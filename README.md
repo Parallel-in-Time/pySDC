@@ -29,11 +29,8 @@ HowTo
 To start your own example, take a look at the examples shipped with this code:
 
 * heat1d: MLSDC implementation of the forced 1D heat equation with Dirichlet-0 BC in [0,1]
-
 * penningtrap: a particle in a penning trap, driven by external electric and magnetic fields
-
 * spiraling_particle: a particle moving in varying electric and magnetic fields
-
 * vanderpol: the van der pol oscillator
 
 Each of these examples should demonstrate some features of this code, e.g. MLSDC and an IMEX sweeper for the heat 
@@ -43,18 +40,13 @@ nonlinear solver in the van der pol example.
 For a new example, you have to either choose or provide at least five components:
 
 * the collocation, examples can be found in pySDC/CollocationClasses.py
-
 * a problem description, examples can be found in examples/*/ProblemClass.py
-
 * a data type, examples can be found in pySDC/datatype_classes/
-
 * a sweeper, examples can be found in pySDC/sweeper_classes/
-
 * a method/stepper, where SDC and MLSDC are already provided in pySDC/Methods.py
 
 
-For MLSDC, suitable transfer operators are also required, examples can be found e.g. in examples/heat1d/TransferClass
-.py.
+For MLSDC, suitable transfer operators are also required, examples can be found e.g. in examples/heat1d/TransferClass.py.
 
 The playground.py routines in the examples show how these components need to be linked together. Basically, 
 most of the management is done via the level and the step data structures. Here, 
