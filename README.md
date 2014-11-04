@@ -16,13 +16,13 @@ News
 Documentation and Testing
 -------------------------
 
-The source code is (at least for now) completely documented. 
-For doxygen generated documentation, a Doxyfile is provided. The latest, auto-generated documentation, 
-can be found on the [PinT server](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC_DOCU/doxygen). To compile your 
+The source code is completely documented (at least for now). 
+For doxygen generated documentation a Doxyfile is provided. The latest, auto-generated documentation can be found on 
+the [PinT server](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC_DOCU/doxygen). To compile your 
 own documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filter. 
 
 Some first, rather rudimentary tests can be found in the tests directory and nose should be able to run those 
-out-of-the-box. Auto-generated test results are here:
+out-of-the-box. Auto-generated test results are here: 
 [![status-img][]](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC/lastCompletedBuild/testReport/) 
 
 
@@ -56,7 +56,7 @@ most of the management is done via the level and the step data structures. Here,
 the components are coupled as expected by the method and all the other components.
 
 In the easiest case (where collocation, data type, sweeper, method and transfer operators can be used as provided 
-with this code ), only a custom problem description and a suitable transfer between degrees-of-freedom has to be 
+with this code ), only a custom problem description and a suitable transfer between degrees-of-freedom have to be 
 implemented.
 
 Note: all interfaces are subject to changes, if necessary.
