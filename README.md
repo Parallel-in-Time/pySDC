@@ -14,13 +14,16 @@ News
 
 
 Documentation and Testing
------------------------
+-------------------------
 
-Doxygen generated documentation can be found in the doc directory, a Doxyfile is provided. To compile your own, 
-full doxygen-based documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filter.
+The source code is (at least for now) completely documented. 
+For doxygen generated documentation, a Doxyfile is provided. The latest, auto-generated documentation, 
+can be found on the [PinT server](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC_DOCU/doxygen). To compile your 
+own documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filter. 
 
 Some first, rather rudimentary tests can be found in the tests directory and nose should be able to run those 
-out-of-the-box.
+out-of-the-box. Auto-generated test results are here:
+[![status-img][]](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC/lastCompletedBuild/testReport/) 
 
 
 HowTo
@@ -59,3 +62,4 @@ implemented.
 Note: all interfaces are subject to changes, if necessary.
 
 
+[status-img]: https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC/badge/icon
