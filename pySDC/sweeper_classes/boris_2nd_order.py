@@ -131,7 +131,7 @@ class boris_2nd_order(sweeper):
         # indicate presence of new values at this level
         L.status.updated = True
 
-        P.dump_timestep(L.u[-1],L.f[-1])
+        P.dump_timestep(L.u[-1],L.f[-1],L.stats)
 
         return None
 

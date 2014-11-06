@@ -175,7 +175,7 @@ class planewave_single(ptype):
         return vel
 
 
-    def dump_timestep(self,u,f):
+    def dump_timestep(self,u,f,stats):
         """
         Implementation of a simple dumping routine (should be linked to stats class)
 
@@ -188,5 +188,5 @@ class planewave_single(ptype):
         H = 1/2*np.dot(u.vel.values,u.vel.values)+0.02/R
         R0 = np.linalg.norm(self.u0[0,:])
         H0 = 1/2*np.dot(self.u0[1,:],self.u0[1,:])+0.02/R0
-        print(abs(H-H0)/H0)
+        stats.energy_err = abs(H-H0)/H0
         return None

@@ -152,7 +152,7 @@ class penningtrap_single(ptype):
 
         return vel
 
-    def dump_timestep(self,u,f):
+    def dump_timestep(self,u,f,stats):
         """
         Dummy dumping routine
         """
