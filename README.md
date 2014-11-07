@@ -36,7 +36,10 @@ To start your own example, take a look at the examples shipped with this code:
 * spiraling_particle: a particle moving in varying electric and magnetic fields
 * vanderpol: the van der pol oscillator
 
-Each of these examples should demonstrate some features of this code, e.g. MLSDC and an IMEX sweeper for the heat 
+To run one of these, add the root directory of pySDC to your PYTHONPATH and execute `python playground` (this could 
+be done e.g. via `PYTHONPATH=../.. python playground.py`. Note that this code requires Python 3!
+
+Each  of these examples should demonstrate some features of this code, e.g. MLSDC and an IMEX sweeper for the heat 
 equation, the Boris-SDC approach in the particle case and the LU decomposition as well as the application of a 
 nonlinear solver in the van der pol example.
  
