@@ -15,8 +15,8 @@ class vanderpol(ptype):
 
         Args:
             cparams: custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence

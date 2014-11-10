@@ -6,7 +6,7 @@ from pySDC.datatype_classes.mesh import mesh
 
 class auzinger(ptype):
     """
-    Example implementing the van der pol oscillator
+    Example implementing the Auzinger initial value problem
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -15,8 +15,8 @@ class auzinger(ptype):
 
         Args:
             cparams: custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -32,12 +32,12 @@ class auzinger(ptype):
 
     def u_exact(self,t):
         """
-        Dummy routine for the exact solution, currently only passes the initial values
+        Routine for the exact solution
 
         Args:
             t: current time
         Returns:
-            mesh type containing the initial values
+            mesh type containing the exact solution
         """
 
         me = mesh(2)
@@ -95,7 +95,7 @@ class auzinger(ptype):
             if res < self.newton_tol:
                 break
 
-            # assemble dg
+            # assemble dg and invert the matrix (yeah, I know)
             dg = np.array([ [1-dt*(1-3*x1**2-x2**2), -dt*(-1-2*x1*x2)], [-dt*(1-6*x1*x2), 1-dt*(3-3*x1**2-9*x2**2)] ])
 
             idg = np.linalg.inv(dg)
