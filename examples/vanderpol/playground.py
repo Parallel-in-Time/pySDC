@@ -3,6 +3,9 @@ from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rc
+from subprocess import call
 
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.datatype_classes.mesh import mesh
@@ -17,8 +20,8 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 0.01
-    sparams['maxiter'] = 10
+    sparams['Tend'] = 30.0
+    sparams['maxiter'] = 100
 
     # This comes as read-in for the problem class
     cparams = {}
@@ -42,7 +45,7 @@ if __name__ == "__main__":
     S.register_level(L0)
 
     S.time = 0
-    S.dt = 0.001
+    S.dt = 0.1
     S.stats.niter = 0
 
     P = S.levels[0].prob
@@ -51,6 +54,13 @@ if __name__ == "__main__":
     S.init_step(uinit)
 
     print('Init:',S.levels[0].u[0].values)
+
+    fig = plt.figure(figsize=(10,10))
+    plt.ion()
+    plt.axis([-2.5, 2.5, -10.5, 10.5])
+
+    hl, = plt.plot(S.levels[0].u[0].values[0],S.levels[0].u[0].values[1],'b-')
+
 
     nsteps = int(S.params.Tend/S.dt)
 
@@ -64,6 +74,10 @@ if __name__ == "__main__":
 
         step_stats.append(S.stats)
 
+        hl.set_xdata(np.append(hl.get_xdata(),uend.values[0]))
+        hl.set_ydata(np.append(hl.get_ydata(),uend.values[1]))
+        plt.draw()
+
         S.time += S.dt
 
         S.reset_step()
@@ -75,3 +89,12 @@ if __name__ == "__main__":
     print(step_stats[5].residual,step_stats[5].level_stats[0].residual,step_stats[5].level_stats[0].iter_stats[0].residual)
 
     print('u_end:',uend.values)
+
+    plt.grid('on')
+    plt.tight_layout()
+
+    name = 'vanderpol_traj.pdf'
+    plt.savefig(name,rasterized=True)
+    call('pdfcrop '+name+' '+name,shell=True)
+
+    plt.show()
