@@ -20,7 +20,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 30.0
+    sparams['Tend'] = 10.0
     sparams['maxiter'] = 100
 
     # This comes as read-in for the problem class
@@ -84,11 +84,10 @@ if __name__ == "__main__":
 
         S.init_step(uend)
 
-    # uex = L.prob.u_exact(L.params.Tend)
-    # print('exact:',uex)
-    print(step_stats[5].residual,step_stats[5].level_stats[0].residual,step_stats[5].level_stats[0].iter_stats[0].residual)
-
     print('u_end:',uend.values)
+
+    print('Min/Max number of iterations: %s/%s' %(min(stats.niter for stats in step_stats),
+                                                  max(stats.niter for stats in step_stats)))
 
     plt.grid('on')
     plt.tight_layout()
