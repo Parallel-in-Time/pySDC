@@ -3,9 +3,6 @@ from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import rc
-from subprocess import call
 
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
@@ -20,7 +17,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 1.0
+    sparams['Tend'] = 20.0
     sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
@@ -43,7 +40,7 @@ if __name__ == "__main__":
     S.register_level(L0)
 
     S.time = 0
-    S.dt = 1.0/4
+    S.dt = 0.1
     S.stats.niter = 0
 
     P = S.levels[0].prob
@@ -52,12 +49,6 @@ if __name__ == "__main__":
     S.init_step(uinit)
 
     print('Init:',S.levels[0].u[0].values)
-
-    # fig = plt.figure(figsize=(10,10))
-    # plt.ion()
-    # plt.axis([-2.5, 2.5, -10.5, 10.5])
-    #
-    # hl, = plt.plot(S.levels[0].u[0].values[0],S.levels[0].u[0].values[1],'b-')
 
 
     nsteps = int(S.params.Tend/S.dt)
@@ -72,10 +63,6 @@ if __name__ == "__main__":
 
         step_stats.append(S.stats)
 
-        # hl.set_xdata(np.append(hl.get_xdata(),uend.values[0]))
-        # hl.set_ydata(np.append(hl.get_ydata(),uend.values[1]))
-        # plt.draw()
-
         S.time += S.dt
 
         S.reset_step()
@@ -83,16 +70,9 @@ if __name__ == "__main__":
         S.init_step(uend)
 
     uex = P.u_exact(S.time)
-    print(uend.values)
-    print(uex.values)
+
     print('Error:',np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf))
 
+    print('Min/Max number of iterations: %s/%s' %(min(stats.niter for stats in step_stats),
+                                                  max(stats.niter for stats in step_stats)))
 
-    # plt.grid('on')
-    # plt.tight_layout()
-    #
-    # name = 'vanderpol_traj.pdf'
-    # plt.savefig(name,rasterized=True)
-    # call('pdfcrop '+name+' '+name,shell=True)
-    #
-    # plt.show()
