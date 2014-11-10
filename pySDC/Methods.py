@@ -1,4 +1,5 @@
 from pySDC import Step as stepclass
+import numpy as np
 
 def check_convergence(S):
 
@@ -45,6 +46,40 @@ def sdc_step(S):
     L.sweep.compute_end_point()
 
     return L.uend
+
+
+def adaptive_sdc_step(S):
+
+    assert isinstance(S,stepclass.step)
+    assert len(S.levels) == 1
+
+    L = S.levels[0]
+
+    dt = L.sweep.predict(S)
+    uend_old = L.sweep.compute_end_point()
+
+    S.iter = 0
+
+    converged = False
+
+    while not converged:
+
+        S.iter += 1
+
+        L.stats.add_iter_stats()
+        L.sweep.update_nodes()
+        L.sweep.compute_residual()
+
+        uend_old = L.sweep.compute_end_point()
+
+        converged = check_convergence(S)
+
+
+    L.sweep.compute_end_point()
+    # print('Niter at time %8.4f: %s' %(S.time+S.dt,S.iter))
+
+    return L.uend
+
 
 
 def mlsdc_step(S):

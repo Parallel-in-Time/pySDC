@@ -4,13 +4,14 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from matplotlib import rc
 from subprocess import call
 
 from examples.vanderpol.ProblemClass import vanderpol
+from examples.vanderpol.mod_LU_sweeper import mod_LU_sweeper
 from pySDC.datatype_classes.mesh import mesh
-from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.Methods import sdc_step, mlsdc_step
+from pySDC.Methods import adaptive_sdc_step, sdc_step
 
 
 if __name__ == "__main__":
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 10.0
+    sparams['Tend'] = 15.0
     sparams['maxiter'] = 100
 
     # This comes as read-in for the problem class
@@ -36,7 +37,7 @@ if __name__ == "__main__":
                         dtype_f             =   mesh,
                         collocation_class   =   collclass.CollGaussLegendre,
                         num_nodes           =   3,
-                        sweeper_class       =   generic_LU,
+                        sweeper_class       =   mod_LU_sweeper,
                         level_params        =   lparams,
                         id                  =   'L0')
 
@@ -56,10 +57,10 @@ if __name__ == "__main__":
     print('Init:',S.levels[0].u[0].values)
 
     fig = plt.figure(figsize=(10,10))
-    plt.ion()
+    # plt.ion()
     plt.axis([-2.5, 2.5, -10.5, 10.5])
 
-    hl, = plt.plot(S.levels[0].u[0].values[0],S.levels[0].u[0].values[1],'b-')
+    # hl, = plt.plot(S.levels[0].u[0].values[0],S.levels[0].u[0].values[1],'bo')
 
 
     nsteps = int(S.params.Tend/S.dt)
@@ -67,16 +68,22 @@ if __name__ == "__main__":
     step_stats = []
 
     nsteps = int(S.params.Tend/S.dt)
+    xdata = []
+    ydata = []
+    cdata = []
+    while S.time < S.params.Tend:
 
-    for n in range(nsteps):
-
-        uend = sdc_step(S)
+        uend = adaptive_sdc_step(S)
 
         step_stats.append(S.stats)
 
-        hl.set_xdata(np.append(hl.get_xdata(),uend.values[0]))
-        hl.set_ydata(np.append(hl.get_ydata(),uend.values[1]))
-        plt.draw()
+        xdata.append(uend.values[0])
+        ydata.append(uend.values[1])
+        cdata.append(cm.jet(S.dt))
+        # hl.set_xdata(np.append(hl.get_xdata(),uend.values[0]))
+        # hl.set_ydata(np.append(hl.get_ydata(),uend.values[1]))
+        # hl.set_color(np.append(hl.get_color(),cm.hot(S.dt)))
+        # plt.draw()
 
         S.time += S.dt
 
@@ -89,11 +96,15 @@ if __name__ == "__main__":
     print('Min/Max number of iterations: %s/%s' %(min(stats.niter for stats in step_stats),
                                                   max(stats.niter for stats in step_stats)))
 
-    plt.grid('on')
-    plt.tight_layout()
-
-    name = 'vanderpol_traj.pdf'
-    plt.savefig(name,rasterized=True)
-    call('pdfcrop '+name+' '+name,shell=True)
-
+    plt.scatter(xdata,ydata,c=cdata,s=40,label='Stepsize')
+    plt.legend()
     plt.show()
+
+    # plt.grid('on')
+    # plt.tight_layout()
+    #
+    # name = 'vanderpol_traj.pdf'
+    # plt.savefig(name,rasterized=True)
+    # call('pdfcrop '+name+' '+name,shell=True)
+    #
+    # plt.show()
