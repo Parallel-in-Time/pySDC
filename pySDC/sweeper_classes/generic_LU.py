@@ -1,4 +1,5 @@
 import scipy.linalg as LA
+import numpy as np
 
 from pySDC.Sweeper import sweeper
 
@@ -38,9 +39,15 @@ class generic_LU(sweeper):
         Returns:
             Qd: U^T of Q^T = L*U
         """
-        QT = coll.Qmat.T
+
+        # strip Qmat by initial value u0
+        QT = coll.Qmat[1:,1:].T
+        # do LU decomposition of QT
         [P,L,U] = LA.lu(QT,overwrite_a=True)
-        return U.T
+        # enrich QT by initial value u0
+        Qd = np.zeros(np.shape(coll.Qmat))
+        Qd[1:,1:] = U.T
+        return Qd
 
     def integrate(self,weights):
         """

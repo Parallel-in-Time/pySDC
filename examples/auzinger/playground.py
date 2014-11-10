@@ -20,7 +20,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 0.01
+    sparams['Tend'] = 1.0
     sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
@@ -33,7 +33,7 @@ if __name__ == "__main__":
                         dtype_u             =   mesh,
                         dtype_f             =   mesh,
                         collocation_class   =   collclass.CollGaussLobatto,
-                        num_nodes           =   5,
+                        num_nodes           =   3,
                         sweeper_class       =   generic_LU,
                         level_params        =   lparams,
                         id                  =   'L0')
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     S.register_level(L0)
 
     S.time = 0
-    S.dt = 0.01
+    S.dt = 1.0/4
     S.stats.niter = 0
 
     P = S.levels[0].prob
