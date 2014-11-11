@@ -9,7 +9,7 @@ from matplotlib import rc
 from subprocess import call
 
 from examples.vanderpol.ProblemClass import vanderpol
-from examples.vanderpol.mod_LU_sweeper import mod_LU_sweeper
+from pySDC.sweeper_classes.generic_LU import generic_LU
 from pySDC.datatype_classes.mesh import mesh
 from pySDC.Methods import adaptive_sdc_step, sdc_step
 
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     sparams = {}
     sparams['Tend'] = 15.0
     sparams['maxiter'] = 100
+    sparams['pred_iter_lim'] = 8
 
     # This comes as read-in for the problem class
     cparams = {}
@@ -37,7 +38,7 @@ if __name__ == "__main__":
                         dtype_f             =   mesh,
                         collocation_class   =   collclass.CollGaussLegendre,
                         num_nodes           =   3,
-                        sweeper_class       =   mod_LU_sweeper,
+                        sweeper_class       =   generic_LU,
                         level_params        =   lparams,
                         id                  =   'L0')
 
@@ -93,8 +94,9 @@ if __name__ == "__main__":
 
     print('u_end:',uend.values)
 
-    print('Min/Max number of iterations: %s/%s' %(min(stats.niter for stats in step_stats),
-                                                  max(stats.niter for stats in step_stats)))
+    print('Min/Max/Sum number of iterations: %s/%s/%s' %(min(stats.niter for stats in step_stats),
+                                                         max(stats.niter for stats in step_stats),
+                                                         sum(stats.niter for stats in step_stats)))
 
     plt.scatter(xdata,ydata,c=cdata,s=40,label='Stepsize')
     plt.legend()

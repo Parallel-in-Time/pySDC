@@ -50,13 +50,14 @@ def sdc_step(S):
 
 def adaptive_sdc_step(S):
 
+    import pySDC.Plugins.apdativity as AD
+
     assert isinstance(S,stepclass.step)
     assert len(S.levels) == 1
 
     L = S.levels[0]
 
-    dt = L.sweep.predict(S)
-    uend_old = L.sweep.compute_end_point()
+    AD.adaptive_predict(L.sweep,S)
 
     S.iter = 0
 
@@ -70,10 +71,7 @@ def adaptive_sdc_step(S):
         L.sweep.update_nodes()
         L.sweep.compute_residual()
 
-        uend_old = L.sweep.compute_end_point()
-
         converged = check_convergence(S)
-
 
     L.sweep.compute_end_point()
     # print('Niter at time %8.4f: %s' %(S.time+S.dt,S.iter))

@@ -6,8 +6,9 @@ import numpy as np
 
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
+from examples.vanderpol.mod_LU_sweeper import mod_LU_sweeper
 from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.Methods import sdc_step, mlsdc_step
+from pySDC.Methods import sdc_step, mlsdc_step, adaptive_sdc_step
 
 
 if __name__ == "__main__":
@@ -31,7 +32,7 @@ if __name__ == "__main__":
                         dtype_f             =   mesh,
                         collocation_class   =   collclass.CollGaussLobatto,
                         num_nodes           =   3,
-                        sweeper_class       =   generic_LU,
+                        sweeper_class       =   mod_LU_sweeper,
                         level_params        =   lparams,
                         id                  =   'L0')
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
 
     for n in range(nsteps):
 
-        uend = sdc_step(S)
+        uend = adaptive_sdc_step(S)
 
         step_stats.append(S.stats)
 
@@ -73,6 +74,6 @@ if __name__ == "__main__":
 
     print('Error:',np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf))
 
-    print('Min/Max number of iterations: %s/%s' %(min(stats.niter for stats in step_stats),
-                                                  max(stats.niter for stats in step_stats)))
-
+    print('Min/Max/Sum number of iterations: %s/%s/%s' %(min(stats.niter for stats in step_stats),
+                                                         max(stats.niter for stats in step_stats),
+                                                         sum(stats.niter for stats in step_stats)))
