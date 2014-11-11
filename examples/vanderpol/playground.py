@@ -3,6 +3,7 @@ from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
+import logging
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib import rc
@@ -21,9 +22,9 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 15.0
+    sparams['Tend'] = 2.0
     sparams['maxiter'] = 100
-    sparams['pred_iter_lim'] = 8
+    sparams['pred_iter_lim'] = 2
 
     # This comes as read-in for the problem class
     cparams = {}
@@ -46,6 +47,8 @@ if __name__ == "__main__":
     S = stepclass.step(sparams)
     S.register_level(L0)
 
+    S.levels[0].logger.setLevel(logging.WARNING)
+
     S.time = 0
     S.dt = 0.1
     S.stats.niter = 0
@@ -58,33 +61,23 @@ if __name__ == "__main__":
     print('Init:',S.levels[0].u[0].values)
 
     fig = plt.figure(figsize=(10,10))
-    # plt.ion()
     plt.axis([-2.5, 2.5, -10.5, 10.5])
-
-    # hl, = plt.plot(S.levels[0].u[0].values[0],S.levels[0].u[0].values[1],'bo')
-
-
-    nsteps = int(S.params.Tend/S.dt)
 
     step_stats = []
 
-    nsteps = int(S.params.Tend/S.dt)
     xdata = []
     ydata = []
     cdata = []
     while S.time < S.params.Tend:
 
-        uend = adaptive_sdc_step(S)
+        uend = sdc_step(S)
+        # uend = adaptive_sdc_step(S)
 
         step_stats.append(S.stats)
 
         xdata.append(uend.values[0])
         ydata.append(uend.values[1])
         cdata.append(cm.jet(S.dt))
-        # hl.set_xdata(np.append(hl.get_xdata(),uend.values[0]))
-        # hl.set_ydata(np.append(hl.get_ydata(),uend.values[1]))
-        # hl.set_color(np.append(hl.get_color(),cm.hot(S.dt)))
-        # plt.draw()
 
         S.time += S.dt
 
@@ -92,12 +85,18 @@ if __name__ == "__main__":
 
         S.init_step(uend)
 
-    print('u_end:',uend.values)
+    np.set_printoptions(16)
+    print('u_end:',uend.values,' at time',S.time)
+
+    # this is for Tend = 2.0, computed with 2k time-steps and M=3 (G-Le)
+    if S.time == 2.0:
+        uex = np.array([1.7092338721248415, -0.17438654047532 ])
+        print('Error:',np.linalg.norm(uex-uend.values,np.inf)/np.linalg.norm(uex,np.inf))
 
     print('Min/Max/Sum number of iterations: %s/%s/%s' %(min(stats.niter for stats in step_stats),
                                                          max(stats.niter for stats in step_stats),
                                                          sum(stats.niter for stats in step_stats)))
-
+    exit()
     plt.scatter(xdata,ydata,c=cdata,s=40,label='Stepsize')
     plt.legend()
     plt.show()

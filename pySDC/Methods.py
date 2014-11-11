@@ -26,6 +26,10 @@ def sdc_step(S):
 
     L = S.levels[0]
 
+    if S.time+S.dt > S.params.Tend:
+        S.dt = S.params.Tend - S.time
+        print('Resetting step size to %12.8f to hit %12.8f...' %(S.dt,S.params.Tend))
+
     L.sweep.predict()
 
     S.iter = 0
