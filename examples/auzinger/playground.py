@@ -19,7 +19,7 @@ if __name__ == "__main__":
     sparams = {}
     sparams['Tend'] = 20.0
     sparams['maxiter'] = 20
-    sparams['pred_iter_lim'] = 6
+    sparams['pred_iter_lim'] = 4
 
 
     # This comes as read-in for the problem class

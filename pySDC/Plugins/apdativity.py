@@ -38,6 +38,8 @@ def adaptive_predict(Sweeper,Step):
         L.sweep.update_nodes()
         L.sweep.compute_residual()
 
+        Step.iter += 1
+
         pred_iter = np.ceil(np.log(L.status.residual/L.params.restol)/np.log(res_old/L.status.residual))
 
         # pred_iter = np.ceil(np.log10(L.status.residual/L.params.restol))

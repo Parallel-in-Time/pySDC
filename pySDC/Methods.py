@@ -9,7 +9,7 @@ def check_convergence(S):
 
         converged = S.iter >= S.params.maxiter or res <= L.params.restol
 
-        L.stats.iter_stats[S.iter-1].residual = res
+        L.stats.iter_stats[-1].residual = res
 
         if converged:
             S.stats.niter = S.iter
@@ -61,9 +61,9 @@ def adaptive_sdc_step(S):
 
     L = S.levels[0]
 
-    AD.adaptive_predict(L.sweep,S)
-
     S.iter = 0
+
+    AD.adaptive_predict(L.sweep,S)
 
     converged = False
 
