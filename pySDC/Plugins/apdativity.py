@@ -55,7 +55,7 @@ def adaptive_predict(Sweeper,Step):
             adapt_flag = None
             accepted = True
 
-        if Step.time+Step.dt > Step.params.Tend:
+        if Step.time+Step.dt > Step.params.Tend - 1E-14:
             Step.dt = Step.params.Tend - Step.time
             print('Resetting dt to ',Step.dt)
             accepted = True

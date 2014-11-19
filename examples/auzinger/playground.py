@@ -6,7 +6,6 @@ import numpy as np
 
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
-from examples.vanderpol.mod_LU_sweeper import mod_LU_sweeper
 from pySDC.sweeper_classes.generic_LU import generic_LU
 from pySDC.Methods import sdc_step, mlsdc_step, adaptive_sdc_step
 
@@ -20,6 +19,8 @@ if __name__ == "__main__":
     sparams = {}
     sparams['Tend'] = 20.0
     sparams['maxiter'] = 20
+    sparams['pred_iter_lim'] = 6
+
 
     # This comes as read-in for the problem class
     cparams = {}
@@ -32,7 +33,7 @@ if __name__ == "__main__":
                         dtype_f             =   mesh,
                         collocation_class   =   collclass.CollGaussLobatto,
                         num_nodes           =   3,
-                        sweeper_class       =   mod_LU_sweeper,
+                        sweeper_class       =   generic_LU,
                         level_params        =   lparams,
                         id                  =   'L0')
 
@@ -56,9 +57,7 @@ if __name__ == "__main__":
 
     step_stats = []
 
-    nsteps = int(S.params.Tend/S.dt)
-
-    for n in range(nsteps):
+    while S.time < S.params.Tend:
 
         uend = adaptive_sdc_step(S)
 
