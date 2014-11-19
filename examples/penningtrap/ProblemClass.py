@@ -28,6 +28,7 @@ class penningtrap(ptype):
         assert 'u0' in cparams      # initial position and velocity
         assert 'nparts' in cparams  # number of particles
         assert 'sig' in cparams     # smoothing parameter for Coulomb interaction
+        assert 'alpha' in cparams   # charge to mass ratio (fixed for all particles!)
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -41,7 +42,7 @@ class penningtrap(ptype):
 
     def __get_interactions(self,part):
         """
-        Routine to compute the particle-particle interaction
+        Routine to compute the particle-particle interaction, assuming q = 1 for all particles
 
         Args:
             part: the particles
@@ -57,12 +58,14 @@ class penningtrap(ptype):
         for i in range(N):
             for j in range(N):
 
-                contrib = (part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3]) * part.charge[j] / \
+                contrib = (part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3]) / \
                           (np.linalg.norm(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3],2)**2+self.sig**2)**(3/2)
 
-                Efield[3*i  ] += part.charge[i]/part.mass[i] * contrib[0]
-                Efield[3*i+1] += part.charge[i]/part.mass[i] * contrib[1]
-                Efield[3*i+2] += part.charge[i]/part.mass[i] * contrib[2]
+                Efield[3*i  ] += contrib[0]
+                Efield[3*i+1] += contrib[1]
+                Efield[3*i+2] += contrib[2]
+
+        Efield *= self.alpha*Efield
 
         return Efield
 
@@ -140,10 +143,6 @@ class penningtrap(ptype):
             comz += u.pos.values[3*n+2]
 
         print('Center of positions:',comx/N,comy/N,comz/N)
-
-        # set charges and masses to 1 (in whatever unit)
-        u.charge[:] = 1
-        u.mass[:] = 1
 
         return u
 

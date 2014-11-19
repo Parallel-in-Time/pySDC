@@ -28,7 +28,7 @@ if __name__ == "__main__":
     cparams_f = {}
     cparams_f['omega_E'] = 4.9
     cparams_f['omega_B'] = 25.0
-    cparams_f['alpha'] = 1
+    cparams_f['alpha'] = 1 # this is the charge to mass ratio for all (!) particles, only one species allowed so far
     cparams_f['u0'] = np.array([[10,0,0],[100,0,100]])
     cparams_f['eps'] = -1
     cparams_f['nparts'] = 10
