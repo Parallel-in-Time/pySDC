@@ -33,10 +33,10 @@ class swfw_scalar(ptype):
         for k,v in cparams.items():
             setattr(self,k,v)
 
-        # self.nvars = 1
+        self.nvars = (self.lambda_s.size,self.lambda_f.size)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(swfw_scalar,self).__init__(1,dtype_u,dtype_f)
+        super(swfw_scalar,self).__init__(self.nvars,dtype_u,dtype_f)
 
 
 
@@ -53,8 +53,11 @@ class swfw_scalar(ptype):
             solution as mesh
         """
 
-        me = mesh(1)
-        me.values = rhs.values/(1-factor*self.lambda_f)
+        me = mesh(self.nvars)
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+               me.values[i,j] = rhs.values[i,j]/(1-factor*self.lambda_f[j])
+
         return me
 
 
@@ -70,8 +73,10 @@ class swfw_scalar(ptype):
             explicit part of RHS
         """
 
-        fexpl = mesh(1)
-        fexpl.values = self.lambda_s*u.values
+        fexpl = mesh(self.nvars)
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                fexpl.values[i,j] = self.lambda_s[i]*u.values[i,j]
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -86,8 +91,11 @@ class swfw_scalar(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(1)
-        fimpl.values = self.lambda_f*u.values
+        fimpl = mesh(self.nvars)
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                fimpl.values[i,j] = self.lambda_f[j]*u.values[i,j]
+
         return fimpl
 
 
@@ -103,7 +111,7 @@ class swfw_scalar(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_imex_mesh(1)
+        f = rhs_imex_mesh(self.nvars)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -120,6 +128,8 @@ class swfw_scalar(ptype):
             exact solution
         """
 
-        me = mesh(1)
-        me.values[:] = self.u0*np.exp((self.lambda_f+self.lambda_s)*t)
+        me = mesh(self.nvars)
+        for i in range(self.lambda_s.size):
+            for j in range(self.lambda_f.size):
+                me.values[i,j] = self.u0*np.exp((self.lambda_f[j]+self.lambda_s[i])*t)
         return me
