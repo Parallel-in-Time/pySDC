@@ -56,32 +56,32 @@ if __name__ == "__main__":
                         level_params        =   lparams,
                         id                  =   'L1')
 
-    L2 = levclass.level(problem_class       =   heat1d,
-                        problem_params      =   cparams_c,
-                        dtype_u             =   mesh,
-                        dtype_f             =   rhs_imex_mesh,
-                        collocation_class   =   collclass.CollGaussLegendre,
-                        num_nodes           =   3,
-                        sweeper_class       =   imex_1st_order,
-                        level_params        =   lparams,
-                        id                  =   'L2')
+    # L2 = levclass.level(problem_class       =   heat1d,
+    #                     problem_params      =   cparams_c,
+    #                     dtype_u             =   mesh,
+    #                     dtype_f             =   rhs_imex_mesh,
+    #                     collocation_class   =   collclass.CollGaussLegendre,
+    #                     num_nodes           =   3,
+    #                     sweeper_class       =   imex_1st_order,
+    #                     level_params        =   lparams,
+    #                     id                  =   'L2')
 
     S = stepclass.step(sparams)
     S.register_level(L0)
     S.register_level(L1)
-    S.register_level(L2)
+    # S.register_level(L2)
 
 
     S.connect_levels(transfer_class = mesh_to_mesh_1d,
                      fine_level     = L0,
                      coarse_level   = L1)
 
-    S.connect_levels(transfer_class = mesh_to_mesh_1d,
-                     fine_level     = L1,
-                     coarse_level   = L2)
+    # S.connect_levels(transfer_class = mesh_to_mesh_1d,
+    #                  fine_level     = L1,
+    #                  coarse_level   = L2)
 
-    del L0,L1,L2
-    del lparams,sparams,cparams_f,cparams_m,cparams_c
+    # del L0,L1,L2
+    # del lparams,sparams,cparams_f,cparams_m,cparams_c
 
     S.time = 0
     S.dt = 0.125
