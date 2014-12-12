@@ -48,6 +48,89 @@ class step():
         self.levels = []
 
 
+    def generate_hierarchy(self,descr):
+        """
+        Routine to generate the level hierarchy for a single step
+
+        This makes the explicit generation of levels in the frontend obsolete and hides a few dirty hacks here and
+        there.
+
+        Args:
+            descr: dictionary containing the description of the levels as list per key
+        """
+        # assert the existence of all the keys we need to set up at least on level
+        assert 'problem_class' in descr
+        assert 'problem_params' in descr
+        assert 'dtype_u' in descr
+        assert 'dtype_f' in descr
+        assert 'collocation_class' in descr
+        assert 'num_nodes' in descr
+        assert 'sweeper_class' in descr
+        assert 'level_params' in descr
+
+        # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
+        # single entry per key, one dict per level
+        pparams_list = self.__dict_to_list(descr['problem_params'])
+        # put this newly generated list into the description dictionary
+        descr['problem_params'] = pparams_list
+        # generate list of dictionaries out of the description
+        descr_list = self.__dict_to_list(descr)
+
+        # sanity check: is there a transfer class? is there one even if only a single level is specified?
+        if len(descr_list) > 1:
+            assert 'transfer_class' in descr
+        elif 'transfer_class' in descr:
+            print('WARNING: you have specified transfer classes, but only a single level...')
+
+        # generate levels, register and connect if needed
+        for l in range(len(pparams_list)):
+
+            L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
+                               problem_params     =   descr_list[l]['problem_params'],
+                               dtype_u            =   descr_list[l]['dtype_u'],
+                               dtype_f            =   descr_list[l]['dtype_f'],
+                               collocation_class  =   descr_list[l]['collocation_class'],
+                               num_nodes          =   descr_list[l]['num_nodes'],
+                               sweeper_class      =   descr_list[l]['sweeper_class'],
+                               level_params       =   descr_list[l]['level_params'],
+                               id                 =   'L'+str(l))
+
+            self.register_level(L)
+
+            if l > 0:
+                self.connect_levels(transfer_class = descr_list[l]['transfer_class'],
+                                    fine_level     = self.levels[l-1],
+                                    coarse_level   = self.levels[l])
+
+
+    @staticmethod
+    def __dict_to_list(dict):
+        """
+        Straightforward helper function to convert dictionary of list to list of dictionaries
+
+        Args:
+            dict: dictionary of lists
+        Returns:
+            list of dictionaries
+        """
+
+        max_val = 1
+        for k,v in dict.items():
+            if type(v) is list:
+                if max_val > 1 and len(v) is not max_val:
+                    sys.exit('All lists in cparams need to be of length 1 or %i.. key %s has this list: %s' %(max_val,k,v))
+                max_val = len(v)
+
+        ld = [{} for l in range(max_val)]
+        for d in range(len(ld)):
+            for k,v in dict.items():
+                if type(v) is not list:
+                    ld[d][k] = v
+                else:
+                    ld[d][k] = v[d]
+        return ld
+
+
     def register_level(self,L):
         """
         Routine to register levels
