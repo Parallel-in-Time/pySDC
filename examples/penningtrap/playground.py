@@ -10,7 +10,7 @@ from examples.penningtrap.ProblemClass import penningtrap
 from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.Methods import sdc_step, mlsdc_step
+from pySDC.Methods_Serial import sdc_step, mlsdc_step
 
 
 if __name__ == "__main__":

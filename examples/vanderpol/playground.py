@@ -12,7 +12,7 @@ from subprocess import call
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.sweeper_classes.generic_LU import generic_LU
 from pySDC.datatype_classes.mesh import mesh
-from pySDC.Methods import adaptive_sdc_step, sdc_step
+from pySDC.Methods_Serial import adaptive_sdc_step, sdc_step
 
 
 if __name__ == "__main__":

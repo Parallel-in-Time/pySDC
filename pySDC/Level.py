@@ -51,7 +51,8 @@ class level():
     __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats')
 
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class, level_params, id):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
+                 level_params, id):
         """
         Initialization routine
 

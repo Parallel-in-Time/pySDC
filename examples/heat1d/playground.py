@@ -8,7 +8,7 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.Methods import sdc_step, mlsdc_step
+from pySDC.Methods_Serial import sdc_step, mlsdc_step
 
 
 if __name__ == "__main__":
