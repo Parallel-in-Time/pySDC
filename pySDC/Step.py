@@ -1,6 +1,8 @@
 from pySDC import Level as levclass
 from pySDC import Stats as statclass
 
+import copy as cp
+
 class step():
     """
     Step class, referencing most of the structure needed for the time-stepping
@@ -19,7 +21,7 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict')
+    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__state','__slot')
 
     def __init__(self, params):
         """
@@ -46,6 +48,8 @@ class step():
         self.__k = None
         self.__transfer_dict = {}
         self.levels = []
+        self.__state = None
+        self.__slot = None
 
 
     def generate_hierarchy(self,descr):
@@ -71,15 +75,16 @@ class step():
         # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
         # single entry per key, one dict per level
         pparams_list = self.__dict_to_list(descr['problem_params'])
-        # put this newly generated list into the description dictionary
-        descr['problem_params'] = pparams_list
+        # put this newly generated list into the description dictionary (copy to avoid changing the original one)
+        descr_new = cp.deepcopy(descr)
+        descr_new['problem_params'] = pparams_list
         # generate list of dictionaries out of the description
-        descr_list = self.__dict_to_list(descr)
+        descr_list = self.__dict_to_list(descr_new)
 
         # sanity check: is there a transfer class? is there one even if only a single level is specified?
         if len(descr_list) > 1:
-            assert 'transfer_class' in descr
-        elif 'transfer_class' in descr:
+            assert 'transfer_class' in descr_new
+        elif 'transfer_class' in descr_new:
             print('WARNING: you have specified transfer classes, but only a single level...')
 
         # generate levels, register and connect if needed
@@ -218,6 +223,7 @@ class step():
         # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
         self.levels[0].u[0] = P.dtype_u(u0)
+        self.stats.niter = 0
 
 
     @property
@@ -281,3 +287,41 @@ class step():
             k: iteration to set
         """
         self.__k = k
+
+    @property
+    def state(self):
+        """
+        Getter for state
+        Returns:
+            state
+        """
+        return self.__state
+
+
+    @state.setter
+    def state(self,s):
+        """
+        Setter for state
+        Args:
+            s: new state
+        """
+        self.__state = s
+
+    @property
+    def slot(self):
+        """
+        Getter for slots
+        Returns:
+            state
+        """
+        return self.__slot
+
+
+    @slot.setter
+    def slot(self,s):
+        """
+        Setter for slots
+        Args:
+            s: new slot
+        """
+        self.__slot = s

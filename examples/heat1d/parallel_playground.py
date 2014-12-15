@@ -4,6 +4,7 @@ from pySDC import CollocationClasses as collclass
 
 
 import numpy as np
+import copy as cp
 
 
 from examples.heat1d.ProblemClass import heat1d
@@ -16,25 +17,25 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
+    num_procs = 2
+
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-12
 
     sparams = {}
-    sparams['Tend'] = 2*0.125
     sparams['maxiter'] = 10
-    sparams['parblocks'] = 2
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = 255
+    pparams['nvars'] = [255,127]
 
     description = {}
     description['problem_class'] = heat1d
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
+    description['dtype_f'] = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
@@ -42,40 +43,40 @@ if __name__ == "__main__":
     description['transfer_class'] = mesh_to_mesh_1d
 
 
-    S = stepclass.step(sparams)
+    MS = []
+    for p in range(num_procs):
+        MS.append(stepclass.step(sparams))
+        MS[-1].generate_hierarchy(description)
 
-    S.generate_hierarchy(description)
+    t0 = 0
+    Tend = 0.25
+    dt = 0.125
 
-    S.dt = 0.125
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    S.time = 0
+    uend = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    S.stats.niter = 0
-
-    P = S.levels[0].prob
-    uinit = P.u_exact(S.time)
-    S.init_step(uinit)
-
-
-
+    exit()
     step_stats = []
 
 
-    while S.time < S.params.Tend:
+    while MS[-1].time < Tend:
 
-        uend = mlsdc_step(S)
+        uend = mlsdc_step(MS[0])
 
-        step_stats.append(S.stats)
+        step_stats.append(MS[0].stats)
 
-        S.time += S.dt
+        MS[0].time += MS[0].dt
 
-        S.reset_step()
+        MS[0].reset_step()
 
-        S.init_step(uend)
+        MS[0].init_step(uend)
 
 
-    uex = P.u_exact(S.time)
+    uex = P.u_exact(MS[0].time)
 
     print(step_stats[1].residual,step_stats[1].level_stats[0].residual)
 
-    print('error at time %s: %s' %(S.time,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)))
+    print('error at time %s: %s' %(MS[-1].time,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+        uex.values,np.inf)))
