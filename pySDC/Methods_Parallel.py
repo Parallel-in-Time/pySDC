@@ -27,47 +27,70 @@ class switch(object):
 def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     num_procs = len(MS)
-    slots = np.array(range(num_procs))
+    slots = [p for p in range(num_procs)]
 
     for p in range(num_procs):
 
         MS[p].dt = dt
         MS[p].time = t0 + p*MS[p].dt
         MS[p].slot = slots[p]
+        MS[p].init_step(u0)
+        MS[p].state = 'SPREAD'
+        MS[p].levels[0].stats.add_iter_stats()
+        if p > 0:
+            MS[p].prev = MS[slots[p-1]]
 
-    MS[0].init_step(u0)
-    MS[0].state = 'INIT'
-
-    for p in range(1,num_procs):
-        MS[p].state = 'STARTUP'
-
-
-    active = [MS[p].time < Tend for p in range(num_procs)]
+    active = [MS[p].time < Tend for p in slots]
 
     while any(active):
-        for p in range(num_procs):
-            print(p)
-            MS[p] = pfasst_serial(MS[p],num_procs)
-        active = [MS[p].time < Tend for p in range(num_procs)]
+
+        for p in np.extract(active,slots):
+            print(p,MS[p].state)
+            MS = pfasst_serial(MS,p,slots)
+        # This is only for ring-parallelization
+        # indx = np.argsort([MS[p].time for p in slots])
+        # slots = slots[indx]
+
+        active = [MS[p].time < Tend for p in slots]
 
     return MS[-1].levels[0].uend
 
 
 
-def pfasst_serial(S,num_procs):
+def pfasst_serial(MS,p,slots):
+
+    S = MS[p]
 
     for case in switch(S.state):
-        if case('INIT'):
-            S.time += num_procs*S.dt
-            print(S.state,S.time)
-            return S
-        if case('STARTUP'):
-            S.time += num_procs*S.dt
-            print(S.state,S.time)
-            return S
+
+        if case('SPREAD'):
+
+            S.levels[0].sweep.predict()
+            S.state = 'PREDICT_RESTRICT'
+            return MS
+
+        if case('PREDICT_RESTRICT'):
+
+            for l in range(1,len(S.levels)):
+                S.transfer(source=S.levels[l-1],target=S.levels[l])
+            S.state = 'PREDICT_SWEEP'
+            return MS
+
+        if case('PREDICT_SWEEP'):
+
+            if slots.index(p) > 0:
+                prev = MS[p].prev.levels[-1].uend
+                S.init_step(prev)
+
+            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.compute_end_point()
+
+            #line 63 of pfasst_flex.m comes here
+            exit()
 
 
-
+            S.state = 'PREDICT_SWEEP'
+            return MS
 
 
 

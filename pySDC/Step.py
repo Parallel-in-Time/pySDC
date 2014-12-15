@@ -21,7 +21,7 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__state','__slot')
+    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__state','__slot','__prev','__done')
 
     def __init__(self, params):
         """
@@ -50,6 +50,9 @@ class step():
         self.levels = []
         self.__state = None
         self.__slot = None
+        self.__prev = None
+        self.__done = None
+
 
 
     def generate_hierarchy(self,descr):
@@ -312,7 +315,7 @@ class step():
         """
         Getter for slots
         Returns:
-            state
+            slot
         """
         return self.__slot
 
@@ -324,4 +327,44 @@ class step():
         Args:
             s: new slot
         """
+        assert type(s) is int
         self.__slot = s
+
+    @property
+    def prev(self):
+        """
+        Getter for previous step
+        Returns:
+            prev
+        """
+        return self.__prev
+
+
+    @prev.setter
+    def prev(self,p):
+        """
+        Setter for previous step
+        Args:
+            p: new previous step
+        """
+        self.__prev = p
+
+    @property
+    def done(self):
+        """
+        Getter for done status
+        Returns:
+            done
+        """
+        return self.__done
+
+
+    @done.setter
+    def done(self,d):
+        """
+        Setter for done status
+        Args:
+            s: new done status
+        """
+        assert d is type(True)
+        self.__slot = d
