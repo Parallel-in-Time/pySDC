@@ -180,7 +180,7 @@ class step():
         self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
 
 
-    def transfer(self,source,target):
+    def transfer(self,source,target,init=False):
         """
         Wrapper routine to ease the call of the transfer functions
 
@@ -191,8 +191,10 @@ class step():
             source: source level
             target: target level
         """
-
-        self.__transfer_dict[tuple([source,target])]()
+        if not init:
+            self.__transfer_dict[tuple([source,target])]()
+        else:
+            self.__transfer_dict[tuple([source,target])](init)
 
 
     def reset_step(self):
@@ -368,7 +370,7 @@ class step():
         Args:
             s: new done status
         """
-        self.__slot = d
+        self.__done = d
 
     @property
     def pred_cnt(self):

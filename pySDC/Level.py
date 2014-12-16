@@ -115,9 +115,9 @@ class level():
         """
 
         # some logger magic
-        formatter = logging.Formatter('%(name)s at time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
+        formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
                                       datefmt='%d.%m.%Y %H:%M:%S')
-        logger = logging.getLogger(str(self.id))
+        logger = cp.deepcopy(logging.getLogger())
         # this is where the logging level is set
         logger.setLevel(logging.INFO)
         ch = logging.StreamHandler()

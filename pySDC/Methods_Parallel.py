@@ -1,5 +1,6 @@
 import numpy as np
 import copy as cp
+import logging
 
 
 class switch(object):
@@ -60,19 +61,47 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         MS[p].done = False
 
     active = [MS[p].time < Tend for p in slots]
+    working = [not MS[p].done for p in slots]
 
     while any(active):
 
-        for p in np.extract(active,slots):
-            print(p,MS[p].stage)
-            MS = pfasst_serial(MS,p,slots)
+        while any(working):
+
+            for p in np.extract(working,slots):
+                print(p,MS[p].stage)
+                MS = pfasst_serial(MS,p,slots)
+
+            working = [not MS[p].done for p in np.extract(active,slots)]
+
+        uend = MS[slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
+
+        active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
+
+        for p in range(num_procs):
+            MS[p].reset_step()
+            MS[p].time += num_procs*MS[p].dt
+            MS[p].init_step(uend)
+            MS[p].done = False
+            MS[p].pred_cnt = -1
+            MS[p].iter = 0
+            MS[p].stage = 'SPREAD'
+            MS[p].levels[0].stats.add_iter_stats()
+            #FIXME: need to update slots and prev for ring-parallelization
+
+        working = active
+
+
         # This is only for ring-parallelization
         # indx = np.argsort([MS[p].time for p in slots])
         # slots = slots[indx]
 
-        active = [MS[p].time < Tend for p in slots]
+        # active = [MS[p].time < Tend for p in slots]
 
-    return MS[-1].levels[0].uend
+        # if all(not active[p] for p in slots):
+        #     for p in slots:
+        #         MS[p].time =
+
+    return uend
 
 
 
@@ -114,25 +143,28 @@ def pfasst_serial(MS,p,slots):
 
             for l in range(len(S.levels)-1,0,-1):
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
-            S.stage = 'IT_SWEEP_FINE'
+            S.stage = 'IT_FINE_SWEEP'
             return MS
 
-        if case('IT_SWEEP_FINE'):
+        if case('IT_FINE_SWEEP'):
 
             S.iter += 1
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_end_point()
+            S.levels[0].sweep.compute_residual()
+            S.levels[0].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                                    p,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
+
             S.stage = 'IT_CHECK'
             return MS
 
         if case('IT_CHECK'):
 
-            S.levels[0].sweep.compute_residual()
-
             S.done = check_convergence(S)
 
-            if S.done and not S.prev.done:
-                S.done = False
+            # FIXME
+            # if S.done and not S.prev.done:
+            #     S.done = False
 
             if S.done:
                 S.stage = 'DONE'
@@ -141,8 +173,49 @@ def pfasst_serial(MS,p,slots):
 
             return MS
 
+        if case('IT_UP'):
 
+            S.transfer(source=S.levels[0],target=S.levels[1])
 
+            for l in range(1,len(S.levels)-1):
+                S.levels[l].sweep.update_nodes()
+                S.levels[l].sweep.compute_end_point()
+                S.levels[l].sweep.compute_residual()
+                S.levels[l].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                                        p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+                S.transfer(source=S.levels[l],target=S.levels[l+1])
+
+            S.stage = 'IT_COARSE_SWEEP'
+            return MS
+
+        if case('IT_COARSE_SWEEP'):
+
+            recv(S.levels[-1],S.prev.levels[-1],slots,p)
+
+            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.compute_end_point()
+            S.levels[-1].sweep.compute_residual()
+            S.levels[-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                                     p,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
+            S.stage = 'IT_DOWN'
+            return MS
+
+        if case('IT_DOWN'):
+
+            for l in range(len(S.levels)-1,0,-1):
+                S.transfer(source=S.levels[l],target=S.levels[l-1])
+                recv(S.levels[l-1],S.prev.levels[l-1],slots,p)
+                S.transfer(source=S.levels[l],target=S.levels[l-1],init=slots.index(p)>0)
+                # FIXME
+                # if l > :
+                #     S.levels[l-1].sweep.update_nodes()
+                #     S.levels[l-1].sweep.compute_end_point()
+                #     S.levels[l-1].sweep.compute_residual()
+                #     S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
+                #                               '%12.8e', p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+
+            S.stage = 'IT_FINE_SWEEP'
+            return MS
 
 
 def recv(target,source,slots,p):

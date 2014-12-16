@@ -17,7 +17,7 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
-    num_procs = 2
+    num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussLobatto
     description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         MS[-1].generate_hierarchy(description)
 
     t0 = 0
-    Tend = 0.25
+    Tend = 0.5
     dt = 0.125
 
     P = MS[0].levels[0].prob
