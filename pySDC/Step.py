@@ -21,7 +21,8 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__state','__slot','__prev','__done')
+    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__stage','__slot','__prev','__done',
+                 '__pred_cnt')
 
     def __init__(self, params):
         """
@@ -48,10 +49,11 @@ class step():
         self.__k = None
         self.__transfer_dict = {}
         self.levels = []
-        self.__state = None
+        self.__stage = None
         self.__slot = None
         self.__prev = None
         self.__done = None
+        self.__pred_cnt = None
 
 
 
@@ -292,23 +294,23 @@ class step():
         self.__k = k
 
     @property
-    def state(self):
+    def stage(self):
         """
-        Getter for state
+        Getter for stage
         Returns:
-            state
+            stage
         """
-        return self.__state
+        return self.__stage
 
 
-    @state.setter
-    def state(self,s):
+    @stage.setter
+    def stage(self,s):
         """
-        Setter for state
+        Setter for stage
         Args:
-            s: new state
+            s: new stage
         """
-        self.__state = s
+        self.__stage = s
 
     @property
     def slot(self):
@@ -366,5 +368,24 @@ class step():
         Args:
             s: new done status
         """
-        assert d is type(True)
         self.__slot = d
+
+    @property
+    def pred_cnt(self):
+        """
+        Getter for done status
+        Returns:
+            done
+        """
+        return self.__pred_cnt
+
+
+    @pred_cnt.setter
+    def pred_cnt(self,p):
+        """
+        Setter for pred_cnt
+        Args:
+            s: new pred_cnt
+        """
+        assert type(p) is int
+        self.__pred_cnt = p
