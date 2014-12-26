@@ -60,6 +60,8 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     # fixme: add ring parallelization as before
     # fixme: encap initialization of new step
     # fixme: simplify send (and fix IT_DOWN)
+    # fixme: join SDC and MLSDC
+    # fixme: need excessive commenting
 
     uend = None
     num_procs = len(MS)
@@ -94,7 +96,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     while any(active):
 
         for p in active_slots:
-            # print(p,MS[p].stage)
+            print(p,MS[p].stage)
             MS = pfasst_serial(MS,p)
 
         finished = [MS[p].done for p in active_slots]
@@ -154,7 +156,10 @@ def pfasst_serial(MS,p):
         if case('SPREAD'):
 
             S.levels[0].sweep.predict()
-            S.stage = 'PREDICT_RESTRICT'
+            if len(S.levels) > 1:
+                S.stage = 'PREDICT_RESTRICT'
+            else:
+                S.stage = 'IT_FINE_SWEEP'
             return MS
 
         if case('PREDICT_RESTRICT'):
@@ -240,7 +245,10 @@ def pfasst_serial(MS,p):
                 S.levels[0].sweep.compute_end_point()
                 S.stage = 'DONE'
             else:
-                S.stage = 'IT_UP'
+                if len(S.levels) > 1:
+                    S.stage = 'IT_UP'
+                else:
+                    S.stage = 'IT_FINE_SWEEP'
 
             return MS
 
@@ -308,7 +316,7 @@ def pfasst_serial(MS,p):
                         S.prev.levels[l-1].tag = False
                     else:
                         if not S.prev.done:
-                            print('RECV ERROR')
+                            print('RECV ERROR DOWN')
                             exit()
 
                 S.transfer(source=S.levels[l],target=S.levels[l-1])

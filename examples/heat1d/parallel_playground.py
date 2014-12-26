@@ -14,7 +14,7 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
-    num_procs = 3
+    num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [255,127]
+    pparams['nvars'] = [255]
 
     description = {}
     description['problem_class'] = heat1d
