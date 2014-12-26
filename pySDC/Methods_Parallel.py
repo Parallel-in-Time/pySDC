@@ -60,7 +60,6 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     # fixme: add ring parallelization as before
     # fixme: encap initialization of new step
     # fixme: simplify send (and fix IT_DOWN)
-    # fixme: join SDC and MLSDC
     # fixme: need excessive commenting
 
     uend = None
@@ -248,7 +247,6 @@ def pfasst_serial(MS,p):
                 if len(S.levels) > 1:
                     S.stage = 'IT_UP'
                 else:
-                    S.iter += 1
                     S.stage = 'IT_COARSE_RECV'
 
             return MS
@@ -281,9 +279,20 @@ def pfasst_serial(MS,p):
                 if S.prev.levels[-1].tag:
                     recv(S.levels[-1],S.prev.levels[-1])
                     S.prev.levels[-1].tag = False
-                    S.stage = 'IT_COARSE_SWEEP'
+                    if len(S.levels) > 1:
+                        S.stage = 'IT_COARSE_SWEEP'
+                    else:
+                        S.stage = 'IT_FINE_SWEEP'
                 else:
                     S.stage = 'IT_COARSE_RECV'
+            else:
+                if len(S.levels) > 1:
+                    S.stage = 'IT_COARSE_SWEEP'
+                else:
+                    S.stage = 'IT_FINE_SWEEP'
+
+            return MS
+
 
         if case('IT_COARSE_SWEEP'):
 
@@ -298,17 +307,11 @@ def pfasst_serial(MS,p):
         if case('IT_COARSE_SEND'):
 
             if S.last:
-                if len(S.levels) > 1:
-                    S.stage = 'IT_DOWN'
-                else:
-                    S.stage = 'IT_CHECK'
+                S.stage = 'IT_DOWN'
             else:
                 if not S.levels[-1].tag:
                     send(S.levels[-1],tag=True)
-                    if len(S.levels) > 1:
-                        S.stage = 'IT_DOWN'
-                    else:
-                        S.stage = 'IT_CHECK'
+                    S.stage = 'IT_DOWN'
                 else:
                     S.stage = 'IT_COARSE_SEND'
 
