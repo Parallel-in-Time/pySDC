@@ -44,6 +44,9 @@ def check_convergence(S):
 
 def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
+    # fixme: deal with stats
+    # fixme: join block and ring parallelization into one (as before)
+
     num_procs = len(MS)
     slots = [p for p in range(num_procs)]
 
@@ -68,7 +71,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         while any(working):
 
             for p in np.extract(working,slots):
-                print(p,MS[p].stage)
+                # print(p,MS[p].stage)
                 MS = pfasst_serial(MS,p,slots)
 
             working = [not MS[p].done for p in np.extract(active,slots)]
@@ -77,7 +80,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
         active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
 
-        for p in range(num_procs):
+        for p in np.extract(active,slots):
             MS[p].reset_step()
             MS[p].time += num_procs*MS[p].dt
             MS[p].init_step(uend)
@@ -203,16 +206,15 @@ def pfasst_serial(MS,p,slots):
         if case('IT_DOWN'):
 
             for l in range(len(S.levels)-1,0,-1):
-                S.transfer(source=S.levels[l],target=S.levels[l-1])
                 recv(S.levels[l-1],S.prev.levels[l-1],slots,p)
-                S.transfer(source=S.levels[l],target=S.levels[l-1],init=slots.index(p)>0)
-                # FIXME
-                # if l > :
-                #     S.levels[l-1].sweep.update_nodes()
-                #     S.levels[l-1].sweep.compute_end_point()
-                #     S.levels[l-1].sweep.compute_residual()
-                #     S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
-                #                               '%12.8e', p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+                S.transfer(source=S.levels[l],target=S.levels[l-1])
+
+                if l-1 > 0:
+                    S.levels[l-1].sweep.update_nodes()
+                    S.levels[l-1].sweep.compute_end_point()
+                    S.levels[l-1].sweep.compute_residual()
+                    S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
+                                              '%12.8e', p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
 
             S.stage = 'IT_FINE_SWEEP'
             return MS

@@ -17,7 +17,7 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
-    num_procs = 4
+    num_procs = 2
 
     # This comes as read-in for the level class
     lparams = {}
@@ -56,6 +56,10 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     uend = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+    uex = P.u_exact(Tend)
+    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+        uex.values,np.inf)))
 
     exit()
     step_stats = []
