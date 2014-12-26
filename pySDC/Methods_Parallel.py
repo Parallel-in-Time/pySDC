@@ -45,7 +45,7 @@ def check_convergence(S):
 def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     # fixme: deal with stats
-    # fixme: join block and ring parallelization into one (as before)
+    # fixme: add ring parallelization as before
 
     num_procs = len(MS)
     slots = [p for p in range(num_procs)]
@@ -55,43 +55,45 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         MS[p].dt = dt
         MS[p].time = t0 + p*MS[p].dt
         MS[p].slot = slots[p]
+        MS[p].prev = MS[slots[p-1]] # ring here for simplicity, need to test during recv whether I'm not the first
+        MS[p].first = slots.index(p) == 0
+
         MS[p].init_step(u0)
         MS[p].stage = 'SPREAD'
         MS[p].levels[0].stats.add_iter_stats()
-        MS[p].prev = MS[slots[p-1]]
-        MS[p].pred_cnt = -1
+        MS[p].pred_cnt = slots.index(p)+1
         MS[p].iter = 0
         MS[p].done = False
 
     active = [MS[p].time < Tend for p in slots]
-    working = [not MS[p].done for p in slots]
+    active_slots = np.extract(active,slots)
 
     while any(active):
 
-        while any(working):
+        for p in active_slots:
+            # print(p,MS[p].stage)
+            MS = pfasst_serial(MS,p)
 
-            for p in np.extract(working,slots):
-                # print(p,MS[p].stage)
-                MS = pfasst_serial(MS,p,slots)
+        finished = [MS[p].done for p in active_slots]
 
-            working = [not MS[p].done for p in np.extract(active,slots)]
+        # for block-parallelization
+        if all(finished):
 
-        uend = MS[slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
+            uend = MS[active_slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
 
-        active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
+            for p in range(num_procs):
+                MS[p].reset_step()
+                MS[p].time += num_procs*MS[p].dt
 
-        for p in np.extract(active,slots):
-            MS[p].reset_step()
-            MS[p].time += num_procs*MS[p].dt
-            MS[p].init_step(uend)
-            MS[p].done = False
-            MS[p].pred_cnt = -1
-            MS[p].iter = 0
-            MS[p].stage = 'SPREAD'
-            MS[p].levels[0].stats.add_iter_stats()
-            #FIXME: need to update slots and prev for ring-parallelization
+                MS[p].init_step(uend)
+                MS[p].done = False
+                MS[p].pred_cnt = slots.index(p)+1 # fixme: how to do this for ring-parallelization?
+                MS[p].iter = 0
+                MS[p].stage = 'SPREAD'
+                MS[p].levels[0].stats.add_iter_stats()
 
-        working = active
+            active = [MS[p].time < Tend for p in slots]
+            active_slots = np.extract(active,slots)
 
 
         # This is only for ring-parallelization
@@ -108,9 +110,12 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
 
 
-def pfasst_serial(MS,p,slots):
+def pfasst_serial(MS,p):
 
     S = MS[p]
+
+    if S.done:
+        return MS
 
     for case in switch(S.stage):
 
@@ -129,13 +134,14 @@ def pfasst_serial(MS,p,slots):
 
         if case('PREDICT_SWEEP'):
 
-            recv(S.levels[-1],S.prev.levels[-1],slots,p)
+            if not S.first:
+                recv(S.levels[-1],S.prev.levels[-1])
 
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_end_point()
 
-            S.pred_cnt += 1
-            if S.pred_cnt == slots.index(p):
+            S.pred_cnt -= 1
+            if S.pred_cnt == 0:
                 S.stage = 'PREDICT_INTERP'
             else:
                 S.stage = 'PREDICT_SWEEP'
@@ -165,9 +171,8 @@ def pfasst_serial(MS,p,slots):
 
             S.done = check_convergence(S)
 
-            # FIXME
-            # if S.done and not S.prev.done:
-            #     S.done = False
+            if not S.first and S.done and not S.prev.done:
+                S.done = False
 
             if S.done:
                 S.stage = 'DONE'
@@ -193,7 +198,8 @@ def pfasst_serial(MS,p,slots):
 
         if case('IT_COARSE_SWEEP'):
 
-            recv(S.levels[-1],S.prev.levels[-1],slots,p)
+            if not S.first:
+                recv(S.levels[-1],S.prev.levels[-1])
 
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_end_point()
@@ -206,7 +212,10 @@ def pfasst_serial(MS,p,slots):
         if case('IT_DOWN'):
 
             for l in range(len(S.levels)-1,0,-1):
-                recv(S.levels[l-1],S.prev.levels[l-1],slots,p)
+
+                if not S.first:
+                    recv(S.levels[l-1],S.prev.levels[l-1])
+
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
 
                 if l-1 > 0:
@@ -220,10 +229,9 @@ def pfasst_serial(MS,p,slots):
             return MS
 
 
-def recv(target,source,slots,p):
+def recv(target,source):
 
-    if slots.index(p) > 0:
-        target.u[0] = cp.deepcopy(source.uend)
+    target.u[0] = cp.deepcopy(source.uend)
 
 
 

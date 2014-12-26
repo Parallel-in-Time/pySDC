@@ -22,7 +22,7 @@ class step():
     """
 
     __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__stage','__slot','__prev','__done',
-                 '__pred_cnt')
+                 '__pred_cnt','__first')
 
     def __init__(self, params):
         """
@@ -54,6 +54,7 @@ class step():
         self.__prev = None
         self.__done = None
         self.__pred_cnt = None
+        self.__first = None
 
 
 
@@ -388,3 +389,22 @@ class step():
         """
         assert type(p) is int
         self.__pred_cnt = p
+
+    @property
+    def first(self):
+        """
+        Getter for first
+        Returns:
+            first
+        """
+        return self.__first
+
+    @first.setter
+    def first(self,b):
+        """
+        Setter for first
+        Args:
+            s: new first
+        """
+        self.__first = b
+
