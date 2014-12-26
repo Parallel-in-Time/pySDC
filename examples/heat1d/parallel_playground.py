@@ -1,10 +1,7 @@
-from pySDC import Step as stepclass
+
 from pySDC import CollocationClasses as collclass
 
-
-
 import numpy as np
-import copy as cp
 
 
 from examples.heat1d.ProblemClass import heat1d
@@ -43,10 +40,7 @@ if __name__ == "__main__":
     description['transfer_class'] = mesh_to_mesh_1d
 
 
-    MS = []
-    for p in range(num_procs):
-        MS.append(stepclass.step(sparams))
-        MS[-1].generate_hierarchy(description)
+    MS = mp.generate_steps(num_procs,sparams,description)
 
     t0 = 0
     Tend = 0.5
@@ -78,9 +72,4 @@ if __name__ == "__main__":
         MS[0].init_step(uend)
 
 
-    uex = P.u_exact(MS[0].time)
-
     print(step_stats[1].residual,step_stats[1].level_stats[0].residual)
-
-    print('error at time %s: %s' %(MS[-1].time,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values,np.inf)))

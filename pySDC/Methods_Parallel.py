@@ -24,6 +24,17 @@ class switch(object):
             return False
 
 
+def generate_steps(num_procs,sparams,description):
+
+    from pySDC import Step as stepclass
+
+    MS = []
+    for p in range(num_procs):
+        MS.append(stepclass.step(sparams))
+        MS[-1].generate_hierarchy(description)
+
+    return MS
+
 def check_convergence(S):
 
         L = S.levels[0]
