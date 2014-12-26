@@ -22,7 +22,7 @@ class step():
     """
 
     __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__stage','__slot','__prev','__done',
-                 '__pred_cnt','__first')
+                 '__pred_cnt','__first','__last')
 
     def __init__(self, params):
         """
@@ -55,6 +55,7 @@ class step():
         self.__done = None
         self.__pred_cnt = None
         self.__first = None
+        self.__last = None
 
 
 
@@ -408,3 +409,20 @@ class step():
         """
         self.__first = b
 
+    @property
+    def last(self):
+        """
+        Getter for last
+        Returns:
+            last
+        """
+        return self.__last
+
+    @last.setter
+    def last(self,b):
+        """
+        Setter for last
+        Args:
+            s: new last
+        """
+        self.__last = b

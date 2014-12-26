@@ -46,6 +46,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     # fixme: deal with stats
     # fixme: add ring parallelization as before
+    # fixme: encap initialization of new step
 
     num_procs = len(MS)
     slots = [p for p in range(num_procs)]
@@ -57,7 +58,9 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         MS[p].slot = slots[p]
         MS[p].prev = MS[slots[p-1]] # ring here for simplicity, need to test during recv whether I'm not the first
         MS[p].first = slots.index(p) == 0
+        MS[p].last = slots.index(p) == num_procs
 
+        #fixme: encap this
         MS[p].init_step(u0)
         MS[p].stage = 'SPREAD'
         MS[p].levels[0].stats.add_iter_stats()
@@ -85,6 +88,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
                 MS[p].reset_step()
                 MS[p].time += num_procs*MS[p].dt
 
+                #fixme: encap this
                 MS[p].init_step(uend)
                 MS[p].done = False
                 MS[p].pred_cnt = slots.index(p)+1 # fixme: how to do this for ring-parallelization?
@@ -95,6 +99,10 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
             active = [MS[p].time < Tend for p in slots]
             active_slots = np.extract(active,slots)
 
+        # fixme: for ring parallelization
+        # update first and last
+        # update slots
+        # update pred_cnt
 
         # This is only for ring-parallelization
         # indx = np.argsort([MS[p].time for p in slots])
@@ -135,10 +143,23 @@ def pfasst_serial(MS,p):
         if case('PREDICT_SWEEP'):
 
             if not S.first:
-                recv(S.levels[-1],S.prev.levels[-1])
+                print(S.pred_cnt,S.prev.levels[-1].tag)
+                if S.pred_cnt == S.prev.levels[-1].tag:
+                    print('receiving..',S.slot,S.prev.slot)
+                    recv(S.levels[-1],S.prev.levels[-1])
+                else:
+                    print('skipping..')
 
             S.levels[-1].sweep.update_nodes()
-            S.levels[-1].sweep.compute_end_point()
+
+            S.stage = 'PREDICT_SEND'
+
+            return MS
+
+        if case('PREDICT_SEND'):
+
+            if not S.last:
+                send(S.levels[-1],tag=S.pred_cnt)
 
             S.pred_cnt -= 1
             if S.pred_cnt == 0:
@@ -231,9 +252,12 @@ def pfasst_serial(MS,p):
 
 def recv(target,source):
 
+    # print(target.iter,source.iter)
     target.u[0] = cp.deepcopy(source.uend)
 
-
+def send(source,tag):
+    source.sweep.compute_end_point()
+    source.tag = tag
 
 
 
