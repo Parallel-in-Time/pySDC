@@ -35,6 +35,7 @@ def generate_steps(num_procs,sparams,description):
 
     return MS
 
+
 def check_convergence(S):
 
         L = S.levels[0]
@@ -60,6 +61,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     # fixme: encap initialization of new step
     # fixme: simplify send (and fix IT_DOWN)
 
+    uend = None
     num_procs = len(MS)
     slots = [p for p in range(num_procs)]
 
@@ -313,12 +315,13 @@ def pfasst_serial(MS,p):
 
                 if l-1 > 0:
                     S.levels[l-1].sweep.update_nodes()
-
-                    #fixme: send
-                    S.levels[l-1].sweep.compute_end_point()
                     S.levels[l-1].sweep.compute_residual()
                     S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
                                               '%12.8e', p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+                    if not S.levels[0].tag:
+                        send(S.levels[l-1],tag=True)
+                    else:
+                        print('SEND ERROR DOWN')
 
             S.stage = 'IT_FINE_SWEEP'
             return MS

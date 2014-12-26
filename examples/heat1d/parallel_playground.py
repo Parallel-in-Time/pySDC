@@ -14,7 +14,7 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
-    num_procs = 4
+    num_procs = 3
 
     # This comes as read-in for the level class
     lparams = {}
@@ -38,7 +38,6 @@ if __name__ == "__main__":
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
-
 
     MS = mp.generate_steps(num_procs,sparams,description)
 
