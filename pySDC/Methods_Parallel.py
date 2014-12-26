@@ -159,7 +159,7 @@ def pfasst_serial(MS,p):
             if len(S.levels) > 1:
                 S.stage = 'PREDICT_RESTRICT'
             else:
-                S.stage = 'IT_FINE_SWEEP'
+                S.stage = 'IT_COARSE_RECV'
             return MS
 
         if case('PREDICT_RESTRICT'):
@@ -248,7 +248,8 @@ def pfasst_serial(MS,p):
                 if len(S.levels) > 1:
                     S.stage = 'IT_UP'
                 else:
-                    S.stage = 'IT_FINE_SWEEP'
+                    S.iter += 1
+                    S.stage = 'IT_COARSE_RECV'
 
             return MS
 
@@ -271,18 +272,20 @@ def pfasst_serial(MS,p):
                                         p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
                 S.transfer(source=S.levels[l],target=S.levels[l+1])
 
-            S.stage = 'IT_COARSE_SWEEP'
+            S.stage = 'IT_COARSE_RECV'
             return MS
 
-        if case('IT_COARSE_SWEEP'):
+        if case('IT_COARSE_RECV'):
 
             if not S.first and not S.prev.done:
                 if S.prev.levels[-1].tag:
                     recv(S.levels[-1],S.prev.levels[-1])
                     S.prev.levels[-1].tag = False
+                    S.stage = 'IT_COARSE_SWEEP'
                 else:
-                    print('RECV ERROR COARSE',S.slot,S.prev.slot,S.iter,S.prev.levels[-1].tag)
-                    exit()
+                    S.stage = 'IT_COARSE_RECV'
+
+        if case('IT_COARSE_SWEEP'):
 
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
@@ -295,11 +298,17 @@ def pfasst_serial(MS,p):
         if case('IT_COARSE_SEND'):
 
             if S.last:
-                S.stage = 'IT_DOWN'
+                if len(S.levels) > 1:
+                    S.stage = 'IT_DOWN'
+                else:
+                    S.stage = 'IT_CHECK'
             else:
                 if not S.levels[-1].tag:
                     send(S.levels[-1],tag=True)
-                    S.stage = 'IT_DOWN'
+                    if len(S.levels) > 1:
+                        S.stage = 'IT_DOWN'
+                    else:
+                        S.stage = 'IT_CHECK'
                 else:
                     S.stage = 'IT_COARSE_SEND'
 
