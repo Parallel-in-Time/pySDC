@@ -58,8 +58,8 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     # fixme: deal with stats
     # fixme: add ring parallelization as before
-    # fixme: encap initialization of new step
     # fixme: need excessive commenting
+    # fixme: use error classes for send/recv and stage errors
 
     uend = None
     num_procs = len(MS)
@@ -72,25 +72,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     active = [MS[p].time < Tend for p in slots]
     active_slots = list(itertools.compress(slots, active))
 
-    #fixme: encap this
-    for j in range(len(active_slots)):
-
-        p = active_slots[j]
-
-        MS[p].reset_step()
-        MS[p].prev = MS[active_slots[j-1]] # ring here for simplicity, need to test during recv whether I'm not the first
-        MS[p].first = active_slots.index(p) == 0
-        MS[p].last = active_slots.index(p) == len(active_slots)-1
-        MS[p].init_step(u0)
-        MS[p].stage = 'SPREAD'
-        MS[p].levels[0].stats.add_iter_stats()
-        MS[p].pred_cnt = active_slots.index(p)+1
-        MS[p].iter = 0
-        MS[p].done = False
-        for l in MS[p].levels:
-            l.tag = False
-
-
+    MS = restart_block(MS,active_slots,u0)
 
     while any(active):
 
@@ -106,26 +88,11 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
             active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
-            #fixme: encap this
-
-            for j in range(len(active_slots)):
-
-                p = active_slots[j]
-
+            for p in active_slots:
                 MS[p].time += num_procs*MS[p].dt
 
-                MS[p].prev = MS[active_slots[j-1]]
-                MS[p].reset_step()
-                MS[p].first = active_slots.index(p) == 0
-                MS[p].last = active_slots.index(p) == len(active_slots)-1
-                MS[p].init_step(uend)
-                MS[p].done = False
-                MS[p].pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
-                MS[p].iter = 0
-                MS[p].stage = 'SPREAD'
-                MS[p].levels[0].stats.add_iter_stats()
-                for l in MS[p].levels:
-                    l.tag = False
+            MS = restart_block(MS,active_slots,uend)
+
 
 
         # fixme: for ring parallelization
@@ -144,6 +111,28 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         #         MS[p].time =
 
     return uend
+
+
+def restart_block(MS,active_slots,u0):
+
+    for j in range(len(active_slots)):
+
+            p = active_slots[j]
+
+            MS[p].prev = MS[active_slots[j-1]]
+            MS[p].reset_step()
+            MS[p].first = active_slots.index(p) == 0
+            MS[p].last = active_slots.index(p) == len(active_slots)-1
+            MS[p].init_step(u0)
+            MS[p].done = False
+            MS[p].pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
+            MS[p].iter = 0
+            MS[p].stage = 'SPREAD'
+            MS[p].levels[0].stats.add_iter_stats()
+            for l in MS[p].levels:
+                l.tag = False
+
+    return MS
 
 
 
@@ -331,9 +320,8 @@ def pfasst_serial(MS,p):
                         recv(S.levels[l-1],S.prev.levels[l-1])
                         S.prev.levels[l-1].tag = False
                     else:
-                        if not S.prev.done:
-                            print('RECV ERROR DOWN')
-                            exit()
+                        print('RECV ERROR DOWN')
+                        exit()
 
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
 
