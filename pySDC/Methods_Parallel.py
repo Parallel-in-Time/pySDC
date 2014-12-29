@@ -77,8 +77,8 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     while any(active):
 
         for p in active_slots:
-            print(p,MS[p].stage)
-            MS = pfasst_serial(MS,p)
+            # print(p,MS[p].stage)
+            MS[p] = pfasst_serial(MS[p])
 
         # for block-parallelization
         if all([MS[p].done for p in active_slots]):
@@ -119,6 +119,7 @@ def restart_block(MS,active_slots,u0):
 
             p = active_slots[j]
 
+            MS[p].slot = p
             MS[p].prev = MS[active_slots[j-1]]
             MS[p].reset_step()
             MS[p].first = active_slots.index(p) == 0
@@ -136,12 +137,11 @@ def restart_block(MS,active_slots,u0):
 
 
 
-def pfasst_serial(MS,p):
+def pfasst_serial(S):
 
-    S = MS[p]
 
     if S.done:
-        return MS
+        return S
 
     for case in switch(S.stage):
 
@@ -152,14 +152,14 @@ def pfasst_serial(MS,p):
                 S.stage = 'PREDICT_RESTRICT'
             else:
                 S.stage = 'IT_COARSE_RECV'
-            return MS
+            return S
 
         if case('PREDICT_RESTRICT'):
 
             for l in range(1,len(S.levels)):
                 S.transfer(source=S.levels[l-1],target=S.levels[l])
             S.stage = 'PREDICT_SWEEP'
-            return MS
+            return S
 
         if case('PREDICT_SWEEP'):
 
@@ -173,7 +173,7 @@ def pfasst_serial(MS,p):
 
             S.stage = 'PREDICT_SEND'
 
-            return MS
+            return S
 
         if case('PREDICT_SEND'):
 
@@ -190,14 +190,14 @@ def pfasst_serial(MS,p):
             else:
                 S.stage = 'PREDICT_SWEEP'
 
-            return MS
+            return S
 
         if case('PREDICT_INTERP'):
 
             for l in range(len(S.levels)-1,0,-1):
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
             S.stage = 'IT_FINE_SWEEP'
-            return MS
+            return S
 
         if case('IT_FINE_SWEEP'):
 
@@ -206,11 +206,11 @@ def pfasst_serial(MS,p):
 
             S.levels[0].sweep.compute_residual()
             S.levels[0].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                    p,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
+                                    S.slot,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
 
             S.stage = 'IT_FINE_SEND'
 
-            return MS
+            return S
 
         if case('IT_FINE_SEND'):
 
@@ -223,7 +223,7 @@ def pfasst_serial(MS,p):
                 else:
                     S.stage = 'IT_FINE_SEND'
 
-            return MS
+            return S
 
 
         if case('IT_CHECK'):
@@ -242,7 +242,7 @@ def pfasst_serial(MS,p):
                 else:
                     S.stage = 'IT_COARSE_RECV'
 
-            return MS
+            return S
 
         if case('IT_UP'):
 
@@ -264,7 +264,7 @@ def pfasst_serial(MS,p):
                 S.transfer(source=S.levels[l],target=S.levels[l+1])
 
             S.stage = 'IT_COARSE_RECV'
-            return MS
+            return S
 
         if case('IT_COARSE_RECV'):
 
@@ -284,7 +284,7 @@ def pfasst_serial(MS,p):
                 else:
                     S.stage = 'IT_FINE_SWEEP'
 
-            return MS
+            return S
 
 
         if case('IT_COARSE_SWEEP'):
@@ -292,9 +292,9 @@ def pfasst_serial(MS,p):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
             S.levels[-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                     p,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
+                                     S.slot,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
             S.stage = 'IT_COARSE_SEND'
-            return MS
+            return S
 
 
         if case('IT_COARSE_SEND'):
@@ -308,7 +308,7 @@ def pfasst_serial(MS,p):
                 else:
                     S.stage = 'IT_COARSE_SEND'
 
-            return MS
+            return S
 
 
         if case('IT_DOWN'):
@@ -332,10 +332,13 @@ def pfasst_serial(MS,p):
                                               '%12.8e', p,S.stage,S.levels[l-1].id,S.iter,S.levels[l-1].status.residual)
 
             S.stage = 'IT_FINE_SWEEP'
-            return MS
+            return S
 
         print('Something is wrong here, you should have hit one case statement!')
         exit()
+
+    print('Something is wrong here, you should have hit one case statement!')
+    exit()
 
 
 def recv(target,source):
