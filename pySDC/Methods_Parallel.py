@@ -1,6 +1,5 @@
 import itertools
 import copy as cp
-import logging
 
 
 class switch(object):
@@ -44,7 +43,7 @@ def check_convergence(S):
 
         converged = S.iter >= S.params.maxiter or res <= L.params.restol
 
-        L.stats.iter_stats[-1].residual = res
+        # L.stats.iter_stats[-1].residual = res
 
         if converged:
             S.stats.niter = S.iter
@@ -56,12 +55,14 @@ def check_convergence(S):
 
 def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
-    # fixme: deal with stats
     # fixme: add ring parallelization as before
     # fixme: need excessive commenting
     # fixme: use error classes for send/recv and stage errors
+    # fixme: last need to be able to send even if values have not been fetched yet (ring!)
 
     uend = None
+    step_stats = []
+
     num_procs = len(MS)
     slots = [p for p in range(num_procs)]
 
@@ -84,6 +85,9 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         if all([MS[p].done for p in active_slots]):
 
             uend = MS[active_slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
+
+            for p in active_slots:
+                step_stats.append(MS[p].stats)
 
             active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
             active_slots = list(itertools.compress(slots, active))
@@ -110,7 +114,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         #     for p in slots:
         #         MS[p].time =
 
-    return uend
+    return uend,step_stats
 
 
 def restart_block(MS,active_slots,u0):
@@ -129,7 +133,6 @@ def restart_block(MS,active_slots,u0):
             MS[p].pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
             MS[p].iter = 0
             MS[p].stage = 'SPREAD'
-            MS[p].levels[0].stats.add_iter_stats()
             for l in MS[p].levels:
                 l.tag = False
 
@@ -182,7 +185,7 @@ def pfasst_serial(S):
                     send(S.levels[-1],tag=True)
                 else:
                     S.stage = 'PREDICT_SEND'
-                    return MS
+                    return S
 
             S.pred_cnt -= 1
             if S.pred_cnt == 0:
@@ -202,9 +205,11 @@ def pfasst_serial(S):
         if case('IT_FINE_SWEEP'):
 
             S.iter += 1
-            S.levels[0].sweep.update_nodes()
 
+            S.levels[0].stats.add_iter_stats()
+            S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
+            S.levels[0].stats.iter_stats[-1].residual = S.levels[0].status.residual
             S.levels[0].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                     S.slot,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
 
@@ -260,7 +265,7 @@ def pfasst_serial(S):
 
                 S.levels[l].sweep.compute_residual()
                 S.levels[l].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                        p,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+                                        S.slot,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
                 S.transfer(source=S.levels[l],target=S.levels[l+1])
 
             S.stage = 'IT_COARSE_RECV'
@@ -289,8 +294,10 @@ def pfasst_serial(S):
 
         if case('IT_COARSE_SWEEP'):
 
+            S.levels[-1].stats.add_iter_stats()
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
+            S.levels[-1].stats.iter_stats[-1].residual = S.levels[-1].status.residual
             S.levels[-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                      S.slot,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
             S.stage = 'IT_COARSE_SEND'
@@ -326,10 +333,13 @@ def pfasst_serial(S):
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
 
                 if l-1 > 0:
+
+                    S.levels[l-1].stats.add_iter_stats()
                     S.levels[l-1].sweep.update_nodes()
                     S.levels[l-1].sweep.compute_residual()
+                    S.levels[l-1].stats.iter_stats[-1].residual = S.levels[l-1].status.residual
                     S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
-                                              '%12.8e', p,S.stage,S.levels[l-1].id,S.iter,S.levels[l-1].status.residual)
+                                              '%12.8e', S.slot,S.stage,S.levels[l-1].id,S.iter,S.levels[l-1].status.residual)
 
             S.stage = 'IT_FINE_SWEEP'
             return S

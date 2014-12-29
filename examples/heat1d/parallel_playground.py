@@ -3,12 +3,10 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.Methods_Serial import mlsdc_step, sdc_step
 import pySDC.Methods_Parallel as mp
 
 
@@ -48,27 +46,10 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    uend = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,step_stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     uex = P.u_exact(Tend)
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
-
-    exit()
-    step_stats = []
-
-
-    while MS[-1].time < Tend:
-
-        uend = mlsdc_step(MS[0])
-
-        step_stats.append(MS[0].stats)
-
-        MS[0].time += MS[0].dt
-
-        MS[0].reset_step()
-
-        MS[0].init_step(uend)
-
-
-    print(step_stats[1].residual,step_stats[1].level_stats[0].residual)
+    print(len(step_stats),len(step_stats[1].level_stats),len(step_stats[-1].level_stats[0].iter_stats))
+    print(step_stats[1].residual,step_stats[0].level_stats[0].iter_stats[0].residual)
