@@ -10,7 +10,7 @@ from subprocess import call
 from examples.spiraling_particle.ProblemClass import planewave_single
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.Methods import sdc_step
+from pySDC.Methods_Serial import sdc_step
 
 
 if __name__ == "__main__":

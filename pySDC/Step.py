@@ -1,6 +1,8 @@
 from pySDC import Level as levclass
 from pySDC import Stats as statclass
 
+import copy as cp
+
 class step():
     """
     Step class, referencing most of the structure needed for the time-stepping
@@ -19,7 +21,8 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict')
+    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__stage','__slot','__prev','__done',
+                 '__pred_cnt','__first','__last')
 
     def __init__(self, params):
         """
@@ -46,6 +49,98 @@ class step():
         self.__k = None
         self.__transfer_dict = {}
         self.levels = []
+        self.__stage = None
+        self.__slot = None
+        self.__prev = None
+        self.__done = None
+        self.__pred_cnt = None
+        self.__first = None
+        self.__last = None
+
+
+
+    def generate_hierarchy(self,descr):
+        """
+        Routine to generate the level hierarchy for a single step
+
+        This makes the explicit generation of levels in the frontend obsolete and hides a few dirty hacks here and
+        there.
+
+        Args:
+            descr: dictionary containing the description of the levels as list per key
+        """
+        # assert the existence of all the keys we need to set up at least on level
+        assert 'problem_class' in descr
+        assert 'problem_params' in descr
+        assert 'dtype_u' in descr
+        assert 'dtype_f' in descr
+        assert 'collocation_class' in descr
+        assert 'num_nodes' in descr
+        assert 'sweeper_class' in descr
+        assert 'level_params' in descr
+
+        # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
+        # single entry per key, one dict per level
+        pparams_list = self.__dict_to_list(descr['problem_params'])
+        # put this newly generated list into the description dictionary (copy to avoid changing the original one)
+        descr_new = cp.deepcopy(descr)
+        descr_new['problem_params'] = pparams_list
+        # generate list of dictionaries out of the description
+        descr_list = self.__dict_to_list(descr_new)
+
+        # sanity check: is there a transfer class? is there one even if only a single level is specified?
+        if len(descr_list) > 1:
+            assert 'transfer_class' in descr_new
+        elif 'transfer_class' in descr_new:
+            print('WARNING: you have specified transfer classes, but only a single level...')
+
+        # generate levels, register and connect if needed
+        for l in range(len(pparams_list)):
+
+            L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
+                               problem_params     =   descr_list[l]['problem_params'],
+                               dtype_u            =   descr_list[l]['dtype_u'],
+                               dtype_f            =   descr_list[l]['dtype_f'],
+                               collocation_class  =   descr_list[l]['collocation_class'],
+                               num_nodes          =   descr_list[l]['num_nodes'],
+                               sweeper_class      =   descr_list[l]['sweeper_class'],
+                               level_params       =   descr_list[l]['level_params'],
+                               id                 =   'L'+str(l))
+
+            self.register_level(L)
+
+            if l > 0:
+                self.connect_levels(transfer_class = descr_list[l]['transfer_class'],
+                                    fine_level     = self.levels[l-1],
+                                    coarse_level   = self.levels[l])
+
+
+    @staticmethod
+    def __dict_to_list(dict):
+        """
+        Straightforward helper function to convert dictionary of list to list of dictionaries
+
+        Args:
+            dict: dictionary of lists
+        Returns:
+            list of dictionaries
+        """
+
+        max_val = 1
+        for k,v in dict.items():
+            if type(v) is list:
+                if max_val > 1 and len(v) is not max_val:
+                    sys.exit('All lists in cparams need to be of length 1 or %i.. key %s has this list: %s' %(max_val,k,v))
+                max_val = len(v)
+
+        ld = [{} for l in range(max_val)]
+        for d in range(len(ld)):
+            for k,v in dict.items():
+                if type(v) is not list:
+                    ld[d][k] = v
+                else:
+                    ld[d][k] = v[d]
+        return ld
 
 
     def register_level(self,L):
@@ -98,7 +193,6 @@ class step():
             source: source level
             target: target level
         """
-
         self.__transfer_dict[tuple([source,target])]()
 
 
@@ -135,6 +229,7 @@ class step():
         # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
         self.levels[0].u[0] = P.dtype_u(u0)
+        self.stats.niter = 0
 
 
     @property
@@ -198,3 +293,136 @@ class step():
             k: iteration to set
         """
         self.__k = k
+
+    @property
+    def stage(self):
+        """
+        Getter for stage
+        Returns:
+            stage
+        """
+        return self.__stage
+
+
+    @stage.setter
+    def stage(self,s):
+        """
+        Setter for stage
+        Args:
+            s: new stage
+        """
+        self.__stage = s
+
+    @property
+    def slot(self):
+        """
+        Getter for slots
+        Returns:
+            slot
+        """
+        return self.__slot
+
+
+    @slot.setter
+    def slot(self,s):
+        """
+        Setter for slots
+        Args:
+            s: new slot
+        """
+        assert type(s) is int
+        self.__slot = s
+
+    @property
+    def prev(self):
+        """
+        Getter for previous step
+        Returns:
+            prev
+        """
+        return self.__prev
+
+
+    @prev.setter
+    def prev(self,p):
+        """
+        Setter for previous step
+        Args:
+            p: new previous step
+        """
+        self.__prev = p
+
+    @property
+    def done(self):
+        """
+        Getter for done status
+        Returns:
+            done
+        """
+        return self.__done
+
+
+    @done.setter
+    def done(self,d):
+        """
+        Setter for done status
+        Args:
+            s: new done status
+        """
+        self.__done = d
+
+    @property
+    def pred_cnt(self):
+        """
+        Getter for done status
+        Returns:
+            done
+        """
+        return self.__pred_cnt
+
+
+    @pred_cnt.setter
+    def pred_cnt(self,p):
+        """
+        Setter for pred_cnt
+        Args:
+            s: new pred_cnt
+        """
+        assert type(p) is int
+        self.__pred_cnt = p
+
+    @property
+    def first(self):
+        """
+        Getter for first
+        Returns:
+            first
+        """
+        return self.__first
+
+    @first.setter
+    def first(self,b):
+        """
+        Setter for first
+        Args:
+            s: new first
+        """
+        self.__first = b
+
+    @property
+    def last(self):
+        """
+        Getter for last
+        Returns:
+            last
+        """
+        return self.__last
+
+    @last.setter
+    def last(self,b):
+        """
+        Setter for last
+        Args:
+            s: new last
+        """
+        self.__last = b

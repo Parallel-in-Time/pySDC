@@ -48,10 +48,11 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats')
+    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats','__tag')
 
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class, level_params, id):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
+                 level_params, id):
         """
         Initialization routine
 
@@ -104,6 +105,8 @@ class level():
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
 
+        self.__tag = None
+
 
     def __create_logger(self):
         """
@@ -114,9 +117,9 @@ class level():
         """
 
         # some logger magic
-        formatter = logging.Formatter('%(name)s at time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
+        formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
                                       datefmt='%d.%m.%Y %H:%M:%S')
-        logger = logging.getLogger(str(self.id))
+        logger = cp.deepcopy(logging.getLogger())
         # this is where the logging level is set
         logger.setLevel(logging.INFO)
         ch = logging.StreamHandler()
@@ -215,3 +218,28 @@ class level():
         Meta-getter for the iteration (only passing the step's iteration)
         """
         return self.__step.iter
+
+    @property
+    def dt(self):
+        """
+        Meta-getter for the step size (only passing the step's step size)
+        """
+        return self.__step.dt
+
+    @property
+    def tag(self):
+        """
+        Getter for tag
+        Returns:
+            tag
+        """
+        return self.__tag
+
+    @tag.setter
+    def tag(self,t):
+        """
+        Setter for tag
+        Args:
+            s: new tag
+        """
+        self.__tag = t

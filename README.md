@@ -3,13 +3,14 @@ pySDC
 
 The pySDC project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors, 
 esp. the multilevel extension MLSDC. It is intended for rapid prototyping and educational purposes. New ideas like e.g 
-sweepers or predictors can be tested and first toy problems can be easily implemented. A further extension to PFASST 
-(at least virtually parallel) is possible and on the todo list (volunteers welcomed).
+sweepers or predictors can be tested and first toy problems can be easily implemented. A virtually parallel PFASST 
+iterator is implemented as well, giving full access to all values at any time (real parallelism is on the todo list).
 
 
 News
 ----
 
+* December 29, 2014: virtual PFASST implemented using stages
 * November 4, 2014: First open source release on github, four very basic examples up and running, code is documented
 
 
@@ -31,15 +32,16 @@ HowTo
 
 To start your own example, take a look at the examples shipped with this code:
 
-* heat1d: MLSDC implementation of the forced 1D heat equation with Dirichlet-0 BC in [0,1]
+* heat1d: MLSDC and PFASST implementation of the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 * penningtrap: a particle in a penning trap, driven by external electric and magnetic fields
 * spiraling_particle: a particle moving in varying electric and magnetic fields
 * vanderpol: the van der pol oscillator
 
 To run one of these, add the root directory of pySDC to your PYTHONPATH and execute `python playground` (this could 
-be done e.g. via `PYTHONPATH=../.. python playground.py`. Note that this code requires Python 3!
+be done e.g. via `PYTHONPATH=../.. python playground.py`. The script `parallel_playground.py` in the heat1d example 
+shows first tests with PFASST. Note that all this requires Python 3!
 
-Each  of these examples should demonstrate some features of this code, e.g. MLSDC and an IMEX sweeper for the heat 
+Each of these examples should demonstrate some features of this code, e.g. MLSDC/PFASST and an IMEX sweeper for the heat 
 equation, the Boris-SDC approach in the particle case and the LU decomposition as well as the application of a 
 nonlinear solver in the van der pol example.
  
@@ -49,7 +51,7 @@ For a new example, you have to either choose or provide at least five components
 * a problem description, examples can be found in examples/*/ProblemClass.py
 * a data type, examples can be found in pySDC/datatype_classes/
 * a sweeper, examples can be found in pySDC/sweeper_classes/
-* a method/stepper, where SDC and MLSDC are already provided in pySDC/Methods.py
+* a method/stepper, where SDC and MLSDC are already provided in pySDC/Methods_Serial.py (for PFASST see heat1d example)
 
 
 For MLSDC, suitable transfer operators are also required, examples can be found e.g. in examples/heat1d/TransferClass.py.

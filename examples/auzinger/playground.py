@@ -7,7 +7,7 @@ import numpy as np
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
 from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.Methods import sdc_step, mlsdc_step, adaptive_sdc_step
+from pySDC.Methods_Serial import sdc_step, mlsdc_step, adaptive_sdc_step
 
 
 if __name__ == "__main__":
