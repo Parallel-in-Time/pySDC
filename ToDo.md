@@ -20,6 +20,6 @@ ok, but should be done automatically somehow) and (2) explicitly write things li
     - multi-particle penning trap with MLSDC and PFASST
     - SWFW, maybe couple to PyClaw
 
-* write a more detailed howto, explaining all the features of the code using basiv examples
+* write a more detailed howto, explaining all the features of the code using basic examples
 
 * convert docs to sphinx and set up homepage

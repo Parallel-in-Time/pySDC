@@ -98,7 +98,6 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     """
 
     # fixme: add ring parallelization as before
-    # fixme: need excessive commenting
     # fixme: use error classes for send/recv and stage errors
     # fixme: last need to be able to send even if values have not been fetched yet (ring!)
 
