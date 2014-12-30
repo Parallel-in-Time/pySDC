@@ -10,7 +10,7 @@ iterator is implemented as well, giving full access to all values at any time (r
 News
 ----
 
-* December 29, 2014: virtual PFASST implemented using stages
+* December 29, 2014: virtual PFASST implemented using stages, see [flowchart](flowchart.png) for implementation details
 * November 4, 2014: First open source release on github, four very basic examples up and running, code is documented
 
 
@@ -38,7 +38,7 @@ To start your own example, take a look at the examples shipped with this code:
 * vanderpol: the van der pol oscillator
 
 To run one of these, add the root directory of pySDC to your PYTHONPATH and execute `python playground` (this could 
-be done e.g. via `PYTHONPATH=../.. python playground.py`. The script `parallel_playground.py` in the heat1d example 
+be done e.g. via `PYTHONPATH=../.. python playground.py`). The script `parallel_playground.py` in the heat1d example 
 shows first tests with PFASST. Note that all this requires Python 3!
 
 Each of these examples should demonstrate some features of this code, e.g. MLSDC/PFASST and an IMEX sweeper for the heat 
@@ -61,7 +61,7 @@ most of the management is done via the level and the step data structures. Here,
 the components are coupled as expected by the method and all the other components.
 
 In the easiest case (where collocation, data type, sweeper, method and transfer operators can be used as provided 
-with this code ), only a custom problem description and a suitable transfer between degrees-of-freedom have to be 
+with this code), only a custom problem description and a suitable transfer between degrees-of-freedom have to be 
 implemented.
 
 Note: all interfaces are subject to changes, if necessary.

@@ -242,7 +242,7 @@ def pfasst_serial(S):
             if len(S.levels) > 1:
                 S.stage = 'PREDICT_RESTRICT'
             else:
-                S.stage = 'IT_COARSE_RECV'
+                S.stage = 'IT_FINE_SWEEP'
             return S
 
 
@@ -456,7 +456,7 @@ def pfasst_serial(S):
         if case('IT_DOWN'):
             # prolong corrections own to finest level
 
-            # receive and sweep on middle levels (except for coarsest and finest levels)
+            # receive and sweep on middle levels (except for coarsest level)
             for l in range(len(S.levels)-1,0,-1):
 
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
