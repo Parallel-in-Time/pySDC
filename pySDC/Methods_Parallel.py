@@ -1,5 +1,6 @@
 import itertools
 import copy as cp
+import numpy as np
 
 
 class switch(object):
@@ -115,7 +116,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         MS[p].time = t0 + sum(MS[j].dt for j in range(p))
 
     # determine which steps are still active (time < Tend)
-    active = [MS[p].time < Tend for p in slots]
+    active = [MS[p].time < Tend - np.finfo(float).eps for p in slots]
     # compress slots according to active steps, i.e. remove all steps which have times above Tend
     active_slots = list(itertools.compress(slots, active))
 
@@ -141,7 +142,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
                 step_stats.append(MS[p].stats)
 
             # determine new set of active steps and compress slots accordingly
-            active = [MS[p].time+num_procs*MS[p].dt < Tend for p in slots]
+            active = [MS[p].time+num_procs*MS[p].dt < Tend - np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # increment timings for now active steps

@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 3E-12
 
     sparams = {}
     sparams['maxiter'] = 10
@@ -43,8 +43,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.5
-    dt = 0.125
+    Tend = 1
+    dt = 0.25
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
