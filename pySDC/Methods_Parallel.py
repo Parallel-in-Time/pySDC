@@ -222,7 +222,6 @@ def pfasst_serial(S):
     Returns:
         current step
     """
-    # fixme: write control flow graph
 
     # if S is done, stop right here
     if S.done:
@@ -330,16 +329,12 @@ def pfasst_serial(S):
         if case('IT_FINE_SEND'):
             # send forward values on finest level
 
-            # fixme: send also on last step
-            if S.last:
+            # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
+            if not S.levels[0].tag or S.last:
+                send(S.levels[0],tag=True)
                 S.stage = 'IT_CHECK'
             else:
-                # if last send succeeded on this level, send new values (otherwise: try again)
-                if not S.levels[0].tag:
-                    send(S.levels[0],tag=True)
-                    S.stage = 'IT_CHECK'
-                else:
-                    S.stage = 'IT_FINE_SEND'
+                S.stage = 'IT_FINE_SEND'
             # return
             return S
 
@@ -379,12 +374,11 @@ def pfasst_serial(S):
                                         S.slot,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
-                if not S.last:
-                    if not S.levels[l].tag:
-                        send(S.levels[l],tag=True)
-                    else:
-                        print('SEND ERROR',l,p,S.levels[l].tag)
-                        exit()
+                if not S.levels[l].tag or S.last:
+                    send(S.levels[l],tag=True)
+                else:
+                    print('SEND ERROR',l,p,S.levels[l].tag)
+                    exit()
 
                 # transfer further up the hierarchy
                 S.transfer(source=S.levels[l],target=S.levels[l+1])
@@ -439,16 +433,12 @@ def pfasst_serial(S):
         if case('IT_COARSE_SEND'):
             # send forward coarsest values
 
-            # fixme: allow sending at last step as well
-            if S.last:
+            # try to send new values (if old ones have not been picked up yet, retry)
+            if not S.levels[-1].tag or S.last:
+                send(S.levels[-1],tag=True)
                 S.stage = 'IT_DOWN'
             else:
-                # try to send new values (if old ones have not been picked up yet, retry)
-                if not S.levels[-1].tag:
-                    send(S.levels[-1],tag=True)
-                    S.stage = 'IT_DOWN'
-                else:
-                    S.stage = 'IT_COARSE_SEND'
+                S.stage = 'IT_COARSE_SEND'
             # return
             return S
 
