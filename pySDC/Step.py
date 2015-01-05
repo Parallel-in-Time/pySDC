@@ -2,6 +2,7 @@ from pySDC import Level as levclass
 from pySDC import Stats as statclass
 
 import copy as cp
+import sys
 
 class step():
     """
@@ -95,7 +96,7 @@ class step():
             print('WARNING: you have specified transfer classes, but only a single level...')
 
         # generate levels, register and connect if needed
-        for l in range(len(pparams_list)):
+        for l in range(len(descr_list)):
 
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   descr_list[l]['problem_params'],
@@ -129,9 +130,9 @@ class step():
         max_val = 1
         for k,v in dict.items():
             if type(v) is list:
-                if max_val > 1 and len(v) is not max_val:
+                if len(v) > 1 and (max_val > 1 and len(v) is not max_val):
                     sys.exit('All lists in cparams need to be of length 1 or %i.. key %s has this list: %s' %(max_val,k,v))
-                max_val = len(v)
+                max_val = max(max_val,len(v))
 
         ld = [{} for l in range(max_val)]
         for d in range(len(ld)):
@@ -139,7 +140,10 @@ class step():
                 if type(v) is not list:
                     ld[d][k] = v
                 else:
-                    ld[d][k] = v[d]
+                    if len(v) == 1:
+                        ld[d][k] = v[0]
+                    else:
+                        ld[d][k] = v[d]
         return ld
 
 

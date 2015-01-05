@@ -319,7 +319,7 @@ def pfasst_serial(S):
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
             S.levels[0].stats.iter_stats[-1].residual = S.levels[0].status.residual
-            S.levels[0].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+            S.levels[0].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                     S.slot,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
 
             # update stage and return
@@ -375,7 +375,7 @@ def pfasst_serial(S):
             for l in range(1,len(S.levels)-1):
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
-                S.levels[l].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                S.levels[l].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                         S.slot,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
@@ -428,7 +428,7 @@ def pfasst_serial(S):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
             S.levels[-1].stats.iter_stats[-1].residual = S.levels[-1].status.residual
-            S.levels[-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+            S.levels[-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                      S.slot,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
 
             # update stage and return
@@ -478,7 +478,7 @@ def pfasst_serial(S):
                     S.levels[l-1].sweep.update_nodes()
                     S.levels[l-1].sweep.compute_residual()
                     S.levels[l-1].stats.iter_stats[-1].residual = S.levels[l-1].status.residual
-                    S.levels[l-1].logger.info('Process %2i at stage %s: Level: %s -- Iteration: %2i -- Residual: '
+                    S.levels[l-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: '
                                               '%12.8e', S.slot,S.stage,S.levels[l-1].id,S.iter,S.levels[l-1].status.residual)
 
             # update stage and return

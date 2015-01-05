@@ -12,7 +12,7 @@ import pySDC.Methods_Parallel as mp
 
 if __name__ == "__main__":
 
-    num_procs = 3
+    num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
@@ -60,5 +60,8 @@ if __name__ == "__main__":
         uex.values,np.inf)))
 
     # testing stats output...
-    print(len(step_stats),len(step_stats[1].level_stats),len(step_stats[-1].level_stats[0].iter_stats))
-    print(step_stats[1].residual,step_stats[0].level_stats[0].iter_stats[0].residual)
+    # print(len(step_stats),len(step_stats[1].level_stats),len(step_stats[-1].level_stats[0].iter_stats))
+    # print(step_stats[1].residual,step_stats[0].level_stats[0].iter_stats[0].residual)
+
+    for l in step_stats:
+        print(l.residual,l.niter)
