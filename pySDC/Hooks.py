@@ -1,6 +1,7 @@
 from pySDC.Level import level
 import logging
 
+
 class hooks():
 
     __slots__ = ('__level')

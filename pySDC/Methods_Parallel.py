@@ -2,9 +2,6 @@ import itertools
 import copy as cp
 import numpy as np
 
-import pySDC.Hooks as Hooks
-
-
 class switch(object):
     """
     Helper class for using case/switch statements in Python (not necessary, but easier to read)

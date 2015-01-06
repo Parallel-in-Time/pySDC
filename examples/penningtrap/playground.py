@@ -17,6 +17,7 @@ from pySDC import Log
 
 if __name__ == "__main__":
 
+    # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
     num_procs = 1
