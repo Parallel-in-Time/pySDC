@@ -48,11 +48,12 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats','__tag')
+    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats',
+                 '__tag','__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
-                 level_params, id):
+                 level_params, hook_class, id):
         """
         Initialization routine
 
@@ -65,6 +66,7 @@ class level():
             num_nodes: the only parameter for collocation class
             sweeper_class: sweeper class
             level_params: parameters given by the user, will be added as attributes
+            hook_class: class to add hooks (e.g. for output and diag)
             id: custom string naming this level
         """
 
@@ -74,10 +76,11 @@ class level():
                 for k,v in params.items():
                     setattr(self,k,v)
 
-        # instantiate collocation, sweeper and problem
+        # instantiate collocation, sweeper, problem and hooks
         coll = collocation_class(num_nodes,0,1)
         self.__sweep = sweeper_class(coll)
         self.__prob = problem_class(problem_params,dtype_u,dtype_f)
+        self.__hooks = hook_class()
 
         # set level parameters and status
         self.params = pars(level_params)
@@ -104,6 +107,7 @@ class level():
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
+        self.hooks._hooks__set_level(self)
 
         self.__tag = None
 
@@ -190,6 +194,13 @@ class level():
         Getter for the sweeper
         """
         return self.__sweep
+
+    @property
+    def hooks(self):
+        """
+        Getter for the hooks
+        """
+        return self.__hooks
 
     @property
     def prob(self):

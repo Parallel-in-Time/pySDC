@@ -10,10 +10,14 @@ from examples.penningtrap.ProblemClass import penningtrap
 from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
+from examples.penningtrap.HookClass import particles_output
 from pySDC.Methods_Serial import sdc_step, mlsdc_step
+import pySDC.Methods_Parallel as mp
 
 
 if __name__ == "__main__":
+
+    num_procs = 1
 
     # This comes as read-in for each level
     lparams = {}
@@ -21,18 +25,53 @@ if __name__ == "__main__":
 
     # This comes as read-in for the time-stepping
     sparams = {}
-    sparams['Tend'] = 500*0.015625
     sparams['maxiter'] = 10
 
     # This comes as read-in for the problem
-    cparams_f = {}
-    cparams_f['omega_E'] = 4.9
-    cparams_f['omega_B'] = 25.0
-    cparams_f['alpha'] = 1 # this is the charge to mass ratio for all (!) particles, only one species allowed so far
-    cparams_f['u0'] = np.array([[10,0,0],[100,0,100]])
-    cparams_f['eps'] = -1
-    cparams_f['nparts'] = 10
-    cparams_f['sig'] = 0.1
+    pparams = {}
+    pparams['omega_E'] = 4.9
+    pparams['omega_B'] = 25.0
+    pparams['alpha'] = 1 # this is the charge to mass ratio for all (!) particles, only one species allowed so far
+    pparams['u0'] = np.array([[10,0,0],[100,0,100]])
+    pparams['eps'] = -1
+    pparams['nparts'] = 10
+    pparams['sig'] = 0.1
+
+    # Fill description dictionary for easy hierarchy creation
+    description = {}
+    description['problem_class'] = penningtrap
+    description['problem_params'] = pparams
+    description['dtype_u'] = particles
+    description['dtype_f'] = fields
+    description['collocation_class'] = collclass.CollGaussLobatto
+    description['num_nodes'] = 3
+    description['sweeper_class'] = boris_2nd_order
+    description['level_params'] = lparams
+    description['transfer_class'] = particles_to_particles
+    description['hook_class'] = particles_output
+
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
+
+    # setup parameters "in time"
+    t0 = 0
+    dt = 0.015625
+    Tend = 10*dt
+
+    # get initial values on finest level
+    P = MS[0].levels[0].prob
+    uinit = P.u_init()
+
+    # call main function to get things done...
+    uend,step_stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+    print('Number of steps:',len(step_stats))
+    for l in step_stats:
+        print(l.residual,l.niter)
+
+    exit()
+
+
 
     # definition of the fine level (which is the only one we care about here)
     L0 = levclass.level(problem_class       =   penningtrap,

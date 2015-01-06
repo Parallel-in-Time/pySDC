@@ -2,6 +2,8 @@ import itertools
 import copy as cp
 import numpy as np
 
+import pySDC.Hooks as Hooks
+
 
 class switch(object):
     """
@@ -322,6 +324,8 @@ def pfasst_serial(S):
             S.levels[0].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                                     S.slot,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
 
+            S.levels[0].hooks.dump_iteration()
+
             # update stage and return
             S.stage = 'IT_FINE_SEND'
             return S
@@ -352,6 +356,7 @@ def pfasst_serial(S):
             # if I am done, signal accordingly, otherwise proceed
             if S.done:
                 S.levels[0].sweep.compute_end_point()
+                S.levels[0].hooks.dump_step()
                 S.stage = 'DONE'
             else:
                 if len(S.levels) > 1:

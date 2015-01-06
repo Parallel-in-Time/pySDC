@@ -1,5 +1,6 @@
 from pySDC import Level as levclass
 from pySDC import Stats as statclass
+from pySDC import Hooks as hookclass
 
 import copy as cp
 import sys
@@ -98,6 +99,12 @@ class step():
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
 
+            # check if we have a hook on this list. if not, use default class.
+            if 'hook_class' in descr_list[l]:
+                hook = descr_list[l]['hook_class']
+            else:
+                hook = hookclass.hooks
+
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   descr_list[l]['problem_params'],
                                dtype_u            =   descr_list[l]['dtype_u'],
@@ -106,6 +113,7 @@ class step():
                                num_nodes          =   descr_list[l]['num_nodes'],
                                sweeper_class      =   descr_list[l]['sweeper_class'],
                                level_params       =   descr_list[l]['level_params'],
+                               hook_class         =   hook,
                                id                 =   'L'+str(l))
 
             self.register_level(L)

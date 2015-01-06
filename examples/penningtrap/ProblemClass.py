@@ -256,10 +256,16 @@ class penningtrap(ptype):
 
         return vel
 
-    def dump_timestep(self,u,f,stats):
-        """
-        Dummy dumping routine
-        """
-        #FIXME: add energy dump here (ekin + epot)
-
-        pass
+    # def dump_iteration(self,u,f,stats):
+    #     """
+    #     Dummy dumping routine
+    #     """
+    #     #FIXME: add energy dump here (ekin + epot)
+    #     oldcol = self.sframe
+    #     self.sframe = self.ax.scatter(u.pos.values[0::3],u.pos.values[1::3],u.pos.values[2::3])
+    #     # Remove old line collection before drawing
+    #     if oldcol is not None:
+    #         self.ax.collections.remove(oldcol)
+    #     plt.pause(.001)
+    #
+    #     pass
