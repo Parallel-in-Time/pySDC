@@ -2,6 +2,8 @@ import itertools
 import copy as cp
 import numpy as np
 
+import pySDC.Hooks as Hooks
+
 
 class switch(object):
     """
@@ -71,11 +73,11 @@ def check_convergence(S):
 
     # get residual and check against prescribed tolerance (plus check number of iterations
     res = L.status.residual
-    converged = S.iter >= S.params.maxiter or res <= L.params.restol
+    converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
 
     # if we are done, pass residual to level and step stats and niter to step stats (FIXME)
     if converged:
-        S.stats.niter = S.iter
+        S.stats.niter = S.status.iter
         L.stats.residual = res
         S.stats.residual = res
 
@@ -112,11 +114,11 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     # initialize time variables of each step
     for p in slots:
-        MS[p].dt = dt # could have different dt per step here
-        MS[p].time = t0 + sum(MS[j].dt for j in range(p))
+        MS[p].status.dt = dt # could have different dt per step here
+        MS[p].status.time = t0 + sum(MS[j].status.dt for j in range(p))
 
     # determine which steps are still active (time < Tend)
-    active = [MS[p].time < Tend - np.finfo(float).eps for p in slots]
+    active = [MS[p].status.time < Tend - np.finfo(float).eps for p in slots]
     # compress slots according to active steps, i.e. remove all steps which have times above Tend
     active_slots = list(itertools.compress(slots, active))
 
@@ -132,7 +134,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
             MS[p] = pfasst_serial(MS[p])
 
         # if all active steps are done (for block-parallelization, need flag to distinguish (FIXME))
-        if all([MS[p].done for p in active_slots]):
+        if all([MS[p].status.done for p in active_slots]):
 
             # uend is uend of the last active step in the list
             uend = MS[active_slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
@@ -142,12 +144,12 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
                 step_stats.append(MS[p].stats)
 
             # determine new set of active steps and compress slots accordingly
-            active = [MS[p].time+num_procs*MS[p].dt < Tend - np.finfo(float).eps for p in slots]
+            active = [MS[p].status.time+num_procs*MS[p].status.dt < Tend - np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # increment timings for now active steps
             for p in active_slots:
-                MS[p].time += num_procs*MS[p].dt
+                MS[p].status.time += num_procs*MS[p].status.dt
             # restart active steps (reset all values and pass uend to u0)
             MS = restart_block(MS,active_slots,uend)
 
@@ -189,21 +191,21 @@ def restart_block(MS,active_slots,u0):
             p = active_slots[j]
 
             # store current slot number for diagnostics
-            MS[p].slot = p
+            MS[p].status.slot = p
             # store link to previous step
             MS[p].prev = MS[active_slots[j-1]]
             # resets step
             MS[p].reset_step()
             # determine whether I am the first and/or last in line
-            MS[p].first = active_slots.index(p) == 0
-            MS[p].last = active_slots.index(p) == len(active_slots)-1
+            MS[p].status.first = active_slots.index(p) == 0
+            MS[p].status.last = active_slots.index(p) == len(active_slots)-1
             # intialize step with u0
             MS[p].init_step(u0)
             # reset some values
-            MS[p].done = False
-            MS[p].pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
-            MS[p].iter = 0
-            MS[p].stage = 'SPREAD'
+            MS[p].status.done = False
+            MS[p].status.pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
+            MS[p].status.iter = 0
+            MS[p].status.stage = 'SPREAD'
             for l in MS[p].levels:
                 l.tag = False
 
@@ -225,11 +227,11 @@ def pfasst_serial(S):
     """
 
     # if S is done, stop right here
-    if S.done:
+    if S.status.done:
         return S
 
     # otherwise: read out stage of S and act accordingly
-    for case in switch(S.stage):
+    for case in switch(S.status.stage):
 
 
         if case('SPREAD'):
@@ -240,9 +242,9 @@ def pfasst_serial(S):
 
             # update stage and return
             if len(S.levels) > 1:
-                S.stage = 'PREDICT_RESTRICT'
+                S.status.stage = 'PREDICT_RESTRICT'
             else:
-                S.stage = 'IT_FINE_SWEEP'
+                S.status.stage = 'IT_FINE_SWEEP'
             return S
 
 
@@ -253,7 +255,7 @@ def pfasst_serial(S):
                 S.transfer(source=S.levels[l-1],target=S.levels[l])
 
             # update stage and return
-            S.stage = 'PREDICT_SWEEP'
+            S.status.stage = 'PREDICT_SWEEP'
             return S
 
 
@@ -261,7 +263,7 @@ def pfasst_serial(S):
             # do a (serial) sweep on coarsest level
 
             # receive new values from previous step (if not first step)
-            if not S.first:
+            if not S.status.first:
                 if S.prev.levels[-1].tag:
                     recv(S.levels[-1],S.prev.levels[-1])
                     # reset tag to signal successful receive
@@ -271,7 +273,7 @@ def pfasst_serial(S):
             S.levels[-1].sweep.update_nodes()
 
             # update stage and return
-            S.stage = 'PREDICT_SEND'
+            S.status.stage = 'PREDICT_SEND'
             return S
 
 
@@ -279,21 +281,21 @@ def pfasst_serial(S):
             # send updated values on coarsest level
 
             # send new values forward, if previous send was successful (otherwise: try again)
-            if not S.last:
+            if not S.status.last:
                 if not S.levels[-1].tag:
                     send(S.levels[-1],tag=True)
                 else:
-                    S.stage = 'PREDICT_SEND'
+                    S.status.stage = 'PREDICT_SEND'
                     return S
 
             # decrement counter to determine how many coarse sweeps are necessary
-            S.pred_cnt -= 1
+            S.status.pred_cnt -= 1
 
             # update stage and return
-            if S.pred_cnt == 0:
-                S.stage = 'PREDICT_INTERP'
+            if S.status.pred_cnt == 0:
+                S.status.stage = 'PREDICT_INTERP'
             else:
-                S.stage = 'PREDICT_SWEEP'
+                S.status.stage = 'PREDICT_SWEEP'
             return S
 
 
@@ -304,7 +306,7 @@ def pfasst_serial(S):
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
 
             # uodate stage and return
-            S.stage = 'IT_FINE_SWEEP'
+            S.status.stage = 'IT_FINE_SWEEP'
             return S
 
 
@@ -312,18 +314,20 @@ def pfasst_serial(S):
             # do sweep on finest level
 
             # increment iteration count here (and only here)
-            S.iter += 1
+            S.status.iter += 1
 
             # standard sweep workflow: add stats, update nodes, compute residual, log progress
             S.levels[0].stats.add_iter_stats()
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
             S.levels[0].stats.iter_stats[-1].residual = S.levels[0].status.residual
-            S.levels[0].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                    S.slot,S.stage,S.levels[0].id,S.iter,S.levels[0].status.residual)
+
+            S.levels[0].hooks.dump_sweep(S.status)
+
+            S.levels[0].hooks.dump_iteration(S.status)
 
             # update stage and return
-            S.stage = 'IT_FINE_SEND'
+            S.status.stage = 'IT_FINE_SEND'
             return S
 
 
@@ -331,11 +335,11 @@ def pfasst_serial(S):
             # send forward values on finest level
 
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
-            if not S.levels[0].tag or S.last:
+            if not S.levels[0].tag or S.status.last:
                 send(S.levels[0],tag=True)
-                S.stage = 'IT_CHECK'
+                S.status.stage = 'IT_CHECK'
             else:
-                S.stage = 'IT_FINE_SEND'
+                S.status.stage = 'IT_FINE_SEND'
             # return
             return S
 
@@ -343,21 +347,22 @@ def pfasst_serial(S):
         if case('IT_CHECK'):
             # check whether to stop iterating
 
-            S.done = check_convergence(S)
+            S.status.done = check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
-            if not S.first and S.done and not S.prev.done:
-                S.done = False
+            if not S.status.first and S.status.done and not S.prev.status.done:
+                S.status.done = False
 
             # if I am done, signal accordingly, otherwise proceed
-            if S.done:
+            if S.status.done:
                 S.levels[0].sweep.compute_end_point()
-                S.stage = 'DONE'
+                S.levels[0].hooks.dump_step(S.status)
+                S.status.stage = 'DONE'
             else:
                 if len(S.levels) > 1:
-                    S.stage = 'IT_UP'
+                    S.status.stage = 'IT_UP'
                 else:
-                    S.stage = 'IT_COARSE_RECV'
+                    S.status.stage = 'IT_COARSE_RECV'
             # return
             return S
 
@@ -371,11 +376,11 @@ def pfasst_serial(S):
             for l in range(1,len(S.levels)-1):
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
-                S.levels[l].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                        S.slot,S.stage,S.levels[l].id,S.iter,S.levels[l].status.residual)
+
+                S.levels[l].hooks.dump_sweep(S.status)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
-                if not S.levels[l].tag or S.last:
+                if not S.levels[l].tag or S.status.last:
                     send(S.levels[l],tag=True)
                 else:
                     print('SEND ERROR',l,p,S.levels[l].tag)
@@ -385,7 +390,7 @@ def pfasst_serial(S):
                 S.transfer(source=S.levels[l],target=S.levels[l+1])
 
             # update stage and return
-            S.stage = 'IT_COARSE_RECV'
+            S.status.stage = 'IT_COARSE_RECV'
             return S
 
 
@@ -395,22 +400,22 @@ def pfasst_serial(S):
             # rather complex logic here...
             # if I am not the first in line and if the first is not done yet, try to receive
             # otherwise: proceed, no receiving possible/necessary
-            if not S.first and not S.prev.done:
+            if not S.status.first and not S.prev.status.done:
                 # try to receive and the progress (otherwise: try again)
                 if S.prev.levels[-1].tag:
                     recv(S.levels[-1],S.prev.levels[-1])
                     S.prev.levels[-1].tag = False
                     if len(S.levels) > 1:
-                        S.stage = 'IT_COARSE_SWEEP'
+                        S.status.stage = 'IT_COARSE_SWEEP'
                     else:
-                        S.stage = 'IT_FINE_SWEEP'
+                        S.status.stage = 'IT_FINE_SWEEP'
                 else:
-                    S.stage = 'IT_COARSE_RECV'
+                    S.status.stage = 'IT_COARSE_RECV'
             else:
                 if len(S.levels) > 1:
-                    S.stage = 'IT_COARSE_SWEEP'
+                    S.status.stage = 'IT_COARSE_SWEEP'
                 else:
-                    S.stage = 'IT_FINE_SWEEP'
+                    S.status.stage = 'IT_FINE_SWEEP'
             # return
             return S
 
@@ -423,11 +428,11 @@ def pfasst_serial(S):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
             S.levels[-1].stats.iter_stats[-1].residual = S.levels[-1].status.residual
-            S.levels[-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                     S.slot,S.stage,S.levels[-1].id,S.iter,S.levels[-1].status.residual)
+
+            S.levels[-1].hooks.dump_sweep(S.status)
 
             # update stage and return
-            S.stage = 'IT_COARSE_SEND'
+            S.status.stage = 'IT_COARSE_SEND'
             return S
 
 
@@ -435,11 +440,11 @@ def pfasst_serial(S):
             # send forward coarsest values
 
             # try to send new values (if old ones have not been picked up yet, retry)
-            if not S.levels[-1].tag or S.last:
+            if not S.levels[-1].tag or S.status.last:
                 send(S.levels[-1],tag=True)
-                S.stage = 'IT_DOWN'
+                S.status.stage = 'IT_DOWN'
             else:
-                S.stage = 'IT_COARSE_SEND'
+                S.status.stage = 'IT_COARSE_SEND'
             # return
             return S
 
@@ -451,7 +456,7 @@ def pfasst_serial(S):
             for l in range(len(S.levels)-1,0,-1):
 
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
-                if not S.first and not S.prev.done:
+                if not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l-1].tag:
                         recv(S.levels[l-1],S.prev.levels[l-1])
                         S.prev.levels[l-1].tag = False
@@ -469,11 +474,11 @@ def pfasst_serial(S):
                     S.levels[l-1].sweep.update_nodes()
                     S.levels[l-1].sweep.compute_residual()
                     S.levels[l-1].stats.iter_stats[-1].residual = S.levels[l-1].status.residual
-                    S.levels[l-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: '
-                                              '%12.8e', S.slot,S.stage,S.levels[l-1].id,S.iter,S.levels[l-1].status.residual)
+
+                    S.levels[l-1].hooks.dump_sweep(S.status)
 
             # update stage and return
-            S.stage = 'IT_FINE_SWEEP'
+            S.status.stage = 'IT_FINE_SWEEP'
             return S
 
         #fixme: use meaningful error object here

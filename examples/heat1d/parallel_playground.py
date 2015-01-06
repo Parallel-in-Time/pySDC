@@ -8,9 +8,11 @@ from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods_Parallel as mp
-
+from pySDC import Log
 
 if __name__ == "__main__":
+
+    logger = Log.setup_custom_logger('root') # remove this if you do not want the output
 
     num_procs = 3
 

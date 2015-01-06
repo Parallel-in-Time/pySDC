@@ -48,11 +48,11 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats','__tag')
+    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','__step','id','stats','__tag','__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
-                 level_params, id):
+                 level_params, hook_class, id):
         """
         Initialization routine
 
@@ -65,6 +65,7 @@ class level():
             num_nodes: the only parameter for collocation class
             sweeper_class: sweeper class
             level_params: parameters given by the user, will be added as attributes
+            hook_class: class to add hooks (e.g. for output and diag)
             id: custom string naming this level
         """
 
@@ -74,10 +75,11 @@ class level():
                 for k,v in params.items():
                     setattr(self,k,v)
 
-        # instantiate collocation, sweeper and problem
+        # instantiate collocation, sweeper, problem and hooks
         coll = collocation_class(num_nodes,0,1)
         self.__sweep = sweeper_class(coll)
         self.__prob = problem_class(problem_params,dtype_u,dtype_f)
+        self.__hooks = hook_class()
 
         # set level parameters and status
         self.params = pars(level_params)
@@ -92,10 +94,6 @@ class level():
         # set name
         self.id = id
 
-        # set logger, empty time
-        self.logger = self.__create_logger()
-        self.__change_logger('')
-
         # dummy step variable, will be defined by registration at step
         self.__step = None
 
@@ -104,51 +102,31 @@ class level():
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
+        self.hooks._hooks__set_level(self)
 
         self.__tag = None
 
 
-    def __create_logger(self):
-        """
-        Routine to create a logging object
+    # def __create_logger(self):
+    #     """
+    #     Routine to create a logging object
+    #
+    #     Returns:
+    #         logger: custom logger for this level
+    #     """
+    #
+    #     # some logger magic
+    #     formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
+    #                                   datefmt='%d.%m.%Y %H:%M:%S')
+    #     logger = cp.deepcopy(logging.getLogger())
+    #     # this is where the logging level is set
+    #     logger.setLevel(logging.INFO)
+    #     ch = logging.StreamHandler()
+    #     ch.setFormatter(formatter)
+    #     logger.addHandler(ch)
+    #
+    #     return logger
 
-        Returns:
-            logger: custom logger for this level
-        """
-
-        # some logger magic
-        formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
-                                      datefmt='%d.%m.%Y %H:%M:%S')
-        logger = cp.deepcopy(logging.getLogger())
-        # this is where the logging level is set
-        logger.setLevel(logging.INFO)
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-
-        return logger
-
-
-    def __change_logger(self,var):
-        """
-        Add custom text to logger, e.g. time
-
-        The var input is put into the simtime attribute via the ContextFilter class. In the Formatter, the variable
-        simtime was defined/prepared.
-
-        Args:
-            var: this will be part of the output
-        """
-
-        class ContextFilter(logging.Filter):
-            """
-            This is a filter which injects contextual information into the log.
-            """
-            def filter(self, record):
-                record.simtime = var
-                return True
-
-        self.logger.addFilter(ContextFilter())
 
     def reset_level(self):
         """
@@ -192,6 +170,13 @@ class level():
         return self.__sweep
 
     @property
+    def hooks(self):
+        """
+        Getter for the hooks
+        """
+        return self.__hooks
+
+    @property
     def prob(self):
         """
         Getter for the problem
@@ -203,28 +188,28 @@ class level():
         """
         Meta-getter for the current time (only passing the step's time)
         """
-        return self.__step.time
+        return self.__step.status.time
 
     @property
     def dt(self):
         """
         Meta-getter for the step size (only passing the step's step size)
         """
-        return self.__step.dt
+        return self.__step.status.dt
 
     @property
     def iter(self):
         """
         Meta-getter for the iteration (only passing the step's iteration)
         """
-        return self.__step.iter
+        return self.__step.status.iter
 
     @property
     def dt(self):
         """
         Meta-getter for the step size (only passing the step's step size)
         """
-        return self.__step.dt
+        return self.__step.status.dt
 
     @property
     def tag(self):
