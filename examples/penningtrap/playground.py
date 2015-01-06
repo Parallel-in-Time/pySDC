@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 10*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

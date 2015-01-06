@@ -23,8 +23,7 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','__t','__dt','__k','levels','__transfer_dict','__stage','__slot','__prev','__done',
-                 '__pred_cnt','__first','__last')
+    __slots__ = ('params','stats','levels','__transfer_dict','status','__prev')
 
     def __init__(self, params):
         """
@@ -41,25 +40,29 @@ class step():
                     setattr(self,k,v)
                 pass
 
+        # short helper class to bundle all status variables
+        class status():
+            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','time','dt')
+            def __init__(self):
+                self.iter = None
+                self.stage = None
+                self.slot = None
+                self.first = None
+                self.last = None
+                self.pred_cnt = None
+                self.done = None
+                self.time = None
+                self.dt = None
+
         # set params and stats
         self.params = pars(params)
         self.stats = statclass.step_stats()
+        self.status = status()
 
         # empty attributes
-        self.__t = None
-        self.__dt = None
-        self.__k = None
         self.__transfer_dict = {}
         self.levels = []
-        self.__stage = None
-        self.__slot = None
         self.__prev = None
-        self.__done = None
-        self.__pred_cnt = None
-        self.__first = None
-        self.__last = None
-
-
 
     def generate_hierarchy(self,descr):
         """
@@ -139,6 +142,7 @@ class step():
         for k,v in dict.items():
             if type(v) is list:
                 if len(v) > 1 and (max_val > 1 and len(v) is not max_val):
+                    #FIXME: get a real error here
                     sys.exit('All lists in cparams need to be of length 1 or %i.. key %s has this list: %s' %(max_val,k,v))
                 max_val = max(max_val,len(v))
 
@@ -245,107 +249,6 @@ class step():
 
 
     @property
-    def time(self):
-        """
-        Getter for __t/time
-        Returns:
-            time
-        """
-        return self.__t
-
-
-    @time.setter
-    def time(self,t):
-        """
-        Setter for __t/time
-        Args:
-            t: time to set
-        """
-        self.__t = t
-        # pass new time to level loggers
-        for l in self.levels:
-            l._level__change_logger(self.__t)
-
-
-    @property
-    def dt(self):
-        """
-        Getter for __dt/dt
-        Returns:
-            dt
-        """
-        return self.__dt
-
-
-    @dt.setter
-    def dt(self,dt):
-        """
-        Setter for __dt/d
-        Args:
-            dt: step size to set
-        """
-        self.__dt = dt
-
-
-    @property
-    def iter(self):
-        """
-        Getter for __k/iter
-        Returns:
-            iter
-        """
-        return self.__k
-
-
-    @iter.setter
-    def iter(self,k):
-        """
-        Setter for __k/iter
-        Args:
-            k: iteration to set
-        """
-        self.__k = k
-
-    @property
-    def stage(self):
-        """
-        Getter for stage
-        Returns:
-            stage
-        """
-        return self.__stage
-
-
-    @stage.setter
-    def stage(self,s):
-        """
-        Setter for stage
-        Args:
-            s: new stage
-        """
-        self.__stage = s
-
-    @property
-    def slot(self):
-        """
-        Getter for slots
-        Returns:
-            slot
-        """
-        return self.__slot
-
-
-    @slot.setter
-    def slot(self,s):
-        """
-        Setter for slots
-        Args:
-            s: new slot
-        """
-        assert type(s) is int
-        self.__slot = s
-
-    @property
     def prev(self):
         """
         Getter for previous step
@@ -362,79 +265,5 @@ class step():
         Args:
             p: new previous step
         """
+        assert type(p) is type(self)
         self.__prev = p
-
-    @property
-    def done(self):
-        """
-        Getter for done status
-        Returns:
-            done
-        """
-        return self.__done
-
-
-    @done.setter
-    def done(self,d):
-        """
-        Setter for done status
-        Args:
-            s: new done status
-        """
-        self.__done = d
-
-    @property
-    def pred_cnt(self):
-        """
-        Getter for done status
-        Returns:
-            done
-        """
-        return self.__pred_cnt
-
-
-    @pred_cnt.setter
-    def pred_cnt(self,p):
-        """
-        Setter for pred_cnt
-        Args:
-            s: new pred_cnt
-        """
-        assert type(p) is int
-        self.__pred_cnt = p
-
-    @property
-    def first(self):
-        """
-        Getter for first
-        Returns:
-            first
-        """
-        return self.__first
-
-    @first.setter
-    def first(self,b):
-        """
-        Setter for first
-        Args:
-            s: new first
-        """
-        self.__first = b
-
-    @property
-    def last(self):
-        """
-        Getter for last
-        Returns:
-            last
-        """
-        return self.__last
-
-    @last.setter
-    def last(self,b):
-        """
-        Setter for last
-        Args:
-            s: new last
-        """
-        self.__last = b

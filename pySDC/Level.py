@@ -214,28 +214,28 @@ class level():
         """
         Meta-getter for the current time (only passing the step's time)
         """
-        return self.__step.time
+        return self.__step.status.time
 
     @property
     def dt(self):
         """
         Meta-getter for the step size (only passing the step's step size)
         """
-        return self.__step.dt
+        return self.__step.status.dt
 
     @property
     def iter(self):
         """
         Meta-getter for the iteration (only passing the step's iteration)
         """
-        return self.__step.iter
+        return self.__step.status.iter
 
     @property
     def dt(self):
         """
         Meta-getter for the step size (only passing the step's step size)
         """
-        return self.__step.dt
+        return self.__step.status.dt
 
     @property
     def tag(self):
