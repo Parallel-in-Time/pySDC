@@ -24,11 +24,9 @@ class penningtrap(ptype):
         # these parameters will be used later, so assert their existence
         assert 'omega_B' in cparams # B field frequency
         assert 'omega_E' in cparams # E field frequency
-        assert 'eps' in cparams     # +/-1
         assert 'u0' in cparams      # initial position and velocity
         assert 'nparts' in cparams  # number of particles
         assert 'sig' in cparams     # smoothing parameter for Coulomb interaction
-        assert 'alpha' in cparams   # charge to mass ratio (fixed for all particles!)
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -57,15 +55,12 @@ class penningtrap(ptype):
 
         for i in range(N):
             for j in range(N):
-
-                contrib = (part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3]) / \
-                          (np.linalg.norm(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3],2)**2+self.sig**2)**(3/2)
+                dist2 = np.linalg.norm(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3],2)**2+self.sig**2
+                contrib = part.q[j]*(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3]) / dist2**(3/2)
 
                 Efield[3*i  ] += contrib[0]
                 Efield[3*i+1] += contrib[1]
                 Efield[3*i+2] += contrib[2]
-
-        Efield *= self.alpha*Efield
 
         return Efield
 
@@ -88,9 +83,11 @@ class penningtrap(ptype):
 
         f.elec.values = self.__get_interactions(part)
 
+
         for n in range(N):
-            f.elec.values[3*n:3*n+3] = -self.eps*self.omega_E**2*np.dot(Emat,part.pos.values[3*n:3*n+3])
-            f.magn.values[3*n:3*n+3] = self.omega_B*np.array([0,0,1])
+            f.elec.values[3*n:3*n+3] += self.omega_E**2 / (part.q[n]/part.m[n]) * np.dot(Emat,part.pos.values[
+                                                                                              3*n:3*n+3])
+            f.magn.values[3*n:3*n+3] = self.omega_B * np.array([0,0,1])
 
         return f
 
@@ -108,13 +105,20 @@ class penningtrap(ptype):
 
         u = particles(N)
 
+        if u0[2][0] is not 1 or u0[3][0] is not 1:
+            print('Error: so far only q = m = 1 is implemented (I think)')
+            exit()
+
         # set first particle to u0
-        u.pos.values[0] = u0[0,0]
-        u.pos.values[1] = u0[0,1]
-        u.pos.values[2] = u0[0,2]
-        u.vel.values[0] = u0[1,0]
-        u.vel.values[1] = u0[1,1]
-        u.vel.values[2] = u0[1,2]
+        u.pos.values[0] = u0[0][0]
+        u.pos.values[1] = u0[0][1]
+        u.pos.values[2] = u0[0][2]
+        u.vel.values[0] = u0[1][0]
+        u.vel.values[1] = u0[1][1]
+        u.vel.values[2] = u0[1][2]
+
+        u.q[0] = u0[2][0]
+        u.m[0] = u0[3][0]
 
         # initialize random seed
         np.random.seed(N)
@@ -126,16 +130,19 @@ class penningtrap(ptype):
         for n in range(1,N):
 
             # draw 3 random variables in [-0.1,0.1] to shift positions
-            r = 0.2*np.random.random_sample(3)-0.1
-            u.pos.values[3*n  ] = r[0]+u0[0,0]
-            u.pos.values[3*n+1] = r[1]+u0[0,1]
-            u.pos.values[3*n+2] = r[2]+u0[0,2]
+            r = 0.002*np.random.random_sample(3)-0.001
+            u.pos.values[3*n  ] = r[0]+u0[0][0]
+            u.pos.values[3*n+1] = r[1]+u0[0][1]
+            u.pos.values[3*n+2] = r[2]+u0[0][2]
 
             # draw 3 random variables in [-5,5] to shift velocities
             r = 10*np.random.random_sample(3)-5
-            u.vel.values[3*n  ] = r[0]+u0[1,0]
-            u.vel.values[3*n+1] = r[1]+u0[1,1]
-            u.vel.values[3*n+2] = r[2]+u0[1,2]
+            u.vel.values[3*n  ] = r[0]+u0[1][0]
+            u.vel.values[3*n+1] = r[1]+u0[1][1]
+            u.vel.values[3*n+2] = r[2]+u0[1][2]
+
+            u.q[n] = u0[2][0]
+            u.m[n] = u0[3][0]
 
             # gather positions to check center
             comx += u.pos.values[3*n  ]
@@ -161,7 +168,6 @@ class penningtrap(ptype):
         # some abbreviations
         wE = self.omega_E
         wB = self.omega_B
-        eps = self.eps
         N = self.nparts
         u0 = self.u0
 
@@ -169,19 +175,19 @@ class penningtrap(ptype):
 
         u = particles(1)
 
-        wbar = np.sqrt(-2*eps)*wE
+        wbar = np.sqrt(2)*wE
 
         # position and velocity in z direction is easy to compute
-        u.pos.values[2] = u0[0,2]*np.cos(wbar*t) + u0[1,2]/wbar*np.sin(wbar*t)
-        u.vel.values[2] = -u0[0,2]*wbar*np.sin(wbar*t) + u0[1,2]*np.cos(wbar*t)
+        u.pos.values[2] = u0[0][2]*np.cos(wbar*t) + u0[1][2]/wbar*np.sin(wbar*t)
+        u.vel.values[2] = -u0[0][2]*wbar*np.sin(wbar*t) + u0[1][2]*np.cos(wbar*t)
 
         # define temp. variables to compute complex position
-        Op = 1/2*(wB + np.sqrt(wB**2+4*eps*wE**2))
-        Om = 1/2*(wB - np.sqrt(wB**2+4*eps*wE**2))
-        Rm = (Op*u0[0,0]+u0[1,1])/(Op-Om)
-        Rp = u0[0,0] - Rm
-        Im = (Op*u0[0,1]-u0[1,0])/(Op-Om)
-        Ip = u0[0,1] - Im
+        Op = 1/2*(wB + np.sqrt(wB**2-4*wE**2))
+        Om = 1/2*(wB - np.sqrt(wB**2-4*wE**2))
+        Rm = (Op*u0[0][0]+u0[1][1])/(Op-Om)
+        Rp = u0[0][0] - Rm
+        Im = (Op*u0[0][1]-u0[1][0])/(Op-Om)
+        Ip = u0[0][1] - Im
 
         # compute position in complex notation
         w = np.complex(Rp,Ip)*np.exp(-np.complex(0,Op*t)) + np.complex(Rm,Im)*np.exp(-np.complex(0,Om*t))
@@ -216,7 +222,7 @@ class penningtrap(ptype):
         rhs = acceleration(self.nparts)
 
         for n in range(N):
-            rhs.values[3*n:3*n+3] = self.alpha*(f.elec.values[3*n:3*n+3] + np.cross(part.vel.values[3*n:3*n+3],
+            rhs.values[3*n:3*n+3] = part.q[n]/part.m[n]*(f.elec.values[3*n:3*n+3] + np.cross(part.vel.values[3*n:3*n+3],
                                                                                     f.magn.values[3*n:3*n+3]))
 
         return rhs
@@ -235,6 +241,8 @@ class penningtrap(ptype):
         Returns:
             the velocities at the (m+1)th node
         """
+
+        # FIXME: this needs to include charge to mass ratio!
 
         assert type(oldvel) == particles.velocity
 
@@ -255,17 +263,3 @@ class penningtrap(ptype):
             vel.values[3*n:3*n+3] = vp + dt/2*Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
 
         return vel
-
-    # def dump_iteration(self,u,f,stats):
-    #     """
-    #     Dummy dumping routine
-    #     """
-    #     #FIXME: add energy dump here (ekin + epot)
-    #     oldcol = self.sframe
-    #     self.sframe = self.ax.scatter(u.pos.values[0::3],u.pos.values[1::3],u.pos.values[2::3])
-    #     # Remove old line collection before drawing
-    #     if oldcol is not None:
-    #         self.ax.collections.remove(oldcol)
-    #     plt.pause(.001)
-    #
-    #     pass

@@ -1,12 +1,17 @@
 from pySDC.Hooks import hooks
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 class particles_output(hooks):
 
     def __init__(self):
+        """
+        Initialization of particles output
+        """
         super(particles_output,self).__init__()
 
+        # add figure object for further use
         fig = plt.figure()
         self.ax = fig.add_subplot(111, projection='3d')
         self.ax.set_xlim3d([-20,20])
@@ -17,15 +22,49 @@ class particles_output(hooks):
 
 
     def dump_step(self,status):
-        L = self.level
+        """
+        Overwrite standard dump per step
 
-        print('plotting particles...')
+        Args:
+            status: status object per step
+
+        """
+        # some abbreviations
+        L = self.level
+        part = L.uend
+        N = L.prob.nparts
+        w = np.array([1,1,-2])
+
+        # compute (slowly..) the potential at uend
+        fpot = np.zeros(N)
+        for i in range(N):
+            # inner loop, omit ith particle
+            for j in range(0,i):
+                dist2 = np.linalg.norm(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3],2)**2+L.prob.sig**2
+                fpot[i] += part.q[j]/np.sqrt(dist2)
+            for j in range(i+1,N):
+                dist2 = np.linalg.norm(part.pos.values[3*i:3*i+3]-part.pos.values[3*j:3*j+3],2)**2+L.prob.sig**2
+                fpot[i] += part.q[j]/np.sqrt(dist2)
+            fpot[i] -= L.prob.omega_E**2 * part.m[i]/part.q[i]/2.0 \
+                                         * np.dot(w,L.uend.pos.values[3*i:3*i+3]*L.uend.pos.values[3*i:3*i+3])
+
+        # add up kinetic and potntial contributions to total energy
+        epot = 0
+        ekin = 0
+        for n in range(N):
+            epot += part.q[n]*fpot[n]
+            ekin += part.m[n]/2.0*np.dot(part.vel.values[3*n:3*n+3],part.vel.values[3*n:3*n+3])
+
+        print('Energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
+
+        # print('plotting particles...')
 
         oldcol = self.sframe
-        self.sframe = self.ax.scatter(L.u[-1].pos.values[0::3],L.u[-1].pos.values[1::3],L.u[-1].pos.values[2::3])
+        # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])
+        self.sframe = self.ax.scatter(L.uend.pos.values[0::3],L.uend.pos.values[1::3],L.uend.pos.values[2::3])
         # Remove old line collection before drawing
         if oldcol is not None:
             self.ax.collections.remove(oldcol)
-        plt.pause(.001)
+        plt.pause(0.001)
 
         return None

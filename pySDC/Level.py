@@ -107,27 +107,6 @@ class level():
         self.__tag = None
 
 
-    # def __create_logger(self):
-    #     """
-    #     Routine to create a logging object
-    #
-    #     Returns:
-    #         logger: custom logger for this level
-    #     """
-    #
-    #     # some logger magic
-    #     formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
-    #                                   datefmt='%d.%m.%Y %H:%M:%S')
-    #     logger = cp.deepcopy(logging.getLogger())
-    #     # this is where the logging level is set
-    #     logger.setLevel(logging.INFO)
-    #     ch = logging.StreamHandler()
-    #     ch.setFormatter(formatter)
-    #     logger.addHandler(ch)
-    #
-    #     return logger
-
-
     def reset_level(self):
         """
         Routine to clean-up the level for the next time step

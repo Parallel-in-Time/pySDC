@@ -204,7 +204,7 @@ class particles():
             return np.amax(np.absolute(self.values))
 
 
-    def __init__(self,init=None,vals=(None,None)):
+    def __init__(self,init=None,vals=(None,None,None,None)):
         """
         Initialization routine
 
@@ -219,10 +219,16 @@ class particles():
         if isinstance(init,type(self)):
             self.pos = particles.position(init.pos)
             self.vel = particles.velocity(init.vel)
+            self.q = cp.deepcopy(init.q)
+            self.m = cp.deepcopy(init.m)
         # if init is a number, create particles object and pick the corresponding initial values
         elif isinstance(init,int):
             self.pos = particles.position(init,val=vals[0])
             self.vel = particles.velocity(init,val=vals[1])
+            self.q = np.zeros(int(np.size(self.pos.values)/3))
+            self.q[:] = vals[2]
+            self.m = np.zeros(int(np.size(self.pos.values)/3))
+            self.m[:] = vals[3]
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

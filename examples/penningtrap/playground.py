@@ -1,5 +1,3 @@
-from pySDC import Step as stepclass
-from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
@@ -24,7 +22,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for each level
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 5E-12
 
     # This comes as read-in for the time-stepping
     sparams = {}
@@ -34,9 +32,7 @@ if __name__ == "__main__":
     pparams = {}
     pparams['omega_E'] = 4.9
     pparams['omega_B'] = 25.0
-    pparams['alpha'] = 1 # this is the charge to mass ratio for all (!) particles, only one species allowed so far
-    pparams['u0'] = np.array([[10,0,0],[100,0,100]])
-    pparams['eps'] = -1
+    pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
     pparams['nparts'] = 10
     pparams['sig'] = 0.1
 
@@ -47,7 +43,7 @@ if __name__ == "__main__":
     description['dtype_u'] = particles
     description['dtype_f'] = fields
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = 3
+    description['num_nodes'] = [3]
     description['sweeper_class'] = boris_2nd_order
     description['level_params'] = lparams
     description['transfer_class'] = particles_to_particles # this is only needed for more than 2 levels
@@ -59,7 +55,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 1*dt
+    Tend = 100*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -71,5 +67,4 @@ if __name__ == "__main__":
     print('Number of steps:',len(step_stats))
     for l in step_stats:
         print(l.residual,l.niter)
-
-    exit()
+    plt.show()
