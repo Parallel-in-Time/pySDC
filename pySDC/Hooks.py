@@ -33,6 +33,13 @@ class hooks():
         return self.__level
 
 
+    def dump_sweep(self):
+        """
+        Default routine called after each sweep
+        """
+        pass
+
+
     def dump_iteration(self):
         """
         Default routine called after each iteration

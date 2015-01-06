@@ -15,18 +15,6 @@ class particles_output(hooks):
         plt.ion()
         self.sframe = None
 
-    # def dump_iteration(self):
-    #     L = self.level
-    #
-    #     oldcol = self.sframe
-    #     self.sframe = self.ax.scatter(L.u[-1].pos.values[0::3],L.u[-1].pos.values[1::3],L.u[-1].pos.values[2::3])
-    #     # Remove old line collection before drawing
-    #     if oldcol is not None:
-    #         self.ax.collections.remove(oldcol)
-    #     plt.pause(.001)
-    #
-    #     return None
-
 
     def dump_step(self):
         L = self.level
