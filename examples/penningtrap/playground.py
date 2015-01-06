@@ -12,9 +12,12 @@ from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.penningtrap.HookClass import particles_output
 import pySDC.Methods_Parallel as mp
+from pySDC import Log
 
 
 if __name__ == "__main__":
+
+    logger = Log.setup_custom_logger('root')
 
     num_procs = 1
 

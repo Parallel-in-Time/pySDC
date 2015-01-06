@@ -281,7 +281,7 @@ def pfasst_serial(S):
             # send updated values on coarsest level
 
             # send new values forward, if previous send was successful (otherwise: try again)
-            if not S.last:
+            if not S.status.last:
                 if not S.levels[-1].tag:
                     send(S.levels[-1],tag=True)
                 else:
@@ -289,10 +289,10 @@ def pfasst_serial(S):
                     return S
 
             # decrement counter to determine how many coarse sweeps are necessary
-            S.pred_cnt -= 1
+            S.status.pred_cnt -= 1
 
             # update stage and return
-            if S.pred_cnt == 0:
+            if S.status.pred_cnt == 0:
                 S.status.stage = 'PREDICT_INTERP'
             else:
                 S.status.stage = 'PREDICT_SWEEP'
@@ -322,12 +322,9 @@ def pfasst_serial(S):
             S.levels[0].sweep.compute_residual()
             S.levels[0].stats.iter_stats[-1].residual = S.levels[0].status.residual
 
-            S.levels[0].hooks.dump_sweep()
-            print(S.status.slot,S.status.stage,S.levels[0].id,S.status.iter,S.levels[0].status.residual)
-            S.levels[0].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                    S.status.slot,S.status.stage,S.levels[0].id,S.status.iter,S.levels[0].status.residual)
+            S.levels[0].hooks.dump_sweep(S.status)
 
-            S.levels[0].hooks.dump_iteration()
+            S.levels[0].hooks.dump_iteration(S.status)
 
             # update stage and return
             S.status.stage = 'IT_FINE_SEND'
@@ -359,7 +356,7 @@ def pfasst_serial(S):
             # if I am done, signal accordingly, otherwise proceed
             if S.status.done:
                 S.levels[0].sweep.compute_end_point()
-                S.levels[0].hooks.dump_step()
+                S.levels[0].hooks.dump_step(S.status)
                 S.status.stage = 'DONE'
             else:
                 if len(S.levels) > 1:
@@ -380,9 +377,7 @@ def pfasst_serial(S):
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
 
-                S.levels[l].hooks.dump_sweep()
-                S.levels[l].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                        S.status.slot,S.status.stage,S.levels[l].id,S.status.iter,S.levels[l].status.residual)
+                S.levels[l].hooks.dump_sweep(S.status)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
                 if not S.levels[l].tag or S.status.last:
@@ -434,9 +429,7 @@ def pfasst_serial(S):
             S.levels[-1].sweep.compute_residual()
             S.levels[-1].stats.iter_stats[-1].residual = S.levels[-1].status.residual
 
-            S.levels[-1].hooks.dump_sweep()
-            S.levels[-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                                     S.status.slot,S.status.stage,S.levels[-1].id,S.status.iter,S.levels[-1].status.residual)
+            S.levels[-1].hooks.dump_sweep(S.status)
 
             # update stage and return
             S.status.stage = 'IT_COARSE_SEND'
@@ -482,9 +475,7 @@ def pfasst_serial(S):
                     S.levels[l-1].sweep.compute_residual()
                     S.levels[l-1].stats.iter_stats[-1].residual = S.levels[l-1].status.residual
 
-                    S.levels[l-1].hooks.dump_sweep()
-                    S.levels[l-1].logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: '
-                                              '%12.8e', S.status.slot,S.status.stage,S.levels[l-1].id,S.status.iter,S.levels[l-1].status.residual)
+                    S.levels[l-1].hooks.dump_sweep(S.status)
 
             # update stage and return
             S.status.stage = 'IT_FINE_SWEEP'

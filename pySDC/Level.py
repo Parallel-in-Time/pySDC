@@ -48,8 +48,7 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','logger','__step','id','stats',
-                 '__tag','__hooks')
+    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','__step','id','stats','__tag','__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
@@ -95,10 +94,6 @@ class level():
         # set name
         self.id = id
 
-        # set logger, empty time
-        self.logger = self.__create_logger()
-        self.__change_logger('')
-
         # dummy step variable, will be defined by registration at step
         self.__step = None
 
@@ -112,47 +107,26 @@ class level():
         self.__tag = None
 
 
-    def __create_logger(self):
-        """
-        Routine to create a logging object
+    # def __create_logger(self):
+    #     """
+    #     Routine to create a logging object
+    #
+    #     Returns:
+    #         logger: custom logger for this level
+    #     """
+    #
+    #     # some logger magic
+    #     formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
+    #                                   datefmt='%d.%m.%Y %H:%M:%S')
+    #     logger = cp.deepcopy(logging.getLogger())
+    #     # this is where the logging level is set
+    #     logger.setLevel(logging.INFO)
+    #     ch = logging.StreamHandler()
+    #     ch.setFormatter(formatter)
+    #     logger.addHandler(ch)
+    #
+    #     return logger
 
-        Returns:
-            logger: custom logger for this level
-        """
-
-        # some logger magic
-        formatter = logging.Formatter('Time %(simtime)8.4e -- %(levelname)s: %(message)s (logged at %(asctime)s)',
-                                      datefmt='%d.%m.%Y %H:%M:%S')
-        logger = cp.deepcopy(logging.getLogger())
-        # this is where the logging level is set
-        logger.setLevel(logging.INFO)
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-
-        return logger
-
-
-    def __change_logger(self,var):
-        """
-        Add custom text to logger, e.g. time
-
-        The var input is put into the simtime attribute via the ContextFilter class. In the Formatter, the variable
-        simtime was defined/prepared.
-
-        Args:
-            var: this will be part of the output
-        """
-
-        class ContextFilter(logging.Filter):
-            """
-            This is a filter which injects contextual information into the log.
-            """
-            def filter(self, record):
-                record.simtime = var
-                return True
-
-        self.logger.addFilter(ContextFilter())
 
     def reset_level(self):
         """

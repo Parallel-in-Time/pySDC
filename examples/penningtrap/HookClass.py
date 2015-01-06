@@ -16,7 +16,7 @@ class particles_output(hooks):
         self.sframe = None
 
 
-    def dump_step(self):
+    def dump_step(self,status):
         L = self.level
 
         print('plotting particles...')

@@ -1,4 +1,5 @@
 from pySDC.Level import level
+import logging
 
 class hooks():
 
@@ -33,21 +34,25 @@ class hooks():
         return self.__level
 
 
-    def dump_sweep(self):
+    def dump_sweep(self,status):
         """
         Default routine called after each sweep
         """
+        L = self.level
+        logger = logging.getLogger('root')
+        logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                    status.slot,status.stage,L.id,status.iter,L.status.residual)
         pass
 
 
-    def dump_iteration(self):
+    def dump_iteration(self,status):
         """
         Default routine called after each iteration
         """
         pass
 
 
-    def dump_step(self):
+    def dump_step(self,status):
         """
         Default routine called after each step
         """
