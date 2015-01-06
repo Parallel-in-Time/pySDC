@@ -43,6 +43,9 @@ class hooks():
         logger = logging.getLogger('root')
         logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                     status.slot,status.stage,L.id,status.iter,L.status.residual)
+
+        L.stats.iter_stats[-1].residual = L.status.residual
+
         pass
 
 
@@ -57,4 +60,6 @@ class hooks():
         """
         Default routine called after each step
         """
+        self.level.stats.niter = 99#status.iter
+        self.level.stats.residual = self.level.status.residual
         pass

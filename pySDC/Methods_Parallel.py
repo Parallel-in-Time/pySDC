@@ -75,7 +75,7 @@ def check_convergence(S):
     # if we are done, pass residual to level and step stats and niter to step stats (FIXME)
     if converged:
         S.stats.niter = S.status.iter
-        L.stats.residual = res
+        # L.stats.residual = res
         S.stats.residual = res
 
     return converged
@@ -317,8 +317,6 @@ def pfasst_serial(S):
             S.levels[0].stats.add_iter_stats()
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
-            S.levels[0].stats.iter_stats[-1].residual = S.levels[0].status.residual
-
             S.levels[0].hooks.dump_sweep(S.status)
 
             S.levels[0].hooks.dump_iteration(S.status)
@@ -371,9 +369,9 @@ def pfasst_serial(S):
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
             for l in range(1,len(S.levels)-1):
+                S.levels[l].stats.add_iter_stats()
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
-
                 S.levels[l].hooks.dump_sweep(S.status)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
@@ -420,11 +418,10 @@ def pfasst_serial(S):
         if case('IT_COARSE_SWEEP'):
             # coarsest sweep
 
-            # standard sweep workflow: add stats, update nodes, compute residual, update stats, log progress
+            # standard sweep workflow: add stats, update nodes, compute residual, log progress
             S.levels[-1].stats.add_iter_stats()
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
-            S.levels[-1].stats.iter_stats[-1].residual = S.levels[-1].status.residual
 
             S.levels[-1].hooks.dump_sweep(S.status)
 
@@ -466,12 +463,8 @@ def pfasst_serial(S):
 
                 # on middle levels: do sweep as usual
                 if l-1 > 0:
-
-                    S.levels[l-1].stats.add_iter_stats()
                     S.levels[l-1].sweep.update_nodes()
                     S.levels[l-1].sweep.compute_residual()
-                    S.levels[l-1].stats.iter_stats[-1].residual = S.levels[l-1].status.residual
-
                     S.levels[l-1].hooks.dump_sweep(S.status)
 
             # update stage and return

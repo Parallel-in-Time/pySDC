@@ -54,7 +54,7 @@ class step():
                 self.time = None
                 self.dt = None
 
-        # set params and stats
+        # set params, stats and status
         self.params = pars(params)
         self.stats = statclass.step_stats()
         self.status = status()

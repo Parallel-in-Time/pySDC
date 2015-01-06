@@ -27,8 +27,9 @@ class particles_output(hooks):
 
         Args:
             status: status object per step
-
         """
+        super(particles_output,self).dump_step(status)
+
         # some abbreviations
         L = self.level
         part = L.uend
@@ -56,6 +57,8 @@ class particles_output(hooks):
             ekin += part.m[n]/2.0*np.dot(part.vel.values[3*n:3*n+3],part.vel.values[3*n:3*n+3])
 
         print('Energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
+
+        L.stats.iter_stats[-1].etot = epot+ekin
 
         # print('plotting particles...')
 

@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 100*dt
+    Tend = 2*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -66,5 +66,5 @@ if __name__ == "__main__":
 
     print('Number of steps:',len(step_stats))
     for l in step_stats:
-        print(l.residual,l.niter)
-    plt.show()
+        print(l.level_stats[0].residual,l.level_stats[0].niter,l.level_stats[0].iter_stats[-1].etot)
+    # plt.show()
