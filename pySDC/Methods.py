@@ -108,6 +108,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     for p in slots:
         MS[p].status.dt = dt # could have different dt per step here
         MS[p].status.time = t0 + sum(MS[j].status.dt for j in range(p))
+        MS[p].status.step = p
 
     # determine which steps are still active (time < Tend)
     active = [MS[p].status.time < Tend - np.finfo(float).eps for p in slots]
@@ -141,6 +142,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
             # increment timings for now active steps
             for p in active_slots:
                 MS[p].status.time += num_procs*MS[p].status.dt
+                MS[p].status.step += num_procs
             # restart active steps (reset all values and pass uend to u0)
             MS = restart_block(MS,active_slots,uend)
 

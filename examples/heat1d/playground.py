@@ -1,20 +1,26 @@
+
+from pySDC import CollocationClasses as collclass
+
 import numpy as np
 
-from pySDC import Step as stepclass
-from pySDC import CollocationClasses as collclass
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.deprecated.Methods_Serial import mlsdc_step
-
+import pySDC.Methods as mp
+from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":
 
-    # This comes as read-in for the level class
+    # set global logger (remove this if you do not want the output at all)
+    logger = Log.setup_custom_logger('root')
+
+    num_procs = 3
+
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 3E-12
 
     sparams = {}
     sparams['maxiter'] = 10
@@ -24,6 +30,7 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['nvars'] = [255,127]
 
+    # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d
     description['problem_params'] = pparams
@@ -35,41 +42,27 @@ if __name__ == "__main__":
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
 
-    S = stepclass.step(sparams)
-    S.generate_hierarchy(description)
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
 
-    S.time = 0
-    S.dt = 0.125
+    # setup parameters "in time"
+    t0 = 0
+    Tend = 1.25
+    dt = 0.25
 
-    Tend = 2*S.dt
+    # get initial values on finest level
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    S.stats.niter = 0
+    # call main function to get things done...
+    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    P = S.levels[0].prob
-    uinit = P.u_exact(S.time)
+    # compute exact solution and compare
+    uex = P.u_exact(Tend)
 
-    S.init_step(uinit)
+    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+        uex.values,np.inf)))
 
-    step_stats = []
-
-    nsteps = int(Tend/S.dt)
-
-    for n in range(nsteps):
-
-        uend = mlsdc_step(S)
-
-        step_stats.append(S.stats)
-
-        S.time += S.dt
-
-        S.reset_step()
-
-        S.init_step(uend)
-
-
-    uex = P.u_exact(S.time)
-
-    print(step_stats[1].residual,step_stats[1].level_stats[0].residual)
-
-    print('error at time %s: %s' %(S.time,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)))
-
+    extract_stats = grep_stats(stats,iter=-1,type='residual')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    print(extract_stats,sortedlist_stats)

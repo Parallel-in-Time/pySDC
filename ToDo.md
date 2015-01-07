@@ -18,4 +18,4 @@ ToDo list
 
 * convert docs to sphinx and set up homepage
 
-* add timings mechanism to statistics e.g. via hooks, add step counter to statistics
+* add timings mechanism to statistics e.g. via hooks

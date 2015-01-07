@@ -41,7 +41,7 @@ class step():
 
         # short helper class to bundle all status variables
         class status():
-            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','time','dt')
+            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','time','dt','step')
             def __init__(self):
                 self.iter = None
                 self.stage = None
@@ -52,6 +52,7 @@ class step():
                 self.done = None
                 self.time = None
                 self.dt = None
+                self.step = None
 
         # set params and status
         self.params = pars(params)

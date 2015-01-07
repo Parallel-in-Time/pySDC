@@ -14,7 +14,7 @@ class stats_class():
         """
         self.__stats = {}
 
-    def add_to_stats(self,time=-1,level=-1,iter=-1,type=-1,value=-1):
+    def add_to_stats(self,step=-1,time=-1,level=-1,iter=-1,type=-1,value=-1):
         """
         Routine to add data to the statistics dict
 
@@ -26,8 +26,8 @@ class stats_class():
             value: the actual data
         """
         # create named tuple for the key and add to dict
-        Entry = namedtuple('Entry',['time','level','iter','type'])
-        self.__stats[Entry(time=time,level=level,iter=iter,type=type)] = value
+        Entry = namedtuple('Entry',['step','time','level','iter','type'])
+        self.__stats[Entry(step=step,time=time,level=level,iter=iter,type=type)] = value
 
     def return_stats(self):
         """
@@ -38,7 +38,7 @@ class stats_class():
         return self.__stats
 
 
-def grep_stats(stats,time=None,level=None,iter=None,type=None):
+def grep_stats(stats,step=None,time=None,level=None,iter=None,type=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -55,6 +55,7 @@ def grep_stats(stats,time=None,level=None,iter=None,type=None):
     for k,v in stats.items():
         # get data if key matches the filter (if specified)
         if (k.time == time or time is None) and \
+                (k.step == step or step is None) and \
                 (k.level == level or level is None) and \
                 (k.iter == iter or iter is None) and \
                 (k.type == type or type is None):

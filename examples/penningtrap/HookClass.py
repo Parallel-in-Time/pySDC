@@ -101,7 +101,7 @@ class particles_output(hooks):
 
         print('Energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
 
-        stats.add_to_stats(time=status.time, type='etot', value=epot+ekin)
+        stats.add_to_stats(step=status.step, time=status.time, type='etot', value=epot+ekin)
 
         # print('plotting particles...')
 

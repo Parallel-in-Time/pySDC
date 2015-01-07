@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 10*dt
+    Tend = 20*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -68,9 +68,8 @@ if __name__ == "__main__":
     sortedlist_stats = sort_stats(extract_stats,sortby='time')
 
     fig = plt.figure()
-
-    xvals = [entry[0] for entry in sortedlist_stats]
-    yvals = [entry[1]/sortedlist_stats[0][1] for entry in sortedlist_stats]
+    xvals = [entry[0] for entry in sortedlist_stats[10:]]
+    yvals = [abs(entry[1]-sortedlist_stats[10][1])/sortedlist_stats[10][1] for entry in sortedlist_stats[10:]]
     plt.plot(xvals,yvals,'b-')
 
     plt.show()

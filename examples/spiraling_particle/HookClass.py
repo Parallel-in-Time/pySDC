@@ -38,7 +38,7 @@ class particles_output(hooks):
         R = np.linalg.norm(u.pos.values)
         H = 1/2*np.dot(u.vel.values,u.vel.values)+0.02/R
 
-        stats.add_to_stats(time=status.time, type='energy', value=H)
+        stats.add_to_stats(step=status.step, time=status.time, type='energy', value=H)
 
         oldcol = self.sframe
         # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])
