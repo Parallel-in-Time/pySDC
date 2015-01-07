@@ -17,6 +17,7 @@ if __name__ == "__main__":
     logger = Log.setup_custom_logger('root')
 
     num_procs = 1
+
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-10
@@ -30,7 +31,6 @@ if __name__ == "__main__":
     pparams['maxiter'] = 50
     pparams['mu'] = 5
     pparams['u0'] = np.array([2.0,0])
-
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

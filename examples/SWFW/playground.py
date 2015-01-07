@@ -8,79 +8,59 @@ import matplotlib.pyplot as plt
 from examples.SWFW.ProblemClass import swfw_scalar
 from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.Methods import sdc_step
+import pySDC.Methods as mp
+from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
 
 
 if __name__ == "__main__":
+
+    # set global logger (remove this if you do not want the output at all)
+    logger = Log.setup_custom_logger('root')
+
+    num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-12
 
     sparams = {}
-    sparams['Tend'] = 1
     sparams['maxiter'] = 2
 
     # This comes as read-in for the problem class
-    cparams_f = {}
-    cparams_f['lambda_s'] = 1j*np.linspace(0,2,100)
-    cparams_f['lambda_f'] = 1j*np.linspace(0,16,100)
-    cparams_f['u0'] = 1
+    pparams = {}
+    pparams['lambda_s'] = 1j*np.linspace(0,2,100)
+    pparams['lambda_f'] = 1j*np.linspace(0,16,100)
+    pparams['u0'] = 1
 
-    L0 = levclass.level(problem_class       =   swfw_scalar,
-                        problem_params      =   cparams_f,
-                        dtype_u             =   mesh,
-                        dtype_f             =   rhs_imex_mesh,
-                        collocation_class   =   collclass.CollGaussLobatto,
-                        num_nodes           =   2,
-                        sweeper_class       =   imex_1st_order,
-                        level_params        =   lparams,
-                        id                  =   'L0')
+    # Fill description dictionary for easy hierarchy creation
+    description = {}
+    description['problem_class'] = swfw_scalar
+    description['problem_params'] = pparams
+    description['dtype_u'] = mesh
+    description['dtype_f'] = rhs_imex_mesh
+    description['collocation_class'] = collclass.CollGaussLobatto
+    description['num_nodes'] = [5]
+    description['sweeper_class'] = imex_1st_order
+    description['level_params'] = lparams
 
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
 
-    S = stepclass.step(sparams)
-    S.register_level(L0)
+    # setup parameters "in time"
+    t0 = 0
+    dt = 1.0
+    Tend = 1.0
 
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    S.time = 0.0
-    S.dt = 1.0
+    print('Init:',uinit.values)
 
-    S.stats.niter = 0
+    # call main function to get things done...
+    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    P = S.levels[0].prob
-    uinit = P.u_exact(S.time)
-
-
-    S.init_step(uinit)
-
-    step_stats = []
-
-    nsteps = int(S.params.Tend/S.dt)
-
-    for n in range(nsteps):
-
-        uend = sdc_step(S)
-
-        step_stats.append(S.stats)
-
-        S.time += S.dt
-
-        S.reset_step()
-
-        S.init_step(uend)
-
-
-    uex = P.u_exact(S.time)
-
-    # plt.pcolor(np.imag(uex.values).T)
-    # plt.colorbar()
-    # plt.show()
-    #
-    # exit()
-
-    # print(uex.values)
-    # print(uend.values)
-    # print(abs(uend.values))
+    uex = P.u_exact(Tend)
 
     plt.pcolor(np.absolute(uend.values).T,vmin=1,vmax=1.01)
     # plt.pcolor(np.imag(uend.values))
@@ -88,7 +68,6 @@ if __name__ == "__main__":
 
     plt.show()
 
-    # print(step_stats[1].residual,step_stats[1].level_stats[0].residual)
-
-    print('error at time %s: %s' %(S.time,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)))
+    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,
+                                                                                                     np.inf)))
 
