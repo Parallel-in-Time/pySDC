@@ -30,7 +30,7 @@ class particles_output(hooks):
         Args:
             status: status object per step
         """
-        super(particles_output,self).dump_step(status)
+        super(particles_output,self).dump_pre(status)
 
         # some abbreviations
         L = self.level

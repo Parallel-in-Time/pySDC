@@ -72,4 +72,8 @@ if __name__ == "__main__":
     yvals = [abs(entry[1]-sortedlist_stats[10][1])/sortedlist_stats[10][1] for entry in sortedlist_stats[10:]]
     plt.plot(xvals,yvals,'b-')
 
+    extract_stats = grep_stats(stats,type='timing_step')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    print(sortedlist_stats)
+
     plt.show()

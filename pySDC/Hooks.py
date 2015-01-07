@@ -1,18 +1,20 @@
 from pySDC.Level import level
 import logging
+import time
 
 from pySDC.Stats import stats
 
 
 class hooks():
 
-    __slots__ = ('__level')
+    __slots__ = ('__level','t0')
 
     def __init__(self):
         """
         Initialization routine
         """
         self.__level = None
+        self.t0 = None
         pass
 
 
@@ -35,6 +37,15 @@ class hooks():
             level
         """
         return self.__level
+
+
+    def pre_step(self,status):
+        """
+        Hook called before each step
+        """
+        self.t0 = time.time()
+        pass
+
 
     def dump_pre(self,status):
         """
@@ -72,7 +83,9 @@ class hooks():
         """
         Default routine called after each step
         """
+
         L = self.level
+        stats.add_to_stats(step=status.step, time=status.time, type='timing_step', value=time.time()-self.t0)
         stats.add_to_stats(step=status.step, time=status.time, type='niter', value=status.iter)
         stats.add_to_stats(step=status.step, time=status.time, type='residual', value=L.status.residual)
 

@@ -229,6 +229,7 @@ def pfasst_serial(S):
 
         if case('SPREAD'):
             # first stage: spread values
+            S.levels[0].hooks.pre_step(S.status)
 
             # call predictor from sweeper
             S.levels[0].sweep.predict()
