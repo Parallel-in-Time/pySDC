@@ -25,7 +25,6 @@ class planewave_single(ptype):
         assert 'delta' in cparams   # polarization
         assert 'a0' in cparams      # normalized amplitude
         assert 'u0' in cparams      # initial position and velocity
-        assert 'alpha' in cparams   # mass to charge ratio
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -111,13 +110,16 @@ class planewave_single(ptype):
         # u.vel.values[1] = 0
         # u.vel.values[2] = 0
 
-        u.pos.values[0] = u0[0,0]
-        u.pos.values[1] = u0[0,1]
-        u.pos.values[2] = u0[0,2]
+        u.pos.values[0] = u0[0][0]
+        u.pos.values[1] = u0[0][1]
+        u.pos.values[2] = u0[0][2]
 
-        u.vel.values[0] = u0[1,0]
-        u.vel.values[1] = u0[1,1]
-        u.vel.values[2] = u0[1,2]
+        u.vel.values[0] = u0[1][0]
+        u.vel.values[1] = u0[1][1]
+        u.vel.values[2] = u0[1][2]
+
+        u.q[:] = u0[2][0]
+        u.m[:] = u0[3][0]
 
         return u
 
@@ -136,7 +138,7 @@ class planewave_single(ptype):
 
         assert type(part) == particles
         rhs = acceleration(self.nparts)
-        rhs.values[:] = self.alpha*(f.elec.values + np.cross(part.vel.values,f.magn.values))
+        rhs.values[:] = part.q[:]/part.m[:]*(f.elec.values + np.cross(part.vel.values,f.magn.values))
 
         return rhs
 
@@ -156,7 +158,7 @@ class planewave_single(ptype):
         """
 
         assert type(oldvel) == particles.velocity
-        a = self.alpha
+        a = 1 # fixme: this boris assumes charge to mass ratio of 1
         c.values += dt*a*1/2*np.cross(oldvel.values,old_fields.magn.values-new_fields.magn.values)
         Emean = 1/2*(old_fields.elec + new_fields.elec)
         # Bmean = 1/2*(old_fields.magn + new_fields.magn)
@@ -173,20 +175,3 @@ class planewave_single(ptype):
         vel.values[:] = vp + dt/2*a*Emean.values + c.values/2
 
         return vel
-
-
-    def dump_timestep(self,u,f,stats):
-        """
-        Implementation of a simple dumping routine (should be linked to stats class)
-
-        Args:
-            u: current particle
-            f: current fields
-        """
-
-        R = np.linalg.norm(u.pos.values)
-        H = 1/2*np.dot(u.vel.values,u.vel.values)+0.02/R
-        R0 = np.linalg.norm(self.u0[0,:])
-        H0 = 1/2*np.dot(self.u0[1,:],self.u0[1,:])+0.02/R0
-        stats.energy_err = abs(H-H0)/H0
-        return None

@@ -1,7 +1,5 @@
 import numpy as np
 
-from pySDC import Step as stepclass
-from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
