@@ -17,3 +17,5 @@ ToDo list
 * write a more detailed howto, explaining all the features of the code using basic examples
 
 * convert docs to sphinx and set up homepage
+
+* add timings mechanism to statistics e.g. via hooks, add step counter to statistics

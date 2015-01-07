@@ -36,6 +36,12 @@ class hooks():
         """
         return self.__level
 
+    def dump_pre(self,status):
+        """
+        Default routine called before time-loop starts
+        """
+        pass
+
 
     def dump_sweep(self,status):
         """

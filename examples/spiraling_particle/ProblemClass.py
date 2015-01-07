@@ -143,35 +143,39 @@ class planewave_single(ptype):
         return rhs
 
 
-    def boris_solver(self,c,dt,old_fields,new_fields,oldvel):
+    def boris_solver(self,c,dt,old_fields,new_fields,old_parts):
         """
-        The actual Boris solver for non-static B fields, extended by the c-term (now modified)
+        The actual Boris solver for static (!) B fields, extended by the c-term
 
         Args:
             c: the c term gathering the known values from the previous iteration
             dt: the (probably scaled) time step size
             old_fields: the field values at the previous node m
             new_fields: the field values at the current node m+1
-            oldvel: the velocity at the previous node m
+            old_parts: the particles at the previous node m
         Returns:
-            the velocity at the (m+1)th node
+            the velocities at the (m+1)th node
         """
 
-        assert type(oldvel) == particles.velocity
-        a = 1 # fixme: this boris assumes charge to mass ratio of 1
-        c.values += dt*a*1/2*np.cross(oldvel.values,old_fields.magn.values-new_fields.magn.values)
+        N = self.nparts
+        vel = particles.velocity(N)
+
         Emean = 1/2*(old_fields.elec + new_fields.elec)
-        # Bmean = 1/2*(old_fields.magn + new_fields.magn)
-        # Emean = old_fields.elec
-        Bmean = new_fields.magn
-        # pre-velocity, separated by the electric forces (and the c term)
-        vm = oldvel.values + dt/2*a*Emean.values + c.values/2
-        # rotation
-        t = dt/2*a*Bmean.values
-        s = 2*t/(1+np.linalg.norm(t,2)**2)
-        vp = vm + np.cross(vm+np.cross(vm,t),s)
-        # post-velocity
-        vel = particles.velocity(self.nparts)
-        vel.values[:] = vp + dt/2*a*Emean.values + c.values/2
+
+        for n in range(N):
+
+            a = old_parts.q[n]/old_parts.m[n]
+
+            c.values[3*n:3*n+3] += dt/2*a*np.cross(old_parts.vel.values[3*n:3*n+3],
+                                                   old_fields.magn.values[3*n:3*n+3]-new_fields.magn.values[3*n:3*n+3])
+
+            # pre-velocity, separated by the electric forces (and the c term)
+            vm = old_parts.vel.values[3*n:3*n+3] + dt/2*a*Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
+            # rotation
+            t = dt/2* a * new_fields.magn.values[3*n:3*n+3]
+            s = 2*t/(1+np.linalg.norm(t,2)**2)
+            vp = vm + np.cross(vm+np.cross(vm,t),s)
+            # post-velocity
+            vel.values[3*n:3*n+3] = vp + dt/2*a* Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
 
         return vel

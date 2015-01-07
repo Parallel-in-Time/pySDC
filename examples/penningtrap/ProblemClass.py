@@ -228,7 +228,7 @@ class penningtrap(ptype):
         return rhs
 
 
-    def boris_solver(self,c,dt,old_fields,new_fields,oldvel):
+    def boris_solver(self,c,dt,old_fields,new_fields,old_parts):
         """
         The actual Boris solver for static (!) B fields, extended by the c-term
 
@@ -237,14 +237,10 @@ class penningtrap(ptype):
             dt: the (probably scaled) time step size
             old_fields: the field values at the previous node m
             new_fields: the field values at the current node m+1
-            oldvel: the velocities at the previous node m
+            old_parts: the particles at the previous node m
         Returns:
             the velocities at the (m+1)th node
         """
-
-        # FIXME: this needs to include charge to mass ratio!
-
-        assert type(oldvel) == particles.velocity
 
         N = self.nparts
         vel = particles.velocity(N)
@@ -253,13 +249,18 @@ class penningtrap(ptype):
 
         for n in range(N):
 
+            a = old_parts.q[n]/old_parts.m[n]
+
+            c.values[3*n:3*n+3] += dt/2*a*np.cross(old_parts.vel.values[3*n:3*n+3],
+                                                   old_fields.magn.values[3*n:3*n+3]-new_fields.magn.values[3*n:3*n+3])
+
             # pre-velocity, separated by the electric forces (and the c term)
-            vm = oldvel.values[3*n:3*n+3] + dt/2*Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
+            vm = old_parts.vel.values[3*n:3*n+3] + dt/2*a*Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
             # rotation
-            t = dt/2*new_fields.magn.values[3*n:3*n+3]
+            t = dt/2* a * new_fields.magn.values[3*n:3*n+3]
             s = 2*t/(1+np.linalg.norm(t,2)**2)
             vp = vm + np.cross(vm+np.cross(vm,t),s)
             # post-velocity
-            vel.values[3*n:3*n+3] = vp + dt/2*Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
+            vel.values[3*n:3*n+3] = vp + dt/2*a* Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
 
         return vel

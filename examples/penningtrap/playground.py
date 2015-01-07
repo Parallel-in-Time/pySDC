@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 2*dt
+    Tend = 10*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -66,6 +66,11 @@ if __name__ == "__main__":
 
     extract_stats = grep_stats(stats,type='etot')
     sortedlist_stats = sort_stats(extract_stats,sortby='time')
-    print(extract_stats,sortedlist_stats)
+
+    fig = plt.figure()
+
+    xvals = [entry[0] for entry in sortedlist_stats]
+    yvals = [entry[1]/sortedlist_stats[0][1] for entry in sortedlist_stats]
+    plt.plot(xvals,yvals,'b-')
 
     plt.show()
