@@ -1,6 +1,8 @@
 from pySDC.Hooks import hooks
+from pySDC.Stats import stats
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 class particles_output(hooks):
@@ -19,6 +21,7 @@ class particles_output(hooks):
         self.ax.set_zlim3d([-20,20])
         plt.ion()
         self.sframe = None
+
 
 
     def dump_step(self,status):
@@ -58,9 +61,10 @@ class particles_output(hooks):
 
         print('Energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
 
-        L.stats.iter_stats[-1].etot = epot+ekin
+        stats.add_to_stats(time=status.time, type='etot', value=epot+ekin)
 
         # print('plotting particles...')
+
 
         oldcol = self.sframe
         # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])

@@ -46,7 +46,7 @@ class hooks():
         logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                     status.slot,status.stage,L.id,status.iter,L.status.residual)
 
-        stats.add_to_stats(time=status.time, level=L.id, iter=status.iter, key='residual', value=L.status.residual)
+        stats.add_to_stats(time=status.time, level=L.id, iter=status.iter, type='residual', value=L.status.residual)
 
         pass
 
@@ -56,7 +56,7 @@ class hooks():
         Default routine called after each iteration
         """
         L = self.level
-        stats.add_to_stats(time=status.time, iter=status.iter, key='residual', value=L.status.residual)
+        stats.add_to_stats(time=status.time, iter=status.iter, type='residual', value=L.status.residual)
         pass
 
 
@@ -65,7 +65,7 @@ class hooks():
         Default routine called after each step
         """
         L = self.level
-        stats.add_to_stats(time=status.time, level=L.id, key='niter', value=status.iter)
-        stats.add_to_stats(time=status.time, level=L.id, key='residual', value=L.status.residual)
+        stats.add_to_stats(time=status.time, type='niter', value=status.iter)
+        stats.add_to_stats(time=status.time, type='residual', value=L.status.residual)
 
         pass

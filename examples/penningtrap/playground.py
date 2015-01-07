@@ -1,7 +1,6 @@
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
 from examples.penningtrap.ProblemClass import penningtrap
@@ -11,6 +10,7 @@ from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.penningtrap.HookClass import particles_output
 import pySDC.Methods_Parallel as mp
 from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
 
 
 if __name__ == "__main__":
@@ -62,9 +62,10 @@ if __name__ == "__main__":
     uinit = P.u_init()
 
     # call main function to get things done...
-    uend,step_stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    print('Number of steps:',len(step_stats))
-    for l in step_stats:
-        print(l.level_stats[0].residual,l.level_stats[0].niter,l.level_stats[0].iter_stats[-1].etot)
-    # plt.show()
+    extract_stats = grep_stats(stats,type='etot')
+    sortedlist_stats = sort_stats(extract_stats,sortby='time')
+    print(extract_stats,sortedlist_stats)
+
+    plt.show()

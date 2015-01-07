@@ -9,6 +9,7 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods_Parallel as mp
 from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":
 
@@ -62,12 +63,6 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    for k,v in stats.items():
-        print(k,v)
-
-    allstepres = [(key[0],stats[key]) for key in stats.keys() if key[2]==-1 and key[3]=='residual']
-    print(sorted(allstepres,key=lambda tup: tup[0]))
-
-    stepres = [(key[2],stats[key]) for key in stats.keys() if key[0]==0 and key[1] =='L0' and key[2] is not -1 and key[3]=='residual']
-    print(sorted(stepres,key=lambda tup: tup[0]))
-
+    extract_stats = grep_stats(stats,time=0.0,level='L0',type='residual')
+    sortedlist_stats = sort_stats(extract_stats,sortby='iter')
+    print(extract_stats,sortedlist_stats)

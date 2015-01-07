@@ -74,13 +74,6 @@ def check_convergence(S):
     res = L.status.residual
     converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
 
-    # if we are done, pass residual to level and step stats and niter to step stats (FIXME)
-    # if converged:
-    #     Stats.step_stats.niter = S.status.iter
-    #     S.stats.niter = S.status.iter
-        # L.stats.residual = res
-        # S.stats.residual = res
-
     return converged
 
 
