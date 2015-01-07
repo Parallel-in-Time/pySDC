@@ -8,7 +8,7 @@ from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.penningtrap.HookClass import particles_output
-import pySDC.Methods_Parallel as mp
+import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 

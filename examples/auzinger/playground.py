@@ -6,72 +6,65 @@ from pySDC import CollocationClasses as collclass
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
 from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.deprecated.Methods_Serial import adaptive_sdc_step
+import pySDC.Methods as mp
+from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
 
 
 if __name__ == "__main__":
+
+    # set global logger (remove this if you do not want the output at all)
+    logger = Log.setup_custom_logger('root')
+
+    num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['Tend'] = 20.0
     sparams['maxiter'] = 20
-    sparams['pred_iter_lim'] = 4
-
 
     # This comes as read-in for the problem class
-    cparams = {}
-    cparams['newton_tol'] = 1E-12
-    cparams['maxiter'] = 50
+    pparams = {}
+    pparams['newton_tol'] = 1E-12
+    pparams['maxiter'] = 50
 
-    L0 = levclass.level(problem_class       =   auzinger,
-                        problem_params      =   cparams,
-                        dtype_u             =   mesh,
-                        dtype_f             =   mesh,
-                        collocation_class   =   collclass.CollGaussLobatto,
-                        num_nodes           =   3,
-                        sweeper_class       =   generic_LU,
-                        level_params        =   lparams,
-                        id                  =   'L0')
+    # Fill description dictionary for easy hierarchy creation
+    description = {}
+    description['problem_class'] = auzinger
+    description['problem_params'] = pparams
+    description['dtype_u'] = mesh
+    description['dtype_f'] = mesh
+    description['collocation_class'] = collclass.CollGaussLobatto
+    description['num_nodes'] = [3]
+    description['sweeper_class'] = generic_LU
+    description['level_params'] = lparams
 
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
 
-    S = stepclass.step(sparams)
-    S.register_level(L0)
+    # setup parameters "in time"
+    t0 = 0
+    dt = 0.1
+    Tend = 2
 
-    S.time = 0
-    S.dt = 0.1
-    S.stats.niter = 0
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    P = S.levels[0].prob
-    uinit = P.u_exact(S.time)
+    print('Init:',uinit.values)
 
-    S.init_step(uinit)
+    # call main function to get things done...
+    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    print('Init:',S.levels[0].u[0].values)
+    # get stats and error
+    extract_stats = grep_stats(stats,type='niter')
+    sortedlist_stats = sort_stats(extract_stats,sortby='time')
 
-
-    nsteps = int(S.params.Tend/S.dt)
-
-    step_stats = []
-
-    while S.time < S.params.Tend:
-
-        uend = adaptive_sdc_step(S)
-
-        step_stats.append(S.stats)
-
-        S.time += S.dt
-
-        S.reset_step()
-
-        S.init_step(uend)
-
-    uex = P.u_exact(S.time)
+    uex = P.u_exact(Tend)
 
     print('Error:',np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf))
 
-    print('Min/Max/Sum number of iterations: %s/%s/%s' %(min(stats.niter for stats in step_stats),
-                                                         max(stats.niter for stats in step_stats),
-                                                         sum(stats.niter for stats in step_stats)))
+    print('Min/Max/Sum number of iterations: %s/%s/%s' %(min(entry[1] for entry in sortedlist_stats),
+                                                         max(entry[1] for entry in sortedlist_stats),
+                                                         sum(entry[1] for entry in sortedlist_stats)))
