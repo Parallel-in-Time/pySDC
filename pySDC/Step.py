@@ -223,8 +223,7 @@ class step():
         """
         Initialization routine for a new step.
 
-        This routine uses initial values u0 to set up the u[0] values at the finest level and the level stats are
-        linked with the step stats for easy access.
+        This routine uses initial values u0 to set up the u[0] values at the finest level
 
         Args:
             u0: initial values

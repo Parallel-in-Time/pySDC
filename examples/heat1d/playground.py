@@ -1,14 +1,12 @@
-from pySDC import Step as stepclass
-from pySDC import Level as levclass
-from pySDC import CollocationClasses as collclass
-
 import numpy as np
 
+from pySDC import Step as stepclass
+from pySDC import CollocationClasses as collclass
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.Methods_Serial import sdc_step, mlsdc_step
+from pySDC.deprecated.Methods_Serial import mlsdc_step
 
 
 if __name__ == "__main__":

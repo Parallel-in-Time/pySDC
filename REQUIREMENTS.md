@@ -6,3 +6,4 @@
 * copy, min. version ???
 * abc, min. version ???
 * itertools, min. version ???
+* collections, min. version ???

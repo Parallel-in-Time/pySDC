@@ -1,18 +1,16 @@
+import logging
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 from pySDC import Step as stepclass
 from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
-
-import numpy as np
-import logging
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from matplotlib import rc
-from subprocess import call
-
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.sweeper_classes.generic_LU import generic_LU
 from pySDC.datatype_classes.mesh import mesh
-from pySDC.Methods_Serial import adaptive_sdc_step, sdc_step
+from pySDC.deprecated.Methods_Serial import sdc_step
 
 
 if __name__ == "__main__":

@@ -109,7 +109,7 @@ class level():
         Routine to clean-up the level for the next time step
         """
 
-        # reset status and stats
+        # reset status
         self.status = level.cstatus()
 
         # all data back to None

@@ -1,16 +1,16 @@
-from pySDC import Step as stepclass
-from pySDC import Level as levclass
-from pySDC import CollocationClasses as collclass
+from subprocess import call
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
-from subprocess import call
 
+from pySDC import Step as stepclass
+from pySDC import Level as levclass
+from pySDC import CollocationClasses as collclass
 from examples.spiraling_particle.ProblemClass import planewave_single
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.Methods_Serial import sdc_step
+from pySDC.deprecated.Methods_Serial import sdc_step
 
 
 if __name__ == "__main__":
