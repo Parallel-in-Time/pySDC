@@ -18,12 +18,11 @@ class step():
         __k: current iteration (property iter)
         __transfer_dict: data structure to couple levels and transfer operators
         levels: list of levels
-        stats: step statistics
         params: parameters given by the user
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','stats','levels','__transfer_dict','status','__prev')
+    __slots__ = ('params','levels','__transfer_dict','status','__prev')
 
     def __init__(self, params):
         """
@@ -54,9 +53,8 @@ class step():
                 self.time = None
                 self.dt = None
 
-        # set params, stats and status
+        # set params and status
         self.params = pars(params)
-        self.stats = statclass.step_stats()
         self.status = status()
 
         # empty attributes
@@ -216,9 +214,6 @@ class step():
         """
         Routine so clean-up step structure and the corresp. levels for further uses
         """
-
-        # reset step statistics
-        self.stats = statclass.step_stats()
         # reset all levels
         for l in self.levels:
             l.reset_level()
@@ -238,15 +233,9 @@ class step():
         assert len(self.levels) >=1
         assert len(self.levels[0].u) >=1
 
-        # link level stats to step stats and reset level status
-        for L in self.levels:
-            self.stats.register_level_stats(L.stats)
-
         # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
         self.levels[0].u[0] = P.dtype_u(u0)
-        self.stats.niter = 0
-
 
     @property
     def prev(self):

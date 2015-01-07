@@ -1,6 +1,8 @@
 from pySDC.Level import level
 import logging
 
+from pySDC.Stats import stats
+
 
 class hooks():
 
@@ -44,7 +46,7 @@ class hooks():
         logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                     status.slot,status.stage,L.id,status.iter,L.status.residual)
 
-        L.stats.iter_stats[-1].residual = L.status.residual
+        stats.add_to_stats(time=status.time, level=L.id, iter=status.iter, key='residual', value=L.status.residual)
 
         pass
 
@@ -53,6 +55,8 @@ class hooks():
         """
         Default routine called after each iteration
         """
+        L = self.level
+        stats.add_to_stats(time=status.time, iter=status.iter, key='residual', value=L.status.residual)
         pass
 
 
@@ -60,6 +64,8 @@ class hooks():
         """
         Default routine called after each step
         """
-        self.level.stats.niter = 99#status.iter
-        self.level.stats.residual = self.level.status.residual
+        L = self.level
+        stats.add_to_stats(time=status.time, level=L.id, key='niter', value=status.iter)
+        stats.add_to_stats(time=status.time, level=L.id, key='residual', value=L.status.residual)
+
         pass

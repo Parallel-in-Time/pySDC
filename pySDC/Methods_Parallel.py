@@ -2,6 +2,8 @@ import itertools
 import copy as cp
 import numpy as np
 
+from pySDC.Stats import stats
+
 class switch(object):
     """
     Helper class for using case/switch statements in Python (not necessary, but easier to read)
@@ -73,10 +75,11 @@ def check_convergence(S):
     converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
 
     # if we are done, pass residual to level and step stats and niter to step stats (FIXME)
-    if converged:
-        S.stats.niter = S.status.iter
+    # if converged:
+    #     Stats.step_stats.niter = S.status.iter
+    #     S.stats.niter = S.status.iter
         # L.stats.residual = res
-        S.stats.residual = res
+        # S.stats.residual = res
 
     return converged
 
@@ -103,7 +106,6 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
     # some initializations
     uend = None
-    step_stats = []
     num_procs = len(MS)
 
     # initial ordering of the steps: 0,1,...,Np-1
@@ -136,10 +138,6 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
             # uend is uend of the last active step in the list
             uend = MS[active_slots[-1]].levels[0].uend # FIXME: only true for non-ring-parallelization?
 
-            # gather stats before we reset them
-            for p in active_slots:
-                step_stats.append(MS[p].stats)
-
             # determine new set of active steps and compress slots accordingly
             active = [MS[p].status.time+num_procs*MS[p].status.dt < Tend - np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
@@ -165,7 +163,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         #     for p in slots:
         #         MS[p].time =
 
-    return uend,step_stats
+    return uend,stats.return_stats()
 
 
 def restart_block(MS,active_slots,u0):
@@ -313,10 +311,10 @@ def pfasst_serial(S):
             # increment iteration count here (and only here)
             S.status.iter += 1
 
-            # standard sweep workflow: add stats, update nodes, compute residual, log progress
-            S.levels[0].stats.add_iter_stats()
+            # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
+
             S.levels[0].hooks.dump_sweep(S.status)
 
             S.levels[0].hooks.dump_iteration(S.status)
@@ -369,7 +367,6 @@ def pfasst_serial(S):
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
             for l in range(1,len(S.levels)-1):
-                S.levels[l].stats.add_iter_stats()
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
                 S.levels[l].hooks.dump_sweep(S.status)
@@ -418,8 +415,7 @@ def pfasst_serial(S):
         if case('IT_COARSE_SWEEP'):
             # coarsest sweep
 
-            # standard sweep workflow: add stats, update nodes, compute residual, log progress
-            S.levels[-1].stats.add_iter_stats()
+            # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
 

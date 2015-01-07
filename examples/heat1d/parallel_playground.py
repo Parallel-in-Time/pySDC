@@ -54,7 +54,7 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,step_stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
@@ -62,9 +62,12 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    # testing stats output...
-    # print(len(step_stats),len(step_stats[1].level_stats),len(step_stats[-1].level_stats[0].iter_stats))
-    # print(step_stats[1].residual,step_stats[0].level_stats[0].iter_stats[0].residual)
+    for k,v in stats.items():
+        print(k,v)
 
-    for l in step_stats:
-        print(l.residual,l.niter)
+    allstepres = [(key[0],stats[key]) for key in stats.keys() if key[2]==-1 and key[3]=='residual']
+    print(sorted(allstepres,key=lambda tup: tup[0]))
+
+    stepres = [(key[2],stats[key]) for key in stats.keys() if key[0]==0 and key[1] =='L0' and key[2] is not -1 and key[3]=='residual']
+    print(sorted(stepres,key=lambda tup: tup[0]))
+

@@ -23,7 +23,7 @@ class level():
         id: custom string naming this level
         logger: a logging object for level-dependent output
         __step: link to the step where this level is part of (set from the outside by the step)
-        stats: level status object
+        __hooks: a private instance of a hooks class
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
@@ -48,7 +48,7 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','__step','id','stats','__tag','__hooks')
+    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','__step','id','__tag','__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
@@ -97,9 +97,6 @@ class level():
         # dummy step variable, will be defined by registration at step
         self.__step = None
 
-        # set stats
-        self.stats = statclass.level_stats()
-
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
         self.hooks._hooks__set_level(self)
@@ -114,7 +111,6 @@ class level():
 
         # reset status and stats
         self.status = level.cstatus()
-        self.stats = statclass.level_stats()
 
         # all data back to None
         self.uend = None
