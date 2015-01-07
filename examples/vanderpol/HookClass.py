@@ -4,19 +4,19 @@ from pySDC.Stats import stats
 import matplotlib.pyplot as plt
 import numpy as np
 
-class particles_output(hooks):
+class vanderpol_output(hooks):
 
     def __init__(self):
         """
-        Initialization of particles output
+        Initialization of vanderpol output
         """
-        super(particles_output,self).__init__()
+        super(vanderpol_output,self).__init__()
 
         # add figure object for further use
         fig = plt.figure()
         self.ax = fig.add_subplot(111)
-        self.ax.set_xlim([-1.5,1.5])
-        self.ax.set_ylim([-1.5,1.5])
+        self.ax.set_xlim([-2.5,2.5])
+        self.ax.set_ylim([-10.5,10.5])
         plt.ion()
         self.sframe = None
 
@@ -29,23 +29,16 @@ class particles_output(hooks):
         Args:
             status: status object per step
         """
-        super(particles_output,self).dump_step(status)
+        super(vanderpol_output,self).dump_step(status)
 
-        # some abbreviations
         L = self.level
-        u = L.uend
-
-        R = np.linalg.norm(u.pos.values)
-        H = 1/2*np.dot(u.vel.values,u.vel.values)+0.02/R
-
-        stats.add_to_stats(time=status.time, type='energy', value=H)
 
         oldcol = self.sframe
         # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])
-        self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1])
+        self.sframe = self.ax.scatter(L.uend.values[0],L.uend.values[1])
         # Remove old line collection before drawing
-        if oldcol is not None:
-            self.ax.collections.remove(oldcol)
+        # if oldcol is not None:
+        #     self.ax.collections.remove(oldcol)
         plt.pause(0.00001)
 
         return None
