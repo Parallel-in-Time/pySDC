@@ -117,8 +117,8 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     # initialize block of steps with u0
     MS = restart_block(MS,active_slots,u0)
 
-    for p in active_slots:
-        MS[p].levels[0].hooks.dump_pre(MS[p].status)
+    # call pre-start hook
+    MS[active_slots[0]].levels[0].hooks.dump_pre(MS[p].status)
 
     # main loop: as long as at least one step is still active (time < Tend), do something
     while any(active):
