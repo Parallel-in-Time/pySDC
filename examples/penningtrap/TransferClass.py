@@ -1,4 +1,5 @@
 from pySDC.Transfer import transfer
+from pySDC.datatype_classes.particles import particles
 
 class particles_to_particles(transfer):
     """
@@ -33,7 +34,9 @@ class particles_to_particles(transfer):
             F: the fine level data (easier to access than via the fine attribute)
 
         """
-        return F
+
+        G = particles(F)
+        return G
 
     def prolong_space(self,G):
         """
@@ -42,4 +45,6 @@ class particles_to_particles(transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        return G
+
+        F = particles(G)
+        return F

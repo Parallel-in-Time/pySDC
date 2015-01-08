@@ -126,7 +126,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
 
         # loop over all active steps (in the correct order)
         for p in active_slots:
-            # print(p,MS[p].stage)
+            # print(p,MS[p].status.stage)
             MS[p] = pfasst_serial(MS[p])
 
         # if all active steps are done (for block-parallelization, need flag to distinguish (FIXME))
@@ -313,13 +313,13 @@ def pfasst_serial(S):
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
-
             S.levels[0].hooks.dump_sweep(S.status)
 
             S.levels[0].hooks.dump_iteration(S.status)
 
             # update stage and return
             S.status.stage = 'IT_FINE_SEND'
+
             return S
 
 

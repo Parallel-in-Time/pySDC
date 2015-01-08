@@ -251,6 +251,8 @@ class particles():
             p = particles(int(np.size(self.pos.values)/3))
             p.pos = self.pos + other.pos
             p.vel = self.vel + other.vel
+            p.m = self.m
+            p.q = self.q
             return p
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
@@ -273,6 +275,8 @@ class particles():
             p = particles(int(np.size(self.pos.values)/3))
             p.pos = self.pos - other.pos
             p.vel = self.vel - other.vel
+            p.m = self.m
+            p.q = self.q
             return p
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))

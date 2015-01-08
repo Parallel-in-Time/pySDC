@@ -3,7 +3,7 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 import matplotlib.pyplot as plt
 
-from examples.penningtrap.ProblemClass import penningtrap
+from examples.penningtrap.ProblemClass import penningtrap,penningtrap_coarse
 from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the time-stepping
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 20
 
     # This comes as read-in for the problem
     pparams = {}
@@ -38,7 +38,8 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = penningtrap
+    description['problem_class'] = [penningtrap,penningtrap_coarse]
+    # description['problem_class'] = [penningtrap]
     description['problem_params'] = pparams
     description['dtype_u'] = particles
     description['dtype_f'] = fields
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 20*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -75,5 +76,8 @@ if __name__ == "__main__":
     extract_stats = grep_stats(stats,type='timing_step')
     sortedlist_stats = sort_stats(extract_stats,sortby='step')
     print(sortedlist_stats)
+
+    # uex = P.u_exact(Tend)
+    # print(np.linalg.norm(uex.pos.values-uend.pos.values,np.inf)/np.linalg.norm(uex.pos.values,np.inf))
 
     plt.show()

@@ -38,7 +38,7 @@ class penningtrap(ptype):
         super(penningtrap,self).__init__(self.nparts, dtype_u, dtype_f)
 
 
-    def __get_interactions(self,part):
+    def get_interactions(self,part):
         """
         Routine to compute the particle-particle interaction, assuming q = 1 for all particles
 
@@ -81,7 +81,7 @@ class penningtrap(ptype):
         Emat = np.diag([1,1,-2])
         f = fields(self.nparts)
 
-        f.elec.values = self.__get_interactions(part)
+        f.elec.values = self.get_interactions(part)
 
 
         for n in range(N):
@@ -264,3 +264,31 @@ class penningtrap(ptype):
             vel.values[3*n:3*n+3] = vp + dt/2*a* Emean.values[3*n:3*n+3] + c.values[3*n:3*n+3]/2
 
         return vel
+
+class penningtrap_coarse(penningtrap):
+    """
+    Coarse level problem description class, will only overwrite what is needed
+    """
+
+    def eval_f(self,part,t):
+        """
+        Routine to compute the E and B fields (named f for consistency with the original PEPC version)
+
+        Args:
+            t: current time (not used here)
+            part: the particles
+        Returns:
+            Fields for the particles (external only)
+        """
+
+        N = self.nparts
+
+        Emat = np.diag([1,1,-2])
+        f = fields(self.nparts,vals=(0,0))
+
+        for n in range(N):
+            f.elec.values[3*n:3*n+3] = self.omega_E**2 / (part.q[n]/part.m[n]) * np.dot(Emat,part.pos.values[
+                                                                                              3*n:3*n+3])
+            f.magn.values[3*n:3*n+3] = self.omega_B * np.array([0,0,1])
+
+        return f

@@ -127,7 +127,6 @@ class boris_2nd_order(sweeper):
             # do the boris scheme
             L.u[m+1].vel = P.boris_solver(ck,L.dt*self.coll.delta_m[m],L.f[m],L.f[m+1],L.u[m])
 
-
         # indicate presence of new values at this level
         L.status.updated = True
 
