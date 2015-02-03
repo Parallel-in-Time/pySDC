@@ -99,7 +99,7 @@ class particles_output(hooks):
             epot += part.q[n]*fpot[n]
             ekin += part.m[n]/2.0*np.dot(part.vel.values[3*n:3*n+3],part.vel.values[3*n:3*n+3])
 
-        print('Energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
+        print('Energy (pot/kin/tot) at step %i: %12.4f / %12.4f / %12.4f' %(status.step,epot,ekin,epot+ekin))
 
         stats.add_to_stats(step=status.step, time=status.time, type='etot', value=epot+ekin)
 
@@ -108,7 +108,7 @@ class particles_output(hooks):
 
         # oldcol = self.sframe
         # # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])
-        # self.sframe = self.ax.scatter(L.uend.pos.values[0::3],L.uend.pos.values[1::3],L.uend.pos.values[2::3])
+        self.sframe = self.ax.scatter(L.uend.pos.values[0::3],L.uend.pos.values[1::3],L.uend.pos.values[2::3])
         # # Remove old line collection before drawing
         # if oldcol is not None:
         #     self.ax.collections.remove(oldcol)

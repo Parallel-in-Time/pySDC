@@ -1,5 +1,5 @@
 from pySDC.Transfer import transfer
-from pySDC.datatype_classes.particles import particles
+from pySDC.datatype_classes.particles import particles, fields
 
 class particles_to_particles(transfer):
     """
@@ -35,7 +35,13 @@ class particles_to_particles(transfer):
 
         """
 
-        G = particles(F)
+        if type(F) is particles:
+            G = particles(F)
+        elif type(F) is fields:
+            G = fields(F)
+        else:
+            print('Transfer error')
+            exit()
         return G
 
     def prolong_space(self,G):
@@ -46,5 +52,11 @@ class particles_to_particles(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        F = particles(G)
+        if type(G) is particles:
+            F = particles(G)
+        elif type(G) is fields:
+            F = fields(G)
+        else:
+            print('Transfer error')
+            exit()
         return F

@@ -123,6 +123,43 @@ class transfer(metaclass=abc.ABCMeta):
         return None
 
 
+# FIXME: add time prolongation
+    def prolong_f(self):
+        """
+        Space-time prolongation routine w.r.t. the rhs f
+
+        This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+        values on the coarse level and then adds this difference to the fine values as coarse correction.
+        """
+
+        # get data for easier access
+        F = self.fine
+        G = self.coarse
+
+        PF = F.prob
+        PG = G.prob
+
+        SF = F.sweep
+        SG = G.sweep
+
+        # only of the level is unlocked at least by prediction or restriction
+        assert G.status.unlocked
+        # can only do space-restriction so far
+        assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
+
+        # build coarse correction
+
+        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
+        F.f[0] = PF.eval_f(F.u[0],F.time)
+
+        for m in range(1,SF.coll.num_nodes+1):
+            F.u[m] += self.prolong_space(G.u[m] - self.restrict_space(F.u[m]))
+            # F.f[m] += self.prolong_space(G.f[m] - self.restrict_space(F.f[m]))
+            F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
+
+        return None
+
+
     @abc.abstractmethod
     def restrict_space(self,F):
         """

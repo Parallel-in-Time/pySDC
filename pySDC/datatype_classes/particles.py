@@ -428,6 +428,26 @@ class fields():
             else:
                 raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
 
+        def __sub__(self, other):
+            """
+            Overloading the subtraction operator for electric types
+
+            Args:
+                other: electric object to be subtracted
+            Raises:
+                DataError: if other is not a electric object
+            Returns:
+                difference of caller and other values (self-other)
+            """
+
+            if isinstance(other, type(self)):
+                # always create new electric, since otherwise c = a + b changes a as well!
+                E = fields.electric(int(np.size(self.values)/3))
+                E.values = self.values - other.values
+                return E
+            else:
+                raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
+
         def __rmul__(self, other):
             """
             Overloading the right multiply by factor operator for electric types
@@ -500,6 +520,27 @@ class fields():
             else:
                 raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
 
+        def __sub__(self, other):
+            """
+            Overloading the subrtaction operator for magnetic types
+
+            Args:
+                other: magnetic object to be subtracted
+            Raises:
+                DataError: if other is not a magnetic object
+            Returns:
+                difference of caller and other values (self-other)
+            """
+
+            if isinstance(other, type(self)):
+                # always create new magnetic, since otherwise c = a + b changes a as well!
+                M = fields.magnetic(int(np.size(self.values)/3))
+                M.values = self.values - other.values
+                return M
+            else:
+                raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
+
+
         def __rmul__(self, other):
             """
             Overloading the right multiply by factor operator for magnetic types
@@ -543,3 +584,45 @@ class fields():
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
+
+    def __add__(self, other):
+        """
+        Overloading the addition operator for fields types
+
+        Args:
+            other: fields object to be added
+        Raises:
+            DataError: if other is not a fields object
+        Returns:
+            sum of caller and other values (self+other)
+        """
+
+        if isinstance(other, type(self)):
+            # always create new fields, since otherwise c = a - b changes a as well!
+            p = fields(int(np.size(self.elec.values)/3))
+            p.elec = self.elec + other.elec
+            p.magn = self.magn + other.magn
+            return p
+        else:
+            raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
+
+    def __sub__(self, other):
+        """
+        Overloading the subtraction operator for fields types
+
+        Args:
+            other: fields object to be subtracted
+        Raises:
+            DataError: if other is not a fields object
+        Returns:
+            differences between caller and other values (self-other)
+        """
+
+        if isinstance(other, type(self)):
+            # always create new fields, since otherwise c = a - b changes a as well!
+            p = fields(int(np.size(self.elec.values)/3))
+            p.elec = self.elec - other.elec
+            p.magn = self.magn - other.magn
+            return p
+        else:
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
