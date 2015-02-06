@@ -57,6 +57,7 @@ class boris_2nd_order(sweeper):
         Sx = np.zeros(np.shape(coll.Qmat))
         ST = np.zeros(np.shape(coll.Qmat))
         S = np.zeros(np.shape(coll.Qmat))
+
         # fill-in node-to-node matrices
         Sx[0,:] = Qx[0,:]
         ST[0,:] = QT[0,:]
@@ -67,6 +68,7 @@ class boris_2nd_order(sweeper):
             S[m+1,:] = coll.Qmat[m+1,:] - coll.Qmat[m,:]
         # SQ via dot-product, could also be done via QQ
         SQ = np.dot(S,coll.Qmat)
+
         return [S,ST,SQ,Sx]
 
 
@@ -104,6 +106,10 @@ class boris_2nd_order(sweeper):
             # add tau if associated
             if L.tau is not None:
                 integral[m] += L.tau[m]
+                # tau is 0-to-node, need to change it to node-to-node here
+                # @torbjoern: this was my big error no. 1
+                if m > 0:
+                    integral[m] -= L.tau[m-1]
 
         # do the sweep
         for m in range(0,M):
@@ -133,7 +139,7 @@ class boris_2nd_order(sweeper):
         return None
 
 
-    def integrate(self,weights):
+    def integrate(self,weights,flag=None):
         """
         Integrates the right-hand side
 
@@ -150,10 +156,63 @@ class boris_2nd_order(sweeper):
         # create new instance of dtype_u, initialize values with 0
         p = P.dtype_u(P.init,vals=(0,0,0,0))
 
-         # integrate RHS over all collocation nodes, RHS is here v and f(x,v)
-        for j in range(self.coll.num_nodes):
-            f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
-            p.pos += L.dt*weights[j]*L.u[j+1].vel
-            p.vel += L.dt*weights[j]*f
+        # fixme: this is only a workaround
+        # @torbjoern: here we can distinguish between the different ways to compute the integral: either using
+        # the QQ matrices or using only Q (and then v instead of f for the position)
+        if flag is not None:
+
+            # fixme: ugly, should go somewhere else (class member!)
+            QQ = np.dot(self.coll.Qmat,self.coll.Qmat)
+
+            # integrate RHS over all collocation nodes, RHS is here only f(x,v)!
+            for j in range(self.coll.num_nodes):
+                f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
+                p.pos += L.dt*(L.dt*QQ[flag,j+1]*f)
+                p.vel += L.dt*weights[j]*f
+
+        else:
+            # integrate RHS over all collocation nodes, RHS is here v and f(x,v)
+            for j in range(self.coll.num_nodes):
+                f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
+                p.pos += L.dt*weights[j]*L.u[j+1].vel
+                p.vel += L.dt*weights[j]*f
 
         return p
+
+    # Override residual computation, if QQ-rhs is requested
+    def compute_residual(self):
+        """
+        Computation of the residual using the collocation matrix Q
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        # check if there are new values (e.g. from a sweep)
+        assert L.status.updated
+
+        # compute the residual for each node
+        res = []
+        for m in range(self.coll.num_nodes):
+            # build QF(u)
+            res.append(P.dtype_u(self.integrate(self.coll.Qmat[m+1,1:],flag=m+1))) # use modified rhs here!
+            # add u0 and subtract u at current node
+            res[m] += L.u[0] - L.u[m+1]
+
+            # add the stupid v0 term, necessary if modified rhs is used above
+            # @ torbjoern: this was my big error no. 2
+            for n in range(self.coll.num_nodes):
+                res[m].pos += L.dt*self.coll.Qmat[m+1,n+1]*L.u[0].vel
+
+            # add tau if associated
+            if L.tau is not None:
+                res[m] += L.tau[m]
+
+        # use standard residual norm: ||.||_inf
+        L.status.residual = np.linalg.norm(res,np.inf)
+
+        # indicate that the residual has seen the new values
+        L.status.updated = False
+
+        return None

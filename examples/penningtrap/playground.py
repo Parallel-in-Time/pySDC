@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the time-stepping
     sparams = {}
-    sparams['maxiter'] = 5
+    sparams['maxiter'] = 10
 
     # This comes as read-in for the problem
     pparams = {}
@@ -37,6 +37,8 @@ if __name__ == "__main__":
     pparams['sig'] = 0.1
 
     # Fill description dictionary for easy hierarchy creation
+    # @torbjoern: SDC and MLSDC can be activated by providing a list of 1 or 2 elements at problem_class and/or
+    # num_nodes. The max. list size defines the number of levels!
     description = {}
     description['problem_class'] = [penningtrap,penningtrap_coarse]
     # description['problem_class'] = [penningtrap]
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     description['dtype_u'] = particles
     description['dtype_f'] = fields
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = [3,3]
+    description['num_nodes'] = [5,5]
     description['sweeper_class'] = boris_2nd_order
     description['level_params'] = lparams
     description['transfer_class'] = particles_to_particles # this is only needed for more than 2 levels
@@ -55,8 +57,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.00015625
-    Tend = 1*dt
+    dt = 0.015625
+    Tend = 2*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -64,6 +66,8 @@ if __name__ == "__main__":
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+    print(uend.pos.values)
 
     exit()
 
