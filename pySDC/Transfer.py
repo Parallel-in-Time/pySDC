@@ -125,7 +125,7 @@ class transfer(metaclass=abc.ABCMeta):
         return None
 
 
-# FIXME: add time prolongation
+    # FIXME: add time prolongation
     def prolong_f(self):
         """
         Space-time prolongation routine w.r.t. the rhs f
@@ -156,6 +156,7 @@ class transfer(metaclass=abc.ABCMeta):
 
         for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - self.restrict_space(F.u[m]))
+            #fixme: this does not work for Boris.. why?
             # F.f[m] += self.prolong_space(G.f[m] - self.restrict_space(F.f[m]))
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 

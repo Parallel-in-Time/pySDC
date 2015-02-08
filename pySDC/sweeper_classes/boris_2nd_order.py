@@ -28,7 +28,7 @@ class boris_2nd_order(sweeper):
         super(boris_2nd_order,self).__init__(coll)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
-        [self.S, self.ST, self.SQ, self.Sx] = self.__get_Qd(coll)
+        [self.S, self.ST, self.SQ, self.Sx, self.QQ] = self.__get_Qd(coll)
 
     def __get_Qd(self,coll):
         """
@@ -69,7 +69,10 @@ class boris_2nd_order(sweeper):
         # SQ via dot-product, could also be done via QQ
         SQ = np.dot(S,coll.Qmat)
 
-        return [S,ST,SQ,Sx]
+        # QQ-matrix via product of Q
+        QQ = np.dot(self.coll.Qmat,self.coll.Qmat)
+
+        return [S,ST,SQ,Sx,QQ]
 
 
     def update_nodes(self):
@@ -160,14 +163,10 @@ class boris_2nd_order(sweeper):
         # @torbjoern: here we can distinguish between the different ways to compute the integral: either using
         # the QQ matrices or using only Q (and then v instead of f for the position)
         if flag is not None:
-
-            # fixme: ugly, should go somewhere else (class member!)
-            QQ = np.dot(self.coll.Qmat,self.coll.Qmat)
-
             # integrate RHS over all collocation nodes, RHS is here only f(x,v)!
             for j in range(self.coll.num_nodes):
                 f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
-                p.pos += L.dt*(L.dt*QQ[flag,j+1]*f)
+                p.pos += L.dt*(L.dt*self.QQ[flag,j+1]*f) + L.dt*weights[j]*L.u[0].vel
                 p.vel += L.dt*weights[j]*f
 
         else:
@@ -178,41 +177,3 @@ class boris_2nd_order(sweeper):
                 p.vel += L.dt*weights[j]*f
 
         return p
-
-    # Override residual computation, if QQ-rhs is requested
-    def compute_residual(self):
-        """
-        Computation of the residual using the collocation matrix Q
-        """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # check if there are new values (e.g. from a sweep)
-        assert L.status.updated
-
-        # compute the residual for each node
-        res = []
-        for m in range(self.coll.num_nodes):
-            # build QF(u)
-            res.append(P.dtype_u(self.integrate(self.coll.Qmat[m+1,1:],flag=m+1))) # use modified rhs here!
-            # add u0 and subtract u at current node
-            res[m] += L.u[0] - L.u[m+1]
-
-            # add the stupid v0 term, necessary if modified rhs is used above
-            # @ torbjoern: this was my big error no. 2
-            for n in range(self.coll.num_nodes):
-                res[m].pos += L.dt*self.coll.Qmat[m+1,n+1]*L.u[0].vel
-
-            # add tau if associated
-            if L.tau is not None:
-                res[m] += L.tau[m]
-
-        # use standard residual norm: ||.||_inf
-        L.status.residual = np.linalg.norm(res,np.inf)
-
-        # indicate that the residual has seen the new values
-        L.status.updated = False
-
-        return None
