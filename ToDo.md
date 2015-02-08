@@ -11,7 +11,7 @@ ToDo list
     - advection diffusion using fft
     - reaction diffusion using fft
     - bernus model: simple explicit SDC to monodomain PFASST
-    - multi-particle penning trap with MLSDC and PFASST
+    - multi-particle penning trap with PFASST
     - SWFW, maybe couple to PyClaw
 
 * write a more detailed howto, explaining all the features of the code using basic examples
@@ -19,3 +19,9 @@ ToDo list
 * convert docs to sphinx and set up homepage
 
 * add more detailed timings mechanism to statistics via hooks
+
+* figure out why f-interpolation is currently not working
+
+* add temporal coarsening
+
+* don't we need a tau-correction for compute_end_node on coarser levels..?
