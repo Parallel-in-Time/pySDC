@@ -62,16 +62,10 @@ class transfer(metaclass=abc.ABCMeta):
             G.f[m] = PG.eval_f(G.u[m],G.time+G.dt*SG.coll.nodes[m-1])
 
         # build coarse level tau correction part
-        tauG = []
-        for m in range(SG.coll.num_nodes):
-            # fixme: this flag is ugly and only here for testing purpose (BORIS only!)
-            tauG.append(PG.dtype_u(G.sweep.integrate(SG.coll.Qmat[m+1,1:],flag=m+1)))
+        tauG = G.sweep.integrate()
 
         # build fine level tau correction part
-        tauF = []
-        for m in range(SF.coll.num_nodes):
-            # fixme: this flag is ugly and only here for testing purpose (BORIS only!)
-            tauF.append(PF.dtype_u(F.sweep.integrate(SF.coll.Qmat[m+1,1:],flag=m+1)))
+        tauF = F.sweep.integrate()
 
         # restrict fine level tau correction part
         tauFG = []

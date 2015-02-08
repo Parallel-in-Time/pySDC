@@ -1,5 +1,3 @@
-from pySDC import Step as stepclass
-from pySDC import Level as levclass
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
@@ -10,7 +8,7 @@ from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods as mp
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
+
 
 
 if __name__ == "__main__":

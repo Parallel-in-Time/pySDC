@@ -90,10 +90,10 @@ class sweeper(metaclass=abc.ABCMeta):
         assert L.status.updated
 
         # compute the residual for each node
-        res = []
+
+        # build QF(u)
+        res = self.integrate()
         for m in range(self.coll.num_nodes):
-            # build QF(u)
-            res.append(P.dtype_u(self.integrate(self.coll.Qmat[m+1,1:])))
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m+1]
             # add tau if associated
@@ -108,39 +108,18 @@ class sweeper(metaclass=abc.ABCMeta):
 
         return None
 
-
+    @abc.abstractmethod
     def compute_end_point(self):
         """
-        Compute u at the right point of the interval
-
-        The value uend computed here might be a simple copy from u[M] (if right point is a collocation node) or
-        a full evaluation of the Picard formulation (if right point is not a collocation node)
+        Abstract interface to end-node computation
         """
-
-        # get current level and problem description
-        L = self.level
-        P = L.prob
-
-        # check if Mth node is equal to right point (flag is set in collocation class)
-        if self.coll.right_is_node:
-            # a copy is sufficient
-            L.uend = P.dtype_u(L.u[-1])
-        else:
-            # start with u0 and add integral over the full interval (using coll.weights)
-            L.uend = P.dtype_u(L.u[0])
-            L.uend += self.integrate(self.coll.weights)
-            #FIXME: do we need some sort of tau correction here as well?
-
         return None
 
 
     @abc.abstractmethod
-    def integrate(self,weights):
+    def integrate(self):
         """
         Abstract interface to right-hand side integration
-
-        Args:
-            weights: integration weights
         """
         return None
 

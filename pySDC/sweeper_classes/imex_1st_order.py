@@ -45,27 +45,26 @@ class imex_1st_order(sweeper):
         return QI, QE
 
 
-    def integrate(self,weights):
+    def integrate(self):
         """
         Integrates the right-hand side (here impl + expl)
 
-        Args:
-            weights: integration weights, length num_nodes
         Returns:
-            dtype_u: containing the integral as values
+            list of dtype_u: containing the integral as values
         """
-        assert len(weights) == self.coll.num_nodes
 
         # get current level and problem description
         L = self.level
         P = L.prob
 
-        # create new instance of dtype_u, initialize values with 0
-        me = P.dtype_u(P.init,val=0)
+        me = []
 
         # integrate RHS over all collocation nodes
-        for j in range(self.coll.num_nodes):
-            me += L.dt*weights[j]*(L.f[j+1].impl + L.f[j+1].expl)
+        for m in range(1,self.coll.num_nodes+1):
+            # new instance of dtype_u, initialize values with 0
+            me.append(P.dtype_u(P.init,val=0))
+            for j in range(1,self.coll.num_nodes+1):
+                me[-1] += L.dt*self.coll.Qmat[m,j]*(L.f[j].impl + L.f[j].expl)
 
         return me
 
@@ -88,13 +87,12 @@ class imex_1st_order(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
-        integral = []
-
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
+
+         # get QF(u^k)
+        integral = self.integrate()
         for m in range(M):
-            # get QF(u^k)_m
-            integral.append(self.integrate(self.coll.Qmat[m+1,1:]))
             # subtract QIFI(u^k)_m - QEFE(u^k)_m
             for j in range(M+1):
                 integral[m] -= L.dt*(self.QI[m+1,j]*L.f[j].impl + self.QE[m+1,j]*L.f[j].expl)
@@ -118,5 +116,31 @@ class imex_1st_order(sweeper):
 
         # indicate presence of new values at this level
         L.status.updated = True
+
+        return None
+
+
+    def compute_end_point(self):
+        """
+        Compute u at the right point of the interval
+
+        The value uend computed here might be a simple copy from u[M] (if right point is a collocation node) or
+        a full evaluation of the Picard formulation (if right point is not a collocation node)
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        # check if Mth node is equal to right point (flag is set in collocation class)
+        if self.coll.right_is_node:
+            # a copy is sufficient
+            L.uend = P.dtype_u(L.u[-1])
+        else:
+            # start with u0 and add integral over the full interval (using coll.weights)
+            L.uend = P.dtype_u(L.u[0])
+            for m in range(self.coll.num_nodes):
+                L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
+            #FIXME: do we need some sort of tau correction here as well?
 
         return None

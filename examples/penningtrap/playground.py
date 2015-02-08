@@ -46,7 +46,7 @@ if __name__ == "__main__":
     description['dtype_u'] = particles
     description['dtype_f'] = fields
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = [5,5]
+    description['num_nodes'] = [5]
     description['sweeper_class'] = boris_2nd_order
     description['level_params'] = lparams
     description['transfer_class'] = particles_to_particles # this is only needed for more than 2 levels

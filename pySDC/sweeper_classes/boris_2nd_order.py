@@ -142,14 +142,14 @@ class boris_2nd_order(sweeper):
         return None
 
 
-    def integrate(self,weights,flag=None):
+    def integrate(self):
         """
         Integrates the right-hand side
 
         Args:
             weights: integration weights, length num_nodes
         Returns:
-            dtype_u: containing the integral as values
+            list of dtype_u: containing the integral as values
         """
 
         # get current level and problem description
@@ -157,23 +157,45 @@ class boris_2nd_order(sweeper):
         P = L.prob
 
         # create new instance of dtype_u, initialize values with 0
-        p = P.dtype_u(P.init,vals=(0,0,0,0))
+        p = []
 
-        # fixme: this is only a workaround
-        # @torbjoern: here we can distinguish between the different ways to compute the integral: either using
-        # the QQ matrices or using only Q (and then v instead of f for the position)
-        if flag is not None:
+        for m in range(1,self.coll.num_nodes+1):
+            p.append(P.dtype_u(P.init,vals=(0,0,0,0)))
+
             # integrate RHS over all collocation nodes, RHS is here only f(x,v)!
-            for j in range(self.coll.num_nodes):
-                f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
-                p.pos += L.dt*(L.dt*self.QQ[flag,j+1]*f) + L.dt*weights[j]*L.u[0].vel
-                p.vel += L.dt*weights[j]*f
-
-        else:
-            # integrate RHS over all collocation nodes, RHS is here v and f(x,v)
-            for j in range(self.coll.num_nodes):
-                f = P.build_f(L.f[j+1],L.u[j+1],L.time+L.dt*self.coll.nodes[j])
-                p.pos += L.dt*weights[j]*L.u[j+1].vel
-                p.vel += L.dt*weights[j]*f
+            for j in range(1,self.coll.num_nodes+1):
+                f = P.build_f(L.f[j],L.u[j],L.time+L.dt*self.coll.nodes[j-1])
+                p[-1].pos += L.dt*(L.dt*self.QQ[m,j]*f) + L.dt*self.coll.Qmat[m,j]*L.u[0].vel
+                p[-1].vel += L.dt*self.coll.Qmat[m,j]*f
 
         return p
+
+
+    def compute_end_point(self):
+        """
+        Compute u at the right point of the interval
+
+        The value uend computed here might be a simple copy from u[M] (if right point is a collocation node) or
+        a full evaluation of the Picard formulation (if right point is not a collocation node)
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        # check if Mth node is equal to right point (flag is set in collocation class)
+        if self.coll.right_is_node:
+            # a copy is sufficient
+            L.uend = P.dtype_u(L.u[-1])
+        else:
+            # start with u0 and add integral over the full interval (using coll.weights)
+            L.uend = P.dtype_u(L.u[0])
+            # compute q*Q on the fly.. could be done a priori (fixme)
+            qQ = np.dot(self.coll.weights,self.coll.Qmat[1:,1:])
+            for m in range(self.coll.num_nodes):
+                f = P.build_f(L.f[m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
+                L.uend.pos += L.dt*(L.dt*qQ[m]*f) + L.dt*self.coll.weights[m]*L.u[0].vel
+                L.uend.vel += L.dt*self.coll.weights[m]*f
+            #FIXME: do we need some sort of tau correction here as well?
+
+        return None
