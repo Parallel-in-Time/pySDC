@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.Transfer import transfer
-from pySDC.datatype_classes.mesh import mesh
+from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 # FIXME: extend this to ndarrays
 class mesh_to_mesh_1d(transfer):
@@ -88,8 +88,13 @@ class mesh_to_mesh_1d(transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
-        u_coarse = mesh(self.init_c,val=0)
-        u_coarse.values = np.dot(self.Rspace,F.values)
+        if type(F) is mesh:
+            u_coarse = mesh(self.init_c,val=0)
+            u_coarse.values = np.dot(self.Rspace,F.values)
+        elif type(F) is rhs_imex_mesh:
+            u_coarse = rhs_imex_mesh(self.init_c)
+            u_coarse.impl.values = np.dot(self.Rspace,F.impl.values)
+            u_coarse.expl.values = np.dot(self.Rspace,F.expl.values)
 
         return u_coarse
 
@@ -101,7 +106,12 @@ class mesh_to_mesh_1d(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        u_fine = mesh(self.init_f,val=0)
-        u_fine.values = np.dot(self.Pspace,G.values)
+        if type(G) is mesh:
+            u_fine = mesh(self.init_c,val=0)
+            u_fine.values = np.dot(self.Pspace,G.values)
+        elif type(G) is rhs_imex_mesh:
+            u_fine = rhs_imex_mesh(self.init_c)
+            u_fine.impl.values = np.dot(self.Pspace,G.impl.values)
+            u_fine.expl.values = np.dot(self.Pspace,G.expl.values)
 
         return u_fine
