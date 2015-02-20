@@ -27,8 +27,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['lambda_s'] = 1j*np.linspace(0,2,100)
-    pparams['lambda_f'] = 1j*np.linspace(0,16,100)
+    pparams['lambda_s'] = 1j*np.linspace(0,3,100)
+    pparams['lambda_f'] = 1j*np.linspace(0,8,100)
     pparams['u0'] = 1
 
     # Fill description dictionary for easy hierarchy creation
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = [5]
+    description['num_nodes'] = [2]
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
 
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     MS = mp.generate_steps(num_procs,sparams,description)
 
     # setup parameters "in time"
-    t0 = 0
-    dt = 1.0
+    t0   = 0
+    dt   = 1.0
     Tend = 1.0
 
     P = MS[0].levels[0].prob
@@ -60,9 +60,12 @@ if __name__ == "__main__":
 
     uex = P.u_exact(Tend)
 
-    plt.pcolor(np.absolute(uend.values).T,vmin=1,vmax=1.01)
+    fig = plt.figure(figsize=(8,8))
+    plt.pcolor(pparams['lambda_s'].imag, pparams['lambda_f'].imag, np.absolute(uend.values).T,vmin=1,vmax=1.01)
     # plt.pcolor(np.imag(uend.values))
     plt.colorbar()
+    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=18, labelpad=20)
+    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=18)
 
     plt.show()
 
