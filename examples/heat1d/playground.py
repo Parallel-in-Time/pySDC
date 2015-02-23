@@ -30,6 +30,10 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['nvars'] = [127,63]
 
+    # This comes as read-in for the transfer operations
+    tparams = {}
+    tparams['finter'] = True
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d
@@ -41,6 +45,7 @@ if __name__ == "__main__":
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
+    description['transfer_params'] = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)

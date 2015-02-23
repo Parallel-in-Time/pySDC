@@ -36,6 +36,10 @@ if __name__ == "__main__":
     pparams['nparts'] = 2
     pparams['sig'] = 0.1
 
+    # This comes as read-in for the transfer operations
+    tparams = {}
+    tparams['finter'] = True
+
     # Fill description dictionary for easy hierarchy creation
     # @torbjoern: SDC and MLSDC can be activated by providing a list of 1 or 2 elements at problem_class and/or
     # num_nodes. The max. list size defines the number of levels!
@@ -50,6 +54,7 @@ if __name__ == "__main__":
     description['sweeper_class'] = boris_2nd_order
     description['level_params'] = lparams
     description['transfer_class'] = particles_to_particles # this is only needed for more than 2 levels
+    description['transfer_params'] = tparams
     description['hook_class'] = particles_output # this is optional
 
     # quickly generate block of steps

@@ -95,6 +95,7 @@ class step():
         # sanity check: is there a transfer class? is there one even if only a single level is specified?
         if len(descr_list) > 1:
             assert 'transfer_class' in descr_new
+            assert 'transfer_params' in descr_new
         elif 'transfer_class' in descr_new:
             print('WARNING: you have specified transfer classes, but only a single level...')
 
@@ -121,9 +122,10 @@ class step():
             self.register_level(L)
 
             if l > 0:
-                self.connect_levels(transfer_class = descr_list[l]['transfer_class'],
-                                    fine_level     = self.levels[l-1],
-                                    coarse_level   = self.levels[l])
+                self.connect_levels(transfer_class  = descr_list[l]['transfer_class'],
+                                    transfer_params = descr_list[l]['transfer_params'],
+                                    fine_level      = self.levels[l-1],
+                                    coarse_level    = self.levels[l])
 
 
     @staticmethod
@@ -180,12 +182,13 @@ class step():
             L._level__add_tau()
 
 
-    def connect_levels(self, transfer_class, fine_level, coarse_level):
+    def connect_levels(self, transfer_class, transfer_params, fine_level, coarse_level):
         """
         Routine to couple levels with transfer operators
 
         Args:
-            transfer_class: the class which can transfer between he two levels
+            transfer_class: the class which can transfer between the two levels
+            transfer_params: parameters for the transfer class
             fine_level: the fine level
             coarse_level: the coarse level
         """
@@ -194,9 +197,14 @@ class step():
         T = transfer_class(fine_level,coarse_level)
         # use transfer dictionary twice to set restrict and prologn operator
         self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
-        # self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
-        # fixme: get a switch for that
-        self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
+
+        assert 'finter' in transfer_params
+
+        if transfer_params['finter']:
+            self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
+        else:
+            self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
+
 
 
     def transfer(self,source,target):
