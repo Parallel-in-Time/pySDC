@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [255,127]
+    pparams['nvars'] = [127,63]
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussLobatto
     description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.25
+    dt = 0.125
     Tend = dt
 
     # get initial values on finest level

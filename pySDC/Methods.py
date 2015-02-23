@@ -235,10 +235,10 @@ def pfasst_serial(S):
             S.levels[0].sweep.predict()
 
             # update stage and return
-            if len(S.levels) > 1:
-                S.status.stage = 'PREDICT_RESTRICT'
-            else:
-                S.status.stage = 'IT_FINE_SWEEP'
+            # if len(S.levels) > 1:
+            #     S.status.stage = 'PREDICT_RESTRICT'
+            # else:
+            S.status.stage = 'IT_FINE_SWEEP'
             return S
 
 

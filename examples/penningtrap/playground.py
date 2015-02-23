@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the time-stepping
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 5
 
     # This comes as read-in for the problem
     pparams = {}
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 2*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

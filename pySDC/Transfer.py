@@ -1,5 +1,6 @@
 import abc
 import numpy as np
+import copy as cp
 
 
 class transfer(metaclass=abc.ABCMeta):
@@ -78,6 +79,10 @@ class transfer(metaclass=abc.ABCMeta):
             if F.tau is not None:
                 G.tau[m] += self.restrict_space(F.tau[m])
 
+        # save u and rhs evaluations for interpolation
+        G.uold = cp.deepcopy(G.u)
+        G.fold = cp.deepcopy(G.f)
+
         # works as a predictor
         G.status.unlocked = True
 
@@ -97,7 +102,6 @@ class transfer(metaclass=abc.ABCMeta):
         G = self.coarse
 
         PF = F.prob
-        PG = G.prob
 
         SF = F.sweep
         SG = G.sweep
@@ -109,18 +113,17 @@ class transfer(metaclass=abc.ABCMeta):
 
         # build coarse correction
 
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
+        F.u[0] += self.prolong_space(G.u[0] - G.uold[0])
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
-            F.u[m] += self.prolong_space(G.u[m] - self.restrict_space(F.u[m]))
+            F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 
         return None
 
 
     # FIXME: add time prolongation
-    # FIXME: this is currently not working!!!
     def prolong_f(self):
         """
         Space-time prolongation routine w.r.t. the rhs f
@@ -134,7 +137,6 @@ class transfer(metaclass=abc.ABCMeta):
         G = self.coarse
 
         PF = F.prob
-        PG = G.prob
 
         SF = F.sweep
         SG = G.sweep
@@ -146,12 +148,12 @@ class transfer(metaclass=abc.ABCMeta):
 
         # build coarse correction
 
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
+        F.u[0] += self.prolong_space(G.u[0] - G.uold[0])
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
-            F.u[m] += self.prolong_space(G.u[m] - self.restrict_space(F.u[m]))
-            F.f[m] += self.prolong_space(G.f[m] - self.restrict_space(F.f[m]))
+            F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
+            F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
 
         return None
 

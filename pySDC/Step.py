@@ -194,9 +194,9 @@ class step():
         T = transfer_class(fine_level,coarse_level)
         # use transfer dictionary twice to set restrict and prologn operator
         self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
-        self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
-        # fixme: this is currently not working (why?).. also: get a switch for that
-        # self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
+        # self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
+        # fixme: get a switch for that
+        self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
 
 
     def transfer(self,source,target):

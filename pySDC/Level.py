@@ -17,8 +17,8 @@ class level():
         params: parameter object containing the custom parameters passed by the user
         status: status object
         uend: dof values at the right end point of the interval
-        u: dof values at the nodes
-        f: RHS values at the nodes
+        u: dof values at the nodes (+uold for saving data during restriction)
+        f: RHS values at the nodes (+fold for saving data during restriction)
         tau: FAS correction, allocated via step class if necessary
         id: custom string naming this level
         logger: a logging object for level-dependent output
@@ -48,7 +48,8 @@ class level():
             self.updated = False
 
 
-    __slots__ = ('__prob','__sweep','uend','u','f','tau','status','params','id','__step','id','__tag','__hooks')
+    __slots__ = ('__prob','__sweep','uend','u','uold','f','fold','tau','status','params','id','__step','id','__tag',
+                 '__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
@@ -88,7 +89,9 @@ class level():
         # empty data the nodes, the right end point and tau
         self.uend = None
         self.u = [None] * (self.sweep.coll.num_nodes+1)
+        self.uold = [None] * (self.sweep.coll.num_nodes+1)
         self.f = [None] * (self.sweep.coll.num_nodes+1)
+        self.fold = [None] * (self.sweep.coll.num_nodes+1)
         self.tau = None
 
         # set name
@@ -115,7 +118,9 @@ class level():
         # all data back to None
         self.uend = None
         self.u = [None] * (self.sweep.coll.num_nodes+1)
+        self.uold = [None] * (self.sweep.coll.num_nodes+1)
         self.f = [None] * (self.sweep.coll.num_nodes+1)
+        self.fold = [None] * (self.sweep.coll.num_nodes+1)
 
 
     def __add_tau(self):
