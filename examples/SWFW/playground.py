@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
