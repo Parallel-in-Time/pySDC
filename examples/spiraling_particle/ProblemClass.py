@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 
 from pySDC.Problem import ptype
@@ -136,7 +137,7 @@ class planewave_single(ptype):
             correct RHS of type acceleration
         """
 
-        assert type(part) == particles
+        assert isinstance(part,particles)
         rhs = acceleration(self.nparts)
         rhs.values[:] = part.q[:]/part.m[:]*(f.elec.values + np.cross(part.vel.values,f.magn.values))
 
