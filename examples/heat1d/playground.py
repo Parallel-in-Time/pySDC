@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 2
 
     # This comes as read-in for the level class
     lparams = {}
@@ -28,11 +28,11 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [127,127]
+    pparams['nvars'] = [255,127]
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = False
+    tparams['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
