@@ -5,7 +5,7 @@ import time
 from pySDC.Stats import stats
 
 
-class hooks():
+class hooks(object):
 
     __slots__ = ('__level','t0')
 
