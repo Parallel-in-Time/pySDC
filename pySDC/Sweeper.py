@@ -4,8 +4,10 @@ import numpy as np
 from pySDC.Collocation import CollBase
 from pySDC.Level import level
 
+from future.utils import with_metaclass
 
-class sweeper(metaclass=abc.ABCMeta):
+
+class sweeper(with_metaclass(abc.ABCMeta)):
     """
     Base abstract sweeper class
 

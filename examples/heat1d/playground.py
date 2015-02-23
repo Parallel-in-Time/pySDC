@@ -28,11 +28,11 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [127,63]
+    pparams['nvars'] = [127,127]
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.125
-    Tend = dt
+    Tend = 2*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

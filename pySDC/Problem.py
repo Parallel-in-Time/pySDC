@@ -1,5 +1,5 @@
 
-class ptype():
+class ptype(object):
     """
     Prototype class for problems, just defines the attributes essential to get started
 
