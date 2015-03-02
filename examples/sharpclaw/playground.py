@@ -11,9 +11,6 @@ import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
-# Sharpclaw imports
-from clawpack import pyclaw
-
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)

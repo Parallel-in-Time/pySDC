@@ -5,6 +5,9 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
+# Sharpclaw imports
+from clawpack import pyclaw
+
 class sharpclaw(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
@@ -38,7 +41,9 @@ class sharpclaw(ptype):
         # compute dx and get discretization matrix A
         self.dx = 1./(self.nvars + 1.)
         self.A = self.__get_A(self.nvars,self.nu,self.dx)
-
+            
+        # At the moment, there is no interaction of these lines with the rest of the code
+        solver = pyclaw.SharpClawSolver1D()
 
     def __get_A(self,N,nu,dx):
         """
