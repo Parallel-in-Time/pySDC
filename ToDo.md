@@ -20,8 +20,4 @@ ToDo list
 
 * add more detailed timings mechanism to statistics via hooks
 
-* figure out why f-interpolation is currently not working
-
 * add temporal coarsening
-
-* don't we need a tau-correction for compute_end_node on coarser levels..?

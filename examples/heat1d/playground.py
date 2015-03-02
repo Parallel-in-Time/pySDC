@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 2
+    num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [255,127]
+    pparams['nvars'] = [127,63]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
+    description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.125
-    Tend = 2*dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

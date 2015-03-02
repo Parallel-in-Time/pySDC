@@ -147,6 +147,9 @@ class generic_LU(sweeper):
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt*self.coll.weights[m]*L.f[m+1]
-            #FIXME: do we need some sort of tau correction here as well?
+
+            # add up tau correction of the full interval (last entry)
+            if L.tau is not None:
+                L.uend += L.tau[-1]
 
         return None

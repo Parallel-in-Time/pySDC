@@ -196,6 +196,8 @@ class boris_2nd_order(sweeper):
                 f = P.build_f(L.f[m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
                 L.uend.pos += L.dt*(L.dt*qQ[m]*f) + L.dt*self.coll.weights[m]*L.u[0].vel
                 L.uend.vel += L.dt*self.coll.weights[m]*f
-            #FIXME: do we need some sort of tau correction here as well?
+
+            if L.tau is not None:
+                L.uend += L.tau[-1]
 
         return None
