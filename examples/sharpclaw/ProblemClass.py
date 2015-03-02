@@ -7,6 +7,7 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 # Sharpclaw imports
 from clawpack import pyclaw
+from clawpack import riemann
 
 class sharpclaw(ptype):
     """
@@ -43,8 +44,12 @@ class sharpclaw(ptype):
         self.A = self.__get_A(self.nvars,self.nu,self.dx)
             
         # At the moment, there is no interaction of these lines with the rest of the code
-        solver = pyclaw.SharpClawSolver1D()
-
+        riemann_solver = riemann.advection_1D
+        solver = pyclaw.SharpClawSolver1D(riemann_solver)
+        x = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        domain = pyclaw.Domain(x)
+        state = pyclaw.State(domain,solver.num_eqn)
+  
     def __get_A(self,N,nu,dx):
         """
         Helper function to assemble FD matrix A in sparse format
