@@ -44,12 +44,32 @@ class sharpclaw(ptype):
         self.A = self.__get_A(self.nvars,self.nu,self.dx)
             
         # At the moment, there is no interaction of these lines with the rest of the code
-        riemann_solver = riemann.advection_1D
-        solver = pyclaw.SharpClawSolver1D(riemann_solver)
-        x = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        riemann_solver         = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
+        solver.weno_order      = 5
+        solver.time_integrator = 'Euler' # Remove later
+        solver.kernel_language = 'Fortran'
+        solver.bc_lower[0]     = pyclaw.BC.periodic
+        solver.bc_upper[0]     = pyclaw.BC.periodic
+        
+        x      = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
         domain = pyclaw.Domain(x)
-        state = pyclaw.State(domain,solver.num_eqn)
-  
+        state  = pyclaw.State(domain,solver.num_eqn)
+        state.problem_data['u'] = 1.0
+            
+        # Initial data
+        xc = state.grid.x.centers
+        beta = 100; gamma=0; x0 = 0.75
+        state.q[0,:] = np.exp(-beta * (xc-x0)**2) * np.cos(gamma * (xc - x0))
+
+        claw = pyclaw.Controller()
+        claw.keep_copy = True
+        claw.solution = pyclaw.Solution(state,domain)
+        claw.solver = solver
+        claw.outdir = './_output'
+        claw.tfinal = 1.0
+        claw.run()
+
     def __get_A(self,N,nu,dx):
         """
         Helper function to assemble FD matrix A in sparse format
