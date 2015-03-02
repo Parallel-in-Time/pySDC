@@ -1,3 +1,4 @@
+from __future__ import division
 from pySDC.Hooks import hooks
 from pySDC.Stats import stats
 

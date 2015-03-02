@@ -2,8 +2,10 @@ import abc
 import numpy as np
 import copy as cp
 
+from future.utils import with_metaclass
 
-class transfer(metaclass=abc.ABCMeta):
+
+class transfer(with_metaclass(abc.ABCMeta)):
     """
     Abstract transfer class
 

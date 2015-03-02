@@ -35,9 +35,9 @@ class particles_to_particles(transfer):
 
         """
 
-        if type(F) is particles:
+        if isinstance(F,particles):
             G = particles(F)
-        elif type(F) is fields:
+        elif isinstance(F,fields):
             G = fields(F)
         else:
             print('Transfer error')
@@ -52,9 +52,9 @@ class particles_to_particles(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        if type(G) is particles:
+        if isinstance(G,particles):
             F = particles(G)
-        elif type(G) is fields:
+        elif isinstance(G,fields):
             F = fields(G)
         else:
             print('Transfer error')
