@@ -36,7 +36,7 @@ class sharpclaw(ptype):
         super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
 
         # compute dx and get discretization matrix A
-        self.dx = 1/(self.nvars + 1)
+        self.dx = 1./(self.nvars + 1.)
         self.A = self.__get_A(self.nvars,self.nu,self.dx)
 
 
