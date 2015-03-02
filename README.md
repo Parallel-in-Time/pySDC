@@ -39,7 +39,7 @@ To start your own example, take a look at the examples shipped with this code:
 * vanderpol: the van der pol oscillator
 
 To run one of these, add the root directory of pySDC to your PYTHONPATH and execute `python playground` (this could 
-be done e.g. via `PYTHONPATH=../.. python playground.py`). Note that all this requires Python 3!
+be done e.g. via `PYTHONPATH=../.. python playground.py`). Note that all this requires Python 3! For Python 2 support, check out the python2 branch.
 
 Each of these examples should demonstrate some features of this code, e.g. MLSDC/PFASST and an IMEX sweeper for the heat 
 equation, the Boris-SDC approach in the particle case and the LU decomposition as well as the application of a 
