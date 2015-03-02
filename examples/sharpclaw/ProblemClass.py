@@ -68,6 +68,15 @@ class sharpclaw(ptype):
         claw.solver = solver
         claw.outdir = './_output'
         claw.tfinal = 1.0
+   
+        my_state = claw.solution.states[0]
+        solver.setup(claw.solution)
+        solver.dt = 0.001
+        solver.cfl_max = 1.0
+        print solver.is_valid()
+        print solver.cfl_max
+        deltaq   = solver.dq(my_state)
+        
         claw.run()
 
     def __get_A(self,N,nu,dx):
