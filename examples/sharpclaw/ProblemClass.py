@@ -76,7 +76,9 @@ class sharpclaw(ptype):
         print solver.is_valid()
         print solver.cfl_max
         deltaq   = solver.dq(my_state)
-        
+        print np.size(deltaq)
+        # Note: A forward Euler step would now read state.q += deltaq
+        # ..cf line 262ff in pyclaw/sharpclaw/solver.py
         claw.run()
 
     def __get_A(self,N,nu,dx):
