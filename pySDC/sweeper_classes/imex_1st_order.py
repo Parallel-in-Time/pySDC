@@ -141,7 +141,6 @@ class imex_1st_order(sweeper):
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
-
             # add up tau correction of the full interval (last entry)
             if L.tau is not None:
                 L.uend += L.tau[-1]

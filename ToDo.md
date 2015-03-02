@@ -12,7 +12,7 @@ ToDo list
     - reaction diffusion using fft
     - bernus model: simple explicit SDC to monodomain PFASST
     - multi-particle penning trap with PFASST
-    - SWFW, maybe couple to PyClaw
+    - SWFW, couple to PyClaw
 
 * write a more detailed howto, explaining all the features of the code using basic examples
 
