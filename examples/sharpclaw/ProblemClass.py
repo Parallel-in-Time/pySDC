@@ -16,6 +16,7 @@ class sharpclaw(ptype):
     Attributes:
       solver: A sharpclaw solver
       claw: A ...
+      my_state: A ...
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -68,7 +69,7 @@ class sharpclaw(ptype):
         self.claw.outdir = './_output'
         self.claw.tfinal = 1.0
 
-        my_state = self.claw.solution.states[0]
+        self.my_state = self.claw.solution.states[0]
         self.claw.solver.setup(self.claw.solution)
         self.claw.solver.dt = 0.001
         self.claw.solver.cfl_max = 1.0
@@ -108,8 +109,9 @@ class sharpclaw(ptype):
         """
 
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = 0.0*mesh(self.nvars)
+        fexpl    = 0.0*mesh(self.nvars)
 
+        self.claw.solver.dq(self.my_state)
         
         #fexpl.values = self.claw.solver.dq(my_state)
         return fexpl
