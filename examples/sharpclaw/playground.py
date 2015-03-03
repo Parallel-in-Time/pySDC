@@ -11,6 +11,10 @@ import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
+# Sharpclaw imports
+from clawpack import pyclaw
+from clawpack import riemann
+
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
@@ -27,7 +31,6 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.1
     pparams['nvars'] = [255]
 
     # This comes as read-in for the transfer operations

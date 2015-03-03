@@ -14,8 +14,8 @@ class sharpclaw(ptype):
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+      solver: A sharpclaw solver
+      claw: A ...
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -30,7 +30,7 @@ class sharpclaw(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'nu' in cparams
+        #assert 'u0' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -41,8 +41,7 @@ class sharpclaw(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = 1./(self.nvars + 1.)
-        self.A = self.__get_A(self.nvars,self.nu,self.dx)
-            
+        
         # At the moment, there is no interaction of these lines with the rest of the code
         riemann_solver         = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
         solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
@@ -62,43 +61,22 @@ class sharpclaw(ptype):
         beta = 100; gamma=0; x0 = 0.75
         state.q[0,:] = np.exp(-beta * (xc-x0)**2) * np.cos(gamma * (xc - x0))
 
-        claw = pyclaw.Controller()
-        claw.keep_copy = True
-        claw.solution = pyclaw.Solution(state,domain)
-        claw.solver = solver
-        claw.outdir = './_output'
-        claw.tfinal = 1.0
-   
-        my_state = claw.solution.states[0]
-        solver.setup(claw.solution)
-        solver.dt = 0.001
-        solver.cfl_max = 1.0
-        print solver.is_valid()
-        print solver.cfl_max
-        deltaq   = solver.dq(my_state)
-        print np.size(deltaq)
+        self.claw = pyclaw.Controller()
+        self.claw.keep_copy = True
+        self.claw.solution = pyclaw.Solution(state,domain)
+        self.claw.solver = solver
+        self.claw.outdir = './_output'
+        self.claw.tfinal = 1.0
+
+        my_state = self.claw.solution.states[0]
+        self.claw.solver.setup(self.claw.solution)
+        self.claw.solver.dt = 0.001
+        self.claw.solver.cfl_max = 1.0
+        assert self.claw.solver.is_valid()
+
         # Note: A forward Euler step would now read state.q += deltaq
         # ..cf line 262ff in pyclaw/sharpclaw/solver.py
-        claw.run()
-
-    def __get_A(self,N,nu,dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N: number of dofs
-            nu: diffusion coefficient
-            dx: distance between two spatial nodes
-
-        Returns:
-         matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
-        A *= nu / (dx**2)
-        return A.tocsc()
-
+        self.claw.run()
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -113,8 +91,7 @@ class sharpclaw(ptype):
             solution as mesh
         """
 
-        me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me = 0.0*mesh(self.nvars)
         return me
 
 
@@ -131,8 +108,10 @@ class sharpclaw(ptype):
         """
 
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
+        fexpl = 0.0*mesh(self.nvars)
+
+        
+        #fexpl.values = self.claw.solver.dq(my_state)
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -148,7 +127,7 @@ class sharpclaw(ptype):
         """
 
         fimpl = mesh(self.nvars)
-        fimpl.values = self.A.dot(u.values)
+        fimpl.values = 0.0*u.values
         return fimpl
 
 
