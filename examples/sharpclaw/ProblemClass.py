@@ -16,7 +16,8 @@ class sharpclaw(ptype):
     Attributes:
       solver: A sharpclaw solver
       claw: A ...
-      my_state: A ...
+      state: A ...
+      domain: A ...
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -52,19 +53,20 @@ class sharpclaw(ptype):
         solver.bc_lower[0]     = pyclaw.BC.periodic
         solver.bc_upper[0]     = pyclaw.BC.periodic
         
-        x      = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
-        domain = pyclaw.Domain(x)
-        state  = pyclaw.State(domain,solver.num_eqn)
-        state.problem_data['u'] = 1.0
+        x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        self.domain = pyclaw.Domain(x)
+        
+        self.state  = pyclaw.State(self.domain,solver.num_eqn)
+        self.state.problem_data['u'] = 1.0
             
         # Initial data
-        xc = state.grid.x.centers
+        xc = self.state.grid.x.centers
         beta = 100; gamma=0; x0 = 0.75
-        state.q[0,:] = np.exp(-beta * (xc-x0)**2) * np.cos(gamma * (xc - x0))
+        self.state.q[0,:] = np.exp(-beta * (xc-x0)**2) * np.cos(gamma * (xc - x0))
 
         self.claw = pyclaw.Controller()
         self.claw.keep_copy = True
-        self.claw.solution = pyclaw.Solution(state,domain)
+        self.claw.solution = pyclaw.Solution(self.state,self.domain)
         self.claw.solver = solver
         self.claw.outdir = './_output'
         self.claw.tfinal = 1.0
@@ -109,10 +111,11 @@ class sharpclaw(ptype):
         """
 
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl    = 0.0*mesh(self.nvars)
-
-        self.claw.solver.dq(self.my_state)
+        self.state.q[0,:]= mesh(self.nvars)
         
+        self.claw.solver.dq(self.state)
+        
+        fexpl = 0.0*xvalues
         #fexpl.values = self.claw.solver.dq(my_state)
         return fexpl
 
