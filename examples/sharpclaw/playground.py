@@ -32,11 +32,11 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.001
-    Tend = 2*dt
+    Tend = 5*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [255]
+    pparams['nvars'] = [127]
     pparams['dt']    = dt
 
     # This comes as read-in for the transfer operations

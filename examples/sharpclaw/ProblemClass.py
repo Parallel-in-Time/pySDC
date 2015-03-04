@@ -39,9 +39,6 @@ class sharpclaw(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
-
-        # compute dx and get discretization matrix A
-        self.dx = 1./(self.nvars + 1.)
         
         riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
         self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
@@ -59,10 +56,11 @@ class sharpclaw(ptype):
 
         self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
         self.state.problem_data['u'] = 1.0
-  
+        self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+
         # Initial data
-        xc                = self.state.grid.x.centers
-        self.state.q[0,:] = np.sin(np.pi*xc)
+        u0                = self.u_exact(0.0)
+        self.state.q[0,:] = u0.values
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
@@ -155,8 +153,8 @@ class sharpclaw(ptype):
         Returns:
             exact solution
         """
-
+        
+        xc        = self.state.grid.x.centers
         me        = mesh(self.nvars)
-        xvalues   = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*xvalues - t)
+        me.values = np.sin(np.pi*xc - t)
         return me
