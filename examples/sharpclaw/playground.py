@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.01
+    dt = 0.001
     Tend = 2*dt
 
     # This comes as read-in for the problem class

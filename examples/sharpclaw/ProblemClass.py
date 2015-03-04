@@ -51,7 +51,7 @@ class sharpclaw(ptype):
         self.solver.bc_lower[0]     = pyclaw.BC.periodic
         self.solver.bc_upper[0]     = pyclaw.BC.periodic
         self.solver.dt              = self.dt
-        self.solver.cfl_max         = 5.0
+        self.solver.cfl_max         = 1.0
         assert self.solver.is_valid()
 
         x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
@@ -82,7 +82,7 @@ class sharpclaw(ptype):
         """
 
         me        = mesh(self.nvars)
-        me.values = 0.0*rhs.values
+        me.values = rhs.values
         return me
 
 
