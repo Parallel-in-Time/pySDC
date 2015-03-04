@@ -99,7 +99,7 @@ class sharpclaw(ptype):
         self.state.q[0,:] = u.values
         
         # Evaluate right hand side
-        deltaq           = self.solver.dq(self.state)
+        deltaq           = self.solver.dqdt(self.state)
         
         # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
