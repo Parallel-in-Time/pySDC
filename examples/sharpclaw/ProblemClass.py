@@ -79,7 +79,6 @@ class sharpclaw(ptype):
 
         # Note: A forward Euler step would now read state.q += deltaq
         # ..cf line 262ff in pyclaw/sharpclaw/solver.py
-        self.claw.run()
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -110,13 +109,11 @@ class sharpclaw(ptype):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        self.state.q[0,:]= mesh(self.nvars)
+        self.state.q[0,:] = u.values
+        deltaq = self.claw.solver.dq(self.state)
         
-        self.claw.solver.dq(self.state)
-        
-        fexpl = 0.0*xvalues
-        #fexpl.values = self.claw.solver.dq(my_state)
+        fexpl        = mesh(self.nvars)
+        fexpl.values = deltaq
         return fexpl
 
     def __eval_fimpl(self,u,t):
