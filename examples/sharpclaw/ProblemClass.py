@@ -14,9 +14,9 @@ class sharpclaw(ptype):
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
-      solver: A sharpclaw solver
-      state: A ...
-      domain: A ...
+      solver: Sharpclaw solver
+      state:  Sharclaw state
+      domain: Sharpclaw domain
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -61,10 +61,9 @@ class sharpclaw(ptype):
         self.state.problem_data['u'] = 1.0
   
         # Initial data
-        xc = self.state.grid.x.centers
-        beta = 100; gamma=0; x0 = 0.75
-        
+        xc                = self.state.grid.x.centers
         self.state.q[0,:] = np.sin(np.pi*xc)
+        
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
 
@@ -157,7 +156,7 @@ class sharpclaw(ptype):
             exact solution
         """
 
-        me = mesh(self.nvars)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
+        me        = mesh(self.nvars)
+        xvalues   = np.array([(i+1)*self.dx for i in range(self.nvars)])
         me.values = np.sin(np.pi*xvalues - t)
         return me
