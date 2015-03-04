@@ -93,7 +93,8 @@ class sharpclaw(ptype):
             solution as mesh
         """
 
-        me = 0.0*mesh(self.nvars)
+        me        = mesh(self.nvars)
+        me.values = 0.0*rhs.values
         return me
 
 
@@ -109,9 +110,12 @@ class sharpclaw(ptype):
             explicit part of RHS
         """
 
+        # Copy values of u into pyClaw state object
         self.state.q[0,:] = u.values
+        # Evaluate right hand side
         deltaq = self.claw.solver.dq(self.state)
         
+        # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
         fexpl.values = deltaq
         return fexpl
