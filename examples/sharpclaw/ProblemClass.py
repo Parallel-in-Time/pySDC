@@ -31,7 +31,7 @@ class sharpclaw(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        #assert 'u0' in cparams
+        assert 'dt' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -50,8 +50,8 @@ class sharpclaw(ptype):
         self.solver.kernel_language = 'Fortran'
         self.solver.bc_lower[0]     = pyclaw.BC.periodic
         self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.dt              = 0.001
-        self.solver.cfl_max         = 1.0
+        self.solver.dt              = self.dt
+        self.solver.cfl_max         = 5.0
         assert self.solver.is_valid()
 
         x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
@@ -100,12 +100,14 @@ class sharpclaw(ptype):
 
         # Copy values of u into pyClaw state object
         self.state.q[0,:] = u.values
+        
         # Evaluate right hand side
-        deltaq = self.solver.dq(self.state)
+        deltaq           = self.solver.dq(self.state)
         
         # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
         fexpl.values = deltaq
+        
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -120,8 +122,9 @@ class sharpclaw(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
+        fimpl        = mesh(self.nvars)
         fimpl.values = 0.0*u.values
+        
         return fimpl
 
 

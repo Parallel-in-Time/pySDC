@@ -29,9 +29,15 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 10
 
+    # setup parameters "in time"
+    t0 = 0
+    dt = 0.01
+    Tend = 2*dt
+
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nvars'] = [255]
+    pparams['dt']    = dt
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -39,24 +45,19 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = sharpclaw
-    description['problem_params'] = pparams
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
+    description['problem_class']     = sharpclaw
+    description['problem_params']    = pparams
+    description['dtype_u']           = mesh
+    description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = 3
-    description['sweeper_class'] = imex_1st_order
-    description['level_params'] = lparams
+    description['num_nodes']         = 3
+    description['sweeper_class']     = imex_1st_order
+    description['level_params']      = lparams
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
-
-    # setup parameters "in time"
-    t0 = 0
-    dt = 0.125
-    Tend = 2*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
