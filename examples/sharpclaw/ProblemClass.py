@@ -15,7 +15,6 @@ class sharpclaw(ptype):
 
     Attributes:
       solver: A sharpclaw solver
-      claw: A ...
       state: A ...
       domain: A ...
     """
@@ -44,41 +43,30 @@ class sharpclaw(ptype):
         # compute dx and get discretization matrix A
         self.dx = 1./(self.nvars + 1.)
         
-        # At the moment, there is no interaction of these lines with the rest of the code
-        riemann_solver         = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
-        solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
-        solver.weno_order      = 5
-        solver.time_integrator = 'Euler' # Remove later
-        solver.kernel_language = 'Fortran'
-        solver.bc_lower[0]     = pyclaw.BC.periodic
-        solver.bc_upper[0]     = pyclaw.BC.periodic
-        
+        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
+        self.solver.weno_order      = 5
+        self.solver.time_integrator = 'Euler' # Remove later
+        self.solver.kernel_language = 'Fortran'
+        self.solver.bc_lower[0]     = pyclaw.BC.periodic
+        self.solver.bc_upper[0]     = pyclaw.BC.periodic
+        self.solver.dt              = 0.001
+        self.solver.cfl_max         = 1.0
+        assert self.solver.is_valid()
+
         x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
         self.domain = pyclaw.Domain(x)
-        
-        self.state  = pyclaw.State(self.domain,solver.num_eqn)
+
+        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
         self.state.problem_data['u'] = 1.0
-            
+  
         # Initial data
         xc = self.state.grid.x.centers
         beta = 100; gamma=0; x0 = 0.75
-        self.state.q[0,:] = np.exp(-beta * (xc-x0)**2) * np.cos(gamma * (xc - x0))
-
-        self.claw = pyclaw.Controller()
-        self.claw.keep_copy = True
-        self.claw.solution = pyclaw.Solution(self.state,self.domain)
-        self.claw.solver = solver
-        self.claw.outdir = './_output'
-        self.claw.tfinal = 1.0
-
-        self.my_state = self.claw.solution.states[0]
-        self.claw.solver.setup(self.claw.solution)
-        self.claw.solver.dt = 0.001
-        self.claw.solver.cfl_max = 1.0
-        assert self.claw.solver.is_valid()
-
-        # Note: A forward Euler step would now read state.q += deltaq
-        # ..cf line 262ff in pyclaw/sharpclaw/solver.py
+        
+        self.state.q[0,:] = np.sin(np.pi*xc)
+        solution = pyclaw.Solution(self.state, self.domain)
+        self.solver.setup(solution)
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -113,7 +101,7 @@ class sharpclaw(ptype):
         # Copy values of u into pyClaw state object
         self.state.q[0,:] = u.values
         # Evaluate right hand side
-        deltaq = self.claw.solver.dq(self.state)
+        deltaq = self.solver.dq(self.state)
         
         # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
@@ -168,5 +156,5 @@ class sharpclaw(ptype):
 
         me = mesh(self.nvars)
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*xvalues)*np.cos(t)
+        me.values = np.sin(np.pi*xvalues - t)
         return me
