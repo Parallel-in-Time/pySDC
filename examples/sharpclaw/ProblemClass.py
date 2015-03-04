@@ -47,7 +47,6 @@ class sharpclaw(ptype):
         self.solver.kernel_language = 'Fortran'
         self.solver.bc_lower[0]     = pyclaw.BC.periodic
         self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.dt              = self.dt
         self.solver.cfl_max         = 1.0
         assert self.solver.is_valid()
 
@@ -104,7 +103,7 @@ class sharpclaw(ptype):
         # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
         fexpl.values = deltaq
-        
+                
         return fexpl
 
     def __eval_fimpl(self,u,t):
