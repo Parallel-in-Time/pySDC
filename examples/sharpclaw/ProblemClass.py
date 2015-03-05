@@ -155,5 +155,5 @@ class sharpclaw(ptype):
         
         xc        = self.state.grid.x.centers
         me        = mesh(self.nvars)
-        me.values = np.sin(np.pi*xc - t)
+        me.values = np.sin(2.0*np.pi*(xc - t))
         return me

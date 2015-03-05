@@ -14,6 +14,8 @@ from pySDC.Stats import grep_stats, sort_stats
 # Sharpclaw imports
 from clawpack import pyclaw
 from clawpack import riemann
+from matplotlib import pyplot as plt
+
 
 if __name__ == "__main__":
 
@@ -31,12 +33,12 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.001
-    Tend = 5*dt
+    dt = 0.01
+    Tend = 100*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [255]
+    pparams['nvars'] = [127]
     pparams['dt']    = dt
 
     # This comes as read-in for the transfer operations
@@ -72,6 +74,14 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
+    fig = plt.figure(figsize=(8,8))
+    plt.plot(P.state.grid.x.centers,uend.values, color='b', label='SDC')
+    plt.plot(P.state.grid.x.centers,uex.values, color='r', label='Exact')
+    plt.legend()
+    plt.xlim([0, 1])
+    plt.ylim([-1, 1])
+    plt.show()
+    
     extract_stats = grep_stats(stats,iter=-1,type='residual')
     sortedlist_stats = sort_stats(extract_stats,sortby='step')
     print(extract_stats,sortedlist_stats)
