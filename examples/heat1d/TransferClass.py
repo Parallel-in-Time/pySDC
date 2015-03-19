@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 
 from pySDC.Transfer import transfer
@@ -88,10 +89,10 @@ class mesh_to_mesh_1d(transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
-        if type(F) is mesh:
+        if isinstance(F,mesh):
             u_coarse = mesh(self.init_c,val=0)
             u_coarse.values = np.dot(self.Rspace,F.values)
-        elif type(F) is rhs_imex_mesh:
+        elif isinstance(F,rhs_imex_mesh):
             u_coarse = rhs_imex_mesh(self.init_c)
             u_coarse.impl.values = np.dot(self.Rspace,F.impl.values)
             u_coarse.expl.values = np.dot(self.Rspace,F.expl.values)
@@ -106,10 +107,10 @@ class mesh_to_mesh_1d(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        if type(G) is mesh:
+        if isinstance(G,mesh):
             u_fine = mesh(self.init_c,val=0)
             u_fine.values = np.dot(self.Pspace,G.values)
-        elif type(G) is rhs_imex_mesh:
+        elif isinstance(G,rhs_imex_mesh):
             u_fine = rhs_imex_mesh(self.init_c)
             u_fine.impl.values = np.dot(self.Pspace,G.impl.values)
             u_fine.expl.values = np.dot(self.Pspace,G.expl.values)

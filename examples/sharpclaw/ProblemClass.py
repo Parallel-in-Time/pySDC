@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
@@ -6,13 +5,18 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-class heat1d(ptype):
+# Sharpclaw imports
+from clawpack import pyclaw
+from clawpack import riemann
+
+class sharpclaw(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+      solver: Sharpclaw solver
+      state:  Sharclaw state
+      domain: Sharpclaw domain
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -27,38 +31,38 @@ class heat1d(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'nu' in cparams
+        assert 'dt' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
+        
+        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
+        self.solver.weno_order      = 5
+        self.solver.time_integrator = 'Euler' # Remove later
+        self.solver.kernel_language = 'Fortran'
+        self.solver.bc_lower[0]     = pyclaw.BC.periodic
+        self.solver.bc_upper[0]     = pyclaw.BC.periodic
+        self.solver.cfl_max         = 1.0
+        assert self.solver.is_valid()
 
-        # compute dx and get discretization matrix A
-        self.dx = 1/(self.nvars + 1)
-        self.A = self.__get_A(self.nvars,self.nu,self.dx)
+        x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        self.domain = pyclaw.Domain(x)
 
+        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
+        self.state.problem_data['u'] = 1.0
+        self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
 
-    def __get_A(self,N,nu,dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N: number of dofs
-            nu: diffusion coefficient
-            dx: distance between two spatial nodes
-
-        Returns:
-         matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
-        A *= nu / (dx**2)
-        return A.tocsc()
-
+        # Initial data
+        u0                = self.u_exact(0.0)
+        self.state.q[0,:] = u0.values
+        
+        solution = pyclaw.Solution(self.state, self.domain)
+        self.solver.setup(solution)
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -73,8 +77,8 @@ class heat1d(ptype):
             solution as mesh
         """
 
-        me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me        = mesh(self.nvars)
+        me.values = rhs.values
         return me
 
 
@@ -90,9 +94,16 @@ class heat1d(ptype):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
+        # Copy values of u into pyClaw state object
+        self.state.q[0,:] = u.values
+        
+        # Evaluate right hand side
+        deltaq           = self.solver.dqdt(self.state)
+        
+        # Copy right hand side values back into pySDC solution structure
+        fexpl        = mesh(self.nvars)
+        fexpl.values = deltaq
+                
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -107,8 +118,9 @@ class heat1d(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
-        fimpl.values = self.A.dot(u.values)
+        fimpl        = mesh(self.nvars)
+        fimpl.values = 0.0*u.values
+        
         return fimpl
 
 
@@ -140,8 +152,8 @@ class heat1d(ptype):
         Returns:
             exact solution
         """
-
-        me = mesh(self.nvars)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*xvalues)*np.cos(t)
+        
+        xc        = self.state.grid.x.centers
+        me        = mesh(self.nvars)
+        me.values = np.sin(2.0*np.pi*(xc - t))
         return me

@@ -1,3 +1,4 @@
+from __future__ import division
 from subprocess import call
 
 import numpy as np
