@@ -3,8 +3,9 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from examples.fenics_heat2d.ProblemClass import fenics_heat2d
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from ProblemClass import fenics_heat2d
+from fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.Methods as mp
 from pySDC import Log
@@ -58,6 +59,7 @@ if __name__ == "__main__":
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
+
     uinit = P.u_init(t0)
 
     # call main function to get things done...

@@ -3,7 +3,7 @@ import numpy as np
 import dolfin as df
 
 from pySDC.Problem import ptype
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from fenics_mesh import fenics_mesh, rhs_fenics_mesh
 
 class fenics_heat2d(ptype):
     """
@@ -38,13 +38,14 @@ class fenics_heat2d(ptype):
         for k,v in cparams.items():
             setattr(self,k,v)
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_heat2d,self).__init__(self.nvars,dtype_u,dtype_f)
-
         mesh = df.UnitSquareMesh(self.nvars[0],self.nvars[1])
         self.V = df.FunctionSpace(mesh, 'Lagrange', 1)
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)
+
         # Laplace terms
-        u = df.TrialFunction(self.sV)
+        u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
         a_K = df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx
 
@@ -78,10 +79,11 @@ class fenics_heat2d(ptype):
         A = self.M + factor*self.K
 
         self.u0.t = t
-        self.bc.apply(A,rhs)
+
+        self.bc.apply(A,rhs.values.vector())
 
         u = fenics_mesh(u0)
-        df.solve(A,u.vector(),rhs)
+        df.solve(A,u.values.vector(),rhs.values.vector())
 
         return u
 
@@ -99,7 +101,8 @@ class fenics_heat2d(ptype):
         """
 
         # self.g.t = t
-        fexpl = df.interpolate(self.g,self.V)
+        fexpl = fenics_mesh(self.V)
+        fexpl.values = df.interpolate(self.g,self.V)
 
         return fexpl
 
@@ -115,7 +118,8 @@ class fenics_heat2d(ptype):
             implicit part of RHS
         """
 
-        fimpl = self.K*u.vector()
+        fimpl = fenics_mesh(self.V)
+        fimpl.values = df.Function(self.V,self.K*u.values.vector())
 
         return fimpl
 
@@ -132,10 +136,15 @@ class fenics_heat2d(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_fenics_mesh(self.nvars)
+        f = rhs_fenics_mesh(u.V)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
+
+
+    def apply_mass_matrix(self,u):
+
+        return self.M*u.values.vector()
 
 
     def u_exact(self,t):
@@ -152,4 +161,6 @@ class fenics_heat2d(ptype):
 
     def u_init(self,t0):
 
-        return df.interpolate(self.u0,self.V)
+        me = fenics_mesh(self.init)
+        me.values = df.interpolate(self.u0,self.V)
+        return me
