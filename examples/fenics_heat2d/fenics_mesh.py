@@ -1,6 +1,3 @@
-import numpy as np
-import copy as cp
-
 from pySDC.Errors import DataError
 import dolfin as df
 
@@ -115,7 +112,7 @@ class fenics_mesh():
 
         # take absolute values of the mesh values
 
-        absval = df.norm(self.values)
+        absval = df.norm(self.values.vector(),'linf')
 
         # return maximum
         return absval
@@ -192,7 +189,7 @@ class rhs_fenics_mesh():
         """
 
         if isinstance(other, rhs_fenics_mesh):
-            # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
+            # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
             me = rhs_fenics_mesh(self)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl

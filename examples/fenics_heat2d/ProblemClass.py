@@ -1,6 +1,7 @@
 from __future__ import division
-import numpy as np
 import dolfin as df
+
+import numpy as np
 
 from pySDC.Problem import ptype
 from fenics_mesh import fenics_mesh, rhs_fenics_mesh
@@ -24,14 +25,16 @@ class fenics_heat2d(ptype):
             dtype_f: acceleration data type (will be passed parent class)
         """
 
-        class Boundary(df.SubDomain):  # define the Dirichlet boundary
-            def inside(self, x, on_boundary):
-                    return on_boundary
+        # class Boundary(df.SubDomain):  # define the Dirichlet boundary
+        #     def inside(self, x, on_boundary):
+        #             return on_boundary
+
+        def Boundary(x, on_boundary):
+            return on_boundary
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'alpha' in cparams
-        assert 'beta' in cparams
+        assert 'nu' in cparams
         assert 't0' in cparams
 
         # add parameters as attributes for further reference
@@ -53,15 +56,12 @@ class fenics_heat2d(ptype):
         a_M = u*v*df.dx
 
         self.M = df.assemble(a_M)
-        self.K = df.assemble(a_K)
+        self.K = self.nu*df.assemble(a_K)
 
-        self.g = df.Expression('beta - 2 - 2*alpha', beta=self.beta, alpha=self.alpha)
-        self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
-
-
-
-        boundary = Boundary()
-        self.bc = df.DirichletBC(self.V, self.u0, boundary)
+        self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0)
+        # self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
+        self.u0 = df.Constant(0.0)
+        self.bc = df.DirichletBC(self.V, self.u0, Boundary)
 
 
 
@@ -79,13 +79,12 @@ class fenics_heat2d(ptype):
         """
 
         A = self.M + factor*self.K
+        b = fenics_mesh(rhs)
 
-        self.u0.t = t
-
-        self.bc.apply(A,rhs.values.vector())
+        self.bc.apply(A,b.values.vector())
 
         u = fenics_mesh(u0)
-        df.solve(A,u.values.vector(),rhs.values.vector())
+        df.solve(A,u.values.vector(),b.values.vector())
 
         return u
 
@@ -102,9 +101,9 @@ class fenics_heat2d(ptype):
             explicit part of RHS
         """
 
-        # self.g.t = t
+        self.g.t = t
         fexpl = fenics_mesh(self.V)
-        fexpl.values = df.interpolate(self.g,self.V)
+        fexpl.values = df.Function(self.V,self.M*df.interpolate(self.g,self.V).vector())
 
         return fexpl
 
@@ -156,8 +155,9 @@ class fenics_heat2d(ptype):
 
         me = fenics_mesh(self.V)
 
-        A = self.M
+        A = 1.0*self.M
         b = fenics_mesh(u)
+
         self.bc.apply(A,b.values.vector())
 
         df.solve(A,me.values.vector(),b.values.vector())
@@ -175,10 +175,10 @@ class fenics_heat2d(ptype):
         Returns:
             exact solution
         """
-        return None
 
-    def u_init(self,t0):
+        u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t)
 
         me = fenics_mesh(self.init)
-        me.values = df.interpolate(self.u0,self.V)
+        me.values = df.interpolate(u0,self.V)
+
         return me

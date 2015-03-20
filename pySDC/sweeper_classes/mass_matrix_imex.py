@@ -138,9 +138,11 @@ class mass_matrix_imex(sweeper):
             L.uend = P.dtype_u(L.u[-1])
         else:
             # start with u0 and add integral over the full interval (using coll.weights)
-            L.uend = P.dtype_u(L.u[0])
+            L.uend = P.dtype_u(L.u[0].V)
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
+            L.uend = P.invert_mass_matrix(L.uend)
+            L.uend += L.u[0]
             # add up tau correction of the full interval (last entry)
             if L.tau is not None:
                 L.uend += L.tau[-1]
@@ -168,6 +170,7 @@ class mass_matrix_imex(sweeper):
             res[m] = P.invert_mass_matrix(res[m])
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m+1]
+            # res[m] += P.apply_mass_matrix(L.u[0] - L.u[m+1])
             # add tau if associated
             if L.tau is not None:
                 res[m] += L.tau[m]
