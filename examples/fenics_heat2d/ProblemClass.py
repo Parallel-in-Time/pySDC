@@ -55,8 +55,10 @@ class fenics_heat2d(ptype):
         self.M = df.assemble(a_M)
         self.K = df.assemble(a_K)
 
-        self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
         self.g = df.Expression('beta - 2 - 2*alpha', beta=self.beta, alpha=self.alpha)
+        self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
+
+
 
         boundary = Boundary()
         self.bc = df.DirichletBC(self.V, self.u0, boundary)
@@ -119,7 +121,7 @@ class fenics_heat2d(ptype):
         """
 
         fimpl = fenics_mesh(self.V)
-        fimpl.values = df.Function(self.V,self.K*u.values.vector())
+        fimpl.values = df.Function(self.V,-1.0*self.K*u.values.vector())
 
         return fimpl
 
@@ -144,7 +146,23 @@ class fenics_heat2d(ptype):
 
     def apply_mass_matrix(self,u):
 
-        return self.M*u.values.vector()
+        me = fenics_mesh(self.V)
+        me.values = df.Function(self.V,self.M*u.values.vector())
+
+        return me
+
+
+    def invert_mass_matrix(self,u):
+
+        me = fenics_mesh(self.V)
+
+        A = self.M
+        b = fenics_mesh(u)
+        self.bc.apply(A,b.values.vector())
+
+        df.solve(A,me.values.vector(),b.values.vector())
+
+        return me
 
 
     def u_exact(self,t):

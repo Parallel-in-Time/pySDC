@@ -5,7 +5,6 @@ import numpy as np
 
 from ProblemClass import fenics_heat2d
 from fenics_mesh import fenics_mesh, rhs_fenics_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.Methods as mp
 from pySDC import Log
@@ -30,7 +29,7 @@ if __name__ == "__main__":
     pparams['alpha'] = 3
     pparams['beta'] = 1.2
     pparams['nvars'] = [[2,2]]
-    pparams['t0'] = 0 # ugly, but necessary to set up ProblemClass
+    pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
 
     # This comes as read-in for the transfer operations
     # tparams = {}
@@ -42,7 +41,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussLobatto
     description['num_nodes'] = 3
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
@@ -52,10 +51,12 @@ if __name__ == "__main__":
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
 
+    exit()
+
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.3
-    Tend = 1.8
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

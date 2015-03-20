@@ -97,7 +97,7 @@ class mass_matrix_imex(sweeper):
             for j in range(M+1):
                 integral[m] -= L.dt*(self.QI[m+1,j]*L.f[j].impl + self.QE[m+1,j]*L.f[j].expl)
             # add initial value
-            integral[m] += L.u[0]
+            integral[m] += P.apply_mass_matrix(L.u[0])
             # add tau if associated
             if L.tau is not None:
                 integral[m] += L.tau[m]
@@ -119,7 +119,7 @@ class mass_matrix_imex(sweeper):
 
         return None
 
-
+    #FIXME: mass matrix needed for Legendre
     def compute_end_point(self):
         """
         Compute u at the right point of the interval
@@ -144,5 +144,38 @@ class mass_matrix_imex(sweeper):
             # add up tau correction of the full interval (last entry)
             if L.tau is not None:
                 L.uend += L.tau[-1]
+
+        return None
+
+
+    def compute_residual(self):
+        """
+        Computation of the residual using the collocation matrix Q
+        """
+
+        # get current level and problem description
+        L = self.level
+        P = L.prob
+
+        # check if there are new values (e.g. from a sweep)
+        assert L.status.updated
+
+        # compute the residual for each node
+
+        # build QF(u)
+        res = self.integrate()
+        for m in range(self.coll.num_nodes):
+            res[m] = P.invert_mass_matrix(res[m])
+            # add u0 and subtract u at current node
+            res[m] += L.u[0] - L.u[m+1]
+            # add tau if associated
+            if L.tau is not None:
+                res[m] += L.tau[m]
+
+        # use standard residual norm: ||.||_inf
+        L.status.residual = np.linalg.norm(res,np.inf)
+
+        # indicate that the residual has seen the new values
+        L.status.updated = False
 
         return None
