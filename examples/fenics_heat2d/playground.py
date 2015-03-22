@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [[32,32]]
+    pparams['nvars'] = [[128,128]]
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
 
     # This comes as read-in for the transfer operations

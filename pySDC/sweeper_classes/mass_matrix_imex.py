@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg as LA
 from pySDC.Sweeper import sweeper
 
 class mass_matrix_imex(sweeper):
@@ -36,11 +37,21 @@ class mass_matrix_imex(sweeper):
             QI: implicit Euler matrix, will also act on u0
             QE: explicit Euler matrix, will also act on u0
         """
-        QI = np.zeros(np.shape(self.coll.Qmat))
+        # QI = np.zeros(np.shape(self.coll.Qmat))
         QE = np.zeros(np.shape(self.coll.Qmat))
         for m in range(self.coll.num_nodes + 1):
-            QI[m, 1:m+1] = self.coll.delta_m[0:m]
+            # QI[m, 1:m+1] = self.coll.delta_m[0:m]
             QE[m, 0:m] = self.coll.delta_m[0:m]
+
+        # This is for using LU decomposition
+        # strip Qmat by initial value u0
+        QT = self.coll.Qmat[1:,1:].T
+        # do LU decomposition of QT
+        [P,L,U] = LA.lu(QT,overwrite_a=True)
+        # enrich QT by initial value u0
+        Qd = np.zeros(np.shape(self.coll.Qmat))
+        Qd[1:,1:] = U.T
+        QI = Qd
 
         return QI, QE
 
