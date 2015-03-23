@@ -36,13 +36,15 @@ class fenics_heat2d(ptype):
         assert 'nvars' in cparams
         assert 'nu' in cparams
         assert 't0' in cparams
+        assert 'family' in cparams
+        assert 'order' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
         mesh = df.UnitSquareMesh(self.nvars[0],self.nvars[1])
-        self.V = df.FunctionSpace(mesh, 'Lagrange', 1)
+        self.V = df.FunctionSpace(mesh, self.family, self.order)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)

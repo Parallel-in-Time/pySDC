@@ -8,28 +8,30 @@ import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
-import dolfin as df
-import numpy as np
-
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
+    # nvars = [[8,8],[16,16],[32,32],[64,64],[128,128],[256,256]]
+    # dt = [0.125]
+
     num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-12
+    lparams['restol'] = 8E-11
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 50
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [[128,128]]
+    pparams['nvars'] = [[32,32]]
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
+    pparams['family'] = 'CG'
+    pparams['order'] = 1
 
     # This comes as read-in for the transfer operations
     # tparams = {}
