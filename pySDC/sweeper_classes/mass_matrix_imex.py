@@ -104,14 +104,14 @@ class mass_matrix_imex(sweeper):
          # get QF(u^k)
         integral = self.integrate()
         for m in range(M):
-            # subtract QIFI(u^k)_m - QEFE(u^k)_m
+            # subtract QIFI(u^k)_m + QEFE(u^k)_m
             for j in range(M+1):
                 integral[m] -= L.dt*(self.QI[m+1,j]*L.f[j].impl + self.QE[m+1,j]*L.f[j].expl)
             # add initial value
             integral[m] += P.apply_mass_matrix(L.u[0])
             # add tau if associated
             if L.tau is not None:
-                integral[m] += L.tau[m]
+                integral[m] += L.tau[m]#P.apply_mass_matrix(L.tau[m])
 
         # do the sweep
         for m in range(0,M):
@@ -184,7 +184,7 @@ class mass_matrix_imex(sweeper):
             # res[m] += P.apply_mass_matrix(L.u[0] - L.u[m+1])
             # add tau if associated
             if L.tau is not None:
-                res[m] += L.tau[m]
+                res[m] += P.invert_mass_matrix(L.tau[m])
 
         # use standard residual norm: ||.||_inf
         L.status.residual = np.linalg.norm(res,np.inf)

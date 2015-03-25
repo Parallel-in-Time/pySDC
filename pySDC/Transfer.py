@@ -73,10 +73,13 @@ class transfer(with_metaclass(abc.ABCMeta)):
         # restrict fine level tau correction part
         tauFG = []
         for m in range(SG.coll.num_nodes):
-            tauFG.append(self.restrict_space(tauF[m]))
+            mod_F = PF.invert_mass_matrix(tauF[m])
+            tauFG.append(PG.apply_mass_matrix(self.restrict_space(mod_F)))
+            # tauFG.append(self.restrict_space(tauF[m]))
 
         # build tau correction, also restrict possible tau correction from fine
         for m in range(SG.coll.num_nodes):
+            # mod_G = PG.invert_mass_matrix(tauG[m])
             G.tau[m] = tauFG[m] - tauG[m]
             if F.tau is not None:
                 G.tau[m] += self.restrict_space(F.tau[m])

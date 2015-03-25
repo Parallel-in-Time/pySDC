@@ -65,10 +65,10 @@ class mesh_to_mesh_fenics(transfer):
 
         if isinstance(G,fenics_mesh):
             u_fine = fenics_mesh(self.init_f)
-            u_fine.values = df.interpolate(G.values,u_fine.V)
+            u_fine.values = df.project(G.values,u_fine.V)
         elif isinstance(G,rhs_fenics_mesh):
             u_fine = rhs_fenics_mesh(self.init_f)
-            u_fine.impl.values = df.interpolate(G.impl.values,u_fine.V)
-            u_fine.expl.values = df.interpolate(G.expl.values,u_fine.V)
+            u_fine.impl.values = df.project(G.impl.values,u_fine.V)
+            u_fine.expl.values = df.project(G.expl.values,u_fine.V)
 
         return u_fine
