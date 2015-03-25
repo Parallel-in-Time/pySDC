@@ -3,6 +3,7 @@ from pySDC import CollocationClasses as collclass
 
 from ProblemClass import fenics_heat2d
 from fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.Methods as mp
 from pySDC import Log
@@ -23,19 +24,20 @@ if __name__ == "__main__":
     lparams['restol'] = 8E-11
 
     sparams = {}
-    sparams['maxiter'] = 50
+    sparams['maxiter'] = 10
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [[32,32]]
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
+    pparams['c_nvars'] = [[32,32]]
     pparams['family'] = 'CG'
     pparams['order'] = 1
+    pparams['levelnumber'] = [2,1]
 
     # This comes as read-in for the transfer operations
-    # tparams = {}
-    # tparams['finter'] = True
+    tparams = {}
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -47,8 +49,8 @@ if __name__ == "__main__":
     description['num_nodes'] = 3
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
-    # description['transfer_class'] = mesh_to_mesh_1d
-    # description['transfer_params'] = tparams
+    description['transfer_class'] = mesh_to_mesh_fenics
+    description['transfer_params'] = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)

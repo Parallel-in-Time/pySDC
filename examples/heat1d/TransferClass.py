@@ -108,10 +108,10 @@ class mesh_to_mesh_1d(transfer):
         """
 
         if isinstance(G,mesh):
-            u_fine = mesh(self.init_c,val=0)
+            u_fine = mesh(self.init_f,val=0)
             u_fine.values = np.dot(self.Pspace,G.values)
         elif isinstance(G,rhs_imex_mesh):
-            u_fine = rhs_imex_mesh(self.init_c)
+            u_fine = rhs_imex_mesh(self.init_f)
             u_fine.impl.values = np.dot(self.Pspace,G.impl.values)
             u_fine.expl.values = np.dot(self.Pspace,G.expl.values)
 

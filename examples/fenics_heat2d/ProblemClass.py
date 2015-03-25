@@ -33,17 +33,21 @@ class fenics_heat2d(ptype):
             return on_boundary
 
         # these parameters will be used later, so assert their existence
-        assert 'nvars' in cparams
+        assert 'c_nvars' in cparams
         assert 'nu' in cparams
         assert 't0' in cparams
         assert 'family' in cparams
         assert 'order' in cparams
+        assert 'levelnumber' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
-        mesh = df.UnitSquareMesh(self.nvars[0],self.nvars[1])
+        mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
+        for i in range(self.levelnumber):
+            mesh = df.refine(mesh)
+
         self.V = df.FunctionSpace(mesh, self.family, self.order)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f

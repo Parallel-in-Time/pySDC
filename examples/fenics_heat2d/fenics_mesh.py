@@ -145,10 +145,12 @@ class rhs_fenics_mesh():
         if isinstance(init,type(self)):
             self.impl = fenics_mesh(init.impl)
             self.expl = fenics_mesh(init.expl)
+            self.V = init.V
         # if init is a number or a tuple of numbers, create mesh object with None as initial value
         else:
             self.impl = fenics_mesh(init)
             self.expl = fenics_mesh(init)
+            self.V = init
         # something is wrong, if none of the ones above hit
         # else:
         #     raise DataError('something went wrong during %s initialization' % type(self))
@@ -171,6 +173,7 @@ class rhs_fenics_mesh():
             me = rhs_fenics_mesh(self)
             me.impl = self.impl - other.impl
             me.expl = self.expl - other.expl
+            me.V = self.V
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
@@ -193,6 +196,7 @@ class rhs_fenics_mesh():
             me = rhs_fenics_mesh(self)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl
+            me.V = self.V
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
