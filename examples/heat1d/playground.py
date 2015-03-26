@@ -20,10 +20,10 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-12
+    lparams['restol'] = 5E-11
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.125
+    dt = 0.25
     Tend = 4*dt
 
     # get initial values on finest level
@@ -68,6 +68,8 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
     sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    print(extract_stats,sortedlist_stats)
+    for item in sortedlist_stats:
+        print(item)
+    # print(extract_stats,sortedlist_stats)

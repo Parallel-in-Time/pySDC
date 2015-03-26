@@ -222,7 +222,7 @@ def pfasst_serial(S):
     # if S is done, stop right here
     if S.status.done:
         return S
-
+    # print(S.status.step,S.status.stage)
     # otherwise: read out stage of S and act accordingly
     for case in switch(S.status.stage):
 
@@ -309,6 +309,17 @@ def pfasst_serial(S):
 
             # increment iteration count here (and only here)
             S.status.iter += 1
+
+            # if S.status.iter == 3 and S.status.step == 4:
+            #     print('things went wrong here',S.status.step,S.status.iter,S.status.time)
+            #
+            #     S.reset_step()
+            #
+            #     for l in range(len(S.levels)):
+            #         S.levels[l].u[0] = cp.deepcopy(S.prev.levels[l].uend)
+            #         S.levels[l].sweep.predict()
+            #         S.levels[l].sweep.compute_residual()
+            #         S.levels[l].sweep.compute_end_point()
 
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
@@ -482,8 +493,18 @@ def recv(target,source):
         target: level which will receive the values
         source: level which initiated the send
     """
-    # simply do a deepcopy of the values uend to become the new u0 at the target
-    target.u[0] = cp.deepcopy(source.uend)
+    if source.status.residual is not None and target.status.residual is not None:
+        if source.status.residual < target.status.residual:
+
+            # simply do a deepcopy of the values uend to become the new u0 at the target
+            target.u[0] = cp.deepcopy(source.uend)
+
+        else:
+            print('ignoring this...',target._level__step.status.step)
+            pass
+    else:
+        # simply do a deepcopy of the values uend to become the new u0 at the target
+        target.u[0] = cp.deepcopy(source.uend)
 
 
 def send(source,tag):

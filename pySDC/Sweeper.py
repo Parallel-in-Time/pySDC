@@ -89,7 +89,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         P = L.prob
 
         # check if there are new values (e.g. from a sweep)
-        assert L.status.updated
+        # assert L.status.updated
 
         # compute the residual for each node
 
