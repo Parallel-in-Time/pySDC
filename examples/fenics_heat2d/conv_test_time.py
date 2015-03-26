@@ -7,6 +7,7 @@ from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
+from TransferClass import mesh_to_mesh_fenics
 
 import dolfin as df
 import numpy as np
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    dts = [2.0,1.0,0.5,0.25,0.125]
+    dts = [0.5,0.25,0.125]
 
     error = []
     for item_dt in dts:
@@ -35,14 +36,14 @@ if __name__ == "__main__":
         # This comes as read-in for the problem class
         pparams = {}
         pparams['nu'] = 0.1
-        pparams['nvars'] = [[32,32]]
+        pparams['nvars'] = [[32,32],[16,16]]
         pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
         pparams['family'] = 'CG'
-        pparams['order'] = 4
+        pparams['order'] = 1
 
         # This comes as read-in for the transfer operations
-        # tparams = {}
-        # tparams['finter'] = True
+        tparams = {}
+        tparams['finter'] = True
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
@@ -54,8 +55,8 @@ if __name__ == "__main__":
         description['num_nodes'] = 3
         description['sweeper_class'] = mass_matrix_imex
         description['level_params'] = lparams
-        # description['transfer_class'] = mesh_to_mesh_1d
-        # description['transfer_params'] = tparams
+        description['transfer_class'] = mesh_to_mesh_fenics
+        description['transfer_params'] = tparams
 
         # quickly generate block of steps
         MS = mp.generate_steps(num_procs,sparams,description)
