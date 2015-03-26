@@ -3,7 +3,7 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from examples.sharpclaw_burgers1d.ProblemClass import sharpclaw
+from ProblemClass import sharpclaw
 #from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
