@@ -3,8 +3,8 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from examples.sharpclaw.ProblemClass import sharpclaw
-#from examples.sharpclaw.TransferClass import mesh_to_mesh_1d
+from examples.sharpclaw_burgers1d.ProblemClass import sharpclaw
+#from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods as mp
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     lparams['restol'] = 3E-12
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 20
 
     # setup parameters "in time"
     t0 = 0
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nvars'] = [127]
-    pparams['dt']    = dt
+    pparams['nu'] = 0.001
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -82,6 +82,6 @@ if __name__ == "__main__":
     plt.ylim([-1, 1])
     plt.show()
     
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
-    sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    print(extract_stats,sortedlist_stats)
+    # extract_stats = grep_stats(stats,iter=-1,type='residual')
+    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    # print(extract_stats,sortedlist_stats)

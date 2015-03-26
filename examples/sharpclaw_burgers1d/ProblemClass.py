@@ -31,7 +31,6 @@ class sharpclaw(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'dt' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -40,7 +39,7 @@ class sharpclaw(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
         
-        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        riemann_solver              = riemann.burgers_1D # NOTE: This uses the FORTRAN kernels of clawpack
         self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
         self.solver.weno_order      = 5
         self.solver.time_integrator = 'Euler' # Remove later
@@ -54,15 +53,32 @@ class sharpclaw(ptype):
         self.domain = pyclaw.Domain(x)
 
         self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
-        self.state.problem_data['u'] = 1.0
         self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
-
-        # Initial data
-        u0                = self.u_exact(0.0)
-        self.state.q[0,:] = u0.values
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
+
+        self.A = self.__get_A(self.nvars,self.nu,self.dx)
+
+
+    def __get_A(self,N,nu,dx):
+        """
+        Helper function to assemble FD matrix A in sparse format
+
+        Args:
+            N: number of dofs
+            nu: diffusion coefficient
+            dx: distance between two spatial nodes
+
+        Returns:
+         matrix A in CSC format
+        """
+
+        stencil = [1, -2, 1]
+        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
+        A *= nu / (dx**2)
+        return A.tocsc()
+
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -77,8 +93,9 @@ class sharpclaw(ptype):
             solution as mesh
         """
 
-        me        = mesh(self.nvars)
-        me.values = rhs.values
+        me = mesh(self.nvars)
+        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+
         return me
 
 
@@ -98,11 +115,8 @@ class sharpclaw(ptype):
         self.state.q[0,:] = u.values
         
         # Evaluate right hand side
-        deltaq           = self.solver.dqdt(self.state)
-        
-        # Copy right hand side values back into pySDC solution structure
         fexpl        = mesh(self.nvars)
-        fexpl.values = deltaq
+        fexpl.values = self.solver.dqdt(self.state)
                 
         return fexpl
 
@@ -118,8 +132,8 @@ class sharpclaw(ptype):
             implicit part of RHS
         """
 
-        fimpl        = mesh(self.nvars)
-        fimpl.values = 0.0*u.values
+        fimpl = mesh(self.nvars,val=0)
+        fimpl.values = self.A.dot(u.values)
         
         return fimpl
 
