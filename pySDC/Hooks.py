@@ -60,8 +60,9 @@ class hooks(object):
         """
         L = self.level
         logger = logging.getLogger('root')
-        logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                    status.slot,status.stage,L.id,status.iter,L.status.residual)
+        if status.slot == 4:
+            logger.info('Process %2i at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+                        status.slot,status.stage,L.id,status.iter,L.status.residual)
 
         stats.add_to_stats(step=status.step, time=status.time, level=L.id, iter=status.iter,
                            type='residual',  value=L.status.residual)

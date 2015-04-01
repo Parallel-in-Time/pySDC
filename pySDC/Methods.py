@@ -310,17 +310,56 @@ def pfasst_serial(S):
             # increment iteration count here (and only here)
             S.status.iter += 1
 
-            # if S.status.iter == 3 and S.status.step == 4:
-            #     print('things went wrong here',S.status.step,S.status.iter,S.status.time)
-            #
-            #     S.reset_step()
-            #
-            #     for l in range(len(S.levels)):
-            #         S.levels[l].u[0] = cp.deepcopy(S.prev.levels[l].uend)
-            #         S.levels[l].sweep.predict()
-            #         S.levels[l].sweep.compute_residual()
-            #         S.levels[l].sweep.compute_end_point()
+            if S.status.iter == 2 and S.status.step == 4:
+                print('things went wrong here',S.status.step,S.status.iter,S.status.time)
 
+                uright0 = S.levels[0].prob.dtype_u(S.levels[0].uend)
+                uleft0 = S.levels[0].prob.dtype_u(S.prev.levels[0].uend)
+
+                uright1 = S.levels[1].prob.dtype_u(S.levels[1].uend)
+                uleft1 = S.levels[1].prob.dtype_u(S.prev.levels[1].uend)
+
+                S.reset_step()
+
+                L = S.levels[0]
+
+                L.u[0] = cp.deepcopy(uleft0)
+                L.f[0] = L.prob.eval_f(L.u[0],L.time)
+                for m in range(1,L.sweep.coll.num_nodes+1):
+                    L.u[m] = (1-L.sweep.coll.nodes[m-1])*uleft0 + L.sweep.coll.nodes[m-1]*uright0
+                    L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
+
+                L.status.unlocked = True
+
+                # L = S.levels[1]
+                #
+                # L.u[0] = cp.deepcopy(uleft1)
+                # L.f[0] = L.prob.eval_f(L.u[0],L.time)
+                # for m in range(1,L.sweep.coll.num_nodes+1):
+                #     L.u[m] = (1-L.sweep.coll.nodes[m-1])*uleft1 + L.sweep.coll.nodes[m-1]*uright1
+                #     L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
+                #
+                # L.status.unlocked = True
+                #
+                # S.levels[1].sweep.compute_end_point()
+                # S.levels[0].sweep.compute_end_point()
+
+
+                S.levels[0].sweep.compute_residual()
+
+                S.transfer(source=S.levels[0],target=S.levels[1])
+                S.levels[1].sweep.update_nodes()
+                S.levels[1].sweep.compute_end_point()
+                S.transfer(source=S.levels[1],target=S.levels[0])
+                S.levels[0].sweep.compute_end_point()
+
+                # for l in range(len(S.levels)):
+                #     S.levels[l].u[0] = cp.deepcopy(S.prev.levels[l].uend)
+                #     S.levels[l].sweep.predict()
+                #     S.levels[l].sweep.compute_residual()
+                #     S.levels[l].sweep.compute_end_point()
+
+            # else:
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
