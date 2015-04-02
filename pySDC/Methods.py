@@ -124,10 +124,20 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     # main loop: as long as at least one step is still active (time < Tend), do something
     while any(active):
 
-        # loop over all active steps (in the correct order)
+        MS_active = []
         for p in active_slots:
-            # print(p,MS[p].status.stage)
-            MS[p] = pfasst_serial(MS[p])
+            MS_active.append(MS[p])
+
+        MS_active = pfasst_parallel(MS_active)
+
+        for p in range(len(MS_active)):
+            MS[active_slots[p]] = MS_active[p]
+
+        # loop over all active steps (in the correct order)
+
+        # for p in active_slots:
+        #     print(p,MS[p].status.stage)
+            # MS[p] = pfasst_serial(MS[p])
 
         # if all active steps are done (for block-parallelization, need flag to distinguish (FIXME))
         if all([MS[p].status.done for p in active_slots]):
@@ -205,6 +215,187 @@ def restart_block(MS,active_slots,u0):
     return MS
 
 
+def pfasst_parallel(MS):
+
+    if all(S.status.stage for S in MS):
+        stage = MS[0].status.stage
+    else:
+        print('not all stages are equal, aborting..')
+        exit()
+
+    for case in switch(stage):
+
+        if case('IT_FINE_SWEEP'):
+
+            # do sweep on finest level
+            for S in MS:
+
+                # increment iteration count here (and only here)
+                S.status.iter += 1
+
+                # standard sweep workflow: update nodes, compute residual, log progress
+                S.levels[0].sweep.update_nodes()
+                S.levels[0].sweep.compute_residual()
+                S.levels[0].hooks.dump_sweep(S.status)
+
+                S.levels[0].hooks.dump_iteration(S.status)
+
+                if not S.levels[0].tag:
+                    send(S.levels[0],tag=True)
+                else:
+                    print('SEND ERROR',l,p,S.levels[l].tag)
+                    exit()
+
+                S.status.stage = 'IT_CHECK'
+
+            return MS
+
+
+        if case('IT_CHECK'):
+
+            # check whether to stop iterating
+            for S in MS:
+                S.status.done = check_convergence(S)
+
+            if not all(S.status.done for S in MS):
+
+                for S in MS:
+                    S.status.done = False
+                    if len(S.levels) > 1:
+                        S.status.stage = 'IT_UP'
+                    else:
+                        S.status.stage = 'IT_COARSE_RECV'
+
+            else:
+
+                for S in MS:
+                    S.levels[0].sweep.compute_end_point()
+                    S.levels[0].hooks.dump_step(S.status)
+                    S.status.stage = 'DONE'
+
+            return MS
+
+
+        if case('IT_UP'):
+
+            # go up the hierarchy from finest to coarsest level
+            for S in MS:
+
+                S.transfer(source=S.levels[0],target=S.levels[1])
+
+                # sweep and send on middle levels (not on finest, not on coarsest, though)
+                for l in range(1,len(S.levels)-1):
+                    S.levels[l].sweep.update_nodes()
+                    S.levels[l].sweep.compute_residual()
+                    S.levels[l].hooks.dump_sweep(S.status)
+
+                    # send if last send succeeded on this level (otherwise: abort with error (FIXME))
+                    if not S.levels[l].tag or S.status.last:
+                        send(S.levels[l],tag=True)
+                    else:
+                        print('SEND ERROR',l,p,S.levels[l].tag)
+                        exit()
+
+                    # transfer further up the hierarchy
+                    S.transfer(source=S.levels[l],target=S.levels[l+1])
+
+                # update stage and return
+                S.status.stage = 'IT_COARSE_RECV'
+
+            return MS
+
+
+        if case('IT_COARSE_RECV'):
+            # receive on coarsest level
+
+            # rather complex logic here...
+            # if I am not the first in line and if the first is not done yet, try to receive
+            # otherwise: proceed, no receiving possible/necessary
+            if not S.status.first and not S.prev.status.done:
+                # try to receive and the progress (otherwise: try again)
+                if S.prev.levels[-1].tag:
+                    recv(S.levels[-1],S.prev.levels[-1])
+                    S.prev.levels[-1].tag = False
+                    if len(S.levels) > 1:
+                        S.status.stage = 'IT_COARSE_SWEEP'
+                    else:
+                        S.status.stage = 'IT_FINE_SWEEP'
+                else:
+                    S.status.stage = 'IT_COARSE_RECV'
+            else:
+                if len(S.levels) > 1:
+                    S.status.stage = 'IT_COARSE_SWEEP'
+                else:
+                    S.status.stage = 'IT_FINE_SWEEP'
+            # return
+            return S
+
+
+        if case('IT_COARSE_SWEEP'):
+            # coarsest sweep
+
+            # standard sweep workflow: update nodes, compute residual, log progress
+            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.compute_residual()
+
+            S.levels[-1].hooks.dump_sweep(S.status)
+
+            # update stage and return
+            S.status.stage = 'IT_COARSE_SEND'
+            return S
+
+
+        if case('IT_COARSE_SEND'):
+            # send forward coarsest values
+
+            # try to send new values (if old ones have not been picked up yet, retry)
+            if not S.levels[-1].tag or S.status.last:
+                send(S.levels[-1],tag=True)
+                S.status.stage = 'IT_DOWN'
+            else:
+                S.status.stage = 'IT_COARSE_SEND'
+            # return
+            return S
+
+
+        if case('IT_DOWN'):
+            # prolong corrections own to finest level
+
+            # receive and sweep on middle levels (except for coarsest level)
+            for l in range(len(S.levels)-1,0,-1):
+
+                # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
+                if not S.status.first and not S.prev.status.done:
+                    if S.prev.levels[l-1].tag:
+                        recv(S.levels[l-1],S.prev.levels[l-1])
+                        S.prev.levels[l-1].tag = False
+                    else:
+                        print('RECV ERROR DOWN')
+                        exit()
+
+                # prolong values
+                S.transfer(source=S.levels[l],target=S.levels[l-1])
+
+                # on middle levels: do sweep as usual
+                if l-1 > 0:
+                    S.levels[l-1].sweep.update_nodes()
+                    S.levels[l-1].sweep.compute_residual()
+                    S.levels[l-1].hooks.dump_sweep(S.status)
+
+            # update stage and return
+            S.status.stage = 'IT_FINE_SWEEP'
+            return S
+
+        #fixme: use meaningful error object here
+        print('Something is wrong here, you should have hit one case statement!')
+        exit()
+    #fixme: use meaningful error object here
+    print('Something is wrong here, you should have hit one case statement!')
+    exit()
+
+
+
+
 
 def pfasst_serial(S):
     """
@@ -222,6 +413,7 @@ def pfasst_serial(S):
     # if S is done, stop right here
     if S.status.done:
         return S
+
 
     # otherwise: read out stage of S and act accordingly
     for case in switch(S.status.stage):
