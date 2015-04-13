@@ -1,5 +1,5 @@
 import numpy as np
-from getFDMatrix import getFDMatrix
+from examples.advection.getFDMatrix import getFDMatrix
 import numpy.linalg as LA
 import math
 from matplotlib import pyplot as plt
