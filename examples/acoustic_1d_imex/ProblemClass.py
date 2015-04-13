@@ -11,7 +11,7 @@ from clawpack import riemann
 
 from getFDMatrix import getFDMatrix
 
-class sharpclaw(ptype):
+class acoustic_1d_imex(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
@@ -42,7 +42,7 @@ class sharpclaw(ptype):
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(acoustic_1d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
         
         riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
         self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
@@ -58,10 +58,11 @@ class sharpclaw(ptype):
         self.domain = pyclaw.Domain(x)
 
         self.state = pyclaw.State(self.domain, self.solver.num_eqn)
-        self.dx    = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+        self.mesh  = self.state.grid.x.centers
+        self.dx    = self.mesh[1] - self.mesh[0]
         self.A     = getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
-        self.state.problem_data['u'] = self.cadv
+        self.state.problem_data['u'] = 0.0
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
@@ -116,6 +117,11 @@ class sharpclaw(ptype):
         tmp = self.solver.dqdt(self.state)
         fexpl.values[1,:] = tmp.reshape(self.nvars[1:])
 
+# DEBUGGING
+        fexpl             = mesh(self.nvars)
+        fexpl.values[0,:] = 0.0*self.mesh
+        fexpl.values[1,:] = 0.0*self.mesh
+        
         return fexpl
 
 
@@ -131,7 +137,7 @@ class sharpclaw(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars,val=0)
+        fimpl             = mesh(self.nvars,val=0)
         fimpl.values[0,:] = self.A.dot(u.values[0,:])
         fimpl.values[1,:] = self.A.dot(u.values[1,:])
         
@@ -167,9 +173,8 @@ class sharpclaw(ptype):
             exact solution
         """
         
-        xc             = np.asarray(self.state.grid.p_centers)
         me             = mesh(self.nvars)
-        me.values[0,:] = np.sin(2.0*np.pi*xc)
-        me.values[1,:] = 0.0*xc
+        me.values[0,:] = np.cos(2.0*np.pi*(self.mesh-self.cadv*t))
+        me.values[1,:] = np.cos(2.0*np.pi*(self.mesh-self.cadv*t)); #0.0*xc
 
         return me
