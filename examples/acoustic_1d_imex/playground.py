@@ -38,8 +38,10 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(2,50,50)]
-    pparams['nu'] = 0.001
+    pparams['nvars'] = [(2,10)]
+    pparams['cadv']  = 1.0
+    pparams['cs']    = 0.0
+    pparams['order_adv'] = 2
 
     # This comes as read-in for the transfer operations
     tparams = {}

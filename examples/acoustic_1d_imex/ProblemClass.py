@@ -9,6 +9,8 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from clawpack import pyclaw
 from clawpack import riemann
 
+from getFDMatrix import getFDMatrix
+
 class sharpclaw(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
@@ -31,7 +33,10 @@ class sharpclaw(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-
+        assert 'cs' in cparams
+        assert 'cadv' in cparams
+        assert 'order_adv' in cparams
+        
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
@@ -39,27 +44,24 @@ class sharpclaw(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
         
-        riemann_solver              = riemann.advection_2D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver2D(riemann_solver)
+        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
         self.solver.weno_order      = 5
         self.solver.time_integrator = 'Euler' # Remove later
         self.solver.kernel_language = 'Fortran'
         self.solver.bc_lower[0]     = pyclaw.BC.periodic
         self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.bc_lower[1]     = pyclaw.BC.periodic
-        self.solver.bc_upper[1]     = pyclaw.BC.periodic
         self.solver.cfl_max         = 1.0
         assert self.solver.is_valid()
 
-        x = pyclaw.Dimension(0.0,1.0,self.nvars[1],name='x')
-        y = pyclaw.Dimension(0.0,1.0,self.nvars[2],name='y')
-        self.domain = pyclaw.Domain([x,y])
+        x = pyclaw.Dimension(0.0, 1.0, self.nvars[1], name='x')
+        self.domain = pyclaw.Domain(x)
 
-        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
-        # self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+        self.state = pyclaw.State(self.domain, self.solver.num_eqn)
+        self.dx    = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+        self.A     = getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
-        self.state.problem_data['u'] = 0.5
-        self.state.problem_data['v'] = 1.0
+        self.state.problem_data['u'] = self.cadv
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
@@ -78,10 +80,11 @@ class sharpclaw(ptype):
             solution as mesh
         """
 
-        # me = mesh(self.nvars)
-        # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me = mesh(self.nvars)
+        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
+        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
 
-        return rhs
+        return me
 
 
     def __eval_fexpl(self,u,t):
@@ -100,19 +103,18 @@ class sharpclaw(ptype):
         fexpl        = mesh(self.nvars)
 
         # Copy values of u into pyClaw state object
-        self.state.q[0,:,:] = u.values[0,:,:]
+        self.state.q[0,:] = u.values[0,:]
 
         # Evaluate right hand side
         tmp = self.solver.dqdt(self.state)
-        fexpl.values[0,:,:] = tmp.reshape(self.nvars[1:])
-
+        fexpl.values[0,:] = tmp.reshape(self.nvars[1:])
 
         # Copy values of u into pyClaw state object
-        self.state.q[0,:,:] = u.values[1,:,:]
+        self.state.q[0,:] = u.values[1,:]
 
         # Evaluate right hand side
         tmp = self.solver.dqdt(self.state)
-        fexpl.values[1,:,:] = tmp.reshape(self.nvars[1:])
+        fexpl.values[1,:] = tmp.reshape(self.nvars[1:])
 
         return fexpl
 
@@ -130,7 +132,8 @@ class sharpclaw(ptype):
         """
 
         fimpl = mesh(self.nvars,val=0)
-        # fimpl.values = self.A.dot(u.values)
+        fimpl.values[0,:] = self.A.dot(u.values[0,:])
+        fimpl.values[1,:] = self.A.dot(u.values[1,:])
         
         return fimpl
 
@@ -164,9 +167,9 @@ class sharpclaw(ptype):
             exact solution
         """
         
-        xc,yc = self.state.grid.p_centers
-        me        = mesh(self.nvars)
-        me.values[0,:,:] = np.sin(2*np.pi*xc)*np.sin(2*np.pi*yc)
-        me.values[1,:,:] = np.sin(2*np.pi*xc)*np.sin(2*np.pi*yc)
+        xc             = np.asarray(self.state.grid.p_centers)
+        me             = mesh(self.nvars)
+        me.values[0,:] = np.sin(2.0*np.pi*xc)
+        me.values[1,:] = 0.0*xc
 
         return me
