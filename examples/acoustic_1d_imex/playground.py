@@ -34,14 +34,14 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.01
-    Tend = 20*dt
+    Tend = 100*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(2,100)]
-    pparams['cadv']  = 0.0
+    pparams['nvars'] = [(2,500)]
+    pparams['cadv']  = 0.1
     pparams['cs']    = 1.0
-    pparams['order_adv'] = 2
+    pparams['order_adv'] = 4
     
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 2
+    description['num_nodes']         = 4
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     #description['transfer_class'] = mesh_to_mesh_1d
