@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.05
+    dt = 0.01
     Tend = 20*dt
 
     # This comes as read-in for the problem class
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     pparams['nvars'] = [(2,100)]
     pparams['cadv']  = 0.0
     pparams['cs']    = 1.0
-    pparams['order_adv'] = 6
+    pparams['order_adv'] = 2
     
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 5
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     #description['transfer_class'] = mesh_to_mesh_1d
@@ -77,8 +77,10 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(8,8))
 
-    plt.plot(P.state.grid.x.centers,uend.values[0,:], color='b', label='SDC')
-    plt.plot(P.state.grid.x.centers,uex.values[0,:], color='r', label='Exact')
+    plt.plot(P.state.grid.x.centers, uex.values[0,:],  '+', color='b', label='u (exact)')
+    plt.plot(P.state.grid.x.centers, uend.values[0,:], '-', color='b', label='u (SDC)')
+    plt.plot(P.state.grid.x.centers, uex.values[1,:],  '+', color='r', label='p (exact)')
+    plt.plot(P.state.grid.x.centers, uend.values[1,:], '-', color='r', label='p (SDC)')
     plt.legend()
     plt.xlim([0, 1])
     plt.ylim([-1, 1])

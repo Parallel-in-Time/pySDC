@@ -23,6 +23,10 @@ from clawpack import riemann
 
 from getFDMatrix import getFDMatrix
 
+def u_initial(x):
+    return np.sin(2.0*np.pi*x)
+#    return np.exp(-0.5*(x-0.5)**2/0.1**2)
+
 class acoustic_1d_imex(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
@@ -68,11 +72,10 @@ class acoustic_1d_imex(ptype):
 
         x = pyclaw.Dimension(0.0, 1.0, self.nvars[1], name='x')
         self.domain = pyclaw.Domain(x)
-
-        self.state = pyclaw.State(self.domain, self.solver.num_eqn)
-        self.mesh  = self.state.grid.x.centers
-        self.dx    = self.mesh[1] - self.mesh[0]
-        self.A     = -self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
+        self.state  = pyclaw.State(self.domain, self.solver.num_eqn)
+        self.mesh   = self.state.grid.x.centers
+        self.dx     = self.mesh[1] - self.mesh[0]
+        self.A      = self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
         self.state.problem_data['u'] = self.cadv
         
@@ -94,8 +97,8 @@ class acoustic_1d_imex(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
-        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
+        me.values[0,:] = LA.spsolve( sp.eye(self.nvars[1])-factor*self.A, rhs.values[1,:])
+        me.values[1,:] = LA.spsolve( sp.eye(self.nvars[1])-factor*self.A, rhs.values[0,:])
         
         return me
 
@@ -168,7 +171,6 @@ class acoustic_1d_imex(ptype):
         f.expl = self.__eval_fexpl(u,t)
         return f
 
-
     def u_exact(self,t):
         """
         Routine to compute the exact solution at time t
@@ -181,7 +183,8 @@ class acoustic_1d_imex(ptype):
         """
         
         me             = mesh(self.nvars)
-        me.values[0,:] = np.exp(-0.5*(self.mesh-0.5)**2/0.1**2)
-        me.values[1,:] = 0.0*self.mesh
-
+        me.values[0,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) + 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
+        me.values[1,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) - 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
         return me
+
+
