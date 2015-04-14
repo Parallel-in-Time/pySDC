@@ -39,9 +39,9 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nvars'] = [(2,100)]
-    pparams['cadv']  = 1.0
-    pparams['cs']    = 0.0
-    pparams['order_adv'] = 2
+    pparams['cadv']  = 0.0
+    pparams['cs']    = 1.0
+    pparams['order_adv'] = 6
 
     # This comes as read-in for the transfer operations
     tparams = {}

@@ -60,7 +60,7 @@ class acoustic_1d_imex(ptype):
         self.state = pyclaw.State(self.domain, self.solver.num_eqn)
         self.mesh  = self.state.grid.x.centers
         self.dx    = self.mesh[1] - self.mesh[0]
-        self.A     = getFDMatrix(self.nvars[1], self.order_adv, self.dx)
+        self.A     = self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
         self.state.problem_data['u'] = self.cadv
         
@@ -82,10 +82,8 @@ class acoustic_1d_imex(ptype):
         """
 
         me = mesh(self.nvars)
-        # me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
-        # me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
-        me.values[0,:] = rhs.values[0,:]
-        me.values[1,:] = rhs.values[1,:]
+        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
+        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
         
         return me
 
@@ -135,11 +133,11 @@ class acoustic_1d_imex(ptype):
         """
 
         fimpl             = mesh(self.nvars,val=0)
-        #fimpl.values[0,:] = self.A.dot(u.values[0,:])
-        #fimpl.values[1,:] = self.A.dot(u.values[1,:])
+        fimpl.values[0,:] = self.A.dot(u.values[0,:])
+        fimpl.values[1,:] = self.A.dot(u.values[1,:])
         
-        fimpl.values[0,:] = 0.0*self.mesh
-        fimpl.values[1,:] = 0.0*self.mesh
+        #fimpl.values[0,:] = 0.0*self.mesh
+        #fimpl.values[1,:] = 0.0*self.mesh
         
         return fimpl
 
@@ -174,7 +172,7 @@ class acoustic_1d_imex(ptype):
         """
         
         me             = mesh(self.nvars)
-        me.values[0,:] = np.cos(2.0*np.pi*(self.mesh-self.cadv*t))
-        me.values[1,:] = np.cos(2.0*np.pi*(self.mesh-self.cadv*t)); #0.0*xc
+        me.values[0,:] = np.cos(2.0*np.pi*(self.mesh-self.cs*t))
+        me.values[1,:] = np.cos(2.0*np.pi*(self.mesh-self.cs*t)); #0.0*xc
 
         return me
