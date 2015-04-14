@@ -34,11 +34,11 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.005
-    Tend = dt
+    Tend = 100*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(2,50)]
+    pparams['nvars'] = [(2,100)]
     pparams['cadv']  = 1.0
     pparams['cs']    = 0.0
     pparams['order_adv'] = 2

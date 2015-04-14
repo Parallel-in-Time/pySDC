@@ -62,7 +62,7 @@ class acoustic_1d_imex(ptype):
         self.dx    = self.mesh[1] - self.mesh[0]
         self.A     = getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
-        self.state.problem_data['u'] = 0.0
+        self.state.problem_data['u'] = self.cadv
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
@@ -82,9 +82,11 @@ class acoustic_1d_imex(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
-        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
-
+        # me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
+        # me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
+        me.values[0,:] = rhs.values[0,:]
+        me.values[1,:] = rhs.values[1,:]
+        
         return me
 
 
@@ -116,11 +118,6 @@ class acoustic_1d_imex(ptype):
         # Evaluate right hand side
         tmp = self.solver.dqdt(self.state)
         fexpl.values[1,:] = tmp.reshape(self.nvars[1:])
-
-# DEBUGGING
-        fexpl             = mesh(self.nvars)
-        fexpl.values[0,:] = 0.0*self.mesh
-        fexpl.values[1,:] = 0.0*self.mesh
         
         return fexpl
 
@@ -138,8 +135,11 @@ class acoustic_1d_imex(ptype):
         """
 
         fimpl             = mesh(self.nvars,val=0)
-        fimpl.values[0,:] = self.A.dot(u.values[0,:])
-        fimpl.values[1,:] = self.A.dot(u.values[1,:])
+        #fimpl.values[0,:] = self.A.dot(u.values[0,:])
+        #fimpl.values[1,:] = self.A.dot(u.values[1,:])
+        
+        fimpl.values[0,:] = 0.0*self.mesh
+        fimpl.values[1,:] = 0.0*self.mesh
         
         return fimpl
 
