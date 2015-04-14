@@ -1,3 +1,15 @@
+r"""
+  One-dimensional IMEX acoustic-advection
+  =========================
+  
+  Integrate the linear 1D acoustic-advection problem:
+  
+  .. math::
+  u_t + U u_x + c p_x & = 0 \\
+  p_t + U p_x + c u_x & = 0.
+  
+"""
+
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
@@ -60,7 +72,7 @@ class acoustic_1d_imex(ptype):
         self.state = pyclaw.State(self.domain, self.solver.num_eqn)
         self.mesh  = self.state.grid.x.centers
         self.dx    = self.mesh[1] - self.mesh[0]
-        self.A     = self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
+        self.A     = -self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
 
         self.state.problem_data['u'] = self.cadv
         
@@ -82,8 +94,8 @@ class acoustic_1d_imex(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
-        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
+        me.values[0,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[1,:])
+        me.values[1,:] = LA.spsolve(sp.eye(self.nvars[1])-factor*self.A,rhs.values[0,:])
         
         return me
 
@@ -133,11 +145,8 @@ class acoustic_1d_imex(ptype):
         """
 
         fimpl             = mesh(self.nvars,val=0)
-        fimpl.values[0,:] = self.A.dot(u.values[0,:])
-        fimpl.values[1,:] = self.A.dot(u.values[1,:])
-        
-        #fimpl.values[0,:] = 0.0*self.mesh
-        #fimpl.values[1,:] = 0.0*self.mesh
+        fimpl.values[0,:] = self.A.dot(u.values[1,:])
+        fimpl.values[1,:] = self.A.dot(u.values[0,:])
         
         return fimpl
 
@@ -172,7 +181,7 @@ class acoustic_1d_imex(ptype):
         """
         
         me             = mesh(self.nvars)
-        me.values[0,:] = np.cos(2.0*np.pi*(self.mesh-self.cs*t))
-        me.values[1,:] = np.cos(2.0*np.pi*(self.mesh-self.cs*t)); #0.0*xc
+        me.values[0,:] = np.exp(-0.5*(self.mesh-0.5)**2/0.1**2)
+        me.values[1,:] = 0.0*self.mesh
 
         return me

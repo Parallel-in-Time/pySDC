@@ -33,8 +33,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.005
-    Tend = 100*dt
+    dt = 0.05
+    Tend = 20*dt
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     pparams['cadv']  = 0.0
     pparams['cs']    = 1.0
     pparams['order_adv'] = 6
-
+    
     # This comes as read-in for the transfer operations
     tparams = {}
     tparams['finter'] = True
