@@ -60,7 +60,9 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    # uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
@@ -68,6 +70,6 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
-    sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    print(extract_stats,sortedlist_stats)
+    extract_stats = grep_stats(stats, iter=-1, type='residual')
+    sortedlist_stats = sort_stats(extract_stats, sortby='step')
+    print(extract_stats, sortedlist_stats)

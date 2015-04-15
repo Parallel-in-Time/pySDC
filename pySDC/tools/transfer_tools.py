@@ -4,7 +4,7 @@ import scipy.interpolate as intpl
 import scipy.sparse as sprs
 
 
-def to_sparse(D, return_type="csc"):
+def to_sparse(D, format="csc"):
     """
     Transform dense matrix to sparse matrix of return_type
         bsr_matrix(arg1[, shape, dtype, copy, blocksize]) 	Block Sparse Row matrix
@@ -15,22 +15,22 @@ def to_sparse(D, return_type="csc"):
         dok_matrix(arg1[, shape, dtype, copy]) 	Dictionary Of Keys based sparse matrix.
         lil_matrix(arg1[, shape, dtype, copy]) 	Row-based linked list sparse matrix
     :param D: Dense matrix
-    :param return_type: how to save the sparse matrix
+    :param format: how to save the sparse matrix
     :return: sparse version
     """
-    if return_type == "bsr":
+    if format == "bsr":
         return sprs.bsr_matrix(D)
-    elif return_type == "coo":
+    elif format == "coo":
         return sprs.coo_matrix(D)
-    elif return_type == "csc":
+    elif format == "csc":
         return sprs.csc_matrix(D)
-    elif return_type == "csr":
+    elif format == "csr":
         return sprs.csr_matrix(D)
-    elif return_type == "dia":
+    elif format == "dia":
         return sprs.dia_matrix(D)
-    elif return_type == "dok":
+    elif format == "dok":
         return sprs.dok_matrix(D)
-    elif return_type == "lil":
+    elif format == "lil":
         return sprs.lil_matrix(D)
     else:
         return D

@@ -374,7 +374,8 @@ def pfasst_serial(S):
                 if not S.levels[l].tag or S.status.last:
                     send(S.levels[l],tag=True)
                 else:
-                    print('SEND ERROR',l,p,S.levels[l].tag)
+                    print('SEND ERROR',l,S.levels[l].tag)
+                    # print('SEND ERROR',l,p,S.levels[l].tag)
                     exit()
 
                 # transfer further up the hierarchy
@@ -498,4 +499,3 @@ def send(source,tag):
     source.sweep.compute_end_point()
     source.tag = cp.deepcopy(tag)
 
-def

@@ -145,3 +145,28 @@ class heat1d(ptype):
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
         me.values = np.sin(np.pi*xvalues)*np.cos(t)
         return me
+
+
+    def get_mesh(self, form="list"):
+        """
+        Returns the mesh the problem is computed on.
+
+        :param form: the form in which the mesh is needed
+        :return: depends on form
+        """
+
+        if form is "list":
+            return [np.linspace(0, 1, self.nvars)]
+        elif form is "meshgrid":
+            return np.linspace(0, 1, self.nvars)
+        else:
+            return None
+
+
+    @property
+    def system_matrix(self):
+        """
+        Returns the system matrix
+        :return:
+        """
+        return self.A
