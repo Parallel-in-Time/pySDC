@@ -101,6 +101,9 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
     uend = None
     num_procs = len(MS)
 
+    if num_procs > 1:
+        assert len(MS[0].levels) > 1
+
     # initial ordering of the steps: 0,1,...,Np-1
     slots = [p for p in range(num_procs)]
 
@@ -215,13 +218,13 @@ def restart_block(MS,active_slots,u0):
     return MS
 
 #TODO:
-#  - restore MLSDC and SDC
+#  - restore MSSDC
 #  - stop iterating if done to avoid noise
 #  - better commenting
 #  - compare to original PFASST
 #  - parallelize loops
 #  - add step to hook output
-#  - test three levels
+
 
 def predictor(MS):
 
@@ -282,7 +285,10 @@ def pfasst_parallel(MS):
                 S.levels[0].sweep.predict()
 
                 # update stage and return
-                S.status.stage = 'PREDICT'
+                if len(S.levels) > 1:
+                    S.status.stage = 'PREDICT'
+                else:
+                    S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -330,7 +336,10 @@ def pfasst_parallel(MS):
 
                 for S in MS:
                     S.status.done = False
-                    S.status.stage = 'IT_UP'
+                    if len(S.levels) > 1:
+                        S.status.stage = 'IT_UP'
+                    else:
+                        S.status.stage = 'IT_FINE'
 
             else:
 
@@ -398,14 +407,14 @@ def pfasst_parallel(MS):
                     if not S.status.first:
                         recv(S.levels[l-1],S.prev.levels[l-1],tag=(l-1,S.status.iter,S.prev.status.slot))
 
-                # prolong values
-                S.transfer(source=S.levels[l],target=S.levels[l-1])
+                    # prolong values
+                    S.transfer(source=S.levels[l],target=S.levels[l-1])
 
-                # on middle levels: do sweep as usual
-                if l-1 > 0:
-                    S.levels[l-1].sweep.update_nodes()
-                    S.levels[l-1].sweep.compute_residual()
-                    S.levels[l-1].hooks.dump_sweep(S.status)
+                    # on middle levels: do sweep as usual
+                    if l-1 > 0:
+                        S.levels[l-1].sweep.update_nodes()
+                        S.levels[l-1].sweep.compute_residual()
+                        S.levels[l-1].hooks.dump_sweep(S.status)
 
                 # update stage
                 S.status.stage = 'IT_FINE'
