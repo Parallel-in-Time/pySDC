@@ -223,7 +223,7 @@ def restart_block(MS,active_slots,u0):
 #  - better commenting
 #  - compare to original PFASST
 #  - parallelize loops
-#  - add step to hook output
+#  - ring parallelization...?
 
 
 def predictor(MS):
