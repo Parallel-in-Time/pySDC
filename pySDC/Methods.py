@@ -214,7 +214,15 @@ def restart_block(MS,active_slots,u0):
 
     return MS
 
-#FIXME: this is not yet correct
+#TODO:
+#  - restore MLSDC and SDC
+#  - stop iterating if done to avoid noise
+#  - better commenting
+#  - compare to original PFASST
+#  - parallelize loops
+#  - add step to hook output
+#  - test three levels
+
 def predictor(MS):
 
     for S in MS:
@@ -222,20 +230,32 @@ def predictor(MS):
         for l in range(1,len(S.levels)):
             S.transfer(source=S.levels[l-1],target=S.levels[l])
 
-        if not S.status.first:
-            recv(S.levels[-1],S.prev.levels[-1],tag=(len(S.levels),-1,S.prev.status.slot))
+    for q in range(len(MS)):
 
-        # do the sweep with (possibly) new values
-        S.levels[-1].sweep.update_nodes()
+        for p in range(q,len(MS)):
 
-        # send updated values on coarsest level
-        send(S.levels[-1],tag=(len(S.levels),-1,S.status.slot))
+            # print('%i is doing sweeps + send' %p)
+
+            S = MS[p]
+
+            # do the sweep with (possibly) new values
+            S.levels[-1].sweep.update_nodes()
+
+            # send updated values on coarsest level
+            send(S.levels[-1],tag=(len(S.levels),0,S.status.slot))
+
+        for p in range(q+1,len(MS)):
+
+            # print('%i is receiving' %p)
+            S = MS[p]
+
+            recv(S.levels[-1],S.prev.levels[-1],tag=(len(S.levels),0,S.prev.status.slot))
+
+    for S in MS:
 
         for l in range(len(S.levels)-1,0,-1):
             S.transfer(source=S.levels[l],target=S.levels[l-1])
 
-        # update stage and return
-        S.status.stage = 'IT_FINE_SWEEP'
 
     return MS
 
@@ -271,10 +291,14 @@ def pfasst_parallel(MS):
 
             MS = predictor(MS)
 
+            for S in MS:
+                # update stage and return
+                S.status.stage = 'IT_FINE'
+
             return MS
 
 
-        if case('IT_FINE_SWEEP'):
+        if case('IT_FINE'):
 
             # do sweep on finest level
             for S in MS:
@@ -384,7 +408,7 @@ def pfasst_parallel(MS):
                     S.levels[l-1].hooks.dump_sweep(S.status)
 
                 # update stage
-                S.status.stage = 'IT_FINE_SWEEP'
+                S.status.stage = 'IT_FINE'
 
             return MS
 
