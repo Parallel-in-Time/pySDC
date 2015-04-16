@@ -4,7 +4,7 @@ pySDC
 The pySDC project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors, 
 esp. the multilevel extension MLSDC. It is intended for rapid prototyping and educational purposes. New ideas like e.g 
 sweepers or predictors can be tested and first toy problems can be easily implemented. Two virtually parallel PFASST 
-iterators are implemented as well, giving full access to all values at any time .
+iterators are implemented as well, giving full access to all values at any time.
 
 
 News
@@ -36,7 +36,7 @@ HowTo
 To start your own example, take a look at the examples shipped with this code:
 
 * heat1d: MLSDC and PFASST implementation of the forced 1D heat equation with Dirichlet-0 BC in [0,1]
-* penningtrap: a particle in a penning trap, driven by external electric and magnetic fields
+* penningtrap: particles in a penning trap, driven by external electric and magnetic fields
 * spiraling_particle: a particle moving in varying electric and magnetic fields
 * vanderpol: the van der pol oscillator
 
@@ -53,7 +53,7 @@ For a new example, you have to either choose or provide at least five components
 * a problem description, examples can be found in examples/*/ProblemClass.py
 * a data type, examples can be found in pySDC/datatype_classes/
 * a sweeper, examples can be found in pySDC/sweeper_classes/
-* a method/stepper, provided in the driver pySDC/Methods.py 
+* a method/stepper, provided in the drivers pySDC/PFASST_*.py 
 
 
 For MLSDC, suitable transfer operators are also required, examples can be found e.g. in examples/heat1d/TransferClass.py.
