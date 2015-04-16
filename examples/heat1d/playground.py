@@ -7,9 +7,12 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.Methods as mp
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
+# import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
+
 
 if __name__ == "__main__":
 
@@ -20,15 +23,15 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-12
+    lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [127,63]
+    pparams['nvars'] = [255,127]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -40,8 +43,8 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
-    description['num_nodes'] = 3
+    description['collocation_class'] = collclass.CollGaussLobatto
+    description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
@@ -53,14 +56,14 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.125
-    Tend = 4*dt
+    Tend = 12*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
@@ -68,6 +71,6 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
-    sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    print(extract_stats,sortedlist_stats)
+    # extract_stats = grep_stats(stats,iter=-1,type='residual')
+    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    # print(extract_stats,sortedlist_stats)
