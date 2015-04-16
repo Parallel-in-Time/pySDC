@@ -10,7 +10,6 @@ from pySDC.PFASST_helper import *
 #TODO:
 #  - restore MSSDC
 #  - stop iterating if done to avoid noise
-#  - better commenting
 #  - ring parallelization...?
 
 
@@ -139,12 +138,13 @@ def recv(target,source,tag=None):
     Args:
         target: level which will receive the values
         source: level which initiated the send
+        tag: identifier to check if this message is really for me
     """
-    # simply do a deepcopy of the values uend to become the new u0 at the target
+
     if tag is not None and source.tag != tag:
         print('RECV ERROR',tag,source.tag)
         exit()
-
+    # simply do a deepcopy of the values uend to become the new u0 at the target
     target.u[0] = cp.deepcopy(source.uend)
 
 
@@ -154,7 +154,7 @@ def send(source,tag):
 
     Args:
         source: level which has the new values
-        tag: signal new values
+        tag: identifier for this message
     """
     # sending here means computing uend ("one-sided communication")
     source.sweep.compute_end_point()
@@ -162,44 +162,68 @@ def send(source,tag):
 
 
 def predictor(MS):
+    """
+    Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
 
+    Args:
+        MS: multiple steps
+
+    Returns:
+        block of steps with initial values
+    """
+
+    # loop over all steps
     for S in MS:
 
+        # restrict to coarsest level
         for l in range(1,len(S.levels)):
             S.transfer(source=S.levels[l-1],target=S.levels[l])
 
+    # loop over all steps
     for q in range(len(MS)):
 
+        # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
         for p in range(q,len(MS)):
-
-            # print('%i is doing sweeps + send' %p)
 
             S = MS[p]
 
-            # do the sweep with (possibly) new values
+            # do the sweep with new values
             S.levels[-1].sweep.update_nodes()
 
             # send updated values on coarsest level
             send(S.levels[-1],tag=(len(S.levels),0,S.status.slot))
 
+        # loop over last steps: [2,3,4], [3,4], [4]
         for p in range(q+1,len(MS)):
 
-            # print('%i is receiving' %p)
             S = MS[p]
-
+            # receive values sent during previous sweep
             recv(S.levels[-1],S.prev.levels[-1],tag=(len(S.levels),0,S.prev.status.slot))
 
+    # loop over all steps
     for S in MS:
 
+        # interpolate back to finest level
         for l in range(len(S.levels)-1,0,-1):
             S.transfer(source=S.levels[l],target=S.levels[l-1])
-
 
     return MS
 
 
 def pfasst(MS):
+    """
+    Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
+    For the workflow of this controller, check out one of our PFASST talks
+
+    Args:
+        MS: all active steps
+
+    Returns:
+        all active steps
+    """
+
+    # if all stages are the same, continue, otherwise abort
     if all(S.status.stage for S in MS):
         stage = MS[0].status.stage
     else:
@@ -210,8 +234,9 @@ def pfasst(MS):
     for case in switch(stage):
 
         if case('SPREAD'):
+            # (potentially) serial spreading phase
 
-            for S in MS: # SERIAL
+            for S in MS:
 
                 # first stage: spread values
                 S.levels[0].hooks.pre_step(S.status)
@@ -219,7 +244,7 @@ def pfasst(MS):
                 # call predictor from sweeper
                 S.levels[0].sweep.predict()
 
-                # update stage and return
+                # update stage
                 if len(S.levels) > 1:
                     S.status.stage = 'PREDICT'
                 else:
@@ -229,18 +254,19 @@ def pfasst(MS):
 
 
         if case('PREDICT'):
+            # call predictor (serial)
 
             MS = predictor(MS)
-            # MS = exact_values(MS)
 
             for S in MS:
-                # update stage and return
+                # update stage
                 S.status.stage = 'IT_FINE'
 
             return MS
 
 
         if case('IT_FINE'):
+            # do fine sweep for all steps (virtually parallel)
 
             for S in MS:
                 # increment iteration count here (and only here)
@@ -253,30 +279,34 @@ def pfasst(MS):
 
                 S.levels[0].hooks.dump_iteration(S.status)
 
+                # send updated values forward (non-blocking)
                 send(S.levels[0],tag=(0,S.status.iter,S.status.slot))
 
+                # update stage
                 S.status.stage = 'IT_CHECK'
 
             return MS
 
 
         if case('IT_CHECK'):
+            # check whether to stop iterating (parallel)
 
-            # check whether to stop iterating
             for S in MS:
                 S.status.done = check_convergence(S)
 
+            # if not everyone is ready yet, keep doing stuff
             if not all(S.status.done for S in MS):
 
                 for S in MS:
                     S.status.done = False
+                    # multi-level or single-level?
                     if len(S.levels) > 1:
                         S.status.stage = 'IT_UP'
                     else:
                         S.status.stage = 'IT_FINE'
 
             else:
-
+                # if everyone is ready, end
                 for S in MS:
                     S.levels[0].sweep.compute_end_point()
                     S.levels[0].hooks.dump_step(S.status)
@@ -286,8 +316,8 @@ def pfasst(MS):
 
 
         if case('IT_UP'):
+            # go up the hierarchy from finest to coarsest level (parallel)
 
-            # go up the hierarchy from finest to coarsest level
             for S in MS:
 
                 S.transfer(source=S.levels[0],target=S.levels[1])
@@ -303,26 +333,30 @@ def pfasst(MS):
                     # transfer further up the hierarchy
                     S.transfer(source=S.levels[l],target=S.levels[l+1])
 
-                # update stage and return
+                # update stage
                 S.status.stage = 'IT_COARSE'
 
             return MS
 
 
         if case('IT_COARSE'):
-            # receive on coarsest level
+            # sweeps on coarsest level (serial/blocking)
 
             for S in MS:
 
+                # receive from previous step (if not first)
                 if not S.status.first:
                     recv(S.levels[-1],S.prev.levels[-1],tag=(len(S.levels),S.status.iter,S.prev.status.slot))
 
+                # do the sweep
                 S.levels[-1].sweep.update_nodes()
                 S.levels[-1].sweep.compute_residual()
                 S.levels[-1].hooks.dump_sweep(S.status)
 
+                # send to next step
                 send(S.levels[-1],tag=(len(S.levels),S.status.iter,S.status.slot))
 
+                # update stage
                 S.status.stage = 'IT_DOWN'
 
             # return
@@ -330,14 +364,14 @@ def pfasst(MS):
 
 
         if case('IT_DOWN'):
+            # prolong corrections down to finest level (parallel)
 
-            # prolong corrections down to finest level
             for S in MS:
 
                 # receive and sweep on middle levels (except for coarsest level)
                 for l in range(len(S.levels)-1,0,-1):
 
-                    # receive values from IT_UP
+                    # receive values from IT_UP (non-blocking)
                     if not S.status.first:
                         recv(S.levels[l-1],S.prev.levels[l-1],tag=(l-1,S.status.iter,S.prev.status.slot))
 

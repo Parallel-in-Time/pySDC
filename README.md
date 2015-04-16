@@ -3,13 +3,14 @@ pySDC
 
 The pySDC project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors, 
 esp. the multilevel extension MLSDC. It is intended for rapid prototyping and educational purposes. New ideas like e.g 
-sweepers or predictors can be tested and first toy problems can be easily implemented. A virtually parallel PFASST 
-iterator is implemented as well, giving full access to all values at any time (real parallelism is on the todo list).
+sweepers or predictors can be tested and first toy problems can be easily implemented. Two virtually parallel PFASST 
+iterators are implemented as well, giving full access to all values at any time .
 
 
 News
 ----
 
+* April 16, 2015: new PFASST iterator (loop-based) implemented, new examples added
 * March 19, 2015: code now also runs with Python 2.7, development of SharpClaw example started 
 * January 7, 2015: revised the examples to work with the new driver in Methods.py, new statistics framework
 * December 29, 2014: virtual PFASST implemented using stages, see [flowchart](flowchart.png) for implementation details

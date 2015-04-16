@@ -5,8 +5,6 @@ ToDo list
 
 * add matrix-based sweeper and e.g. compute spectral radii on the fly
 
-* add real parallelization for PFASST using mpi4py
-
 * add more examples, esp. for PFASST
     - advection diffusion using fft
     - reaction diffusion using fft
