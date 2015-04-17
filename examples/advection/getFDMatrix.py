@@ -15,6 +15,7 @@ def getFDMatrix(N, p, dx):
     range = [-3,-2,-1,0,1,2,3]
   else:
     print ("Do not have order %1i implemented." % p)
+    exit()
 
   A = sp.diags(stencil, range, shape=(N,N))
   A = sp.lil_matrix(A)
@@ -42,5 +43,6 @@ def getFDMatrix(N, p, dx):
     A[N-1,0] = stencil[4]
     A[N-1,1] = stencil[5]
     A[N-1,2] = stencil[6]
+
   A *= (1.0/dx)
   return sp.csr_matrix(A)

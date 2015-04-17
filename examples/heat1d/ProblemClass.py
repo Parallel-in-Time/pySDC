@@ -29,6 +29,8 @@ class heat1d(ptype):
         assert 'nvars' in cparams
         assert 'nu' in cparams
 
+        assert (cparams['nvars']+1)%2 == 0
+
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)

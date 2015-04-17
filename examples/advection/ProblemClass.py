@@ -31,6 +31,8 @@ class advection(ptype):
         assert 'nvars' in cparams
         assert 'c' in cparams
         assert 'order' in cparams
+
+        assert cparams['nvars']%2 == 0
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():

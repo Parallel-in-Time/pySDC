@@ -5,7 +5,7 @@ from pySDC.Transfer import transfer
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 # FIXME: extend this to ndarrays
-class mesh_to_mesh_1d(transfer):
+class mesh_to_mesh_1d_periodic(transfer):
     """
     Custon transfer class, implements Transfer.py
 
@@ -31,18 +31,19 @@ class mesh_to_mesh_1d(transfer):
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_1d,self).__init__(fine_level,coarse_level)
+        super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level)
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:
             self.Rspace = np.eye(self.init_c)
         # assemble weighted restriction by hand
         else:
-            self.Rspace = np.zeros((self.init_f,self.init_c))
-            np.fill_diagonal(self.Rspace[1::2,:],1)
-            np.fill_diagonal(self.Rspace[0::2,:],1/2)
-            np.fill_diagonal(self.Rspace[2::2,:],1/2)
-            self.Rspace = 1/2*self.Rspace.T
+            self.Rspace = np.zeros((self.init_c,self.init_f))
+            np.fill_diagonal(self.Rspace[:,0::2],1)
+            np.fill_diagonal(self.Rspace[:,1::2],1/2)
+            np.fill_diagonal(self.Rspace[1:,1::2],1/2)
+            self.Rspace[0,-1] = 1/2
+            self.Rspace = 1/2*self.Rspace
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
@@ -51,33 +52,22 @@ class mesh_to_mesh_1d(transfer):
         else:
             self.Pspace = np.zeros((self.init_f,self.init_c))
 
-            np.fill_diagonal(self.Pspace[1::2,:],1)
-
-            np.fill_diagonal(self.Pspace[0::2,:],1/2)
-            np.fill_diagonal(self.Pspace[2::2,:],1/2)
-
-            # this would be 3rd-order accurate
-            # c1 = -0.0625
-            # c2 = 0.5625
-            # c3 = c2
-            # c4 = c1
-            # np.fill_diagonal(self.Pspace[0::2,:],c3)
-            # np.fill_diagonal(self.Pspace[2::2,:],c2)
-            # np.fill_diagonal(self.Pspace[0::2,1:],c4)
-            # np.fill_diagonal(self.Pspace[4::2,:],c1)
-            # self.Pspace[0,0:3] = [0.9375, -0.3125, 0.0625]
-            # self.Pspace[-1,-3:init_c] = [0.0625, -0.3125, 0.9375]
-
-            np.fill_diagonal(self.Pspace[0::2,:],0.5859375)
-            np.fill_diagonal(self.Pspace[2::2,:],0.5859375)
-            np.fill_diagonal(self.Pspace[0::2,1:],-0.09765625)
-            np.fill_diagonal(self.Pspace[4::2,:],-0.09765625)
-            np.fill_diagonal(self.Pspace[0::2,2:],0.01171875)
-            np.fill_diagonal(self.Pspace[6::2,:],0.01171875)
-            self.Pspace[0,0:5] = [1.23046875, -0.8203125, 0.4921875, -0.17578125, 0.02734375]
-            self.Pspace[2,0:5] = [0.41015625, 0.8203125, -0.2734375, 0.08203125, -0.01171875]
-            self.Pspace[-1,-5:self.init_c] = [0.02734375,  -0.17578125, 0.4921875, -0.8203125, 1.23046875]
-            self.Pspace[-3,-5:self.init_c] = [-0.01171875, 0.08203125, -0.2734375, 0.8203125, 0.41015625]
+            np.fill_diagonal(self.Pspace[0::2,:],1)
+            np.fill_diagonal(self.Pspace[1::2,:],0.5859375)
+            np.fill_diagonal(self.Pspace[1::2,1:],0.5859375)
+            np.fill_diagonal(self.Pspace[3::2,:],-0.09765625)
+            np.fill_diagonal(self.Pspace[1::2,2:],-0.09765625)
+            np.fill_diagonal(self.Pspace[5::2,:],0.01171875)
+            np.fill_diagonal(self.Pspace[1::2,3:],0.01171875)
+            self.Pspace[1,-1] = -0.09765625
+            self.Pspace[1,-2] = 0.01171875
+            self.Pspace[3,-1] = 0.01171875
+            self.Pspace[-1,0] = 0.5859375
+            self.Pspace[-1,1] = -0.09765625
+            self.Pspace[-1,2] = 0.01171875
+            self.Pspace[-3,0] = -0.09765625
+            self.Pspace[-3,1] = 0.01171875
+            self.Pspace[-5,0] = 0.01171875
 
         pass
 
