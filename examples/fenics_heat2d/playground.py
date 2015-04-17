@@ -1,13 +1,14 @@
 
 from pySDC import CollocationClasses as collclass
 
-from ProblemClass import fenics_heat2d
-from fenics_mesh import fenics_mesh, rhs_fenics_mesh
-from TransferClass import mesh_to_mesh_fenics
+from examples.fenics_heat2d.ProblemClass import fenics_heat2d
+from examples.fenics_heat2d.fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from examples.fenics_heat2d.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.PFASST_blockwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
+from examples.fenics_heat2d.HookClass import error_output
 
 import dolfin as df
 
@@ -32,14 +33,14 @@ if __name__ == "__main__":
     pparams = {}
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [(128,128),(64,64)]
+    pparams['c_nvars'] = [(128,128),(128,128)]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
     # pparams['levelnumber'] = [2,1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = False
+    tparams['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -53,6 +54,7 @@ if __name__ == "__main__":
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
+    description['hook_class'] = error_output
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -87,11 +89,11 @@ if __name__ == "__main__":
     # urest = fenics_mesh(uinit_g)
     # df.solve(A, urest.values.vector(), rhs)
 
-    # meshc = df.UnitSquareMesh(4,4)
-    # meshf = df.refine(meshc)
+    # meshc = df.UnitSquareMesh(128,128)
+    # meshf = df.UnitSquareMesh(64,64)
     # Vc = df.FunctionSpace(meshc,'CG',1)
     # Vf = df.FunctionSpace(meshf,'CG',1)
-    # f = df.Expression("sin(2.0*pi*x[0])")
+    # f = df.Expression("sin(2*pi*x[0])*sin(2*pi*x[1])")
     # f_fine = df.project(f, Vf)
     # f_coarse = df.project(f, Vc)
     #
@@ -107,7 +109,7 @@ if __name__ == "__main__":
     # print(len(f_l2.vector().array()),len(f_coarse.vector().array()))
     # print(df.norm(f_l2.vector()-f_coarse.vector(),'linf'))
     #
-    # frest = df.project(f_fine,Vc)
+    # frest = df.interpolate(f_fine,Vc)
     # print(len(frest.vector().array()),len(f_coarse.vector().array()))
     # print(df.norm(frest.vector()-f_coarse.vector(),'linf'))
     #
@@ -119,12 +121,12 @@ if __name__ == "__main__":
     # rhs = f_coarse*v*df.dx(meshf)
     # b = df.assemble(rhs)
     # f_l2 = df.Function(Vf)
-    # # df.solve(A, f_l2.vector(), b)
-    # df.solve(lhs==rhs,f_l2)
+    # df.solve(A, f_l2.vector(), b)
+    # # df.solve(lhs==rhs,f_l2)
     # print(len(f_l2.vector().array()),len(f_fine.vector().array()))
     # print(df.norm(f_l2.vector()-f_fine.vector(),'linf'))
     #
-    # finter = df.project(f_coarse,Vf)
+    # finter = df.interpolate(f_coarse,Vf)
     # print(len(finter.vector().array()),len(f_fine.vector().array()))
     # print(df.norm(finter.vector()-f_fine.vector(),'linf'))
     #
@@ -141,7 +143,7 @@ if __name__ == "__main__":
     # print(len(uinit_f.values.vector().array()),len(uinter.values.vector().array()))
     # print(abs(uinit_f-uinter))
     #
-    exit()
+    # exit()
 
 
     # call main function to get things done...
