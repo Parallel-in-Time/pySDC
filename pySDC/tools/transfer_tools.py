@@ -36,6 +36,13 @@ def to_sparse(D, format="csc"):
         return D
 
 
+def to_dense(D):
+    if isinstance(D, np.ndarray):
+        return D
+    elif sprs.issparse(D):
+        return D.toarry()
+
+
 def next_neighbors(p, ps, k):
     """
     This function gives for a value p the k points next to it which are found in
