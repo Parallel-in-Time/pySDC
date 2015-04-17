@@ -5,7 +5,7 @@ from ProblemClass import fenics_heat2d
 from fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
-import pySDC.Methods as mp
+import pySDC.PFASST_blockwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -32,14 +32,14 @@ if __name__ == "__main__":
     pparams = {}
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [[512]]#,[256]]
+    pparams['c_nvars'] = [(128,128),(64,64)]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
     # pparams['levelnumber'] = [2,1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -141,11 +141,11 @@ if __name__ == "__main__":
     # print(len(uinit_f.values.vector().array()),len(uinter.values.vector().array()))
     # print(abs(uinit_f-uinter))
     #
-    # exit()
+    exit()
 
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # df.plot(uend.values,interactive=True)
 

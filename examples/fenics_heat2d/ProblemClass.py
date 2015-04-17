@@ -46,7 +46,8 @@ class fenics_heat2d(ptype):
 
         df.set_log_level(df.WARNING)
 
-        mesh = df.UnitIntervalMesh(self.c_nvars[0])#,self.c_nvars[1])
+        # mesh = df.UnitIntervalMesh(self.c_nvars[0])#,self.c_nvars[1])
+        mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
         # for i in range(self.levelnumber):
         #     mesh = df.refine(mesh)
 
@@ -66,8 +67,8 @@ class fenics_heat2d(ptype):
         self.M = df.assemble(a_M)
         self.K = self.nu*df.assemble(a_K)
 
-        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
+        # self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
+        self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
         # self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
         self.u0 = df.Constant(0.0)
         self.bc = df.DirichletBC(self.V, self.u0, Boundary)
@@ -185,8 +186,8 @@ class fenics_heat2d(ptype):
             exact solution
         """
 
-        # u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
-        u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t)
+        u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
+        # u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t)
 
         me = fenics_mesh(self.init)
         me.values = df.interpolate(u0,self.V)
