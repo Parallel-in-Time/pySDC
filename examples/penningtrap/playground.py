@@ -8,7 +8,8 @@ from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.penningtrap.HookClass import particles_output
-import pySDC.Methods as mp
+import pySDC.PFASST_blockwise as mp
+# import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     pparams['omega_E'] = 4.9
     pparams['omega_B'] = 25.0
     pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
-    pparams['nparts'] = 2
+    pparams['nparts'] = 10
     pparams['sig'] = 0.1
 
     # This comes as read-in for the transfer operations
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     uinit = P.u_init()
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     print(uend.pos.values)
 

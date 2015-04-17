@@ -5,14 +5,12 @@ ToDo list
 
 * add matrix-based sweeper and e.g. compute spectral radii on the fly
 
-* add real parallelization for PFASST using mpi4py
-
 * add more examples, esp. for PFASST
     - advection diffusion using fft
     - reaction diffusion using fft
     - bernus model: simple explicit SDC to monodomain PFASST
-    - multi-particle penning trap with PFASST
-    - SWFW, couple to PyClaw
+    - SharpClaw integration
+    - FEniCS integration, incl. new sweeper
 
 * write a more detailed howto, explaining all the features of the code using basic examples
 

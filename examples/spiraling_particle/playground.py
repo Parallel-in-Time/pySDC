@@ -10,7 +10,7 @@ from examples.spiraling_particle.ProblemClass import planewave_single
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.spiraling_particle.HookClass import particles_output
-import pySDC.Methods as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     print('Init:',uinit.pos.values,uinit.vel.values)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     extract_stats = grep_stats(stats,type='energy')
     sortedlist_stats = sort_stats(extract_stats,sortby='time')

@@ -1,4 +1,4 @@
-* python, min. version 3.3 (for python2 branch: 2.7)
+* python, min. version 2.7
 * numpy, min. version 1.9
 * scipy, (optional) min. version 0.15, depends on the example and the sweeper
 * logging, min. version ???
@@ -7,4 +7,4 @@
 * abc, min. version ???
 * itertools, min. version ???
 * collections, min. version ???
-* future, min. version 0.14 (for python2 branch)
+* future, min. version 0.14 
