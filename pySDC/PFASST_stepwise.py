@@ -4,80 +4,10 @@ import numpy as np
 
 from pySDC.Stats import stats
 
-class switch(object):
-    """
-    Helper class for using case/switch statements in Python (not necessary, but easier to read)
-    """
-    def __init__(self, value):
-        self.value = value
-        self.fall = False
-
-    def __iter__(self):
-        """Return the match method once, then stop"""
-        yield self.match
-        raise StopIteration
-
-    def match(self, *args):
-        """Indicate whether or not to enter a case suite"""
-        if self.fall or not args:
-            return True
-        elif self.value in args: # changed for v1.5, see below
-            self.fall = True
-            return True
-        else:
-            return False
+from pySDC.PFASST_helper import *
 
 
-def generate_steps(num_procs,sparams,description):
-    """
-    Routine to easily generate a block of steps to run in (pseudo-)parallel
-
-    This function is the quick way to get a block of steps. Each step is treated the same way here, i.e. using the same
-    hierarchy and the same parameter set per step.
-
-    Args:
-        num_procs: number of (virtual) processors
-        sparams: parameters for the steps
-        description: description dictionary for the hierarchy
-
-    Returns:
-        block of steps (list)
-    """
-
-    from pySDC import Step as stepclass
-
-    MS = []
-    # simply append step after step and generate the hierarchies
-    for p in range(num_procs):
-        MS.append(stepclass.step(sparams))
-        MS[-1].generate_hierarchy(description)
-
-    return MS
-
-
-def check_convergence(S):
-    """
-    Routine to determine whether to stop iterating (currently testing the residual and the max. number of iterations)
-
-    Args:
-        S: current step
-
-    Returns:
-        converged, true or false
-
-    """
-
-    # do all this on the finest level
-    L = S.levels[0]
-
-    # get residual and check against prescribed tolerance (plus check number of iterations
-    res = L.status.residual
-    converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
-
-    return converged
-
-
-def run_pfasst_serial(MS,u0,t0,dt,Tend):
+def run_pfasst(MS,u0,t0,dt,Tend):
     """
     Main driver for running the serial version of SDC, MLSDC and PFASST (virtual parallelism)
 
@@ -127,7 +57,7 @@ def run_pfasst_serial(MS,u0,t0,dt,Tend):
         # loop over all active steps (in the correct order)
         for p in active_slots:
             # print(p,MS[p].status.stage)
-            MS[p] = pfasst_serial(MS[p])
+            MS[p] = pfasst(MS[p])
 
         # if all active steps are done (for block-parallelization, need flag to distinguish (FIXME))
         if all([MS[p].status.done for p in active_slots]):
@@ -205,8 +135,32 @@ def restart_block(MS,active_slots,u0):
     return MS
 
 
+def recv(target,source):
+    """
+    Receive function
 
-def pfasst_serial(S):
+    Args:
+        target: level which will receive the values
+        source: level which initiated the send
+    """
+    # simply do a deepcopy of the values uend to become the new u0 at the target
+    target.u[0] = cp.deepcopy(source.uend)
+
+
+def send(source,tag):
+    """
+    Send function
+
+    Args:
+        source: level which has the new values
+        tag: signal new values
+    """
+    # sending here means computing uend ("one-sided communication")
+    source.sweep.compute_end_point()
+    source.tag = cp.deepcopy(tag)
+
+
+def pfasst(S):
     """
     Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -222,7 +176,7 @@ def pfasst_serial(S):
     # if S is done, stop right here
     if S.status.done:
         return S
-    # print(S.status.step,S.status.stage)
+
     # otherwise: read out stage of S and act accordingly
     for case in switch(S.status.stage):
 
@@ -310,56 +264,6 @@ def pfasst_serial(S):
             # increment iteration count here (and only here)
             S.status.iter += 1
 
-            if S.status.iter == 2 and S.status.step == 4:
-                print('things went wrong here',S.status.step,S.status.iter,S.status.time)
-
-                uright0 = S.levels[0].prob.dtype_u(S.levels[0].uend)
-                uleft0 = S.levels[0].prob.dtype_u(S.prev.levels[0].uend)
-
-                uright1 = S.levels[1].prob.dtype_u(S.levels[1].uend)
-                uleft1 = S.levels[1].prob.dtype_u(S.prev.levels[1].uend)
-
-                S.reset_step()
-
-                L = S.levels[0]
-
-                L.u[0] = cp.deepcopy(uleft0)
-                L.f[0] = L.prob.eval_f(L.u[0],L.time)
-                for m in range(1,L.sweep.coll.num_nodes+1):
-                    L.u[m] = (1-L.sweep.coll.nodes[m-1])*uleft0 + L.sweep.coll.nodes[m-1]*uright0
-                    L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
-
-                L.status.unlocked = True
-
-                # L = S.levels[1]
-                #
-                # L.u[0] = cp.deepcopy(uleft1)
-                # L.f[0] = L.prob.eval_f(L.u[0],L.time)
-                # for m in range(1,L.sweep.coll.num_nodes+1):
-                #     L.u[m] = (1-L.sweep.coll.nodes[m-1])*uleft1 + L.sweep.coll.nodes[m-1]*uright1
-                #     L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
-                #
-                # L.status.unlocked = True
-                #
-                # S.levels[1].sweep.compute_end_point()
-                # S.levels[0].sweep.compute_end_point()
-
-
-                S.levels[0].sweep.compute_residual()
-
-                S.transfer(source=S.levels[0],target=S.levels[1])
-                S.levels[1].sweep.update_nodes()
-                S.levels[1].sweep.compute_end_point()
-                S.transfer(source=S.levels[1],target=S.levels[0])
-                S.levels[0].sweep.compute_end_point()
-
-                # for l in range(len(S.levels)):
-                #     S.levels[l].u[0] = cp.deepcopy(S.prev.levels[l].uend)
-                #     S.levels[l].sweep.predict()
-                #     S.levels[l].sweep.compute_residual()
-                #     S.levels[l].sweep.compute_end_point()
-
-            # else:
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
@@ -522,41 +426,6 @@ def pfasst_serial(S):
     #fixme: use meaningful error object here
     print('Something is wrong here, you should have hit one case statement!')
     exit()
-
-
-def recv(target,source):
-    """
-    Receive function
-
-    Args:
-        target: level which will receive the values
-        source: level which initiated the send
-    """
-    if source.status.residual is not None and target.status.residual is not None:
-        if source.status.residual < target.status.residual:
-
-            # simply do a deepcopy of the values uend to become the new u0 at the target
-            target.u[0] = cp.deepcopy(source.uend)
-
-        else:
-            print('ignoring this...',target._level__step.status.step)
-            pass
-    else:
-        # simply do a deepcopy of the values uend to become the new u0 at the target
-        target.u[0] = cp.deepcopy(source.uend)
-
-
-def send(source,tag):
-    """
-    Send function
-
-    Args:
-        source: level which has the new values
-        tag: signal new values
-    """
-    # sending here means computing uend ("one-sided communication")
-    source.sweep.compute_end_point()
-    source.tag = cp.deepcopy(tag)
 
 
 

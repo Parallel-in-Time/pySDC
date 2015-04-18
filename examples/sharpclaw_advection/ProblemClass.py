@@ -31,7 +31,6 @@ class sharpclaw(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'dt' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -40,29 +39,31 @@ class sharpclaw(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
         
-        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
+        riemann_solver              = riemann.advection_2D # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver                 = pyclaw.SharpClawSolver2D(riemann_solver)
         self.solver.weno_order      = 5
         self.solver.time_integrator = 'Euler' # Remove later
         self.solver.kernel_language = 'Fortran'
         self.solver.bc_lower[0]     = pyclaw.BC.periodic
         self.solver.bc_upper[0]     = pyclaw.BC.periodic
+        self.solver.bc_lower[1]     = pyclaw.BC.periodic
+        self.solver.bc_upper[1]     = pyclaw.BC.periodic
         self.solver.cfl_max         = 1.0
         assert self.solver.is_valid()
 
-        x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
-        self.domain = pyclaw.Domain(x)
+        x = pyclaw.Dimension(0.0,1.0,self.nvars[1],name='x')
+        y = pyclaw.Dimension(0.0,1.0,self.nvars[2],name='y')
+        self.domain = pyclaw.Domain([x,y])
 
         self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
-        self.state.problem_data['u'] = 1.0
-        self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+        # self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
 
-        # Initial data
-        u0                = self.u_exact(0.0)
-        self.state.q[0,:] = u0.values
+        self.state.problem_data['u'] = 0.5
+        self.state.problem_data['v'] = 1.0
         
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
+
 
     def solve_system(self,rhs,factor,u0):
         """
@@ -77,9 +78,10 @@ class sharpclaw(ptype):
             solution as mesh
         """
 
-        me        = mesh(self.nvars)
-        me.values = rhs.values
-        return me
+        # me = mesh(self.nvars)
+        # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+
+        return rhs
 
 
     def __eval_fexpl(self,u,t):
@@ -94,17 +96,26 @@ class sharpclaw(ptype):
             explicit part of RHS
         """
 
-        # Copy values of u into pyClaw state object
-        self.state.q[0,:] = u.values
-        
-        # Evaluate right hand side
-        deltaq           = self.solver.dqdt(self.state)
-        
-        # Copy right hand side values back into pySDC solution structure
+
         fexpl        = mesh(self.nvars)
-        fexpl.values = deltaq
-                
+
+        # Copy values of u into pyClaw state object
+        self.state.q[0,:,:] = u.values[0,:,:]
+
+        # Evaluate right hand side
+        tmp = self.solver.dqdt(self.state)
+        fexpl.values[0,:,:] = tmp.reshape(self.nvars[1:])
+
+
+        # Copy values of u into pyClaw state object
+        self.state.q[0,:,:] = u.values[1,:,:]
+
+        # Evaluate right hand side
+        tmp = self.solver.dqdt(self.state)
+        fexpl.values[1,:,:] = tmp.reshape(self.nvars[1:])
+
         return fexpl
+
 
     def __eval_fimpl(self,u,t):
         """
@@ -118,8 +129,8 @@ class sharpclaw(ptype):
             implicit part of RHS
         """
 
-        fimpl        = mesh(self.nvars)
-        fimpl.values = 0.0*u.values
+        fimpl = mesh(self.nvars,val=0)
+        # fimpl.values = self.A.dot(u.values)
         
         return fimpl
 
@@ -153,7 +164,9 @@ class sharpclaw(ptype):
             exact solution
         """
         
-        xc        = self.state.grid.x.centers
+        xc,yc = self.state.grid.p_centers
         me        = mesh(self.nvars)
-        me.values = np.sin(2.0*np.pi*(xc - t))
+        me.values[0,:,:] = np.sin(2*np.pi*xc)*np.sin(2*np.pi*yc)
+        me.values[1,:,:] = np.sin(2*np.pi*xc)*np.sin(2*np.pi*yc)
+
         return me

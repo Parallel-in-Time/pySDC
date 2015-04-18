@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
@@ -6,13 +5,18 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-class heat1d(ptype):
+# Sharpclaw imports
+from clawpack import pyclaw
+from clawpack import riemann
+
+class sharpclaw(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+      solver: Sharpclaw solver
+      state:  Sharclaw state
+      domain: Sharpclaw domain
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -27,19 +31,33 @@ class heat1d(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'nu' in cparams
-
-        assert (cparams['nvars']+1)%2 == 0
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
+        
+        riemann_solver              = riemann.burgers_1D # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
+        self.solver.weno_order      = 5
+        self.solver.time_integrator = 'Euler' # Remove later
+        self.solver.kernel_language = 'Fortran'
+        self.solver.bc_lower[0]     = pyclaw.BC.periodic
+        self.solver.bc_upper[0]     = pyclaw.BC.periodic
+        self.solver.cfl_max         = 1.0
+        assert self.solver.is_valid()
 
-        # compute dx and get discretization matrix A
-        self.dx = 1/(self.nvars + 1)
+        x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        self.domain = pyclaw.Domain(x)
+
+        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
+        self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
+        
+        solution = pyclaw.Solution(self.state, self.domain)
+        self.solver.setup(solution)
+
         self.A = self.__get_A(self.nvars,self.nu,self.dx)
 
 
@@ -77,6 +95,7 @@ class heat1d(ptype):
 
         me = mesh(self.nvars)
         me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+
         return me
 
 
@@ -92,9 +111,13 @@ class heat1d(ptype):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
+        # Copy values of u into pyClaw state object
+        self.state.q[0,:] = u.values
+        
+        # Evaluate right hand side
+        fexpl        = mesh(self.nvars)
+        fexpl.values = self.solver.dqdt(self.state)
+                
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -109,8 +132,9 @@ class heat1d(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
+        fimpl = mesh(self.nvars,val=0)
         fimpl.values = self.A.dot(u.values)
+        
         return fimpl
 
 
@@ -142,8 +166,8 @@ class heat1d(ptype):
         Returns:
             exact solution
         """
-
-        me = mesh(self.nvars)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*xvalues)*np.cos(t)
+        
+        xc        = self.state.grid.x.centers
+        me        = mesh(self.nvars)
+        me.values = np.sin(2.0*np.pi*(xc - t))
         return me

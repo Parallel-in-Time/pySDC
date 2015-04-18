@@ -3,35 +3,33 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from examples.heat1d.ProblemClass import heat1d
-from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from examples.advection.ProblemClass import advection
+from examples.advection.TransferClass import mesh_to_mesh_1d_periodic
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
-# import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
-
 
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 20
+    sparams['maxiter'] = 15
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.1
-    pparams['nvars'] = [255,127]
+    pparams['c'] = 1.0
+    pparams['nvars'] = [512,256]
+    pparams['order'] = [6]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -39,24 +37,24 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = heat1d
+    description['problem_class'] = advection
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
+    description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d
+    description['transfer_class'] = mesh_to_mesh_1d_periodic
     description['transfer_params'] = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
 
     # setup parameters "in time"
-    t0 = 0
-    dt = 0.5
-    Tend = 1*dt
+    t0 = 0.0
+    dt = 0.125
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

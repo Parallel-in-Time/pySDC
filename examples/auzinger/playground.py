@@ -6,7 +6,7 @@ from pySDC import CollocationClasses as collclass
 from examples.auzinger.ProblemClass import auzinger
 from pySDC.datatype_classes.mesh import mesh
 from pySDC.sweeper_classes.generic_LU import generic_LU
-import pySDC.Methods as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print('Init:',uinit.values)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # get stats and error
     extract_stats = grep_stats(stats,type='niter')
