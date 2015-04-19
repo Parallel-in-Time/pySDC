@@ -8,8 +8,8 @@ from examples.penningtrap.TransferClass import particles_to_particles
 from pySDC.datatype_classes.particles import particles, fields
 from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 from examples.penningtrap.HookClass import particles_output
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -19,22 +19,22 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 16
 
     # This comes as read-in for each level
     lparams = {}
-    lparams['restol'] = 1E-08
+    lparams['restol'] = 1E-09
 
     # This comes as read-in for the time-stepping
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 50
 
     # This comes as read-in for the problem
     pparams = {}
     pparams['omega_E'] = 4.9
     pparams['omega_B'] = 25.0
     pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
-    pparams['nparts'] = 10
+    pparams['nparts'] = 50
     pparams['sig'] = 0.1
 
     # This comes as read-in for the transfer operations
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = particles
     description['dtype_f'] = fields
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussLobatto
     description['num_nodes'] = [5]
     description['sweeper_class'] = boris_2nd_order
     description['level_params'] = lparams
@@ -63,8 +63,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 8*0.015625
-    Tend = 8*dt
+    dt = 1*0.015625
+    Tend = 16*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

@@ -7,7 +7,7 @@ from examples.advection.ProblemClass import advection
 from examples.advection.TransferClass import mesh_to_mesh_1d_periodic
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -16,20 +16,20 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 4
+    num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-10
+    lparams['restol'] = 1E-09
 
     sparams = {}
-    sparams['maxiter'] = 15
+    sparams['maxiter'] = 50
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['c'] = 1.0
-    pparams['nvars'] = [512,256]
-    pparams['order'] = [6]
+    pparams['nvars'] = [256]#,128]
+    pparams['order'] = [2]#,2]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0.0
     dt = 0.125
-    Tend = 4*dt
+    Tend = 16*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -69,6 +69,7 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    for item in sortedlist_stats:
+        print(item)

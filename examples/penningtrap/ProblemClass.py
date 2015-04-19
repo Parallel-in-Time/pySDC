@@ -131,7 +131,7 @@ class penningtrap(ptype):
         for n in range(1,N):
 
             # draw 3 random variables in [-1,1] to shift positions
-            r = 2*np.random.random_sample(3)-1
+            r = 0.2*np.random.random_sample(3)-0.1
             u.pos.values[3*n  ] = r[0]+u0[0][0]
             u.pos.values[3*n+1] = r[1]+u0[0][1]
             u.pos.values[3*n+2] = r[2]+u0[0][2]
