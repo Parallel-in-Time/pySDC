@@ -231,7 +231,6 @@ class MultiDimensionalIterativeSolver(IterativeSolver):
         pass
 
 
-
 class MultiStepIterativeSolver(IterativeSolver):
     """ A Iterative solver which does one iteration on one interval, passes the
         result to the next block and so on.
@@ -273,7 +272,7 @@ class MultiStepIterativeSolver(IterativeSolver):
         n = tau.shape[0]
         if rows == -1:
             rows = n
-        N = np.zeros((rows,n))
+        N = np.zeros((rows, n))
         # construct the lagrange polynomials
         circulating_one = np.asarray([1.0]+[0.0]*(n-1))
         lag_pol = []
@@ -335,6 +334,53 @@ class MultiStepIterativeSolver(IterativeSolver):
         else:
             return Bunch(dot=solver)
 
+#TODO: I am not happy with the structure of this function
+class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
+    """
+    Like the multi-step solver expect the difference that the pre-conditioner is
+    solved on a coarser level and then transferred back to the fine level.
+    this class is needed for the LinearPFASST.
+    """
+    def __init__(self, iterative_solver_list, nodes_on_unit_list, transfer_list,
+                 P_c_list, N_x_list=0, sparse_format="dense"):
+
+        super(TransferredMultiStepIterativeSolver, self).__init__(iterative_solver_list, nodes_on_unit_list,
+                                                                  N_x_list, sparse_format)
+        self.transfer_list = transfer_list
+        self.P_c_list = P_c_list
+        self.P_c_inv_list = map(lambda x: la.inv(x), self.P_c_list)
+        # N_x_list
+        self.P = self.distributeOperatorsToFullInterval(map(lambda x, y: y.Pspace.dot(x.dot(y.Rspace)),
+                                                            P_c_list, transfer_list),
+                                                        nodes_on_unit_list, N_x_list)
+        self.__nodes_on_unit = nodes_on_unit_list
+        self.__N_x_list = N_x_list
+
+    @property
+    def P_inv(self):
+
+        if self.sparse_format is "dense":
+            P_c_inv = map(lambda x: la.inv(x), self.P_c_list)
+            return self.distributeOperatorsToFullInterval(P_c_inv, self.__nodes_on_unit, self.__N_x_list)
+        else:
+            def solver(v):
+                v_split = self.split(v)
+                v_solution = []
+                v_transfer = np.zeros(v_split[0].shape)
+                for i in range(self.n_blocks):
+                    # T_gf P_inf T
+                    v_solution.append(
+                        self.transfer_list.Pspace.dot(
+                            self.P_c_inv[i].dot(
+                                self.transfer_list[i].Rspace.dot(v_split[i]-v_transfer))))
+
+                    if i < self.n_blocks-1:
+                        v_transfer = self.N_list[i].dot(v_solution[-1])
+                return np.concatenate(v_solution)
+
+            return Bunch(dot=solver)
+
+
 
 class LinearPFASST(IterativeSolver):
     """ LinearPFASST with just two Level
@@ -344,7 +390,7 @@ class LinearPFASST(IterativeSolver):
         Note that the coarseSolver is not really used but that a new solver is reconstructed
         implicitly through the transferoperators.
     """
-    def __init__(self, multistep_iterative_solver, block_iterative_solver, transfer_list, sparse_format = "dense"):
+    def __init__(self, multistep_iterative_solver, block_iterative_solver, transfer_list, sparse_format="dense"):
         # gather some important values from step_list
         self.__ms_its = multistep_iterative_solver
         self.__bl_its = block_iterative_solver
@@ -413,118 +459,6 @@ class LinearPFASST(IterativeSolver):
             return np.dot(np.eye(self.M.shape[0])-np.dot(self.P_f_inv, self.M),
                           np.eye(self.M.shape[0])-np.dot(self.P_c_inv,self.M))
 
-def generate_LinearPFASST(transfer_list):
-    # generate IterativeBlockSolver
-    # putting the transfer_operators into a block_diagonal form
-    T_fg = sprs.block_diag(*map(lambda x: x.Rspace, transfer_list))
-    T_gf = sprs.block_diag(*map(lambda x: x.Pspace, transfer_list))
-    # generate MultiStepSolver
-    # put them together into LinearPFASST and return the object
-    pass
-
-
-class LinearPfasst(IterativeSolver):
-    """ LinearPFASST with just two Level
-        The CoarseSolver should be a serial BlockSDC_Sweeper and
-        the FineSolver a parallel BlockDiagonalIterativeSolver.
-
-        Note that the coarseSolver is not really used but that a new solver is reconstructed
-        implicitly through the transferoperators.
-    """
-    def __init__(self, CoarseSolver, FineSolver,
-                 transfer_level_space_list_fg = False,transfer_level_space_list_gf = False,
-                 transfer_type_lists = None,k_lists = None,debug=False):
-        """" transfer_type_lists=[f_to_g_list,g_to_f_list]
-             k_lists =[f_to_g_list, g_to_f_list] """
-        self.N_t = CoarseSolver.N_t
-        self.CoarseSolver = CoarseSolver
-        self.FineSolver = FineSolver
-        transfer_ops = []
-        # initialize the transfer_ops for
-        for i in range(CoarseSolver.N_t):
-            #print CoarseSolver.borders[i]
-            transfer_ops.append(SimpleTransferOperationHandler(([FineSolver.tau_list[i],
-                                                                 CoarseSolver.tau_list[i]],
-                                                                 CoarseSolver.borders[i]) ))
-        # now we have the operators to on each interval
-        # the next step is to build T_fg and T_gf, we assume there are only two space level
-        level_a = [0]
-        level_b = [1]
-        fg_list = []
-        gf_list = []
-
-        if transfer_type_lists is None:
-            transfer_type_lists = [["linear"]*len(transfer_ops),["linear"]*len(transfer_ops)]
-        if k_lists is None:
-            k_lists = [[2]*len(transfer_ops),[2]*len(transfer_ops)]
-
-        for t_op, t_type_fg, t_type_gf, tx_fg, tx_gf,k_fg,k_gf in zip(transfer_ops, transfer_type_lists[0],
-                                                                      transfer_type_lists[1],transfer_level_space_list_fg,
-                                                                      transfer_level_space_list_gf,k_lists[0],k_lists[1]):
-            fg_list.append(np.kron(t_op.transfer_between_levels(level_a, level_b, t_type_fg,k_fg), tx_fg))
-            gf_list.append(np.kron(t_op.transfer_between_levels(level_b, level_a, t_type_gf,k_gf), tx_gf))
-
-        self.T_fg = block_diag(*fg_list)
-        self.T_gf = block_diag(*gf_list)
-
-        #print "T_fg.shape :", self.T_fg.shape
-        #print "T_gf.shape :", self.T_gf.shape
-        #print "P_inv.shape :", CoarseSolver.P_inv.shape
-
-
-        self.P_c_inv = np.dot(self.T_gf,np.dot(CoarseSolver.P_inv,self.T_fg))
-        self.P_f_inv = FineSolver.P_inv
-        self.P_c = CoarseSolver.P
-        self.P_c_transfered = np.dot(self.T_gf,np.dot(self.P_c,self.T_fg))
-        self.P_f = FineSolver.P
-        self.M = FineSolver.M
-        self.c = FineSolver.c
-        # self.P = la.inv(self.P_inv)
-        self.U_half = np.zeros(self.P_f_inv.shape[0])
-
-        # Not really necessary, maybe later
-        # self.just_N = FineSolver.just_N
-        # self.P_inv = self.P_c_inv + self.P_f_inv + np.dot(np.dot(self.P_f_inv, self.M),self.P_c_inv)
-        # self.P = la.inv(self.P_inv)
-        self.T_complete = np.hstack(FineSolver.all_nodes)
-
-        if debug:
-            print("transfer_type_lists\n", transfer_type_lists)
-            print("interpolation_orders\n", k_lists)
-            print("Transfer spatial space")
-            matrix_plot(transfer_level_space_list_fg[0])
-            matrix_plot(transfer_level_space_list_gf[0])
-            print("Transfer time space")
-            matrix_plot((transfer_ops[0]).transfer_between_levels(level_a,level_b, transfer_type_lists[0][0],k_lists[0][0]))
-            matrix_plot((transfer_ops[0]).transfer_between_levels(level_b,level_a, transfer_type_lists[1][0],k_lists[1][0]))
-    def step(self,U_last):
-        self.U_half[:] = (U_last + np.dot(self.P_c_inv, self.c - np.dot(self.M,U_last)))[:]
-        return self.U_half + np.dot(self.P_f_inv,(self.c - np.dot(self.M,self.U_half)))
-
-    def sweep(self,U_0,k):
-        if k==0:
-            return U_0
-        U_last = np.copy(U_0)
-        for i in range(k):
-            U_last[:] = self.step(U_last)[:]
-        return U_last
-
-    def set_interpolation_type(self, interpolation_type_list):
-        self.intpl_type_list = interpolation_type_list
-
-    def it_matrix(self):
-        return np.dot(np.eye(self.M.shape[0])-np.dot(self.P_f_inv,self.M),
-                      np.eye(self.M.shape[0])-np.dot(self.P_c_inv,self.M))
-
-    def combine_two_P(self,P_1,P_2):
-        return P_1 + P_2 - np.dot(P_2,np.dot(self.M,P_1))
-
-    def it_matrix(self):
-        # see MultiSolverIterativeSolver
-        self.it_matr = np.eye(self.P_c_inv.shape[0]) - \
-            np.dot(self.P_c_inv + self.P_f_inv-np.dot(np.dot(self.P_f_inv, self.M),self.P_c_inv),self.M)
-        return self.it_matr
-
     def spectral_radius(self):
         return np.max(np.abs(np.linalg.eigvals(self.it_matrix())))
 
@@ -574,4 +508,57 @@ class LinearPfasst(IterativeSolver):
 
         print("C_p \t\t C_s \t\t lam_p \t\t lam_s \n",C_p," \t\t ",C_s," \t\t ", lambda_p, " \t\t ", lambda_s)
         print("Parallel efficieny:",  (C_s*np.log(lambda_p))/(C_p*np.log(lambda_s)))
-        return  (C_s*np.log(lambda_p))/(C_p*np.log(lambda_s))
+        return (C_s*np.log(lambda_p))/(C_p*np.log(lambda_s))
+
+
+def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
+    # generate IterativeBlockSolver
+    # putting the transfer_operators into a block_diagonal form
+    T_fg = sprs.block_diag(*map(lambda x: x.Rspace, transfer_list))
+    T_gf = sprs.block_diag(*map(lambda x: x.Pspace, transfer_list))
+    # generate MultiStepSolver
+    # put them together into LinearPFASST and return the object
+    # first we need the system matrix, e.g. Q kron A
+    fine_levels = map(lambda x: x.levels[0], step_list)
+    coarse_levels = map(lambda x: x.levels[-1], step_list)
+    problems = map(lambda x: x.prob, fine_levels)
+    dt_list = map(lambda x: x.dt, step_list)
+    M_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.Qmat, y.system_matrix),
+                 fine_levels, problems, dt_list)
+    P_f_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.delta_m, y.system_matrix),
+                 fine_levels, problems, dt_list)
+    c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
+    it_solver_list = [IterativeSolver(P_f_list[0], M_list[0], c_0)] \
+                     + map(lambda P,M,x: IterativeSolver(P, M, np.zeros(x.sweep.coll.num_nodes)),
+                           P_f_list[1:], M_list[1:], fine_levels[1:])
+
+    # construct the block solver
+    block_solver = BlockDiagonalIterativeSolver(it_solver_list)
+
+    # construct the multistep solver
+    # pre-conditioner for the coarse level
+    P_c_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.delta_m, y.system_matrix),
+                   coarse_levels, problems, dt_list)
+    # nodes on unit interval
+    nodes_on_unit = map(lambda x: x.sweep.coll.nodes, fine_levels)
+    N_x_list = map(lambda x: x.nvars, problems)
+    multi_step_solver = TransferredMultiStepIterativeSolver(it_solver_list, nodes_on_unit,
+                                                            transfer_list, P_c_list, N_x_list)
+
+    return LinearPFASST(multi_step_solver, block_solver, transfer_list)
+
+
+def generate_transfer_list(step_list, transfer_class, **kwargs):
+    """
+    This takes the generated step list and constructs a list
+    of Transfer-objects, for each subinterval. This is needed to
+    construct the LinearPFASST object.
+    :param step_list: List of steps
+    :param transfer_class: transferclass which is used for all steps
+    :return:
+    """
+    # FIXME:this is a dirty hack, which assumes that we use the mesh_to_mesh class
+    return map(lambda x, int_ord, restr_ord: transfer_class(x.levels[0], x.levels[-1],
+                                                            int_ord, restr_ord, kwargs['sparse_format']),
+               step_list, kwargs['interpolation_order'], kwargs['restriction_order'])
+
