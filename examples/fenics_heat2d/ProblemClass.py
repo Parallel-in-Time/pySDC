@@ -38,7 +38,7 @@ class fenics_heat2d(ptype):
         assert 't0' in cparams
         assert 'family' in cparams
         assert 'order' in cparams
-        # assert 'levelnumber' in cparams
+        assert 'refinements' in cparams
 
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -48,10 +48,13 @@ class fenics_heat2d(ptype):
 
         # mesh = df.UnitIntervalMesh(self.c_nvars[0])#,self.c_nvars[1])
         mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
-        for i in range(self.levelnumber):
+        for i in range(self.refinements):
             mesh = df.refine(mesh)
 
         self.V = df.FunctionSpace(mesh, self.family, self.order)
+
+        tmp = df.Function(self.V)
+        print('DoFs on this level:',len(tmp.vector().array()))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)
@@ -72,7 +75,6 @@ class fenics_heat2d(ptype):
         # self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
         self.u0 = df.Constant(0.0)
         self.bc = df.DirichletBC(self.V, self.u0, Boundary)
-
 
 
     def solve_system(self,rhs,factor,u0,t):

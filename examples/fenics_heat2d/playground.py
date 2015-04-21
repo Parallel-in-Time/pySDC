@@ -20,23 +20,23 @@ if __name__ == "__main__":
     # nvars = [[8,8],[16,16],[32,32],[64,64],[128,128],[256,256]]
     # dt = [0.125]
 
-    num_procs = 1
+    num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 8E-11
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [(64,64)]
+    pparams['c_nvars'] = [(32,32)]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
-    pparams['levelnumber'] = [2,1]
+    pparams['refinements'] = [1,0]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.5
-    Tend = 1*dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
