@@ -48,8 +48,8 @@ class fenics_heat2d(ptype):
 
         # mesh = df.UnitIntervalMesh(self.c_nvars[0])#,self.c_nvars[1])
         mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
-        # for i in range(self.levelnumber):
-        #     mesh = df.refine(mesh)
+        for i in range(self.levelnumber):
+            mesh = df.refine(mesh)
 
         self.V = df.FunctionSpace(mesh, self.family, self.order)
 

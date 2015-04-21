@@ -33,10 +33,10 @@ if __name__ == "__main__":
     pparams = {}
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [(128,128),(128,128)]
+    pparams['c_nvars'] = [(64,64)]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
-    # pparams['levelnumber'] = [2,1]
+    pparams['levelnumber'] = [2,1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -89,13 +89,15 @@ if __name__ == "__main__":
     # urest = fenics_mesh(uinit_g)
     # df.solve(A, urest.values.vector(), rhs)
 
-    # meshc = df.UnitSquareMesh(128,128)
-    # meshf = df.UnitSquareMesh(64,64)
+    # meshc = df.UnitSquareMesh(64,64)
+    # meshf = df.refine(meshc)
     # Vc = df.FunctionSpace(meshc,'CG',1)
     # Vf = df.FunctionSpace(meshf,'CG',1)
     # f = df.Expression("sin(2*pi*x[0])*sin(2*pi*x[1])")
     # f_fine = df.project(f, Vf)
     # f_coarse = df.project(f, Vc)
+
+
     #
     # # Approach #1 you suggested
     # u = df.TrialFunction(Vc)
@@ -109,7 +111,7 @@ if __name__ == "__main__":
     # print(len(f_l2.vector().array()),len(f_coarse.vector().array()))
     # print(df.norm(f_l2.vector()-f_coarse.vector(),'linf'))
     #
-    # frest = df.interpolate(f_fine,Vc)
+    # frest = df.project(f_fine,Vc)
     # print(len(frest.vector().array()),len(f_coarse.vector().array()))
     # print(df.norm(frest.vector()-f_coarse.vector(),'linf'))
     #
@@ -126,7 +128,7 @@ if __name__ == "__main__":
     # print(len(f_l2.vector().array()),len(f_fine.vector().array()))
     # print(df.norm(f_l2.vector()-f_fine.vector(),'linf'))
     #
-    # finter = df.interpolate(f_coarse,Vf)
+    # finter = df.project(f_coarse,Vf)
     # print(len(finter.vector().array()),len(f_fine.vector().array()))
     # print(df.norm(finter.vector()-f_fine.vector(),'linf'))
     #

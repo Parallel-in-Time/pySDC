@@ -143,6 +143,7 @@ class transfer(with_metaclass(abc.ABCMeta)):
         G = self.coarse
 
         PF = F.prob
+        PG = G.prob
 
         SF = F.sweep
         SG = G.sweep
@@ -159,7 +160,8 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
-            F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
+            F.f[m].impl += PF.apply_mass_matrix(self.prolong_space(PG.invert_mass_matrix(G.f[m].impl - G.fold[m].impl)))
+            F.f[m].expl += PF.apply_mass_matrix(self.prolong_space(PG.invert_mass_matrix(G.f[m].expl - G.fold[m].expl)))
 
         return None
 
