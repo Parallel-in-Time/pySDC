@@ -5,6 +5,7 @@ import numpy as np
 from pySDC.Stats import stats
 
 from pySDC.PFASST_helper import *
+from pySDC.Plugins.fault_tolerance import hard_fault_injection
 
 
 def run_pfasst(MS,u0,t0,dt,Tend):
@@ -115,13 +116,20 @@ def restart_block(MS,active_slots,u0):
 
             # store current slot number for diagnostics
             MS[p].status.slot = p
-            # store link to previous step
-            MS[p].prev = MS[active_slots[j-1]]
             # resets step
             MS[p].reset_step()
             # determine whether I am the first and/or last in line
             MS[p].status.first = active_slots.index(p) == 0
             MS[p].status.last = active_slots.index(p) == len(active_slots)-1
+            # store link to previous and next step
+            if not MS[p].status.first:
+                MS[p].prev = MS[active_slots[j-1]]
+            else:
+                MS[p].prev = None
+            if not MS[p].status.last:
+                MS[p].next = MS[active_slots[j+1]]
+            else:
+                MS[p].next = None
             # intialize step with u0
             MS[p].init_step(u0)
             # reset some values
@@ -263,6 +271,8 @@ def pfasst(S):
 
             # increment iteration count here (and only here)
             S.status.iter += 1
+
+            S = hard_fault_injection(S)
 
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()

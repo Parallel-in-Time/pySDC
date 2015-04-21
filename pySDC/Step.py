@@ -22,7 +22,7 @@ class step():
         __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','levels','__transfer_dict','status','__prev')
+    __slots__ = ('params','levels','__transfer_dict','status','__prev','__next')
 
     def __init__(self, params):
         """
@@ -62,6 +62,7 @@ class step():
         self.__transfer_dict = {}
         self.levels = []
         self.__prev = None
+        self.__next = None
 
     def generate_hierarchy(self,descr):
         """
@@ -264,5 +265,25 @@ class step():
         Args:
             p: new previous step
         """
-        assert type(p) is type(self)
+        # assert type(p) is type(self)
         self.__prev = p
+
+    @property
+    def next(self):
+        """
+        Getter for next step
+        Returns:
+            prev
+        """
+        return self.__next
+
+
+    @next.setter
+    def next(self,p):
+        """
+        Setter for previous step
+        Args:
+            p: new previous step
+        """
+        # assert type(p) is type(self)
+        self.__next = p
