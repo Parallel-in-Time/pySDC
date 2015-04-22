@@ -32,42 +32,10 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    # # This comes as read-in for the problem class
-    # pparams = {}
-    # pparams['nu'] = 0.5
-    # pparams['nvars'] = [255,127]
-    #
-    # # This comes as read-in for the transfer operations
-    # tparams = {}
-    # tparams['finter'] = True
-    #
-    # # Fill description dictionary for easy hierarchy creation
-    # description = {}
-    # description['problem_class'] = heat1d
-    # description['problem_params'] = pparams
-    # description['dtype_u'] = mesh
-    # description['dtype_f'] = rhs_imex_mesh
-    # description['collocation_class'] = collclass.CollGaussLobatto
-    # description['num_nodes'] = 5
-    # description['sweeper_class'] = imex_1st_order
-    # description['level_params'] = lparams
-    # description['transfer_class'] = mesh_to_mesh_1d
-    # description['transfer_params'] = tparams
-    #
-    # # quickly generate block of steps
-    # MS = mp.generate_steps(num_procs,sparams,description)
-    #
-    # # setup parameters "in time"
-    # t0 = 0
-    # dt = 0.5
-    # Tend = 16*dt
-
-
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['c'] = 1.0
-    pparams['nvars'] = [256,128]
-    pparams['order'] = [2,2]
+    pparams['nu'] = 0.5
+    pparams['nvars'] = [255,127]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -75,7 +43,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = advection
+    description['problem_class'] = heat1d
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
@@ -83,17 +51,49 @@ if __name__ == "__main__":
     description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d_periodic
+    description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
 
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
+
     # setup parameters "in time"
-    t0 = 0.0
-    dt = 0.125
+    t0 = 0
+    dt = 0.5
     Tend = 16*dt
 
-    ft_iter = range(1,12)
+
+    # # This comes as read-in for the problem class
+    # pparams = {}
+    # pparams['c'] = 1.0
+    # pparams['nvars'] = [256,128]
+    # pparams['order'] = [2,2]
+    #
+    # # This comes as read-in for the transfer operations
+    # tparams = {}
+    # tparams['finter'] = True
+    #
+    # # Fill description dictionary for easy hierarchy creation
+    # description = {}
+    # description['problem_class'] = advection
+    # description['problem_params'] = pparams
+    # description['dtype_u'] = mesh
+    # description['dtype_f'] = rhs_imex_mesh
+    # description['collocation_class'] = collclass.CollGaussLobatto
+    # description['num_nodes'] = 5
+    # description['sweeper_class'] = imex_1st_order
+    # description['level_params'] = lparams
+    # description['transfer_class'] = mesh_to_mesh_1d_periodic
+    # description['transfer_params'] = tparams
+    #
+    # # setup parameters "in time"
+    # t0 = 0.0
+    # dt = 0.125
+    # Tend = 16*dt
+
+    ft_iter = range(1,10)
     ft_step = range(0,16)
-    ft_strategy = ['SPREAD']
+    ft_strategy = ['SPREAD','INTERP','PREDICT']
 
     for strategy in ft_strategy:
 
@@ -139,5 +139,5 @@ if __name__ == "__main__":
 
         print(iter_count)
 
-        np.savez('advection_results_hf_'+strategy,iter_count=iter_count,description=description,ft_step=ft_step,
+        np.savez('heat_results_hf_'+strategy,iter_count=iter_count,description=description,ft_step=ft_step,
                  ft_iter=ft_iter)
