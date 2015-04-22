@@ -44,7 +44,7 @@ class advection(ptype):
         # compute dx and get discretization matrix A
         self.mesh = np.linspace(0, 1, num=self.nvars, endpoint=False)
         self.dx   = self.mesh[1] - self.mesh[0]
-        self.A    = getFDMatrix(self.nvars, self.order, self.dx)
+        self.A    = -getFDMatrix(self.nvars, self.order, self.dx)
     
     def solve_system(self,rhs,factor,u0):
         """
