@@ -32,68 +32,103 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    # This comes as read-in for the problem class
-    pparams = {}
-    pparams['nu'] = 0.5
-    pparams['nvars'] = [255,127]
+    ft_strategy = ['SPREAD_PREDICT']#['SPREAD','INTERP','PREDICT','SPREAD_PREDICT']
+    ft_setup = 'HEAT'
 
-    # This comes as read-in for the transfer operations
-    tparams = {}
-    tparams['finter'] = True
+    if ft_setup is 'HEAT':
 
-    # Fill description dictionary for easy hierarchy creation
-    description = {}
-    description['problem_class'] = heat1d
-    description['problem_params'] = pparams
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = 5
-    description['sweeper_class'] = imex_1st_order
-    description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d
-    description['transfer_params'] = tparams
+        # This comes as read-in for the problem class
+        pparams = {}
+        pparams['nu'] = 0.5
+        pparams['nvars'] = [255,127]
+
+        # This comes as read-in for the transfer operations
+        tparams = {}
+        tparams['finter'] = True
+
+        # Fill description dictionary for easy hierarchy creation
+        description = {}
+        description['problem_class'] = heat1d
+        description['problem_params'] = pparams
+        description['dtype_u'] = mesh
+        description['dtype_f'] = rhs_imex_mesh
+        description['collocation_class'] = collclass.CollGaussLobatto
+        description['num_nodes'] = 5
+        description['sweeper_class'] = imex_1st_order
+        description['level_params'] = lparams
+        description['transfer_class'] = mesh_to_mesh_1d
+        description['transfer_params'] = tparams
+
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs,sparams,description)
+
+        # setup parameters "in time"
+        t0 = 0
+        dt = 0.5
+        Tend = 16*dt
+
+    elif ft_setup is 'ADVECTION':
+
+        # This comes as read-in for the problem class
+        pparams = {}
+        pparams['c'] = 1.0
+        pparams['nvars'] = [256,128]
+        pparams['order'] = [2,2]
+
+        # This comes as read-in for the transfer operations
+        tparams = {}
+        tparams['finter'] = True
+
+        # Fill description dictionary for easy hierarchy creation
+        description = {}
+        description['problem_class'] = advection
+        description['problem_params'] = pparams
+        description['dtype_u'] = mesh
+        description['dtype_f'] = rhs_imex_mesh
+        description['collocation_class'] = collclass.CollGaussLobatto
+        description['num_nodes'] = 5
+        description['sweeper_class'] = imex_1st_order
+        description['level_params'] = lparams
+        description['transfer_class'] = mesh_to_mesh_1d_periodic
+        description['transfer_params'] = tparams
+
+        # setup parameters "in time"
+        t0 = 0.0
+        dt = 0.125
+        Tend = 16*dt
+
+    else:
+
+        print('setup not implemented, aborting...',setup)
+        exit()
+
+    ft.step = 99
+    ft.iter = 99
+    ft.strategy = 'SPREAD'
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
+    # get initial values on finest level
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    # setup parameters "in time"
-    t0 = 0
-    dt = 0.5
-    Tend = 16*dt
+    # call main function to get things done...
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
+    # compute exact solution and compare
+    uex = P.u_exact(Tend)
 
-    # # This comes as read-in for the problem class
-    # pparams = {}
-    # pparams['c'] = 1.0
-    # pparams['nvars'] = [256,128]
-    # pparams['order'] = [2,2]
-    #
-    # # This comes as read-in for the transfer operations
-    # tparams = {}
-    # tparams['finter'] = True
-    #
-    # # Fill description dictionary for easy hierarchy creation
-    # description = {}
-    # description['problem_class'] = advection
-    # description['problem_params'] = pparams
-    # description['dtype_u'] = mesh
-    # description['dtype_f'] = rhs_imex_mesh
-    # description['collocation_class'] = collclass.CollGaussLobatto
-    # description['num_nodes'] = 5
-    # description['sweeper_class'] = imex_1st_order
-    # description['level_params'] = lparams
-    # description['transfer_class'] = mesh_to_mesh_1d_periodic
-    # description['transfer_params'] = tparams
-    #
-    # # setup parameters "in time"
-    # t0 = 0.0
-    # dt = 0.125
-    # Tend = 16*dt
+    ref_err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
+    print('reference error at time %s: %s' %(Tend,ref_err))
 
-    ft_iter = range(1,10)
-    ft_step = range(0,16)
-    ft_strategy = ['SPREAD','INTERP','PREDICT']
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    ref_niter = sortedlist_stats[-1][1]
+
+    print('Will sweep over %i steps and %i iterations now...' %(num_procs,ref_niter))
+
+    ft_iter = range(1,ref_niter+1)
+    ft_step = range(0,num_procs)
 
     for strategy in ft_strategy:
 
@@ -125,9 +160,10 @@ if __name__ == "__main__":
 
                 # compute exact solution and compare
                 uex = P.u_exact(Tend)
-
-                print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-                    uex.values,np.inf)))
+                err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
+                print('error at time %s: %s' %(Tend,err))
+                if abs(err-ref_err) > 1E-12:
+                    print('WARNING: this run returned a high error!',err,ref_err)
 
                 extract_stats = grep_stats(stats,iter=-1,type='niter')
                 sortedlist_stats = sort_stats(extract_stats,sortby='step')
