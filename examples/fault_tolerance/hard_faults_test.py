@@ -32,8 +32,8 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    ft_strategy = ['SPREAD_PREDICT']#['SPREAD','INTERP','PREDICT','SPREAD_PREDICT']
-    ft_setup = 'HEAT'
+    ft_strategy = ['INTERP_PREDICT']#['SPREAD_PREDICT','SPREAD','INTERP','INTERP_PREDICT']
+    ft_setup = 'ADVECTION'
 
     if ft_setup is 'HEAT':
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
                 uex = P.u_exact(Tend)
                 err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
                 print('error at time %s: %s' %(Tend,err))
-                if abs(err-ref_err) > 1E-12:
+                if abs(err-ref_err) > 1E-10:
                     print('WARNING: this run returned a high error!',err,ref_err)
 
                 extract_stats = grep_stats(stats,iter=-1,type='niter')
@@ -175,5 +175,5 @@ if __name__ == "__main__":
 
         print(iter_count)
 
-        np.savez('heat_results_hf_'+strategy,iter_count=iter_count,description=description,ft_step=ft_step,
+        np.savez(ft_setup+'_results_hf_'+strategy,iter_count=iter_count,description=description,ft_step=ft_step,
                  ft_iter=ft_iter)

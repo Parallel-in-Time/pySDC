@@ -10,12 +10,17 @@ rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
-fields = [('heat_results_hf_SPREAD.npz','hard restart'),('heat_results_hf_INTERP.npz','interpolation'),
-          ('heat_results_hf_PREDICT.npz','predict')]
-# fields = [('advection_results_hf_SPREAD.npz','hard restart'),('advection_results_hf_INTERP.npz','interpolation'),('advection_results_hf_PREDICT.npz','predict')]
+fields = [('HEAT_results_hf_SPREAD.npz','hard restart'),
+          ('HEAT_results_hf_INTERP.npz','interpolation'),
+          ('HEAT_results_hf_INTERP_PREDICT.npz','interpolate predict'),
+          ('HEAT_results_hf_SPREAD_PREDICT.npz','spread predict')]
+# fields = [('ADVECTION_results_hf_SPREAD.npz','hard restart'),
+#           ('ADVECTION_results_hf_INTERP.npz','interpolation'),
+#           ('ADVECTION_results_hf_INTERP_PREDICT.npz','interpolate predict'),
+#           ('ADVECTION_results_hf_SPREAD_PREDICT.npz','spread predict')]
 
 
-vmin = 0
+vmin = 99
 vmax = 0
 for file,title in fields:
 
@@ -23,12 +28,12 @@ for file,title in fields:
 
     data = infile['iter_count'].T
 
-    data = data-data[0,0]
+    # data = data-data[0,0]
 
     ft_iter = infile['ft_iter']
     ft_step = infile['ft_step']
 
-    vmin = min(vmin,max(data.min(),0.0))
+    vmin = min(vmin,data.min())
     vmax = max(vmax,data.max())
 
 print(vmin,vmax)
@@ -39,7 +44,7 @@ for file,title in fields:
 
     data = infile['iter_count'].T
 
-    data = data-data[0,0]
+    # data = data-data[0,0]
 
     ft_iter = infile['ft_iter']
     ft_step = infile['ft_step']
@@ -51,11 +56,11 @@ for file,title in fields:
 
     plt.axis([ft_step[0],ft_step[-1]+1,ft_iter[0]-1,ft_iter[-1]])
 
-    ticks = np.arange(vmin,vmax+1)
+    ticks = np.arange(vmin,vmax+1,2)
     tickpos = np.linspace(ticks[0]+0.5, ticks[-1]-0.5, len(ticks))
     cax = plt.colorbar(ticks=tickpos)
     cax.set_ticklabels(ticks)
-    cax.set_label('additional iterations')
+    cax.set_label('number of iterations')
 
     plt.title(title)
 
@@ -69,7 +74,7 @@ for file,title in fields:
 
     plt.tight_layout()
 
-    fname = 'add_'+os.path.splitext(file)[0]+'.png'
+    fname = 'abs_'+os.path.splitext(file)[0]+'.png'
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
     # plt.show()

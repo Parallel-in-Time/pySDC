@@ -19,7 +19,7 @@ def hard_fault_injection(S):
             S = hard_fault_correction_spread(S)
         elif strategy is 'INTERP':
             S = hard_fault_correction_interp_all(S)
-        elif strategy is 'PREDICT':
+        elif strategy is 'INTERP_PREDICT':
             S = hard_fault_correction_predict(S,res,niter)
         elif strategy is 'SPREAD_PREDICT':
             S = hard_fault_correction_spread_predict(S,res,niter)
