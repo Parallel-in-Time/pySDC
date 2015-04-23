@@ -266,3 +266,7 @@ class step():
         """
         assert type(p) is type(self)
         self.__prev = p
+
+    @property
+    def dt(self):
+        return self.__dt

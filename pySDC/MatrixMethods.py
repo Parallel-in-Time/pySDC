@@ -7,14 +7,15 @@ import scipy.linalg as la
 import scipy.interpolate as intpl
 from scipy.integrate import quad
 from scipy.linalg import block_diag
-import matplotlib.pyplot as plt
-import matplotlib as mplt
-import pylab
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
+# import matplotlib.pyplot as plt
+# import matplotlib as mplt
+# import pylab
+# from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib import cm
+# from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from pySDC.tools.transfer_tools import to_sparse, to_dense
 from pySDC.tools.plot_tools import matrix_plot
+from pySDC.transfer_classes.transfer_between_meshes import time_mesh_to_time_mesh,composed_mesh_to_composed_mesh
 import functools as ft
 # Own collection of tools, require the imports from above. But first we will try to
 # to use and enhance the tools given by pySDC
@@ -104,16 +105,13 @@ class IterativeSolver(object):
     """ The basic Iterative Solver class,
         several steps of the iterative solver are called sweeps"""
     def __init__(self, P, M, c, sparse_format="dense"):
-        assert P.shape == M.shape and c.shape[0] == M.shape[0], "Matrix P and matrix M don't fit"
+        assert P.shape == M.shape and c.shape[0] == M.shape[0], \
+            "Matrix P and matrix M don't fit.\n \tM_shape:" + str(M.shape) + "P_shape:" \
+            + str(P.shape) + " c_shape:" + str(c.shape)
         self.format = sparse_format
         self.P = to_sparse(P, sparse_format)
         self.M = to_sparse(M, sparse_format)
         self.c = to_sparse(c, sparse_format)
-        if sparse_format is "dense":
-            self.P_inv = self.invert_P()
-        else:
-            # define a function to compute P_inv.dot()
-            self.P_inv = Bunch(dot=self.lin_solve)
 
     def invert_P(self):
         return la.inv(self.P)
@@ -121,6 +119,9 @@ class IterativeSolver(object):
     @property
     def P_inv(self):
         if self.format is "dense":
+            return self.invert_P()
+        else:
+            # define a function to compute P_inv.dot()
             return Bunch(dot=self.lin_solve)
 
     def step(self, U_last):
@@ -155,6 +156,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
 
     def __init__(self, IterativeSolverList, connect_function=None, sparse_format="dense"):
         self.it_solv_list = IterativeSolverList
+        self.sparse_format = sparse_format
 
         P_list = []
         M_list = []
@@ -168,10 +170,10 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
             shape_list.append(it_solv.P.shape[0])
 
         self.__split_points = np.cumsum(shape_list)[:-1]
-        self.P = sprs.block_diag(*P_list)
+        self.P = sprs.block_diag(P_list, format=self.sparse_format)
         if connect_function is None:
             def connect_function(M_list, c_list, sparse_format):
-                return sprs.block_diag(*M_list), np.concatenate(c_list)
+                return sprs.block_diag(M_list, format=self.sparse_format), np.concatenate(c_list)
 
         self.M, self.c = connect_function(M_list, c_list, sparse_format)
         # self.P_inv = sprs.block_diag(*P_inv_list)
@@ -254,11 +256,13 @@ class MultiStepIterativeSolver(IterativeSolver):
         self.sparse_format = sparse_format
         self.it_list = iterative_solver_list
 
-        self.M = self.distributeOperatorsToFullInterval(map(lambda x: x.M, iterative_solver_list),
+        self.M = self.distributeOperatorsToFullInterval(map(lambda x: to_sparse(x.M, sparse_format),
+                                                            iterative_solver_list),
                                                         nodes_on_unit_list, N_x_list)
-        self.P = self.distributeOperatorsToFullInterval(map(lambda x: x.P, iterative_solver_list),
+        self.P = self.distributeOperatorsToFullInterval(map(lambda x: to_sparse(x.P, sparse_format),
+                                                            iterative_solver_list),
                                                         nodes_on_unit_list, N_x_list)
-        self.c = np.concatenate(map(lambda x: x.c, iterative_solver_list))
+        self.c = np.concatenate(map(lambda x: to_sparse(x.c, sparse_format), iterative_solver_list))
 
         self.N_list = self.get_matrixN_list(map(lambda x: x.M, iterative_solver_list),
                                             nodes_on_unit_list, N_x_list)
@@ -288,13 +292,14 @@ class MultiStepIterativeSolver(IterativeSolver):
         else:
             N_x = N_x_list
         # n = sum(map(lambda x: x.shape[0], operator_list))
-        M = sprs.block_diag(*operator_list)
+        M = sprs.block_diag(operator_list, format=self.sparse_format)
         n_x = 0
         n_y = operator_list[0].shape[1]
         for i in range(len(operator_list)-1):
             x_plus = operator_list[i].shape[0]
             y_plus = operator_list[i+1].shape[1]
-            M[n_y:n_y+y_plus, n_x:n_x + x_plus] = np.kron(self.matrixN(tau_list[i], y_plus/N_x[i+1]), np.eye(N_x[i]))
+            M[n_y:n_y+y_plus, n_x:n_x + x_plus] = sprs.kron(self.matrixN(tau_list[i], y_plus/N_x[i+1]), np.eye(N_x[i])
+                                                            , format=self.sparse_format)
             n_x = n_x + x_plus
             n_y = n_y + y_plus
         return M
@@ -347,9 +352,10 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
         super(TransferredMultiStepIterativeSolver, self).__init__(iterative_solver_list, nodes_on_unit_list,
                                                                   N_x_list, sparse_format)
         self.transfer_list = transfer_list
-        self.P_c_list = P_c_list
+        self.P_c_list = map(lambda x: to_sparse(x, sparse_format), P_c_list)
         self.P_c_inv_list = map(lambda x: la.inv(x), self.P_c_list)
         # N_x_list
+
         self.P = self.distributeOperatorsToFullInterval(map(lambda x, y: y.Pspace.dot(x.dot(y.Rspace)),
                                                             P_c_list, transfer_list),
                                                         nodes_on_unit_list, N_x_list)
@@ -512,32 +518,39 @@ class LinearPFASST(IterativeSolver):
 
 
 def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
+
+    # depending on the kind of nodes used, we have to change minor details
+    # , hence we define a special offset
+    # offset_list_coarse =
+
     # generate IterativeBlockSolver
     # putting the transfer_operators into a block_diagonal form
-    T_fg = sprs.block_diag(*map(lambda x: x.Rspace, transfer_list))
-    T_gf = sprs.block_diag(*map(lambda x: x.Pspace, transfer_list))
+    T_fg = sprs.block_diag(map(lambda x: x.Rspace, transfer_list), format=kwargs['sparse_format'])
+    T_gf = sprs.block_diag(map(lambda x: x.Pspace, transfer_list), format=kwargs['sparse_format'])
     # generate MultiStepSolver
     # put them together into LinearPFASST and return the object
     # first we need the system matrix, e.g. Q kron A
     fine_levels = map(lambda x: x.levels[0], step_list)
     coarse_levels = map(lambda x: x.levels[-1], step_list)
     problems = map(lambda x: x.prob, fine_levels)
-    dt_list = map(lambda x: x.dt, step_list)
-    M_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.Qmat, y.system_matrix),
+    dt_list = map(lambda x: x.status.dt, step_list)
+    M_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.Qmat[1:,1:], y.system_matrix),
                  fine_levels, problems, dt_list)
-    P_f_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.delta_m, y.system_matrix),
+    P_f_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:,1:], y.system_matrix),
                  fine_levels, problems, dt_list)
-    c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
-    it_solver_list = [IterativeSolver(P_f_list[0], M_list[0], c_0)] \
-                     + map(lambda P,M,x: IterativeSolver(P, M, np.zeros(x.sweep.coll.num_nodes)),
-                           P_f_list[1:], M_list[1:], fine_levels[1:])
 
+    # offset = int(not fine_levels[0].sweep.coll.left_is_node)
+    c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
+
+    it_solver_list = [IterativeSolver(P_f_list[0], M_list[0], c_0)] \
+                     + map(lambda P, M, x: IterativeSolver(P, M, np.zeros(P.shape[0])),
+                           P_f_list[1:], M_list[1:], fine_levels[1:])
     # construct the block solver
     block_solver = BlockDiagonalIterativeSolver(it_solver_list)
 
     # construct the multistep solver
     # pre-conditioner for the coarse level
-    P_c_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.delta_m, y.system_matrix),
+    P_c_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:, 1:], y.system_matrix),
                    coarse_levels, problems, dt_list)
     # nodes on unit interval
     nodes_on_unit = map(lambda x: x.sweep.coll.nodes, fine_levels)
@@ -557,8 +570,22 @@ def generate_transfer_list(step_list, transfer_class, **kwargs):
     :param transfer_class: transferclass which is used for all steps
     :return:
     """
-    # FIXME:this is a dirty hack, which assumes that we use the mesh_to_mesh class
-    return map(lambda x, int_ord, restr_ord: transfer_class(x.levels[0], x.levels[-1],
-                                                            int_ord, restr_ord, kwargs['sparse_format']),
-               step_list, kwargs['interpolation_order'], kwargs['restriction_order'])
+    # Das Problem is das in PySDC die Transfer nur in Raumrichtung stattfinden, was aber nötig ist
+    # für eine allgemeinere darstellung ist der nutzen von ZeitRaum, die frage ist wo ich es reinpacke
+    # am besten hierhin weil es eh nicht fertig ist.
 
+    # the transfer object list just for space
+    space_transfer_list = map(lambda x, int_ord, restr_ord: transfer_class(x.levels[0], x.levels[-1],
+                                                                           int_ord, restr_ord, kwargs['sparse_format']),
+                              step_list, kwargs['interpolation_order'], kwargs['restriction_order'])
+
+    # the transfer list for the time component are extracted not from the level but more from the sweeper which is used
+    # time_transfer_list = map(lambda )
+    time_transfer_list = map(lambda x, int_ord, restr_ord: time_mesh_to_time_mesh(x.levels[0], x.levels[-1],
+                                                                           int_ord, restr_ord, kwargs['sparse_format']),
+                              step_list, kwargs['t_interpolation_order'], kwargs['t_restriction_order'])
+
+    # return the composition of the two transfer classes, very hacky
+    return map(lambda x, s_trans, t_trans: composed_mesh_to_composed_mesh(x.levels[0], x.levels[-1],
+                                                                          [t_trans, s_trans], kwargs['sparse_format']),
+               step_list, space_transfer_list, time_transfer_list)

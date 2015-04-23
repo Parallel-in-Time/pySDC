@@ -18,6 +18,7 @@ class CollGaussLegendre(CollBase):
         self.weights = self._getWeights(tleft,tright)
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
+        self.QDmat = self._gen_QDmatrix
         self.delta_m = self._gen_deltas
         self.left_is_node = False
         self.right_is_node = False
@@ -79,6 +80,7 @@ class CollGaussLobatto(CollBase):
         self.weights = self._getWeights(tleft,tright)
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
+        self.QDmat = self._gen_QDmatrix
         self.delta_m = self._gen_deltas
         self.left_is_node = True
         self.right_is_node = True

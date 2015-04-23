@@ -31,6 +31,7 @@ class CollBase(object):
         self.Qmat = None
         self.Smat = None
         self.delta_m = None
+        self.Qdmat = None
 
     @staticmethod
     def _GaussLegendre(M, a, b):
@@ -231,3 +232,33 @@ class CollBase(object):
             delta[m] = self.nodes[m] - self.nodes[m-1]
 
         return delta
+
+    @property
+    def _gen_QDmatrix(self):
+        """
+        Depending on how the nodes are distributed we construct the associated deltas and  from there
+        the resulting Q_delta matrix which is needed in the matrix formulation of LinearPFASST
+        :return: Q_delta matrix
+        """
+
+        def q_delta(tau):
+            n = tau.shape[0]
+            Q_delta = np.zeros((n, n))
+            i = 0
+            for t in tau:
+                Q_delta[i:, i] = np.ones(n-i)*t
+                i += 1
+            return Q_delta
+
+        if self.tleft == self.nodes[0] and self.tright == self.nodes[-1]:
+            tau = np.concatenate([np.zeros(1), self.nodes[1:]-self.nodes[:-1]])
+        elif self.tleft != self.nodes[0] and self.tright != self.nodes[-1]:
+            tau = np.hstack([np.asarray([0.0, self.nodes[0]-self.tleft]), self.nodes[1:]-self.nodes[:-1]])
+        elif self.tleft == self.nodes[0] and self.tright != self.nodes[-1]:
+            pass
+        else:
+            pass
+
+        return q_delta(tau)
+
+

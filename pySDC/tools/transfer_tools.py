@@ -33,15 +33,14 @@ def to_sparse(D, format="csc"):
     elif format == "lil":
         return sprs.lil_matrix(D)
     else:
-        return D
+        return to_dense(D)
 
 
 def to_dense(D):
-    if isinstance(D, np.ndarray):
+    if sprs.issparse(D):
+        return D.toarray()
+    elif isinstance(D, np.ndarray):
         return D
-    elif sprs.issparse(D):
-        return D.toarry()
-
 
 def next_neighbors(p, ps, k):
     """
