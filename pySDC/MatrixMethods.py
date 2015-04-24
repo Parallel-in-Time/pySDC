@@ -104,7 +104,7 @@ def sparse_inv(P,v):
 class IterativeSolver(object):
     """ The basic Iterative Solver class,
         several steps of the iterative solver are called sweeps"""
-    def __init__(self, P, M, c, sparse_format="dense"):
+    def __init__(self, P, M, c, sparse_format="array"):
         assert P.shape == M.shape and c.shape[0] == M.shape[0], \
             "Matrix P and matrix M don't fit.\n \tM_shape:" + str(M.shape) + "P_shape:" \
             + str(P.shape) + " c_shape:" + str(c.shape)
@@ -118,7 +118,7 @@ class IterativeSolver(object):
 
     @property
     def P_inv(self):
-        if self.format is "dense":
+        if self.format is "array":
             return self.invert_P()
         else:
             # define a function to compute P_inv.dot()
@@ -138,7 +138,7 @@ class IterativeSolver(object):
 
     @property
     def it_matrix(self):
-        if self.format is "dense":
+        if self.format is "array":
             return np.eye(self.P.shape[0])-np.dot(self.P_inv, self.M)
         else:
             func = lambda v: v - self.P_inv.dot(self.M.dot(v))
@@ -155,7 +155,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
     describe how the different problems are connected.
     """
 
-    def __init__(self, IterativeSolverList, connect_function=None, sparse_format="dense"):
+    def __init__(self, IterativeSolverList, connect_function=None, sparse_format="array"):
         self.it_solv_list = IterativeSolverList
         self.sparse_format = sparse_format
 
@@ -187,7 +187,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
         Solver list.
         :return: object with the attribute dot, which
         """
-        if self.sparse_format is "dense":
+        if self.sparse_format is "array":
             return sprs.block_diag(map(lambda x: to_dense(x.P_inv), self.it_solv_list), "array")
         else:
             def func(v):
@@ -247,7 +247,7 @@ class MultiStepIterativeSolver(IterativeSolver):
         Using
 
     """
-    def __init__(self, iterative_solver_list, nodes_on_unit_list, N_x_list=0, sparse_format="dense"):
+    def __init__(self, iterative_solver_list, nodes_on_unit_list, N_x_list=0, sparse_format="array"):
         """
         Construct the matrices which are needed for the IterativeSolver class
 
@@ -339,7 +339,7 @@ class MultiStepIterativeSolver(IterativeSolver):
                     v_transfer = self.N_list[i].dot(v_solution[-1])
             return np.concatenate(v_solution)
 
-        if self.sparse_format is "dense":
+        if self.sparse_format is "array":
             return la.inv(self.P)
         else:
             return Bunch(dot=solver)
@@ -352,7 +352,7 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
     this class is needed for the LinearPFASST.
     """
     def __init__(self, iterative_solver_list, nodes_on_unit_list, transfer_list,
-                 P_c_list, N_x_list_fine=0, N_x_list_coarse=0, sparse_format="dense"):
+                 P_c_list, N_x_list_fine=0, N_x_list_coarse=0, sparse_format="array"):
 
         super(TransferredMultiStepIterativeSolver, self).__init__(iterative_solver_list, nodes_on_unit_list,
                                                                   N_x_list_fine, sparse_format)
@@ -371,7 +371,7 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
     @property
     def P_inv(self):
 
-        if self.sparse_format is "dense":
+        if self.sparse_format is "array":
             P_c_inv = map(lambda x, y: x.Pspace.dot(y.dot(x.Rspace)), self.__transfer_list, self.P_c_inv_list)
             return self.distributeOperatorsToFullInterval(P_c_inv, self.__nodes_on_unit, self.__N_x_list_fine)
         else:
@@ -402,7 +402,7 @@ class LinearPFASST(IterativeSolver):
         Note that the coarseSolver is not really used but that a new solver is reconstructed
         implicitly through the transferoperators.
     """
-    def __init__(self, multistep_iterative_solver, block_iterative_solver, transfer_list, sparse_format="dense"):
+    def __init__(self, multistep_iterative_solver, block_iterative_solver, transfer_list, sparse_format="array"):
         # gather some important values from step_list
         self.__ms_its = multistep_iterative_solver
         self.__bl_its = block_iterative_solver
@@ -434,7 +434,7 @@ class LinearPFASST(IterativeSolver):
         communication between subintervals
         :return:
         """
-        if self.sparse_format is "dense":
+        if self.sparse_format is "array":
             return self.combine_two_P(self.P_c_inv, self.P_f_inv)
         else:
             def solver(v):
@@ -449,7 +449,10 @@ class LinearPFASST(IterativeSolver):
         return c_1 + np.dot(np.dot(la.inv(P),P_2),c_2-c_1)
 
     def step(self, U_last):
-        self.U_half[:] = U_last + self.P_c_inv.dot(self.c - self.M.dot(U_last))
+        # print(self.M.dot(U_last).T.shape, self.c.shape, self.P_c_inv.shape,
+        #       self.P_c_inv.dot((self.c.reshape(1,-1) - self.M.dot(U_last).reshape(1,-1))).shape,
+        #       U_last.shape)
+        self.U_half[:] = U_last + self.P_c_inv.dot((self.c - self.M.dot(U_last).T)).T
         return self.U_half + self.P_f_inv.dot(self.c - self.M.dot(self.U_half))
 
     def sweep(self,U_0,k):

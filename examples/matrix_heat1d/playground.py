@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [127,63]
+    pparams['nvars'] = [31,15]
 
     # This comes as read-in for the all kind of generating options for the matrix classes
     mparams = {}
@@ -80,7 +80,15 @@ if __name__ == "__main__":
     transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
     lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
     # what to do with lin pfasst
-    print("Spektral radius of PFASST:", lin_pfasst.spectral_radius())
+    # one could compute the spectral radius
+    # print("Spektral radius of PFASST:", lin_pfasst.spectral_radius())
+    # Or one could compute some steps and see how the error converges
+    # first we need an initial value
+    u_0 = lin_pfasst.c
+    u = [u_0]
+    numb_sweeps = 5
+    for i in range(numb_sweeps):
+        u.append(lin_pfasst.step(u[-1]))
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
