@@ -2,7 +2,7 @@ import itertools
 import copy as cp
 import numpy as np
 
-from pySDC.Stats import stats
+import pySDC.Stats as st
 
 from pySDC.PFASST_helper import *
 
@@ -34,6 +34,8 @@ def run_pfasst(MS,u0,t0,dt,Tend):
     # some initializations
     uend = None
     num_procs = len(MS)
+
+    st.stats = st.stats_class()
 
     if num_procs > 1:
         assert len(MS[0].levels) > 1
@@ -88,7 +90,7 @@ def run_pfasst(MS,u0,t0,dt,Tend):
             # restart active steps (reset all values and pass uend to u0)
             MS = restart_block(MS,active_slots,uend)
 
-    return uend,stats.return_stats()
+    return uend,st.stats.return_stats()
 
 
 def restart_block(MS,active_slots,u0):

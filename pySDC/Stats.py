@@ -81,6 +81,8 @@ def sort_stats(stats,sortby='time'):
     # sort by first element of the tuple (which is the sortby key) and return
     return sorted(result,key=lambda tup: tup[0])
 
+def print_stats():
+    print(stats)
 
 # global variable here for much easier access (no passing around)
-stats = stats_class()
+stats = None

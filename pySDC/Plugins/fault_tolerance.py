@@ -7,7 +7,7 @@ strategy = None
 def hard_fault_injection(S):
     global iter, step, strategy
 
-    if step == S.status.step and iter == S.status.iter:
+    if step == S.status.step and iter == S.status.iter and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %(S.status.step,S.status.iter,S.status.time))
         res = cp.deepcopy(S.levels[-1].status.residual)

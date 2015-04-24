@@ -2,7 +2,7 @@ from pySDC.Level import level
 import logging
 import time
 
-from pySDC.Stats import stats
+import pySDC.Stats as st
 
 
 class hooks(object):
@@ -63,7 +63,7 @@ class hooks(object):
         logger.info('Process %2i on time %8.6f at stage %10s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                     status.slot,status.time,status.stage,L.id,status.iter,L.status.residual)
 
-        stats.add_to_stats(step=status.step, time=status.time, level=L.id, iter=status.iter,
+        st.stats.add_to_stats(step=status.step, time=status.time, level=L.id, iter=status.iter,
                            type='residual',  value=L.status.residual)
 
         pass
@@ -74,7 +74,7 @@ class hooks(object):
         Default routine called after each iteration
         """
         L = self.level
-        stats.add_to_stats(step=status.step, time=status.time, iter=status.iter, type='residual',
+        st.stats.add_to_stats(step=status.step, time=status.time, iter=status.iter, type='residual',
                            value=L.status.residual)
         pass
 
@@ -85,8 +85,8 @@ class hooks(object):
         """
 
         L = self.level
-        stats.add_to_stats(step=status.step, time=status.time, type='timing_step', value=time.time()-self.t0)
-        stats.add_to_stats(step=status.step, time=status.time, type='niter', value=status.iter)
-        stats.add_to_stats(step=status.step, time=status.time, type='residual', value=L.status.residual)
+        st.stats.add_to_stats(step=status.step, time=status.time, type='timing_step', value=time.time()-self.t0)
+        st.stats.add_to_stats(step=status.step, time=status.time, type='niter', value=status.iter)
+        st.stats.add_to_stats(step=status.step, time=status.time, type='residual', value=L.status.residual)
 
         pass

@@ -2,7 +2,7 @@ import itertools
 import copy as cp
 import numpy as np
 
-from pySDC.Stats import stats
+import pySDC.Stats as st
 
 from pySDC.PFASST_helper import *
 from pySDC.Plugins.fault_tolerance import hard_fault_injection
@@ -31,6 +31,8 @@ def run_pfasst(MS,u0,t0,dt,Tend):
     # some initializations
     uend = None
     num_procs = len(MS)
+
+    st.stats = st.stats_class()
 
     # initial ordering of the steps: 0,1,...,Np-1
     slots = [p for p in range(num_procs)]
@@ -92,7 +94,7 @@ def run_pfasst(MS,u0,t0,dt,Tend):
         #     for p in slots:
         #         MS[p].time =
 
-    return uend,stats.return_stats()
+    return uend,st.stats.return_stats()
 
 
 def restart_block(MS,active_slots,u0):
