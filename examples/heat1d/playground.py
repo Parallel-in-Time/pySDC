@@ -7,11 +7,14 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
+# from pySDC.Stats import grep_stats, sort_stats
+
+from pySDC.Plugins.visualization_tools import show_residual_across_simulation
+
 
 
 if __name__ == "__main__":
@@ -19,7 +22,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 8
 
     # This comes as read-in for the level class
     lparams = {}
@@ -55,8 +58,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.5
-    Tend = 1*dt
+    dt = 0.25
+    Tend = 8*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -70,6 +73,9 @@ if __name__ == "__main__":
 
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
+
+
+    show_residual_across_simulation(stats,'res_vis_test.png')
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')
