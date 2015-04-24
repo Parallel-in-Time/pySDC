@@ -79,6 +79,8 @@ if __name__ == "__main__":
 
     transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
     lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
+    # what to do with lin pfasst
+    print("Spektral radius of PFASST:", lin_pfasst.spectral_radius())
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

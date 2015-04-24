@@ -136,6 +136,7 @@ class IterativeSolver(object):
             U_last[:] = self.step(U_last)[:]
         return U_last
 
+    @property
     def it_matrix(self):
         if self.format is "dense":
             return np.eye(self.P.shape[0])-np.dot(self.P_inv, self.M)
@@ -169,6 +170,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
             c_list.append(it_solv.c)
             shape_list.append(it_solv.P.shape[0])
 
+        self._P_list = P_list
         self.__split_points = np.cumsum(shape_list)[:-1]
         self.P = sprs.block_diag(P_list, format=self.sparse_format)
         if connect_function is None:
@@ -185,11 +187,14 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
         Solver list.
         :return: object with the attribute dot, which
         """
-        def func(v):
-            solutions = map(lambda f, x: f.P_inv.dot(x), self.it_solv_list, np.split(v, self.__split_points))
-            return np.concatenate(solutions)
+        if self.sparse_format is "dense":
+            return sprs.block_diag(map(lambda x: to_dense(x.P_inv), self.it_solv_list), "array")
+        else:
+            def func(v):
+                solutions = map(lambda f, x: f.P_inv.dot(x), self.it_solv_list, np.split(v, self.__split_points))
+                return np.concatenate(solutions)
 
-        return Bunch(dot=func)
+            return Bunch(dot=func)
 
     def split(self, v):
         """ Splits a vector according to the block sizes"""
@@ -347,10 +352,10 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
     this class is needed for the LinearPFASST.
     """
     def __init__(self, iterative_solver_list, nodes_on_unit_list, transfer_list,
-                 P_c_list, N_x_list=0, sparse_format="dense"):
+                 P_c_list, N_x_list_fine=0, N_x_list_coarse=0, sparse_format="dense"):
 
         super(TransferredMultiStepIterativeSolver, self).__init__(iterative_solver_list, nodes_on_unit_list,
-                                                                  N_x_list, sparse_format)
+                                                                  N_x_list_fine, sparse_format)
         self.transfer_list = transfer_list
         self.P_c_list = map(lambda x: to_sparse(x, sparse_format), P_c_list)
         self.P_c_inv_list = map(lambda x: la.inv(x), self.P_c_list)
@@ -358,16 +363,17 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
 
         self.P = self.distributeOperatorsToFullInterval(map(lambda x, y: y.Pspace.dot(x.dot(y.Rspace)),
                                                             P_c_list, transfer_list),
-                                                        nodes_on_unit_list, N_x_list)
+                                                        nodes_on_unit_list, N_x_list_fine)
         self.__nodes_on_unit = nodes_on_unit_list
-        self.__N_x_list = N_x_list
-
+        self.__N_x_list_fine = N_x_list_fine
+        self.__N_x_list_coarse = N_x_list_coarse
+        self.__transfer_list = transfer_list
     @property
     def P_inv(self):
 
         if self.sparse_format is "dense":
-            P_c_inv = map(lambda x: la.inv(x), self.P_c_list)
-            return self.distributeOperatorsToFullInterval(P_c_inv, self.__nodes_on_unit, self.__N_x_list)
+            P_c_inv = map(lambda x, y: x.Pspace.dot(y.dot(x.Rspace)), self.__transfer_list, self.P_c_inv_list)
+            return self.distributeOperatorsToFullInterval(P_c_inv, self.__nodes_on_unit, self.__N_x_list_fine)
         else:
             def solver(v):
                 v_split = self.split(v)
@@ -454,19 +460,22 @@ class LinearPFASST(IterativeSolver):
             U_last[:] = self.step(U_last)[:]
         return U_last
 
+    @property
     def it_matrix(self):
-        if self.sparse_format is not "dense":
-            M = to_dense(self.M)
-            P_f_inv = la.inv(to_dense(self.P_f))
-            P_c_inv = la.inv(to_dense(self.P_c))
-            I = np.eye(M.shape[0])
-            return np.dot(I - np.dot(P_f_inv, M), I - np.dot(P_c_inv, M))
-        else:
-            return np.dot(np.eye(self.M.shape[0])-np.dot(self.P_f_inv, self.M),
-                          np.eye(self.M.shape[0])-np.dot(self.P_c_inv,self.M))
+        """
+        :return: iteration matrix of the LinPFASST
+        """
+        M = to_dense(self.M)
+        P_f_inv = to_dense(self.P_f_inv)
+        P_c_inv = to_dense(self.P_c_inv)
+        I = np.eye(M.shape[0])
+        print(map(type,[M,self.P_f_inv,P_c_inv,I]))
+        return np.dot(I - np.dot(P_f_inv, M), I - np.dot(P_c_inv, M))
+
+
 
     def spectral_radius(self):
-        return np.max(np.abs(np.linalg.eigvals(self.it_matrix())))
+        return np.max(np.abs(np.linalg.eigvals(self.it_matrix)))
 
     def parallel_efficiency(self, c_c_tuple, c_f_tuple, c_t_tuple, use_dimension_of_A=True):
         """ compute the parallel efficiency of the LinearPFASST setup, given the cost of evaluating and solving
@@ -532,12 +541,13 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     # first we need the system matrix, e.g. Q kron A
     fine_levels = map(lambda x: x.levels[0], step_list)
     coarse_levels = map(lambda x: x.levels[-1], step_list)
-    problems = map(lambda x: x.prob, fine_levels)
+    problems_fine = map(lambda x: x.prob, fine_levels)
+    problems_coarse = map(lambda x: x.prob, coarse_levels)
     dt_list = map(lambda x: x.status.dt, step_list)
     M_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.Qmat[1:,1:], y.system_matrix),
-                 fine_levels, problems, dt_list)
+                 fine_levels, problems_fine, dt_list)
     P_f_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:,1:], y.system_matrix),
-                 fine_levels, problems, dt_list)
+                 fine_levels, problems_fine, dt_list)
 
     # offset = int(not fine_levels[0].sweep.coll.left_is_node)
     c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
@@ -551,12 +561,13 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     # construct the multistep solver
     # pre-conditioner for the coarse level
     P_c_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:, 1:], y.system_matrix),
-                   coarse_levels, problems, dt_list)
+                   coarse_levels, problems_coarse, dt_list)
     # nodes on unit interval
     nodes_on_unit = map(lambda x: x.sweep.coll.nodes, fine_levels)
-    N_x_list = map(lambda x: x.nvars, problems)
+    N_x_list_fine = map(lambda  x: x.nvars, problems_fine)
+    N_x_list_coarse = map(lambda x: x.nvars, problems_coarse)
     multi_step_solver = TransferredMultiStepIterativeSolver(it_solver_list, nodes_on_unit,
-                                                            transfer_list, P_c_list, N_x_list)
+                                                            transfer_list, P_c_list, N_x_list_fine, N_x_list_coarse)
 
     return LinearPFASST(multi_step_solver, block_solver, transfer_list)
 
