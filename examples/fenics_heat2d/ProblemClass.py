@@ -46,7 +46,7 @@ class fenics_heat2d(ptype):
 
         df.set_log_level(df.WARNING)
 
-        # mesh = df.UnitIntervalMesh(self.c_nvars[0])#,self.c_nvars[1])
+        # mesh = df.UnitIntervalMesh(self.c_nvars)
         mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
         for i in range(self.refinements):
             mesh = df.refine(mesh)
@@ -189,7 +189,7 @@ class fenics_heat2d(ptype):
         """
 
         u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
-        # u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t)
+        # u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t,degree=self.order)
 
         me = fenics_mesh(self.init)
         me.values = df.interpolate(u0,self.V)

@@ -130,7 +130,7 @@ class mass_matrix_imex(sweeper):
 
         return None
 
-    #FIXME: mass matrix needed for Legendre
+
     def compute_end_point(self):
         """
         Compute u at the right point of the interval
@@ -152,11 +152,11 @@ class mass_matrix_imex(sweeper):
             L.uend = P.dtype_u(L.u[0].V)
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
-            L.uend = P.invert_mass_matrix(L.uend)
-            L.uend += L.u[0]
             # add up tau correction of the full interval (last entry)
             if L.tau is not None:
                 L.uend += L.tau[-1]
+            L.uend = P.invert_mass_matrix(L.uend)
+            L.uend += L.u[0]
 
         return None
 
@@ -178,13 +178,13 @@ class mass_matrix_imex(sweeper):
         # build QF(u)
         res = self.integrate()
         for m in range(self.coll.num_nodes):
+            # add tau if associated
+            if L.tau is not None:
+                res[m] += L.tau[m]
             res[m] = P.invert_mass_matrix(res[m])
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m+1]
             # res[m] += P.apply_mass_matrix(L.u[0] - L.u[m+1])
-            # add tau if associated
-            if L.tau is not None:
-                res[m] += P.invert_mass_matrix(L.tau[m])
 
         # use standard residual norm: ||.||_inf
         L.status.residual = np.linalg.norm(res,np.inf)

@@ -24,7 +24,7 @@ class error_output(hooks):
         uex = P.u_exact(status.time+status.dt)
 
         # fixme: only works for Gauss-Lobatto so far
-        assert L.sweep.coll.right_is_node
-        print('error at time %s: %s' %(status.time+status.dt,abs(uex-L.u[-1])/abs(uex)))
+        # assert L.sweep.coll.right_is_node
+        # print('error at time %s: %s' %(status.time+status.dt,abs(uex-L.u[-1])/abs(uex)))
 
         return None

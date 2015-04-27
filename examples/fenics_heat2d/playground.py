@@ -6,6 +6,7 @@ from examples.fenics_heat2d.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from examples.fenics_heat2d.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.PFASST_blockwise as mp
+# import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 from examples.fenics_heat2d.HookClass import error_output
@@ -17,14 +18,11 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    # nvars = [[8,8],[16,16],[32,32],[64,64],[128,128],[256,256]]
-    # dt = [0.125]
-
     num_procs = 4
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 8E-11
+    lparams['restol'] = 5E-09
 
     sparams = {}
     sparams['maxiter'] = 20
@@ -34,13 +32,15 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     pparams['c_nvars'] = [(32,32)]
+    # pparams['c_nvars'] = [255]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
     pparams['refinements'] = [1,0]
 
+
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = True #fixme: u-interpolation not working with MLSDC and PFASST???
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
+    description['collocation_class'] = collclass.CollGaussLegendre #fixme: lobatto not working with PFASST..???
     description['num_nodes'] = 3
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
@@ -67,86 +67,6 @@ if __name__ == "__main__":
     # get initial values on finest level
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-
-    # Pf = MS[0].levels[0].prob
-    # uinit_f = Pf.u_exact(t0)
-    #
-    # Pg = MS[0].levels[1].prob
-    # uinit_g = Pg.u_exact(t0)
-    #
-    # urest = df.project(uinit_f.values,Pg.V)
-    # uinter = df.project(uinit_g.values,Pf.V)
-    #
-    # print(df.norm(urest.vector() - uinit_g.values.vector()))
-    # print(df.norm(uinter.vector() - uinit_f.values.vector()))
-
-    # u = df.TrialFunction(Pg.V)
-    # v = df.TestFunction(Pg.V)
-    # lhs = u*v*df.dx
-    # A = df.assemble(lhs)
-    # rhs = uinit_f.values*v*df.dx
-    # b = df.assemble(rhs) ## This line gives an error because v is an "Argument"
-    # urest = fenics_mesh(uinit_g)
-    # df.solve(A, urest.values.vector(), rhs)
-
-    # meshc = df.UnitSquareMesh(64,64)
-    # meshf = df.refine(meshc)
-    # Vc = df.FunctionSpace(meshc,'CG',1)
-    # Vf = df.FunctionSpace(meshf,'CG',1)
-    # f = df.Expression("sin(2*pi*x[0])*sin(2*pi*x[1])")
-    # f_fine = df.project(f, Vf)
-    # f_coarse = df.project(f, Vc)
-
-
-    #
-    # # Approach #1 you suggested
-    # u = df.TrialFunction(Vc)
-    # v = df.TestFunction(Vc)
-    # lhs = u*v*df.dx
-    # A = df.assemble(lhs)
-    # rhs = f_fine*v*df.dx(meshc)
-    # b = df.assemble(rhs)
-    # f_l2 = df.Function(Vc)
-    # df.solve(A, f_l2.vector(), b)
-    # print(len(f_l2.vector().array()),len(f_coarse.vector().array()))
-    # print(df.norm(f_l2.vector()-f_coarse.vector(),'linf'))
-    #
-    # frest = df.project(f_fine,Vc)
-    # print(len(frest.vector().array()),len(f_coarse.vector().array()))
-    # print(df.norm(frest.vector()-f_coarse.vector(),'linf'))
-    #
-    # # Approach #1 you suggested
-    # u = df.TrialFunction(Vf)
-    # v = df.TestFunction(Vf)
-    # lhs = u*v*df.dx
-    # A = df.assemble(lhs)
-    # rhs = f_coarse*v*df.dx(meshf)
-    # b = df.assemble(rhs)
-    # f_l2 = df.Function(Vf)
-    # df.solve(A, f_l2.vector(), b)
-    # # df.solve(lhs==rhs,f_l2)
-    # print(len(f_l2.vector().array()),len(f_fine.vector().array()))
-    # print(df.norm(f_l2.vector()-f_fine.vector(),'linf'))
-    #
-    # finter = df.project(f_coarse,Vf)
-    # print(len(finter.vector().array()),len(f_fine.vector().array()))
-    # print(df.norm(finter.vector()-f_fine.vector(),'linf'))
-    #
-    # exit()
-    #
-    # urest = fenics_mesh(uinit_g)
-    # urest.values = df.project(uinit_f.values,Pg.V)
-    #
-    # uinter = fenics_mesh(uinit_f)
-    # uinter.values = df.project(uinit_g.values,Pf.V)
-    #
-    # print(len(uinit_g.values.vector().array()),len(urest.values.vector().array()))
-    # print(abs(uinit_g-urest))
-    # print(len(uinit_f.values.vector().array()),len(uinter.values.vector().array()))
-    # print(abs(uinit_f-uinter))
-    #
-    # exit()
-
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)

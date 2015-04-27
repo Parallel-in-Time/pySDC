@@ -119,7 +119,7 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         # build coarse correction
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
+        F.u[0] = self.prolong_space(G.u[0])# - self.restrict_space(F.u[0]))
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
@@ -154,8 +154,8 @@ class transfer(with_metaclass(abc.ABCMeta)):
         assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
         # build coarse correction
-        # need to restrict F.u[0] again here, since it might have changed in PFASST
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
+        # need to restrict F.u[0] again here, since it might have changed in PFASST (WWWOOOOT?? fixme)
+        F.u[0] = self.prolong_space(G.u[0])# - self.restrict_space(F.u[0]))
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
