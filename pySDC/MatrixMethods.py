@@ -106,7 +106,7 @@ class IterativeSolver(object):
         several steps of the iterative solver are called sweeps"""
     def __init__(self, P, M, c, sparse_format="array"):
         assert P.shape == M.shape and c.shape[0] == M.shape[0], \
-            "Matrix P and matrix M don't fit.\n \tM_shape:" + str(M.shape) + "P_shape:" \
+            "Matrix P and matrix M don't fit.\n \tM_shape:" + str(M.shape) + " P_shape:" \
             + str(P.shape) + " c_shape:" + str(c.shape)
         self.format = sparse_format
         self.P = to_sparse(P, sparse_format)
@@ -156,7 +156,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
     """
 
     def __init__(self, IterativeSolverList, connect_function=None, sparse_format="array"):
-        self.it_solv_list = IterativeSolverList
+        self.it_list = IterativeSolverList
         self.sparse_format = sparse_format
 
         P_list = []
@@ -188,10 +188,10 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
         :return: object with the attribute dot, which
         """
         if self.sparse_format is "array":
-            return sprs.block_diag(map(lambda x: to_dense(x.P_inv), self.it_solv_list), "array")
+            return sprs.block_diag(map(lambda x: to_dense(x.P_inv), self.it_list), "array")
         else:
             def func(v):
-                solutions = map(lambda f, x: f.P_inv.dot(x), self.it_solv_list, np.split(v, self.__split_points))
+                solutions = map(lambda f, x: f.P_inv.dot(x), self.it_list, np.split(v, self.__split_points))
                 return np.concatenate(solutions)
 
             return Bunch(dot=func)
@@ -428,6 +428,14 @@ class LinearPFASST(IterativeSolver):
         self.U_half = np.zeros(self.M.shape[0])
 
     @property
+    def multi_step_solver(self):
+        return self.__ms_its
+
+    @property
+    def block_diag_solver(self):
+        return self.__bl_its
+
+    @property
     def P_inv(self):
         """
         The preconditioner for the coarse level including coarse grid correction and
@@ -531,14 +539,11 @@ class LinearPFASST(IterativeSolver):
 
 def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
 
-    # depending on the kind of nodes used, we have to change minor details
-    # , hence we define a special offset
-    # offset_list_coarse =
+    if 'sparse_format' in kwargs:
+        sparse_format = kwargs['sparse_format']
+    else:
+        sparse_format = "array"
 
-    # generate IterativeBlockSolver
-    # putting the transfer_operators into a block_diagonal form
-    T_fg = sprs.block_diag(map(lambda x: x.Rspace, transfer_list), format=kwargs['sparse_format'])
-    T_gf = sprs.block_diag(map(lambda x: x.Pspace, transfer_list), format=kwargs['sparse_format'])
     # generate MultiStepSolver
     # put them together into LinearPFASST and return the object
     # first we need the system matrix, e.g. Q kron A
@@ -547,9 +552,12 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     problems_fine = map(lambda x: x.prob, fine_levels)
     problems_coarse = map(lambda x: x.prob, coarse_levels)
     dt_list = map(lambda x: x.status.dt, step_list)
-    M_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.Qmat[1:,1:], y.system_matrix),
+
+    M_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+                                  -dt * sprs.kron(x.sweep.coll.Qmat[1:, 1:], y.system_matrix, format=sparse_format),
                  fine_levels, problems_fine, dt_list)
-    P_f_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:,1:], y.system_matrix),
+    P_f_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+                                    -dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix, format=sparse_format),
                  fine_levels, problems_fine, dt_list)
 
     # offset = int(not fine_levels[0].sweep.coll.left_is_node)
@@ -563,11 +571,12 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
 
     # construct the multistep solver
     # pre-conditioner for the coarse level
-    P_c_list = map(lambda x, y, dt: dt*sprs.kron(x.sweep.coll.QDmat[1:, 1:], y.system_matrix),
+    P_c_list = map(lambda x, y, dt:sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+                                   - dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix),
                    coarse_levels, problems_coarse, dt_list)
     # nodes on unit interval
     nodes_on_unit = map(lambda x: x.sweep.coll.nodes, fine_levels)
-    N_x_list_fine = map(lambda  x: x.nvars, problems_fine)
+    N_x_list_fine = map(lambda x: x.nvars, problems_fine)
     N_x_list_coarse = map(lambda x: x.nvars, problems_coarse)
     multi_step_solver = TransferredMultiStepIterativeSolver(it_solver_list, nodes_on_unit,
                                                             transfer_list, P_c_list, N_x_list_fine, N_x_list_coarse)
@@ -603,3 +612,9 @@ def generate_transfer_list(step_list, transfer_class, **kwargs):
     return map(lambda x, s_trans, t_trans: composed_mesh_to_composed_mesh(x.levels[0], x.levels[-1],
                                                                           [t_trans, s_trans], kwargs['sparse_format']),
                step_list, space_transfer_list, time_transfer_list)
+
+
+def get_all_nodes(steps):
+    dts = map(lambda x: x.status.dt, steps)
+    return np.hstack(map(lambda x,dt,i: x.levels[0].sweep.coll.nodes*dt+dt*i, steps,dts,range(len(dts))))
+

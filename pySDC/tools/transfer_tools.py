@@ -122,3 +122,33 @@ def kron_on_list(matrix_list):
         return sprs.kron(matrix_list[0], kron_on_list(matrix_list[1:]))
 
 
+def matrixN(tau, rows=-1, last_value=1.0):
+    n = tau.shape[0]
+    if rows == -1:
+        rows = n
+    N = np.zeros((rows, n))
+    # construct the lagrange polynomials
+    circulating_one = np.asarray([1.0]+[0.0]*(n-1))
+    lag_pol = []
+    for i in range(n):
+        lag_pol.append(intpl.lagrange(tau, np.roll(circulating_one, i)))
+        N[:, i] = -np.ones(rows)*lag_pol[-1](last_value)
+    return N
+
+def interpolate_to_t_end(nodes_on_unit, values):
+    """
+    Assume a GaussLegendre nodes, we are interested in the value at the end of
+    the interval, but we now only the values in the interior of the interval.
+    We compute the value by legendre interpolation.
+    :param nodes_on_unit: nodes transformed to the unit interval
+    :param values: values on those nodes
+    :return: interpolation to the end of the interval
+    """
+    n = nodes_on_unit.shape[0]
+    circulating_one = np.asarray([1.0]+[0.0]*(n-1))
+    lag_pol = []
+    result = np.zeros(values[0].shape)
+    for i in range(n):
+        lag_pol.append(intpl.lagrange(nodes_on_unit, np.roll(circulating_one, i)))
+        result += values[i]*lag_pol[-1](1.0)
+    return result

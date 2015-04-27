@@ -248,6 +248,7 @@ class CollBase(object):
             for t in tau:
                 Q_delta[i:, i] = np.ones(n-i)*t
                 i += 1
+            # print Q_delta
             return Q_delta
 
         if self.tleft == self.nodes[0] and self.tright == self.nodes[-1]:
