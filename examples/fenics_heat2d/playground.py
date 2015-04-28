@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 4
+    num_procs = 1
 
     # This comes as read-in for the level class
     lparams = {}
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = True #fixme: u-interpolation not working with MLSDC and PFASST???
+    tparams['finter'] = False #fixme: u-interpolation not working with MLSDC and PFASST???
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.5
-    Tend = 4*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

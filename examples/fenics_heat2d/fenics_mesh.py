@@ -11,7 +11,7 @@ class fenics_mesh():
         values: contains the ndarray of the values
     """
 
-    def __init__(self,init=None,val=None):
+    def __init__(self,init=None,val=0.0):
         """
         Initialization routine
 
@@ -29,7 +29,8 @@ class fenics_mesh():
             self.V = init.V
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         else:
-            self.values = df.Function(init)
+            u0 = df.Constant(val)
+            self.values = df.interpolate(u0,init)
             self.V = init
         # something is wrong, if none of the ones above hit
         # else:
@@ -52,7 +53,6 @@ class fenics_mesh():
             # always create new mesh, since otherwise c = a + b changes a as well!
             me = fenics_mesh(other)
             me.values = df.Function(self.V,self.values.vector() + other.values.vector())
-            me.V = other.V
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
@@ -74,7 +74,6 @@ class fenics_mesh():
             # always create new mesh, since otherwise c = a - b changes a as well!
             me = fenics_mesh(other)
             me.values = df.Function(self.V,self.values.vector() - other.values.vector())
-            me.V = other.V
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
@@ -94,9 +93,8 @@ class fenics_mesh():
 
         if isinstance(other, float):
             # always create new mesh, since otherwise c = f*a changes a as well!
-            me = fenics_mesh(self.values)
+            me = fenics_mesh(self)
             me.values = df.Function(self.V,other * self.values.vector())
-            me.V = self.V
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
@@ -145,12 +143,12 @@ class rhs_fenics_mesh():
         if isinstance(init,type(self)):
             self.impl = fenics_mesh(init.impl)
             self.expl = fenics_mesh(init.expl)
-            self.V = init.V
+            # self.V = init.V
         # if init is a number or a tuple of numbers, create mesh object with None as initial value
         else:
             self.impl = fenics_mesh(init)
             self.expl = fenics_mesh(init)
-            self.V = init
+            # self.V = init
         # something is wrong, if none of the ones above hit
         # else:
         #     raise DataError('something went wrong during %s initialization' % type(self))
@@ -173,7 +171,6 @@ class rhs_fenics_mesh():
             me = rhs_fenics_mesh(self)
             me.impl = self.impl - other.impl
             me.expl = self.expl - other.expl
-            me.V = self.V
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
@@ -196,7 +193,6 @@ class rhs_fenics_mesh():
             me = rhs_fenics_mesh(self)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl
-            me.V = self.V
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))

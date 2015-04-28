@@ -149,7 +149,7 @@ class fenics_heat2d(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_fenics_mesh(u.V)
+        f = rhs_fenics_mesh(self.V)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -191,7 +191,7 @@ class fenics_heat2d(ptype):
         u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
         # u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t,degree=self.order)
 
-        me = fenics_mesh(self.init)
+        me = fenics_mesh(self.V)
         me.values = df.interpolate(u0,self.V)
 
         return me
