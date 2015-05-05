@@ -6,7 +6,9 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-class heat1d(ptype):
+from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
+
+class advection(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
@@ -21,45 +23,29 @@ class heat1d(ptype):
 
         Args:
             cparams: custom parameters for the example
-            dtype_u: temperature on a mesh (will be passed parent class)
-            dtype_f: temperature per time unit on a mesh (will be passed parent class)
+            dtype_u: particle data type (will be passed parent class)
+            dtype_f: acceleration data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-        assert 'nu' in cparams
+        assert 'c' in cparams
+        assert 'order' in cparams
 
+        assert cparams['nvars']%2 == 0
+        
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(advection,self).__init__(self.nvars,dtype_u,dtype_f)
 
         # compute dx and get discretization matrix A
-        self.dx = 1/(self.nvars + 1)
-        self.A = self.__get_A(self.nvars,self.nu,self.dx)
-        self.xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-
-    def __get_A(self,N,nu,dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N: number of dofs
-            nu: diffusion coefficient
-            dx: distance between two spatial nodes
-
-        Returns:
-         matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
-        A *= nu / (dx**2)
-        return A.tocsc()
-
-
+        self.mesh = np.linspace(0, 1, num=self.nvars, endpoint=False)
+        self.dx   = self.mesh[1] - self.mesh[0]
+        self.A    = -getFDMatrix(self.nvars, self.order, self.dx)
+    
     def solve_system(self,rhs,factor,u0):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -90,10 +76,8 @@ class heat1d(ptype):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
-        # fexpl.values = np.zeros(self.nvars)
+        fexpl        = mesh(self.nvars)
+        fexpl.values = 0.0*self.mesh
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -108,7 +92,7 @@ class heat1d(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
+        fimpl        = mesh(self.nvars)
         fimpl.values = self.A.dot(u.values)
         return fimpl
 
@@ -143,54 +127,5 @@ class heat1d(ptype):
         """
 
         me = mesh(self.nvars)
-        # xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*self.xvalues)*np.cos(t)
-        # me.values = np.sin(np.pi*self.xvalues)*np.exp(-np.pi**2 * self.nu * t)
+        me.values = np.cos(2.0*np.pi*(self.mesh-self.c*t))
         return me
-
-
-    def get_mesh(self, form="list"):
-        """
-        Returns the mesh the problem is computed on.
-
-        :param form: the form in which the mesh is needed
-        :return: depends on form
-        """
-
-        if form is "list":
-            return [np.linspace(0, 1, self.nvars)]
-        elif form is "meshgrid":
-            return np.linspace(0, 1, self.nvars)
-        else:
-            return None
-
-
-    @property
-    def system_matrix(self):
-        """
-        Returns the system matrix
-        :return:
-        """
-        return self.A
-
-    @property
-    def A_I(self):
-        return self.A
-
-    @property
-    def A_E(self):
-        return np.zeros(self.A.shape)
-
-    def force_term(self, t):
-        """
-        For the linear matrix framework it is possible to
-        deal with forcing terms as long they only depend on t.
-        :param t: time point , array
-        :return: forcing term of the heat  equation
-        """
-        if type(t) is np.ndarray:
-            # return np.zeros(self.xvalues.shape[0]*t.shape[0])
-            return np.hstack(map(lambda tau: -np.sin(np.pi*self.xvalues)*(np.sin(tau)-self.nu*np.pi**2*np.cos(tau)), t))
-        else:
-            return -np.sin(np.pi*self.xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
-

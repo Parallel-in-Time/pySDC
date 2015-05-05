@@ -42,6 +42,32 @@ def to_dense(D):
     elif isinstance(D, np.ndarray):
         return D
 
+def next_neighbors_periodic(p, ps, k, T=None):
+    """
+    This function gives for a value p the k points next to it which are found in
+    in the vector ps and the points which are as
+    :param p: value
+    :param ps: ndarray, vector where to find the next neighbors
+    :param k: integer, number of neighbours
+    :return: ndarray, with the k next neighbors
+    """
+    if T is None:
+        T = ps[-1]-2*ps[0]+ps[1]
+    p_bar = p - np.floor(p/T)*T
+    ps = ps - ps[0]
+    distance_to_p = np.asarray(map(lambda tk: min([np.abs(tk+T-p_bar), np.abs(tk-p_bar), np.abs(tk-T-p_bar)]),ps))
+    # print p_bar
+    # print distance_to_p
+    # zip it
+    value_index = []
+    for d,i in zip(distance_to_p, range(distance_to_p.size)):
+        value_index.append((d, i))
+    # sort by distance
+    value_index_sorted = sorted(value_index, key=lambda s: s[0])
+    # take first k indices with least distance and sort them
+    return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
+
+
 def next_neighbors(p, ps, k):
     """
     This function gives for a value p the k points next to it which are found in
