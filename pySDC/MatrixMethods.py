@@ -148,6 +148,42 @@ class IterativeSolver(object):
     def lin_solve(self, v):
         return sparse_inv(self.P, v)
 
+
+class SDCIterativeSolver(IterativeSolver):
+    """
+    Takes a level and returns an matrix SDC sweeper
+    for this level.
+    """
+
+    def __init__(self, level, c, sparse_format="array"):
+    #         M_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+    #                               -dt * sprs.kron(x.sweep.coll.Qmat[1:, 1:], y.system_matrix, format=sparse_format),
+    #              fine_levels, problems_fine, dt_list)
+    # P_f_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+    #                                 -dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix, format=sparse_format),
+    #              fine_levels, problems_fine, dt_list)
+        self.sparse_format = sparse_format
+        # explicit part of the system matrix
+        self.A_E = level.prob.A_E
+        # implicit part of the system matrix
+        self.A_I = level.prob.A_I
+        # Q matrix
+        self.Q = level.sweep.coll.Qmat[1:, 1:]
+        self.QD = level.sweep.coll.QDmat
+        # M matrix
+        A = self.A_E + self.A_I
+        dt = level.dt
+        E = to_dense(sprs.dia_matrix((np.ones(self.Q.shape[0]-1), -1), shape=self.Q.shape))
+        M = sprs.eye(self.A_E.shape[0]*self.Q.shape[0], format=sparse_format) \
+            - sprs.kron(dt*self.Q, A, format=sparse_format)
+        # print type(self.QD.dot(E))
+        # print to_dense(self.QD.dot(E))
+        P = sprs.eye(self.A_E.shape[0]*self.QD.shape[0], format=sparse_format) \
+            - sprs.kron(dt*self.QD, self.A_I, format=sparse_format) \
+            - sprs.kron(dt*self.QD.dot(E), self.A_E, format=sparse_format)
+        super(SDCIterativeSolver, self).__init__(P, M, c, sparse_format=sparse_format)
+
+
 class BlockDiagonalIterativeSolver(IterativeSolver):
     """
     Takes a list of iterative solvers and put them together into a Block Diagonal solver.
@@ -559,13 +595,37 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     P_f_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
                                     -dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix, format=sparse_format),
                  fine_levels, problems_fine, dt_list)
+    c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
+    # for the comparison use the SDC IterativeSolver class and adjust the c_list to take
+    # in account forcing terms
+    # das muss anders gehen
+
+    # compute the quadrature of the forcing term
+
+    all_nodes_split = np.split(get_all_nodes(step_list),len(step_list))
+    # values of the forcing term
+    f_values = map(lambda prob, nodes: prob.force_term(nodes), problems_fine, all_nodes_split)
+    # quadrature of the f_values
+    Qf_values = map(lambda lvl, f, dt: dt*sprs.kron(lvl.sweep.coll.Qmat[1:, 1:], sprs.eye(lvl.prob.nvars),
+                                             format=sparse_format).dot(f), fine_levels, f_values, dt_list)
+
+    c_list = [c_0+Qf_values[0]] + Qf_values[1:]
+
+
+    sdc_it_solver_list = map(lambda x, y: SDCIterativeSolver(x, y, sparse_format=sparse_format), fine_levels, c_list)
 
     # offset = int(not fine_levels[0].sweep.coll.left_is_node)
-    c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
 
-    it_solver_list = [IterativeSolver(P_f_list[0], M_list[0], c_0)] \
-                     + map(lambda P, M, x: IterativeSolver(P, M, np.zeros(P.shape[0])),
-                           P_f_list[1:], M_list[1:], fine_levels[1:])
+    # it_solver_list = [IterativeSolver(P_f_list[0], M_list[0], c_0)] \
+    #                  + map(lambda P, M, x: IterativeSolver(P, M, np.zeros(P.shape[0])),
+    #                        P_f_list[1:], M_list[1:], fine_levels[1:])
+    # dadurch das c gegeben ist
+
+    # it_solver_list = map(lambda P, M, c: IterativeSolver(P, M, c), P_f_list, M_list, c_list)
+    it_solver_list = sdc_it_solver_list
+    # print c_list
+    # to test if the
+
     # construct the block solver
     block_solver = BlockDiagonalIterativeSolver(it_solver_list)
 
@@ -616,5 +676,39 @@ def generate_transfer_list(step_list, transfer_class, **kwargs):
 
 def get_all_nodes(steps):
     dts = map(lambda x: x.status.dt, steps)
-    return np.hstack(map(lambda x,dt,i: x.levels[0].sweep.coll.nodes*dt+dt*i, steps,dts,range(len(dts))))
+    offsets = np.cumsum([0.0]+dts)[:-1]
+    return np.hstack(map(lambda x, dt, off: x.levels[0].sweep.coll.nodes*dt+off, steps, dts, offsets))
 
+
+def run_linear_pfasst(lin_pfasst, u_0, kwargs):
+    """
+    Runs linear pfasst.
+    :param lin_pfasst: The Linear PFASST object
+    :param u_0: initial value
+    :param kwargs: options
+    :return: list of residuals, list_of_solution
+    """
+    run_type = kwargs['run_type']
+    norm = kwargs['norm']
+    # debug = kwargs['debug']
+    if run_type is "max_it":
+        # runs max_it iterations.
+        max_it = kwargs['max_it']
+        u = [u_0]
+        res = [norm(lin_pfasst.M.dot(u_0) - lin_pfasst.c)]
+        for i in range(max_it):
+            u.append(lin_pfasst.step(u[-1]))
+            res.append(norm(lin_pfasst.M.dot(u[-1])-lin_pfasst.c))
+    elif run_type is "tolerance":
+        # runs until a certain norm(residuum) is achieved
+        tol = kwargs['tol']
+        u = [u_0]
+        res = [norm(lin_pfasst.M.dot(u_0) - lin_pfasst.c)]
+        while res[-1] > tol and len(u) < 1000:
+            u.append(lin_pfasst.step(u[-1]))
+            res.append(norm(lin_pfasst.M.dot(u[-1])-lin_pfasst.c))
+    else:
+        raise TypeError("This run type is undefined")
+
+
+    return res, u
