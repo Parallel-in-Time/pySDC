@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from examples.SWFW.ProblemClass import swfw_scalar
 from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.Methods as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print('Init:',uinit.values)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     uex = P.u_exact(Tend)
 
