@@ -13,6 +13,7 @@ import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 import pySDC.MatrixMethods as mmp
+
 from pySDC.tools.transfer_tools import interpolate_to_t_end
 if __name__ == "__main__":
 
@@ -87,83 +88,14 @@ if __name__ == "__main__":
 
     transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
     lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
-    # what to do with lin pfasst
-    # one could compute the spectral radius
-    # print("Spektral radius of PFASST:", lin_pfasst.spectral_radius())
-    # Or one could compute some steps and see how the error converges
-    # first we need an initial value
-    # u_0 = lin_pfasst.c
+
     u_0 = np.kron(np.asarray([1]*description['num_nodes']+[0]*description['num_nodes']*(num_procs-1)),
                   uinit.values)
     res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, linpparams)
     all_nodes = mmp.get_all_nodes(MS)
     print "Residuals:\n", res, "\nNumber of iterations: ", len(res)
     u_end_split = np.split(u[-1], num_procs*description['num_nodes'])
-    # M = lin_pfasst.M
-    # first_block = M[:45, :45]
-    # first_block_inv = la.inv(first_block)
-    # u_sol = la.inv(M).dot(u_0)
-    # u_sol_split = np.split(u_sol, 12)
-    # u_sol_fblock = first_block_inv.dot(np.kron(np.ones(3), uinit.values))
-    # # print u_sol_split[0],"\n",u_sol_fblock
 
-    # u_sol_at_tend = interpolate_to_t_end(all_nodes[:3]/dt, u_sol_split[-3:])
-
-    # for p, i in zip(np.split(u_0, 12), all_nodes):
-    #     print i, "\n", p, "\n"
-    #
-    #
-    # u = [u_0]
-    # res = [u_0 - M.dot(u_0)]
-    # numb_sweeps = 5
-    # for i in range(numb_sweeps):
-    #     u.append(lin_pfasst.step(u[-1]))
-    #     res.append(u_0-M.dot(u[-1]))
-    # print "max Residuum LinearPFASST:\n", np.max(np.abs(res[-1]))
-    # # compute exact solution and compare
-    # for i in u:
-    #     print uex.values - np.split(i, 12)[-1]
-    #     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-np.split(i, 12)[-1], np.inf)/np.linalg.norm(uex.values, np.inf)))
-    # uex_last_node = P.u_exact(all_nodes[-1])
-    # print uex.values,"\n",u_sol_at_tend
-    # print uex_last_node.values,"\n",u_sol_split[-1]
-    # testen mal was der erste block so produziert
-    # ha = 3
-    # print all_nodes
-    # print P.u_exact(all_nodes[ha]).values, "\n", u_sol_split[ha]
-    # print P.u_exact(all_nodes[0]).values - u_sol_fblock[:15]
-
-    # get the first iterative solver in the list of linpfasst and test ist
-    # basically test if the sdc part is computed right
-    # first_it_solv =lin_pfasst.multi_step_solver.it_list[0]
-    # print first_it_solv is lin_pfasst.block_diag_solver.it_list[0]
-    # print first_it_solv.M
-    # check with Q_mat and System mat
-    # print MS[0].levels[0].sweep.coll.Qmat[1:,1:]#.dot(np.ones(3))
-    # print MS[0].levels[0].sweep.coll.nodes
-    # print MS[0].levels[0].prob.system_matrix.toarray()[0,0]
-    # print 1-0.125*MS[0].levels[0].prob.system_matrix.toarray()[0,0]*MS[0].levels[0].sweep.coll.Qmat[1,1]
-    # das klappt ja schonmal
-    # testen wi
-    #
-    # u_sdc = [np.kron(np.ones(3), uinit.values).flatten()]
-    # print np.kron(np.ones(3), uinit.values).flatten().shape
-    #
-    # res_sdc = [u_sdc[0] - first_it_solv.M]
-    #
-    # for i in range(numb_sweeps):
-    #     u_sdc.append(first_it_solv.step(u_sdc[-1]))
-    #     res_sdc.append(u_sdc[0]-first_it_solv.M.dot(u_sdc[-1]))
-    #     # print res_sdc[-1]
-    # uex_fblock = P.u_exact(all_nodes[2])
-    # print "(relativer) Fehler im ersten Block"
-    # for u in u_sdc:
-    #     print uex_fblock.values - np.split(u, 3)[-1]
-    #     print('error at time %s: %s'
-    #           %(dt,np.linalg.norm(uex_fblock.values-np.split(u, 3)[-1], np.inf)/np.linalg.norm(uex_fblock.values, np.inf)))
-    #
-    # u_sol_fblock = la.inv(first_it_solv.M).dot(u_sdc[0])
-    # print P.u_exact(all_nodes[2]).values - u_sol_fblock[-15:]
 
     uex = P.u_exact(Tend)
     print('matrix error at time %s: %s' %(Tend, np.linalg.norm(uex.values-u_end_split[-1], np.inf)/np.linalg.norm(

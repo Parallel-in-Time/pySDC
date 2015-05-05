@@ -5,6 +5,57 @@ import scipy.interpolate as intpl
 from pySDC.Transfer import transfer
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.tools.transfer_tools import *
+class mesh_to_mesh_1d_periodic(transfer):
+
+    def __init__(self, fine_level, coarse_level, interpolation_order=2, restriction_order=2, sparse_format="array", T=1):
+        super(mesh_to_mesh_1d_periodic, self).__init__(fine_level, coarse_level)
+
+        self.coarse_mesh = coarse_level.prob.get_mesh("meshgrid")
+        self.fine_mesh = fine_level.prob.get_mesh("meshgrid")
+        self.sparse_format = sparse_format
+        self.Pspace = interpolation_matrix_1d(self.fine_mesh, self.coarse_mesh,
+                                              interpolation_order, sparse_format, True, T)
+        self.Rspace = restriction_matrix_1d(self.fine_mesh, self.coarse_mesh,
+                                            restriction_order, sparse_format, True, T)
+
+
+    def restrict_space(self, F):
+        """
+        Restriction implementation
+
+        Args:
+            F: the fine level data (easier to access than via the fine attribute)
+        """
+
+        if isinstance(F,mesh):
+            u_coarse = mesh(self.init_c,val=0)
+            u_coarse.values = np.dot(self.Rspace, F.values)
+        elif isinstance(F,rhs_imex_mesh):
+            u_coarse = rhs_imex_mesh(self.init_c)
+            u_coarse.impl.values = np.dot(self.Rspace, F.impl.values)
+            u_coarse.expl.values = np.dot(self.Rspace, F.expl.values)
+
+        return u_coarse
+
+    def prolong_space(self, G):
+        """
+        Prolongation implementation
+
+        Args:
+            G: the coarse level data (easier to access than via the coarse attribute)
+        """
+
+        if isinstance(G, mesh):
+            u_fine = mesh(self.init_c, val=0)
+            u_fine.values = np.dot(self.Pspace, G.values)
+        elif isinstance(G, rhs_imex_mesh):
+            u_fine = rhs_imex_mesh(self.init_c)
+            u_fine.impl.values = np.dot(self.Pspace, G.impl.values)
+            u_fine.expl.values = np.dot(self.Pspace, G.expl.values)
+
+        return u_fine
+
+
 
 class mesh_to_mesh(transfer):
     """
@@ -23,7 +74,7 @@ class mesh_to_mesh(transfer):
         Pspace: spatial prolongation matrix, dim. Nc_1*Nc_2*...Nc_D x Nf_1*Nf_2*...*Nf_D
     """
 
-    def __init__(self, fine_level, coarse_level, interpolation_order=[2], restriction_order=[2], sparse_format="dense"):
+    def __init__(self, fine_level, coarse_level, interpolation_order=[2], restriction_order=[2], sparse_format="array"):
         """
         Initialization routine
 
@@ -208,3 +259,4 @@ class time_mesh_to_time_mesh(transfer):
             u_fine.expl.values = np.dot(self.Pspace, G.expl.values)
 
         return u_fine
+

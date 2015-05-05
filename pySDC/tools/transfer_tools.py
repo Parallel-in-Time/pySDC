@@ -45,7 +45,7 @@ def to_dense(D):
 def next_neighbors_periodic(p, ps, k, T=None):
     """
     This function gives for a value p the k points next to it which are found in
-    in the vector ps and the points which are as
+    in the vector ps and the points which are found periodically.
     :param p: value
     :param ps: ndarray, vector where to find the next neighbors
     :param k: integer, number of neighbours
@@ -88,7 +88,7 @@ def next_neighbors(p, ps, k):
     return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
 
-def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc"):
+def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", periodic=False, T=1.0):
     """
     We construct the restriction matrix between two 1d grids, using lagrange interpolation.
 
@@ -101,7 +101,10 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc"):
     n_g = coarse_grid.size
 
     for i, p in zip(range(n_g), coarse_grid):
-        nn = next_neighbors(p, fine_grid, k)
+        if periodic:
+            nn = next_neighbors_periodic(p, fine_grid, k, T)
+        else:
+            nn = next_neighbors(p, fine_grid, k)
         # construct the lagrange polynomials for the k neighbors
         circulating_one = np.asarray([1.0]+[0.0]*(k-1))
         lag_pol = []
@@ -112,7 +115,7 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc"):
     return to_sparse(M, return_type)
 
 
-def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc"):
+def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", periodic=False, T=1.0):
     """
     We construct the interpolation matrix between two 1d grids, using lagrange interpolation.
 
@@ -125,7 +128,10 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc"):
     n_f = fine_grid.size
 
     for i, p in zip(range(n_f), fine_grid):
-        nn = next_neighbors(p, coarse_grid, k)
+        if periodic:
+            nn = next_neighbors_periodic(p, fine_grid, k, T)
+        else:
+            nn = next_neighbors(p, fine_grid, k)
         # construct the lagrange polynomials for the k neighbors
         circulating_one = np.asarray([1.0]+[0.0]*(k-1))
         lag_pol = []

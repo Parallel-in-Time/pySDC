@@ -22,7 +22,7 @@ class mesh_to_mesh_1d(transfer):
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
 
-    def __init__(self,fine_level,coarse_level,*args):
+    def __init__(self, fine_level, coarse_level,*args):
         """
         Initialization routine
 
