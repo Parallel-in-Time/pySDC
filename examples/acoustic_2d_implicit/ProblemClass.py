@@ -71,7 +71,7 @@ class acoustic_2d_implicit(ptype):
         
         x = np.linspace(-3, 3, self.Nx)
         z = np.linspace( 0, 1, self.Nz)
-        self.domainx, self.domainy = np.meshgrid(x, z, indexing="ij")
+        self.domainx, self.domainz = np.meshgrid(x, z, indexing="ij")
         self.dx     = x[1] - x[0]
         self.dz     = z[1] - z[0]
         
@@ -212,7 +212,7 @@ class acoustic_2d_implicit(ptype):
         me               = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.domainx
         me.values[1,:,:] = 0.0*self.domainx
-        me.values[2,:,:] = 0.5*u_initial(self.domainx - t) - 0.5*u_initial(self.domainx + t)
+        me.values[2,:,:] = 0.5*u_initial(self.domainx - t) + 0.5*u_initial(self.domainx + t)
         return me
 
 

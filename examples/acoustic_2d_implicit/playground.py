@@ -14,7 +14,9 @@ from pySDC.Stats import grep_stats, sort_stats
 from clawpack import pyclaw
 from clawpack import riemann
 from matplotlib import pyplot as plt
-
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 if __name__ == "__main__":
 
@@ -28,16 +30,16 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 20
+    sparams['maxiter'] = 5
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.01
-    Tend = 100*dt
+    dt = 0.1
+    Tend = 1*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3, 30, 10)]
+    pparams['nvars'] = [(3, 90, 30)]
     pparams['cs']    = 1.0
     
     # This comes as read-in for the transfer operations
@@ -69,3 +71,20 @@ if __name__ == "__main__":
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
+
+    diff = uex.values - uend.values
+    error = np.linalg.norm( diff.flatten(), np.inf )/np.linalg.norm( uex.values.flatten(), np.inf )
+    print('error at time %s: %s' % (Tend,error))
+
+    print np.shape(P.domainx)
+    print np.shape(P.domainz)
+    print np.shape(uex.values)
+    fig = plt.figure(figsize=(18,6))
+    ax = fig.gca(projection='3d')
+    ax.view_init(elev=90., azim=90.)
+#plt.contourf(P.domainx, P.domainz, uex.values[2,:,:])
+    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+    plt.xlabel('x')
+    plt.ylabel('z')
+#plt.axes().set_aspect('equal')    #ax.set_xlim3d(x[0], x[Nx-1])
+    plt.show()
