@@ -6,7 +6,7 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-from examples.advection.getFDMatrix import getFDMatrix
+from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
 
 class advection(ptype):
     """
