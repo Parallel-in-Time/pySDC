@@ -13,7 +13,7 @@ import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
 
-from pySDC.Plugins.visualization_tools import show_residual_across_simulation
+# from pySDC.Plugins.visualization_tools import show_residual_across_simulation
 
 
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         uex.values,np.inf)))
 
 
-    show_residual_across_simulation(stats,'res_vis_test.png')
+    # show_residual_across_simulation(stats,'res_vis_test.png')
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')

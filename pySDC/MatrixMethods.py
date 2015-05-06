@@ -580,6 +580,11 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     else:
         sparse_format = "array"
 
+    if 't_0' in kwargs:
+        t_0 = kwargs['t_0']
+    else:
+        t_0 = 0
+
     # generate MultiStepSolver
     # put them together into LinearPFASST and return the object
     # first we need the system matrix, e.g. Q kron A
@@ -589,12 +594,12 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     problems_coarse = map(lambda x: x.prob, coarse_levels)
     dt_list = map(lambda x: x.status.dt, step_list)
 
-    M_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
-                                  -dt * sprs.kron(x.sweep.coll.Qmat[1:, 1:], y.system_matrix, format=sparse_format),
-                 fine_levels, problems_fine, dt_list)
-    P_f_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
-                                    -dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix, format=sparse_format),
-                 fine_levels, problems_fine, dt_list)
+    # M_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+    #                               -dt * sprs.kron(x.sweep.coll.Qmat[1:, 1:], y.system_matrix, format=sparse_format),
+    #              fine_levels, problems_fine, dt_list)
+    # P_f_list = map(lambda x, y, dt: sprs.eye(x.sweep.coll.num_nodes*y.system_matrix.shape[0], format=sparse_format)
+    #                                 -dt*sprs.kron(x.sweep.coll.QDmat, y.system_matrix, format=sparse_format),
+    #              fine_levels, problems_fine, dt_list)
     c_0 = np.kron(np.ones(fine_levels[0].sweep.coll.num_nodes), u_0)
     # for the comparison use the SDC IterativeSolver class and adjust the c_list to take
     # in account forcing terms
@@ -602,7 +607,7 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
 
     # compute the quadrature of the forcing term
 
-    all_nodes_split = np.split(get_all_nodes(step_list),len(step_list))
+    all_nodes_split = np.split(get_all_nodes(step_list, t_0), len(step_list))
     # values of the forcing term
     f_values = map(lambda prob, nodes: prob.force_term(nodes), problems_fine, all_nodes_split)
     # quadrature of the f_values
@@ -674,10 +679,10 @@ def generate_transfer_list(step_list, transfer_class, **kwargs):
                step_list, space_transfer_list, time_transfer_list)
 
 
-def get_all_nodes(steps):
+def get_all_nodes(steps, t_0=0):
     dts = map(lambda x: x.status.dt, steps)
     offsets = np.cumsum([0.0]+dts)[:-1]
-    return np.hstack(map(lambda x, dt, off: x.levels[0].sweep.coll.nodes*dt+off, steps, dts, offsets))
+    return np.hstack(map(lambda x, dt, off: x.levels[0].sweep.coll.nodes*dt+off+t_0, steps, dts, offsets))
 
 
 def run_linear_pfasst(lin_pfasst, u_0, kwargs):

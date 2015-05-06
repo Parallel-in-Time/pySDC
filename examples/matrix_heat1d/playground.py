@@ -9,7 +9,7 @@ from examples.matrix_heat1d.TransferClass import mesh_to_mesh_1d
 
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.Methods as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 import pySDC.MatrixMethods as mmp
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
     # print uinit
     # call main function to get things done...
-    uend, stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # start with the analysis using the iteration matrix of PFASST
 
