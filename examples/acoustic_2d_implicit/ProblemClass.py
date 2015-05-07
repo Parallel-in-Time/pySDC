@@ -84,30 +84,31 @@ class acoustic_2d_implicit(ptype):
         # Use Dirichlet BC in z direction for w
         
         Ax = bfd.getFDMatrix(self.Nx, self.dx, True)
-        Dx = sp.kron( Ax, sp.eye(self.Nz), format="csc")
+        Dx = sp.kron( Ax, sp.eye(self.Nz), format="csr")
         
         Az = bfd.getFDMatrix(self.Nz, self.dz, False)
         Az = bfd.modify_delete(Az, 'both')
-        Dz = sp.kron( sp.eye(self.Nx), Az, format="csc" )
+        Dz = sp.kron( sp.eye(self.Nx), Az, format="csr" )
         
         # Modify the identy matrix to include Neumann BC
         Id_z = sp.eye(self.Nz)
         Id_z = bfd.modify_neumann(Id_z, self.dz, 'both')
-        Id   = sp.kron( sp.eye(self.Nx), Id_z,  format="csc")
+        Id   = sp.kron( sp.eye(self.Nx), Id_z,  format="csr")
       
         Zero = sp.csr_matrix(((self.Nx*self.Nz, self.Nx*self.Nz)))
-        Id1 = sp.hstack((Id,                      Zero, Zero), format="csc")
-        Id2 = sp.hstack((Zero, sp.eye(self.Nx*self.Nz), Zero), format="csc")
-        Id3 = sp.hstack((Zero,                    Zero,   Id), format="csc")
-        self.Id = sp.vstack((Id1, Id2, Id3), format="csc")
+        Id1 = sp.hstack((Id,                      Zero, Zero), format="csr")
+        Id2 = sp.hstack((Zero, sp.eye(self.Nx*self.Nz), Zero), format="csr")
+        Id3 = sp.hstack((Zero,                    Zero,   Id), format="csr")
+        self.Id = sp.vstack((Id1, Id2, Id3), format="csr")
             
-        M1  = sp.hstack((Zero, Zero, -Dx), format="csc")
-        M2  = sp.hstack((Zero, Zero, -Dz), format="csc")
-        M3  = sp.hstack((-Dx,   -Dz, Zero), format="csc")
-        self.M = sp.vstack((M1, M2, M3), format="csc")
+        M1  = sp.hstack((Zero, Zero, -Dx), format="csr")
+        M2  = sp.hstack((Zero, Zero, -Dz), format="csr")
+        M3  = sp.hstack((-Dx,   -Dz, Zero), format="csr")
+        self.M = sp.vstack((M1, M2, M3), format="csr")
 
         # LU factorization to be used later as preconditioner
-        self.Pinv = sp.eye(3*self.Nx*self.Nz)
+        # self.Pinv = LA.spilu( self.Id - (0.05/4.0)*self.M, drop_tol=1e-10, fill_factor=20 )
+        # ... not working for some reason
         
         self.solver_time = 0.0
         self.nsolves = 0

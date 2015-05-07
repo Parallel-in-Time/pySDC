@@ -37,8 +37,8 @@ if __name__ == "__main__":
     dt = 0.05
     Tend = 2*dt
     
-    Nx = 300
-    Nz = 50
+    Nx = 450
+    Nz = 75
 
     # This comes as read-in for the problem class
     pparams = {}
