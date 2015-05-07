@@ -144,7 +144,7 @@ def recv(target,source):
         source: level which initiated the send
     """
     # simply do a deepcopy of the values uend to become the new u0 at the target
-    target.u[0] = cp.deepcopy(source.uend)
+    target.u[0] = target.prob.dtype_u(source.uend)
 
 
 def send(source,tag):
