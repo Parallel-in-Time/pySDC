@@ -94,6 +94,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         # compute the residual for each node
 
         # build QF(u)
+        res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
             # add u0 and subtract u at current node
@@ -101,9 +102,11 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             # add tau if associated
             if L.tau is not None:
                 res[m] += L.tau[m]
+            # use abs function from datga type here
+            res_norm.append(abs(res[m]))
 
-        # use standard residual norm: ||.||_inf
-        L.status.residual = np.linalg.norm(res,np.inf)
+        # find maximal residual over the nodes
+        L.status.residual = max(res_norm)
 
         # indicate that the residual has seen the new values
         L.status.updated = False

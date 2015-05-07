@@ -110,7 +110,7 @@ class fenics_mesh():
 
         # take absolute values of the mesh values
 
-        absval = df.norm(self.values.vector(),'linf')
+        absval = df.norm(self.values,'L2')
 
         # return maximum
         return absval

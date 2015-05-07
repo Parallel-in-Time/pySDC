@@ -10,6 +10,10 @@ import pySDC.PFASST_blockwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
+import dolfin as df
+import numpy as np
+
+
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
@@ -31,7 +35,7 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [32]
+    pparams['c_nvars'] = [128]
     pparams['family'] = 'CG'
     pparams['order'] = [4]
     pparams['refinements'] = [1,0]
@@ -74,7 +78,11 @@ if __name__ == "__main__":
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    print('error at time %s: %s' %(Tend,abs(uex-uend)/abs(uex)))
+    print('(classical) error at time %s: %s' %(Tend,abs(uex-uend)/abs(uex)))
+
+
+    uex = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=Tend)
+    print('(fenics-style) error at time %s: %s' %(Tend,df.errornorm(uex,uend.values)))
 
     extract_stats = grep_stats(stats,iter=-1,type='residual')
     sortedlist_stats = sort_stats(extract_stats,sortby='step')
