@@ -34,13 +34,17 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.01
-    Tend = 100*dt
+    dt = 0.05
+    Tend = 2*dt
+    
+    Nx = 300
+    Nz = 50
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3, 250, 4)]
+    pparams['nvars'] = [(3, Nx, Nz)]
     pparams['cs']    = 1.0
+    pparams['dt']    = dt
     
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -76,16 +80,15 @@ if __name__ == "__main__":
     error = np.linalg.norm( diff.flatten(), np.inf )
     print('error at time %s: %s' % (Tend,error))
 
-#print np.shape(P.domainx)
-#print np.shape(P.domainz)
-#print np.shape(uex.values)
+    print ('average time in linear solver (sec.) %7.4f' % (P.solver_time/float(P.nsolves)))
+
     fig = plt.figure(figsize=(18,6))
     #    ax = fig.gca(projection='3d')
     #ax.view_init(elev=90., azim=90.)
 #plt.contourf(P.domainx, P.domainz, uex.values[2,:,:])
 #    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-    plt.plot(np.linspace(0,1,250), uex.values[2,:,2], 'r')
-    plt.plot(np.linspace(0,1,250), uend.values[2,:,2], 'b')
+    plt.plot(np.linspace(0,1,Nx), uex.values[2,:,2], 'r')
+    plt.plot(np.linspace(0,1,Nx), uend.values[2,:,2], 'b')
     plt.xlabel('x')
     plt.ylabel('z')
 #plt.axes().set_aspect('equal')    #ax.set_xlim3d(x[0], x[Nx-1])

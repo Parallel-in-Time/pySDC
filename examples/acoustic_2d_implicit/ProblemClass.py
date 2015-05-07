@@ -19,6 +19,7 @@ r"""
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
+import time
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
@@ -26,8 +27,8 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 import buildFDMatrix as bfd
 from unflatten import unflatten
 
-def u_initial(x):
-  return np.exp(-0.5*(x-0.0)**2/0.1**2)
+def u_initial(x,z):
+  return np.exp( -0.5*(x-0.0)**2/0.25**2-0.0*(z-0.5)**2/0.05**2 )
 
 
 class acoustic_2d_implicit(ptype):
@@ -39,10 +40,13 @@ class acoustic_2d_implicit(ptype):
       domainz: Second output of np.meshgrid
       dx: 
       dz:
+      dt:
       Id:
       M:
       Nx:
       Nz:
+      solver_time:
+      nsolves:
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -80,28 +84,34 @@ class acoustic_2d_implicit(ptype):
         # Use Dirichlet BC in z direction for w
         
         Ax = bfd.getFDMatrix(self.Nx, self.dx, True)
-        Dx = sp.kron( Ax, sp.eye(self.Nz), format="csr")
+        Dx = sp.kron( Ax, sp.eye(self.Nz), format="csc")
         
         Az = bfd.getFDMatrix(self.Nz, self.dz, False)
         Az = bfd.modify_delete(Az, 'both')
-        Dz = sp.kron( sp.eye(self.Nx), Az, format="csr" )
+        Dz = sp.kron( sp.eye(self.Nx), Az, format="csc" )
         
         # Modify the identy matrix to include Neumann BC
         Id_z = sp.eye(self.Nz)
         Id_z = bfd.modify_neumann(Id_z, self.dz, 'both')
-        Id   = sp.kron( sp.eye(self.Nx), Id_z,  format="csr")
+        Id   = sp.kron( sp.eye(self.Nx), Id_z,  format="csc")
       
         Zero = sp.csr_matrix(((self.Nx*self.Nz, self.Nx*self.Nz)))
-        Id1 = sp.hstack((Id,                      Zero, Zero), format="csr")
-        Id2 = sp.hstack((Zero, sp.eye(self.Nx*self.Nz), Zero), format="csr")
-        Id3 = sp.hstack((Zero,                    Zero,   Id), format="csr")
-        self.Id = sp.vstack((Id1, Id2, Id3), format="csr")
+        Id1 = sp.hstack((Id,                      Zero, Zero), format="csc")
+        Id2 = sp.hstack((Zero, sp.eye(self.Nx*self.Nz), Zero), format="csc")
+        Id3 = sp.hstack((Zero,                    Zero,   Id), format="csc")
+        self.Id = sp.vstack((Id1, Id2, Id3), format="csc")
             
-        M1  = sp.hstack((Zero, Zero, -Dx), format="csr")
-        M2  = sp.hstack((Zero, Zero, -Dz), format="csr")
-        M3  = sp.hstack((-Dx,   -Dz, Zero), format="csr")
-        self.M = sp.vstack((M1, M2, M3), format="csr")
-          
+        M1  = sp.hstack((Zero, Zero, -Dx), format="csc")
+        M2  = sp.hstack((Zero, Zero, -Dz), format="csc")
+        M3  = sp.hstack((-Dx,   -Dz, Zero), format="csc")
+        self.M = sp.vstack((M1, M2, M3), format="csc")
+
+        # LU factorization to be used later as preconditioner
+        self.Pinv = sp.eye(3*self.Nx*self.Nz)
+        
+        self.solver_time = 0.0
+        self.nsolves = 0
+            
     def solve_system(self,rhs,factor,u0):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -121,8 +131,19 @@ class acoustic_2d_implicit(ptype):
           rhs.values[i,:,self.Nz-1] = 0.0
         
         b = rhs.values.flatten()
+        u0 = u0.values.flatten()
         
-        sol = LA.spsolve( self.Id-factor*self.M, b)
+        # Define the preconditioner as a linear operator
+        # prec = lambda x : self.Pinv.dot(x)
+        # dim  = 3*self.Nx*self.Nz
+        # prec_op = LA.LinearOperator((dim,dim),prec)
+        
+        start = time.time()
+        #sol = LA.spsolve( self.Id-factor*self.M, b)
+        sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0, tol=1e-8, restart=20, maxiter=50, M=None)
+        end = time.time()
+        self.solver_time = self.solver_time + (end-start)
+        self.nsolves = self.nsolves + 1
         
         me = mesh(self.nvars)
         me.values = unflatten(sol, 3, self.Nx, self.Nz)
@@ -205,7 +226,7 @@ class acoustic_2d_implicit(ptype):
         me               = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.domainx
         me.values[1,:,:] = 0.0*self.domainx
-        me.values[2,:,:] = 0.5*u_initial(self.domainx - t) + 0.5*u_initial(self.domainx + t)
+        me.values[2,:,:] = 0.5*u_initial(self.domainx - t,self.domainz) + 0.5*u_initial(self.domainx + t, self.domainz)
         return me
 
 
