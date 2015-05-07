@@ -11,6 +11,7 @@ News
 ----
 
 * May 7, 2015: added first [FEniCS](http://fenicsproject.org/) example
+* May 5, 2015: added [Clawpack](http://www.clawpack.org/) examples using Sharpclaw
 * April 16, 2015: new PFASST iterator (loop-based) implemented, new examples added
 * March 19, 2015: code now also runs with Python 2.7, development of SharpClaw example started 
 * January 7, 2015: revised the examples to work with the new driver in Methods.py, new statistics framework
