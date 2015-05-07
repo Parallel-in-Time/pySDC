@@ -82,8 +82,9 @@ class transfer(with_metaclass(abc.ABCMeta)):
                 G.tau[m] += self.restrict_space(F.tau[m])
 
         # save u and rhs evaluations for interpolation
-        G.uold = cp.deepcopy(G.u)
-        G.fold = cp.deepcopy(G.f)
+        for m in range(SG.coll.num_nodes+1):
+            G.uold[m] = PG.dtype_u(G.u[m])
+            G.fold[m] = PG.dtype_f(G.f[m])
 
         # works as a predictor
         G.status.unlocked = True
@@ -139,6 +140,7 @@ class transfer(with_metaclass(abc.ABCMeta)):
         G = self.coarse
 
         PF = F.prob
+        PG = G.prob
 
         SF = F.sweep
         SG = G.sweep
@@ -155,7 +157,8 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
-            F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
+            F.f[m].impl += self.prolong_space(G.f[m].impl - G.fold[m].impl)
+            F.f[m].expl += self.prolong_space(G.f[m].expl - G.fold[m].expl)
 
         return None
 
