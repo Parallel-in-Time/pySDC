@@ -115,7 +115,7 @@ class acoustic_2d_implicit(ptype):
             solution as mesh
         """
         
-        # Dirichlet BC in z for w and Neumann BC in z for u, p
+        # Set Dirichlet BC in z for w and Neumann BC in z for u, p
         for i in range(0,3):
           rhs.values[i,:,0]         = 0.0
           rhs.values[i,:,self.Nz-1] = 0.0
@@ -167,7 +167,7 @@ class acoustic_2d_implicit(ptype):
 
         b = u.values.flatten()
         sol = self.M.dot(b)
-                    
+        
         fimpl = mesh(self.nvars,val=0)
         fimpl.values = unflatten(sol, 3, self.Nx, self.Nz)
         
