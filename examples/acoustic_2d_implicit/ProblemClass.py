@@ -24,7 +24,7 @@ from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 import buildFDMatrix as bfd
-
+from unflatten import unflatten
 
 def u_initial(x):
   return np.exp(-0.5*(x-0.0)**2/0.1**2)
@@ -89,17 +89,17 @@ class acoustic_2d_implicit(ptype):
         # Modify the identy matrix to include Neumann BC
         Id_z = sp.eye(self.Nz)
         Id_z = bfd.modify_neumann(Id_z, self.dz, 'both')
-        Id   = sp.kron( Id_z, sp.eye(self.Nx), format="csr")
+        Id   = sp.kron( sp.eye(self.Nx), Id_z,  format="csr")
       
         Zero = sp.csr_matrix(((self.Nx*self.Nz, self.Nx*self.Nz)))
-        Id1 = sp.hstack((Id, Zero, Zero), format="csr")
+        Id1 = sp.hstack((Id,                      Zero, Zero), format="csr")
         Id2 = sp.hstack((Zero, sp.eye(self.Nx*self.Nz), Zero), format="csr")
-        Id3 = sp.hstack((Zero, Zero, Id), format="csr")
+        Id3 = sp.hstack((Zero,                    Zero,   Id), format="csr")
         self.Id = sp.vstack((Id1, Id2, Id3), format="csr")
             
-        M1  = sp.hstack((Zero, Zero,   Dx), format="csr")
-        M2  = sp.hstack((Zero, Zero,   Dz), format="csr")
-        M3  = sp.hstack((Dx,     Dz, Zero), format="csr")
+        M1  = sp.hstack((Zero, Zero, -Dx), format="csr")
+        M2  = sp.hstack((Zero, Zero, -Dz), format="csr")
+        M3  = sp.hstack((-Dx,   -Dz, Zero), format="csr")
         self.M = sp.vstack((M1, M2, M3), format="csr")
           
     def solve_system(self,rhs,factor,u0):
@@ -122,13 +122,10 @@ class acoustic_2d_implicit(ptype):
         
         b = rhs.values.flatten()
         
-        sol = LA.spsolve(self.Id-factor*self.M, b)
+        sol = LA.spsolve( self.Id-factor*self.M, b)
         
-        temp = np.zeros((3, self.Nx*self.Nz))
-        temp = np.asarray(np.split(sol, 3))
         me = mesh(self.nvars)
-        for i in range(0,3):
-          me.values[i,:,:] = np.split(temp[i,:], self.Nx)
+        me.values = unflatten(sol, 3, self.Nx, self.Nz)
         
         return me
 
@@ -169,14 +166,10 @@ class acoustic_2d_implicit(ptype):
 
 
         b = u.values.flatten()
-        
         sol = self.M.dot(b)
                     
         fimpl = mesh(self.nvars,val=0)
-        temp  = np.zeros((3, self.Nx*self.Nz))
-        temp  = np.asarray(np.split(sol, 3))
-        for i in range(0,3):
-          fimpl.values[i,:,:] = np.split(temp[i,:], self.Nx)
+        fimpl.values = unflatten(sol, 3, self.Nx, self.Nz)
         
         return fimpl
 

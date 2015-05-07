@@ -34,12 +34,12 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.1
-    Tend = 1*dt
+    dt = 0.05
+    Tend = 20*dt
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3, 90, 30)]
+    pparams['nvars'] = [(3, 250, 4)]
     pparams['cs']    = 1.0
     
     # This comes as read-in for the transfer operations
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 4
+    description['num_nodes']         = 5
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     #description['transfer_class'] = mesh_to_mesh_1d
@@ -72,18 +72,20 @@ if __name__ == "__main__":
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    diff = uex.values - uend.values
-    error = np.linalg.norm( diff.flatten(), np.inf )/np.linalg.norm( uex.values.flatten(), np.inf )
+    diff = uex.values[2,:,:] - uend.values[2,:,:]
+    error = np.linalg.norm( diff.flatten(), np.inf )
     print('error at time %s: %s' % (Tend,error))
 
-    print np.shape(P.domainx)
-    print np.shape(P.domainz)
-    print np.shape(uex.values)
+#print np.shape(P.domainx)
+#print np.shape(P.domainz)
+#print np.shape(uex.values)
     fig = plt.figure(figsize=(18,6))
-    ax = fig.gca(projection='3d')
-    ax.view_init(elev=90., azim=90.)
+    #    ax = fig.gca(projection='3d')
+    #ax.view_init(elev=90., azim=90.)
 #plt.contourf(P.domainx, P.domainz, uex.values[2,:,:])
-    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+#    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+    plt.plot(np.linspace(0,1,250), uex.values[2,:,2], 'r')
+    plt.plot(np.linspace(0,1,250), uend.values[2,:,2], 'b')
     plt.xlabel('x')
     plt.ylabel('z')
 #plt.axes().set_aspect('equal')    #ax.set_xlim3d(x[0], x[Nx-1])
