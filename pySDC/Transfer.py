@@ -73,13 +73,10 @@ class transfer(with_metaclass(abc.ABCMeta)):
         # restrict fine level tau correction part
         tauFG = []
         for m in range(SG.coll.num_nodes):
-            mod_F = PF.invert_mass_matrix(tauF[m])
-            tauFG.append(PG.apply_mass_matrix(self.restrict_space(mod_F)))
-            # tauFG.append(self.restrict_space(tauF[m]))
+            tauFG.append(self.restrict_space(tauF[m]))
 
         # build tau correction, also restrict possible tau correction from fine
         for m in range(SG.coll.num_nodes):
-            # mod_G = PG.invert_mass_matrix(tauG[m])
             G.tau[m] = tauFG[m] - tauG[m]
             if F.tau is not None:
                 G.tau[m] += self.restrict_space(F.tau[m])
@@ -154,14 +151,14 @@ class transfer(with_metaclass(abc.ABCMeta)):
         assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
         # build coarse correction
-        # need to restrict F.u[0] again here, since it might have changed in PFASST (WWWOOOOT?? fixme)
+        # need to restrict F.u[0] again here, since it might have changed in PFASST
         F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
-            F.f[m].impl += PF.apply_mass_matrix(self.prolong_space(PG.invert_mass_matrix(G.f[m].impl - G.fold[m].impl)))
-            F.f[m].expl += PF.apply_mass_matrix(self.prolong_space(PG.invert_mass_matrix(G.f[m].expl - G.fold[m].expl)))
+            F.f[m].impl += self.prolong_space(G.f[m].impl - G.fold[m].impl)
+            F.f[m].expl += self.prolong_space(G.f[m].expl - G.fold[m].expl)
 
         return None
 

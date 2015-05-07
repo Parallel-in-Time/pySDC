@@ -4,15 +4,18 @@ import dolfin as df
 import numpy as np
 
 from pySDC.Problem import ptype
-from fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 
 class fenics_heat2d(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
-        A: second-order FD discretization of the 1D laplace operator
-        dx: distance between two spatial nodes
+        V: function space
+        M: mass matrix for FEM
+        K: stiffness matrix incl. diffusion coefficient (and correct sign)
+        g: forcing term
+        bc: boundary conditions
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
@@ -25,10 +28,7 @@ class fenics_heat2d(ptype):
             dtype_f: acceleration data type (will be passed parent class)
         """
 
-        # class Boundary(df.SubDomain):  # define the Dirichlet boundary
-        #     def inside(self, x, on_boundary):
-        #             return on_boundary
-
+        # define the Dirichlet boundary
         def Boundary(x, on_boundary):
             return on_boundary
 
@@ -46,40 +46,41 @@ class fenics_heat2d(ptype):
 
         df.set_log_level(df.WARNING)
 
-        # mesh = df.UnitIntervalMesh(self.c_nvars)
-        mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
+        # set mesh and refinement (for multilevel)
+        mesh = df.UnitIntervalMesh(self.c_nvars)
+        # mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
         for i in range(self.refinements):
             mesh = df.refine(mesh)
 
+        # define function space for future reference
         self.V = df.FunctionSpace(mesh, self.family, self.order)
-
         tmp = df.Function(self.V)
         print('DoFs on this level:',len(tmp.vector().array()))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)
 
-        # Laplace terms
+        # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
         a_K = df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx
 
-        # "Mass matrix" term
+        # Mass term
         a_M = u*v*df.dx
 
         self.M = df.assemble(a_M)
-        self.K = self.nu*df.assemble(a_K)
+        self.K = -self.nu*df.assemble(a_K)
 
-        # self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # self.u0 = df.Expression('1 + x[0]*x[0] + alpha*x[1]*x[1] + beta*t',alpha=self.alpha, beta=self.beta, t=self.t0)
-        self.u0 = df.Constant(0.0)
-        self.bc = df.DirichletBC(self.V, self.u0, Boundary)
+        # set forcing term as expression
+        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
+        # self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
+        # set boundary values
+        self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
 
     def solve_system(self,rhs,factor,u0,t):
         """
-        Simple linear solver for (I-dtA)u = rhs
+        Dolfin's linear solver for (M-dtA)u = rhs
 
         Args:
             rhs: right-hand side for the nonlinear system
@@ -90,7 +91,7 @@ class fenics_heat2d(ptype):
             solution as mesh
         """
 
-        A = self.M + factor*self.K
+        A = self.M - factor*self.K
         b = fenics_mesh(rhs)
 
         self.bc.apply(A,b.values.vector())
@@ -115,7 +116,7 @@ class fenics_heat2d(ptype):
 
         self.g.t = t
         fexpl = fenics_mesh(self.V)
-        fexpl.values = df.Function(self.V,self.M*df.interpolate(self.g,self.V).vector())
+        fexpl.values = df.Function(self.V,df.interpolate(self.g,self.V).vector())
 
         return fexpl
 
@@ -131,8 +132,9 @@ class fenics_heat2d(ptype):
             implicit part of RHS
         """
 
-        fimpl = fenics_mesh(self.V)
-        fimpl.values = df.Function(self.V,-1.0*self.K*u.values.vector())
+        tmp = fenics_mesh(self.V)
+        tmp.values = df.Function(self.V,self.K*u.values.vector())
+        fimpl = self.__invert_mass_matrix(tmp)
 
         return fimpl
 
@@ -156,6 +158,15 @@ class fenics_heat2d(ptype):
 
 
     def apply_mass_matrix(self,u):
+        """
+        Routine to apply mass matrix
+
+        Args:
+            u: current values
+
+        Returns:
+            M*u
+        """
 
         me = fenics_mesh(self.V)
         me.values = df.Function(self.V,self.M*u.values.vector())
@@ -163,7 +174,16 @@ class fenics_heat2d(ptype):
         return me
 
 
-    def invert_mass_matrix(self,u):
+    def __invert_mass_matrix(self,u):
+        """
+        Helper routine to invert mass matrix
+
+        Args:
+            u: current values
+
+        Returns:
+            inv(M)*u
+        """
 
         me = fenics_mesh(self.V)
 
@@ -188,8 +208,8 @@ class fenics_heat2d(ptype):
             exact solution
         """
 
-        u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
-        # u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t,degree=self.order)
+        # u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
+        u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t,degree=self.order)
 
         me = fenics_mesh(self.V)
         me.values = df.interpolate(u0,self.V)

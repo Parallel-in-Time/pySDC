@@ -1,24 +1,23 @@
 
 from pySDC import CollocationClasses as collclass
 
-from examples.fenics_heat2d.ProblemClass import fenics_heat2d
-from examples.fenics_heat2d.fenics_mesh import fenics_mesh, rhs_fenics_mesh
-from examples.fenics_heat2d.TransferClass import mesh_to_mesh_fenics
+from examples.fenics_heat1d.ProblemClass import fenics_heat2d
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
+from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
-from examples.fenics_heat2d.HookClass import error_output
-
-import dolfin as df
 
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 4
+
+    # assert num_procs == 1,'turn on predictor!'
 
     # This comes as read-in for the level class
     lparams = {}
@@ -31,16 +30,16 @@ if __name__ == "__main__":
     pparams = {}
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [(32,32)]
-    # pparams['c_nvars'] = [255]
+    # pparams['c_nvars'] = [(16,16)]
+    pparams['c_nvars'] = [32]
     pparams['family'] = 'CG'
-    pparams['order'] = [1]
+    pparams['order'] = [4]
     pparams['refinements'] = [1,0]
 
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = False #fixme: u-interpolation not working with MLSDC and PFASST???
+    tparams['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -48,13 +47,12 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre #fixme: lobatto not working with PFASST..???
+    description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 3
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
-    description['hook_class'] = error_output
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -62,7 +60,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.5
-    Tend = 1*dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

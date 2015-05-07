@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 
 from pySDC.Transfer import transfer
-from fenics_mesh import fenics_mesh, rhs_fenics_mesh
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 
 import dolfin as df
 

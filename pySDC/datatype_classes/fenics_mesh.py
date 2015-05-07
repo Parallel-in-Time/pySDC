@@ -34,7 +34,7 @@ class fenics_mesh():
             self.V = init
         # something is wrong, if none of the ones above hit
         # else:
-        #     raise DataError('something went wrong during %s initialization' % type(self))
+        #     raise DataError('something went wrong during %s initialization' % type(self)) fixme
 
 
     def __add__(self, other):
@@ -151,7 +151,7 @@ class rhs_fenics_mesh():
             # self.V = init
         # something is wrong, if none of the ones above hit
         # else:
-        #     raise DataError('something went wrong during %s initialization' % type(self))
+        #     raise DataError('something went wrong during %s initialization' % type(self)) fixme
 
 
     def __sub__(self, other):
