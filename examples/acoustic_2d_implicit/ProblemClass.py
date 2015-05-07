@@ -28,7 +28,7 @@ import buildFDMatrix as bfd
 from unflatten import unflatten
 
 def u_initial(x,z):
-  return np.exp( -0.0*(x-0.0)**2/0.25**2-0.5*(z-0.5)**2/0.05**2 )
+  return np.exp( -0.5*(x-1.5)**2/0.15**2-0.5*(z-0.5)**2/0.25**2 )
 
 
 class acoustic_2d_implicit(ptype):
