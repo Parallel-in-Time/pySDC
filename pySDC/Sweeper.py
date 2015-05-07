@@ -102,7 +102,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             # add tau if associated
             if L.tau is not None:
                 res[m] += L.tau[m]
-            # use abs function from datga type here
+            # use abs function from data type here
             res_norm.append(abs(res[m]))
 
         # find maximal residual over the nodes

@@ -6,7 +6,7 @@ import numpy as np
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 
-class fenics_heat2d(ptype):
+class fenics_adv_diff_1d(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
@@ -29,8 +29,8 @@ class fenics_heat2d(ptype):
         """
 
         # define the Dirichlet boundary
-        def Boundary(x, on_boundary):
-            return on_boundary
+        # def Boundary(x, on_boundary):
+        #     return on_boundary
 
         # Sub domain for Periodic boundary condition
         class PeriodicBoundary(df.SubDomain):
@@ -69,14 +69,16 @@ class fenics_heat2d(ptype):
         print('DoFs on this level:',len(tmp.vector().array()))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)
+        super(fenics_adv_diff_1d,self).__init__(self.V,dtype_u,dtype_f)
 
-        # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
-        a_K = -self.nu*df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx
 
-        a_G = -self.mu*df.inner(df.nabla_grad(u)[0],v)*df.dx
+        # Stiffness term (diffusion)
+        a_K = -1.0*df.inner(df.nabla_grad(u), self.nu*df.nabla_grad(v))*df.dx
+
+        # Stiffness term (advection)
+        a_G = df.inner(self.mu*df.nabla_grad(u)[0], v)*df.dx
 
         # Mass term
         a_M = u*v*df.dx
@@ -84,12 +86,6 @@ class fenics_heat2d(ptype):
         self.M = df.assemble(a_M)
         self.K = df.assemble(a_K)
         self.G = df.assemble(a_G)
-
-        # set forcing term as expression
-        # self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # set boundary values
-        # self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
 
     def solve_system(self,rhs,factor,u0,t):
@@ -108,8 +104,6 @@ class fenics_heat2d(ptype):
         A = self.M - factor*self.K
         b = fenics_mesh(rhs)
 
-        # self.bc.apply(A,b.values.vector())
-
         u = fenics_mesh(u0)
         df.solve(A,u.values.vector(),b.values.vector())
 
@@ -127,11 +121,6 @@ class fenics_heat2d(ptype):
         Returns:
             explicit part of RHS
         """
-
-        # self.g.t = t
-        # fexpl = fenics_mesh(self.V)
-        # # fexpl.values = df.Function(self.V,df.interpolate(self.g,self.V).vector())
-        # fexpl.values = df.Function(self.V,self.G*u.values.vector())
 
         tmp = fenics_mesh(self.V)
         tmp.values = df.Function(self.V,self.G*u.values.vector())
@@ -209,8 +198,6 @@ class fenics_heat2d(ptype):
         A = 1.0*self.M
         b = fenics_mesh(u)
 
-        # self.bc.apply(A,b.values.vector())
-
         df.solve(A,me.values.vector(),b.values.vector())
 
         return me
@@ -228,7 +215,7 @@ class fenics_heat2d(ptype):
         """
 
         # u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
-        u0 = df.Expression('exp(-nu*pow(k,2)*t) * sin(2*a*k*(x[0]-mu*t))',a=np.pi,nu=self.nu,mu=self.mu,k=self.k,t=t)
+        u0 = df.Expression('exp(-nu*pow(2*a*k,2)*t) * sin(2*a*k*(x[0]+mu*t))',a=np.pi,nu=self.nu,mu=self.mu,k=self.k,t=t)
 
         me = fenics_mesh(self.V)
         me.values = df.interpolate(u0,self.V)

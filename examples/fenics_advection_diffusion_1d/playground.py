@@ -1,9 +1,9 @@
 
 from pySDC import CollocationClasses as collclass
 
-from examples.fenics_other.ProblemClass import fenics_heat2d
+from examples.fenics_advection_diffusion_1d.ProblemClass import fenics_adv_diff_1d
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-from examples.fenics_other.TransferClass import mesh_to_mesh_fenics
+from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
@@ -37,10 +37,10 @@ if __name__ == "__main__":
     pparams['k'] = 1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [128]
+    pparams['c_nvars'] = [32]
     pparams['family'] = 'CG'
     pparams['order'] = [4]
-    pparams['refinements'] = [1]
+    pparams['refinements'] = [1,0]
 
 
     # This comes as read-in for the transfer operations
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = fenics_heat2d
+    description['problem_class'] = fenics_adv_diff_1d
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
@@ -65,8 +65,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
-    dt = 0.05
-    Tend = 1*dt
+    dt = 0.2
+    Tend = 1.0
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -83,9 +83,9 @@ if __name__ == "__main__":
     print('(classical) error at time %s: %s' %(Tend,abs(uex-uend)/abs(uex)))
 
     # df.plot(uex.values,key='u')
-    df.plot(uend.values,key='u')
+    # df.plot(uend.values,key='u')
     # df.plot(uex.values-uend.values)
-    df.interactive()
+    # df.interactive()
 
     # uex = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=Tend)
     # print('(fenics-style) error at time %s: %s' %(Tend,df.errornorm(uex,uend.values)))
