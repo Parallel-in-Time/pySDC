@@ -28,7 +28,7 @@ import buildFDMatrix as bfd
 from unflatten import unflatten
 
 def u_initial(x,z):
-  return np.exp( -0.5*(x-0.0)**2/0.25**2-0.0*(z-0.5)**2/0.05**2 )
+  return np.exp( -0.5*(x-0.0)**2/0.25**2-0.5*(z-0.5)**2/0.15**2 )
 
 
 class acoustic_2d_implicit(ptype):
@@ -227,7 +227,9 @@ class acoustic_2d_implicit(ptype):
         me               = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.domainx
         me.values[1,:,:] = 0.0*self.domainx
-        me.values[2,:,:] = 0.5*u_initial(self.domainx - t,self.domainz) + 0.5*u_initial(self.domainx + t, self.domainz)
+        me.values[2,:,:] = u_initial(self.domainx,self.domainz)
+        # Only valid in quasi 1D case with constant-in-z solution
+        #me.values[2,:,:] = 0.5*u_initial(self.domainx - t,self.domainz) + 0.5*u_initial(self.domainx + t, self.domainz)
         return me
 
 

@@ -34,8 +34,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.05
-    Tend = 2*dt
+    dt = 0.1
+    Tend = 20*dt
     
     Nx = 450
     Nz = 75
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 4
+    description['num_nodes']         = 3
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     #description['transfer_class'] = mesh_to_mesh_1d
@@ -83,13 +83,13 @@ if __name__ == "__main__":
     print ('average time in linear solver (sec.) %7.4f' % (P.solver_time/float(P.nsolves)))
 
     fig = plt.figure(figsize=(18,6))
-    #    ax = fig.gca(projection='3d')
+    ax = fig.gca(projection='3d')
     #ax.view_init(elev=90., azim=90.)
-#plt.contourf(P.domainx, P.domainz, uex.values[2,:,:])
-#    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-    plt.plot(np.linspace(0,1,Nx), uex.values[2,:,2], 'r')
-    plt.plot(np.linspace(0,1,Nx), uend.values[2,:,2], 'b')
+    #plt.contourf(P.domainx, P.domainz, uex.values[2,:,:])
+    surf = ax.plot_surface(P.domainx, P.domainz, uend.values[2,:,:], rstride=4, cstride=4, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+    #plt.plot(np.linspace(0,1,Nx), uex.values[2,:,2], 'r')
+    #plt.plot(np.linspace(0,1,Nx), uend.values[2,:,2], 'b')
     plt.xlabel('x')
     plt.ylabel('z')
-#plt.axes().set_aspect('equal')    #ax.set_xlim3d(x[0], x[Nx-1])
+    #plt.axes().set_aspect('equal')
     plt.show()
