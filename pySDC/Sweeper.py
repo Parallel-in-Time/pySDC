@@ -66,12 +66,14 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         P = L.prob
 
         # evaluate RHS at left point
-        L.f[0] = P.eval_f(L.u[0],L.time)
+        # L.f[0] = P.eval_f(L.u[0],L.time)
+        L.f[0] = P.eval_f(L.u[0],0)
 
         # copy u[0] to all collocation nodes, evaluate RHS
         for m in range(1,self.coll.num_nodes+1):
             L.u[m] = P.dtype_u(L.u[0])
-            L.f[m] = P.eval_f(L.u[m],L.time+L.dt*self.coll.nodes[m-1])
+            # L.f[m] = P.eval_f(L.u[m],L.time+L.dt*self.coll.nodes[m-1])
+            L.f[m] = P.eval_f(L.u[m],0)
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True

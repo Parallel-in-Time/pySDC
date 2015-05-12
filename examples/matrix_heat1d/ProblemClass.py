@@ -74,7 +74,9 @@ class heat1d(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        Minv = LA.inv(sp.eye(self.nvars)-factor*self.A)
+        me.values = Minv.dot(rhs.values)
         return me
 
 
@@ -92,8 +94,8 @@ class heat1d(ptype):
 
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
         fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
-        # fexpl.values = np.zeros(self.nvars)
+        # fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
+        fexpl.values = np.zeros(self.nvars)
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -144,8 +146,8 @@ class heat1d(ptype):
 
         me = mesh(self.nvars)
         # xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*self.xvalues)*np.cos(t)
-        # me.values = np.sin(np.pi*self.xvalues)*np.exp(-np.pi**2 * self.nu * t)
+        # me.values = np.sin(np.pi*self.xvalues)*np.cos(t)
+        me.values = np.sin(np.pi*self.xvalues)*np.exp(-np.pi**2 * self.nu * t)
         return me
 
 
@@ -189,8 +191,8 @@ class heat1d(ptype):
         :return: forcing term of the heat  equation
         """
         if type(t) is np.ndarray:
-            # return np.zeros(self.xvalues.shape[0]*t.shape[0])
-            return np.hstack(map(lambda tau: -np.sin(np.pi*self.xvalues)*(np.sin(tau)-self.nu*np.pi**2*np.cos(tau)), t))
+            return np.zeros(self.xvalues.shape[0]*t.shape[0])
+            # return np.hstack(map(lambda tau: -np.sin(np.pi*self.xvalues)*(np.sin(tau)-self.nu*np.pi**2*np.cos(tau)), t))
         else:
             return -np.sin(np.pi*self.xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
 

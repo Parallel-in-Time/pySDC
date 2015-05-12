@@ -59,6 +59,7 @@ class hooks(object):
         Default routine called after each sweep
         """
         L = self.level
+
         logger = logging.getLogger('root')
         logger.info('Process %2i on time %8.6f at stage %10s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                     status.slot,status.time,status.stage,L.id,status.iter,L.status.residual)

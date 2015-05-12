@@ -181,6 +181,9 @@ class SDCIterativeSolver(IterativeSolver):
         P = sprs.eye(self.A_E.shape[0]*self.QD.shape[0], format=sparse_format) \
             - sprs.kron(dt*self.QD, self.A_I, format=sparse_format) \
             - sprs.kron(dt*self.QD.dot(E), self.A_E, format=sparse_format)
+        if c is None:
+            c = np.zeros(P.shape[0])
+
         super(SDCIterativeSolver, self).__init__(P, M, c, sparse_format=sparse_format)
 
 
@@ -310,7 +313,7 @@ class MultiStepIterativeSolver(IterativeSolver):
 
         shape_list = map(lambda x: x.P.shape[0], iterative_solver_list)
         self.__split_points = np.cumsum(shape_list)[:-1]
-
+        self.block_shapes = map(lambda x: x.P.shape, iterative_solver_list)
 
     @staticmethod
     def matrixN(tau, rows=-1, last_value=1.0):
@@ -404,6 +407,7 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
         self.__N_x_list_fine = N_x_list_fine
         self.__N_x_list_coarse = N_x_list_coarse
         self.__transfer_list = transfer_list
+
     @property
     def P_inv(self):
 
@@ -464,6 +468,10 @@ class LinearPFASST(IterativeSolver):
         self.U_half = np.zeros(self.M.shape[0])
 
     @property
+    def P(self):
+        return self.combine_two_P(self.P_c_inv, self.P_f_inv)
+
+    @property
     def multi_step_solver(self):
         return self.__ms_its
 
@@ -519,7 +527,27 @@ class LinearPFASST(IterativeSolver):
         print(map(type,[M,self.P_f_inv,P_c_inv,I]))
         return np.dot(I - np.dot(P_f_inv, M), I - np.dot(P_c_inv, M))
 
+    def check_condition_numbers(self, p=2):
+        K_M = np.linalg.cond(self.M, p=p)
+        K_P = np.linalg.cond(self.P, p=p)
+        # K_P_c = np.linalg.cond(self.P_c, p=np.inf)
+        K_P_f = np.linalg.cond(self.P_f, p=p)
+        norm_b = np.linalg.norm(self.c, ord=p)
+        print "K(M) \t : \t", K_M
+        print "K(P) \t : \t", K_P
+        # print "K(P_c) \t : \t", K_P_c
+        print "K(P_f) \t : \t", K_P_f
+        print "norm(c) \t : \t", norm_b
+        print "rock_bottom \t : \t", norm_b/K_M * 9.9E-5
+        print "top_heaven\t : \t", norm_b*K_M * 9.9E-5
 
+        # now do it for all subblocks to compare with
+        K_M_sum = 0
+        for it in self.__ms_its.it_list:
+            K_M_sum += np.linalg.cond(it.M, p=p)
+            print "\tK(M_sub) \t : \t", np.linalg.cond(it.M, p=p)
+            print "\tK(P_sub) \t : \t", np.linalg.cond(it.P, p=p)
+        print "sum K_M_sub \t : \t", K_M_sum
 
     def spectral_radius(self):
         return np.max(np.abs(np.linalg.eigvals(self.it_matrix)))
@@ -709,7 +737,7 @@ def run_linear_pfasst(lin_pfasst, u_0, kwargs):
         tol = kwargs['tol']
         u = [u_0]
         res = [norm(lin_pfasst.M.dot(u_0) - lin_pfasst.c)]
-        while res[-1] > tol and len(u) < 1000:
+        while res[-1] > tol and len(u) < 50:
             u.append(lin_pfasst.step(u[-1]))
             res.append(norm(lin_pfasst.M.dot(u[-1])-lin_pfasst.c))
     else:
@@ -717,3 +745,156 @@ def run_linear_pfasst(lin_pfasst, u_0, kwargs):
 
 
     return res, u
+
+def run_multiple_linear_pfasst(steps, decomposition_of_time, **kwargs):
+    """
+    Generates linear_pfasst objects and transfer objects according to the decomposition of time.
+    The grouping of the intervals in decomposition_of_time could be for example
+        [[t_0,t_1,t_2],[t_2,t_3],[t_3,t_4,t_5,T_end]]
+    it translates to 3 linear_pfasst objects, where the first has 3 blocks, the second just one and the last 3 blocks.
+    """
+    # as preparation we need a lists of parameter dicts, which we get from **kwargs
+    # we start with the transfer parameter list
+    num_procs = len(steps)
+    if 'tparams_list' in kwargs:
+        tparams_list = kwargs['tparams_list']
+    else:
+        tparams = {}
+        tparams['finter'] = True
+        tparams['sparse_format'] = "array"
+        tparams['interpolation_order'] = [[3, 10]]*num_procs
+        tparams['restriction_order'] = [[3, 10]]*num_procs
+        tparams['interpolation_order'] = [[3, 10]]*num_procs
+        tparams['restriction_order'] = [[3, 10]]*num_procs
+        tparams['t_interpolation_order'] = [2]*num_procs
+        tparams['t_restriction_order'] = [2]*num_procs
+        tparams_list = [tparams]*len(decomposition_of_time)
+
+    if 'run_type_list' in kwargs:
+        run_type_list = kwargs['run_type_list']
+    else:
+        run_type_list = ['tolerance']*len(decomposition_of_time)
+
+
+
+    # decompose steps accordingly
+    numb_of_blocks = [(len(p) - 1) for p in decomposition_of_time]
+    assert sum(numb_of_blocks) is len(steps)
+    step_list = [steps[i:j] for i, j in zip(np.cumsum([0]+numb_of_blocks[:-1]), np.cumsum(numb_of_blocks))]
+
+    # construct the first transfer_list and linear_pfasst object
+
+class LFAForLinearPFASST:
+    """ Takes a LinearPFASST object extracts the submatrices needed and performs a LFA by
+        computing the eigenvalues of the different fouriersymbols.
+        Additionally it compares the results with the eigenvalues itself.
+        Note that the blocks must be identical.
+    """
+    def __init__(self, lin_pfasst_solver, steps, time_space, debug=False):
+        self.debug = debug
+        self.lin_pfasst_solver = lin_pfasst_solver
+        self.time_space = time_space
+        # extracted from the time_space
+        # self.nn_t_coarse = time_space.nn_coarse
+        self.nn_t_coarse = steps[0].levels[0].sweep.coll.num_nodes
+        # self.nn_t_fine = time_space.nn_fine
+        self.nn_t_fine = steps[0].levels[-1].sweep.coll.num_nodestime_space.nn_fine
+        # self.N_t = time_space.N_t
+        self.N_t = len(steps)
+        # extracted from the fine Solver
+        pf1_col = lin_pfasst_solver.block_shapes_fine[0][1]
+        pf1_row = lin_pfasst_solver.block_shapes_fine[0][0]
+        pf2_row = lin_pfasst_solver.block_shapes_fine[1][0]
+
+        self.N_f = lin_pfasst_solver.M[pf1_row:pf1_row+pf2_row, 0:pf1_col]
+        self.M_f = lin_pfasst_solver.M[0:pf1_row, 0:pf1_col]
+        self.P_f = lin_pfasst_solver.P_f[0:pf1_row, 0:pf1_col]
+        self.P_f_inv = lin_pfasst_solver.P_f_inv[0:pf1_row, 0:pf1_col]
+
+        # extracted from the coarse Solver
+        pc1_col = lin_pfasst_solver.block_shapes_coarse[0][1]
+        pc1_row = lin_pfasst_solver.block_shapes_coarse[0][0]
+        pc2_row = lin_pfasst_solver.block_shapes_coarse[1][0]
+
+        # this two have to be generated, we do it using the multistepsolverclass with just two blocks,
+        # to minimize computational costs
+        # so first make two sdc solver
+        coarse_level = steps[0].levels[-1]
+
+        self.N_c = lin_pfasst_solver.M[pc1_row:pc1_row+pc2_row,0:pc1_col]
+        self.M_c = lin_pfasst_solver.M
+
+        self.P_c = lin_pfasst_solver.CoarseSolver.P_list[0]
+        self.P_c_inv = lin_pfasst_solver.CoarseSolver.P_inv_list[0]
+        # extracted from the linPFASST class (TransferOperator)
+        # first we may compute the fine and coarse space time
+        self.nn_x_fine = pf1_col/self.nn_t_fine
+        self.nn_x_coarse = pc1_col/self.nn_t_coarse
+        # we get the first
+        self.T_fg = lin_pfasst_solver.T_fg[:pc1_col,:pf1_row]
+        self.T_gf = lin_pfasst_solver.T_gf[:pf1_col,:pc1_row]
+        if debug:
+            print "T_fg"
+            matrix_plot(self.T_fg)
+            print "T_gf"
+            matrix_plot(self.T_gf)
+            print "N_f"
+            matrix_plot(self.N_f)
+            print "N_c"
+            matrix_plot(self.N_c)
+
+    def M_f_symbol(self,theta):
+        """ Symbol of the system matrix on a fine level"""
+        return self.M_f - np.exp(-1.0j * theta)*self.N_f
+
+    def M_c_symbol(self,theta):
+        """ Symbol of the system matrix on a coarse level"""
+        return self.M_c - np.exp(-1.0j * theta)*self.N_c
+
+    def S_symbol(self,theta):
+        """ Smoother Symbol """
+        return np.eye(self.nn_t_fine)-np.dot(self.P_f_inv, self.M_f_symbol(theta))
+
+    def B_c_symbol_inv(self,theta):
+        """ Symbol of the coarse sdc matrix """
+        return la.inv(self.P_c - np.exp(-1.0j * theta) * self.N_c)
+
+    def K_symbol(self,theta):
+        """ Symbol of the coarse grid correction """
+        return np.eye(self.nn_t_fine) - \
+                    np.dot(np.dot(self.T_gf,np.dot(self.B_c_symbol_inv(theta),self.T_fg)),self.M_f_symbol(theta))
+
+    def two_grid_symbol(self,theta,nu=1):
+        """ combine all symbols above to a two_grid cycle"""
+        S = np.linalg.matrix_power(self.S_symbol(theta),nu)
+        return np.dot(S,self.K_symbol(theta))
+
+    def low_thetas(self):
+        N_L = self.N_t
+        low_frequencies=[]
+        for k in range(1-N_L/2,N_L/2+1):
+            if (k*np.pi*2/N_L > -np.pi/2 and k*np.pi*2/N_L < np.pi/2):
+                low_frequencies.append(k*np.pi*2/N_L)
+        return low_frequencies
+
+    def high_thetas(self):
+        N_L = self.N_t
+        high_frequencies=[]
+        for k in range(1-N_L/2,N_L/2+1):
+            if not (k*np.pi*2 > -np.pi/2 and k*np.pi*2 < np.pi/2):
+                high_frequencies.append(k*np.pi*2/N_L)
+        return high_frequencies
+
+    def asymptotic_conv_factor(self,nu=1):
+        current_max = 0.0
+        for theta in self.low_thetas():
+            spec_rad = np.max(np.abs(la.eigvals(self.two_grid_symbol(theta,nu))))
+
+            if self.debug:
+                print "Theta:\t",theta
+                print "SpecRad:\t",spec_rad
+
+            if spec_rad > current_max:
+                current_max = spec_rad
+
+        return current_max

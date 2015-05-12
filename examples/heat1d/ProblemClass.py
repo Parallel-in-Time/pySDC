@@ -76,7 +76,9 @@ class heat1d(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        Minv = LA.inv(sp.eye(self.nvars)-factor*self.A)
+        me.values = Minv.dot(rhs.values)
+        # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
         return me
 
 
