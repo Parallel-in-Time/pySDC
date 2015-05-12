@@ -72,8 +72,8 @@ class fenics_vortex_2d(ptype):
         # set mesh and refinement (for multilevel)
         # mesh = df.UnitIntervalMesh(self.c_nvars)
         mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
-        # for i in range(self.refinements):
-        #     mesh = df.refine(mesh)
+        for i in range(self.refinements):
+            mesh = df.refine(mesh)
 
         self.mesh = df.Mesh(mesh)
 
@@ -133,35 +133,14 @@ class fenics_vortex_2d(ptype):
             explicit part of RHS
         """
 
-        # vort = self.apply_mass_matrix(u)
-        vort = u.values
 
-        w = df.TrialFunction(self.V)
-        v = df.TestFunction(self.V)
-
-        a = -1.0*df.inner(df.nabla_grad(w),df.nabla_grad(v))*df.dx
-        L = vort*v*df.dx
-        psi = df.Function(self.V)
-        df.solve(a == L,psi)
-
-        V_g = df.VectorFunctionSpace(self.mesh, self.family, self.order, constrained_domain=self.bc)
-        w = df.TrialFunction(V_g)
-        v = df.TestFunction(V_g)
-
-        a = df.inner(w, v)*df.dx
-        L = df.inner(df.curl(psi), v)*df.dx(self.mesh)
-        vel = df.Function(V_g)
-        df.solve(a == L, vel)
-
-        a = df.inner(w, v)*df.dx
-        L = df.inner(df.nabla_grad(vort), v)*df.dx(self.mesh)
-        grad_w = df.Function(V_g)
-        df.solve(a == L,grad_w)
+        A = 1.0*self.K
+        b = self.apply_mass_matrix(u)
+        psi = fenics_mesh(self.V)
+        df.solve(A,psi.values.vector(),b.values.vector())
 
         fexpl = fenics_mesh(self.V)
-        fexpl.values = df.project(df.inner(vel,grad_w),self.V)
-
-        fexpl = self.__invert_mass_matrix(fexpl)
+        fexpl.values = df.project(df.Dx(psi.values,1)*df.Dx(u.values,0) - df.Dx(psi.values,0)*df.Dx(u.values,1),self.V)
 
         return fexpl
 
@@ -179,7 +158,7 @@ class fenics_vortex_2d(ptype):
         """
 
         tmp = fenics_mesh(self.V)
-        tmp.values = df.Function(self.V,self.K*u.values.vector())
+        tmp.values = df.Function(self.V,-1.0*self.nu*self.K*u.values.vector())
         fimpl = self.__invert_mass_matrix(tmp)
 
         return fimpl

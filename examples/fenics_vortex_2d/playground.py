@@ -32,14 +32,14 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.05
+    pparams['nu'] = 0.01
     pparams['delta'] = 0.05
     pparams['rho'] = 50
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     pparams['c_nvars'] = [(16,16)]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
-    pparams['refinements'] = [1]
+    pparams['refinements'] = [0]
 
 
     # This comes as read-in for the transfer operations
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
-    description['num_nodes'] = 3
+    description['num_nodes'] = 5
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
