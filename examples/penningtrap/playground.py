@@ -19,11 +19,11 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 4
+    num_procs = 1
 
     # This comes as read-in for each level
     lparams = {}
-    lparams['restol'] = 5E-12
+    lparams['restol'] = 5E-09
 
     # This comes as read-in for the time-stepping
     sparams = {}
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     pparams['omega_E'] = 4.9
     pparams['omega_B'] = 25.0
     pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
-    pparams['nparts'] = 10
+    pparams['nparts'] = 100
     pparams['sig'] = 0.1
 
     # This comes as read-in for the transfer operations
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 4*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -72,8 +72,6 @@ if __name__ == "__main__":
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-    print(uend.pos.values)
 
     exit()
 

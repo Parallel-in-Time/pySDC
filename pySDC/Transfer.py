@@ -157,8 +157,7 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
-            F.f[m].impl += self.prolong_space(G.f[m].impl - G.fold[m].impl)
-            F.f[m].expl += self.prolong_space(G.f[m].expl - G.fold[m].expl)
+            F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
 
         return None
 
