@@ -63,7 +63,7 @@ class fenics_heat2d(ptype):
         # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
-        a_K = -1.0*df.inner(df.nabla_grad(u), self.nu*df.nabla_grad(v))*df.dx
+        a_K = -self.nu*df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx
 
         # Mass term
         a_M = u*v*df.dx
