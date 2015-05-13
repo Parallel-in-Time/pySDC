@@ -790,7 +790,7 @@ class LFAForLinearPFASST:
         Additionally it compares the results with the eigenvalues itself.
         Note that the blocks must be identical.
     """
-    def __init__(self, lin_pfasst_solver, steps, time_space, debug=False):
+    def __init__(self, lin_pfasst_solver, steps, transfer_list, time_space, debug=False):
         self.debug = debug
         self.lin_pfasst_solver = lin_pfasst_solver
         self.time_space = time_space
@@ -812,36 +812,30 @@ class LFAForLinearPFASST:
         self.P_f_inv = lin_pfasst_solver.P_f_inv[0:pf1_row, 0:pf1_col]
 
         # extracted from the coarse Solver
-        pc1_col = lin_pfasst_solver.block_shapes_coarse[0][1]
-        pc1_row = lin_pfasst_solver.block_shapes_coarse[0][0]
-        pc2_row = lin_pfasst_solver.block_shapes_coarse[1][0]
-
-        # this two have to be generated, we do it using the multistepsolverclass with just two blocks,
-        # to minimize computational costs
-        # so first make two sdc solver
+        # generate SDCSolver for the coarse level
         coarse_level = steps[0].levels[-1]
+        sdc_solver = SDCIterativeSolver(coarse_level, None)
+        ms_solver = MultiStepIterativeSolver([sdc_solver]*2,
+                                             [coarse_level.sweep.coll.nodes]*2,
+                                             [coarse_level.prob.nvars]*2)
 
-        self.N_c = lin_pfasst_solver.M[pc1_row:pc1_row+pc2_row,0:pc1_col]
-        self.M_c = lin_pfasst_solver.M
+        pc1_col = ms_solver.block_shapes[0][1]
+        pc1_row = ms_solver.block_shapes[0][0]
+        pc2_row = ms_solver.block_shapes[1][0]
 
-        self.P_c = lin_pfasst_solver.CoarseSolver.P_list[0]
-        self.P_c_inv = lin_pfasst_solver.CoarseSolver.P_inv_list[0]
+        self.N_c = ms_solver.M[pc1_row:pc1_row+pc2_row, 0:pc1_col]
+        self.M_c = sdc_solver.M
+        self.P_c = sdc_solver.P
+        self.P_c_inv = sdc_solver.P_inv
+
         # extracted from the linPFASST class (TransferOperator)
         # first we may compute the fine and coarse space time
         self.nn_x_fine = pf1_col/self.nn_t_fine
         self.nn_x_coarse = pc1_col/self.nn_t_coarse
         # we get the first
-        self.T_fg = lin_pfasst_solver.T_fg[:pc1_col,:pf1_row]
-        self.T_gf = lin_pfasst_solver.T_gf[:pf1_col,:pc1_row]
-        if debug:
-            print "T_fg"
-            matrix_plot(self.T_fg)
-            print "T_gf"
-            matrix_plot(self.T_gf)
-            print "N_f"
-            matrix_plot(self.N_f)
-            print "N_c"
-            matrix_plot(self.N_c)
+        self.T_fg = transfer_list[0].Rspace
+        self.T_gf = transfer_list[0].Pspace
+
 
     def M_f_symbol(self,theta):
         """ Symbol of the system matrix on a fine level"""
