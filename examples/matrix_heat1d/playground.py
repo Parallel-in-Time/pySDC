@@ -107,8 +107,12 @@ if __name__ == "__main__":
     transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
     lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
     # print lin_pfasst.spectral_radius()
-    # print
     # lin_pfasst.check_condition_numbers(p=2)
+    # check the how well the LFA is doing
+    lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
+    print "lfa:"
+    print lfa.asymptotic_conv_factor()
+    print lin_pfasst.spectral_radius()
     u_0 = np.kron(np.asarray([1]*description['num_nodes']+[1]*description['num_nodes']*(num_procs-1)),
                   uinit.values)
 

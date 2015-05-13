@@ -790,21 +790,20 @@ class LFAForLinearPFASST:
         Additionally it compares the results with the eigenvalues itself.
         Note that the blocks must be identical.
     """
-    def __init__(self, lin_pfasst_solver, steps, transfer_list, time_space, debug=False):
+    def __init__(self, lin_pfasst_solver, steps, transfer_list, debug=False):
         self.debug = debug
         self.lin_pfasst_solver = lin_pfasst_solver
-        self.time_space = time_space
         # extracted from the time_space
         # self.nn_t_coarse = time_space.nn_coarse
-        self.nn_t_coarse = steps[0].levels[0].sweep.coll.num_nodes
+        self.nn_t_coarse = steps[0].levels[-1].sweep.coll.num_nodes * steps[0].levels[-1].prob.nvars
         # self.nn_t_fine = time_space.nn_fine
-        self.nn_t_fine = steps[0].levels[-1].sweep.coll.num_nodestime_space.nn_fine
+        self.nn_t_fine = steps[0].levels[0].sweep.coll.num_nodes * steps[0].levels[0].prob.nvars
         # self.N_t = time_space.N_t
         self.N_t = len(steps)
         # extracted from the fine Solver
-        pf1_col = lin_pfasst_solver.block_shapes_fine[0][1]
-        pf1_row = lin_pfasst_solver.block_shapes_fine[0][0]
-        pf2_row = lin_pfasst_solver.block_shapes_fine[1][0]
+        pf1_col = lin_pfasst_solver.multi_step_solver.block_shapes[0][1]
+        pf1_row = lin_pfasst_solver.multi_step_solver.block_shapes[0][0]
+        pf2_row = lin_pfasst_solver.multi_step_solver.block_shapes[1][0]
 
         self.N_f = lin_pfasst_solver.M[pf1_row:pf1_row+pf2_row, 0:pf1_col]
         self.M_f = lin_pfasst_solver.M[0:pf1_row, 0:pf1_col]
@@ -858,9 +857,9 @@ class LFAForLinearPFASST:
         return np.eye(self.nn_t_fine) - \
                     np.dot(np.dot(self.T_gf,np.dot(self.B_c_symbol_inv(theta),self.T_fg)),self.M_f_symbol(theta))
 
-    def two_grid_symbol(self,theta,nu=1):
+    def two_grid_symbol(self, theta, nu=1):
         """ combine all symbols above to a two_grid cycle"""
-        S = np.linalg.matrix_power(self.S_symbol(theta),nu)
+        S = np.linalg.matrix_power(self.S_symbol(theta), nu)
         return np.dot(S,self.K_symbol(theta))
 
     def low_thetas(self):
