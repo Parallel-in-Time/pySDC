@@ -302,6 +302,29 @@ class particles():
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
 
+    def __rmul__(self, other):
+            """
+            Overloading the right multiply by factor operator for particle types
+
+            Args:
+                other: float factor
+            Raises:
+                DataError: is other is not a float
+            Returns:
+                particle
+            """
+
+            if isinstance(other, float):
+                # create particle here!
+                part = particles(int(np.size(self.pos.values)/3))
+                part.vel.values = self.vel.values*other
+                part.pos.values = self.pos.values*other
+                part.m = self.m
+                part.q = self.q
+                return part
+            else:
+                raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
+
 
     def __abs__(self):
         """
