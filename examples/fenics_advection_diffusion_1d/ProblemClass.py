@@ -46,6 +46,8 @@ class fenics_adv_diff_1d(ptype):
         # these parameters will be used later, so assert their existence
         assert 'c_nvars' in cparams
         assert 'nu' in cparams
+        assert 'mu' in cparams
+        assert 'k' in cparams
         assert 't0' in cparams
         assert 'family' in cparams
         assert 'order' in cparams
@@ -59,7 +61,6 @@ class fenics_adv_diff_1d(ptype):
 
         # set mesh and refinement (for multilevel)
         mesh = df.UnitIntervalMesh(self.c_nvars)
-        # mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
         for i in range(self.refinements):
             mesh = df.refine(mesh)
 
@@ -75,10 +76,10 @@ class fenics_adv_diff_1d(ptype):
         v = df.TestFunction(self.V)
 
         # Stiffness term (diffusion)
-        a_K = -1.0*df.inner(df.nabla_grad(u), self.nu*df.nabla_grad(v))*df.dx
+        a_K = -self.nu*df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx(mesh)
 
         # Stiffness term (advection)
-        a_G = df.inner(self.mu*df.nabla_grad(u)[0], v)*df.dx
+        a_G = self.mu*df.inner(df.nabla_grad(u)[0], v)*df.dx(mesh)
 
         # Mass term
         a_M = u*v*df.dx
@@ -214,7 +215,6 @@ class fenics_adv_diff_1d(ptype):
             exact solution
         """
 
-        # u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
         u0 = df.Expression('exp(-nu*pow(2*a*k,2)*t) * sin(2*a*k*(x[0]+mu*t))',a=np.pi,nu=self.nu,mu=self.mu,k=self.k,t=t)
 
         me = fenics_mesh(self.V)
