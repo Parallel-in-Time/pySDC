@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 4
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -36,10 +36,10 @@ if __name__ == "__main__":
     pparams['delta'] = 0.05
     pparams['rho'] = 50
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [(16,16)]
+    pparams['c_nvars'] = [(32,32)]
     pparams['family'] = 'CG'
-    pparams['order'] = [1]
-    pparams['refinements'] = [0]
+    pparams['order'] = [4]
+    pparams['refinements'] = [1,0]
 
 
     # This comes as read-in for the transfer operations
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
-    description['num_nodes'] = 5
+    description['num_nodes'] = 2
     description['sweeper_class'] = mass_matrix_imex
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.001
-    Tend = dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
