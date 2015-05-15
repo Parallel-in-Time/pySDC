@@ -144,5 +144,5 @@ class acoustic_2d_implicit(ptype):
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
         me.values[1,:,:] = 0.0*self.xx
-        me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2/0.1**2.0)
+        me.values[2,:,:] = 0.5*np.exp(-0.5*(self.xx-t)**2/0.1**2.0) + 0.5*np.exp(-0.5*(self.xx+t)**2/0.1**2.0)
         return me
