@@ -5,6 +5,8 @@ import numpy as np
 
 from ProblemClass import acoustic_2d_implicit
 #from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
+from examples.acoustic_2d_implicit.HookClass import plot_solution
+
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_stepwise as mp
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     description['num_nodes']         = 7
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
+    description['hook_class'] = plot_solution
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
 
