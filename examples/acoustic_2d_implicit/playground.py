@@ -78,17 +78,7 @@ if __name__ == "__main__":
         uex.values.flatten(),np.inf)))
 
     fig = plt.figure(figsize=(8,8))
-    fig.clear()
-    yplot = uend.values
-    ax = fig.gca(projection='3d')
-    ax.view_init(elev=0., azim=-90.)
-    surf = ax.plot_surface(P.xx, P.zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-    ax.set_xlim(left   =  P.x_b[0], right = P.x_b[1])
-    ax.set_ylim(bottom =  P.z_b[0], top   = P.z_b[1])
-    ax.set_zlim(bottom = -1.0, top   = 1.0)
-    plt.xlabel('x')
-    plt.ylabel('z')
-    plt.show()
+
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')
