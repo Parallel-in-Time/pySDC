@@ -524,7 +524,7 @@ class LinearPFASST(IterativeSolver):
         P_f_inv = to_dense(self.P_f_inv)
         P_c_inv = to_dense(self.P_c_inv)
         I = np.eye(M.shape[0])
-        print(map(type,[M,self.P_f_inv,P_c_inv,I]))
+        # print(map(type,[M,self.P_f_inv,P_c_inv,I]))
         return np.dot(I - np.dot(P_f_inv, M), I - np.dot(P_c_inv, M))
 
     def check_condition_numbers(self, p=2):

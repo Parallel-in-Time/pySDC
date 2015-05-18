@@ -61,7 +61,7 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

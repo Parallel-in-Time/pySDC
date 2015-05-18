@@ -2,19 +2,16 @@
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
-import scipy.linalg as la
 
-from examples.matrix_heat1d.ProblemClass import heat1d
-from examples.matrix_heat1d.TransferClass import mesh_to_mesh_1d
-
+from examples.matrix_advection_diffusion_1d_imex.ProblemClass import advection_diffusion
+from examples.matrix_advection_diffusion_1d_imex.TransferClass import mesh_to_mesh_1d_periodic
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_blockwise as mp
+import pySDC.MatrixMethods as mmp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
-import pySDC.MatrixMethods as mmp
 
-from pySDC.tools.transfer_tools import interpolate_to_t_end
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
@@ -24,16 +21,17 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-9
+    lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 50
+    sparams['maxiter'] = 35
 
     # This comes as read-in for the problem class
     pparams = {}
+    pparams['c'] = 1.0
     pparams['nu'] = 0.1
-    pparams['nvars'] = [63,31]
-    # pparams['nvars'] = [15, 7]
+    pparams['nvars'] = [64, 32]
+    pparams['order'] = [6]
 
     # This comes as read-in for the all kind of generating options for the matrix classes
     mparams = {}
@@ -41,7 +39,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = False
+    tparams['finter'] = True
     tparams['sparse_format'] = "array"
     tparams['interpolation_order'] = [[3, 10]]*num_procs
     tparams['restriction_order'] = [[3, 10]]*num_procs
@@ -53,89 +51,65 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = heat1d
+    description['problem_class'] = advection_diffusion
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes'] = 3
+    description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d
+    description['transfer_class'] = mesh_to_mesh_1d_periodic
     description['transfer_params'] = tparams
 
     # Options for run_linear_pfasst
     linpparams = {}
     linpparams['run_type'] = "tolerance"
     linpparams['norm'] = lambda x: np.linalg.norm(x, np.inf)
-    linpparams['tol'] = lparams['restol']
+    linpparams['tol'] = lparams['restol']*100
+    linpparams['tol'] = lparams['restol']*100
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
 
-
     # setup parameters "in time"
-    t0 = 0
-    dt = 0.125
-    Tend = 4*dt
+    t0 = 0.0
+    dt = 0.005
+    Tend = 5*dt
     print "cfl:", pparams['nu']*(pparams['nvars'][0]**2)*dt
     # get initial values on finest level
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-    # print uinit
+
     # call main function to get things done...
-    uend, stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-    # MS = mp.generate_steps(num_procs,sparams,description)
-    # u_0 = []
-    # for S,p in zip(MS,range(len(MS))):
-    #     # call predictor from sweeper
-    #     S.status.dt = dt # could have different dt per step here
-    #     S.status.time = t0 + sum(MS[j].status.dt for j in range(p))
-    #     S.init_step(uinit)
-    #     S.levels[0].sweep.predict()
-    #
-    # MS = mp.predictor(MS)
-    #
-    # for S in MS:
-    #     for u in S.u[1:]:
-    #         u_0.append(u)
-
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # start with the analysis using the iteration matrix of PFASST
 
     transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
     lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
-    # print lin_pfasst.spectral_radius()
-    # lin_pfasst.check_condition_numbers(p=2)
-    # check the how well the LFA is doing
-    lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
-    print "lfa:"
-    print lfa.asymptotic_conv_factor()
-    print lin_pfasst.spectral_radius()
     u_0 = np.kron(np.asarray([1]*description['num_nodes']+[1]*description['num_nodes']*(num_procs-1)),
                   uinit.values)
-
     res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, linpparams)
     all_nodes = mmp.get_all_nodes(MS, t0)
     print "Residuals:\n", res, "\nNumber of iterations: ", len(res)-1
     u_end_split = np.split(u[-1], num_procs*description['num_nodes'])
+    print "Spectral Radius:\t", lin_pfasst.spectral_radius()
+    lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
+    print "lfa:"
+    print lfa.asymptotic_conv_factor()
+    res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, linpparams)
 
-
+    # compute exact solution and compare
     uex = P.u_exact(Tend)
-    print "relative error per linpfasst iteration"
-    for u in u[1:]:
-        last_u = np.split(u, num_procs*description['num_nodes'])[-1]
-        print np.linalg.norm(uex.values-last_u, np.inf)/np.linalg.norm(uex.values, np.inf)
 
-    print('matrix error at time %s: %s' %(Tend, np.linalg.norm(uex.values-u_end_split[-1], np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    print('non matrix error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    print('difference between pfasst and lin_pfasst at time %s: %s' %(Tend,np.linalg.norm(u_end_split[-1]-uend.values, np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    # extract_stats = grep_stats(stats, type='residual')
-    # sortedlist_stats = sort_stats(extract_stats, sortby='step')
-    # for item in sortedlist_stats:
-    #     print(item)
-    # print(extract_stats, sortedlist_stats)
+    # print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+    #     uex.values,np.inf)))
+
+    print(' absolute difference between pfasst and lin_pfasst at time %s: %s' %(Tend,np.linalg.norm(u_end_split[-1]-uend.values, np.inf)))
+    print(u_end_split[-1])
+    print(uend.values)
+    print(uend.values - u_end_split[-1])
+    # extract_stats = grep_stats(stats,iter=-1,type='residual')
+    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    # print(extract_stats,sortedlist_stats)

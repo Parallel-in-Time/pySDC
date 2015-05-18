@@ -60,7 +60,7 @@ class advection(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A_I, rhs.values)
         return me
 
 
