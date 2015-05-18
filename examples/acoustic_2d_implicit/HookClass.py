@@ -19,7 +19,9 @@ class plot_solution(hooks):
         super(plot_solution,self).__init__()
 
         # add figure object for further use
-        self.fig = plt.figure(figsize=(8,8))
+        #        self.fig = plt.figure(figsize=(18,6))
+        self.fig = plt.figure(figsize=(9,9))
+
 
     def dump_step(self,status):
         """
@@ -33,17 +35,16 @@ class plot_solution(hooks):
         yplot = self.level.uend.values
         xx    = self.level.prob.xx
         zz    = self.level.prob.zz
-
         self.fig.clear()
-        ax = self.fig.gca(projection='3d')
-        ax.view_init(elev=0., azim=-90.)
-        surf = ax.plot_surface(xx, zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-        ax.set_xlim(left   =  self.level.prob.x_b[0], right = self.level.prob.x_b[1])
-        ax.set_ylim(bottom =  self.level.prob.z_b[0], top   = self.level.prob.z_b[1])
-        ax.set_zlim(bottom = -1.0, top   = 1.0)
+        CS = plt.contourf(xx, zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+        cbar = plt.colorbar(CS)
+        plt.axes().set_xlim(xmin = self.level.prob.x_b[0], xmax = self.level.prob.x_b[1])
+        plt.axes().set_ylim(ymin = self.level.prob.z_b[0], ymax = self.level.prob.z_b[1])
+        plt.axes().set_aspect('equal')
         plt.xlabel('x')
         plt.ylabel('z')
-        plt.draw()
+        #plt.tight_layout()
+        plt.show(block=False)
         plt.pause(0.00001)
 
         return None
