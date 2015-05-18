@@ -19,27 +19,28 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 4
 
-    # This comes as read-in for each level
+    # This comes as read-in for each level (this is optional!)
     lparams = {}
     lparams['restol'] = 5E-09
 
-    # This comes as read-in for the time-stepping
+    # This comes as read-in for the step class (this is optional!)
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 15
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem
     pparams = {}
     pparams['omega_E'] = 4.9
     pparams['omega_B'] = 25.0
     pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
-    pparams['nparts'] = 100
+    pparams['nparts'] = 10
     pparams['sig'] = 0.1
 
-    # This comes as read-in for the transfer operations
+    # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     # @torbjoern: SDC and MLSDC can be activated by providing a list of 1 or 2 elements at problem_class and/or
@@ -64,7 +65,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.015625
-    Tend = 1*dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

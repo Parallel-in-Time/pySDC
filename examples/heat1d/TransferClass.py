@@ -53,8 +53,8 @@ class mesh_to_mesh_1d(transfer):
 
             np.fill_diagonal(self.Pspace[1::2,:],1)
 
-            np.fill_diagonal(self.Pspace[0::2,:],1/2)
-            np.fill_diagonal(self.Pspace[2::2,:],1/2)
+            # np.fill_diagonal(self.Pspace[0::2,:],1/2)
+            # np.fill_diagonal(self.Pspace[2::2,:],1/2)
 
             # this would be 3rd-order accurate
             # c1 = -0.0625
@@ -66,7 +66,7 @@ class mesh_to_mesh_1d(transfer):
             # np.fill_diagonal(self.Pspace[0::2,1:],c4)
             # np.fill_diagonal(self.Pspace[4::2,:],c1)
             # self.Pspace[0,0:3] = [0.9375, -0.3125, 0.0625]
-            # self.Pspace[-1,-3:init_c] = [0.0625, -0.3125, 0.9375]
+            # self.Pspace[-1,-3:self.init_c] = [0.0625, -0.3125, 0.9375]
 
             np.fill_diagonal(self.Pspace[0::2,:],0.5859375)
             np.fill_diagonal(self.Pspace[2::2,:],0.5859375)

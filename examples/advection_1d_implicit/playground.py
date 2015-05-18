@@ -7,7 +7,7 @@ from examples.advection_1d_implicit.ProblemClass import advection
 from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -16,22 +16,24 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 4
+    num_procs = 8
 
-    # This comes as read-in for the level class
+    # This comes as read-in for the level class (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
 
+    # This comes as read-in for the step class (this is optional!)
     sparams = {}
     sparams['maxiter'] = 15
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['c'] = 1.0
-    pparams['nvars'] = [512,256]
-    pparams['order'] = [6]
+    pparams['nvars'] = [32,16]
+    pparams['order'] = [4]
 
-    # This comes as read-in for the transfer operations
+    # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = True
 
@@ -54,7 +56,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0.0
     dt = 0.05
-    Tend = 5*dt
+    Tend = 8*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

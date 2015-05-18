@@ -146,6 +146,8 @@ def recv(target,source,tag=None):
         exit()
     # simply do a deepcopy of the values uend to become the new u0 at the target
     target.u[0] = target.prob.dtype_u(source.uend)
+    # re-evaluate f on left interval boundary
+    target.f[0] = target.prob.eval_f(target.u[0],target.time)
 
 
 def send(source,tag):
@@ -280,7 +282,8 @@ def pfasst(MS):
                 S.levels[0].hooks.dump_iteration(S.status)
 
                 # send updated values forward (non-blocking)
-                send(S.levels[0],tag=(0,S.status.iter,S.status.slot))
+                if S.params.fine_comm:
+                    send(S.levels[0],tag=(0,S.status.iter,S.status.slot))
 
                 # update stage
                 S.status.stage = 'IT_CHECK'
@@ -328,7 +331,8 @@ def pfasst(MS):
                     S.levels[l].sweep.compute_residual()
                     S.levels[l].hooks.dump_sweep(S.status)
 
-                    send(S.levels[l],tag=(l,S.status.iter,S.status.slot))
+                    if S.params.fine_comm:
+                        send(S.levels[l],tag=(l,S.status.iter,S.status.slot))
 
                     # transfer further up the hierarchy
                     S.transfer(source=S.levels[l],target=S.levels[l+1])
@@ -371,8 +375,8 @@ def pfasst(MS):
                 # receive and sweep on middle levels (except for coarsest level)
                 for l in range(len(S.levels)-1,0,-1):
 
-                    # receive values from IT_UP (non-blocking)
-                    if not S.status.first:
+                    # # receive values from IT_UP (non-blocking)
+                    if S.params.fine_comm and not S.status.first:
                         recv(S.levels[l-1],S.prev.levels[l-1],tag=(l-1,S.status.iter,S.prev.status.slot))
 
                     # prolong values

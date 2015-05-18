@@ -35,9 +35,17 @@ class step():
         # short helper class to add params as attributes
         class pars():
             def __init__(self,params):
+
+                defaults = dict()
+                defaults['maxiter'] = 20
+                defaults['fine_comm'] = True
+
+                for k,v in defaults.items():
+                    setattr(self,k,v)
                 for k,v in params.items():
                     setattr(self,k,v)
                 pass
+
 
         # short helper class to bundle all status variables
         class status():

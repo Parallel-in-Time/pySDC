@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 8
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -37,9 +37,9 @@ if __name__ == "__main__":
     pparams['k'] = 1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [32]
+    pparams['c_nvars'] = [128]
     pparams['family'] = 'CG'
-    pparams['order'] = [4]
+    pparams['order'] = [1]
     pparams['refinements'] = [1,0]
 
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.2
-    Tend = 1.0
+    Tend = 1.6
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

@@ -73,6 +73,13 @@ class level():
         # short helper class to add params as attributes
         class pars():
             def __init__(self,params):
+
+                defaults = dict()
+                defaults['restol'] = 0.0
+
+                for k,v in defaults.items():
+                    setattr(self,k,v)
+
                 for k,v in params.items():
                     setattr(self,k,v)
 

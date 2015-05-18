@@ -282,7 +282,8 @@ def pfasst(S):
 
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
             if not S.levels[0].tag or S.status.last:
-                send(S.levels[0],tag=True)
+                if S.params.fine_comm:
+                    send(S.levels[0],tag=True)
                 S.status.stage = 'IT_CHECK'
             else:
                 S.status.stage = 'IT_FINE_SEND'
@@ -326,7 +327,8 @@ def pfasst(S):
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
                 if not S.levels[l].tag or S.status.last:
-                    send(S.levels[l],tag=True)
+                    if S.params.fine_comm:
+                        send(S.levels[l],tag=True)
                 else:
                     print('SEND ERROR',l,p,S.levels[l].tag)
                     exit()
@@ -399,7 +401,7 @@ def pfasst(S):
             for l in range(len(S.levels)-1,0,-1):
 
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
-                if not S.status.first and not S.prev.status.done:
+                if S.params.fine_comm and not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l-1].tag:
                         recv(S.levels[l-1],S.prev.levels[l-1])
                         S.prev.levels[l-1].tag = False
