@@ -31,17 +31,17 @@ if __name__ == "__main__":
     lparams['restol'] = 3E-11
 
     sparams = {}
-    sparams['maxiter'] = 50
+    sparams['maxiter'] = 3
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 0.5
-    Nsteps = 25
+    Tend   = 1.7
+    Nsteps = 500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3,300,10)]
+    pparams['nvars'] = [(3,200,50)]
     pparams['u_adv'] = 0.75
     pparams['c_s']   = 1.0
     pparams['x_bounds'] = [(-2.0, 2.0)]
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 5
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution

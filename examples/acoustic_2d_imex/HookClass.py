@@ -32,24 +32,24 @@ class plot_solution(hooks):
         """
         super(plot_solution,self).dump_step(status)
 
-        yplot = self.level.uend.values
-        xx    = self.level.prob.xx
-        zz    = self.level.prob.zz
-        self.fig.clear()
-        plt.plot( xx[:,0], yplot[2,:,0])
-        plt.ylim([-1.1, 1.1])
-        plt.show(block=False)
-        plt.pause(0.00001)        
+        #yplot = self.level.uend.values
+        #xx    = self.level.prob.xx
+        #zz    = self.level.prob.zz
+        #self.fig.clear()
+        #plt.plot( xx[:,0], yplot[2,:,0])
+        #plt.ylim([-1.1, 1.1])
+        #plt.show(block=False)
+        #plt.pause(0.00001)        
           
-        if False:
+        if True:
           yplot = self.level.uend.values
           xx    = self.level.prob.xx
           zz    = self.level.prob.zz
           self.fig.clear()
           CS = plt.contourf(xx, zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
           cbar = plt.colorbar(CS)
-          plt.axes().set_xlim(xmin = self.level.prob.x_b[0], xmax = self.level.prob.x_b[1])
-          plt.axes().set_ylim(ymin = self.level.prob.z_b[0], ymax = self.level.prob.z_b[1])
+          plt.axes().set_xlim(xmin = self.level.prob.x_bounds[0], xmax = self.level.prob.x_bounds[1])
+          plt.axes().set_ylim(ymin = self.level.prob.z_bounds[0], ymax = self.level.prob.z_bounds[1])
           plt.axes().set_aspect('equal')
           plt.xlabel('x')
           plt.ylabel('z')
