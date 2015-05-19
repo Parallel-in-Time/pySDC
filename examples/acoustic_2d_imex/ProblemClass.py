@@ -5,13 +5,10 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-from build2DFDMatrix import get2DMesh
+from build2DFDMatrix import get2DMesh, get2DUpwindMatrix
 from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical
 from unflatten import unflatten
 
-# Sharpclaw imports
-from clawpack import pyclaw
-from clawpack import riemann
 
 class acoustic_2d_imex(ptype):
     """
@@ -42,19 +39,6 @@ class acoustic_2d_imex(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(acoustic_2d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
-        
-        riemann_solver              = riemann.advection_2D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver2D(riemann_solver)
-        self.solver.weno_order      = 5
-        self.solver.time_integrator = 'Euler' # Remove later
-        self.solver.kernel_language = 'Fortran'
-        self.solver.bc_lower[0]     = pyclaw.BC.periodic
-        self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.bc_lower[1]     = pyclaw.BC.wall
-        self.solver.bc_upper[1]     = pyclaw.BC.wall
-        self.solver.cfl_max         = 1.0
-        self.solver.num_eqn         = 3
-        assert self.solver.is_valid()
                 
         self.N   = [ self.nvars[1],  self.nvars[2] ]
         self.x_b = [ -1.0, 1.0]
@@ -64,19 +48,7 @@ class acoustic_2d_imex(ptype):
         self.bc_ver = [ ['neumann', 'neumann'] ,  ['dirichlet', 'dirichlet'], ['neumann', 'neumann'] ]
 
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_b, self.z_b, self.bc_hor[0], self.bc_ver[0])
-
-        x = pyclaw.Dimension(0.0, 1.0, self.nvars[1], name='x')
-        y = pyclaw.Dimension(0.0, 1.0, self.nvars[2], name='y')
-        self.domain = pyclaw.Domain([x,y])
-
-        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
-
-        self.state.problem_data['u'] = 1.0
-        self.state.problem_data['v'] = 0.0
-        
-        solution = pyclaw.Solution(self.state, self.domain)
-        self.solver.setup(solution)
-        
+       
         self.Id, self.M = getWave2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
   
     def solve_system(self,rhs,factor,u0,t):
