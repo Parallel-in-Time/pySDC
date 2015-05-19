@@ -34,6 +34,7 @@ class advection_diffusion(ptype):
         assert 'c' in cparams
         assert 'order' in cparams
         assert 'nu' in cparams
+        assert 't_0' in cparams
 
         assert cparams['nvars']%2 == 0
         
@@ -160,26 +161,30 @@ class advection_diffusion(ptype):
         Returns:
             exact solution
         """
-    # code aus pfasst++
-    # void exact(DVectorT& q, time t)
-    # {
-    # size_t n = q.size();
-    # double a = 1.0 / sqrt(4 * PI * nu * (t + t0));
-    # for (size_t i = 0; i < n; i++) {
-    #     q[i] = 0.0;
-    # }
-    # for (int ii = -2; ii < 3; ii++) {
-    #     for (size_t i = 0; i < n; i++) {
-    #         double x = double(i) / n - 0.5 + ii - t * v;
-    #         q[i] += a * exp(-x * x / (4 * nu * (t + t0)));
-    #         }
-    #     }
-    # }
+        # code aus pfasst++
+        # void exact(DVectorT& q, time t)
+        # {
+        # size_t n = q.size();
+        # double a = 1.0 / sqrt(4 * PI * nu * (t + t0));
+        # for (size_t i = 0; i < n; i++) {
+        #     q[i] = 0.0;
+        # }
+        # for (int ii = -2; ii < 3; ii++) {
+        #     for (size_t i = 0; i < n; i++) {
+        #         double x = double(i) / n - 0.5 + ii - t * v;
+        #         q[i] += a * exp(-x * x / (4 * nu * (t + t0)));
+        #         }
+        #     }
+        # }
 
-        #TODO: this has to be adjusted
-        # in here for the
+        # take just one peak
         me = mesh(self.nvars)
-        me.values = np.cos(2.0*np.pi*(self.mesh-self.c*t))
+        a = 1.0 / np.sqrt(4*np.pi*self.nu*(t + self.t_0))
+        # print a
+        x = self.mesh - 0.5 - t*self.c
+        # print x
+        me.values = a * np.exp(-x*x/(4*self.nu*(t+self.t_0)))
+
         return me
 
     def get_mesh(self, form="list"):
