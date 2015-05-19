@@ -3,9 +3,9 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from ProblemClass import acoustic_2d_implicit
+from ProblemClass import acoustic_2d_imex
 #from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
-from examples.acoustic_2d_implicit.HookClass import plot_solution
+from examples.acoustic_2d_imex.HookClass import plot_solution
 
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
@@ -31,17 +31,17 @@ if __name__ == "__main__":
     lparams['restol'] = 3E-8
 
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 5
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 2.0
-    Nsteps = 50
+    Tend   = 0.1
+    Nsteps = 1
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3,80,40)]
+    pparams['nvars'] = [(3,5,3)]
 
     # This comes as read-in for the transfer operations
     #tparams = {}
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class']     = acoustic_2d_implicit
+    description['problem_class']     = acoustic_2d_imex
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
