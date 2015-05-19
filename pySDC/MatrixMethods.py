@@ -549,8 +549,13 @@ class LinearPFASST(IterativeSolver):
             print "\tK(P_sub) \t : \t", np.linalg.cond(it.P, p=p)
         print "sum K_M_sub \t : \t", K_M_sum
 
-    def spectral_radius(self):
-        return np.max(np.abs(np.linalg.eigvals(self.it_matrix)))
+    def spectral_radius(self, ka=1,tolerance=1e-7):
+        # use iterative scheme to get the first couple of eigenvalues faster
+        # print "real spectralrad:", np.max(np.abs(np.linalg.eigvals(self.it_matrix)))
+        # some randome experiments showed that tolerance of at least 1e-6, but one needs to compute
+        # more than one eigenvalue at once, because else it shows instabilities
+        return np.abs(spla.eigs(self.it_matrix, k=ka, which='LM', tol=tolerance, return_eigenvectors=False))
+        # return np.max(np.abs(np.linalg.eigvals(self.it_matrix)))
 
     def parallel_efficiency(self, c_c_tuple, c_f_tuple, c_t_tuple, use_dimension_of_A=True):
         """ compute the parallel efficiency of the LinearPFASST setup, given the cost of evaluating and solving

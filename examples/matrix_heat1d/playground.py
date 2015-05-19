@@ -15,6 +15,74 @@ from pySDC.Stats import grep_stats, sort_stats
 import pySDC.MatrixMethods as mmp
 
 from pySDC.tools.transfer_tools import interpolate_to_t_end
+
+
+
+def run_with(opts, debug=False):
+    """
+    :param options:
+    :return: (n_it_pfasst, n_it_lin_pfasst, spec_rad, lfa_spec_rad)
+    """
+    # set global logger (remove this if you do not want the output at all)
+    logger = Log.setup_custom_logger('root')
+
+    # make empty class
+    opt = mmp.Bunch()
+    for k, v in opts.items():
+        setattr(opt, k, v)
+    t0 = opt.t0
+    dt = opt.dt
+    Tend = opt.num_procs * dt
+    cfl = opt.pparams['nu']*(opt.pparams['nvars'][0]**2)*dt
+
+        # quickly generate block of steps
+    MS = mp.generate_steps(opt.num_procs, opt.sparams, opt.description)
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+    uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
+
+    # get max_iter from pfasst and min residual
+    max_iter = 0.0
+    min_res = 1.0
+    for tup in sort_stats(stats, 'type'):
+        if tup[0] is 'niter' and tup[1] > max_iter:
+            max_iter = tup[1]
+        elif tup[0] is 'residual' and tup[1] < min_res:
+            min_res = tup[1]
+
+    # initialize linear_pfasst
+    transfer_list = mmp.generate_transfer_list(MS, opt.description['transfer_class'], **opt.tparams)
+    lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **opt.tparams)
+    lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
+    spec_rad = max(lin_pfasst.spectral_radius(ka=8, tolerance=1e-7))
+    lfa_asymp_conv = lfa.asymptotic_conv_factor()
+
+    # run linear_pfasst to get the iteration number of lin_pfasst
+
+    # first the initial value for linear_pfasst
+    u_0 = np.kron(np.asarray([1]*opt.description['num_nodes']+[1]*opt.description['num_nodes']*(opt.num_procs-1)),
+                  uinit.values)
+    res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, opt.linpparams)
+
+    if debug:
+        u_end_split = np.split(u[-1], opt.num_procs*opt.description['num_nodes'])
+        uex = P.u_exact(Tend)
+        print "cfl:", cfl
+        print "relative error per linpfasst iteration"
+        for u in u[1:]:
+            last_u = np.split(u, num_procs*description['num_nodes'])[-1]
+            print np.linalg.norm(uex.values-last_u, np.inf)/np.linalg.norm(uex.values, np.inf)
+
+        print('matrix error at time %s: %s' %(Tend, np.linalg.norm(uex.values-u_end_split[-1], np.inf)/np.linalg.norm(
+            uex.values, 2)))
+        print('non matrix error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+            uex.values, 2)))
+        print('difference between pfasst and lin_pfasst at time %s: %s' %(Tend,np.linalg.norm(u_end_split[-1]-uend.values, np.inf)/np.linalg.norm(
+            uex.values, 2)))
+
+    return (max_iter, len(res)-1, spec_rad, lfa_asymp_conv, cfl)
+
+
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
@@ -24,7 +92,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-9
+    lparams['restol'] = 3E-7
 
     sparams = {}
     sparams['maxiter'] = 50
@@ -70,72 +138,88 @@ if __name__ == "__main__":
     linpparams['norm'] = lambda x: np.linalg.norm(x, np.inf)
     linpparams['tol'] = lparams['restol']
 
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
 
 
     # setup parameters "in time"
     t0 = 0
     dt = 0.125
     Tend = 4*dt
-    print "cfl:", pparams['nu']*(pparams['nvars'][0]**2)*dt
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-    # print uinit
-    # call main function to get things done...
-    uend, stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    # MS = mp.generate_steps(num_procs,sparams,description)
-    # u_0 = []
-    # for S,p in zip(MS,range(len(MS))):
-    #     # call predictor from sweeper
-    #     S.status.dt = dt # could have different dt per step here
-    #     S.status.time = t0 + sum(MS[j].status.dt for j in range(p))
-    #     S.init_step(uinit)
-    #     S.levels[0].sweep.predict()
-    #
-    # MS = mp.predictor(MS)
-    #
-    # for S in MS:
-    #     for u in S.u[1:]:
-    #         u_0.append(u)
-
-
-    # start with the analysis using the iteration matrix of PFASST
-
-    transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
-    lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
-    # print lin_pfasst.spectral_radius()
-    # lin_pfasst.check_condition_numbers(p=2)
-    # check the how well the LFA is doing
-    lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
-    print "lfa:"
-    print lfa.asymptotic_conv_factor()
-    print lin_pfasst.spectral_radius()
-    u_0 = np.kron(np.asarray([1]*description['num_nodes']+[1]*description['num_nodes']*(num_procs-1)),
-                  uinit.values)
-
-    res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, linpparams)
-    all_nodes = mmp.get_all_nodes(MS, t0)
-    print "Residuals:\n", res, "\nNumber of iterations: ", len(res)-1
-    u_end_split = np.split(u[-1], num_procs*description['num_nodes'])
+    # fill opts for run with opts
+    use_run_method = True
+    if use_run_method:
+        results = []
+        for dt in [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]:
+            opts = {'description': description, 'linpparams': linpparams, 'tparams': tparams,
+                    'mparams': mparams, 'pparams': pparams, 'sparams': sparams, 'lparams': lparams,
+                    'num_procs': num_procs, 't0': t0, 'dt': dt}
+            results.append(run_with(opts, debug=True))
+        for r in results:
+            print r
+    else:
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs, sparams, description)
+        print "cfl:", pparams['nu']*(pparams['nvars'][0]**2)*dt
+        # get initial values on finest level
+        P = MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
+        # print uinit
+        # call main function to get things done...
+        uend, stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+        # print "Type:",type(stats)#,stats
+        # for k,v in stats.items():
+        #     print k.type
+        # print sort_stats(stats, 'type')
+        # MS = mp.generate_steps(num_procs,sparams,description)
+        # u_0 = []
+        # for S,p in zip(MS,range(len(MS))):
+        #     # call predictor from sweeper
+        #     S.status.dt = dt # could have different dt per step here
+        #     S.status.time = t0 + sum(MS[j].status.dt for j in range(p))
+        #     S.init_step(uinit)
+        #     S.levels[0].sweep.predict()
+        #
+        # MS = mp.predictor(MS)
+        #
+        # for S in MS:
+        #     for u in S.u[1:]:
+        #         u_0.append(u)
 
 
-    uex = P.u_exact(Tend)
-    print "relative error per linpfasst iteration"
-    for u in u[1:]:
-        last_u = np.split(u, num_procs*description['num_nodes'])[-1]
-        print np.linalg.norm(uex.values-last_u, np.inf)/np.linalg.norm(uex.values, np.inf)
+        # start with the analysis using the iteration matrix of PFASST
 
-    print('matrix error at time %s: %s' %(Tend, np.linalg.norm(uex.values-u_end_split[-1], np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    print('non matrix error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    print('difference between pfasst and lin_pfasst at time %s: %s' %(Tend,np.linalg.norm(u_end_split[-1]-uend.values, np.inf)/np.linalg.norm(
-        uex.values, 2)))
-    # extract_stats = grep_stats(stats, type='residual')
-    # sortedlist_stats = sort_stats(extract_stats, sortby='step')
-    # for item in sortedlist_stats:
-    #     print(item)
-    # print(extract_stats, sortedlist_stats)
+        transfer_list = mmp.generate_transfer_list(MS, description['transfer_class'], **tparams)
+        lin_pfasst = mmp.generate_LinearPFASST(MS, transfer_list, uinit.values, **tparams)
+        # print lin_pfasst.spectral_radius()
+        # lin_pfasst.check_condition_numbers(p=2)
+        # check the how well the LFA is doing
+        lfa = mmp.LFAForLinearPFASST(lin_pfasst, MS, transfer_list, debug=True)
+        print "lfa:"
+        print lfa.asymptotic_conv_factor()
+        print lin_pfasst.spectral_radius(ka=8, tolerance=1e-7)
+        u_0 = np.kron(np.asarray([1]*description['num_nodes']+[1]*description['num_nodes']*(num_procs-1)),
+                      uinit.values)
+
+        res, u = mmp.run_linear_pfasst(lin_pfasst, u_0, linpparams)
+        all_nodes = mmp.get_all_nodes(MS, t0)
+        print "Residuals:\n", res, "\nNumber of iterations: ", len(res)-1
+        u_end_split = np.split(u[-1], num_procs*description['num_nodes'])
+
+
+        uex = P.u_exact(Tend)
+        print "relative error per linpfasst iteration"
+        for u in u[1:]:
+            last_u = np.split(u, num_procs*description['num_nodes'])[-1]
+            print np.linalg.norm(uex.values-last_u, np.inf)/np.linalg.norm(uex.values, np.inf)
+
+        print('matrix error at time %s: %s' %(Tend, np.linalg.norm(uex.values-u_end_split[-1], np.inf)/np.linalg.norm(
+            uex.values, 2)))
+        print('non matrix error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
+            uex.values, 2)))
+        print('difference between pfasst and lin_pfasst at time %s: %s' %(Tend,np.linalg.norm(u_end_split[-1]-uend.values, np.inf)/np.linalg.norm(
+            uex.values, 2)))
+        # extract_stats = grep_stats(stats, type='residual')
+        # sortedlist_stats = sort_stats(extract_stats, sortby='step')
+        # for item in sortedlist_stats:
+        #     print(item)
+        # print(extract_stats, sortedlist_stats)

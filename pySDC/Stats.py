@@ -8,11 +8,11 @@ class stats_class():
         __stats: private variable for the dictionary
     """
 
-    def __init__(self):
+    def __init__(self,stats={}):
         """
         Simple initialization
         """
-        self.__stats = {}
+        self.__stats = stats
 
     def add_to_stats(self,step=-1,time=-1,level=-1,iter=-1,type=-1,value=-1):
         """
