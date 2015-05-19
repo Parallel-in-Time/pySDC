@@ -35,13 +35,13 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 0.1
+    Tend   = 0.05
     Nsteps = 1
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3,5,3)]
+    pparams['nvars'] = [(3,100,15)]
 
     # This comes as read-in for the transfer operations
     #tparams = {}

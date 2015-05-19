@@ -43,6 +43,7 @@ class acoustic_2d_imex(ptype):
         self.N   = [ self.nvars[1],  self.nvars[2] ]
         self.x_b = [ -1.0, 1.0]
         self.z_b = [  0.0, 1.0]
+        self.c_s = 2
   
         self.bc_hor = [ ['periodic', 'periodic'] , ['periodic', 'periodic'], ['periodic', 'periodic'] ]
         self.bc_ver = [ ['neumann', 'neumann'] ,  ['dirichlet', 'dirichlet'], ['neumann', 'neumann'] ]
@@ -50,7 +51,8 @@ class acoustic_2d_imex(ptype):
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_b, self.z_b, self.bc_hor[0], self.bc_ver[0])
        
         self.Id, self.M = getWave2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
-  
+        self.D_upwind   = get2DUpwindMatrix( self.N, self.h[0] )
+    
     def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -67,7 +69,7 @@ class acoustic_2d_imex(ptype):
 
         b = rhs.values.flatten()
         # NOTE: A = -M, therefore solve Id + factor*M here
-        sol, info =  LA.gmres( self.Id + factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
+        sol, info =  LA.gmres( self.Id + factor*self.c_s*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
         me = mesh(self.nvars)
         me.values = unflatten(sol, 3, self.N[0], self.N[1])
 
@@ -108,7 +110,7 @@ class acoustic_2d_imex(ptype):
         temp = self.M.dot(temp)
         fimpl = mesh(self.nvars,val=0)
         # NOTE: M = -A, therefore add a minus here
-        fimpl.values = unflatten(-temp, 3, self.N[0], self.N[1])
+        fimpl.values = unflatten(-self.c_s*temp, 3, self.N[0], self.N[1])
         
         return fimpl
 
@@ -145,6 +147,6 @@ class acoustic_2d_imex(ptype):
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
         me.values[1,:,:] = 0.0*self.xx
-        me.values[2,:,:] = 0.5*np.exp(-0.5*(self.xx-t)**2/0.1**2.0) + 0.5*np.exp(-0.5*(self.xx+t)**2/0.1**2.0)
+        me.values[2,:,:] = 0.5*np.exp(-0.5*(self.xx-self.c_s*t)**2/0.1**2.0) + 0.5*np.exp(-0.5*(self.xx+self.c_s*t)**2/0.1**2.0)
         #me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
         return me
