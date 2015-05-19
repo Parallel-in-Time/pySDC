@@ -37,6 +37,7 @@ class plot_solution(hooks):
         zz    = self.level.prob.zz
         self.fig.clear()
         plt.plot( xx[:,0], yplot[2,:,0])
+        plt.ylim([-1.1, 1.1])
         plt.show(block=False)
         plt.pause(0.00001)        
           
