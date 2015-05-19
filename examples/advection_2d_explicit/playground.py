@@ -3,8 +3,9 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from ProblemClass import sharpclaw
+from ProblemClass import advection_2d_explicit
 #from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
+from examples.advection_2d_explicit.HookClass import plot_solution
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods as mp
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 20
+    sparams['maxiter'] = 0
 
     # setup parameters "in time"
     t0 = 0
@@ -38,8 +39,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(2,50,50)]
-    pparams['nu'] = 0.001
+    pparams['nvars'] = [(1,100,50)]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -47,14 +47,15 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class']     = sharpclaw
+    description['problem_class']     = advection_2d_explicit
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 5
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
+    description['hook_class']        = plot_solution
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
 
@@ -74,9 +75,9 @@ if __name__ == "__main__":
     # print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
     #     uex.values,np.inf)))
 
-    fig = plt.figure(figsize=(8,8))
+    #fig = plt.figure(figsize=(8,8))
 
-    plt.imshow(uend.values[0,:,:])
+    #plt.imshow(uend.values[0,:,:])
     # plt.plot(P.state.grid.x.centers,uend.values, color='b', label='SDC')
     # plt.plot(P.state.grid.x.centers,uex.values, color='r', label='Exact')
     # plt.legend()
