@@ -20,7 +20,7 @@ class plot_solution(hooks):
 
         # add figure object for further use
         #        self.fig = plt.figure(figsize=(18,6))
-        #self.fig = plt.figure(figsize=(9,9))
+        self.fig = plt.figure(figsize=(9,9))
 
 
     def dump_step(self,status):
@@ -32,6 +32,14 @@ class plot_solution(hooks):
         """
         super(plot_solution,self).dump_step(status)
 
+        yplot = self.level.uend.values
+        xx    = self.level.prob.xx
+        zz    = self.level.prob.zz
+        self.fig.clear()
+        plt.plot( xx[:,0], yplot[2,:,0])
+        plt.show(block=False)
+        plt.pause(0.00001)        
+          
         if False:
           yplot = self.level.uend.values
           xx    = self.level.prob.xx
