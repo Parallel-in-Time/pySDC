@@ -2,7 +2,11 @@ import sys
 sys.path.append('../')
 import numpy as np
 import scipy.sparse as sp
-from buildFDMatrix import getMatrix, getBCLeft, getBCRight
+from buildFDMatrix import getMatrix, getUpwindMatrix, getBCLeft, getBCRight
+
+def get2DUpwindMatrix(N, dx):
+  Dx = getUpwindMatrix(N[0], dx)
+  return sp.kron( Dx, sp.eye(N[1]) )
 
 def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
   assert np.size(N)==2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
