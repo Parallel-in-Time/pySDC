@@ -4,9 +4,8 @@ import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
-from build2DFDMatrix import get2DMesh, get2DUpwindMatrix
-from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical
+from build2DFDMatrix import get2DMesh
+from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical, getWave2DUpwindMatrix
 from unflatten import unflatten
 
 
@@ -32,7 +31,11 @@ class acoustic_2d_imex(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-
+        assert 'c_s' in cparams
+        assert 'u_adv' in cparams
+        assert 'x_bounds' in cparams
+        assert 'x_bounds' in cparams
+        
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
@@ -40,18 +43,15 @@ class acoustic_2d_imex(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(acoustic_2d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
                 
-        self.N   = [ self.nvars[1],  self.nvars[2] ]
-        self.x_b = [ -1.0, 1.0]
-        self.z_b = [  0.0, 1.0]
-        self.c_s = 2
-  
+        self.N     = [ self.nvars[1],  self.nvars[2] ]
+        
         self.bc_hor = [ ['periodic', 'periodic'] , ['periodic', 'periodic'], ['periodic', 'periodic'] ]
         self.bc_ver = [ ['neumann', 'neumann'] ,  ['dirichlet', 'dirichlet'], ['neumann', 'neumann'] ]
 
-        self.xx, self.zz, self.h = get2DMesh(self.N, self.x_b, self.z_b, self.bc_hor[0], self.bc_ver[0])
+        self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
        
         self.Id, self.M = getWave2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
-        self.D_upwind   = get2DUpwindMatrix( self.N, self.h[0] )
+        self.D_upwind   = getWave2DUpwindMatrix( self.N, self.h[0] )
     
     def solve_system(self,rhs,factor,u0,t):
         """
@@ -89,9 +89,13 @@ class acoustic_2d_imex(ptype):
         """
         
         # Evaluate right hand side
-        fexpl        = mesh(self.nvars)
-        fexpl.values = 0.0*self.xx
-                
+        fexpl = mesh(self.nvars)
+        temp  = u.values.flatten()
+        temp  = self.D_upwind.dot(temp)
+        # NOTE: M_adv = -D_upwind, therefore add a minus here
+        fexpl.values = unflatten(-self.u_adv*temp, 3, self.N[0], self.N[1])
+              
+        #fexpl.values = np.zeros((3, self.N[0], self.N[1]))
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -147,6 +151,6 @@ class acoustic_2d_imex(ptype):
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
         me.values[1,:,:] = 0.0*self.xx
-        me.values[2,:,:] = 0.5*np.exp(-0.5*(self.xx-self.c_s*t)**2/0.1**2.0) + 0.5*np.exp(-0.5*(self.xx+self.c_s*t)**2/0.1**2.0)
+        me.values[2,:,:] = 0.5*np.exp(-0.5*( self.xx-self.c_s*t - self.u_adv*t )**2/0.2**2.0) + 0.5*np.exp(-0.5*( self.xx + self.c_s*t - self.u_adv*t)**2/0.2**2.0)
         #me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
         return me

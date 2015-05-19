@@ -1,7 +1,19 @@
 import numpy as np
 import scipy.sparse as sp
-from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical
+from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
 
+def getWave2DUpwindMatrix(N, dx):
+
+  Dx   = get2DUpwindMatrix(N, dx)
+  
+  Zero = np.zeros((N[0]*N[1],N[0]*N[1]))
+  M1 = sp.hstack((Dx ,  Zero,   Zero), format="csr")
+  M2 = sp.hstack((Zero,   Dx,   Zero), format="csr")
+  M3 = sp.hstack((Zero, Zero,     Dx), format="csr")
+  M  = sp.vstack((M1,M2,M3), format="csr")
+  
+  return sp.csc_matrix(M)
+  
 def getWave2DMatrix(N, h, bc_hor, bc_ver):
   Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0])
   Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1])
