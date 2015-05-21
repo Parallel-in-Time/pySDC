@@ -48,7 +48,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussRadau_Right
     description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
