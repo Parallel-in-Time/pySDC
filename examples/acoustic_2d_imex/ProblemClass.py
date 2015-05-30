@@ -4,14 +4,12 @@ import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
-# Sharpclaw imports
-from clawpack import pyclaw
-from clawpack import riemann
-
+from build2DFDMatrix import get2DMesh
+from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical, getWave2DUpwindMatrix
 from unflatten import unflatten
 
-class advection_2d_explicit(ptype):
+
+class acoustic_2d_imex(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
@@ -33,41 +31,28 @@ class advection_2d_explicit(ptype):
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
-
+        assert 'c_s' in cparams
+        assert 'u_adv' in cparams
+        assert 'x_bounds' in cparams
+        assert 'x_bounds' in cparams
+        
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection_2d_explicit,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(acoustic_2d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
+                
+        self.N     = [ self.nvars[1],  self.nvars[2] ]
         
-        riemann_solver              = riemann.advection_2D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver2D(riemann.advection_2D)
-        self.solver.weno_order      = 5
-        self.solver.time_integrator = 'Euler' # Remove later
-        self.solver.kernel_language = 'Fortran'
-        self.solver.bc_lower[0]     = pyclaw.BC.periodic
-        self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.bc_lower[1]     = pyclaw.BC.periodic
-        self.solver.bc_upper[1]     = pyclaw.BC.periodic
-        self.solver.cfl_max         = 1.0
-        assert self.solver.is_valid()
+        self.bc_hor = [ ['periodic', 'periodic'] , ['periodic', 'periodic'], ['periodic', 'periodic'] ]
+        self.bc_ver = [ ['neumann', 'neumann'] ,  ['dirichlet', 'dirichlet'], ['neumann', 'neumann'] ]
 
-        x = pyclaw.Dimension(-1.0, 1.0, self.nvars[1], name='x')
-        y = pyclaw.Dimension( 0.0, 1.0, self.nvars[2], name='y')
-        self.domain = pyclaw.Domain([x,y])
-
-        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
-        # self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
-
-        self.state.problem_data['u'] = 1.0
-        self.state.problem_data['v'] = 0.0
-        
-        solution = pyclaw.Solution(self.state, self.domain)
-        self.solver.setup(solution)
-
-        self.xc, self.yc = self.state.grid.p_centers
-
+        self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
+       
+        self.Id, self.M = getWave2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
+        self.D_upwind   = getWave2DUpwindMatrix( self.N, self.h[0] )
+    
     def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -82,10 +67,13 @@ class advection_2d_explicit(ptype):
             solution as mesh
         """
 
-        # me = mesh(self.nvars)
-        # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        b = rhs.values.flatten()
+        # NOTE: A = -M, therefore solve Id + factor*M here
+        sol, info =  LA.gmres( self.Id + factor*self.c_s*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
+        me = mesh(self.nvars)
+        me.values = unflatten(sol, 3, self.N[0], self.N[1])
 
-        return rhs
+        return me
 
 
     def __eval_fexpl(self,u,t):
@@ -99,29 +87,16 @@ class advection_2d_explicit(ptype):
         Returns:
             explicit part of RHS
         """
-
-
-        fexpl        = mesh(self.nvars)
-
-        # Copy values of u into pyClaw state object
-        self.state.q[0,:,:] = u.values[0,:,:]
-
-        # Evaluate right hand side
-        self.solver.before_step(self.solver, self.state)
-        tmp = self.solver.dqdt(self.state)
         
-        fexpl.values[0,:,:] = unflatten(tmp, 1, self.nvars[1], self.nvars[2])
-
-
-        # Copy values of u into pyClaw state object
-        #self.state.q[0,:,:] = u.values[1,:,:]
-
         # Evaluate right hand side
-        #tmp = self.solver.dqdt(self.state)
-        #fexpl.values[1,:,:] = tmp.reshape(self.nvars[1:])
-
+        fexpl = mesh(self.nvars)
+        temp  = u.values.flatten()
+        temp  = self.D_upwind.dot(temp)
+        # NOTE: M_adv = -D_upwind, therefore add a minus here
+        fexpl.values = unflatten(-self.u_adv*temp, 3, self.N[0], self.N[1])
+              
+        #fexpl.values = np.zeros((3, self.N[0], self.N[1]))
         return fexpl
-
 
     def __eval_fimpl(self,u,t):
         """
@@ -135,8 +110,11 @@ class advection_2d_explicit(ptype):
             implicit part of RHS
         """
 
+        temp = u.values.flatten()
+        temp = self.M.dot(temp)
         fimpl = mesh(self.nvars,val=0)
-        # fimpl.values = self.A.dot(u.values)
+        # NOTE: M = -A, therefore add a minus here
+        fimpl.values = unflatten(-self.c_s*temp, 3, self.N[0], self.N[1])
         
         return fimpl
 
@@ -171,7 +149,8 @@ class advection_2d_explicit(ptype):
         """
         
         me        = mesh(self.nvars)
-        me.values[0,:,:] = np.sin(2*np.pi*self.xc)*np.sin(2*np.pi*self.yc)
-        #me.values[1,:,:] = np.sin(2*np.pi*self.xc)#*np.sin(2*np.pi*self.yc)
-
+        me.values[0,:,:] = 0.0*self.xx
+        me.values[1,:,:] = 0.0*self.xx
+        #me.values[2,:,:] = 0.5*np.exp(-0.5*( self.xx-self.c_s*t - self.u_adv*t )**2/0.2**2.0) + 0.5*np.exp(-0.5*( self.xx + self.c_s*t - self.u_adv*t)**2/0.2**2.0)
+        me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
         return me
