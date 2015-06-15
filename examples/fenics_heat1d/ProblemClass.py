@@ -6,7 +6,7 @@ import numpy as np
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 
-class fenics_heat2d(ptype):
+class fenics_heat(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 
@@ -46,6 +46,9 @@ class fenics_heat2d(ptype):
 
         df.set_log_level(df.WARNING)
 
+        df.parameters["form_compiler"]["optimize"]     = True
+        df.parameters["form_compiler"]["cpp_optimize"] = True
+
         # set mesh and refinement (for multilevel)
         mesh = df.UnitIntervalMesh(self.c_nvars)
         # mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
@@ -58,7 +61,7 @@ class fenics_heat2d(ptype):
         print('DoFs on this level:',len(tmp.vector().array()))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_heat2d,self).__init__(self.V,dtype_u,dtype_f)
+        super(fenics_heat,self).__init__(self.V,dtype_u,dtype_f)
 
         # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)
