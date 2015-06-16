@@ -99,8 +99,8 @@ class generic_LU(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(self.coll.num_nodes):
-                integral[m] -= L.dt*self.Qd[m+1,j+1]*L.f[j+1]
+            for j in range(M+1):
+                integral[m] -= L.dt*self.Qd[m+1,j]*L.f[j]
 
             # add initial value
             integral[m] += L.u[0]
