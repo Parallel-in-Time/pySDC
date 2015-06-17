@@ -1,9 +1,9 @@
 
 from pySDC import CollocationClasses as collclass
 
-from examples.fenics_test.ProblemClass import fenics_heat
+from examples.fenics_heat1d_weak.ProblemClass import fenics_heat
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-from examples.fenics_test.TransferClass import mesh_to_mesh_fenics
+from examples.fenics_heat1d_weak.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.generic_LU import generic_LU
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 16
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -28,17 +28,17 @@ if __name__ == "__main__":
     lparams['restol'] = 5E-09
 
     sparams = {}
-    sparams['maxiter'] = 5
+    sparams['maxiter'] = 10
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.1
+    pparams['nu'] = 1.0
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [256]
+    pparams['c_nvars'] = [128]
     pparams['family'] = 'CG'
-    pparams['order'] = [1]
-    pparams['refinements'] = [1]
+    pparams['order'] = [4]
+    pparams['refinements'] = [1,0]
 
 
     # This comes as read-in for the transfer operations
@@ -63,8 +63,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
-    dt = 0.125
-    Tend = 0.125
+    dt = 0.5
+    Tend = 8.0
 
     # get initial values on finest level
     P = MS[0].levels[0].prob

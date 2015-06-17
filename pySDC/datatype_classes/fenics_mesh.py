@@ -29,8 +29,9 @@ class fenics_mesh():
             self.V = init.V
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         else:
-            u0 = df.Constant(val)
-            self.values = df.interpolate(u0,init)
+            # u0 = None
+            # self.values = df.interpolate(u0,init)
+            self.values = df.Function(init)
             self.V = init
         # something is wrong, if none of the ones above hit
         # else:
