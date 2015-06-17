@@ -1,10 +1,11 @@
 
 from pySDC import CollocationClasses as collclass
 
-from examples.fenics_advection_diffusion_1d.ProblemClass import fenics_adv_diff_1d
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
+from examples.fenics_grayscott.ProblemClass import fenics_grayscott
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh
+from examples.fenics_grayscott.TransferClass import mesh_to_mesh_fenics
+from examples.fenics_grayscott.HookClass import fenics_output
+from pySDC.sweeper_classes.generic_LU import generic_LU
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
@@ -19,28 +20,35 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 1
 
     # assert num_procs == 1,'turn on predictor!'
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 5E-09
+    lparams['restol'] = 1E-07
 
     sparams = {}
     sparams['maxiter'] = 20
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.05
-    pparams['mu'] = 1.0
-    pparams['k'] = 1
+    pparams['Du'] = 1.0
+    pparams['Dv'] = 0.01
+    pparams['A'] = 0.01
+    pparams['B'] = 0.10
+    # pparams['Du'] = 2E-05
+    # pparams['Dv'] = 1E-05
+    # pparams['A'] = 0.03
+    # pparams['B'] = 0.092
+
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [128]
+    pparams['c_nvars'] = [256]
     pparams['family'] = 'CG'
-    pparams['order'] = [1]
-    pparams['refinements'] = [1,0]
+    pparams['order'] = [4]
+    pparams['refinements'] = [1]
 
 
     # This comes as read-in for the transfer operations
@@ -49,24 +57,25 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = fenics_adv_diff_1d
+    description['problem_class'] = fenics_grayscott
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
-    description['dtype_f'] = rhs_fenics_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    description['dtype_f'] = fenics_mesh
+    description['collocation_class'] = collclass.CollGaussRadau_Right
     description['num_nodes'] = 3
-    description['sweeper_class'] = mass_matrix_imex
+    description['sweeper_class'] = generic_LU
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
+    description['hook_class'] = fenics_output
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
 
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
-    dt = 0.2
-    Tend = 1.6
+    dt = 5.0
+    Tend = 400
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -75,21 +84,6 @@ if __name__ == "__main__":
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    # df.plot(uend.values,interactive=True)
+    # u1,u2 = df.split(uend.values)
+    # df.plot(u1,interactive=True)
 
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
-
-    print('(classical) error at time %s: %s' %(Tend,abs(uex-uend)/abs(uex)))
-
-    # df.plot(uex.values,key='u')
-    # df.plot(uend.values,key='u')
-    # df.plot(uex.values-uend.values)
-    # df.interactive()
-
-    # uex = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=Tend)
-    # print('(fenics-style) error at time %s: %s' %(Tend,df.errornorm(uex,uend.values)))
-
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)

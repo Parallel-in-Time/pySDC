@@ -55,6 +55,7 @@ class fenics_heat(ptype):
         for i in range(self.refinements):
             mesh = df.refine(mesh)
 
+        # self.mesh = mesh
         # define function space for future reference
         self.V = df.FunctionSpace(mesh, self.family, self.order)
         tmp = df.Function(self.V)
@@ -63,118 +64,19 @@ class fenics_heat(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat,self).__init__(self.V,dtype_u,dtype_f)
 
-        # Stiffness term (Laplace)
-        u = df.TrialFunction(self.V)
-        v = df.TestFunction(self.V)
-        a_K = -self.nu*df.inner(df.nabla_grad(u), df.nabla_grad(v))*df.dx
-
-        # Mass term
-        a_M = u*v*df.dx
-
-        self.M = df.assemble(a_M)
-        self.K = df.assemble(a_K)
-
-        # set forcing term as expression
         self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # self.g = df.Expression('-sin(a*x[0]) * sin(a*x[1]) * (sin(t) - b*2*a*a*cos(t))',a=np.pi,b=self.nu,t=self.t0,degree=self.order)
-        # set boundary values
+
+        # rhs in weak form
+        self.w = df.Function(self.V)
+        v = df.TestFunction(self.V)
+        self.a_K = -self.nu*df.inner(df.nabla_grad(self.w), df.nabla_grad(v))*df.dx + self.g*v*df.dx
+
+        # mass matrix
+        u = df.TrialFunction(self.V)
+        a_M = u*v*df.dx
+        self.M = df.assemble(a_M)
+
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
-
-
-    def solve_system(self,rhs,factor,u0,t):
-        """
-        Dolfin's linear solver for (M-dtA)u = rhs
-
-        Args:
-            rhs: right-hand side for the nonlinear system
-            factor: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver (not used here so far)
-
-        Returns:
-            solution as mesh
-        """
-
-        A = self.M - factor*self.K
-        b = fenics_mesh(rhs)
-
-        self.bc.apply(A,b.values.vector())
-
-        u = fenics_mesh(u0)
-        df.solve(A,u.values.vector(),b.values.vector())
-
-        return u
-
-
-    def __eval_fexpl(self,u,t):
-        """
-        Helper routine to evaluate the explicit part of the RHS
-
-        Args:
-            u: current values (not used here)
-            t: current time
-
-        Returns:
-            explicit part of RHS
-        """
-
-        self.g.t = t
-        fexpl = fenics_mesh(self.V)
-        fexpl.values = df.Function(self.V,df.interpolate(self.g,self.V).vector())
-
-        return fexpl
-
-    def __eval_fimpl(self,u,t):
-        """
-        Helper routine to evaluate the implicit part of the RHS
-
-        Args:
-            u: current values
-            t: current time (not used here)
-
-        Returns:
-            implicit part of RHS
-        """
-
-        tmp = fenics_mesh(self.V)
-        tmp.values = df.Function(self.V,self.K*u.values.vector())
-        fimpl = self.__invert_mass_matrix(tmp)
-
-        return fimpl
-
-
-    def eval_f(self,u,t):
-        """
-        Routine to evaluate both parts of the RHS
-
-        Args:
-            u: current values
-            t: current time
-
-        Returns:
-            the RHS divided into two parts
-        """
-
-        f = rhs_fenics_mesh(self.V)
-        f.impl = self.__eval_fimpl(u,t)
-        f.expl = self.__eval_fexpl(u,t)
-        return f
-
-
-    def apply_mass_matrix(self,u):
-        """
-        Routine to apply mass matrix
-
-        Args:
-            u: current values
-
-        Returns:
-            M*u
-        """
-
-        me = fenics_mesh(self.V)
-        me.values = df.Function(self.V,self.M*u.values.vector())
-
-        return me
 
 
     def __invert_mass_matrix(self,u):
@@ -200,6 +102,74 @@ class fenics_heat(ptype):
         return me
 
 
+    def solve_system(self,rhs,factor,u0,t):
+        """
+        Dolfin's linear solver for (M-dtA)u = rhs
+
+        Args:
+            rhs: right-hand side for the nonlinear system
+            factor: abbrev. for the node-to-node stepsize (or any other factor required)
+            u0: initial guess for the iterative solver (not used here so far)
+
+        Returns:
+            solution as mesh
+        """
+
+        sol = fenics_mesh(self.V)
+
+        self.g.t = t
+        self.w.assign(sol.values)
+
+        v = df.TestFunction(self.V)
+        F = self.w*v*df.dx - factor*self.a_K - rhs.values*v*df.dx
+
+        du = df.TrialFunction(self.V)
+        J  = df.derivative(F, self.w, du)
+
+        problem = df.NonlinearVariationalProblem(F, self.w, self.bc, J)
+        solver  = df.NonlinearVariationalSolver(problem)
+
+        prm = solver.parameters
+        prm['newton_solver']['absolute_tolerance'] = 1E-8
+        prm['newton_solver']['relative_tolerance'] = 1E-7
+        prm['newton_solver']['maximum_iterations'] = 25
+        prm['newton_solver']['relaxation_parameter'] = 1.0
+
+        # df.set_log_level(df.PROGRESS)
+
+        solver.solve()
+
+        sol.values.assign(self.w)
+
+        return sol
+
+
+
+    def eval_f(self,u,t):
+        """
+        Routine to evaluate both parts of the RHS
+
+        Args:
+            u: current values
+            t: current time
+
+        Returns:
+            the RHS divided into two parts
+        """
+
+        self.g.t = t
+
+        f = fenics_mesh(self.V)
+
+        self.w.assign(u.values)
+        f.values = df.Function(self.V,df.assemble(self.a_K))
+
+        f = self.__invert_mass_matrix(f)
+
+        return f
+
+
+
     def u_exact(self,t):
         """
         Routine to compute the exact solution at time t
@@ -213,6 +183,7 @@ class fenics_heat(ptype):
 
         # u0 = df.Expression('sin(a*x[0]) * sin(a*x[1]) * cos(t)',a=np.pi,t=t,degree=self.order)
         u0 = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=t,degree=self.order)
+        # u0 = df.Expression('sin(a*x[0]) * exp(-b*a*a*t)',a=np.pi,b=self.nu,t=t,degree=self.order)
 
         me = fenics_mesh(self.V)
         me.values = df.interpolate(u0,self.V)

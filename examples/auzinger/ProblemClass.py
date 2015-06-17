@@ -66,7 +66,7 @@ class auzinger(ptype):
         return f
 
 
-    def solve_system(self,rhs,dt,u0):
+    def solve_system(self,rhs,dt,u0,t):
         """
         Simple Newton solver for the nonlinear system
 
@@ -74,6 +74,7 @@ class auzinger(ptype):
             rhs: right-hand side for the nonlinear system
             dt: abbrev. for the node-to-node stepsize (or any other factor required)
             u0: initial guess for the iterative solver
+            t: current time (e.g. for time-dependent BCs)
 
         Returns:
             solution u

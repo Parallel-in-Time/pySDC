@@ -99,8 +99,8 @@ class generic_LU(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(self.coll.num_nodes):
-                integral[m] -= L.dt*self.Qd[m+1,j+1]*L.f[j+1]
+            for j in range(M+1):
+                integral[m] -= L.dt*self.Qd[m+1,j]*L.f[j]
 
             # add initial value
             integral[m] += L.u[0]
@@ -116,7 +116,7 @@ class generic_LU(sweeper):
                 rhs += L.dt*self.Qd[m+1,j]*L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            L.u[m+1] = P.solve_system(rhs,L.dt*self.Qd[m+1,m+1],L.u[m+1])
+            L.u[m+1] = P.solve_system(rhs,L.dt*self.Qd[m+1,m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
             # update function values
             L.f[m+1] = P.eval_f(L.u[m+1],L.time+L.dt*self.coll.nodes[m])
 
