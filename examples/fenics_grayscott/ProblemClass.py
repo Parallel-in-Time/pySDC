@@ -57,7 +57,7 @@ class fenics_grayscott(ptype):
         for i in range(self.refinements):
             mesh = df.refine(mesh)
 
-        # self.mesh = mesh
+        self.mesh = mesh
         # define function space for future reference
         V = df.FunctionSpace(mesh, self.family, self.order)
         self.V = V*V
@@ -129,8 +129,8 @@ class fenics_grayscott(ptype):
         q1,q2 = df.TestFunctions(self.V)
         w1,w2 = df.split(self.w)
         r1,r2 = df.split(rhs.values)
-        F1 = w1*q1*df.dx - factor*self.F1 - r1*q1*df.dx
-        F2 = w2*q2*df.dx - factor*self.F2 - r2*q2*df.dx
+        F1 = w1*q1*df.dx(self.mesh) - factor*self.F1 - r1*q1*df.dx(self.mesh)
+        F2 = w2*q2*df.dx(self.mesh) - factor*self.F2 - r2*q2*df.dx(self.mesh)
         F = F1+F2
         du = df.TrialFunction(self.V)
         J  = df.derivative(F, self.w, du)

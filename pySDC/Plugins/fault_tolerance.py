@@ -1,13 +1,21 @@
 import copy as cp
+import random as rd
 
 iter = None
 step = None
 strategy = None
+random = 1.0
 
 def hard_fault_injection(S):
-    global iter, step, strategy
+    global iter, step, strategy, random
 
-    if step == S.status.step and iter == S.status.iter and strategy is not 'NOFAULT':
+    if S.status.iter == 1:
+        rd.seed(S.status.step)
+
+    doit = rd.random() <= random
+    # print(S.status.step,S.status.iter,doit)
+
+    if ((step == S.status.step and iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %(S.status.step,S.status.iter,S.status.time))
         res = cp.deepcopy(S.levels[-1].status.residual)
