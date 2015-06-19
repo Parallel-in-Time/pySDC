@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ft.step = 8
     ft.iter = 6
     ft.strategy = 'INTERP'
-    ft.random = 0.03
+    ft.hard_random = 0.03
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)

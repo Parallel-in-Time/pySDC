@@ -1,18 +1,71 @@
 import copy as cp
 import random as rd
+import struct
 
 iter = None
 step = None
 strategy = None
-random = 1.0
+hard_random = 0.0
+
+do_soft_faults = True
+soft_random = 0.0
+soft_counter = 0
+soft_stats = []
+
+
+def soft_fault_injection(nvars):
+    global soft_random, soft_counter, soft_stats, do_soft_faults
+
+    if not do_soft_faults:
+
+        return -1,None,None,None
+
+    else:
+
+        doit = rd.random() < soft_random
+
+        if doit:
+
+            soft_counter += 1
+            index = rd.randrange(nvars)
+            pos = rd.randrange(31)
+            uf = rd.randrange(2)
+            # index = 93
+            # pos = 26
+            # uf = 1
+
+            return 0,index,pos,uf
+
+        else:
+
+            return 0,None,None,None
+
+
+def __bitsToFloat(b):
+    s = struct.pack('>l', b)
+    return struct.unpack('>f', s)[0]
+
+def __floatToBits(f):
+    s = struct.pack('>f', f)
+    return struct.unpack('>l', s)[0]
+
+def do_bitflip(a,pos=29):
+
+    b = __floatToBits(a)
+    mask = 1<<pos
+    c = b^mask
+
+    return __bitsToFloat(c)
+
+
 
 def hard_fault_injection(S):
-    global iter, step, strategy, random
+    global iter, step, strategy, hard_random
 
     if S.status.iter == 1:
         rd.seed(S.status.step)
 
-    doit = rd.random() <= random
+    doit = rd.random() < hard_random
     # print(S.status.step,S.status.iter,doit)
 
     if ((step == S.status.step and iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
