@@ -42,9 +42,9 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nvars'] = [(4,100,25)]
-    pparams['u_adv'] = -0.75
+    pparams['u_adv'] = -0.5
     pparams['c_s']   = 1.5
-    pparams['Nfreq']     = 0.0
+    pparams['Nfreq']     = 1.0
     pparams['x_bounds'] = [(-1.0, 1.0)]
     pparams['z_bounds'] = [( 0.0, 1.0)]
 

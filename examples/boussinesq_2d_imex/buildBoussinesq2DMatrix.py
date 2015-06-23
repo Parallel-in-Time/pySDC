@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
 
-def getBoussinesq2DUpwindMatrix(N, dx):
+def getBoussinesq2DUpwindMatrix(N, dx, u_adv):
 
   Dx   = get2DUpwindMatrix(N, dx)
   
@@ -11,11 +11,11 @@ def getBoussinesq2DUpwindMatrix(N, dx):
   M2 = sp.hstack((Zero,   Dx,   Zero, Zero), format="csr")
   M3 = sp.hstack((Zero, Zero,     Dx, Zero), format="csr")
   M4 = sp.hstack((Zero, Zero,   Zero,   Dx), format="csr")
-  M  = sp.vstack((M1,M2,M3,M4), format="csr")
+  M  = u_adv*sp.vstack((M1,M2,M3,M4), format="csr")
   
   return sp.csc_matrix(M)
   
-def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, Nfreq):
+def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq):
   Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0])
   Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1])
   Dx_b, Dz_b = get2DMatrix(N, h, bc_hor[2], bc_ver[2])
@@ -23,12 +23,12 @@ def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, Nfreq):
   Id_N = sp.eye(N[0]*N[1])
 
   Zero = np.zeros((N[0]*N[1],N[0]*N[1]))
-  Id_w = -sp.eye(N[0]*N[1])
-  Id_b = Nfreq**2*sp.eye(N[0]*N[1])
-  M1 = sp.hstack((Zero, Zero, Zero, Dx_p), format="csr")
-  M2 = sp.hstack((Zero, Zero, Id_w, Dz_p), format="csr")
-  M3 = sp.hstack((Zero, Id_b, Zero, Zero), format="csr")
-  M4 = sp.hstack((Dx_u, Dz_w, Zero, Zero), format="csr")
+  Id_w = sp.eye(N[0]*N[1])
+
+  M1 = sp.hstack((       Zero,          Zero,  Zero, Dx_p), format="csr")
+  M2 = sp.hstack((       Zero,          Zero, -Id_w, Dz_p), format="csr")
+  M3 = sp.hstack((       Zero, Nfreq**2*Id_w,  Zero, Zero), format="csr")
+  M4 = sp.hstack((c_s**2*Dx_u,   c_s**2*Dz_w,  Zero, Zero), format="csr")
   M  = sp.vstack((M1,M2,M3,M4), format="csr")
 
   Id = sp.eye(4*N[0]*N[1])

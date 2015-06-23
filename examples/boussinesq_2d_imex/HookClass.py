@@ -46,8 +46,7 @@ class plot_solution(hooks):
           xx    = self.level.prob.xx
           zz    = self.level.prob.zz
           self.fig.clear()
-          print ("maximum buoyancy: %9.3f" % np.max(yplot[2,:,:]))
-          CS = plt.contourf(xx, zz, yplot[3,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+          CS = plt.contourf(xx, zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
           cbar = plt.colorbar(CS)
           plt.axes().set_xlim(xmin = self.level.prob.x_bounds[0], xmax = self.level.prob.x_bounds[1])
           plt.axes().set_ylim(ymin = self.level.prob.z_bounds[0], ymax = self.level.prob.z_bounds[1])

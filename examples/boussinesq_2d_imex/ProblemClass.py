@@ -51,8 +51,8 @@ class boussinesq_2d_imex(ptype):
 
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
        
-        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.Nfreq)
-        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0] )
+        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq)
+        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv )
     
     def solve_system(self,rhs,factor,u0,t):
         """
@@ -94,7 +94,7 @@ class boussinesq_2d_imex(ptype):
         temp  = u.values.flatten()
         temp  = self.D_upwind.dot(temp)
         # NOTE: M_adv = -D_upwind, therefore add a minus here
-        fexpl.values = unflatten(-self.u_adv*temp, 4, self.N[0], self.N[1])
+        fexpl.values = unflatten(-temp, 4, self.N[0], self.N[1])
               
         #fexpl.values = np.zeros((3, self.N[0], self.N[1]))
         return fexpl
@@ -115,7 +115,7 @@ class boussinesq_2d_imex(ptype):
         temp = self.M.dot(temp)
         fimpl = mesh(self.nvars,val=0)
         # NOTE: M = -A, therefore add a minus here
-        fimpl.values = unflatten(-self.c_s*temp, 4, self.N[0], self.N[1])
+        fimpl.values = unflatten(-temp, 4, self.N[0], self.N[1])
         
         return fimpl
 
@@ -152,7 +152,8 @@ class boussinesq_2d_imex(ptype):
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
         me.values[1,:,:] = 0.0*self.xx
-        #me.values[2,:,:] = 0.5*np.exp(-0.5*( self.xx-self.c_s*t - self.u_adv*t )**2/0.2**2.0) + 0.5*np.exp(-0.5*( self.xx + self.c_s*t - self.u_adv*t)**2/0.2**2.0)
-        me.values[2,:,:] = 0.0*self.xx
-        me.values[3,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
+        #me.values[2,:,:] = 0.0*self.xx
+        #me.values[3,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
+        me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.05**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.2**2)
+        me.values[3,:,:] = 0.0*self.xx
         return me
