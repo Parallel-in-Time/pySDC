@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
 
-def getWave2DUpwindMatrix(N, dx):
+def getBoussinesq2DUpwindMatrix(N, dx):
 
   Dx   = get2DUpwindMatrix(N, dx)
   
@@ -14,7 +14,7 @@ def getWave2DUpwindMatrix(N, dx):
   
   return sp.csc_matrix(M)
   
-def getWave2DMatrix(N, h, bc_hor, bc_ver):
+def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver):
   Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0])
   Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1])
   Dx_p, Dz_p = get2DMatrix(N, h, bc_hor[2], bc_ver[2])
@@ -31,7 +31,7 @@ def getWave2DMatrix(N, h, bc_hor, bc_ver):
 
   return sp.csc_matrix(Id), sp.csc_matrix(M)
 
-def getWaveBCHorizontal(value, N, dx, bc_hor):
+def getBoussinesqBCHorizontal(value, N, dx, bc_hor):
   
   bu_left, bu_right = getBCHorizontal( value[0], N, dx, bc_hor[0] )
   bw_left, bw_right = getBCHorizontal( value[1], N, dx, bc_hor[1] )
@@ -41,5 +41,5 @@ def getWaveBCHorizontal(value, N, dx, bc_hor):
   b_right = np.concatenate(( bp_right, bp_right, bu_right + bw_right))
   return b_left, b_right
 
-def getWaveBCVertical():
+def getBoussinesqBCVertical():
   return 0.0

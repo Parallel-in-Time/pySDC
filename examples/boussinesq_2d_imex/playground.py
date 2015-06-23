@@ -44,6 +44,7 @@ if __name__ == "__main__":
     pparams['nvars'] = [(3,100,25)]
     pparams['u_adv'] = -0.75
     pparams['c_s']   = 1.5
+    pparams['N']     = 1.0
     pparams['x_bounds'] = [(-1.0, 1.0)]
     pparams['z_bounds'] = [( 0.0, 1.0)]
 

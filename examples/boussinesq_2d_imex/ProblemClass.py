@@ -5,7 +5,7 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from build2DFDMatrix import get2DMesh
-from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical, getWave2DUpwindMatrix
+from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesqBCHorizontal, getBoussinesqBCVertical, getBoussinesq2DUpwindMatrix
 from unflatten import unflatten
 
 
@@ -33,8 +33,9 @@ class boussinesq_2d_imex(ptype):
         assert 'nvars' in cparams
         assert 'c_s' in cparams
         assert 'u_adv' in cparams
+        assert 'N' in cparams
         assert 'x_bounds' in cparams
-        assert 'x_bounds' in cparams
+        assert 'z_bounds' in cparams
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -50,8 +51,8 @@ class boussinesq_2d_imex(ptype):
 
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
        
-        self.Id, self.M = getWave2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
-        self.D_upwind   = getWave2DUpwindMatrix( self.N, self.h[0] )
+        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver)
+        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0] )
     
     def solve_system(self,rhs,factor,u0,t):
         """
