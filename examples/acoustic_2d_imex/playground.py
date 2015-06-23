@@ -35,8 +35,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 2.5
-    Nsteps = 500
+    Tend   = 0.5
+    Nsteps = 100
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
