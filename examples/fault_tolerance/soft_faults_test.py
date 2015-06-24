@@ -2,13 +2,14 @@
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
+import pickle as pkl
 
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order_softfaults import imex_1st_order
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
@@ -23,7 +24,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 16
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
@@ -31,13 +32,13 @@ if __name__ == "__main__":
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
-    sparams['maxiter'] = 20
+    sparams['maxiter'] = 50
     sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.5
-    pparams['nvars'] = [255]
+    pparams['nvars'] = [255,127]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -58,31 +59,55 @@ if __name__ == "__main__":
 
 
     ft.do_soft_faults = True
-    ft.soft_random = 0.02
+    ft.soft_random = 0.01
+    ft.soft_do_correction = True
 
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    nsim = 1
 
-    # setup parameters "in time"
-    t0 = 0
-    dt = 0.5
-    Tend = 1*dt
 
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
+    for k in range(nsim):
 
-    # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+        # ft.rd.seed()
 
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
-    err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
-    # print('error at time %s: %s' %(Tend,err))
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs,sparams,description)
 
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
-    sortedlist_stats = sort_stats(extract_stats,sortby='iter')
-    print(extract_stats,sortedlist_stats)
+        # setup parameters "in time"
+        t0 = 0
+        dt = 0.5
+        Tend = 16*dt
 
-    ft.soft_stats.append((ft.soft_counter,0,0,err))
+        # get initial values on finest level
+        P = MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
+
+        # call main function to get things done...
+        uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+        # compute exact solution and compare
+        uex = P.u_exact(Tend)
+        err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
+        # print('error at time %s: %s' %(Tend,err))
+
+        extract_stats = grep_stats(stats,level=-1,type='residual')
+        maxiter = 0
+        for k,v in extract_stats.items():
+            maxiter = max(maxiter,getattr(k,'iter'))
+            # minres = min(minres,np.log10(v))
+            # maxres = max(maxres,np.log10(v))
+
+        residuals = np.zeros(maxiter)
+        for k,v in extract_stats.items():
+            step = getattr(k,'step')
+            iter = getattr(k,'iter')
+            if iter is not -1:
+                residuals[iter-1] = v
+
+        ft.soft_stats.append((ft.soft_counter,maxiter,residuals,err))
+        ft.soft_counter = 0
+
+    # fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
+    # pkl.dump(ft.soft_stats, open(fname,'wb'))
+
 

@@ -228,7 +228,7 @@ def pfasst(S):
                     S.prev.levels[-1].tag = False
 
             # do the sweep with (possibly) new values
-            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.update_nodes(stopit=True)
 
             # update stage and return
             S.status.stage = 'PREDICT_SEND'

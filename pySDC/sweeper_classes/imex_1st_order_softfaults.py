@@ -71,7 +71,7 @@ class imex_1st_order(sweeper):
 
         return me
 
-    def update_nodes(self,doitnow):
+    def update_nodes(self,stopit=False):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
 
@@ -120,7 +120,7 @@ class imex_1st_order(sweeper):
 
             # check if we will do a bitflip
             loop,index,pos,uf = ft.soft_fault_injection(P.nvars)
-            flip = loop == 0 and index is not None and m > 0# and doitnow and m+1==4
+            flip = loop == 0 and index is not None and m > 0 and not stopit #and ft.soft_counter == 1
 
             # repeat the evaluation at this node, until either we fixed a bitflip or we have done this twice already
             while loop < 2:
@@ -160,18 +160,24 @@ class imex_1st_order(sweeper):
                 for j in range(1,self.coll.num_nodes+1):
                     res += L.dt*self.coll.Qmat[m+1,j]*(L.f[j].impl + L.f[j].expl)
                 res -= L.u[m+1]
+                if L.tau is not None:
+                    res += L.tau[m]
+
                 newres = np.linalg.norm(res.values,np.inf)
                 # print(newres,oldres[m])
 
-                # first take on this node and the residual is too high
-                if loop == 0 and (newres > 10*oldres[m] or math.isnan(newres)):
-                    print('bad things happened, will repeat this step...',m,newres,oldres[m])
-                    loop = 1
-                # second take on this node and the residual is still too high
-                elif loop == 1 and newres > 10*oldres[m]:
-                    print('this was a false positive!',newres,oldres[m])
-                    loop = 2
-                # all is good
+                if ft.soft_do_correction:
+                    # first take on this node and the residual is too high
+                    if loop == 0 and (newres > 10*oldres[m] or math.isnan(newres)):
+                        print('bad things happened, will repeat this step...',m,newres,oldres[m])
+                        loop = 1
+                    # second take on this node and the residual is still too high
+                    elif loop == 1 and newres > 10*oldres[m]:
+                        print('this was a false positive!',newres,oldres[m])
+                        loop = 2
+                    # all is good
+                    else:
+                        loop = 2
                 else:
                     loop = 2
 

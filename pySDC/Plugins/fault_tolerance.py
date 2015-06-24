@@ -11,10 +11,13 @@ do_soft_faults = True
 soft_random = 0.0
 soft_counter = 0
 soft_stats = []
+soft_do_correction = False
 
 
 def soft_fault_injection(nvars):
     global soft_random, soft_counter, soft_stats, do_soft_faults
+
+    rd.seed()
 
     if not do_soft_faults:
 
