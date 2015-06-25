@@ -7,31 +7,46 @@ step = None
 strategy = None
 hard_random = 0.0
 
-soft_random = 0.0
+soft_do_faults = False
+
+soft_step = 0
+soft_iter = 0
+soft_level = 0
+soft_node = 0
+
 soft_fault_injected = 0
 soft_fault_detected = 0
 soft_fault_missed = 0
 soft_fault_hit = 0
+
 soft_safety_factor = 1.0
+
 soft_stats = []
 soft_do_correction = False
 
 
-def soft_fault_injection(nvars):
-    global soft_random, soft_stats
+def soft_fault_preproc(nsteps,niters,nlevs,nnodes):
+    global soft_step, soft_iter, soft_level, soft_node
 
     rd.seed()
 
-    rnd = rd.random()
-    doit = rnd < soft_random
+    soft_step = rd.randrange(nsteps)
+    soft_iter = rd.randrange(1,niters+1)
+    soft_level = rd.randrange(nlevs)
+    # FIXME: do we need to exclude the first node??
+    soft_node = rd.randrange(1,nnodes)
+    # print(soft_step,soft_iter,soft_level,soft_node)
+
+def soft_fault_injection(step,iter,level,node,nvars):
+    global soft_step, soft_iter, soft_level, soft_node, soft_do_faults, soft_stats
+
+    doit = step == soft_step and iter == soft_iter and level == soft_level and node == soft_node and soft_do_faults
 
     if doit:
+        rd.seed()
         index = rd.randrange(nvars)
         pos = rd.randrange(31)
         uf = rd.randrange(2)
-        # index = 93
-        # pos = 26
-        # uf = 1
 
         return index,pos,uf
 

@@ -4,21 +4,22 @@ import math
 import os
 from matplotlib import rc
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 
 if __name__ == "__main__":
 
-    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl',' SDC, no correction',(10,20,30,40,50)),
-             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1',(10,20,30,40,50)),
-             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl','SDC, correction, a = 5',(10,20,30,40,50)),
-             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10',(10,20,30,40,50)) ]
+    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl',' SDC, no correction'),
+             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1'),
+             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl','SDC, correction, a = 5'),
+             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
 
     # list = [ ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10',(5,15,25,35,45)) ,
     #          ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl',' MLSDC, no correction', (5,15,25,35,45)) ]
     # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10', ()),
     #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction', ())]
 
-    for file,title,bins in list:
+    for file,title in list:
         soft_stats = pkl.load(open(file,'rb'))
 
         soft_stats_cleaned = []
@@ -55,37 +56,41 @@ if __name__ == "__main__":
             print('     Number of false positives (full/avg/ref. to detects): %6i \t %4.2f \t %4.2f' %(ndetect-nhits, (ndetect-nhits)/nruns_clean, (ndetect-nhits)/ndetect) )
 
 
-        continue
+        # for l in range(min_iter):
+        #     iters = [np.log10(item[5][l].clip(1E-07,1)) for item in soft_stats_cleaned]
+        #     param = stats.gamma.fit(iters)
+        #     print(param[1],ref_res[l])
+
+        # continue
 
         #####
 
         mean_res = np.zeros(min_iter)
 
         for item in soft_stats_cleaned:
-            mean_res[:] = mean_res[:] + np.log10(item[2][0:min_iter].clip(1E-07,1))
+            mean_res[:] = mean_res[:] + np.log10(item[5][0:min_iter].clip(1E-07,1))
 
-        mean_res[:] = mean_res[:]/nstats
+        mean_res[:] = mean_res[:]/nruns_clean
 
-        stddev_res = np.zeros(min_iter)
+        dev_res = np.zeros(min_iter)
         for item in soft_stats_cleaned:
-            stddev_res[:] = stddev_res[:] + (np.log10(item[2][0:min_iter].clip(1E-07,1)) - mean_res[:])**2
+            dev_res[:] = dev_res[:] + np.sqrt((np.log10(item[5][0:min_iter].clip(1E-07,1)) - mean_res[:])**2)
 
-        stddev_res[:] = np.sqrt(stddev_res[:]/(nstats-1))
-
-        # conf_coeff = 1.96
-        # conf_max = mean_res[:] + conf_coeff*stddev_res[:]/np.sqrt(nstats)
-        # conf_min = mean_res[:] - conf_coeff*stddev_res[:]/np.sqrt(nstats)
-        conf_max = mean_res[:] + stddev_res[:]
-        conf_min = mean_res[:] - stddev_res[:]
+        dev_res[:] = dev_res[:]/nruns_clean
 
         fig, ax = plt.subplots(figsize=(10,10))
 
-        plt.plot(mean_res,'r-',label='mean')
-        plt.plot(ref_res,'k--',label='reference')
-        plt.plot(conf_min,'b-',label='standard deviation')
-        plt.plot(conf_max,'b-',)
+        lw = 3
+        ms = 8
+        mw = 2
 
-        plt.legend()
+        plt.plot(ref_res,  linestyle='--',color='k',linewidth=lw, marker='o', markersize=ms, markeredgecolor='k', markeredgewidth=mw, label='reference')
+        plt.plot(mean_res, linestyle='-', color='r',linewidth=lw, marker='o', markersize=ms, markeredgecolor='k', markeredgewidth=mw, label='mean')
+
+        plt.plot([],[],color='grey',alpha=0.5,linewidth=10,label='mean abs. deviation (MAD)')
+        plt.fill_between(range(min_iter),mean_res-dev_res, mean_res+dev_res, alpha=0.5, facecolor='grey', edgecolor='none')
+
+        plt.legend(numpoints=1)
 
         plt.xlabel('iteration')
         plt.ylabel('log10(residual)')
@@ -100,16 +105,14 @@ if __name__ == "__main__":
         # continue
         #####
 
-        niter = [item[1] for item in soft_stats_cleaned]
+        niter = [item[4] for item in soft_stats_cleaned]
 
         fig, ax = plt.subplots(figsize=(10,10))
 
-        plt.hist(niter,normed=False,histtype='bar',rwidth=0.8)
+        plt.hist(niter,bins=range(min_iter,51,1),normed=False,histtype='bar',rwidth=0.8,log=True)
 
-        # plt.xlim((10,50))
-        # plt.ylim((0,400))
-
-        # plt.xticks([15,25,35,45],['10-20','20-30','30-40','40-50'])
+        plt.xlim((min_iter-1,51))
+        plt.ylim((0,nruns))
 
         plt.xlabel('number of iterations')
         plt.ylabel('number of runs')

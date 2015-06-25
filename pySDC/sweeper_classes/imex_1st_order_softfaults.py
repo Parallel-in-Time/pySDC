@@ -71,7 +71,7 @@ class imex_1st_order(sweeper):
 
         return me
 
-    def update_nodes(self,stopit=False):
+    def update_nodes(self,level=0,stopit=False):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
 
@@ -121,11 +121,9 @@ class imex_1st_order(sweeper):
             loop = 0
 
             # check if we will do a bitflip
-            index,pos,uf = ft.soft_fault_injection(P.nvars)
+            index,pos,uf = ft.soft_fault_injection(L._level__step.status.step,L._level__step.status.iter,level,m,P.nvars)
 
-            # FIXME: do we need to exclude the first node??
-            flip = index is not None and m > 0 and not stopit
-            # flip = index is not None and not stopit
+            flip = index is not None and not stopit
 
             fault_injected = False
 

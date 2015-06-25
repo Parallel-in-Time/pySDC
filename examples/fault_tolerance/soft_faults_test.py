@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.5
-    pparams['nvars'] = [255]
+    pparams['nvars'] = [255,127]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -54,16 +54,16 @@ if __name__ == "__main__":
     description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
-    # description['transfer_class'] = mesh_to_mesh_1d
-    # description['transfer_params'] = tparams
+    description['transfer_class'] = mesh_to_mesh_1d
+    description['transfer_params'] = tparams
 
     # setup parameters "in time"
     t0 = 0
     dt = 0.5
     Tend = num_procs*dt
 
-    ft.soft_random = 0.0 # no faults
-    ft.soft_do_correction = True
+    ft.soft_do_faults = False
+    ft.soft_do_correction = False
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -99,15 +99,19 @@ if __name__ == "__main__":
     ft.soft_fault_detected = 0
     ft.soft_fault_hit = 0
     ft.soft_fault_missed = 0
-    # exit()
 
-    ft.soft_random = 0.01 # 1% soft-faults
-    ft.soft_safety_factor = 10.0
+    maxiter_ref = maxiter
+
+    ft.soft_do_faults = True
+    ft.soft_safety_factor = 1.0
     ft.soft_do_correction = False
 
     nsim = 1000
 
     for k in range(nsim):
+
+        ft.soft_fault_preproc(nsteps=num_procs,niters=maxiter_ref-1,nlevs=len(MS[0].levels),nnodes=MS[0].levels[0].sweep.coll.num_nodes)
+        print()
         print('-----------------------> Working on step %i of %i...' %(k+1,nsim))
 
         # quickly generate block of steps
@@ -147,10 +151,11 @@ if __name__ == "__main__":
 
     # fname = 'HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl'
     # fname = 'HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl'
-    # fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
-    # fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
 
-    fname = 'HEAT_SDC_soft_faults_nocorr_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
+    fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
+
+    # fname = 'HEAT_SDC_soft_faults_nocorr_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr1x_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr5x_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr10x_N1000.pkl'
