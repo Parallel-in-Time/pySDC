@@ -103,8 +103,8 @@ if __name__ == "__main__":
     maxiter_ref = maxiter
 
     ft.soft_do_faults = True
-    ft.soft_safety_factor = 1.0
-    ft.soft_do_correction = False
+    ft.soft_safety_factor = 10.0
+    ft.soft_do_correction = True
 
     nsim = 1000
 
@@ -152,8 +152,10 @@ if __name__ == "__main__":
     # fname = 'HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl'
     # fname = 'HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl'
 
-    # fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
-    fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_corr1x_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_corr5x_N1000.pkl'
+    fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
 
     # fname = 'HEAT_SDC_soft_faults_nocorr_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr1x_N1000.pkl'

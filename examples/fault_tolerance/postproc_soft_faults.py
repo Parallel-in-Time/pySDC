@@ -9,15 +9,18 @@ import scipy.stats as stats
 
 if __name__ == "__main__":
 
-    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl',' SDC, no correction'),
-             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1'),
-             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl','SDC, correction, a = 5'),
-             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
+    # list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl', 'SDC, no correction'),
+    #          ('HEAT_SDC_soft_faults_corr1x_N1000.pkl', 'SDC, correction, a = 1'),
+    #          ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
+    #          ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
 
-    # list = [ ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10',(5,15,25,35,45)) ,
-    #          ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl',' MLSDC, no correction', (5,15,25,35,45)) ]
-    # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10', ()),
-    #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction', ())]
+    list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
+             ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl', 'MLSDC, correction, a = 1'),
+             ('HEAT_MLSDC_soft_faults_corr5x_N1000.pkl', 'MLSDC, correction, a = 5'),
+             ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10') ]
+
+    # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10'),
+    #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction')]
 
     for file,title in list:
         soft_stats = pkl.load(open(file,'rb'))
