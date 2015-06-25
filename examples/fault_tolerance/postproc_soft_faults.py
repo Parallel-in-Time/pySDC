@@ -8,25 +8,54 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    # list = [ ('HEAT_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10',(10,20,30,40,50)) ,
-    #          ('HEAT_soft_faults_nocorr_N1000.pkl',' SDC, no correction',(10,20,30,40,50)) ]
-    list = [ ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10',(5,15,25,35,45)) ,
-             ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl',' MLSDC, no correction', (5,15,25,35,45)) ]
+    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl',' SDC, no correction',(10,20,30,40,50)),
+             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1',(10,20,30,40,50)),
+             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl','SDC, correction, a = 5',(10,20,30,40,50)),
+             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10',(10,20,30,40,50)) ]
+
+    # list = [ ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10',(5,15,25,35,45)) ,
+    #          ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl',' MLSDC, no correction', (5,15,25,35,45)) ]
+    # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10', ()),
+    #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction', ())]
 
     for file,title,bins in list:
         soft_stats = pkl.load(open(file,'rb'))
 
         soft_stats_cleaned = []
         min_iter = 99
+        nfaults = 0
+        ndetect = 0
+        nhits = 0
+        nmissed = 0
+        niter = 0
         for item in soft_stats:
-            if item[0] > 0 and not math.isnan(item[2][-1]):
-                min_iter = min(item[1],min_iter)
+            if item[0] > 0 and not math.isnan(item[6]):
+                min_iter = min(item[4],min_iter)
                 soft_stats_cleaned.append(item)
+                nfaults += item[0]
+                ndetect += item[1]
+                nhits += item[2]
+                nmissed += item[3]
+                niter += item[4]
             elif item[0] == 0:
-                ref_res = np.log10(item[2])
+                ref_res = np.log10(item[5])
 
-        nstats = len(soft_stats_cleaned)
-        print(nstats,min_iter)
+        nruns = len(soft_stats)
+        nruns_clean = len(soft_stats_cleaned)
+
+        print()
+        print('Setup:',file)
+        print('Found %i successfull runs out of %i overall runs' %(nruns_clean,nruns))
+        print('     Number of iterations (full/avg): %6i \t %4.2f' %(niter, niter/nruns_clean) )
+        print('     Number of faults (full/avg):\t  %6i \t %4.2f' %(nfaults, nfaults/nruns_clean) )
+        print('     Number of detections (full/avg): %6i \t %4.2f' %(ndetect,ndetect/nruns_clean) )
+        if ndetect > 0:
+            print('     Number of hits (full/avg/ref. to faults):\t\t\t   %6i \t %4.2f \t %4.2f' %(nhits, nhits/nruns_clean, nhits/nfaults) )
+            print('     Number of false negatives (full/avg/ref. to faults):  %6i \t %4.2f \t %4.2f' %(nmissed, nmissed/nruns_clean, nmissed/nfaults) )
+            print('     Number of false positives (full/avg/ref. to detects): %6i \t %4.2f \t %4.2f' %(ndetect-nhits, (ndetect-nhits)/nruns_clean, (ndetect-nhits)/ndetect) )
+
+
+        continue
 
         #####
 
@@ -68,16 +97,17 @@ if __name__ == "__main__":
 
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
+        # continue
         #####
 
         niter = [item[1] for item in soft_stats_cleaned]
 
         fig, ax = plt.subplots(figsize=(10,10))
 
-        plt.hist(niter,bins=bins,normed=False,histtype='bar',rwidth=0.8)
+        plt.hist(niter,normed=False,histtype='bar',rwidth=0.8)
 
         # plt.xlim((10,50))
-        plt.ylim((0,400))
+        # plt.ylim((0,400))
 
         # plt.xticks([15,25,35,45],['10-20','20-30','30-40','40-50'])
 

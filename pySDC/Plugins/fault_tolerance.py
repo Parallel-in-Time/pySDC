@@ -7,41 +7,37 @@ step = None
 strategy = None
 hard_random = 0.0
 
-do_soft_faults = True
 soft_random = 0.0
-soft_counter = 0
+soft_fault_injected = 0
+soft_fault_detected = 0
+soft_fault_missed = 0
+soft_fault_hit = 0
+soft_safety_factor = 1.0
 soft_stats = []
 soft_do_correction = False
 
 
 def soft_fault_injection(nvars):
-    global soft_random, soft_counter, soft_stats, do_soft_faults
+    global soft_random, soft_stats
 
     rd.seed()
 
-    if not do_soft_faults:
+    rnd = rd.random()
+    doit = rnd < soft_random
 
-        return -1,None,None,None
+    if doit:
+        index = rd.randrange(nvars)
+        pos = rd.randrange(31)
+        uf = rd.randrange(2)
+        # index = 93
+        # pos = 26
+        # uf = 1
+
+        return index,pos,uf
 
     else:
 
-        doit = rd.random() < soft_random
-
-        if doit:
-
-            soft_counter += 1
-            index = rd.randrange(nvars)
-            pos = rd.randrange(31)
-            uf = rd.randrange(2)
-            # index = 93
-            # pos = 26
-            # uf = 1
-
-            return 0,index,pos,uf
-
-        else:
-
-            return 0,None,None,None
+        return None,None,None
 
 
 def __bitsToFloat(b):

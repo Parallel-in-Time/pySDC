@@ -383,7 +383,7 @@ def pfasst(S):
             # coarsest sweep
 
             # standard sweep workflow: update nodes, compute residual, log progress
-            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.update_nodes()#(stopit=True)
             S.levels[-1].sweep.compute_residual()
 
             S.levels[-1].hooks.dump_sweep(S.status)

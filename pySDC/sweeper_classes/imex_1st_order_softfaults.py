@@ -118,9 +118,16 @@ class imex_1st_order(sweeper):
         # do the sweep
         for m in range(0,M):
 
+            loop = 0
+
             # check if we will do a bitflip
-            loop,index,pos,uf = ft.soft_fault_injection(P.nvars)
-            flip = loop == 0 and index is not None and m > 0 and not stopit #and ft.soft_counter == 1
+            index,pos,uf = ft.soft_fault_injection(P.nvars)
+
+            # FIXME: do we need to exclude the first node??
+            flip = index is not None and m > 0 and not stopit
+            # flip = index is not None and not stopit
+
+            fault_injected = False
 
             # repeat the evaluation at this node, until either we fixed a bitflip or we have done this twice already
             while loop < 2:
@@ -137,23 +144,24 @@ class imex_1st_order(sweeper):
 
                 if flip:
 
-                    print('Flipping bit at node %i, index %i, position %i, uf %i...' %(m+1,index,pos,uf))
+                    print('Iteration %i: flipping bit at node %i, index %i, position %i, uf %i...' %(L._level__step.status.iter,m+1,index,pos,uf))
 
                     if uf == 0:
                         # this is for flips in u
-                        print('pre:',L.u[m+1].values[index])
+                        # print('pre:',L.u[m+1].values[index])
                         L.u[m+1].values[index] = ft.do_bitflip(L.u[m+1].values[index],pos)
-                        print('post:',L.u[m+1].values[index])
+                        # print('post:',L.u[m+1].values[index])
                     elif uf == 1:
                         # this is for flips in f.impl 
-                        print('pre:',L.f[m+1].impl.values[index])
+                        # print('pre:',L.f[m+1].impl.values[index])
                         L.f[m+1].impl.values[index] = ft.do_bitflip(L.f[m+1].impl.values[index],pos)
-                        print('post:',L.f[m+1].impl.values[index])
+                        # print('post:',L.f[m+1].impl.values[index])
                     else:
                         print('oooh, too bad..',uf)
                         exit()
                     flip = False
-
+                    ft.soft_fault_injected += 1
+                    fault_injected = True
 
                 # compute the residual with the new values just computed
                 res = P.dtype_u(L.u[0])
@@ -163,20 +171,28 @@ class imex_1st_order(sweeper):
                 if L.tau is not None:
                     res += L.tau[m]
 
-                newres = np.linalg.norm(res.values,np.inf)
+                newres = abs(res)
                 # print(newres,oldres[m])
 
                 if ft.soft_do_correction:
                     # first take on this node and the residual is too high
-                    if loop == 0 and (newres > 10*oldres[m] or math.isnan(newres)):
-                        print('bad things happened, will repeat this step...',m,newres,oldres[m])
+                    if loop == 0 and (newres > ft.soft_safety_factor*oldres[m] or math.isnan(newres)) and newres > L.params.restol:
+                        # print('bad things happened, will repeat this step...',L._level__step.status.step,L._level__step.status.iter,m,newres,oldres[m])
+                        print('Iteration %i: fault detected at node %i!' %(L._level__step.status.iter,m+1))
                         loop = 1
+                        ft.soft_fault_detected += 1
+                        if fault_injected:
+                            ft.soft_fault_hit += 1
+                            fault_injected = False
                     # second take on this node and the residual is still too high
-                    elif loop == 1 and newres > 10*oldres[m]:
-                        print('this was a false positive!',newres,oldres[m])
+                    elif loop == 1 and newres > ft.soft_safety_factor*oldres[m]:
+                        print('Iteration %i: ...this was a false positive at node %i!' %(L._level__step.status.iter,m+1))
                         loop = 2
                     # all is good
                     else:
+                        if fault_injected:
+                            ft.soft_fault_missed += 1
+                            fault_injected = False
                         loop = 2
                 else:
                     loop = 2
