@@ -9,15 +9,15 @@ import scipy.stats as stats
 
 if __name__ == "__main__":
 
-    # list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl', 'SDC, no correction'),
-    #          ('HEAT_SDC_soft_faults_corr1x_N1000.pkl', 'SDC, correction, a = 1'),
-    #          ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
-    #          ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
+    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl', 'SDC, no correction'),
+             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl', 'SDC, correction, a = 1'),
+             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
+             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
 
-    list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
-             ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl', 'MLSDC, correction, a = 1'),
-             ('HEAT_MLSDC_soft_faults_corr5x_N1000.pkl', 'MLSDC, correction, a = 5'),
-             ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10') ]
+    # list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
+    #          ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl', 'MLSDC, correction, a = 1') ,
+    #          ('HEAT_MLSDC_soft_faults_corr5x_N1000.pkl', 'MLSDC, correction, a = 5'),
+    #          ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10') ]
 
     # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10'),
     #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction')]
@@ -71,13 +71,18 @@ if __name__ == "__main__":
         mean_res = np.zeros(min_iter)
 
         for item in soft_stats_cleaned:
-            mean_res[:] = mean_res[:] + np.log10(item[5][0:min_iter].clip(1E-07,1))
+            mean_res[:] = mean_res[:] + np.log10(item[5][0:min_iter].clip(1E-14,1))
 
         mean_res[:] = mean_res[:]/nruns_clean
 
         dev_res = np.zeros(min_iter)
+        min_res = np.zeros(min_iter)
+        max_res = np.zeros(min_iter)
+        max_res[:] = -99
         for item in soft_stats_cleaned:
-            dev_res[:] = dev_res[:] + np.sqrt((np.log10(item[5][0:min_iter].clip(1E-07,1)) - mean_res[:])**2)
+            dev_res[:] = dev_res[:] + np.sqrt((np.log10(item[5][0:min_iter].clip(1E-14,1)) - mean_res[:])**2)
+            min_res[:] = np.minimum(min_res[:],np.log10(item[5][0:min_iter].clip(1E-14,1)))
+            max_res[:] = np.maximum(max_res[:],np.log10(item[5][0:min_iter].clip(1E-14,1)))
 
         dev_res[:] = dev_res[:]/nruns_clean
 
@@ -90,8 +95,9 @@ if __name__ == "__main__":
         plt.plot(ref_res,  linestyle='--',color='k',linewidth=lw, marker='o', markersize=ms, markeredgecolor='k', markeredgewidth=mw, label='reference')
         plt.plot(mean_res, linestyle='-', color='r',linewidth=lw, marker='o', markersize=ms, markeredgecolor='k', markeredgewidth=mw, label='mean')
 
-        plt.plot([],[],color='grey',alpha=0.5,linewidth=10,label='mean abs. deviation (MAD)')
-        plt.fill_between(range(min_iter),mean_res-dev_res, mean_res+dev_res, alpha=0.5, facecolor='grey', edgecolor='none')
+        plt.plot([],[],color='grey',alpha=0.5,linewidth=10,label='range of residuals')
+        # plt.fill_between(range(min_iter),mean_res-dev_res, mean_res+dev_res, alpha=0.5, facecolor='grey', edgecolor='none')
+        plt.fill_between(range(min_iter), min_res, max_res, alpha=0.5, facecolor='grey', edgecolor='none')
 
         plt.legend(numpoints=1)
 
@@ -105,7 +111,7 @@ if __name__ == "__main__":
 
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
-        # continue
+        continue
         #####
 
         niter = [item[4] for item in soft_stats_cleaned]
@@ -126,8 +132,6 @@ if __name__ == "__main__":
         fname = 'iterations_'+os.path.splitext(file)[0]+'.png'
 
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
-
-
 
     plt.show()
 
