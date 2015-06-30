@@ -9,18 +9,21 @@ import scipy.stats as stats
 
 if __name__ == "__main__":
 
-    list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl', 'SDC, no correction'),
-             ('HEAT_SDC_soft_faults_corr1x_N1000.pkl', 'SDC, correction, a = 1'),
-             ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
-             ('HEAT_SDC_soft_faults_corr10x_N1000.pkl','SDC, correction, a = 10') ]
+    # list = [ ('HEAT_SDC_soft_faults_nocorr_N1000.pkl', 'SDC, no correction'),
+    #          ('HEAT_SDC_soft_faults_corr10x_N1000.pkl', 'SDC, correction, a = 10'),
+    #          ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
+    #          ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1') ]
 
-    # list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
-    #          ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl', 'MLSDC, correction, a = 1') ,
+    list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
+             ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl', 'MLSDC, correction, a = 10') ,
     #          ('HEAT_MLSDC_soft_faults_corr5x_N1000.pkl', 'MLSDC, correction, a = 5'),
-    #          ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl','MLSDC, correction, a = 10') ]
+             ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl','MLSDC, correction, a = 1') ]
 
     # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10'),
     #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction')]
+
+    iterhist = []
+    legendhist = []
 
     for file,title in list:
         soft_stats = pkl.load(open(file,'rb'))
@@ -34,7 +37,6 @@ if __name__ == "__main__":
         niter = 0
         for item in soft_stats:
             if item[0] > 0 and not math.isnan(item[6]):
-                min_iter = min(item[4],min_iter)
                 soft_stats_cleaned.append(item)
                 nfaults += item[0]
                 ndetect += item[1]
@@ -43,6 +45,7 @@ if __name__ == "__main__":
                 niter += item[4]
             elif item[0] == 0:
                 ref_res = np.log10(item[5])
+                min_iter = len(item[5])
 
         nruns = len(soft_stats)
         nruns_clean = len(soft_stats_cleaned)
@@ -111,27 +114,32 @@ if __name__ == "__main__":
 
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
-        continue
+        # continue
         #####
 
-        niter = [item[4] for item in soft_stats_cleaned]
+        iterhist.append([item[4] for item in soft_stats_cleaned])
+        legendhist.append(title)
 
-        fig, ax = plt.subplots(figsize=(10,10))
+    fig, ax = plt.subplots(figsize=(10,10))
 
-        plt.hist(niter,bins=range(min_iter,51,1),normed=False,histtype='bar',rwidth=0.8,log=True)
+    # bins = np.arange(min_iter,51,1)
+    plt.hist(iterhist,bins=15,normed=False,histtype='bar',rwidth=0.7,log=True,label=legendhist)
 
-        plt.xlim((min_iter-1,51))
-        plt.ylim((0,nruns))
+    # plt.xlim((min_iter-1,51))
+    plt.ylim((0,nruns))
+    plt.legend()
+    # print(bins)
+    # plt.xticks(bins+1.5,bins)
 
-        plt.xlabel('number of iterations')
-        plt.ylabel('number of runs')
-        plt.title(title)
+    plt.xlabel('number of iterations')
+    plt.ylabel('number of runs')
+    # plt.title()
 
-        plt.tight_layout()
+    plt.tight_layout()
 
-        fname = 'iterations_'+os.path.splitext(file)[0]+'.png'
+    fname = 'iterations_MLSDC_histogram.png'
 
-        plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
     plt.show()
 
