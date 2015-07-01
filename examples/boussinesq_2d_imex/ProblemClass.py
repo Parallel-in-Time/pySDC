@@ -46,7 +46,7 @@ class boussinesq_2d_imex(ptype):
                 
         self.N     = [ self.nvars[1],  self.nvars[2] ]
         
-        self.bc_hor = [ ['periodic', 'periodic'] , ['periodic', 'periodic'], ['periodic', 'periodic'] , ['periodic', 'periodic'] ]
+        self.bc_hor = [ ['periodic', 'periodic'] , ['periodic', 'periodic'],   ['periodic', 'periodic'] , ['periodic', 'periodic'] ]
         self.bc_ver = [ ['neumann', 'neumann'] ,   ['dirichlet', 'dirichlet'], ['dirichlet', 'dirichlet'], ['neumann', 'neumann'] ]
 
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
@@ -70,7 +70,7 @@ class boussinesq_2d_imex(ptype):
 
         b = rhs.values.flatten()
         # NOTE: A = -M, therefore solve Id + factor*M here
-        sol, info =  LA.gmres( self.Id + factor*self.c_s*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
+        sol, info =  LA.gmres( self.Id + factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
         me = mesh(self.nvars)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
 
@@ -149,11 +149,17 @@ class boussinesq_2d_imex(ptype):
             exact solution
         """
         
+        dtheta = 0.01
+        H      = 10
+        a      = 5
+        x_c    = 150
+        
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
         me.values[1,:,:] = 0.0*self.xx
         #me.values[2,:,:] = 0.0*self.xx
         #me.values[3,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
-        me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.05**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.2**2)
+        #me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.05**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.2**2)
+        me.values[2,:,:] = dtheta*np.sin( np.pi*self.zz/H )/( 1.0 + np.square(self.xx - x_c)/(a*a))
         me.values[3,:,:] = 0.0*self.xx
         return me

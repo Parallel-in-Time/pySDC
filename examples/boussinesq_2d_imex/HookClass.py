@@ -46,11 +46,12 @@ class plot_solution(hooks):
           xx    = self.level.prob.xx
           zz    = self.level.prob.zz
           self.fig.clear()
+          levels = [-5e-3, -4e-3, -3e-3, -2e-3, -1e3, 1e-3, 2e-3, 3e-3, 4e-3, 5e-3]
           CS = plt.contourf(xx, zz, yplot[2,:,:], rstride=1, cstride=1, cmap=cm.coolwarm, linewidth=0, antialiased=False)
           cbar = plt.colorbar(CS)
           plt.axes().set_xlim(xmin = self.level.prob.x_bounds[0], xmax = self.level.prob.x_bounds[1])
           plt.axes().set_ylim(ymin = self.level.prob.z_bounds[0], ymax = self.level.prob.z_bounds[1])
-          plt.axes().set_aspect('equal')
+          #plt.axes().set_aspect('equal')
           plt.xlabel('x')
           plt.ylabel('z')
           #plt.tight_layout()

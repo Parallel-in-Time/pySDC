@@ -35,18 +35,18 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 0.5
-    Nsteps = 100
+    Tend   = 3000
+    Nsteps = 1500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(4,100,25)]
-    pparams['u_adv'] = -0.5
-    pparams['c_s']   = 1.5
-    pparams['Nfreq']     = 1.0
-    pparams['x_bounds'] = [(-1.0, 1.0)]
-    pparams['z_bounds'] = [( 0.0, 1.0)]
+    pparams['nvars']    = [(4,600,30)]
+    pparams['u_adv']    = -0.02
+    pparams['c_s']      = 0.3
+    pparams['Nfreq']    = 0.01
+    pparams['x_bounds'] = [(-300.0, 300.0)]
+    pparams['z_bounds'] = [(   0.0,  10.0)]
 
     # This comes as read-in for the transfer operations
     #tparams = {}
