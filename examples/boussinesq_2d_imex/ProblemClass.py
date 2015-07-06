@@ -40,7 +40,7 @@ class boussinesq_2d_imex(ptype):
         # add parameters as attributes for further reference
         for k,v in cparams.items():
             setattr(self,k,v)
-
+        
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(boussinesq_2d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
                 
@@ -68,10 +68,9 @@ class boussinesq_2d_imex(ptype):
             solution as mesh
         """
 
-        b = rhs.values.flatten()
-        # NOTE: A = -M, therefore solve Id + factor*M here
-        sol, info =  LA.gmres( self.Id + factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
-        me = mesh(self.nvars)
+        b         = rhs.values.flatten()
+        sol, info =  LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
+        me        = mesh(self.nvars)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
 
         return me
@@ -90,13 +89,11 @@ class boussinesq_2d_imex(ptype):
         """
         
         # Evaluate right hand side
-        fexpl = mesh(self.nvars)
-        temp  = u.values.flatten()
-        temp  = self.D_upwind.dot(temp)
-        # NOTE: M_adv = -D_upwind, therefore add a minus here
-        fexpl.values = unflatten(-temp, 4, self.N[0], self.N[1])
+        fexpl        = mesh(self.nvars,val=0.0)
+        temp         = u.values.flatten()
+        temp         = self.D_upwind.dot(temp)
+        fexpl.values = unflatten( temp, 4, self.N[0], self.N[1])
               
-        #fexpl.values = np.zeros((3, self.N[0], self.N[1]))
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -111,11 +108,10 @@ class boussinesq_2d_imex(ptype):
             implicit part of RHS
         """
 
-        temp = u.values.flatten()
-        temp = self.M.dot(temp)
-        fimpl = mesh(self.nvars,val=0)
-        # NOTE: M = -A, therefore add a minus here
-        fimpl.values = unflatten(-temp, 4, self.N[0], self.N[1])
+        temp         = u.values.flatten()
+        temp         = self.M.dot(temp)
+        fimpl        = mesh(self.nvars,val=0.0)
+        fimpl.values = unflatten(temp, 4, self.N[0], self.N[1])
         
         return fimpl
 
@@ -132,7 +128,7 @@ class boussinesq_2d_imex(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_imex_mesh(self.nvars)
+        f      = rhs_imex_mesh(self.nvars)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -150,9 +146,9 @@ class boussinesq_2d_imex(ptype):
         """
         
         dtheta = 0.01
-        H      = 10
-        a      = 5
-        x_c    = 150
+        H      = 10.0
+        a      = 5.0
+        x_c    = 50.0
         
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx

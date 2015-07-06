@@ -34,7 +34,7 @@ class acoustic_2d_imex(ptype):
         assert 'c_s' in cparams
         assert 'u_adv' in cparams
         assert 'x_bounds' in cparams
-        assert 'x_bounds' in cparams
+        assert 'z_bounds' in cparams
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():
