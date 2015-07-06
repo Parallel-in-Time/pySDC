@@ -186,8 +186,8 @@ if __name__ == "__main__":
 
                 ycnt +=1
 
-                ft.step = step
-                ft.iter = iter
+                ft.hard_step = step
+                ft.hard_iter = iter
                 ft.strategy = strategy
 
                 # quickly generate block of steps

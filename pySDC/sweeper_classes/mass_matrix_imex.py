@@ -56,7 +56,7 @@ class mass_matrix_imex(imex_1st_order.imex_1st_order):
         return QI, QE
 
 
-    def update_nodes(self):
+    def update_nodes(self,level,stopit):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
 

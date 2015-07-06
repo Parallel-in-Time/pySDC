@@ -113,34 +113,34 @@ def restart_block(MS,active_slots,u0):
     # loop over active slots (not directly, since we need the previous entry as well)
     for j in range(len(active_slots)):
 
-            # get slot number
-            p = active_slots[j]
+        # get slot number
+        p = active_slots[j]
 
-            # store current slot number for diagnostics
-            MS[p].status.slot = p
-            # resets step
-            MS[p].reset_step()
-            # determine whether I am the first and/or last in line
-            MS[p].status.first = active_slots.index(p) == 0
-            MS[p].status.last = active_slots.index(p) == len(active_slots)-1
-            # store link to previous and next step
-            if not MS[p].status.first:
-                MS[p].prev = MS[active_slots[j-1]]
-            else:
-                MS[p].prev = None
-            if not MS[p].status.last:
-                MS[p].next = MS[active_slots[j+1]]
-            else:
-                MS[p].next = None
-            # intialize step with u0
-            MS[p].init_step(u0)
-            # reset some values
-            MS[p].status.done = False
-            MS[p].status.pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
-            MS[p].status.iter = 0
-            MS[p].status.stage = 'SPREAD'
-            for l in MS[p].levels:
-                l.tag = False
+        # store current slot number for diagnostics
+        MS[p].status.slot = p
+        # resets step
+        MS[p].reset_step()
+        # determine whether I am the first and/or last in line
+        MS[p].status.first = active_slots.index(p) == 0
+        MS[p].status.last = active_slots.index(p) == len(active_slots)-1
+        # store link to previous and next step
+        if not MS[p].status.first:
+            MS[p].prev = MS[active_slots[j-1]]
+        else:
+            MS[p].prev = None
+        if not MS[p].status.last:
+            MS[p].next = MS[active_slots[j+1]]
+        else:
+            MS[p].next = None
+        # intialize step with u0
+        MS[p].init_step(u0)
+        # reset some values
+        MS[p].status.done = False
+        MS[p].status.pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
+        MS[p].status.iter = 0
+        MS[p].status.stage = 'SPREAD'
+        for l in MS[p].levels:
+            l.tag = False
 
     return MS
 

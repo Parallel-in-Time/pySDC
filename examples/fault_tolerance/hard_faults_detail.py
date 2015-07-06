@@ -112,8 +112,8 @@ if __name__ == "__main__":
     for strategy in ft_strategy:
 
         ft.strategy = strategy
-        ft.step = ft_step
-        ft.iter = ft_iter
+        ft.hard_step = ft_step
+        ft.hard_iter = ft_iter
 
         # quickly generate block of steps
         MS = mp.generate_steps(num_procs,sparams,description)

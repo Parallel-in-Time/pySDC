@@ -2,10 +2,11 @@ import copy as cp
 import random as rd
 import struct
 
-iter = None
-step = None
+hard_iter = None
+hard_step = None
 strategy = None
 hard_random = 0.0
+hard_stats = []
 
 soft_do_faults = False
 
@@ -72,19 +73,41 @@ def do_bitflip(a,pos=29):
     return __bitsToFloat(c)
 
 
+# def hard_fault_preproc(time,nsteps,MS):
+#     global hard_step, hard_iter
+#
+#     rd.seed(time)
+#
+#     if nsteps > 0:
+#         hard_step = rd.randrange(nsteps)
+#     else:
+#         hard_step = 0
+#
+#     if MS[hard_step].status.iter is not None:
+#         niters = MS[hard_step].status.iter
+#     else:
+#         niters = 8
+#
+#     hard_iter = rd.randrange(1,niters+1)
+#     print(hard_step,hard_iter)
+
 
 def hard_fault_injection(S):
-    global iter, step, strategy, hard_random
+    global hard_iter, hard_step, strategy, hard_stats, hard_random
 
     if S.status.iter == 1:
         rd.seed(S.status.step)
 
-    doit = rd.random() < hard_random
-    # print(S.status.step,S.status.iter,doit)
+    doit = rd.random() < hard_random and S.status.iter < 8
 
-    if ((step == S.status.step and iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
+    # print(S.status.step,S.status.iter,hard_step,hard_iter)
+
+    if ((hard_step == S.status.step and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %(S.status.step,S.status.iter,S.status.time))
+
+        hard_stats.append((S.status.step,S.status.iter,S.status.time))
+
         res = cp.deepcopy(S.levels[-1].status.residual)
         niter = cp.deepcopy(S.status.iter)-1
 
@@ -101,9 +124,6 @@ def hard_fault_injection(S):
         else:
             print('strategy not implemented, aborting...',strategy)
             exit()
-
-        # S = hard_fault_correction_interp_fine(S)
-        # S = hard_fault_correction_interp_coarse(S)
 
     return S
 

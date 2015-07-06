@@ -69,7 +69,7 @@ if __name__ == "__main__":
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
-    description['hook_class'] = fenics_output
+    # description['hook_class'] = fenics_output
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -83,15 +83,41 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    ft.step = 8
-    ft.iter = 6
-    ft.strategy = 'INTERP'
+    # ft.strategy = 'INTERP'
+    # ft.strategy = 'INTERP_PREDICT'
+    # ft.strategy = 'SPREAD_PREDICT'
+    # ft.strategy = 'NOFAULT'
+    ft.strategy = 'SPREAD'
     ft.hard_random = 0.03
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
+    extract_stats = grep_stats(stats,type='residual')
 
+    maxsteps = 0
+    maxiter = 0
+    minres = 0
+    maxres = -99
+    for k,v in extract_stats.items():
+        maxsteps = max(maxsteps,getattr(k,'step'))
+        maxiter = max(maxiter,getattr(k,'iter'))
+        minres = min(minres,np.log10(v))
+        maxres = max(maxres,np.log10(v))
+        # print(getattr(k,'step'),getattr(k,'iter'),v)
+
+    # print(maxsteps,maxiter,minres,maxres)
+
+    residual = np.zeros((maxiter,maxsteps+1))
+    residual[:] = 0
+
+    for k,v in extract_stats.items():
+        step = getattr(k,'step')
+        iter = getattr(k,'iter')
+        if iter is not -1:
+            residual[iter-1,step] = v
+
+    np.savez('GRAYSCOTT_stats_hf_'+ft.strategy,residual=residual,hard_stats=ft.hard_stats)
 
     # u1,u2 = df.split(uend.values)
     # df.plot(u1,interactive=True)
