@@ -3,27 +3,34 @@ import scipy.sparse as sp
 import scipy.linalg as la
 # Only for periodic BC because we have advection only in x direction
 def getUpwindMatrix(N, dx):
+     
+  #stencil    = [-1.0, 1.0]
+  #zero_pos = 2
+  #coeff      = 1.0
   
-  stencil    = [ 2.0, -15.0,  60.0,  -20.0, -30.0, 3.0]
-  range      = [  -3,    -2,    -1,      0,     1,   2]
-  zero_index = 3
-  coeff      = 1.0/60.0
-  
-  #stencil    = [ -3.0, 20.0, -60.0, 120.0, -65.0, -12.0]
-  #range      = [   -4,   -3,    -2,    -1,     0,     1]
-  #zero_index = 4
-  #coeff      = 1.0/60.0
-  
-  #stencil    = [ 1.0, 0.0, -1.0]
-  #range      = [  -1,   0,    1]
-  #zero_index = 1
+  #stencil    = [1.0, -4.0, 3.0]
   #coeff      = 1.0/2.0
+  #zero_pos   = 3
+  
+  #stencil    = [1.0, -6.0, 3.0, 2.0]
+  #coeff      = 1.0/6.0
+  #zero_pos   = 3
+  
+  #stencil  = [-5.0, 30.0, -90.0, 50.0, 15.0]
+  #coeff    = 1.0/60.0
+  #zero_pos = 4
+  
+  stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
+  coeff   = 1.0/60.0
+  zero_pos = 5
   
   first_col = np.zeros(N)
-  first_col[0:np.size(stencil)] = stencil
+  
+  # Because we need to specific first column (not row) in circulant, flip stencil array
+  first_col[0:np.size(stencil)] = np.flipud(stencil)
 
-  # Circulant shift of coefficient column
-  first_col = np.roll(first_col, -zero_index)
+  # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
+  first_col = np.roll(first_col, -np.size(stencil)+zero_pos, axis=0)
 
   return sp.csc_matrix( coeff*(1.0/dx)*la.circulant(first_col) )
 

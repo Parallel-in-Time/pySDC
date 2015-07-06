@@ -35,14 +35,14 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 5.0
-    Nsteps = 1000
+    Tend   = 50.0
+    Nsteps = 2000
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3,100,25)]
-    pparams['u_adv'] = -0.75
+    pparams['nvars'] = [(3, 50,25)]
+    pparams['u_adv'] = 1.0
     pparams['c_s']   = 0.0
     pparams['x_bounds'] = [(-1.0, 1.0)]
     pparams['z_bounds'] = [( 0.0, 1.0)]
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 2
+    description['num_nodes']         = 4
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
