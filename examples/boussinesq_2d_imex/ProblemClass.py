@@ -148,7 +148,7 @@ class boussinesq_2d_imex(ptype):
         dtheta = 0.01
         H      = 10.0
         a      = 5.0
-        x_c    = 50.0
+        x_c    = -50.0
         
         me        = mesh(self.nvars)
         me.values[0,:,:] = 0.0*self.xx
