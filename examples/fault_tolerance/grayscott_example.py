@@ -83,11 +83,11 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    # ft.strategy = 'INTERP'
+    ft.strategy = 'INTERP'
     # ft.strategy = 'INTERP_PREDICT'
     # ft.strategy = 'SPREAD_PREDICT'
     # ft.strategy = 'NOFAULT'
-    ft.strategy = 'SPREAD'
+    # ft.strategy = 'SPREAD'
     ft.hard_random = 0.03
 
     # call main function to get things done...
@@ -117,7 +117,14 @@ if __name__ == "__main__":
         if iter is not -1:
             residual[iter-1,step] = v
 
-    np.savez('GRAYSCOTT_stats_hf_'+ft.strategy,residual=residual,hard_stats=ft.hard_stats)
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
+    iter_count = np.zeros(maxsteps+1)
+    for k,v in extract_stats.items():
+        step = getattr(k,'step')
+        iter_count[step] = v
+    print(iter_count)
+
+    np.savez('GRAYSCOTT_stats_hf_'+ft.strategy,residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
     # u1,u2 = df.split(uend.values)
     # df.plot(u1,interactive=True)
