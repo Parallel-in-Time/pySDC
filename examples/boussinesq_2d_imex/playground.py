@@ -3,9 +3,9 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from ProblemClass import acoustic_2d_imex
+from ProblemClass import boussinesq_2d_imex
 #from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
-from examples.acoustic_2d_imex.HookClass import plot_solution
+from examples.boussinesq_2d_imex.HookClass import plot_solution
 
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
@@ -35,17 +35,18 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 50.0
-    Nsteps = 2000
+    Tend   = 3000
+    Nsteps =  600
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(3, 50,25)]
-    pparams['u_adv'] = 1.0
-    pparams['c_s']   = 0.0
-    pparams['x_bounds'] = [(-1.0, 1.0)]
-    pparams['z_bounds'] = [( 0.0, 1.0)]
+    pparams['nvars']    = [(4,600,20)]
+    pparams['u_adv']    = 0.02
+    pparams['c_s']      = 0.3
+    pparams['Nfreq']    = 0.01
+    pparams['x_bounds'] = [(-150.0, 150.0)]
+    pparams['z_bounds'] = [(   0.0,  10.0)]
 
     # This comes as read-in for the transfer operations
     #tparams = {}
@@ -53,12 +54,12 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class']     = acoustic_2d_imex
+    description['problem_class']     = boussinesq_2d_imex
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 4
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
