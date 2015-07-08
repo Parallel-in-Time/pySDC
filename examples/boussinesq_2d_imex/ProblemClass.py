@@ -8,6 +8,32 @@ from build2DFDMatrix import get2DMesh
 from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesqBCHorizontal, getBoussinesqBCVertical, getBoussinesq2DUpwindMatrix
 from unflatten import unflatten
 
+class logging(object):
+
+  def __init__(self):
+    self.solver_calls = 0
+    self.iterations   = 0
+    
+  def add(self, iterations):
+    self.solver_calls += 1
+    self.iterations   += iterations
+    
+class Callback(object):
+
+    def getresidual(self):
+      return self.residual
+      
+    def getcounter(self):
+      return self.counter
+      
+    def __init__(self):
+      self.counter=0
+      self.residual=0.0
+      
+    def __call__(self, residuals):
+      self.counter+=1
+      self.residual=residuals
+
 
 class boussinesq_2d_imex(ptype):
     """
@@ -54,6 +80,8 @@ class boussinesq_2d_imex(ptype):
         self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq)
         self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv )
     
+        self.logger = logging()
+    
     def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -69,7 +97,12 @@ class boussinesq_2d_imex(ptype):
         """
 
         b         = rhs.values.flatten()
-        sol, info =  LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20)
+        cb        = Callback()
+        sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=500, callback=cb)
+        # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
+        if factor!=0.0:
+          print "Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
+          self.logger.add(cb.getcounter())
         me        = mesh(self.nvars)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
 
@@ -159,3 +192,8 @@ class boussinesq_2d_imex(ptype):
         me.values[2,:,:] = dtheta*np.sin( np.pi*self.zz/H )/( 1.0 + np.square(self.xx - x_c)/(a*a))
         me.values[3,:,:] = 0.0*self.xx
         return me
+        
+    def report_log(self):
+      print "Number of calls to implicit solver: %5i" % self.logger.solver_calls
+      print "Total number of iterations: %5i" % self.logger.iterations
+      print "Average number of iterations per call: %6.3f" % (float(self.logger.iterations)/float(self.logger.solver_calls))

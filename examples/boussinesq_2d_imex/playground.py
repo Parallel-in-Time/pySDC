@@ -28,15 +28,15 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 3E-11
+    lparams['restol'] = 1E-12
 
     sparams = {}
-    sparams['maxiter'] = 8
+    sparams['maxiter'] = 1
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000
-    Nsteps =  600
+    Tend   = 30
+    Nsteps =  6
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -81,6 +81,8 @@ if __name__ == "__main__":
 
     print('error at time %s: %9.5e' %(Tend,np.linalg.norm(uex.values[2,:,:].flatten()-uend.values[2,:,:].flatten(),np.inf)/np.linalg.norm(
         uex.values.flatten(),np.inf)))
+    
+    P.report_log()
 
     plt.show()
 
