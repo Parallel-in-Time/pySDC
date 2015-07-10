@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 16
+    num_procs = 32
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -36,20 +36,26 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
+    # pparams['Du'] = 1.0
+    # pparams['Dv'] = 0.01
+    # pparams['A'] = 0.01
+    # pparams['B'] = 0.10
+    # splitting pulses until steady state
+    # pparams['Du'] = 1.0
+    # pparams['Dv'] = 0.01
+    # pparams['A'] = 0.02
+    # pparams['B'] = 0.079
+    # splitting pulses until steady state
     pparams['Du'] = 1.0
     pparams['Dv'] = 0.01
-    pparams['A'] = 0.01
-    pparams['B'] = 0.10
-    # pparams['Du'] = 2E-05
-    # pparams['Dv'] = 1E-05
-    # pparams['A'] = 0.03
-    # pparams['B'] = 0.092
+    pparams['A'] = 0.09
+    pparams['B'] = 0.086
 
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
     pparams['c_nvars'] = [256]
     pparams['family'] = 'CG'
-    pparams['order'] = [4,2]
+    pparams['order'] = [4]
     pparams['refinements'] = [1,0]
 
 
@@ -71,60 +77,63 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
     # description['hook_class'] = fenics_output
 
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
-
-    # setup parameters "in time"
-    t0 = MS[0].levels[0].prob.t0
-    dt = 5.0
-    Tend = 400.0
-
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    ft.strategy = 'INTERP'
-    # ft.strategy = 'INTERP_PREDICT'
-    # ft.strategy = 'SPREAD_PREDICT'
-    # ft.strategy = 'NOFAULT'
-    # ft.strategy = 'SPREAD'
     ft.hard_random = 0.03
 
-    # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    # strategies = ['INTERP']
+    strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT','NOFAULT']
 
-    extract_stats = grep_stats(stats,type='residual')
+    for strategy in strategies:
 
-    maxsteps = 0
-    maxiter = 0
-    minres = 0
-    maxres = -99
-    for k,v in extract_stats.items():
-        maxsteps = max(maxsteps,getattr(k,'step'))
-        maxiter = max(maxiter,getattr(k,'iter'))
-        minres = min(minres,np.log10(v))
-        maxres = max(maxres,np.log10(v))
-        # print(getattr(k,'step'),getattr(k,'iter'),v)
+        print('------------------------------------------ working on strategy ',strategy)
+        ft.strategy = strategy
 
-    # print(maxsteps,maxiter,minres,maxres)
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs,sparams,description)
 
-    residual = np.zeros((maxiter,maxsteps+1))
-    residual[:] = 0
+        # setup parameters "in time"
+        t0 = MS[0].levels[0].prob.t0
+        dt = 2.0
+        Tend = 1280.0
 
-    for k,v in extract_stats.items():
-        step = getattr(k,'step')
-        iter = getattr(k,'iter')
-        if iter is not -1:
-            residual[iter-1,step] = v
+        # get initial values on finest level
+        P = MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
 
-    extract_stats = grep_stats(stats,iter=-1,type='niter')
-    iter_count = np.zeros(maxsteps+1)
-    for k,v in extract_stats.items():
-        step = getattr(k,'step')
-        iter_count[step] = v
-    print(iter_count)
+        # call main function to get things done...
+        uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    np.savez('GRAYSCOTT_stats_hf_'+ft.strategy,residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        extract_stats = grep_stats(stats,type='residual')
+
+        maxsteps = 0
+        maxiter = 0
+        minres = 0
+        maxres = -99
+        for k,v in extract_stats.items():
+            maxsteps = max(maxsteps,getattr(k,'step'))
+            maxiter = max(maxiter,getattr(k,'iter'))
+            minres = min(minres,np.log10(v))
+            maxres = max(maxres,np.log10(v))
+            # print(getattr(k,'step'),getattr(k,'iter'),v)
+
+        # print(maxsteps,maxiter,minres,maxres)
+
+        residual = np.zeros((maxiter,maxsteps+1))
+        residual[:] = 0
+
+        for k,v in extract_stats.items():
+            step = getattr(k,'step')
+            iter = getattr(k,'iter')
+            if iter is not -1:
+                residual[iter-1,step] = v
+
+        extract_stats = grep_stats(stats,iter=-1,type='niter')
+        iter_count = np.zeros(maxsteps+1)
+        for k,v in extract_stats.items():
+            step = getattr(k,'step')
+            iter_count[step] = v
+        print(iter_count)
+
+        np.savez('GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
     # u1,u2 = df.split(uend.values)
     # df.plot(u1,interactive=True)

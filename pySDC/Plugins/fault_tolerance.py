@@ -98,7 +98,7 @@ def hard_fault_injection(S):
     if S.status.iter == 1:
         rd.seed(S.status.step)
 
-    doit = rd.random() < hard_random and S.status.iter < 8
+    doit = rd.random() < hard_random and S.status.iter < 7
 
     # print(S.status.step,S.status.iter,hard_step,hard_iter)
 

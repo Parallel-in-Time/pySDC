@@ -3,7 +3,7 @@ from pySDC.Hooks import hooks
 from pySDC.Stats import stats
 import dolfin as df
 
-file = df.File('output1d/grayscott.pvd') # dirty, but this has to be unique (and not per step or level)
+file = df.File('/Users/robert/Scratch/output1d/grayscott.pvd') # dirty, but this has to be unique (and not per step or level)
 
 class fenics_output(hooks):
 

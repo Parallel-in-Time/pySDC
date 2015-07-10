@@ -12,15 +12,19 @@ if __name__ == "__main__":
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
 
-    # ref = 'GRAYSCOTT_stats_hf_NOFAULT.npz'
-    ref = 'GRAYSCOTT_stats_hf_SPREAD.npz'
+    # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
+    ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
 
-    list = [ ('GRAYSCOTT_stats_hf_SPREAD.npz','SPREAD','green','o'),
-             ('GRAYSCOTT_stats_hf_INTERP.npz','INTERP','green','o'),
-             ('GRAYSCOTT_stats_hf_INTERP_PREDICT.npz','INTERP_PREDICT','blue','v'),
-             ('GRAYSCOTT_stats_hf_SPREAD_PREDICT.npz','SPREAD_PREDICT','red','d') ]
+    # list = [('GRAYSCOTT_stats_hf_NOFAULT_new.npz','SPREAD','green','o')]
+    list = [ ('GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','green','o'),
+             ('GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','green','o'),
+             ('GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','blue','v'),
+             ('GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','red','d') ]
 
-    nprocs = 16
+    nprocs = 32
+
+    minstep = 288
+    maxstep = 416
 
     maxiter = 0
     nsteps = 0
@@ -28,8 +32,8 @@ if __name__ == "__main__":
 
         data = np.load(file)
 
-        iter_count = data['iter_count']
-        residual = data['residual']
+        iter_count = data['iter_count'][minstep:maxstep]
+        residual = data['residual'][:,minstep:maxstep]
 
         residual = np.where(residual > 0, np.log10(residual), -99)
         vmin = -9
@@ -38,13 +42,12 @@ if __name__ == "__main__":
         maxiter = max(maxiter,int(max(iter_count)))
         nsteps = max(nsteps,len(iter_count))
 
-
     data = np.load(ref)
-    ref_iter_count = data['iter_count']
+    ref_iter_count = data['iter_count'][minstep:maxstep]
 
     fig, ax = plt.subplots(figsize=(20,7))
 
-    plt.plot([0]*nsteps,'k-',linewidth=2)
+    plt.plot(range(minstep,maxstep),[0]*nsteps,'k-',linewidth=2)
 
     ymin = 99
     ymax = 0
@@ -52,18 +55,20 @@ if __name__ == "__main__":
 
         if not file is ref:
             data = np.load(file)
-            iter_count = data['iter_count']
+            iter_count = data['iter_count'][minstep:maxstep]
 
             ymin = min(ymin,min(ref_iter_count-iter_count))
             ymax = max(ymax,max(ref_iter_count-iter_count))
 
-            plt.plot(ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',markersize=12)
+            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',markersize=12)
 
 
-    plt.xlabel('Step')
+    plt.xlabel('step')
     plt.ylabel('Number of saved iterations')
-    plt.xlim(-1,nsteps+1)
+    plt.xlim(-1+minstep,maxstep+1)
     plt.ylim(-1+ymin,ymax+1)
+    ax.set_xticks(np.arange(minstep,maxstep,nprocs)+0.5, minor=False)
+    ax.set_xticklabels(np.arange(minstep,maxstep,nprocs), minor=False)
     plt.legend(loc=1,numpoints=1)
 
     plt.tight_layout()
@@ -75,8 +80,8 @@ if __name__ == "__main__":
 
         data = np.load(file)
 
-        iter_count = data['iter_count']
-        residual = data['residual']
+        iter_count = data['iter_count'][minstep:maxstep]
+        residual = data['residual'][:,minstep:maxstep]
         stats = data['hard_stats']
 
         residual = np.where(residual > 0, np.log10(residual), -99)
@@ -87,7 +92,8 @@ if __name__ == "__main__":
         plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
 
         for item in stats:
-            plt.text(item[0]+0.5,item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
+            if item[0] in range(minstep,maxstep):
+                plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
 
         plt.axis([0,nsteps,0,maxiter])
 
@@ -101,9 +107,9 @@ if __name__ == "__main__":
         ax.set_ylabel('iteration')
 
         ax.set_yticks(np.arange(1,maxiter,2)+0.5, minor=False)
-        # ax.set_yticks(np.arange(nsteps+1)+0.5, minor=False)
+        ax.set_xticks(np.arange(0,nsteps,nprocs)+0.5, minor=False)
         ax.set_yticklabels(np.arange(1,maxiter,2)+1, minor=False)
-        # ax.set_yticklabels(np.arange(nsteps+1), minor=False)
+        ax.set_xticklabels(np.arange(minstep,maxstep,nprocs), minor=False)
 
         plt.tight_layout()
 
