@@ -23,8 +23,8 @@ if __name__ == "__main__":
 
     nprocs = 32
 
-    minstep = 288
-    maxstep = 416
+    minstep = 0
+    maxstep = 640
 
     maxiter = 0
     nsteps = 0
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     plt.ylim(-1+ymin,ymax+1)
     ax.set_xticks(np.arange(minstep,maxstep,nprocs)+0.5, minor=False)
     ax.set_xticklabels(np.arange(minstep,maxstep,nprocs), minor=False)
-    plt.legend(loc=1,numpoints=1)
+    plt.legend(loc=2,numpoints=1)
 
     plt.tight_layout()
 

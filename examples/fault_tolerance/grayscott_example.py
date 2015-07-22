@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 32
+    num_procs = 1
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     pparams['c_nvars'] = [256]
     pparams['family'] = 'CG'
     pparams['order'] = [4]
-    pparams['refinements'] = [1,0]
+    pparams['refinements'] = [1]
 
 
     # This comes as read-in for the transfer operations
@@ -75,12 +75,12 @@ if __name__ == "__main__":
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
-    # description['hook_class'] = fenics_output
+    description['hook_class'] = fenics_output
 
     ft.hard_random = 0.03
 
-    # strategies = ['INTERP']
-    strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT','NOFAULT']
+    strategies = ['NOFAULT']
+    # strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT','NOFAULT']
 
     for strategy in strategies:
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
             iter_count[step] = v
         print(iter_count)
 
-        np.savez('GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
     # u1,u2 = df.split(uend.values)
     # df.plot(u1,interactive=True)
