@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    rc('font', family='serif',size=30)
+    rc('font', family='sans-serif',size=30)
     rc('legend', fontsize='small')
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
     ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
 
-    # list = [('GRAYSCOTT_stats_hf_NOFAULT_new.npz','SPREAD','green','o')]
+    # list = [('GRAYSCOTT_stats_hf_NOFAULT_new.npz','NOFAULT','green','o')]
     list = [ ('GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','green','o'),
              ('GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','green','o'),
              ('GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','blue','v'),
@@ -23,10 +23,12 @@ if __name__ == "__main__":
 
     nprocs = 32
 
-    minstep = 0
-    maxstep = 640
+    xtick_dist = 16
 
-    maxiter = 0
+    minstep = 288
+    maxstep = 384
+
+    maxiter = 14
     nsteps = 0
     for file,label,color,marker in list:
 
@@ -67,12 +69,13 @@ if __name__ == "__main__":
     plt.ylabel('Number of saved iterations')
     plt.xlim(-1+minstep,maxstep+1)
     plt.ylim(-1+ymin,ymax+1)
-    ax.set_xticks(np.arange(minstep,maxstep,nprocs)+0.5, minor=False)
-    ax.set_xticklabels(np.arange(minstep,maxstep,nprocs), minor=False)
+    ax.set_xticks(np.arange(minstep,maxstep,xtick_dist)+0.5, minor=False)
+    ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
     plt.legend(loc=2,numpoints=1)
 
     plt.tight_layout()
 
+    # fname = 'GRAYSCOTT_saved_iteration_vs_NOFAULT_hf.png'
     fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.png'
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
@@ -91,9 +94,10 @@ if __name__ == "__main__":
         cmap = plt.get_cmap('Reds',vmax-vmin+1)
         plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
 
-        for item in stats:
-            if item[0] in range(minstep,maxstep):
-                plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
+        if not "NOFAULT" in label:
+            for item in stats:
+                if item[0] in range(minstep,maxstep):
+                    plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
 
         plt.axis([0,nsteps,0,maxiter])
 
@@ -107,9 +111,9 @@ if __name__ == "__main__":
         ax.set_ylabel('iteration')
 
         ax.set_yticks(np.arange(1,maxiter,2)+0.5, minor=False)
-        ax.set_xticks(np.arange(0,nsteps,nprocs)+0.5, minor=False)
+        ax.set_xticks(np.arange(0,nsteps,xtick_dist)+0.5, minor=False)
         ax.set_yticklabels(np.arange(1,maxiter,2)+1, minor=False)
-        ax.set_xticklabels(np.arange(minstep,maxstep,nprocs), minor=False)
+        ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
 
         plt.tight_layout()
 

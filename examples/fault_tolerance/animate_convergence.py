@@ -12,6 +12,8 @@ if __name__ == "__main__":
 
     nprocs = 32
 
+    xtick_dist = 16
+
     minstep = 288
     maxstep = 384
 
@@ -19,8 +21,9 @@ if __name__ == "__main__":
     maxiter = 0
     nsteps = 0
 
-    ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    # ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
+    # ref = 'SDC_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
+    # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
+    ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
 
     data = np.load(ref)
 
@@ -52,9 +55,9 @@ if __name__ == "__main__":
     ax.set_ylabel('iteration')
 
     ax.set_yticks(np.arange(1,maxiter_full,2)+0.5, minor=False)
-    ax.set_xticks(np.arange(0,nsteps,int(nprocs/2))+0.5, minor=False)
+    ax.set_xticks(np.arange(0,nsteps,xtick_dist)+0.5, minor=False)
     ax.set_yticklabels(np.arange(1,maxiter_full,2)+1, minor=False)
-    ax.set_xticklabels(np.arange(minstep,maxstep,int(nprocs/2)), minor=False)
+    ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
 
     cmap = plt.get_cmap('Reds',vmax-vmin+1)
 
@@ -70,11 +73,17 @@ if __name__ == "__main__":
 
     fig.tight_layout()
 
+    def init():
+        res = np.zeros((maxiter_full,maxstep-minstep))
+        plot.set_array(res.ravel())
+
+        return plot
+
     def animate(index):
 
         csum_blocks = np.zeros(len(iter_count_blocks)+1)
         csum_blocks[1:] = np.cumsum(iter_count_blocks)
-        block = np.searchsorted(csum_blocks,index+1)-1
+        block = np.searchsorted(csum_blocks[1:],index)
         step = block*nprocs + minstep
         iter = index - int(csum_blocks[block])
 
@@ -88,7 +97,7 @@ if __name__ == "__main__":
 
         return plot
 
-    anim = animation.FuncAnimation(fig,animate,frames=sum(iter_count_blocks),interval=1,blit=False,repeat=False)
+    anim = animation.FuncAnimation(fig,animate,init_func=init,frames=sum(iter_count_blocks)+1,interval=1,blit=False,repeat=False)
 
     if not "NOFAULT" in ref:
         stats = data['hard_stats']
@@ -100,7 +109,7 @@ if __name__ == "__main__":
 
     # Set up formatting for the movie files
     Writer = animation.writers['ffmpeg']
-    writer = Writer(fps=1  , metadata=dict(artist='Me'), bitrate=3200)
+    writer = Writer(fps=1 , metadata=dict(artist='Me'), bitrate=3200)
 
     fname = 'anim_conv_'+ref.split('.')[0]+'.mp4'
     anim.save(fname,writer=writer)
