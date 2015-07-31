@@ -39,6 +39,7 @@ class step():
                 defaults = dict()
                 defaults['maxiter'] = 20
                 defaults['fine_comm'] = True
+                defaults['predict'] = True
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
