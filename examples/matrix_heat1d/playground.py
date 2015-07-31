@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/home/zam/moser/PycharmProjects/pySDC")
 
 from pySDC import CollocationClasses as collclass
 
@@ -35,7 +37,7 @@ def run_with(opts, debug=False):
     Tend = opt.num_procs * dt
     cfl = opt.pparams['nu']*(opt.pparams['nvars'][0]**2)*dt
 
-        # quickly generate block of steps
+    # quickly generate block of steps
     MS = mp.generate_steps(opt.num_procs, opt.sparams, opt.description)
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)

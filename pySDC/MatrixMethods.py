@@ -108,7 +108,7 @@ class IterativeSolver(object):
         assert P.shape == M.shape and c.shape[0] == M.shape[0], \
             "Matrix P and matrix M don't fit.\n \tM_shape:" + str(M.shape) + " P_shape:" \
             + str(P.shape) + " c_shape:" + str(c.shape)
-        self.format = sparse_format
+        self.sparse_format = sparse_format
         self.P = to_sparse(P, sparse_format)
         self.M = to_sparse(M, sparse_format)
         self.c = to_sparse(c, sparse_format)
@@ -118,7 +118,7 @@ class IterativeSolver(object):
 
     @property
     def P_inv(self):
-        if self.format is "array":
+        if self.sparse_format is "array":
             return self.invert_P()
         else:
             # define a function to compute P_inv.dot()
@@ -138,7 +138,7 @@ class IterativeSolver(object):
 
     @property
     def it_matrix(self):
-        if self.format is "array":
+        if self.sparse_format is "array":
             return np.eye(self.P.shape[0])-np.dot(self.P_inv, self.M)
         else:
             func = lambda v: v - self.P_inv.dot(self.M.dot(v))
@@ -173,6 +173,7 @@ class SDCIterativeSolver(IterativeSolver):
         # M matrix
         A = self.A_E + self.A_I
         dt = level.dt
+        self.dt = dt
         E = to_dense(sprs.dia_matrix((np.ones(self.Q.shape[0]-1), -1), shape=self.Q.shape))
         M = sprs.eye(self.A_E.shape[0]*self.Q.shape[0], format=sparse_format) \
             - sprs.kron(dt*self.Q, A, format=sparse_format)
@@ -218,6 +219,7 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
 
         self.M, self.c = connect_function(M_list, c_list, sparse_format)
         # self.P_inv = sprs.block_diag(*P_inv_list)
+        
 
     @property
     def P_inv(self):
@@ -238,6 +240,18 @@ class BlockDiagonalIterativeSolver(IterativeSolver):
     def split(self, v):
         """ Splits a vector according to the block sizes"""
         return np.split(v, self.__split_points)
+
+    @property
+    def it_matrix(self):
+        # this iteration matrix is sadly wrong because the M is not 
+        # the system matrix but rather of a simplification.
+        if self.sparse_format is "array":
+            return np.eye(self.P.shape[0])-np.dot(self.P_inv, self.M)
+        else:
+            func = lambda v: v - self.P_inv.dot(self.M.dot(v))
+            it_matrix = Bunch(dot=func)
+            return it_matrix
+
 
 # TODO: this is just a copy from LinearPFASST.ipynb has to be adjusted to be used for sparse matrices
 class MultiSolverIterativeSolver(IterativeSolver):
@@ -399,22 +413,27 @@ class TransferredMultiStepIterativeSolver(MultiStepIterativeSolver):
         self.P_c_list = map(lambda x: to_sparse(x, sparse_format), P_c_list)
         self.P_c_inv_list = map(lambda x: la.inv(x), self.P_c_list)
         # N_x_list
-
+        # Dieses P ist auch nur ein Pseudo P, weil P K^-1 R keine richtige inverse hat die man P nennen koennte
         self.P = self.distributeOperatorsToFullInterval(map(lambda x, y: y.Pspace.dot(x.dot(y.Rspace)),
                                                             P_c_list, transfer_list),
                                                         nodes_on_unit_list, N_x_list_fine)
+        self.Pspace = sprs.block_diag(map(lambda x:x.Pspace,self.transfer_list), format=self.sparse_format)
+        self.Rspace = sprs.block_diag(map(lambda x:x.Rspace,self.transfer_list), format=self.sparse_format)
         self.__nodes_on_unit = nodes_on_unit_list
         self.__N_x_list_fine = N_x_list_fine
         self.__N_x_list_coarse = N_x_list_coarse
         self.__transfer_list = transfer_list
-
+        self.P_c_inv = la.inv(self.distributeOperatorsToFullInterval(self.P_c_list, self.__nodes_on_unit, self.__N_x_list_coarse))
+    
     @property
     def P_inv(self):
 
         if self.sparse_format is "array":
-            P_c_inv = map(lambda x, y: x.Pspace.dot(y.dot(x.Rspace)), self.__transfer_list, self.P_c_inv_list)
-            return self.distributeOperatorsToFullInterval(P_c_inv, self.__nodes_on_unit, self.__N_x_list_fine)
+            #P_c_inv = map(lambda x, y: x.Pspace.dot(y.dot(x.Rspace)), self.__transfer_list, self.P_c_inv_list)
+            # das ist unsinn
+            return self.Pspace.dot(self.P_c_inv.dot(self.Rspace))
         else:
+            #das hier unten ist vermutlich falsch
             def solver(v):
                 v_split = self.split(v)
                 v_solution = []
@@ -611,8 +630,7 @@ def generate_LinearPFASST(step_list, transfer_list, u_0, **kwargs):
     if 'sparse_format' in kwargs:
         sparse_format = kwargs['sparse_format']
     else:
-        sparse_format = "array"
-
+        sparse_format = "array" 
     if 't_0' in kwargs:
         t_0 = kwargs['t_0']
     else:
@@ -713,8 +731,11 @@ def generate_transfer_list(step_list, transfer_class, **kwargs):
 
 
 def get_all_nodes(steps, t_0=0):
+    
     dts = map(lambda x: x.status.dt, steps)
+    # print dts
     offsets = np.cumsum([0.0]+dts)[:-1]
+
     return np.hstack(map(lambda x, dt, off: x.levels[0].sweep.coll.nodes*dt+off+t_0, steps, dts, offsets))
 
 

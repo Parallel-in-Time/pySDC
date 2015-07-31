@@ -88,6 +88,23 @@ def next_neighbors(p, ps, k):
     return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
 
+
+def continue_periodic_array(arr,nn,T):
+    nn = np.asarray(nn)
+    d_nn = nn[1:]-nn[:-1]
+    if np.all(d_nn == np.ones(nn.shape[0]-1)):
+        return arr[nn]
+    else:
+        cont_arr = [arr[nn[0]]]
+        shift = 0.
+        for n,d in zip(nn[1:],d_nn):
+            if d != 1:
+                shift = -T
+            cont_arr.append(arr[n]+shift)
+
+        return np.asarray(cont_arr)
+
+
 def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", periodic=False, T=1.0):
     """
     We construct the restriction matrix between two 1d grids, using lagrange interpolation.
@@ -103,14 +120,22 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", period
     for i, p in zip(range(n_g), coarse_grid):
         if periodic:
             nn = next_neighbors_periodic(p, fine_grid, k, T)
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            lag_pol = []
+            cont_arr = continue_periodic_array(fine_grid, nn, T)
+            if p > np.mean(coarse_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
+                cont_arr = cont_arr + T
+            for l in range(k):
+                lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
         else:
             nn = next_neighbors(p, fine_grid, k)
         # construct the lagrange polynomials for the k neighbors
-        circulating_one = np.asarray([1.0]+[0.0]*(k-1))
-        lag_pol = []
-        for l in range(k):
-            lag_pol.append(intpl.lagrange(fine_grid[nn], np.roll(circulating_one, l)))
-        M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            lag_pol = []
+            for l in range(k):
+                lag_pol.append(intpl.lagrange(fine_grid[nn], np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
 
     return to_sparse(M, return_type)
 
@@ -124,20 +149,31 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", peri
     :param k: order of the restriction
     :return: a interpolation matrix
     """
-    M = np.zeros((coarse_grid.size, fine_grid.size))
+    M = np.zeros((fine_grid.size, coarse_grid.size))
     n_f = fine_grid.size
 
     for i, p in zip(range(n_f), fine_grid):
         if periodic:
-            nn = next_neighbors_periodic(p, fine_grid, k, T)
+            nn = next_neighbors_periodic(p, coarse_grid, k, T)
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            lag_pol = []
+            cont_arr = continue_periodic_array(coarse_grid, nn, T)
+
+            if p > np.mean(fine_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
+                cont_arr = cont_arr + T
+            # print cont_arr
+
+            for l in range(k):
+                lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
         else:
-            nn = next_neighbors(p, fine_grid, k)
+            nn = next_neighbors(p, coarse_grid, k)
         # construct the lagrange polynomials for the k neighbors
-        circulating_one = np.asarray([1.0]+[0.0]*(k-1))
-        lag_pol = []
-        for l in range(k):
-            lag_pol.append(intpl.lagrange(coarse_grid[nn], np.roll(circulating_one, l)))
-        M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            lag_pol = []
+            for l in range(k):
+                lag_pol.append(intpl.lagrange(coarse_grid[nn], np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
     return to_sparse(M, return_type)
 
 
