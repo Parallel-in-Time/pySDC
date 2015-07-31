@@ -251,14 +251,25 @@ class CollBase(object):
             # print Q_delta
             return Q_delta
 
-        if self.tleft == self.nodes[0] and self.tright == self.nodes[-1]:
+        # self.left_is_node = False
+        # self.right_is_node = True
+
+
+        if self.left_is_node and self.right_is_node:
+            # e.g. GaussLobatto
             tau = np.concatenate([np.zeros(1), self.nodes[1:]-self.nodes[:-1]])
-        elif self.tleft != self.nodes[0] and self.tright != self.nodes[-1]:
-            tau = np.hstack([np.asarray([0.0, self.nodes[0]-self.tleft]), self.nodes[1:]-self.nodes[:-1]])
-        elif self.tleft == self.nodes[0] and self.tright != self.nodes[-1]:
-            pass
+        elif not self.left_is_node and self.right_is_node:
+            # e.g. GaussRadau_Right
+            tau = np.concatenate([self.nodes[0:1], self.nodes[1:]-self.nodes[:-1]])
+        elif self.left_is_node and not self.right_is_node:
+            # e.g. GaussRadau_Left
+            tau = np.concatenate([self.nodes[1:]-self.nodes[:-1],1.-self.nodes[-1:]])
         else:
-            pass
+            # e.g. GaussLegendre (using right deltas)
+            tau = np.concatenate([self.nodes[1:]-self.nodes[:-1],1.-self.nodes[-1:]])
+            # e.g. GaussLegendre (using left deltas)
+            # tau = np.concatenate([self.nodes[0:1], self.nodes[1:]-self.nodes[:-1]])
+
 
         return q_delta(tau)
 
