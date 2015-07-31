@@ -82,8 +82,9 @@ class transfer(with_metaclass(abc.ABCMeta)):
                 G.tau[m] += self.restrict_space(F.tau[m])
 
         # save u and rhs evaluations for interpolation
-        G.uold = cp.deepcopy(G.u)
-        G.fold = cp.deepcopy(G.f)
+        for m in range(SG.coll.num_nodes+1):
+            G.uold[m] = PG.dtype_u(G.u[m])
+            G.fold[m] = PG.dtype_f(G.f[m])
 
         # works as a predictor
         G.status.unlocked = True
@@ -115,10 +116,9 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         # build coarse correction
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
-        F.f[0] = PF.eval_f(F.u[0],F.time)
+        G.uold[0] = self.restrict_space(F.u[0])
 
-        for m in range(1,SF.coll.num_nodes+1):
+        for m in range(0,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 
@@ -139,6 +139,7 @@ class transfer(with_metaclass(abc.ABCMeta)):
         G = self.coarse
 
         PF = F.prob
+        PG = G.prob
 
         SF = F.sweep
         SG = G.sweep
@@ -150,10 +151,10 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         # build coarse correction
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        F.u[0] += self.prolong_space(G.u[0] - self.restrict_space(F.u[0]))
-        F.f[0] = PF.eval_f(F.u[0],F.time)
+        G.uold[0] = self.restrict_space(F.u[0])
+        G.fold[0] = PG.eval_f(G.uold[0],G.time)
 
-        for m in range(1,SF.coll.num_nodes+1):
+        for m in range(0,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
             F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
 

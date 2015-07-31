@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.linalg as LA
 from pySDC.Sweeper import sweeper
 
 class imex_1st_order(sweeper):
@@ -24,11 +25,11 @@ class imex_1st_order(sweeper):
         super(imex_1st_order,self).__init__(coll)
 
         # IMEX integration matrices
-        [self.QI, self.QE] = self.__get_Qd
+        [self.QI, self.QE] = self.__get_Qd(coll)
 
 
-    @property
-    def __get_Qd(self):
+    # @property
+    def __get_Qd(self,coll):
         """
         Sets the integration matrices QI and QE for the IMEX sweeper
 
@@ -41,6 +42,14 @@ class imex_1st_order(sweeper):
         for m in range(self.coll.num_nodes + 1):
             QI[m, 1:m+1] = self.coll.delta_m[0:m]
             QE[m, 0:m] = self.coll.delta_m[0:m]
+
+        # # strip Qmat by initial value u0
+        # QT = coll.Qmat[1:,1:].T
+        # # do LU decomposition of QT
+        # [P,L,U] = LA.lu(QT,overwrite_a=True)
+        # # enrich QT by initial value u0
+        # QI = np.zeros(np.shape(coll.Qmat))
+        # QI[1:,1:] = U.T
 
         return QI, QE
 
@@ -110,7 +119,7 @@ class imex_1st_order(sweeper):
                 rhs += L.dt*(self.QI[m+1,j]*L.f[j].impl + self.QE[m+1,j]*L.f[j].expl)
 
             # implicit solve with prefactor stemming from QI
-            L.u[m+1] = P.solve_system(rhs,L.dt*self.QI[m+1,m+1],L.u[m+1])
+            L.u[m+1] = P.solve_system(rhs,L.dt*self.QI[m+1,m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
             # update function values
             L.f[m+1] = P.eval_f(L.u[m+1],L.time+L.dt*self.coll.nodes[m])
 

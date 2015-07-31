@@ -10,6 +10,9 @@ iterators are implemented as well, giving full access to all values at any time.
 News
 ----
 
+* June 17, 2015: Gray-Scott example using FEniCS is up and running
+* May 7, 2015: added first [FEniCS](http://fenicsproject.org/) example
+* May 5, 2015: added [Clawpack](http://www.clawpack.org/) examples using Sharpclaw
 * April 16, 2015: new PFASST iterator (loop-based) implemented, new examples added
 * March 19, 2015: code now also runs with Python 2.7, development of SharpClaw example started 
 * January 7, 2015: revised the examples to work with the new driver in Methods.py, new statistics framework
@@ -20,7 +23,7 @@ News
 Documentation and Testing
 -------------------------
 
-The source code is completely documented (at least for now). 
+Most of the source code is documented (besides some of the examples, at least for now). 
 For doxygen generated documentation a Doxyfile is provided. The latest, auto-generated documentation can be found on 
 the [PinT server](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC_DOCU/doxygen). To compile your 
 own documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filter. 
@@ -33,11 +36,10 @@ out-of-the-box. Auto-generated test results are here:
 HowTo
 -----
 
-To start your own example, take a look at the examples shipped with this code:
+To start your own example, take a look at soem of the examples shipped with this code:
 
 * heat1d: MLSDC and PFASST implementation of the forced 1D heat equation with Dirichlet-0 BC in [0,1]
 * penningtrap: particles in a penning trap, driven by external electric and magnetic fields
-* spiraling_particle: a particle moving in varying electric and magnetic fields
 * vanderpol: the van der pol oscillator
 
 To run one of these, add the root directory of pySDC to your PYTHONPATH and execute `python playground` (this could 

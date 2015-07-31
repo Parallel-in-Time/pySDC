@@ -21,13 +21,14 @@ if __name__ == "__main__":
 
     num_procs = 4
 
-    # This comes as read-in for each level
+    # This comes as read-in for each level (this is optional!)
     lparams = {}
-    lparams['restol'] = 5E-12
+    lparams['restol'] = 5E-09
 
-    # This comes as read-in for the time-stepping
+    # This comes as read-in for the step class (this is optional!)
     sparams = {}
-    sparams['maxiter'] = 10
+    sparams['maxiter'] = 15
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem
     pparams = {}
@@ -37,9 +38,9 @@ if __name__ == "__main__":
     pparams['nparts'] = 10
     pparams['sig'] = 0.1
 
-    # This comes as read-in for the transfer operations
+    # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     # @torbjoern: SDC and MLSDC can be activated by providing a list of 1 or 2 elements at problem_class and/or
@@ -72,8 +73,6 @@ if __name__ == "__main__":
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-    print(uend.pos.values)
 
     exit()
 

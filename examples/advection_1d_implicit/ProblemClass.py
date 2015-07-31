@@ -46,7 +46,7 @@ class advection(ptype):
         self.dx   = self.mesh[1] - self.mesh[0]
         self.A    = -getFDMatrix(self.nvars, self.order, self.dx)
     
-    def solve_system(self,rhs,factor,u0):
+    def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
 
@@ -54,6 +54,7 @@ class advection(ptype):
             rhs: right-hand side for the nonlinear system
             factor: abbrev. for the node-to-node stepsize (or any other factor required)
             u0: initial guess for the iterative solver (not used here so far)
+            t: current time (e.g. for time-dependent BCs)
 
         Returns:
             solution as mesh

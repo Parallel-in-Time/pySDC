@@ -7,8 +7,8 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-# import pySDC.PFASST_blockwise as mp
-import pySDC.PFASST_stepwise as mp
+import pySDC.PFASST_blockwise as mp
+# import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
 from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
@@ -24,19 +24,21 @@ if __name__ == "__main__":
 
     num_procs = 8
 
-    # This comes as read-in for the level class
+    # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
 
+    # This comes as read-in for the step class (this is optional!)
     sparams = {}
     sparams['maxiter'] = 20
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
-    pparams['nvars'] = [255,127]
+    pparams['nvars'] = [127,63]
 
-    # This comes as read-in for the transfer operations
+    # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = True
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
+    description['collocation_class'] = collclass.CollGaussRadau_Right
     description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
