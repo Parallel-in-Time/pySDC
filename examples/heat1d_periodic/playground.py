@@ -33,7 +33,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 5
-    swparams['do_LU'] = True
+    swparams['do_LU'] = False
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
@@ -49,6 +49,8 @@ if __name__ == "__main__":
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = False
+    tparams['iorder'] = 6
+    tparams['rorder'] = 2
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

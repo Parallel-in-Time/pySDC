@@ -18,17 +18,18 @@ class mesh_to_mesh_fenics(transfer):
         init_c: number of variables on the coarse level (whatever init represents there)
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
 
         Args:
             fine_level: fine level connected with the transfer operations (passed to parent)
             coarse_level: coarse level connected with the transfer operations (passed to parent)
+            params: parameters for the transfer operators
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_fenics,self).__init__(fine_level,coarse_level)
+        super(mesh_to_mesh_fenics,self).__init__(fine_level,coarse_level,params)
 
         pass
 

@@ -16,14 +16,32 @@ class transfer(with_metaclass(abc.ABCMeta)):
         init_c: number of variables on the coarse level (whatever init represents there)
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
 
         Args:
             fine_level: fine level connected with the transfer operations
             coarse_level: coarse level connected with the transfer operations
+            params: parameters for the transfer operations
         """
+
+        # short helper class to add params as attributes
+        class pars():
+            def __init__(self,params):
+
+                defaults = dict()
+                defaults['finter'] = False
+                defaults['iorder'] = 6
+                defaults['rorder'] = 2
+
+                for k,v in defaults.items():
+                    setattr(self,k,v)
+                for k,v in params.items():
+                    setattr(self,k,v)
+                pass
+
+        self.params = pars(params)
 
         # just copy by object
         self.fine = fine_level

@@ -41,6 +41,8 @@ if __name__ == "__main__":
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = True
+    tparams['iorder'] = 6
+    tparams['rorder'] = 2
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

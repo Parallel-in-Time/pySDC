@@ -21,17 +21,18 @@ class mesh_to_mesh_1d_periodic(transfer):
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
 
         Args:
             fine_level: fine level connected with the transfer operations (passed to parent)
             coarse_level: coarse level connected with the transfer operations (passed to parent)
+            params: parameters for the transfer operators
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level)
+        super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level,params)
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:

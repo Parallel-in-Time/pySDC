@@ -3,6 +3,7 @@ import numpy as np
 
 from pySDC.Transfer import transfer
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+import pySDC.Plugins.transfer_helper as th
 
 # FIXME: extend this to ndarrays
 class mesh_to_mesh_1d(transfer):
@@ -21,17 +22,20 @@ class mesh_to_mesh_1d(transfer):
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
-
         Args:
             fine_level: fine level connected with the transfer operations (passed to parent)
             coarse_level: coarse level connected with the transfer operations (passed to parent)
+            params: parameters for the transfer operators
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_1d,self).__init__(fine_level,coarse_level)
+        super(mesh_to_mesh_1d,self).__init__(fine_level,coarse_level,params)
+
+        assert params['iorder'] == 6
+        assert params['rorder'] == 2
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:
@@ -81,6 +85,7 @@ class mesh_to_mesh_1d(transfer):
 
         pass
 
+
     def restrict_space(self,F):
         """
         Restriction implementation
@@ -91,11 +96,11 @@ class mesh_to_mesh_1d(transfer):
 
         if isinstance(F,mesh):
             u_coarse = mesh(self.init_c,val=0)
-            u_coarse.values = np.dot(self.Rspace,F.values)
+            u_coarse.values = self.Rspace.dot(F.values)
         elif isinstance(F,rhs_imex_mesh):
             u_coarse = rhs_imex_mesh(self.init_c)
-            u_coarse.impl.values = np.dot(self.Rspace,F.impl.values)
-            u_coarse.expl.values = np.dot(self.Rspace,F.expl.values)
+            u_coarse.impl.values = self.Rspace.dot(F.impl.values)
+            u_coarse.expl.values = self.Rspace.dot(F.expl.values)
 
         return u_coarse
 
@@ -108,11 +113,11 @@ class mesh_to_mesh_1d(transfer):
         """
 
         if isinstance(G,mesh):
-            u_fine = mesh(self.init_f,val=0)
-            u_fine.values = np.dot(self.Pspace,G.values)
+            u_fine = mesh(self.init_c,val=0)
+            u_fine.values = self.Pspace.dot(G.values)
         elif isinstance(G,rhs_imex_mesh):
-            u_fine = rhs_imex_mesh(self.init_f)
-            u_fine.impl.values = np.dot(self.Pspace,G.impl.values)
-            u_fine.expl.values = np.dot(self.Pspace,G.expl.values)
+            u_fine = rhs_imex_mesh(self.init_c)
+            u_fine.impl.values = self.Pspace.dot(G.impl.values)
+            u_fine.expl.values = self.Pspace.dot(G.expl.values)
 
         return u_fine

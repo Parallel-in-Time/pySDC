@@ -213,13 +213,11 @@ class step():
         """
 
         # create new instance of the specific transfer class
-        T = transfer_class(fine_level,coarse_level)
-        # use transfer dictionary twice to set restrict and prologn operator
+        T = transfer_class(fine_level,coarse_level,transfer_params)
+        # use transfer dictionary twice to set restrict and prolong operator
         self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
 
-        assert 'finter' in transfer_params
-
-        if transfer_params['finter']:
+        if T.params.finter:
             self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
         else:
             self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
