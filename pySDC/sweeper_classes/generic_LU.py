@@ -15,7 +15,7 @@ class generic_LU(sweeper):
         Qd: U^T of Q^T = L*U
     """
 
-    def __init__(self,coll):
+    def __init__(self,params):
         """
         Initialization routine for the custom sweeper
 
@@ -24,28 +24,26 @@ class generic_LU(sweeper):
         """
 
         # call parent's initialization routine
-        super(generic_LU,self).__init__(coll)
+        super(generic_LU,self).__init__(params)
 
         # LU integration matrix
-        self.Qd = self.__get_Qd(coll)
+        self.Qd = self.__get_Qd()
         pass
 
-    def __get_Qd(self,coll):
+    def __get_Qd(self):
         """
         Compute LU decomposition of Q^T
 
-        Args:
-            coll: collocation object
         Returns:
             Qd: U^T of Q^T = L*U
         """
 
         # strip Qmat by initial value u0
-        QT = coll.Qmat[1:,1:].T
+        QT = self.coll.Qmat[1:,1:].T
         # do LU decomposition of QT
         [P,L,U] = LA.lu(QT,overwrite_a=True)
         # enrich QT by initial value u0
-        Qd = np.zeros(np.shape(coll.Qmat))
+        Qd = np.zeros(np.shape(self.coll.Qmat))
         Qd[1:,1:] = U.T
         return Qd
 

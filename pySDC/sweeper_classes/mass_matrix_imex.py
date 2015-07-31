@@ -13,7 +13,7 @@ class mass_matrix_imex(imex_1st_order.imex_1st_order):
         QE: explicit Euler integration matrix
     """
 
-    def __init__(self,coll):
+    def __init__(self,params):
         """
         Initialization routine for the custom sweeper
 
@@ -22,7 +22,7 @@ class mass_matrix_imex(imex_1st_order.imex_1st_order):
         """
 
         # call parent's initialization routine
-        super(mass_matrix_imex,self).__init__(coll)
+        super(mass_matrix_imex,self).__init__(params)
 
         # IMEX integration matrices
         [self.QI, self.QE] = self.__get_Qd

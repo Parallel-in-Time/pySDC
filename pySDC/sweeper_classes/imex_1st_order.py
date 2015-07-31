@@ -13,7 +13,7 @@ class imex_1st_order(sweeper):
         QE: explicit Euler integration matrix
     """
 
-    def __init__(self,coll):
+    def __init__(self,params):
         """
         Initialization routine for the custom sweeper
 
@@ -22,19 +22,19 @@ class imex_1st_order(sweeper):
         """
 
         # call parent's initialization routine
-        super(imex_1st_order,self).__init__(coll)
+        super(imex_1st_order,self).__init__(params)
 
         # IMEX integration matrices
-        [self.QI, self.QE] = self.__get_Qd(coll)
+        [self.QI, self.QE] = self.__get_Qd()
 
 
     # @property
-    def __get_Qd(self,coll):
+    def __get_Qd(self):
         """
         Sets the integration matrices QI and QE for the IMEX sweeper
 
         Returns:
-            QI: implicit Euler matrix, will also act on u0
+            QI: implicit Euler matrix or St. Martin's trick, will also act on u0
             QE: explicit Euler matrix, will also act on u0
         """
         QI = np.zeros(np.shape(self.coll.Qmat))
@@ -43,13 +43,14 @@ class imex_1st_order(sweeper):
             QI[m, 1:m+1] = self.coll.delta_m[0:m]
             QE[m, 0:m] = self.coll.delta_m[0:m]
 
-        # # strip Qmat by initial value u0
-        # QT = coll.Qmat[1:,1:].T
-        # # do LU decomposition of QT
-        # [P,L,U] = LA.lu(QT,overwrite_a=True)
-        # # enrich QT by initial value u0
-        # QI = np.zeros(np.shape(coll.Qmat))
-        # QI[1:,1:] = U.T
+        if self.params.do_LU:
+            # strip Qmat by initial value u0
+            QT = self.coll.Qmat[1:,1:].T
+            # do LU decomposition of QT
+            [P,L,U] = LA.lu(QT,overwrite_a=True)
+            # enrich QT by initial value u0
+            QI = np.zeros(np.shape(self.coll.Qmat))
+            QI[1:,1:] = U.T
 
         return QI, QE
 
