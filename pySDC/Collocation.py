@@ -1,6 +1,7 @@
 from __future__ import division
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import scipy.linalg
 
 class CollBase(object):
     """
@@ -221,6 +222,15 @@ class CollBase(object):
             S[m, :] = Q[m, :] - Q[m - 1, :]
 
         return S
+    @property
+    def _gen_QImatrix(self,Q):
+        """
+        Compute LU decomposition of Q^T and to use U^T as preconditioner in lin_pfasst framework
+        :return: U^T matrix
+        """
+        p,l,u = scipy.linalg.lu(Q.transpose())
+        return u.transpose()
+        # TEST IT!    
 
     @property
     def _gen_deltas(self):
