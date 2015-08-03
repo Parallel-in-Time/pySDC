@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
-    tparams['finter'] = True
+    tparams['finter'] = False
     tparams['iorder'] = 6
     tparams['rorder'] = 2
 

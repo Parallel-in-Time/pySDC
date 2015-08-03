@@ -31,15 +31,15 @@ if __name__ == "__main__":
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['num_nodes'] = 5
-    swparams['do_LU'] = False
+    swparams['do_LU'] = True
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
     sparams['maxiter'] = 20
-    sparams['fine_comm'] = False
-    sparams['predict'] = False
+    sparams['fine_comm'] = True
+    sparams['predict'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
