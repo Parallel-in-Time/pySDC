@@ -36,7 +36,7 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    ft_strategy = ['NOFAULT','SPREAD','INTERP','SPREAD_PREDICT','INTERP_PREDICT']
+    ft_strategy = ['NOFAULT','SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
     ft_setup = 'HEAT'
     ft_step = 7
     ft_iter = 7
@@ -126,16 +126,20 @@ if __name__ == "__main__":
 
         extract_stats = st.grep_stats(stats,iter=-1,type='niter')
         sortedlist_stats = st.sort_stats(extract_stats,sortby='step')
-        print('Iterations:',sortedlist_stats[-1][1])
+        niter = sortedlist_stats[-1][1]
+        print('Iterations:',niter)
 
-        # extract_stats = st.grep_stats(stats,type='residual')
-        # print(extract_stats)
-        #
-        # np.savez(ft_setup+'_steps_vs_iteration_hf_'+strategy,residuals=extract_stats,ft_step=ft.hard_step,ft_iter=ft.hard_iter)
-        #
-        plt = show_residual_across_simulation(stats,15,-11,-1)
-        if strategy is not 'NOFAULT':
-            plt.text(ft.hard_step-1+0.5,ft.hard_iter+0.5,'xxx',horizontalalignment='center',verticalalignment='center')
+        residual = np.zeros((niter,num_procs))
+        residual[:] = -99
 
-        fname = ft_setup+'_steps_vs_iteration_hf_'+str(ft.hard_step)+'x'+str(ft.hard_iter)+'_'+strategy+'.png'
-        plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+        extract_stats = st.grep_stats(stats,level=-1,type='residual')
+
+        for k,v in extract_stats.items():
+            step = getattr(k,'step')
+            iter = getattr(k,'iter')
+            if iter is not -1:
+                residual[iter-1,step] = np.log10(v)
+            # if step == ft_step:
+            #     print(iter,np.log10(v))
+        print('')
+        np.savez(ft_setup+'_steps_vs_iteration_hf_'+strategy,residual=residual,ft_step=ft.hard_step,ft_iter=ft.hard_iter)
