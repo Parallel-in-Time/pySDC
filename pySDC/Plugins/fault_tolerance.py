@@ -116,7 +116,7 @@ def hard_fault_injection(S):
         if strategy is 'SPREAD':
             S = hard_fault_correction_spread(S)
         elif strategy is 'INTERP':
-            S = hard_fault_correction_interp_all(S)
+            S = hard_fault_correction_interp(S)
         elif strategy is 'INTERP_PREDICT':
             S = hard_fault_correction_predict(S,res,niter)
         elif strategy is 'SPREAD_PREDICT':
@@ -176,6 +176,37 @@ def hard_fault_correction_interp_all(S):
 
         # L.sweep.update_nodes()
         L.sweep.compute_end_point()
+
+    return S
+
+
+def hard_fault_correction_interp(S):
+
+    if not S.status.first:
+        ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
+    else:
+        ufirst = S.levels[0].prob.u_exact(S.status.time)
+
+    if not S.status.last:
+        ulast = S.next.levels[0].prob.dtype_u(S.next.levels[0].u[0])
+    else:
+        ulast = ufirst
+
+    L = S.levels[0]
+
+    # ffirst = L.prob.eval_f(ufirst,L.time)
+    # flast = L.prob.eval_f(ulast,L.time + L.dt)
+
+    L.u[0] = L.prob.dtype_u(ufirst)
+    L.f[0] = L.prob.eval_f(L.u[0],L.time)
+    for m in range(1,L.sweep.coll.num_nodes+1):
+        L.u[m] = (1-L.sweep.coll.nodes[m-1])*ufirst + L.sweep.coll.nodes[m-1]*ulast
+        L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
+
+    L.status.unlocked = True
+
+    # L.sweep.update_nodes()
+    L.sweep.compute_end_point()
 
     return S
 

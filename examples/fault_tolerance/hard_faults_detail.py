@@ -6,8 +6,8 @@ import numpy as np
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 
-from examples.advection.ProblemClass import advection
-from examples.advection.TransferClass import mesh_to_mesh_1d_periodic
+from examples.advection_1d_implicit.ProblemClass import advection
+from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
 
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     sparams['maxiter'] = 50
 
     ft_strategy = ['NOFAULT','SPREAD','INTERP','SPREAD_PREDICT','INTERP_PREDICT']
-    ft_setup = 'ADVECTION'
+    ft_setup = 'HEAT'
     ft_step = 7
     ft_iter = 7
 
@@ -128,10 +128,14 @@ if __name__ == "__main__":
         sortedlist_stats = st.sort_stats(extract_stats,sortby='step')
         print('Iterations:',sortedlist_stats[-1][1])
 
-
+        # extract_stats = st.grep_stats(stats,type='residual')
+        # print(extract_stats)
+        #
+        # np.savez(ft_setup+'_steps_vs_iteration_hf_'+strategy,residuals=extract_stats,ft_step=ft.hard_step,ft_iter=ft.hard_iter)
+        #
         plt = show_residual_across_simulation(stats,15,-11,-1)
         if strategy is not 'NOFAULT':
-            plt.text(ft_step-1+0.5,ft_iter+0.5,'xxx',horizontalalignment='center',verticalalignment='center')
+            plt.text(ft.hard_step-1+0.5,ft.hard_iter+0.5,'xxx',horizontalalignment='center',verticalalignment='center')
 
-        fname = ft_setup+'_steps_vs_iteration_hf_'+str(ft.step)+'x'+str(ft.iter)+'_'+strategy+'.png'
+        fname = ft_setup+'_steps_vs_iteration_hf_'+str(ft.hard_step)+'x'+str(ft.hard_iter)+'_'+strategy+'.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')

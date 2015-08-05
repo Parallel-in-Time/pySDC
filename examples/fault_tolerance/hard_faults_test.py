@@ -38,10 +38,10 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    # ft_strategy = ['INTERP','INTERP_PREDICT']
-    ft_strategy = ['SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
-    # ft_setup = 'ADVECTION'
-    ft_setup = 'PENNING'
+    ft_strategy = ['INTERP']
+    # ft_strategy = ['SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
+    ft_setup = 'HEAT'
+    # ft_setup = 'PENNING'
 
     if ft_setup is 'HEAT':
 
@@ -143,33 +143,31 @@ if __name__ == "__main__":
         print('setup not implemented, aborting...',ft_setup)
         exit()
 
-    # ft.step = 99
-    # ft.iter = 99
-    # ft.strategy = 'SPREAD'
-    #
-    # # quickly generate block of steps
-    # MS = mp.generate_steps(num_procs,sparams,description)
-    # # get initial values on finest level
-    # P = MS[0].levels[0].prob
-    # uinit = P.u_exact(t0)
-    #
-    # # call main function to get things done...
-    # uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-    #
-    # # compute exact solution and compare
-    # # uex = P.u_exact(Tend)
-    #
-    # # ref_err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
-    # # print('reference error at time %s: %s' %(Tend,ref_err))
-    #
-    # extract_stats = grep_stats(stats,iter=-1,type='niter')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # ref_niter = sortedlist_stats[-1][1]
-    #
-    # print('Will sweep over %i steps and %i iterations now...' %(num_procs,ref_niter))
+    ft.strategy = 'NOFAULT'
 
-    ft_iter = [4]#range(1,ref_niter+1)
-    ft_step = [7]#range(0,num_procs)
+    # quickly generate block of steps
+    MS = mp.generate_steps(num_procs,sparams,description)
+    # get initial values on finest level
+    P = MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+    # compute exact solution and compare
+    # uex = P.u_exact(Tend)
+
+    # ref_err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
+    # print('reference error at time %s: %s' %(Tend,ref_err))
+
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    ref_niter = sortedlist_stats[-1][1]
+
+    print('Will sweep over %i steps and %i iterations now...' %(num_procs,ref_niter))
+
+    ft_iter = range(1,ref_niter+1)
+    ft_step = range(0,num_procs)
 
     for strategy in ft_strategy:
 

@@ -10,14 +10,14 @@ rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
-# fields = [('HEAT_results_hf_SPREAD.npz','hard restart'),
-#           ('HEAT_results_hf_INTERP.npz','interpolation'),
-#           ('HEAT_results_hf_INTERP_PREDICT.npz','interpolate predict'),
-#           ('HEAT_results_hf_SPREAD_PREDICT.npz','spread predict')]
-fields = [('ADVECTION_results_hf_SPREAD.npz','hard restart'),
-          ('ADVECTION_results_hf_INTERP.npz','interpolation'),
-          ('ADVECTION_results_hf_INTERP_PREDICT.npz','interpolate predict'),
-          ('ADVECTION_results_hf_SPREAD_PREDICT.npz','spread predict')]
+fields = [('HEAT_results_hf_SPREAD.npz','hard restart'),
+          ('HEAT_results_hf_INTERP.npz','interpolation'),
+          ('HEAT_results_hf_INTERP_PREDICT.npz','interpolate predict'),
+          ('HEAT_results_hf_SPREAD_PREDICT.npz','spread predict')]
+# fields = [('ADVECTION_results_hf_SPREAD.npz','hard restart'),
+#           ('ADVECTION_results_hf_INTERP.npz','interpolation'),
+#           ('ADVECTION_results_hf_INTERP_PREDICT.npz','interpolate predict'),
+#           ('ADVECTION_results_hf_SPREAD_PREDICT.npz','spread predict')]
 
 
 vmin = 99
