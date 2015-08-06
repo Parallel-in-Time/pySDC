@@ -134,7 +134,8 @@ if __name__ == "__main__":
             iter_count[step] = v
         print(iter_count)
 
-        np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        # np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
     # u1,u2 = df.split(uend.values)
     # df.plot(u1,interactive=True)
