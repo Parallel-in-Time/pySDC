@@ -80,8 +80,8 @@ if __name__ == "__main__":
     ft.hard_random = 0.03
 
     # strategies = ['NOFAULT']
-    # strategies = ['INTERP_PREDICT']
-    strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
+    strategies = ['INTERP_PREDICT','SPREAD_PREDICT']
+    # strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
 
