@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
 
-def getBoussinesq2DUpwindMatrix(N, dx, u_adv):
+def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
 
   Dx   = get2DUpwindMatrix(N, dx)
   
@@ -18,7 +18,7 @@ def getBoussinesq2DUpwindMatrix(N, dx, u_adv):
   
   return sp.csc_matrix(M)
   
-def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq):
+def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq, order):
   Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0])
   Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1])
   Dx_b, Dz_b = get2DMatrix(N, h, bc_hor[2], bc_ver[2])
