@@ -17,7 +17,7 @@ class boris_2nd_order(sweeper):
         Sx: node-to-node Euler half-step for position update
     """
 
-    def __init__(self,coll):
+    def __init__(self,params):
         """
         Initialization routine for the custom sweeper
 
@@ -26,17 +26,15 @@ class boris_2nd_order(sweeper):
         """
 
          # call parent's initialization routine
-        super(boris_2nd_order,self).__init__(coll)
+        super(boris_2nd_order,self).__init__(params)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
-        [self.S, self.ST, self.SQ, self.Sx, self.QQ] = self.__get_Qd(coll)
+        [self.S, self.ST, self.SQ, self.Sx, self.QQ] = self.__get_Qd()
 
-    def __get_Qd(self,coll):
+    def __get_Qd(self):
         """
         Compute LU decomposition of Q^T
 
-        Args:
-            coll: collocation object
         Returns:
             S: node-to-node collocation matrix (first order)
             SQ: node-to-node collocation matrix (second order)
@@ -45,30 +43,30 @@ class boris_2nd_order(sweeper):
         """
 
         # set implicit and explicit Euler matrices
-        QI = np.zeros(np.shape(coll.Qmat))
-        QE = np.zeros(np.shape(coll.Qmat))
-        for m in np.arange(coll.num_nodes+1):
-            QI[m, 1:m+1] = coll.delta_m[0:m]
-            QE[m, 0:m] = coll.delta_m[0:m]
+        QI = np.zeros(np.shape(self.coll.Qmat))
+        QE = np.zeros(np.shape(self.coll.Qmat))
+        for m in np.arange(self.coll.num_nodes+1):
+            QI[m, 1:m+1] = self.coll.delta_m[0:m]
+            QE[m, 0:m] = self.coll.delta_m[0:m]
         # trapezoidal rule
         QT = 1/2*(QI+QE)
         # Qx as in the paper
         Qx = np.dot(QE,QT) + 1/2*QE*QE
 
-        Sx = np.zeros(np.shape(coll.Qmat))
-        ST = np.zeros(np.shape(coll.Qmat))
-        S = np.zeros(np.shape(coll.Qmat))
+        Sx = np.zeros(np.shape(self.coll.Qmat))
+        ST = np.zeros(np.shape(self.coll.Qmat))
+        S = np.zeros(np.shape(self.coll.Qmat))
 
         # fill-in node-to-node matrices
         Sx[0,:] = Qx[0,:]
         ST[0,:] = QT[0,:]
-        S[0,:] = coll.Qmat[0,:]
-        for m in range(coll.num_nodes):
+        S[0,:] = self.coll.Qmat[0,:]
+        for m in range(self.coll.num_nodes):
             Sx[m+1,:] = Qx[m+1,:] - Qx[m,:]
             ST[m+1,:] = QT[m+1,:] - QT[m,:]
-            S[m+1,:] = coll.Qmat[m+1,:] - coll.Qmat[m,:]
+            S[m+1,:] = self.coll.Qmat[m+1,:] - self.coll.Qmat[m,:]
         # SQ via dot-product, could also be done via QQ
-        SQ = np.dot(S,coll.Qmat)
+        SQ = np.dot(S,self.coll.Qmat)
 
         # QQ-matrix via product of Q
         QQ = np.dot(self.coll.Qmat,self.coll.Qmat)

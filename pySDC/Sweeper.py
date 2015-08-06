@@ -16,15 +16,32 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         coll: collocation object
     """
 
-    def __init__(self,coll):
+    def __init__(self,params):
         """
         Initialization routine for the base sweeper
 
         Args:
-            coll: collocation object
+            params: parameter object
 
         """
 
+        # short helper class to add params as attributes
+        class pars():
+            def __init__(self,params):
+
+                defaults = dict()
+                defaults['do_LU'] = False
+
+                for k,v in defaults.items():
+                    setattr(self,k,v)
+
+                for k,v in params.items():
+                    if not k is 'collocation_class':
+                        setattr(self,k,v)
+
+        self.params = pars(params)
+
+        coll = params['collocation_class'](params['num_nodes'],0,1)
         assert isinstance(coll, CollBase)
 
         # This will be set as soon as the sweeper is instantiated at the level

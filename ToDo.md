@@ -7,15 +7,17 @@ ToDo list
 
 * add more examples, esp. for PFASST
     - advection diffusion using fft
-    - reaction diffusion using fft
     - bernus model: simple explicit SDC to monodomain PFASST
     - SharpClaw integration
-    - FEniCS integration, incl. new sweeper
 
 * write a more detailed howto, explaining all the features of the code using basic examples
 
 * convert docs to sphinx and set up homepage
 
 * add more detailed timings mechanism to statistics via hooks
+
+* fix global nature of the stats object
+
+* fix behavior of hooks during PFASST runs: initialization is called per level, but some things may need to be done only once (file openings, figures)
 
 * add temporal coarsening

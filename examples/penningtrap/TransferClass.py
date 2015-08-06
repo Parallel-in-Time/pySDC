@@ -15,7 +15,7 @@ class particles_to_particles(transfer):
         init_c: number of variables on the coarse level (whatever init represents there)
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
 
@@ -23,7 +23,7 @@ class particles_to_particles(transfer):
             fine_level: fine level connected with the transfer operations (passed to parent)
             coarse_level: coarse level connected with the transfer operations (passed to parent)
         """
-        super(particles_to_particles,self).__init__(fine_level,coarse_level)
+        super(particles_to_particles,self).__init__(fine_level,coarse_level,params)
         pass
 
     def restrict_space(self,F):

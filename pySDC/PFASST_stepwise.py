@@ -199,7 +199,7 @@ def pfasst(S):
             S.levels[0].sweep.predict()
 
             # update stage and return
-            if len(S.levels) > 1:
+            if len(S.levels) > 1 and S.params.predict:
                 S.status.stage = 'PREDICT_RESTRICT'
             else:
                 S.status.stage = 'IT_FINE_SWEEP'

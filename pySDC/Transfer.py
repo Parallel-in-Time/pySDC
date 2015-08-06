@@ -16,14 +16,32 @@ class transfer(with_metaclass(abc.ABCMeta)):
         init_c: number of variables on the coarse level (whatever init represents there)
     """
 
-    def __init__(self,fine_level,coarse_level):
+    def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
 
         Args:
             fine_level: fine level connected with the transfer operations
             coarse_level: coarse level connected with the transfer operations
+            params: parameters for the transfer operations
         """
+
+        # short helper class to add params as attributes
+        class pars():
+            def __init__(self,params):
+
+                defaults = dict()
+                defaults['finter'] = False
+                defaults['iorder'] = 6
+                defaults['rorder'] = 2
+
+                for k,v in defaults.items():
+                    setattr(self,k,v)
+                for k,v in params.items():
+                    setattr(self,k,v)
+                pass
+
+        self.params = pars(params)
 
         # just copy by object
         self.fine = fine_level
@@ -118,7 +136,10 @@ class transfer(with_metaclass(abc.ABCMeta)):
         # need to restrict F.u[0] again here, since it might have changed in PFASST
         G.uold[0] = self.restrict_space(F.u[0])
 
-        for m in range(0,SF.coll.num_nodes+1):
+        F.u[0] += self.prolong_space(G.u[0] - G.uold[0])
+        F.f[0] = PF.eval_f(F.u[0],F.time)
+
+        for m in range(1,SF.coll.num_nodes+1):
             F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 

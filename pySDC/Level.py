@@ -52,8 +52,8 @@ class level():
                  '__hooks')
 
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, collocation_class, num_nodes, sweeper_class,
-                 level_params, hook_class, id):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class,
+                 sweeper_params, level_params, hook_class, id):
         """
         Initialization routine
 
@@ -62,9 +62,8 @@ class level():
             problem_params: parameters for the problem to be initialized
             dtype_u: data type of the dofs
             dtype_f: data type of the RHS
-            collocation_class: collocation class for the sweeper
-            num_nodes: the only parameter for collocation class
             sweeper_class: sweeper class
+            sweeper_params: parameters for the sweeper (contains collocation)
             level_params: parameters given by the user, will be added as attributes
             hook_class: class to add hooks (e.g. for output and diag)
             id: custom string naming this level
@@ -83,9 +82,8 @@ class level():
                 for k,v in params.items():
                     setattr(self,k,v)
 
-        # instantiate collocation, sweeper, problem and hooks
-        coll = collocation_class(num_nodes,0,1)
-        self.__sweep = sweeper_class(coll)
+        # instantiate sweeper, problem and hooks
+        self.__sweep = sweeper_class(sweeper_params)
         self.__prob = problem_class(problem_params,dtype_u,dtype_f)
         self.__hooks = hook_class()
 

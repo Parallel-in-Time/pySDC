@@ -39,6 +39,7 @@ class step():
                 defaults = dict()
                 defaults['maxiter'] = 20
                 defaults['fine_comm'] = True
+                defaults['predict'] = True
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
@@ -87,8 +88,6 @@ class step():
         assert 'problem_params' in descr
         assert 'dtype_u' in descr
         assert 'dtype_f' in descr
-        assert 'collocation_class' in descr
-        assert 'num_nodes' in descr
         assert 'sweeper_class' in descr
         assert 'level_params' in descr
 
@@ -117,13 +116,25 @@ class step():
             else:
                 hook = hookclass.hooks
 
+            if 'sweeper_params' in descr_list[l]:
+                swparams = descr_list[l]['sweeper_params']
+            else:
+                swparams = {}
+
+            if not 'collocation_class' in swparams:
+                assert 'collocation_class' in descr_list[l]
+                swparams['collocation_class'] = descr_list[l]['collocation_class']
+
+            if not 'num_nodes' in swparams:
+                assert 'num_nodes' in descr_list[l]
+                swparams['num_nodes'] = descr_list[l]['num_nodes']
+
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   descr_list[l]['problem_params'],
                                dtype_u            =   descr_list[l]['dtype_u'],
                                dtype_f            =   descr_list[l]['dtype_f'],
-                               collocation_class  =   descr_list[l]['collocation_class'],
-                               num_nodes          =   descr_list[l]['num_nodes'],
                                sweeper_class      =   descr_list[l]['sweeper_class'],
+                               sweeper_params     =   swparams,
                                level_params       =   descr_list[l]['level_params'],
                                hook_class         =   hook,
                                id                 =   'L'+str(l))
@@ -203,13 +214,11 @@ class step():
         """
 
         # create new instance of the specific transfer class
-        T = transfer_class(fine_level,coarse_level)
-        # use transfer dictionary twice to set restrict and prologn operator
+        T = transfer_class(fine_level,coarse_level,transfer_params)
+        # use transfer dictionary twice to set restrict and prolong operator
         self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
 
-        assert 'finter' in transfer_params
-
-        if transfer_params['finter']:
+        if T.params.finter:
             self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
         else:
             self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
