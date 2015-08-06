@@ -15,11 +15,11 @@ if __name__ == "__main__":
     # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
     ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
 
-    # list = [('GRAYSCOTT_stats_hf_NOFAULT_new.npz','NOFAULT','green','o')]
-    list = [ ('GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','green','o'),
-             ('GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','green','o'),
-             ('GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','blue','v'),
-             ('GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','red','d') ]
+    list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','2-sided+corr','green','o')]
+    # list = [ ('GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','green','o'),
+    #          ('GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','green','o'),
+    #          ('GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','blue','v'),
+    #          ('GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','red','d') ]
 
     nprocs = 32
 
