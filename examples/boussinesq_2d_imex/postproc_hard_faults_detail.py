@@ -15,11 +15,10 @@ rc('ytick', labelsize='small')
 setup = 'Boussinesq'
 
 list = [(setup+'_steps_vs_iteration_hf_NOFAULT.npz','NOFAULT','no fault','k','^'),
-        (setup+'_steps_vs_iteration_hf_SPREAD.npz','SPREAD','no fault','k','^')]
-        # (setup+'_steps_vs_iteration_hf_SPREAD.npz','SPREAD','1-sided','red','v'),
+        (setup+'_steps_vs_iteration_hf_SPREAD.npz','SPREAD','1-sided','red','v'),
         # (setup+'_steps_vs_iteration_hf_INTERP.npz','INTERP','2-sided','orange','o'),
         # (setup+'_steps_vs_iteration_hf_SPREAD_PREDICT.npz','SPREAD_PREDICT','1-sided + corr','blue','s'),
-        # (setup+'_steps_vs_iteration_hf_INTERP_PREDICT.npz','INTERP_PREDICT','2-sided + corr','green','d')]
+        (setup+'_steps_vs_iteration_hf_INTERP_PREDICT.npz','INTERP_PREDICT','2-sided + corr','green','d')]
 
 maxres = -1
 minres = -11
@@ -33,6 +32,8 @@ for file,strategy,label,color,marker in list:
     maxiter = max(maxiter,len(residual[:,0]))
     maxsteps = max(maxsteps,len(residual[0,:]))
 
+# print(maxiter)
+# exit()
 
 for file,strategy,label,color,marker in list:
 
