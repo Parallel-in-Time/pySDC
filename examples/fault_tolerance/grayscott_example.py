@@ -80,8 +80,8 @@ if __name__ == "__main__":
     ft.hard_random = 0.03
 
     # strategies = ['NOFAULT']
-    strategies = ['INTERP_PREDICT']
-    # strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT','NOFAULT']
+    # strategies = ['INTERP_PREDICT']
+    strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
 
@@ -136,7 +136,4 @@ if __name__ == "__main__":
 
         # np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
         np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
-
-    # u1,u2 = df.split(uend.values)
-    # df.plot(u1,interactive=True)
 
