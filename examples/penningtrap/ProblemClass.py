@@ -172,34 +172,38 @@ class penningtrap(ptype):
         N = self.nparts
         u0 = self.u0
 
-        assert N == 1
+        if N > 1:
 
-        u = particles(1)
+            u = self.u_init()
 
-        wbar = np.sqrt(2)*wE
+        else:
 
-        # position and velocity in z direction is easy to compute
-        u.pos.values[2] = u0[0][2]*np.cos(wbar*t) + u0[1][2]/wbar*np.sin(wbar*t)
-        u.vel.values[2] = -u0[0][2]*wbar*np.sin(wbar*t) + u0[1][2]*np.cos(wbar*t)
+            u = particles(1)
 
-        # define temp. variables to compute complex position
-        Op = 1/2*(wB + np.sqrt(wB**2-4*wE**2))
-        Om = 1/2*(wB - np.sqrt(wB**2-4*wE**2))
-        Rm = (Op*u0[0][0]+u0[1][1])/(Op-Om)
-        Rp = u0[0][0] - Rm
-        Im = (Op*u0[0][1]-u0[1][0])/(Op-Om)
-        Ip = u0[0][1] - Im
+            wbar = np.sqrt(2)*wE
 
-        # compute position in complex notation
-        w = np.complex(Rp,Ip)*np.exp(-np.complex(0,Op*t)) + np.complex(Rm,Im)*np.exp(-np.complex(0,Om*t))
-        # compute velocity as time derivative of the position
-        dw = -1j*Op*np.complex(Rp,Ip)*np.exp(-np.complex(0,Op*t)) - 1j*Om*np.complex(Rm,Im)*np.exp(-np.complex(0,Om*t))
+            # position and velocity in z direction is easy to compute
+            u.pos.values[2] = u0[0][2]*np.cos(wbar*t) + u0[1][2]/wbar*np.sin(wbar*t)
+            u.vel.values[2] = -u0[0][2]*wbar*np.sin(wbar*t) + u0[1][2]*np.cos(wbar*t)
 
-        # get the appropriate real and imaginary parts
-        u.pos.values[0] = w.real
-        u.vel.values[0] = dw.real
-        u.pos.values[1] = w.imag
-        u.vel.values[1] = dw.imag
+            # define temp. variables to compute complex position
+            Op = 1/2*(wB + np.sqrt(wB**2-4*wE**2))
+            Om = 1/2*(wB - np.sqrt(wB**2-4*wE**2))
+            Rm = (Op*u0[0][0]+u0[1][1])/(Op-Om)
+            Rp = u0[0][0] - Rm
+            Im = (Op*u0[0][1]-u0[1][0])/(Op-Om)
+            Ip = u0[0][1] - Im
+
+            # compute position in complex notation
+            w = np.complex(Rp,Ip)*np.exp(-np.complex(0,Op*t)) + np.complex(Rm,Im)*np.exp(-np.complex(0,Om*t))
+            # compute velocity as time derivative of the position
+            dw = -1j*Op*np.complex(Rp,Ip)*np.exp(-np.complex(0,Op*t)) - 1j*Om*np.complex(Rm,Im)*np.exp(-np.complex(0,Om*t))
+
+            # get the appropriate real and imaginary parts
+            u.pos.values[0] = w.real
+            u.vel.values[0] = dw.real
+            u.pos.values[1] = w.imag
+            u.vel.values[1] = dw.imag
 
         return u
 

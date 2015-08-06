@@ -192,3 +192,24 @@ class rhs_imex_mesh():
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
+
+    def __rmul__(self, other):
+        """
+        Overloading the right multiply by factor operator for rhs mesh types
+
+        Args:
+            other: float factor
+        Raises:
+            DataError: is other is not a float
+        Returns:
+            rhs mesh object, copy of original values scaled by factor
+        """
+
+        if isinstance(other, float):
+            # always create new mesh, since otherwise c = f*a changes a as well!
+            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me.impl.values = self.impl.values*other
+            me.expl.values = self.expl.values*other
+            return me
+        else:
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))

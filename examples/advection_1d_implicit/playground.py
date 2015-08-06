@@ -16,24 +16,22 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 1
 
-    # This comes as read-in for the level class (this is optional!)
+    # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-10
+    lparams['restol'] = 1E-09
 
-    # This comes as read-in for the step class (this is optional!)
     sparams = {}
-    sparams['maxiter'] = 15
-    sparams['fine_comm'] = True
+    sparams['maxiter'] = 50
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['c'] = 1.0
-    pparams['nvars'] = [32,16]
-    pparams['order'] = [4]
+    pparams['nvars'] = [256]#,128]
+    pparams['order'] = [2]#,2]
 
-    # This comes as read-in for the transfer operations (this is optional!)
+    # This comes as read-in for the transfer operations
     tparams = {}
     tparams['finter'] = True
 
@@ -55,8 +53,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0.0
-    dt = 0.05
-    Tend = 8*dt
+    dt = 0.125
+    Tend = 16*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
@@ -71,6 +69,7 @@ if __name__ == "__main__":
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
 
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)
+    extract_stats = grep_stats(stats,iter=-1,type='niter')
+    sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    for item in sortedlist_stats:
+        print(item)

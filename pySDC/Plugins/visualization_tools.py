@@ -1,4 +1,4 @@
-from pySDC.Stats import grep_stats
+import pySDC.Stats as st
 
 import numpy as np
 
@@ -6,9 +6,9 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 
 
-def show_residual_across_simulation(stats,fname):
+def show_residual_across_simulation(stats,maxiter_override=None,minres_override=None,maxres_override=None):
 
-    extract_stats = grep_stats(stats,type='residual')
+    extract_stats = st.grep_stats(stats,level=-1,type='residual')
 
     maxsteps = 0
     maxiter = 0
@@ -20,6 +20,14 @@ def show_residual_across_simulation(stats,fname):
         minres = min(minres,np.log10(v))
         maxres = max(maxres,np.log10(v))
         # print(getattr(k,'step'),getattr(k,'iter'),v)
+
+    if maxiter_override is not None:
+        maxiter = maxiter_override
+    if minres_override is not None:
+        minres = minres_override
+    if maxres_override is not None:
+        maxres = maxres_override
+
 
     # print(maxsteps,maxiter,minres,maxres)
 
@@ -45,6 +53,8 @@ def show_residual_across_simulation(stats,fname):
     cmap = plt.get_cmap('Reds')
     plt.pcolor(residual.T, cmap=cmap, vmin=minres, vmax=maxres)
 
+    plt.axis([0,maxiter,0,maxsteps+1])
+
     cax = plt.colorbar()
     cax.set_label('log10(residual)')
 
@@ -58,8 +68,4 @@ def show_residual_across_simulation(stats,fname):
 
     plt.tight_layout()
 
-    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
-
-    plt.show()
-
-    pass
+    return plt

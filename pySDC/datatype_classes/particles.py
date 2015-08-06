@@ -88,6 +88,27 @@ class particles():
             else:
                 raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
 
+        def __rmul__(self, other):
+            """
+            Overloading the right multiply by factor operator for position types
+
+            Args:
+                other: float factor
+            Raises:
+                DataError: is other is not a float
+            Returns:
+                position(!) object, original values scaled by factor
+            """
+
+            if isinstance(other, float):
+                # create new position, interpret float factor as time (time x velocity = position)
+                pos = particles.position(int(np.size(self.values)/3))
+                pos.values = self.values*other
+                return pos
+            else:
+                raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
+
+
         def __abs__(self):
             """
             Overloading the abs operator for position types
@@ -280,6 +301,29 @@ class particles():
             return p
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
+
+    def __rmul__(self, other):
+            """
+            Overloading the right multiply by factor operator for particle types
+
+            Args:
+                other: float factor
+            Raises:
+                DataError: is other is not a float
+            Returns:
+                particle
+            """
+
+            if isinstance(other, float):
+                # create particle here!
+                part = particles(int(np.size(self.pos.values)/3))
+                part.vel.values = self.vel.values*other
+                part.pos.values = self.pos.values*other
+                part.m = self.m
+                part.q = self.q
+                return part
+            else:
+                raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
 
 
     def __abs__(self):

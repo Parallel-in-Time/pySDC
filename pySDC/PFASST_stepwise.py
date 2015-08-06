@@ -2,9 +2,10 @@ import itertools
 import copy as cp
 import numpy as np
 
-from pySDC.Stats import stats
+import pySDC.Stats as st
 
 from pySDC.PFASST_helper import *
+from pySDC.Plugins.fault_tolerance import hard_fault_injection
 
 
 def run_pfasst(MS,u0,t0,dt,Tend):
@@ -30,6 +31,8 @@ def run_pfasst(MS,u0,t0,dt,Tend):
     # some initializations
     uend = None
     num_procs = len(MS)
+
+    st.stats = st.stats_class()
 
     # initial ordering of the steps: 0,1,...,Np-1
     slots = [p for p in range(num_procs)]
@@ -91,7 +94,7 @@ def run_pfasst(MS,u0,t0,dt,Tend):
         #     for p in slots:
         #         MS[p].time =
 
-    return uend,stats.return_stats()
+    return uend,st.stats.return_stats()
 
 
 def restart_block(MS,active_slots,u0):
@@ -110,27 +113,34 @@ def restart_block(MS,active_slots,u0):
     # loop over active slots (not directly, since we need the previous entry as well)
     for j in range(len(active_slots)):
 
-            # get slot number
-            p = active_slots[j]
+        # get slot number
+        p = active_slots[j]
 
-            # store current slot number for diagnostics
-            MS[p].status.slot = p
-            # store link to previous step
+        # store current slot number for diagnostics
+        MS[p].status.slot = p
+        # resets step
+        MS[p].reset_step()
+        # determine whether I am the first and/or last in line
+        MS[p].status.first = active_slots.index(p) == 0
+        MS[p].status.last = active_slots.index(p) == len(active_slots)-1
+        # store link to previous and next step
+        if not MS[p].status.first:
             MS[p].prev = MS[active_slots[j-1]]
-            # resets step
-            MS[p].reset_step()
-            # determine whether I am the first and/or last in line
-            MS[p].status.first = active_slots.index(p) == 0
-            MS[p].status.last = active_slots.index(p) == len(active_slots)-1
-            # intialize step with u0
-            MS[p].init_step(u0)
-            # reset some values
-            MS[p].status.done = False
-            MS[p].status.pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
-            MS[p].status.iter = 0
-            MS[p].status.stage = 'SPREAD'
-            for l in MS[p].levels:
-                l.tag = False
+        else:
+            MS[p].prev = None
+        if not MS[p].status.last:
+            MS[p].next = MS[active_slots[j+1]]
+        else:
+            MS[p].next = None
+        # intialize step with u0
+        MS[p].init_step(u0)
+        # reset some values
+        MS[p].status.done = False
+        MS[p].status.pred_cnt = active_slots.index(p)+1 # fixme: does this also work for ring-parallelization?
+        MS[p].status.iter = 0
+        MS[p].status.stage = 'SPREAD'
+        for l in MS[p].levels:
+            l.tag = False
 
     return MS
 
@@ -218,7 +228,7 @@ def pfasst(S):
                     S.prev.levels[-1].tag = False
 
             # do the sweep with (possibly) new values
-            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.update_nodes(stopit=True)
 
             # update stage and return
             S.status.stage = 'PREDICT_SEND'
@@ -263,6 +273,8 @@ def pfasst(S):
 
             # increment iteration count here (and only here)
             S.status.iter += 1
+
+            S = hard_fault_injection(S)
 
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
@@ -371,7 +383,7 @@ def pfasst(S):
             # coarsest sweep
 
             # standard sweep workflow: update nodes, compute residual, log progress
-            S.levels[-1].sweep.update_nodes()
+            S.levels[-1].sweep.update_nodes(level=len(S.levels)-1,stopit=False)
             S.levels[-1].sweep.compute_residual()
 
             S.levels[-1].hooks.dump_sweep(S.status)
