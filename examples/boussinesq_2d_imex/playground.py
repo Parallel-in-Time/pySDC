@@ -4,7 +4,7 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 
 from ProblemClass import boussinesq_2d_imex
-#from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
+from examples.boussinesq_2d_imex.TransferClass import mesh_to_mesh_2d
 from examples.boussinesq_2d_imex.HookClass import plot_solution
 
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
@@ -29,28 +29,34 @@ if __name__ == "__main__":
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 1E-12
+    
+    swparams = {}
+    swparams['collocation_class'] = collclass.CollGaussLobatto
+    swparams['num_nodes'] = 3
+    swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 1
+    sparams['maxiter'] = 2
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 30
-    Nsteps =  6
+    Tend   = 3
+    Nsteps =  1
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,600,20)]
+    pparams['nvars']    = [(4,300,10)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
     pparams['x_bounds'] = [(-150.0, 150.0)]
     pparams['z_bounds'] = [(   0.0,  10.0)]
+    pparams['order']    = [0, 0] # [fine_level, coarse_level]
 
     # This comes as read-in for the transfer operations
-    #tparams = {}
-    #tparams['finter'] = False
+    tparams = {}
+    tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -58,13 +64,12 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 2
+    description['sweeper_params']    = swparams
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
-    #description['transfer_class'] = mesh_to_mesh_1d
-    #description['transfer_params'] = tparams
+    description['transfer_class']    = mesh_to_mesh_2d
+    description['transfer_params']   = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
