@@ -36,7 +36,7 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 2
+    sparams['maxiter'] = 15
 
     # setup parameters "in time"
     t0     = 0
@@ -53,6 +53,9 @@ if __name__ == "__main__":
     pparams['x_bounds'] = [(-150.0, 150.0)]
     pparams['z_bounds'] = [(   0.0,  10.0)]
     pparams['order']    = [0, 0] # [fine_level, coarse_level]
+    pparams['gmres_maxiter'] = [50, 5]
+    pparams['gmres_restart'] = 20
+    pparams['gmres_tol']     = 1e-14
 
     # This comes as read-in for the transfer operations
     tparams = {}
