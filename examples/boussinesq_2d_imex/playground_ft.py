@@ -20,6 +20,8 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from unflatten import unflatten
 
 import pySDC.Plugins.fault_tolerance as ft
+import pySDC.Stats as st
+
 
 
 if __name__ == "__main__":
@@ -27,15 +29,16 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 16
 
-    ft_strategy = ['NOFAULT']#,'SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
+    # ft_strategy = ['NOFAULT']#,'SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
+    ft_strategy = ['SPREAD','INTERP_PREDICT']
     ft_step = 7
-    ft_iter = 7
+    ft_iter = 5
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 1E-10
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -43,12 +46,12 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 2
+    sparams['maxiter'] = 50
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3
-    Nsteps =  1
+    Tend   = 32
+    Nsteps =  16
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -95,6 +98,25 @@ if __name__ == "__main__":
         uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
         P.report_log()
+
+        extract_stats = st.grep_stats(stats,iter=-1,type='niter')
+        sortedlist_stats = st.sort_stats(extract_stats,sortby='step')
+        niter = sortedlist_stats[-1][1]
+        print('Iterations:',niter)
+
+        residual = np.zeros((niter,num_procs))
+        residual[:] = -99
+
+        extract_stats = st.grep_stats(stats,level=-1,type='residual')
+
+        for k,v in extract_stats.items():
+            step = getattr(k,'step')
+            iter = getattr(k,'iter')
+            if iter is not -1:
+                residual[iter-1,step] = np.log10(v)
+        print(residual)
+        print('')
+        np.savez('Boussinesq_steps_vs_iteration_hf_'+strategy,residual=residual,ft_step=ft.hard_step,ft_iter=ft.hard_iter)
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')
