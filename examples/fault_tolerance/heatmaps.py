@@ -72,6 +72,8 @@ for file,title in fields:
     ax.set_xticklabels(ft_step+1, minor=False)
     ax.set_yticklabels(ft_iter, minor=False)
 
+    ax.tick_params(pad=8)
+
     plt.tight_layout()
 
     fname = 'abs_'+os.path.splitext(file)[0]+'.png'

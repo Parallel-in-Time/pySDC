@@ -37,7 +37,7 @@ if __name__ == "__main__":
     sparams['maxiter'] = 50
 
     ft_strategy = ['NOFAULT','SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
-    ft_setup = 'HEAT'
+    ft_setup = 'ADVECTION'
     ft_step = 7
     ft_iter = 7
 

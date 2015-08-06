@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 16
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     pparams['c_nvars'] = [256]
     pparams['family'] = 'CG'
     pparams['order'] = [4]
-    pparams['refinements'] = [1]
+    pparams['refinements'] = [1,0]
 
 
     # This comes as read-in for the transfer operations
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         # call main function to get things done...
         uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-        extract_stats = grep_stats(stats,type='residual')
+        extract_stats = grep_stats(stats,level=-1,type='residual')
 
         maxsteps = 0
         maxiter = 0

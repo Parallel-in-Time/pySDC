@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def show_residual_across_simulation(stats,maxiter_override=None,minres_override=None,maxres_override=None):
 
-    extract_stats = st.grep_stats(stats,type='residual')
+    extract_stats = st.grep_stats(stats,level=-1,type='residual')
 
     maxsteps = 0
     maxiter = 0
