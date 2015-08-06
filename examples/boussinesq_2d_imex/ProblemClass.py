@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
@@ -102,7 +103,7 @@ class boussinesq_2d_imex(ptype):
         sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=500, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor!=0.0:
-          print "Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
+          print("Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() ))
           self.logger.add(cb.getcounter())
         me        = mesh(self.nvars)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
@@ -195,6 +196,6 @@ class boussinesq_2d_imex(ptype):
         return me
         
     def report_log(self):
-      print "Number of calls to implicit solver: %5i" % self.logger.solver_calls
-      print "Total number of iterations: %5i" % self.logger.iterations
-      print "Average number of iterations per call: %6.3f" % (float(self.logger.iterations)/float(self.logger.solver_calls))
+      print("Number of calls to implicit solver: %5i" % self.logger.solver_calls)
+      print("Total number of iterations: %5i" % self.logger.iterations)
+      print("Average number of iterations per call: %6.3f" % (float(self.logger.iterations)/float(self.logger.solver_calls)))
