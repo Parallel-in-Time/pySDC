@@ -10,8 +10,8 @@ rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
-setup = 'HEAT'
-# setup = 'ADVECTION'
+# setup = 'HEAT'
+setup = 'ADVECTION'
 fields = [(setup+'_results_hf_SPREAD.npz','SPREAD'),
           (setup+'_results_hf_INTERP.npz','INTERP'),
           (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),
@@ -71,7 +71,7 @@ for file,strategy in fields:
 
     plt.tight_layout()
 
-    fname = strategy+'_iteration_counts_hf_'+strategy+'.png'
+    fname = setup+'_iteration_counts_hf_'+strategy+'.png'
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
     # plt.show()
