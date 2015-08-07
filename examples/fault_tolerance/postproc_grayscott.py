@@ -13,25 +13,28 @@ if __name__ == "__main__":
     rc('ytick', labelsize='small')
 
     # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_new.npz'
+    ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
 
-    # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','2-sided+corr','green','o')]
-    list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','1-sided','green','o'),
-             ('PFASST_GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','2-sided','green','o'),
-             ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','1-sided+corr','blue','v'),
-             ('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','2-sided+corr','red','d') ]
+    # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','2-sided+corr','green','o')]
+    list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz','SPREAD','1-sided','red','s'),
+             ('PFASST_GRAYSCOTT_stats_hf_INTERP_P32.npz','INTERP','2-sided','orange','o'),
+             ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_P32.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
+             ('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','INTERP_PREDICT','2-sided+corr','green','d') ]
 
     nprocs = 32
 
     xtick_dist = 16
 
-    # minstep = 288
-    # maxstep = 384
-    minstep = 0
-    maxstep = 640
+    lw = 2
+
+    minstep = 288
+    maxstep = 384
+    # minstep = 0
+    # maxstep = 640
 
     # maxiter = 14
     nsteps = 0
+    maxiter = 0
     for file,strategy,label,color,marker in list:
 
         data = np.load(file)
@@ -51,6 +54,8 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(figsize=(20,7))
 
+
+
     plt.plot(range(minstep,maxstep),[0]*nsteps,'k-',linewidth=2)
 
     ymin = 99
@@ -64,7 +69,7 @@ if __name__ == "__main__":
             ymin = min(ymin,min(ref_iter_count-iter_count))
             ymax = max(ymax,max(ref_iter_count-iter_count))
 
-            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',markersize=12)
+            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',linewidth=lw,markersize=12)
 
 
     plt.xlabel('step')
@@ -122,4 +127,46 @@ if __name__ == "__main__":
         fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
+    exit()
+
+    fig, ax = plt.subplots(figsize=(20,7))
+
+    nblocks = int((maxstep-minstep)/nprocs)
+
+    data = np.load('PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz')
+
+    iter_count = data['iter_count']
+
+    iterblocks = np.zeros(nblocks)
+    iterblocks[:] = iter_count[nprocs-1::nprocs]
+    # for i in range(nblocks):
+    #     iterblocks[i] = np.sum(iter_count[i*nprocs:(i+1)*nprocs])/nprocs
+
+    plt.plot(range(1,nblocks+1),iterblocks,color='k',label='no fault',marker='',linestyle='--',linewidth=lw,markersize=12)
+
+    for file,strategy,label,color,marker in list:
+
+        data = np.load(file)
+
+        iter_count = data['iter_count']
+
+        iterblocks = np.zeros(nblocks)
+        iterblocks[:] = iter_count[nprocs-1::nprocs]
+        # for i in range(nblocks):
+        #     iterblocks[i] = np.sum(iter_count[i*nprocs:(i+1)*nprocs])/nprocs
+
+        plt.plot(range(1,nblocks+1),iterblocks,color=color,label=label,marker=marker,linestyle='-',linewidth=lw,markersize=12)
+
+    plt.xlabel('block')
+    plt.ylabel('number of iterations')
+    plt.xlim(0.5,nblocks+0.5)
+    plt.ylim(-0.5,maxiter+0.5)
+    ax.set_xticks(np.arange(1,nblocks+1), minor=False)
+    # ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
+    plt.legend(loc=2,numpoints=1)
+
+    plt.tight_layout()
+
+    fname = 'GRAYSCOTT_iteration_count_hf.png'
+    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
     # plt.show()
