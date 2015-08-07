@@ -10,19 +10,16 @@ rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
-fields = [('HEAT_results_hf_SPREAD.npz','hard restart'),
-          ('HEAT_results_hf_INTERP.npz','interpolation'),
-          ('HEAT_results_hf_INTERP_PREDICT.npz','interpolate predict'),
-          ('HEAT_results_hf_SPREAD_PREDICT.npz','spread predict')]
-# fields = [('ADVECTION_results_hf_SPREAD.npz','hard restart'),
-#           ('ADVECTION_results_hf_INTERP.npz','interpolation'),
-#           ('ADVECTION_results_hf_INTERP_PREDICT.npz','interpolate predict'),
-#           ('ADVECTION_results_hf_SPREAD_PREDICT.npz','spread predict')]
-
+setup = 'HEAT'
+# setup = 'ADVECTION'
+fields = [(setup+'_results_hf_SPREAD.npz','SPREAD'),
+          (setup+'_results_hf_INTERP.npz','INTERP'),
+          (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),
+          (setup+'_results_hf_SPREAD_PREDICT.npz','SPREAD_PREDICT')]
 
 vmin = 99
 vmax = 0
-for file,title in fields:
+for file,strategy in fields:
 
     infile = np.load(file)
 
@@ -38,7 +35,7 @@ for file,title in fields:
 
 print(vmin,vmax)
 
-for file,title in fields:
+for file,strategy in fields:
 
     infile = np.load(file)
 
@@ -62,8 +59,6 @@ for file,title in fields:
     cax.set_ticklabels(ticks)
     cax.set_label('number of iterations')
 
-    # plt.title(title)
-
     ax.set_xlabel('affected step')
     ax.set_ylabel('affected iteration')
 
@@ -76,7 +71,7 @@ for file,title in fields:
 
     plt.tight_layout()
 
-    fname = 'abs_'+os.path.splitext(file)[0]+'.png'
+    fname = strategy+'_iteration_counts_hf_'+strategy+'.png'
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
     # plt.show()

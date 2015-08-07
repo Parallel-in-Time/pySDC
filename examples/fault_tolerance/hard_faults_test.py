@@ -27,7 +27,7 @@ import pySDC.Plugins.fault_tolerance as ft
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+    # logger = Log.setup_custom_logger('root')
 
     num_procs = 16
 
@@ -39,9 +39,9 @@ if __name__ == "__main__":
     sparams['maxiter'] = 50
 
     # ft_strategy = ['INTERP']
-    ft_strategy = ['NOFAULT','SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
-    ft_setup = 'HEAT'
-    # ft_setup = 'ADVECTION'
+    ft_strategy = ['SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
+    # ft_setup = 'HEAT'
+    ft_setup = 'ADVECTION'
 
     if ft_setup is 'HEAT':
 
@@ -53,6 +53,8 @@ if __name__ == "__main__":
         # This comes as read-in for the transfer operations
         tparams = {}
         tparams['finter'] = True
+        tparams['iorder'] = 6
+        tparams['rorder'] = 2
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
@@ -86,6 +88,8 @@ if __name__ == "__main__":
         # This comes as read-in for the transfer operations
         tparams = {}
         tparams['finter'] = True
+        tparams['iorder'] = 6
+        tparams['rorder'] = 2
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
@@ -171,6 +175,8 @@ if __name__ == "__main__":
 
     for strategy in ft_strategy:
 
+        print('------------------------------------------ working on strategy ',strategy)
+
         iter_count = np.zeros((len(ft_step),len(ft_iter)))
 
         xcnt = -1
@@ -210,7 +216,7 @@ if __name__ == "__main__":
                 niter = sortedlist_stats[-1][1]
                 iter_count[xcnt,ycnt] = niter
                 # print('PFASST needed %i iterations to converge' %niter)
-                print('\n')
+                # print('\n')
 
         print(iter_count)
 
