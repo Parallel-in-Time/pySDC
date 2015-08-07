@@ -4,7 +4,7 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 
 from examples.heat1d_periodic_fft.ProblemClass import heat1d
-from examples.heat1d_periodic_fft.TransferClass import mesh_to_mesh_1d_periodic_fft
+from examples.heat1d_periodic_fft.TransferClass import mesh_to_mesh_1d_periodic
 from examples.heat1d_periodic_fft.HookClass import error_output
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['num_nodes'] = 5
-    swparams['do_LU'] = True
+    swparams['do_LU'] = False
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.01
-    pparams['nvars'] = [64,32]
+    pparams['nvars'] = [32,16]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d_periodic_fft
+    description['transfer_class'] = mesh_to_mesh_1d_periodic
     description['transfer_params'] = tparams
     description['hook_class'] = error_output
 

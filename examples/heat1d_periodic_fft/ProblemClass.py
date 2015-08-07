@@ -41,7 +41,8 @@ class heat1d(ptype):
         super(heat1d,self).__init__(self.nvars, dtype_u, dtype_f)
         N = self.nvars
         self.k = 1j*np.concatenate([np.arange(N/2+1), -1*np.arange(N/2-1)[::-1]-1])
-        self.lap = self.k*self.k
+        self.lap = self.k*self.k*(2*np.pi)**2
+
         # compute dx and get discretization matrix A
         self.dx = 1/(self.nvars)
         # self.A = self.__get_A(self.nvars,self.nu,self.dx)
@@ -87,7 +88,7 @@ class heat1d(ptype):
         # me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
         rhs_fft = fft(rhs.values)
         fft_faktor_inv = np.ones(self.nvars, dtype=np.complex128)-factor*self.nu * self.lap
-        me.values = ifft(rhs_fft / fft_faktor_inv)
+        me.values = np.real(ifft(rhs_fft / fft_faktor_inv))
         return me
 
 
@@ -122,7 +123,7 @@ class heat1d(ptype):
 
         fimpl = mesh(self.nvars)
         u_fft = fft(u.values)
-        fimpl.values = ifft(self.nu*self.lap*u_fft)
+        fimpl.values = np.real(ifft(self.nu*self.lap*u_fft))
         return fimpl
 
 
