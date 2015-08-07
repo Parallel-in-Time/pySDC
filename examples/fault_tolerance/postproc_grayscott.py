@@ -12,25 +12,27 @@ if __name__ == "__main__":
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
 
-    # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
+    # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
+    ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_new.npz'
 
-    list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','2-sided+corr','green','o')]
-    # list = [ ('GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','green','o'),
-    #          ('GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','green','o'),
-    #          ('GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','blue','v'),
-    #          ('GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','red','d') ]
+    # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','2-sided+corr','green','o')]
+    list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_new.npz','SPREAD','1-sided','green','o'),
+             ('PFASST_GRAYSCOTT_stats_hf_INTERP_new.npz','INTERP','2-sided','green','o'),
+             ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_new.npz','SPREAD_PREDICT','1-sided+corr','blue','v'),
+             ('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_new.npz','INTERP_PREDICT','2-sided+corr','red','d') ]
 
     nprocs = 32
 
     xtick_dist = 16
 
-    minstep = 288
-    maxstep = 384
+    # minstep = 288
+    # maxstep = 384
+    minstep = 0
+    maxstep = 640
 
-    maxiter = 14
+    # maxiter = 14
     nsteps = 0
-    for file,label,color,marker in list:
+    for file,strategy,label,color,marker in list:
 
         data = np.load(file)
 
@@ -53,7 +55,7 @@ if __name__ == "__main__":
 
     ymin = 99
     ymax = 0
-    for file,label,color,marker in list:
+    for file,strategy,label,color,marker in list:
 
         if not file is ref:
             data = np.load(file)
@@ -66,7 +68,7 @@ if __name__ == "__main__":
 
 
     plt.xlabel('step')
-    plt.ylabel('Number of saved iterations')
+    plt.ylabel('saved iterations')
     plt.xlim(-1+minstep,maxstep+1)
     plt.ylim(-1+ymin,ymax+1)
     ax.set_xticks(np.arange(minstep,maxstep,xtick_dist)+0.5, minor=False)
@@ -79,7 +81,7 @@ if __name__ == "__main__":
     fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.png'
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
-    for file,label,color,marker in list:
+    for file,strategy,label,color,marker in list:
 
         data = np.load(file)
 
@@ -94,7 +96,7 @@ if __name__ == "__main__":
         cmap = plt.get_cmap('Reds',vmax-vmin+1)
         plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
 
-        if not "NOFAULT" in label:
+        if not "NOFAULT" in strategy:
             for item in stats:
                 if item[0] in range(minstep,maxstep):
                     plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
@@ -117,7 +119,7 @@ if __name__ == "__main__":
 
         plt.tight_layout()
 
-        fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+label+'.png'
+        fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
     # plt.show()

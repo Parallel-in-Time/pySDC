@@ -38,10 +38,10 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    ft_strategy = ['INTERP']
-    # ft_strategy = ['SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
+    # ft_strategy = ['INTERP']
+    ft_strategy = ['NOFAULT','SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
     ft_setup = 'HEAT'
-    # ft_setup = 'PENNING'
+    # ft_setup = 'ADVECTION'
 
     if ft_setup is 'HEAT':
 

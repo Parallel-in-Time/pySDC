@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 16
+    num_procs = 32
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     ft.hard_random = 0.03
 
     # strategies = ['NOFAULT']
-    strategies = ['INTERP_PREDICT','SPREAD_PREDICT']
-    # strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
+    # strategies = ['INTERP_PREDICT','SPREAD_PREDICT']
+    strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
 
@@ -135,5 +135,5 @@ if __name__ == "__main__":
         print(iter_count)
 
         # np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
-        np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_P'+str(num_procs),residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
