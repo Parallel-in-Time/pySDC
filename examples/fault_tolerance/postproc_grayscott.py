@@ -127,20 +127,23 @@ if __name__ == "__main__":
         fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
-    exit()
+    # exit()
 
     fig, ax = plt.subplots(figsize=(20,7))
 
-    nblocks = int((maxstep-minstep)/nprocs)
+    # nblocks = int((maxstep-minstep)/nprocs)
+    nblocks = 20
 
     data = np.load('PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz')
 
-    iter_count = data['iter_count']
+    iter_count = data['iter_count'][:]
 
     iterblocks = np.zeros(nblocks)
     iterblocks[:] = iter_count[nprocs-1::nprocs]
     # for i in range(nblocks):
     #     iterblocks[i] = np.sum(iter_count[i*nprocs:(i+1)*nprocs])/nprocs
+
+    miniter = np.amin(iterblocks)
 
     plt.plot(range(1,nblocks+1),iterblocks,color='k',label='no fault',marker='',linestyle='--',linewidth=lw,markersize=12)
 
@@ -160,7 +163,7 @@ if __name__ == "__main__":
     plt.xlabel('block')
     plt.ylabel('number of iterations')
     plt.xlim(0.5,nblocks+0.5)
-    plt.ylim(-0.5,maxiter+0.5)
+    plt.ylim(miniter-0.5,maxiter+0.5)
     ax.set_xticks(np.arange(1,nblocks+1), minor=False)
     # ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
     plt.legend(loc=2,numpoints=1)
