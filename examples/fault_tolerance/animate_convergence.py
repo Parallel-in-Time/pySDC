@@ -22,8 +22,8 @@ if __name__ == "__main__":
     nsteps = 0
 
     # ref = 'SDC_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    # ref = 'GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    ref = 'GRAYSCOTT_stats_hf_SPREAD_new.npz'
+    # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz'
+    ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
 
     data = np.load(ref)
 
