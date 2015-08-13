@@ -23,6 +23,9 @@ from pySDC.Plugins.visualization_tools import show_residual_across_simulation
 
 
 if __name__ == "__main__":
+    """
+        This routine generates the heatmaps showing the residual for a node failures at step n and iteration k
+    """
 
     # set global logger (remove this if you do not want the output at all)
     # logger = Log.setup_custom_logger('root')
@@ -36,8 +39,10 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
+    # choose the strategy, the setup, the iteration/step where the fault should happen
     ft_strategy = ['NOFAULT','SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
     ft_setup = 'ADVECTION'
+    # ft_setup = 'HEAT'
     ft_step = 7
     ft_iter = 7
 
@@ -51,6 +56,8 @@ if __name__ == "__main__":
         # This comes as read-in for the transfer operations
         tparams = {}
         tparams['finter'] = True
+        tparams['iorder'] = 6
+        tparams['rorder'] = 2
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
@@ -109,6 +116,7 @@ if __name__ == "__main__":
         exit()
 
 
+    # loop over all stategies and check how things evolve
     for strategy in ft_strategy:
 
         ft.strategy = strategy
@@ -124,6 +132,7 @@ if __name__ == "__main__":
         # call main function to get things done...
         uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
+        # stats magic: get iteration counts to find maxiter/niter
         extract_stats = st.grep_stats(stats,iter=-1,type='niter')
         sortedlist_stats = st.sort_stats(extract_stats,sortby='step')
         niter = sortedlist_stats[-1][1]
@@ -132,14 +141,12 @@ if __name__ == "__main__":
         residual = np.zeros((niter,num_procs))
         residual[:] = -99
 
+        #stats magic: extract all residuals (steps vs. iterations)
         extract_stats = st.grep_stats(stats,level=-1,type='residual')
-
         for k,v in extract_stats.items():
             step = getattr(k,'step')
             iter = getattr(k,'iter')
             if iter is not -1:
                 residual[iter-1,step] = np.log10(v)
-            # if step == ft_step:
-            #     print(iter,np.log10(v))
         print('')
         np.savez(ft_setup+'_steps_vs_iteration_hf_'+strategy,residual=residual,ft_step=ft.hard_step,ft_iter=ft.hard_iter)

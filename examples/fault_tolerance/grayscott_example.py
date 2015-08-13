@@ -80,7 +80,6 @@ if __name__ == "__main__":
     ft.hard_random = 0.03
 
     # strategies = ['NOFAULT']
-    # strategies = ['INTERP_PREDICT','SPREAD_PREDICT']
     strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
@@ -103,8 +102,10 @@ if __name__ == "__main__":
         # call main function to get things done...
         uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
+        # stats magic: get all residuals
         extract_stats = grep_stats(stats,level=-1,type='residual')
 
+        # find boundaries
         maxsteps = 0
         maxiter = 0
         minres = 0
@@ -114,19 +115,17 @@ if __name__ == "__main__":
             maxiter = max(maxiter,getattr(k,'iter'))
             minres = min(minres,np.log10(v))
             maxres = max(maxres,np.log10(v))
-            # print(getattr(k,'step'),getattr(k,'iter'),v)
 
-        # print(maxsteps,maxiter,minres,maxres)
-
+        # fill residual array
         residual = np.zeros((maxiter,maxsteps+1))
         residual[:] = 0
-
         for k,v in extract_stats.items():
             step = getattr(k,'step')
             iter = getattr(k,'iter')
             if iter is not -1:
                 residual[iter-1,step] = v
 
+        # stats magic: get niter (probably redundant with maxiter)
         extract_stats = grep_stats(stats,iter=-1,type='niter')
         iter_count = np.zeros(maxsteps+1)
         for k,v in extract_stats.items():

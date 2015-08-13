@@ -1,124 +1,61 @@
 import copy as cp
 import random as rd
-import struct
 
+# dirty, but easiest: global variables to control the injection and recovery
 hard_iter = None
 hard_step = None
 strategy = None
 hard_random = 0.0
 hard_stats = []
 
-soft_do_faults = False
-
-soft_step = 0
-soft_iter = 0
-soft_level = 0
-soft_node = 0
-
-soft_fault_injected = 0
-soft_fault_detected = 0
-soft_fault_missed = 0
-soft_fault_hit = 0
-
-soft_safety_factor = 1.0
-
-soft_stats = []
-soft_do_correction = False
-
-
-def soft_fault_preproc(nsteps,niters,nlevs,nnodes):
-    global soft_step, soft_iter, soft_level, soft_node
-
-    rd.seed()
-
-    soft_step = rd.randrange(nsteps)
-    soft_iter = rd.randrange(1,niters+1)
-    soft_level = rd.randrange(nlevs)
-    # FIXME: do we need to exclude the first node??
-    soft_node = rd.randrange(1,nnodes)
-    # print(soft_step,soft_iter,soft_level,soft_node)
-
-def soft_fault_injection(step,iter,level,node,nvars):
-    global soft_step, soft_iter, soft_level, soft_node, soft_do_faults, soft_stats
-
-    doit = step == soft_step and iter == soft_iter and level == soft_level and node == soft_node and soft_do_faults
-
-    if doit:
-        rd.seed()
-        index = rd.randrange(nvars)
-        pos = rd.randrange(31)
-        uf = rd.randrange(2)
-
-        return index,pos,uf
-
-    else:
-
-        return None,None,None
-
-
-def __bitsToFloat(b):
-    s = struct.pack('>l', b)
-    return struct.unpack('>f', s)[0]
-
-def __floatToBits(f):
-    s = struct.pack('>f', f)
-    return struct.unpack('>l', s)[0]
-
-def do_bitflip(a,pos=29):
-
-    b = __floatToBits(a)
-    mask = 1<<pos
-    c = b^mask
-
-    return __bitsToFloat(c)
-
-
-# def hard_fault_preproc(time,nsteps,MS):
-#     global hard_step, hard_iter
-#
-#     rd.seed(time)
-#
-#     if nsteps > 0:
-#         hard_step = rd.randrange(nsteps)
-#     else:
-#         hard_step = 0
-#
-#     if MS[hard_step].status.iter is not None:
-#         niters = MS[hard_step].status.iter
-#     else:
-#         niters = 8
-#
-#     hard_iter = rd.randrange(1,niters+1)
-#     print(hard_step,hard_iter)
-
 
 def hard_fault_injection(S):
+    """
+        Injects a node failure and recovers using a defined strategy, can be called in the controller
+
+        Args:
+            S: the current step data structure
+        Returns:
+             the step after a node failure
+
+    """
+
+    # name global variables for this routine
     global hard_iter, hard_step, strategy, hard_stats, hard_random
 
+    # set the seed in the first iteration, using the step number for reproducibility
     if S.status.iter == 1:
         rd.seed(S.status.step)
 
+    # draw random number and check if we are below our threshold (hard_random gives percentage)
+    # very ugly: no failure above iteration 7, because the original run took only 7 iterations
     doit = rd.random() < hard_random and S.status.iter < 7
 
     # print(S.status.step,S.status.iter,hard_step,hard_iter)
 
+    # if we set step and iter or if doit is true, inject and recover (if faults are supposed to occur)
     if ((hard_step == S.status.step and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %(S.status.step,S.status.iter,S.status.time))
 
+        # add incident to statistics data type
         hard_stats.append((S.status.step,S.status.iter,S.status.time))
 
+        # ok, that's a little bit of cheating... we would need to retrieve the current residual and iteration count
+        # from the previous process, but this does not matter here
         res = cp.deepcopy(S.levels[-1].status.residual)
         niter = cp.deepcopy(S.status.iter)-1
 
+        # fault injection, set everything to zero or null or whatever
         S.reset_step()
 
+        # recovery
         if strategy is 'SPREAD':
             S = hard_fault_correction_spread(S)
         elif strategy is 'INTERP':
             S = hard_fault_correction_interp(S)
         elif strategy is 'INTERP_PREDICT':
-            S = hard_fault_correction_predict(S,res,niter)
+            S = hard_fault_correction_interp_predict(S,res,niter)
         elif strategy is 'SPREAD_PREDICT':
             S = hard_fault_correction_spread_predict(S,res,niter)
         else:
@@ -127,66 +64,61 @@ def hard_fault_injection(S):
 
     return S
 
+### Here come the recovery strategies ###
+
+
 
 def hard_fault_correction_spread(S):
+    """
+        do nothing, just get new initial conditions and do sweep predict (copy)
+        strategy '1-sided'
 
-    for l in range(len(S.levels)):
+        Args:
+            S: the current step (no data available)
+        Returns:
+            S: recovered step
+    """
 
-        if not S.status.first:
-            ufirst = S.prev.levels[l].prob.dtype_u(S.prev.levels[l].uend)
-        else:
-            ufirst = S.levels[l].prob.u_exact(S.status.time)
+    # get new initial data, either from previous processes or "from scratch"
+    if not S.status.first:
+        ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
+    else:
+        ufirst = S.levels[0].prob.u_exact(S.status.time)
 
-        S.levels[l].u[0] = ufirst
-        S.levels[l].sweep.predict()
-        S.levels[l].sweep.compute_end_point()
+    L = S.levels[0]
 
+    # set data
+    L.u[0] = L.prob.dtype_u(ufirst)
+    # call prediction of the sweeper (copy the values to all nodes)
+    L.sweep.predict()
+    # compute uend
+    L.sweep.compute_end_point()
 
+    # proceed with fine sweep
     S.status.stage = 'IT_FINE_SWEEP'
 
     return S
 
 
-def hard_fault_correction_interp_all(S):
-
-    for l in range(len(S.levels)):
-
-        if not S.status.first:
-            ufirst = S.prev.levels[l].prob.dtype_u(S.prev.levels[l].uend)
-        else:
-            ufirst = S.levels[l].prob.u_exact(S.status.time)
-
-        if not S.status.last:
-            ulast = S.next.levels[l].prob.dtype_u(S.next.levels[l].u[0])
-        else:
-            ulast = ufirst
-
-        L = S.levels[l]
-
-        ffirst = L.prob.eval_f(ufirst,L.time)
-        flast = L.prob.eval_f(ulast,L.time + L.dt)
-
-        L.u[0] = L.prob.dtype_u(ufirst)
-        L.f[0] = L.prob.eval_f(L.u[0],L.time)
-        for m in range(1,L.sweep.coll.num_nodes+1):
-            L.u[m] = (1-L.sweep.coll.nodes[m-1])*ufirst + L.sweep.coll.nodes[m-1]*ulast
-            L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
-
-        L.status.unlocked = True
-
-        # L.sweep.update_nodes()
-        L.sweep.compute_end_point()
-
-    return S
-
-
 def hard_fault_correction_interp(S):
+    """
+        get new initial conditions from left and uend from right, then interpolate
+        strategy '2-sided'
 
+        Args:
+            S: the current step (no data available)
+        Returns:
+            S: recovered step
+    """
+
+    # get new initial data, either from previous processes or "from scratch"
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
         ufirst = S.levels[0].prob.u_exact(S.status.time)
 
+    # if I'm not the last one, get uend from following process
+    # otherwise set uend = u0, so that interpolation is a copy
     if not S.status.last:
         ulast = S.next.levels[0].prob.dtype_u(S.next.levels[0].u[0])
     else:
@@ -194,25 +126,37 @@ def hard_fault_correction_interp(S):
 
     L = S.levels[0]
 
-    # ffirst = L.prob.eval_f(ufirst,L.time)
-    # flast = L.prob.eval_f(ulast,L.time + L.dt)
-
+    # set u0, and interpolate the rest
+    # evaluate f for each node (fixme: we could try to interpolate here as well)
     L.u[0] = L.prob.dtype_u(ufirst)
     L.f[0] = L.prob.eval_f(L.u[0],L.time)
     for m in range(1,L.sweep.coll.num_nodes+1):
         L.u[m] = (1-L.sweep.coll.nodes[m-1])*ufirst + L.sweep.coll.nodes[m-1]*ulast
         L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
 
+    # set fine level to active
     L.status.unlocked = True
-
-    # L.sweep.update_nodes()
+    # compute uend
     L.sweep.compute_end_point()
+
+    # proceed with fine sweep
+    S.status.stage = 'IT_FINE_SWEEP'
 
     return S
 
 
 def hard_fault_correction_spread_predict(S,res,niter):
+    """
+        get new initial conditions from left, copy data to nodes and correct on coarse level
+        strategy '1-sided+corr'
 
+        Args:
+            S: the current step (no data available)
+        Returns:
+            S: recovered step
+    """
+
+    # get new initial data, either from previous processes or "from scratch"
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
@@ -220,13 +164,18 @@ def hard_fault_correction_spread_predict(S,res,niter):
 
     L = S.levels[0]
 
+    # set u0, and copy
     L.u[0] = L.prob.dtype_u(ufirst)
-    S.levels[0].sweep.predict()
+    L.sweep.predict()
 
+    # transfer to the coarsest level (overwrite values)
     for l in range(1,len(S.levels)):
         S.transfer(source=S.levels[l-1],target=S.levels[l])
 
+    # compute preliminary residual (just to set it)
     S.levels[-1].sweep.compute_residual()
+    # keep sweeping until either k < niter or the current residual is lower than res (niter, res was stored before
+    # fault injection (lazy, should get this from the previous process)
     k = 0
     if res is not None:
         while S.levels[-1].status.residual > res and k < niter:
@@ -235,61 +184,38 @@ def hard_fault_correction_spread_predict(S,res,niter):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
 
+    # transfer back to finest level (coarse correction!)
     for l in range(len(S.levels)-1,0,-1):
         S.transfer(source=S.levels[l],target=S.levels[l-1])
 
-    S.levels[0].sweep.compute_end_point()
+    # compute uend
+    L.sweep.compute_end_point()
+
+    # proceed with fine sweep
+    S.status.stage = 'IT_FINE_SWEEP'
 
     return S
 
 
-def hard_fault_correction_interp_coarse(S):
+def hard_fault_correction_interp_predict(S,res,niter):
+    """
+        get new initial conditions from left and uend from right, interpolate data to nodes and correct on coarse level
+        strategy '2-sided+corr'
 
+        Args:
+            S: the current step (no data available)
+        Returns:
+            S: recovered step
+    """
+
+    # get new initial data, either from previous processes or "from scratch"
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
         ufirst = S.levels[0].prob.u_exact(S.status.time)
 
-    S.levels[0].u[0] = S.levels[0].prob.dtype_u(ufirst)
-    S.levels[0].sweep.predict()
-
-    S.levels[0].status.unlocked = True
-
-    S.transfer(source=S.levels[0],target=S.levels[1])
-
-    if not S.status.first:
-        ufirst = S.prev.levels[-1].prob.dtype_u(S.prev.levels[-1].uend)
-    else:
-        ufirst = S.levels[-1].prob.u_exact(S.status.time)
-
-    if not S.status.last:
-        ulast = S.next.levels[-1].prob.dtype_u(S.next.levels[-1].u[0])
-    else:
-        ulast = ufirst
-
-    L = S.levels[-1]
-
-    L.u[0] = L.prob.dtype_u(ufirst)
-    L.f[0] = L.prob.eval_f(L.u[0],L.time)
-    for m in range(1,L.sweep.coll.num_nodes+1):
-        L.u[m] = (1-L.sweep.coll.nodes[m-1])*ufirst + L.sweep.coll.nodes[m-1]*ulast
-        L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
-
-    L.status.unlocked = True
-    S.levels[1].sweep.compute_end_point()
-    S.transfer(source=S.levels[1],target=S.levels[0])
-    S.levels[0].sweep.compute_end_point()
-
-    return S
-
-
-def hard_fault_correction_predict(S,res,niter):
-
-    if not S.status.first:
-        ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
-    else:
-        ufirst = S.levels[0].prob.u_exact(S.status.time)
-
+    # if I'm not the last one, get uend from following process
+    # otherwise set uend = u0, so that interpolation is a copy
     if not S.status.last:
         ulast = S.next.levels[0].prob.dtype_u(S.next.levels[0].u[0])
     else:
@@ -297,18 +223,25 @@ def hard_fault_correction_predict(S,res,niter):
 
     L = S.levels[0]
 
+    # set u0, and interpolate the rest
+    # evaluate f for each node (fixme: we could try to interpolate here as well)
     L.u[0] = L.prob.dtype_u(ufirst)
     L.f[0] = L.prob.eval_f(L.u[0],L.time)
     for m in range(1,L.sweep.coll.num_nodes+1):
         L.u[m] = (1-L.sweep.coll.nodes[m-1])*ufirst + L.sweep.coll.nodes[m-1]*ulast
         L.f[m] = L.prob.eval_f(L.u[m],L.time+L.dt*L.sweep.coll.nodes[m-1])
 
+    # set fine level to active
     L.status.unlocked = True
 
+    # transfer to the coarsest level (overwrite values)
     for l in range(1,len(S.levels)):
         S.transfer(source=S.levels[l-1],target=S.levels[l])
 
+    # compute preliminary residual (just to set it)
     S.levels[-1].sweep.compute_residual()
+    # keep sweeping until either k < niter or the current residual is lower than res (niter, res was stored before
+    # fault injection (lazy, should get this from the previous process)
     k = 0
     if res is not None:
         while S.levels[-1].status.residual > res and k < niter:
@@ -317,10 +250,15 @@ def hard_fault_correction_predict(S,res,niter):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
 
+    # transfer back to finest level (coarse correction!)
     for l in range(len(S.levels)-1,0,-1):
         S.transfer(source=S.levels[l],target=S.levels[l-1])
 
-    S.levels[0].sweep.compute_end_point()
+    # compute uend
+    L.sweep.compute_end_point()
+
+    # proceed with fine sweep
+    S.status.stage = 'IT_FINE_SWEEP'
 
     return S
 

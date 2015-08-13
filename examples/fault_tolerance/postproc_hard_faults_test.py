@@ -1,22 +1,29 @@
 import numpy as np
 from matplotlib import rc
 import matplotlib.pyplot as plt
-import os
 
-rc('text', usetex=True)
+"""
+    Postprocess data from hard_faults_test.py
+"""
+
+# rc('text', usetex=True)
 rc("font", **{"sans-serif": ["Arial"], "size": 30})
 # rc('font', family='serif',size=30)
 rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
+# choose the setup by name
 # setup = 'HEAT'
 setup = 'ADVECTION'
+
+# list the files and strategies
 fields = [(setup+'_results_hf_SPREAD.npz','SPREAD'),
           (setup+'_results_hf_INTERP.npz','INTERP'),
           (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),
           (setup+'_results_hf_SPREAD_PREDICT.npz','SPREAD_PREDICT')]
 
+# find maxiter and miniter
 vmin = 99
 vmax = 0
 for file,strategy in fields:
@@ -35,13 +42,14 @@ for file,strategy in fields:
 
 print(vmin,vmax)
 
+# plot heatmaps of the original iteration counts (no normalization)
 for file,strategy in fields:
 
     infile = np.load(file)
 
     data = infile['iter_count'].T
 
-    # data = data-data[0,0]
+    # data = data-data[0,0] # could do normalization here
 
     ft_iter = infile['ft_iter']
     ft_step = infile['ft_step']

@@ -25,6 +25,10 @@ import pySDC.Plugins.fault_tolerance as ft
 
 
 if __name__ == "__main__":
+    """
+        This routine generates the heatmaps showing the iteration counts for node failures at different
+        steps and iterations
+    """
 
     # set global logger (remove this if you do not want the output at all)
     # logger = Log.setup_custom_logger('root')
@@ -38,7 +42,7 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 50
 
-    # ft_strategy = ['INTERP']
+    # choose the strategy and the setup
     ft_strategy = ['SPREAD','SPREAD_PREDICT','INTERP','INTERP_PREDICT']
     # ft_setup = 'HEAT'
     ft_setup = 'ADVECTION'
@@ -109,44 +113,12 @@ if __name__ == "__main__":
         dt = 0.125
         Tend = 16*dt
 
-    elif ft_setup is 'PENNING':
-
-        # This comes as read-in for the problem
-        pparams = {}
-        pparams['omega_E'] = 4.9
-        pparams['omega_B'] = 25.0
-        pparams['u0'] = np.array([[10,0,0],[100,0,100],[1],[1]])
-        pparams['nparts'] = 50
-        pparams['sig'] = 0.1
-
-        # This comes as read-in for the transfer operations
-        tparams = {}
-        tparams['finter'] = True
-
-        # Fill description dictionary for easy hierarchy creation
-        description = {}
-        description['problem_class'] = [penningtrap,penningtrap_coarse]
-        # description['problem_class'] = [penningtrap]
-        description['problem_params'] = pparams
-        description['dtype_u'] = particles
-        description['dtype_f'] = fields
-        description['collocation_class'] = collclass.CollGaussLobatto
-        description['num_nodes'] = 3
-        description['sweeper_class'] = boris_2nd_order
-        description['level_params'] = lparams
-        description['transfer_class'] = particles_to_particles # this is only needed for more than 2 levels
-        description['transfer_params'] = tparams
-
-        # setup parameters "in time"
-        t0 = 0
-        dt = 0.01
-        Tend = 16*dt
-
     else:
 
         print('setup not implemented, aborting...',ft_setup)
         exit()
 
+    # do a reference run without any faults to see how things would look like (and to get maxiter/ref_niter)
     ft.strategy = 'NOFAULT'
 
     # quickly generate block of steps
@@ -158,33 +130,30 @@ if __name__ == "__main__":
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-    # compute exact solution and compare
-    # uex = P.u_exact(Tend)
-
-    # ref_err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
-    # print('reference error at time %s: %s' %(Tend,ref_err))
-
+    # stats magic: get niter
     extract_stats = grep_stats(stats,iter=-1,type='niter')
     sortedlist_stats = sort_stats(extract_stats,sortby='step')
     ref_niter = sortedlist_stats[-1][1]
 
     print('Will sweep over %i steps and %i iterations now...' %(num_procs,ref_niter))
 
-    ft_iter = range(1,ref_niter+1)
-    ft_step = range(0,num_procs)
-
+    # loop over all strategies
     for strategy in ft_strategy:
+
+        ft_iter = range(1,ref_niter+1)
+        ft_step = range(0,num_procs)
 
         print('------------------------------------------ working on strategy ',strategy)
 
         iter_count = np.zeros((len(ft_step),len(ft_iter)))
 
+        # loop over all steps
         xcnt = -1
-
         for step in ft_step:
 
             xcnt +=1
 
+            # loop over all iterations
             ycnt = -1
             for iter in ft_iter:
 
@@ -203,20 +172,12 @@ if __name__ == "__main__":
                 # call main function to get things done...
                 uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
-                # compute exact solution and compare
-                # uex = P.u_exact(Tend)
-                # err = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
-                # print('error at time %s: %s' %(Tend,err))
-                # if abs(err-ref_err) > 1E-10:
-                #     print('WARNING: this run returned a high error!',err,ref_err)
-
+                # stats magic: get niter
                 extract_stats = grep_stats(stats,iter=-1,type='niter')
                 sortedlist_stats = sort_stats(extract_stats,sortby='step')
                 print(sortedlist_stats)
                 niter = sortedlist_stats[-1][1]
                 iter_count[xcnt,ycnt] = niter
-                # print('PFASST needed %i iterations to converge' %niter)
-                # print('\n')
 
         print(iter_count)
 

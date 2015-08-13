@@ -7,32 +7,35 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
-    rc('font', family='sans-serif',size=30)
+    # rc('text', usetex=True)
+    rc("font", **{"sans-serif": ["Arial"], "size": 30})
+    # rc('font', family='serif',size=30)
     rc('legend', fontsize='small')
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
 
+    # set a reference file (either no fault or spread)
     # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
     ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
 
+    # list files, strategy names, colors, markers
     # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','2-sided+corr','green','o')]
     list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz','SPREAD','1-sided','red','s'),
              ('PFASST_GRAYSCOTT_stats_hf_INTERP_P32.npz','INTERP','2-sided','orange','o'),
              ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_P32.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
              ('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','INTERP_PREDICT','2-sided+corr','green','d') ]
 
+    # no very generic, but easier: set number of processes and xtick frequency
     nprocs = 32
-
     xtick_dist = 16
 
-    lw = 2
-
+    # can choose only some parts of the big run
     minstep = 288
     maxstep = 384
     # minstep = 0
     # maxstep = 640
 
-    # maxiter = 14
+    # find boundaries
     nsteps = 0
     maxiter = 0
     for file,strategy,label,color,marker in list:
@@ -49,12 +52,16 @@ if __name__ == "__main__":
         maxiter = max(maxiter,int(max(iter_count)))
         nsteps = max(nsteps,len(iter_count))
 
+
+    # generate comparison of iteration counts between reference run and recovery strategies
+
     data = np.load(ref)
     ref_iter_count = data['iter_count'][minstep:maxstep]
 
     fig, ax = plt.subplots(figsize=(20,7))
 
-
+    # linewidth
+    lw = 2
 
     plt.plot(range(minstep,maxstep),[0]*nsteps,'k-',linewidth=2)
 
@@ -86,6 +93,7 @@ if __name__ == "__main__":
     fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.png'
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
+    # generate heatmaps steps vs. iterations with xxx for the faults
     for file,strategy,label,color,marker in list:
 
         data = np.load(file)
@@ -127,8 +135,9 @@ if __name__ == "__main__":
         fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
-    # exit()
 
+    # generate iteratin counts plot (not used)
+    
     fig, ax = plt.subplots(figsize=(20,7))
 
     # nblocks = int((maxstep-minstep)/nprocs)

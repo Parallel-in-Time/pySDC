@@ -2,29 +2,35 @@ import numpy as np
 from matplotlib import rc
 import matplotlib.pyplot as plt
 
+"""
+    Postprocess data from hard_faults_detail.py
+"""
 
 # rc('text', usetex=True)
 rc("font", **{"sans-serif": ["Arial"], "size": 30})
-rc('font', family='serif',size=30)
+# rc('font', family='serif',size=30)
 rc('legend', fontsize='small')
 rc('xtick', labelsize='small')
 rc('ytick', labelsize='small')
 
+# choose the setup by name
+setup = 'HEAT'
+# setup = 'ADVECTION'
 
-# setup = 'HEAT'
-setup = 'ADVECTION'
-
+# list the files, strategies, labels, colors and markers
 list = [(setup+'_steps_vs_iteration_hf_NOFAULT.npz','NOFAULT','no fault','k','^'),
         (setup+'_steps_vs_iteration_hf_SPREAD.npz','SPREAD','1-sided','red','v'),
         (setup+'_steps_vs_iteration_hf_INTERP.npz','INTERP','2-sided','orange','o'),
         (setup+'_steps_vs_iteration_hf_SPREAD_PREDICT.npz','SPREAD_PREDICT','1-sided + corr','blue','s'),
         (setup+'_steps_vs_iteration_hf_INTERP_PREDICT.npz','INTERP_PREDICT','2-sided + corr','green','d')]
 
+# some defaults, will be recomputed, but max/min values can be set here
 maxres = -1
 minres = -11
 maxiter = 0
 maxsteps = 0
 
+# compute maxiter and maxsteps for the dimensions
 for file,strategy,label,color,marker in list:
 
     infile = np.load(file)
@@ -32,7 +38,7 @@ for file,strategy,label,color,marker in list:
     maxiter = max(maxiter,len(residual[:,0]))
     maxsteps = max(maxsteps,len(residual[0,:]))
 
-
+# create steps vs. iteration plot (heatmap with residuals and xxx)
 for file,strategy,label,color,marker in list:
 
     residual = np.zeros((maxiter,maxsteps))
@@ -73,12 +79,11 @@ for file,strategy,label,color,marker in list:
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
 
-
+# create plot ala Ruede et al.: iterations vs. residual for the step with a fault
 fig, ax = plt.subplots(figsize=(15,10))
 maxiter = 0
 lw = 2
 ms = 10
-
 
 for file,strategy,label,color,marker in list:
 
