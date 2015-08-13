@@ -10,7 +10,7 @@ if __name__ == "__main__":
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
 
-    nprocs = 1
+    nprocs = 32
 
     xtick_dist = 16
 
@@ -21,9 +21,10 @@ if __name__ == "__main__":
     maxiter = 0
     nsteps = 0
 
-    ref = 'SDC_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
+    # ref = 'SDC_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
     # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz'
     # ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
+    ref = 'PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz'
 
     data = np.load(ref)
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
 
     residual = np.where(residual > 0, np.log10(residual), -99)
     vmin = -9
-    vmax = int(np.amax(residual))
+    vmax = -1#int(np.amax(residual))
 
     maxiter = max(maxiter,int(max(iter_count)))
     maxiter_full = max(maxiter_full,maxiter)
@@ -110,7 +111,7 @@ if __name__ == "__main__":
     # Set up formatting for the movie files
     Writer = animation.writers['ffmpeg']
     # choose fps=1 for PFASST, fps=15 for SDC
-    writer = Writer(fps=15 , metadata=dict(artist='Me'), bitrate=3200)
+    writer = Writer(fps=1 , metadata=dict(artist='Me'), bitrate=3200)
 
     fname = 'anim_conv_'+ref.split('.')[0]+'.mp4'
     anim.save(fname,writer=writer)
