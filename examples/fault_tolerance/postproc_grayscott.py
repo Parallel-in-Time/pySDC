@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
 
     # generate iteratin counts plot (not used)
-    
+
     fig, ax = plt.subplots(figsize=(20,7))
 
     # nblocks = int((maxstep-minstep)/nprocs)

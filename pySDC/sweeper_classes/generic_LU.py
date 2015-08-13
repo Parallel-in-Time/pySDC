@@ -71,7 +71,7 @@ class generic_LU(sweeper):
         return me
 
 
-    def update_nodes(self,level=None,stopit=None):
+    def update_nodes(self):
         """
         Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
 

@@ -228,7 +228,7 @@ def pfasst(S):
                     S.prev.levels[-1].tag = False
 
             # do the sweep with (possibly) new values
-            S.levels[-1].sweep.update_nodes(stopit=True)
+            S.levels[-1].sweep.update_nodes()
 
             # update stage and return
             S.status.stage = 'PREDICT_SEND'
@@ -383,7 +383,7 @@ def pfasst(S):
             # coarsest sweep
 
             # standard sweep workflow: update nodes, compute residual, log progress
-            S.levels[-1].sweep.update_nodes(level=len(S.levels)-1,stopit=False)
+            S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
 
             S.levels[-1].hooks.dump_sweep(S.status)
