@@ -19,7 +19,7 @@ if __name__ == "__main__":
     ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
 
     # list files, strategy names, colors, markers
-    # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','2-sided+corr','green','o')]
+    # list = [('PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz','NOFAULT','no fault','green','o')]
     list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz','SPREAD','1-sided','red','s'),
              ('PFASST_GRAYSCOTT_stats_hf_INTERP_P32.npz','INTERP','2-sided','orange','o'),
              ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_P32.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
@@ -35,19 +35,17 @@ if __name__ == "__main__":
     # minstep = 0
     # maxstep = 640
 
-    # find boundaries
+    # find/define boundaries
     nsteps = 0
-    maxiter = 0
+    maxiter = 14
+    vmin = -9
+    vmax = -1
+
     for file,strategy,label,color,marker in list:
 
         data = np.load(file)
 
         iter_count = data['iter_count'][minstep:maxstep]
-        residual = data['residual'][:,minstep:maxstep]
-
-        residual = np.where(residual > 0, np.log10(residual), -99)
-        vmin = -9
-        vmax = int(np.amax(residual))
 
         maxiter = max(maxiter,int(max(iter_count)))
         nsteps = max(nsteps,len(iter_count))
@@ -96,13 +94,16 @@ if __name__ == "__main__":
     # generate heatmaps steps vs. iterations with xxx for the faults
     for file,strategy,label,color,marker in list:
 
+        residual = np.zeros((maxiter,nsteps))
+        residual[:] = -99
+
         data = np.load(file)
 
         iter_count = data['iter_count'][minstep:maxstep]
-        residual = data['residual'][:,minstep:maxstep]
+        input = data['residual'][:,minstep:maxstep]
         stats = data['hard_stats']
 
-        residual = np.where(residual > 0, np.log10(residual), -99)
+        residual[0:len(input[:,0]),0:len(input[0,:])] = np.where(input > 0, np.log10(input), -99)
 
         fig, ax = plt.subplots(figsize=(20,7))
 
