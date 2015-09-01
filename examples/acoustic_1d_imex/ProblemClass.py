@@ -24,7 +24,7 @@ from clawpack import riemann
 from getFDMatrix import getFDMatrix
 
 def u_initial(x):
-    return np.sin(2.0*np.pi*x)
+    return np.sin(x)
 #    return np.exp(-0.5*(x-0.5)**2/0.1**2)
 
 class acoustic_1d_imex(ptype):
@@ -70,7 +70,7 @@ class acoustic_1d_imex(ptype):
         self.solver.cfl_max         = 1.0
         assert self.solver.is_valid()
 
-        x = pyclaw.Dimension(0.0, 1.0, self.nvars[1], name='x')
+        x = pyclaw.Dimension(0.0, 2*np.pi, self.nvars[1], name='x')
         self.domain = pyclaw.Domain(x)
         self.state  = pyclaw.State(self.domain, self.solver.num_eqn)
         self.mesh   = self.state.grid.x.centers
