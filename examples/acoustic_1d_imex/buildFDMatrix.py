@@ -30,7 +30,7 @@ def getHorizontalDx(N, dx, order):
     coeff    = 1.0/60.0
     zero_pos = 5
   else:
-    print "Order "+order+" not implemented."
+    print "Order "+str(order)+" not implemented."
 
   first_col = np.zeros(N)
   

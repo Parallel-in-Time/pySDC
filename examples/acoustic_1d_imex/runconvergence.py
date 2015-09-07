@@ -34,11 +34,11 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']     = [(2,500)]
-    pparams['cadv']      = 0.1
+    pparams['nvars']     = [(2,250)]
+    pparams['cadv']      = 0.05
     pparams['cs']        = 1.0
-    pparams['order_adv'] = 4
-    
+    pparams['order_adv'] = 5
+
     # This comes as read-in for the transfer operations
     tparams = {}
     tparams['finter'] = True
@@ -56,20 +56,26 @@ if __name__ == "__main__":
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
     
-    Nsteps = [20, 40, 50, 80]
-    order  = 2
+    Nsteps = [3, 4, 6, 8, 10, 12, 15, 18, 20]
+    order  = 4
     error  = np.zeros(np.size(Nsteps))
   
     # setup parameters "in time"
     t0   = 0
-    Tend = 5.5
+    Tend = 1.0
     
     if order==2:
       file = open('conv-data.txt', 'w')
     else:
       file = open('conv-data.txt', 'a')
 
-    description['num_nodes'] = (order+2)/2
+    if order==2:
+      description['num_nodes'] = 2
+    elif order==3:
+      description['num_nodes'] = 3
+    elif order==4:
+      description['num_nodes'] = 3
+
     sparams['maxiter'] = order
     
      # quickly generate block of steps
