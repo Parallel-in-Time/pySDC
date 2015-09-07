@@ -165,7 +165,7 @@ class test_eq(ptype):
         :return: forcing term of
         """
         if type(t) is np.ndarray:
-            return np.zeros(self.xvalues.shape[0]*t.shape[0])
+            return np.zeros(t.shape[0])
             # return np.hstack(map(lambda tau: -np.sin(np.pi*self.xvalues)*(np.sin(tau)-self.nu*np.pi**2*np.cos(tau)), t))
         else:
             # return -np.sin(np.pi*self.xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))

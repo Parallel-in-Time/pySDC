@@ -12,19 +12,22 @@ class value_to_value(transfer):
     its a scalar problem.
     """
 
-    def __init__(self, fine_level, coarse_level,*args,**kwargs):
-        print args
-        if len(args) < 4:
-            super(value_to_value,self).__init__(fine_level, coarse_level, *args)
-        else:
-            args_alt = {}
+    def __init__(self, fine_level, coarse_level, *args,**kwargs):
 
-        super(value_to_value,self).__init__(fine_level, coarse_level, *args)
-        print vars(self)
+
+        super(value_to_value, self).__init__(fine_level, coarse_level)
+        if len(args) == 0:
+            self.sparse_format = "array"
+        else:
+            self.sparse_format = args[2]
+
+        self.int_ord = 1
+        self.restr_ord = 1
+
         self.Rspace = np.eye(1)
         self.Pspace = np.eye(1)
 
-    def restrict_space(self,F):
+    def restrict_space(self, F):
         """
         Restriction implementation
 
@@ -42,7 +45,7 @@ class value_to_value(transfer):
 
         return u_coarse
 
-    def prolong_space(self,G):
+    def prolong_space(self, G):
         """
         Prolongation implementation
 
