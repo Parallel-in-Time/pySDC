@@ -56,13 +56,13 @@ if __name__ == "__main__":
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
     
-    Nsteps = [40, 80, 160]
-    order  = 6
+    Nsteps = [20, 40, 50, 80]
+    order  = 2
     error  = np.zeros(np.size(Nsteps))
   
     # setup parameters "in time"
     t0   = 0
-    Tend = 10.0
+    Tend = 5.5
     
     if order==2:
       file = open('conv-data.txt', 'w')
@@ -84,7 +84,7 @@ if __name__ == "__main__":
       uinit = P.u_exact(t0)
 
       # call main function to get things done...
-      uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+      uend,stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
       # compute exact solution and compare
       uex = P.u_exact(Tend)
