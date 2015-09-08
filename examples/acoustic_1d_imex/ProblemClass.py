@@ -17,14 +17,10 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
-# Sharpclaw imports
-from clawpack import pyclaw
-from clawpack import riemann
-
-from getFDMatrix import getFDMatrix
+from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
 
 def u_initial(x):
-    return np.sin(2.0*np.pi*x)
+    return np.sin(x)
 #    return np.exp(-0.5*(x-0.5)**2/0.1**2)
 
 class acoustic_1d_imex(ptype):
@@ -60,29 +56,13 @@ class acoustic_1d_imex(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(acoustic_1d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
         
-        riemann_solver              = riemann.advection_1D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
-        self.solver.weno_order      = 5
-        self.solver.time_integrator = 'Euler' # Remove later
-        self.solver.kernel_language = 'Fortran'
-        self.solver.bc_lower[0]     = pyclaw.BC.periodic
-        self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.cfl_max         = 1.0
-        assert self.solver.is_valid()
-
-        x = pyclaw.Dimension(0.0, 1.0, self.nvars[1], name='x')
-        self.domain = pyclaw.Domain(x)
-        self.state  = pyclaw.State(self.domain, self.solver.num_eqn)
-        self.mesh   = self.state.grid.x.centers
+        self.mesh   = np.linspace(0.0, 2.0*np.pi, self.nvars[1], endpoint=False)
         self.dx     = self.mesh[1] - self.mesh[0]
-        self.A      = -self.cs*getFDMatrix(self.nvars[1], self.order_adv, self.dx)
         
-        self.state.problem_data['u'] = self.cadv
-        
-        solution = pyclaw.Solution(self.state, self.domain)
-        self.solver.setup(solution)
-
-
+        self.Dx     = -self.cadv*getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
+        self.Id, A  = getWave1DMatrix(self.nvars[1], self.dx, ['periodic','periodic'], ['periodic','periodic'])
+        self.A = -self.cs*A
+                
     def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
@@ -97,9 +77,7 @@ class acoustic_1d_imex(ptype):
             solution as mesh
         """
         
-        M1 = sp.hstack( (sp.eye(self.nvars[1]), -factor*self.A) )
-        M2 = sp.hstack( (-factor*self.A, sp.eye(self.nvars[1])) )
-        M  = sp.vstack( (M1, M2) )
+        M  = self.Id - factor*self.A
         
         b = np.concatenate( (rhs.values[0,:], rhs.values[1,:]) )
         
@@ -124,26 +102,12 @@ class acoustic_1d_imex(ptype):
         """
 
 
+        b = np.concatenate( (u.values[0,:], u.values[1,:]) )
+        sol = self.Dx.dot(b)
+        
         fexpl        = mesh(self.nvars)
+        fexpl.values[0,:], fexpl.values[1,:] = np.split(sol, 2)
 
-        # Copy values of u into pyClaw state object
-        self.state.q[0,:] = u.values[0,:]
-
-        # Evaluate right hand side
-        tmp = self.solver.dqdt(self.state)
-        fexpl.values[0,:] = tmp.reshape(self.nvars[1:])
-
-        # Copy values of u into pyClaw state object
-        self.state.q[0,:] = u.values[1,:]
-
-        # Evaluate right hand side
-        tmp = self.solver.dqdt(self.state)
-        fexpl.values[1,:] = tmp.reshape(self.nvars[1:])
-        
-        
-        # DEBUGGING
-        # fexpl.values[0,:] = 0.0*self.mesh
-        # fexpl.values[1,:] = 0.0*self.mesh
         return fexpl
 
 
@@ -159,9 +123,11 @@ class acoustic_1d_imex(ptype):
             implicit part of RHS
         """
 
+        b = np.concatenate( (u.values[0,:], u.values[1,:]) )
+        sol = self.A.dot(b)
+        
         fimpl             = mesh(self.nvars,val=0)
-        fimpl.values[0,:] = self.A.dot(u.values[1,:])
-        fimpl.values[1,:] = self.A.dot(u.values[0,:])
+        fimpl.values[0,:], fimpl.values[1,:] = np.split(sol, 2)
         
         return fimpl
 

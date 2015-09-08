@@ -4,10 +4,11 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 
 from ProblemClass import acoustic_1d_imex
-#from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
+from examples.acoustic_1d_imex.HookClass import plot_solution
+
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.Methods as mp
+import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
@@ -57,6 +58,7 @@ if __name__ == "__main__":
     description['num_nodes']         = 4
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
+    description['hook_class']        = plot_solution
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
 
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
