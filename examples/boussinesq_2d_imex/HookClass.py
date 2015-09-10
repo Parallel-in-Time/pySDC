@@ -43,7 +43,7 @@ class plot_solution(hooks):
         
         fs = 18
         
-        if True:
+        if False:
           yplot = self.level.uend.values
           xx    = self.level.prob.xx
           zz    = self.level.prob.zz
