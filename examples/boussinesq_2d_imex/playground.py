@@ -36,24 +36,24 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 15
+    sparams['maxiter'] = 4
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3
-    Nsteps =  1
+    Tend   = 3000
+    Nsteps = 500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,300,10)]
+    pparams['nvars']    = [(4,450,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
     pparams['x_bounds'] = [(-150.0, 150.0)]
     pparams['z_bounds'] = [(   0.0,  10.0)]
     pparams['order']    = [0, 0] # [fine_level, coarse_level]
-    pparams['gmres_maxiter'] = [50, 5]
+    pparams['gmres_maxiter'] = [50, 50]
     pparams['gmres_restart'] = 20
     pparams['gmres_tol']     = 1e-14
 
@@ -90,9 +90,9 @@ if __name__ == "__main__":
     print('error at time %s: %9.5e' %(Tend,np.linalg.norm(uex.values[2,:,:].flatten()-uend.values[2,:,:].flatten(),np.inf)/np.linalg.norm(
         uex.values.flatten(),np.inf)))
     
-    P.report_log()
+    #P.report_log()
 
-    plt.show()
+    #plt.show()
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')
