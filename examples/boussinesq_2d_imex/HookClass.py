@@ -66,4 +66,8 @@ class plot_solution(hooks):
           self.counter = self.counter + 1
           plt.pause(0.001)
         
+          # NOTE: Can use ffmpeg to collate images into movie.
+          # HELPFUL WEBSITE: http://hamelot.co.uk/visualization/using-ffmpeg-to-convert-a-set-of-images-into-a-video/
+          # USEFUL COMMAND: ffmpeg -r 25 -i boussinesq-%04d.jpeg -vcodec libx264 -crf 25 test1800.avi
+          # WEBSITE TO CONVERT TO MP4: http://video.online-convert.com/convert-to-mp4
         return None

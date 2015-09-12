@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-6
+    lparams['restol'] = 1E-14
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -41,7 +41,9 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000
-    Nsteps =  250
+    Nsteps =  500
+    Tend   = 30
+    Nsteps =  5
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -71,8 +73,8 @@ if __name__ == "__main__":
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
-    description['transfer_class']    = mesh_to_mesh_2d
-    description['transfer_params']   = tparams
+    #description['transfer_class']    = mesh_to_mesh_2d
+    #description['transfer_params']   = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -97,10 +99,10 @@ if __name__ == "__main__":
     print('error at time %s: %9.5e' %(Tend,np.linalg.norm(uex.values[2,:,:].flatten()-uend.values[2,:,:].flatten(),np.inf)/np.linalg.norm(
         uex.values.flatten(),np.inf)))
     
-    #P.report_log()
+    P.report_log()
 
     #plt.show()
 
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)
+    #extract_stats = grep_stats(stats,iter=-1,type='residual')
+    #sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    #print(extract_stats,sortedlist_stats)
