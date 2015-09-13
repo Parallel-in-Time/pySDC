@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 1E-14
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -36,26 +36,28 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 15
+    sparams['maxiter'] = 4
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3
-    Nsteps =  1
+    Tend   = 3000
+    Nsteps =  500
+    Tend   = 30
+    Nsteps =  5
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,300,10)]
+    pparams['nvars']    = [(4,450,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
     pparams['x_bounds'] = [(-150.0, 150.0)]
     pparams['z_bounds'] = [(   0.0,  10.0)]
-    pparams['order']    = [0, 0] # [fine_level, coarse_level]
-    pparams['gmres_maxiter'] = [50, 5]
+    pparams['order']    = [0] # [fine_level, coarse_level]
+    pparams['gmres_maxiter'] = [50]
     pparams['gmres_restart'] = 20
-    pparams['gmres_tol']     = 1e-14
+    pparams['gmres_tol']     = 1e-6
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -71,8 +73,8 @@ if __name__ == "__main__":
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
-    description['transfer_class']    = mesh_to_mesh_2d
-    description['transfer_params']   = tparams
+    #description['transfer_class']    = mesh_to_mesh_2d
+    #description['transfer_params']   = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -80,6 +82,13 @@ if __name__ == "__main__":
     # get initial values on finest level
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+    
+    cfl_advection = pparams['u_adv']*dt/P.h[0]
+    cfl_acoustic_hor = pparams['c_s']*dt/P.h[0]
+    cfl_acoustic_ver = pparams['c_s']*dt/P.h[1]
+    print ("CFL number of advection: %4.2f" % cfl_advection)
+    print ("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
+    print ("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
@@ -92,8 +101,8 @@ if __name__ == "__main__":
     
     P.report_log()
 
-    plt.show()
+    #plt.show()
 
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)
+    #extract_stats = grep_stats(stats,iter=-1,type='residual')
+    #sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    #print(extract_stats,sortedlist_stats)
