@@ -1,14 +1,8 @@
 import numpy as np
-from matplotlib import rc
 import matplotlib.pyplot as plt
 import os
 
-rc('text', usetex=True)
-rc("font", **{"sans-serif": ["Arial"], "size": 30})
-# rc('font', family='serif',size=30)
-rc('legend', fontsize='small')
-rc('xtick', labelsize='small')
-rc('ytick', labelsize='small')
+axis_font = {'fontname':'Arial', 'size':'30', 'family':'serif'}
 
 # setup = 'HEAT'
 setup = 'ADVECTION'
@@ -49,18 +43,22 @@ for file,strategy in fields:
     fig, ax = plt.subplots(figsize=(15,10))
 
     cmap = plt.get_cmap('Reds', vmax-vmin+1)
-    plt.pcolor(data, cmap=cmap, vmin=vmin, vmax=vmax)
+    pcol = plt.pcolor(data, cmap=cmap, vmin=vmin, vmax=vmax)
+    pcol.set_edgecolor('face')
 
     plt.axis([ft_step[0],ft_step[-1]+1,ft_iter[0]-1,ft_iter[-1]])
 
     ticks = np.arange(vmin,vmax+1,2)
     tickpos = np.linspace(ticks[0]+0.5, ticks[-1]-0.5, len(ticks))
     cax = plt.colorbar(ticks=tickpos)
-    cax.set_ticklabels(ticks)
-    cax.set_label('number of iterations')
+    
+    plt.tick_params(axis='both', which='major', labelsize=20)
 
-    ax.set_xlabel('affected step')
-    ax.set_ylabel('affected iteration')
+    cax.set_ticklabels(ticks)
+    cax.set_label('number of iterations', **axis_font)
+
+    ax.set_xlabel('affected step', **axis_font)
+    ax.set_ylabel('affected iteration', **axis_font)
 
     ax.set_xticks(np.arange(len(ft_step))+0.5, minor=False)
     ax.set_yticks(np.arange(len(ft_iter))+0.5, minor=False)
@@ -68,12 +66,13 @@ for file,strategy in fields:
     ax.set_yticklabels(ft_iter, minor=False)
 
     ax.tick_params(pad=8)
-
     plt.tight_layout()
 
-    fname = setup+'_iteration_counts_hf_'+strategy+'.png'
+    #fname = setup+'_iteration_counts_hf_'+strategy+'.png'
+    fname = setup+'_iteration_counts_hf_'+strategy+'.pdf'
 
-    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    #plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig(fname, bbox_inches='tight')
     # plt.show()
 
 
