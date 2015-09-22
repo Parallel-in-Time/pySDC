@@ -6,8 +6,8 @@ import os
 axis_font = {'fontname':'Arial', 'size':'8', 'family':'serif'}
 fs = 8
 
-# setup = 'HEAT'
-setup = 'ADVECTION'
+setup = 'HEAT'
+#setup = 'ADVECTION'
 fields = [(setup+'_results_hf_SPREAD.npz','SPREAD'),
           (setup+'_results_hf_INTERP.npz','INTERP'),
           (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),

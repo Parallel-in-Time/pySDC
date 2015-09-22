@@ -1,16 +1,15 @@
 import numpy as np
 import math
 import os
-from matplotlib import rc
 import matplotlib.pyplot as plt
+from pylab import rcParams
 
+axis_font = {'fontname':'Arial', 'size':'8', 'family':'serif'}
+fs = 8
+ms = 8
+lw = 2
 
 if __name__ == "__main__":
-
-    rc('font', family='sans-serif',size=30)
-    rc('legend', fontsize='small')
-    rc('xtick', labelsize='small')
-    rc('ytick', labelsize='small')
 
     # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
     ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
@@ -24,8 +23,6 @@ if __name__ == "__main__":
     nprocs = 32
 
     xtick_dist = 16
-
-    lw = 2
 
     minstep = 288
     maxstep = 384
@@ -52,9 +49,8 @@ if __name__ == "__main__":
     data = np.load(ref)
     ref_iter_count = data['iter_count'][minstep:maxstep]
 
-    fig, ax = plt.subplots(figsize=(20,7))
-
-
+    rcParams['figure.figsize'] = 6.0, 2.5
+    fig, ax = plt.subplots()
 
     plt.plot(range(minstep,maxstep),[0]*nsteps,'k-',linewidth=2)
 
@@ -69,22 +65,25 @@ if __name__ == "__main__":
             ymin = min(ymin,min(ref_iter_count-iter_count))
             ymax = max(ymax,max(ref_iter_count-iter_count))
 
-            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',linewidth=lw,markersize=12)
+            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',linewidth=lw,markersize=ms)
 
 
-    plt.xlabel('step')
-    plt.ylabel('saved iterations')
+    plt.xlabel('step', **axis_font)
+    plt.ylabel('saved iterations', **axis_font)
     plt.xlim(-1+minstep,maxstep+1)
     plt.ylim(-1+ymin,ymax+1)
     ax.set_xticks(np.arange(minstep,maxstep,xtick_dist)+0.5, minor=False)
     ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
-    plt.legend(loc=2,numpoints=1)
-
+    plt.legend(loc=2,numpoints=1,fontsize=fs)
+    plt.tick_params(axis='both', which='major', labelsize=fs)
+    ax.xaxis.labelpad = -0.5
+    ax.yaxis.labelpad = -1
     plt.tight_layout()
 
     # fname = 'GRAYSCOTT_saved_iteration_vs_NOFAULT_hf.png'
-    fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.png'
-    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.pdf'
+    plt.savefig(fname, bbox_inches='tight')
+    os.system('pdfcrop '+fname+' '+fname)
 
     for file,strategy,label,color,marker in list:
 
@@ -96,10 +95,12 @@ if __name__ == "__main__":
 
         residual = np.where(residual > 0, np.log10(residual), -99)
 
-        fig, ax = plt.subplots(figsize=(20,7))
+        rcParams['figure.figsize'] = 6.0, 2.5
+        fig, ax = plt.subplots()
 
         cmap = plt.get_cmap('Reds',vmax-vmin+1)
-        plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
+        pcol = plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
+        pcol.set_edgecolor('face')
 
         if not "NOFAULT" in strategy:
             for item in stats:
@@ -110,12 +111,17 @@ if __name__ == "__main__":
 
         ticks = np.arange(vmin,vmax+1,2)
         tickpos = np.linspace(ticks[0]+0.5, ticks[-1]-0.5, len(ticks))
-        cax = plt.colorbar(ticks=tickpos)
+        cax = plt.colorbar(pcol, ticks=tickpos, pad=0.02)
         cax.set_ticklabels(ticks)
-        cax.set_label('log10(residual)')
+        cax.ax.tick_params(labelsize=fs)
 
-        ax.set_xlabel('step')
-        ax.set_ylabel('iteration')
+        cax.set_label('log10(residual)', **axis_font)
+        plt.tick_params(axis='both', which='major', labelsize=fs)
+        ax.xaxis.labelpad = -0.5
+        ax.yaxis.labelpad = -0.5
+
+        ax.set_xlabel('step', **axis_font)
+        ax.set_ylabel('iteration', **axis_font)
 
         ax.set_yticks(np.arange(1,maxiter,2)+0.5, minor=False)
         ax.set_xticks(np.arange(0,nsteps,xtick_dist)+0.5, minor=False)
@@ -124,8 +130,9 @@ if __name__ == "__main__":
 
         plt.tight_layout()
 
-        fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.png'
-        plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+        fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.pdf'
+        plt.savefig(fname, bbox_inches='tight')
+        os.system('pdfcrop '+fname+' '+fname)
 
     # exit()
 
