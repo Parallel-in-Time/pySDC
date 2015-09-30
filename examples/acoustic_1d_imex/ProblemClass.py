@@ -56,12 +56,12 @@ class acoustic_1d_imex(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(acoustic_1d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
         
-        self.mesh   = np.linspace(0.0, 2.0*np.pi, self.nvars[1], endpoint=False)
+        self.mesh   = np.linspace(0.0, 1.0, self.nvars[1], endpoint=False)
         self.dx     = self.mesh[1] - self.mesh[0]
         
         self.Dx     = -self.cadv*getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
         self.Id, A  = getWave1DMatrix(self.nvars[1], self.dx, ['periodic','periodic'], ['periodic','periodic'])
-        self.A = -self.cs*A
+        self.A      = -self.cs*A
                 
     def solve_system(self,rhs,factor,u0,t):
         """
@@ -160,9 +160,16 @@ class acoustic_1d_imex(ptype):
             exact solution
         """
         
+        sigma_0 = 0.1
+        k       = 7.2*np.pi
+        x_0     = 0.75
+        x_1     = 0.25
+        
         me             = mesh(self.nvars)
-        me.values[0,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) + 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
-        me.values[1,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) - 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
+        #me.values[0,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) + 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
+        #me.values[1,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) - 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
+        me.values[0,:] = np.exp(-np.square(self.mesh-x_0-self.cs*t)/(sigma_0*sigma_0)) + np.exp(-np.square(self.mesh-x_1-self.cs*t)/(sigma_0*sigma_0))*np.cos(k*(self.mesh-self.cs*t)/sigma_0)
+        me.values[1,:] = me.values[0,:]
         return me
 
 

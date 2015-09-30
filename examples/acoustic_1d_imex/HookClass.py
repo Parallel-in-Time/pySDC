@@ -20,7 +20,7 @@ class plot_solution(hooks):
 
         # add figure object for further use
         #        self.fig = plt.figure(figsize=(18,6))
-        self.fig = plt.figure(figsize=(9,9))
+        #self.fig = plt.figure(figsize=(9,9))
 
 
     def dump_step(self,status):
@@ -31,17 +31,17 @@ class plot_solution(hooks):
             status: status object per step
         """
         super(plot_solution,self).dump_step(status)
-          
+
         if False:
           yplot = self.level.uend.values
           xx    = self.level.prob.mesh
           self.fig.clear()
           plt.plot(xx, yplot[0,:])
           plt.axes().set_xlim(xmin = xx[0], xmax = np.max(xx))
-          plt.axes().set_ylim(ymin=-1.0, ymax=1.0)
-          plt.axes().set_aspect('equal')
+          plt.axes().set_ylim(ymin=-0.1, ymax=1.1)
+          #plt.axes().set_aspect('equal')
           plt.xlabel('x')
-          plt.ylabel('u')
+          plt.ylabel('p')
           #plt.tight_layout()
           plt.show(block=False)
           plt.pause(0.00001)

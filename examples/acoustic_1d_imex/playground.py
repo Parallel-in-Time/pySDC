@@ -30,19 +30,19 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 20
+    sparams['maxiter'] = 2
 
     # setup parameters "in time"
-    t0 = 0
-    dt = 0.01
-    Tend = 100*dt
-
+    t0 = 0.0
+    Tend = 3.0
+    dt = Tend/float(154)
+    
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(2,500)]
-    pparams['cadv']  = 0.1
+    pparams['nvars'] = [(2,512)]
+    pparams['cadv']  = 0.0
     pparams['cs']    = 1.0
-    pparams['order_adv'] = 4
+    pparams['order_adv'] = 5
     
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 4
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
@@ -79,11 +79,17 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(8,8))
 
-    plt.plot(P.mesh, uex.values[0,:],  '+', color='b', label='u (exact)')
-    plt.plot(P.mesh, uend.values[0,:], '-', color='b', label='u (SDC)')
-    plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
-    plt.plot(P.mesh, uend.values[1,:], '-', color='r', label='p (SDC)')
-    plt.legend()
+    sigma_0 = 0.1
+    x_0     = 0.75
+
+    #plt.plot(P.mesh, uex.values[0,:],  '+', color='b', label='u (exact)')
+    #plt.plot(P.mesh, uend.values[0,:], '-', color='b', label='u (SDC)')
+    #plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
+    plt.plot(P.mesh, uend.values[1,:], '-', color='b', linewidth=2.0, label='p (SDC)')
+    p_slow = np.exp(-np.square(P.mesh-x_0)/(sigma_0*sigma_0))
+    plt.plot(P.mesh, p_slow, '+', color='r', markersize=4, label='slow mode')
+    plt.legend(loc=2)
     plt.xlim([0, 1])
-    plt.ylim([-1, 1])
-    plt.show()
+    plt.ylim([-0.1, 1.1])
+    #plt.show()
+    plt.gcf().savefig('fwsw-sdc-K'+str(sparams['maxiter'])+'-M'+str(description['num_nodes'])+'.pdf', bbox_inches='tight')
