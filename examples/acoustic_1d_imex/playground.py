@@ -79,10 +79,10 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(8,8))
 
-    plt.plot(P.state.grid.x.centers, uex.values[0,:],  '+', color='b', label='u (exact)')
-    plt.plot(P.state.grid.x.centers, uend.values[0,:], '-', color='b', label='u (SDC)')
-    plt.plot(P.state.grid.x.centers, uex.values[1,:],  '+', color='r', label='p (exact)')
-    plt.plot(P.state.grid.x.centers, uend.values[1,:], '-', color='r', label='p (SDC)')
+    plt.plot(P.mesh, uex.values[0,:],  '+', color='b', label='u (exact)')
+    plt.plot(P.mesh, uend.values[0,:], '-', color='b', label='u (SDC)')
+    plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
+    plt.plot(P.mesh, uend.values[1,:], '-', color='r', label='p (SDC)')
     plt.legend()
     plt.xlim([0, 1])
     plt.ylim([-1, 1])
