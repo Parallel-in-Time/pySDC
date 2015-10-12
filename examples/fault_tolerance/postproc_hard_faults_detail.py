@@ -6,8 +6,8 @@ import os
 axis_font = {'fontname':'Arial', 'size':'8', 'family':'serif'}
 fs = 8
 
-#setup = 'HEAT'
-setup = 'ADVECTION'
+setup = 'HEAT'
+# setup = 'ADVECTION'
 
 list = [(setup+'_steps_vs_iteration_hf_NOFAULT.npz','NOFAULT','no fault','k','^'),
         (setup+'_steps_vs_iteration_hf_SPREAD.npz','SPREAD','1-sided','red','v'),
@@ -73,7 +73,7 @@ for file,strategy,label,color,marker in list:
     plt.tight_layout()
 
     if strategy is not 'NOFAULT':
-        plt.text(step-1+0.5,iter+0.5,'xxx',horizontalalignment='center',verticalalignment='center')
+        plt.text(step-1+0.5,iter+0.5,'x',horizontalalignment='center',verticalalignment='center')
 
     fname = setup+'_steps_vs_iteration_hf_'+str(step)+'x'+str(iter)+'_'+strategy+'.pdf'
     plt.savefig(fname, bbox_inches='tight')

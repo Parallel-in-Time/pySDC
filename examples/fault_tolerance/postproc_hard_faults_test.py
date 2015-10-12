@@ -6,8 +6,8 @@ import os
 axis_font = {'fontname':'Arial', 'size':'8', 'family':'serif'}
 fs = 8
 
-setup = 'HEAT'
-#setup = 'ADVECTION'
+# setup = 'HEAT'
+setup = 'ADVECTION'
 fields = [(setup+'_results_hf_SPREAD.npz','SPREAD'),
           (setup+'_results_hf_INTERP.npz','INTERP'),
           (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),
@@ -21,7 +21,7 @@ for file,strategy in fields:
 
     data = infile['iter_count'].T
 
-    # data = data-data[0,0]
+    data = data-data[0,0]
 
     ft_iter = infile['ft_iter']
     ft_step = infile['ft_step']
@@ -37,7 +37,7 @@ for file,strategy in fields:
 
     data = infile['iter_count'].T
 
-    # data = data-data[0,0]
+    data = data-data[0,0]
 
     ft_iter = infile['ft_iter']
     ft_step = infile['ft_step']
@@ -51,18 +51,18 @@ for file,strategy in fields:
 
     plt.axis([ft_step[0],ft_step[-1]+1,ft_iter[0]-1,ft_iter[-1]])
 
-    ticks = np.arange(int(vmin), int(vmax+1) , 2)
+    ticks = np.arange(int(vmin)+1, int(vmax)+2 , 2)
     tickpos = np.linspace(ticks[0]+0.5, ticks[-1]-0.5, len(ticks))
     cax = plt.colorbar(pcol, ticks=tickpos, format='%2i')
     
     plt.tick_params(axis='both', which='major', labelsize=fs)
 
     cax.set_ticklabels(ticks)
-    cax.set_label('number of iterations', **axis_font)
+    cax.set_label('$K_\mathrm{add}$', **axis_font)
     cax.ax.tick_params(labelsize=fs)
 
     ax.set_xlabel('affected step', labelpad=1, **axis_font)
-    ax.set_ylabel('affected iteration', labelpad=1, **axis_font)
+    ax.set_ylabel('affected iteration ($K_\mathrm{fail}$)', labelpad=1, **axis_font)
     
     ax.set_xticks(np.arange(len(ft_step))+0.5, minor=False)
     ax.set_xticklabels(ft_step, minor=False)
