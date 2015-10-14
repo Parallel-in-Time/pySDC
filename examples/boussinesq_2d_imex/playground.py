@@ -40,8 +40,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000
-    Nsteps =  500
+    #Tend   = 3000
+    #Nsteps =  500
     Tend   = 30
     Nsteps =  5
     dt = Tend/float(Nsteps)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     pparams['Nfreq']    = 0.01
     pparams['x_bounds'] = [(-150.0, 150.0)]
     pparams['z_bounds'] = [(   0.0,  10.0)]
-    pparams['order']    = [0] # [fine_level, coarse_level]
+    pparams['order']    = [1] # [fine_level, coarse_level]
     pparams['gmres_maxiter'] = [50]
     pparams['gmres_restart'] = 20
     pparams['gmres_tol']     = 1e-6

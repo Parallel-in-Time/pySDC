@@ -1,29 +1,38 @@
 import numpy as np
 import scipy.sparse as sp
 import scipy.linalg as la
+import sys
+
 # Only for periodic BC because we have advection only in x direction
-def getUpwindMatrix(N, dx):
-     
-  #stencil    = [-1.0, 1.0]
-  #zero_pos = 2
-  #coeff      = 1.0
+def getUpwindMatrix(N, dx, order):
   
-  #stencil    = [1.0, -4.0, 3.0]
-  #coeff      = 1.0/2.0
-  #zero_pos   = 3
+  if order==1:
+    stencil    = [-1.0, 1.0]
+    zero_pos   = 2
+    coeff      = 1.0
   
-  #stencil    = [1.0, -6.0, 3.0, 2.0]
-  #coeff      = 1.0/6.0
-  #zero_pos   = 3
+  elif order==2:
+    stencil    = [1.0, -4.0, 3.0]
+    coeff      = 1.0/2.0
+    zero_pos   = 3
+
+  elif order==3:
+    stencil    = [1.0, -6.0, 3.0, 2.0]
+    coeff      = 1.0/6.0
+    zero_pos   = 3
+
+  elif order==4:
+    stencil  = [-5.0, 30.0, -90.0, 50.0, 15.0]
+    coeff    = 1.0/60.0
+    zero_pos = 4
   
-  #stencil  = [-5.0, 30.0, -90.0, 50.0, 15.0]
-  #coeff    = 1.0/60.0
-  #zero_pos = 4
-  
-  stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
-  coeff   = 1.0/60.0
-  zero_pos = 5
-  
+  elif order==5:
+    stencil  = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
+    coeff    = 1.0/60.0
+    zero_pos = 5
+  else:
+    sys.exit("Order "+str(order)+" not implemented.")
+
   first_col = np.zeros(N)
   
   # Because we need to specific first column (not row) in circulant, flip stencil array
@@ -34,13 +43,14 @@ def getUpwindMatrix(N, dx):
 
   return sp.csc_matrix( coeff*(1.0/dx)*la.circulant(first_col) )
 
-def getMatrix(N, dx, bc_left, bc_right):
+def getMatrix(N, dx, bc_left, bc_right, order):
   stencil = [1.0, -8.0, 0.0, 8.0, -1.0]
   range   = [ -2,   -1,   0,   1,    2]
   A       = sp.diags(stencil, range, shape=(N,N))
   A       = sp.lil_matrix(A)
 
   assert bc_left in ['periodic','neumann','dirichlet'], "Unknown type of BC"
+  
   if bc_left in ['periodic']:
     assert bc_right in ['periodic'], "Periodic BC can only be selected for both sides simultaneously"
   
