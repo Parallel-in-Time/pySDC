@@ -62,6 +62,7 @@ class boussinesq_2d_imex(ptype):
         assert 'Nfreq' in cparams
         assert 'x_bounds' in cparams
         assert 'z_bounds' in cparams
+        assert 'order_upw' in cparams
         assert 'order' in cparams
         assert 'gmres_maxiter' in cparams
         assert 'gmres_restart' in cparams
@@ -82,7 +83,7 @@ class boussinesq_2d_imex(ptype):
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
        
         self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq, self.order)
-        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv , self.order)
+        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv , self.order_upw)
     
         self.logger = logging()
     
