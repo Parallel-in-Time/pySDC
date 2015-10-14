@@ -20,7 +20,7 @@ class plot_solution(hooks):
 
         # add figure object for further use
         #        self.fig = plt.figure(figsize=(18,6))
-        self.fig = plt.figure(figsize=(15,5))
+        #self.fig = plt.figure(figsize=(15,5))
         self.counter = 0
 
     def dump_step(self,status):
