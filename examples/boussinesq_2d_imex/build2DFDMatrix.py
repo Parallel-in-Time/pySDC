@@ -4,11 +4,17 @@ import numpy as np
 import scipy.sparse as sp
 from buildFDMatrix import getMatrix, getUpwindMatrix, getBCLeft, getBCRight
 
-def get2DUpwindMatrix(N, dx):
+#
+#
+#
+def get2DUpwindMatrix(N, dx, order):
 
-  Dx = getUpwindMatrix( N[0], dx)
+  Dx = getUpwindMatrix( N[0], dx, order)
   return sp.kron( Dx, sp.eye(N[1]), format="csr" )
 
+#
+#
+#
 def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
   assert np.size(N)==2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
   assert np.size(x_b)==2, 'x_b needs to be an array with two entries: x_b[0] = left boundary, x_b[1] = right boundary'
@@ -39,12 +45,16 @@ def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
   xx, zz = np.meshgrid(x,z,indexing="ij")
   return xx, zz, h
 
-def get2DMatrix(N, h, bc_hor, bc_ver):
+#
+#
+#
+def get2DMatrix(N, h, bc_hor, bc_ver, order):
+
   assert np.size(N)==2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
   assert np.size(h)==2, 'h needs to be an array with two entries: h[0]=dx and h[1]=dz'
 
-  Ax = getMatrix( N[0], h[0], bc_hor[0], bc_hor[1])
-  Az = getMatrix( N[1], h[1], bc_ver[0], bc_ver[1])
+  Ax = getMatrix( N[0], h[0], bc_hor[0], bc_hor[1], order)
+  Az = getMatrix( N[1], h[1], bc_ver[0], bc_ver[1], order)
 
   Dx = sp.kron( Ax, sp.eye(N[1]), format="csr")
   Dz = sp.kron( sp.eye(N[0]), Az, format="csr")
