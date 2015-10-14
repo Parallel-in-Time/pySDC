@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-14
+    lparams['restol'] = 1E-8
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -36,14 +36,14 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 4
+    sparams['maxiter'] = 12
 
     # setup parameters "in time"
     t0     = 0
-    #Tend   = 3000
-    #Nsteps =  500
-    Tend   = 30
-    Nsteps =  5
+    Tend   = 3000
+    Nsteps =  500
+    #Tend   = 30
+    #Nsteps =  5
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5, 1]
     pparams['gmres_maxiter'] = [50, 50]
     pparams['gmres_restart'] = [20, 20]
-    pparams['gmres_tol']     = [1e-6, 1e-6]
+    pparams['gmres_tol']     = [1e-8, 1e-8]
 
     # This comes as read-in for the transfer operations
     tparams = {}
