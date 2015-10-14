@@ -4,7 +4,7 @@ from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUp
 
 def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
 
-  Dx   = get2DUpwindMatrix(N, dx)
+  Dx   = get2DUpwindMatrix(N, dx, order)
   
   # Note: In the equations it is u_t + u_adv* D_x u = ... so in order to comply with the form u_t = M u,
   # add a minus sign in front of u_adv
@@ -19,10 +19,12 @@ def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
   return sp.csc_matrix(M)
   
 def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq, order):
-  Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0])
-  Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1])
-  Dx_b, Dz_b = get2DMatrix(N, h, bc_hor[2], bc_ver[2])
-  Dx_p, Dz_p = get2DMatrix(N, h, bc_hor[3], bc_ver[3])
+
+  Dx_u, Dz_u = get2DMatrix(N, h, bc_hor[0], bc_ver[0], order)
+  Dx_w, Dz_w = get2DMatrix(N, h, bc_hor[1], bc_ver[1], order)
+  Dx_b, Dz_b = get2DMatrix(N, h, bc_hor[2], bc_ver[2], order)
+  Dx_p, Dz_p = get2DMatrix(N, h, bc_hor[3], bc_ver[3], order)
+
   Id_N = sp.eye(N[0]*N[1])
 
   Zero = np.zeros((N[0]*N[1],N[0]*N[1]))

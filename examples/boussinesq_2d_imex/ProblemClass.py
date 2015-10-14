@@ -63,7 +63,11 @@ class boussinesq_2d_imex(ptype):
         assert 'Nfreq' in cparams
         assert 'x_bounds' in cparams
         assert 'z_bounds' in cparams
+        assert 'order_upw' in cparams
         assert 'order' in cparams
+        assert 'gmres_maxiter' in cparams
+        assert 'gmres_restart' in cparams
+        assert 'gmres_tol' in cparams
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -80,7 +84,7 @@ class boussinesq_2d_imex(ptype):
         self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
        
         self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq, self.order)
-        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv , self.order)
+        self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv , self.order_upw)
     
         self.logger = logging()
     
@@ -100,7 +104,7 @@ class boussinesq_2d_imex(ptype):
 
         b         = rhs.values.flatten()
         cb        = Callback()
-        sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=500, callback=cb)
+        sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=self.gmres_tol, restart=self.gmres_restart, maxiter=self.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor!=0.0:
           print("Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() ))
