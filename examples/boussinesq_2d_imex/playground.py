@@ -24,11 +24,11 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 16
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-8
+    lparams['restol'] = 5E-6
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -36,12 +36,12 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 12
+    sparams['maxiter'] = 16
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000
-    Nsteps =  500
+    Tend   = 384
+    Nsteps =  128
     #Tend   = 30
     #Nsteps =  5
     dt = Tend/float(Nsteps)
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     pparams['order']    = [4, 2] # [fine_level, coarse_level]
     pparams['order_upw'] = [5, 1]
     pparams['gmres_maxiter'] = [50, 50]
-    pparams['gmres_restart'] = [20, 20]
-    pparams['gmres_tol']     = [1e-8, 1e-8]
+    pparams['gmres_restart'] = [10, 10]
+    pparams['gmres_tol']     = [1e-10, 1e-10]
 
     # This comes as read-in for the transfer operations
     tparams = {}

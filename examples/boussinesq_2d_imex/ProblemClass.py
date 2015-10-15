@@ -107,7 +107,7 @@ class boussinesq_2d_imex(ptype):
         sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=self.gmres_tol, restart=self.gmres_restart, maxiter=self.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor!=0.0:
-          print("Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() ))
+          #print("Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() ))
           self.logger.add(cb.getcounter())
         me        = mesh(self.nvars)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
