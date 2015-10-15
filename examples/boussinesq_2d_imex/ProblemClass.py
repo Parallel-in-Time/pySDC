@@ -5,9 +5,9 @@ import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from build2DFDMatrix import get2DMesh
-from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesqBCHorizontal, getBoussinesqBCVertical, getBoussinesq2DUpwindMatrix
-from unflatten import unflatten
+from examples.boussinesq_2d_imex.build2DFDMatrix import get2DMesh
+from examples.boussinesq_2d_imex.buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesqBCHorizontal, getBoussinesqBCVertical, getBoussinesq2DUpwindMatrix
+from examples.boussinesq_2d_imex.unflatten import unflatten
 
 class logging(object):
 

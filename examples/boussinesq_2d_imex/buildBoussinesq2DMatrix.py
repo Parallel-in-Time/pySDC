@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
+from examples.boussinesq_2d_imex.build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
 
 def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
 

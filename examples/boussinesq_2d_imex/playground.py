@@ -3,7 +3,7 @@ from pySDC import CollocationClasses as collclass
 
 import numpy as np
 
-from ProblemClass import boussinesq_2d_imex
+from examples.boussinesq_2d_imex.ProblemClass import boussinesq_2d_imex
 from examples.boussinesq_2d_imex.TransferClass import mesh_to_mesh_2d
 from examples.boussinesq_2d_imex.HookClass import plot_solution
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 5E-6
+    lparams['restol'] = 1E-06
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
@@ -36,14 +36,12 @@ if __name__ == "__main__":
     swparams['do_LU'] = True
 
     sparams = {}
-    sparams['maxiter'] = 16
+    sparams['maxiter'] = 50
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 384
-    Nsteps =  128
-    #Tend   = 30
-    #Nsteps =  5
+    Tend   = 960
+    Nsteps =  320
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -62,7 +60,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = False
+    tparams['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

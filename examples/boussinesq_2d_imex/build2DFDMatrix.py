@@ -2,7 +2,7 @@ import sys
 sys.path.append('../')
 import numpy as np
 import scipy.sparse as sp
-from buildFDMatrix import getMatrix, getUpwindMatrix, getBCLeft, getBCRight
+from examples.boussinesq_2d_imex.buildFDMatrix import getMatrix, getUpwindMatrix, getBCLeft, getBCRight
 
 #
 #
