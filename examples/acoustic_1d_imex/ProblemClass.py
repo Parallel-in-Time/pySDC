@@ -161,7 +161,7 @@ class acoustic_1d_imex(ptype):
         """
         
         sigma_0 = 0.1
-        k       = 7.2*np.pi
+        k       = 7.0*2.0*np.pi
         x_0     = 0.75
         x_1     = 0.25
         
