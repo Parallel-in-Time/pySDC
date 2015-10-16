@@ -1,5 +1,4 @@
 import numpy as np
-import math
 import os
 import matplotlib.pyplot as plt
 from pylab import rcParams

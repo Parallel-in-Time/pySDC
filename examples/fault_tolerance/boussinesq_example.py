@@ -76,13 +76,18 @@ if __name__ == "__main__":
     ft.hard_random = 0.03
 
     # strategies = ['NOFAULT']
-    strategies = ['INTERP']
-    # strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
+    # strategies = ['INTERP']
+    strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
 
         print('------------------------------------------ working on strategy ',strategy)
         ft.strategy = strategy
+
+        # read in reference data from clean run, will provide reproducable locations for faults
+        if not strategy is 'NOFAULT':
+            reffile = np.load('PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz')
+            ft.refdata = reffile['hard_stats']
 
         # quickly generate block of steps
         MS = mp.generate_steps(num_procs,sparams,description)
