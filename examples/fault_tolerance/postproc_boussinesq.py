@@ -10,23 +10,23 @@ lw = 2
 
 if __name__ == "__main__":
 
-    ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz'
+    ref = 'PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz'
 
-    list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz','SPREAD','1-sided','red','s'),
-             ('PFASST_GRAYSCOTT_stats_hf_INTERP_P32.npz','INTERP','2-sided','orange','o'),
-             ('PFASST_GRAYSCOTT_stats_hf_SPREAD_PREDICT_P32.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
-             ('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','INTERP_PREDICT','2-sided+corr','green','d') ]
+    list = [ ('PFASST_BOUSSINESQ_stats_hf_SPREAD_P16.npz','SPREAD','1-sided','red','s'),
+             ('PFASST_BOUSSINESQ_stats_hf_INTERP_P16.npz','INTERP','2-sided','orange','o'),
+             ('PFASST_BOUSSINESQ_stats_hf_SPREAD_PREDICT_P16.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
+             ('PFASST_BOUSSINESQ_stats_hf_INTERP_PREDICT_P16.npz','INTERP_PREDICT','2-sided+corr','green','d') ]
 
-    nprocs = 32
+    nprocs = 16
 
-    xtick_dist = 16
+    xtick_dist = 8
 
-    minstep = 288
-    maxstep = 384
+    minstep = 128
+    maxstep = 176
     # minstep = 0
-    # maxstep = 640
+    # maxstep = 320
 
-    nblocks = int(640/nprocs)
+    nblocks = int(320/nprocs)
 
     # maxiter = 14
     nsteps = 0
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     ax.yaxis.labelpad = -1
     plt.tight_layout()
 
-    fname = 'GRAYSCOTT_Kadd_vs_NOFAULT_hf.pdf'
+    fname = 'BOUSSINESQ_Kadd_vs_NOFAULT_hf.pdf'
     plt.savefig(fname, bbox_inches='tight')
     os.system('pdfcrop '+fname+' '+fname)
     # exit()
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
         plt.tight_layout()
 
-        fname = 'GRAYSCOTT_steps_vs_iteration_hf_'+strategy+'.pdf'
+        fname = 'BOUSSINESQ_steps_vs_iteration_hf_'+strategy+'.pdf'
         plt.savefig(fname, bbox_inches='tight')
         os.system('pdfcrop '+fname+' '+fname)
 
