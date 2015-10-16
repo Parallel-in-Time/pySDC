@@ -29,7 +29,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-06
 
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussLobatto
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
     swparams['do_LU'] = True
 
@@ -75,7 +75,8 @@ if __name__ == "__main__":
 
     ft.hard_random = 0.03
 
-    strategies = ['NOFAULT']
+    # strategies = ['NOFAULT']
+    strategies = ['INTERP']
     # strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:

@@ -1,5 +1,6 @@
 import copy as cp
 import random as rd
+import numpy as np
 
 # dirty, but easiest: global variables to control the injection and recovery
 hard_iter = None
@@ -7,6 +8,7 @@ hard_step = None
 strategy = None
 hard_random = 0.0
 hard_stats = []
+refdata = None
 
 
 def hard_fault_injection(S):
@@ -21,19 +23,23 @@ def hard_fault_injection(S):
     """
 
     # name global variables for this routine
-    global hard_iter, hard_step, strategy, hard_stats, hard_random
+    global hard_iter, hard_step, strategy, hard_stats, hard_random, refdata
 
     # set the seed in the first iteration, using the step number for reproducibility
     if S.status.iter == 1:
         rd.seed(S.status.step)
 
     # draw random number and check if we are below our threshold (hard_random gives percentage)
-    # very ugly: no failure above iteration 7, because the original run took only 7 iterations
-    doit = rd.random() < hard_random and S.status.iter < 7
+    if strategy is 'NOFAULT':
+        doit = rd.random() < hard_random
+        if doit:
+            hard_stats.append((S.status.step,S.status.iter,S.status.time))
+    else:
+        doit = np.any(np.all([S.status.step,S.status.iter,S.status.time]==refdata,axis=1))
 
     # print(S.status.step,S.status.iter,hard_step,hard_iter)
 
-    # if we set step and iter or if doit is true, inject and recover (if faults are supposed to occur)
+    # if we set step and iter, inject and recover (if faults are supposed to occur)
     if ((hard_step == S.status.step and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %(S.status.step,S.status.iter,S.status.time))

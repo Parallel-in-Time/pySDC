@@ -11,8 +11,8 @@ lw = 2
 
 if __name__ == "__main__":
 
-    # ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_new.npz'
-    ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
+    ref = 'PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz'
+    # ref = 'PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz'
 
     # list = [('PFASST_GRAYSCOTT_stats_hf_INTERP_PREDICT_P32.npz','2-sided+corr','green','o')]
     list = [ ('PFASST_GRAYSCOTT_stats_hf_SPREAD_P32.npz','SPREAD','1-sided','red','s'),
@@ -28,6 +28,8 @@ if __name__ == "__main__":
     maxstep = 384
     # minstep = 0
     # maxstep = 640
+
+    nblocks = int(640/nprocs)
 
     # maxiter = 14
     nsteps = 0
@@ -47,12 +49,12 @@ if __name__ == "__main__":
         nsteps = max(nsteps,len(iter_count))
 
     data = np.load(ref)
-    ref_iter_count = data['iter_count'][minstep:maxstep]
+    ref_iter_count = data['iter_count'][nprocs-1::nprocs]
 
     rcParams['figure.figsize'] = 6.0, 2.5
     fig, ax = plt.subplots()
 
-    plt.plot(range(minstep,maxstep),[0]*nsteps,'k-',linewidth=2)
+    plt.plot(range(nblocks),[0]*nblocks,'k-',linewidth=2)
 
     ymin = 99
     ymax = 0
@@ -60,30 +62,28 @@ if __name__ == "__main__":
 
         if not file is ref:
             data = np.load(file)
-            iter_count = data['iter_count'][minstep:maxstep]
+            iter_count = data['iter_count'][nprocs-1::nprocs]
 
-            ymin = min(ymin,min(ref_iter_count-iter_count))
-            ymax = max(ymax,max(ref_iter_count-iter_count))
+            ymin = min(ymin,min(iter_count-ref_iter_count))
+            ymax = max(ymax,max(iter_count-ref_iter_count))
 
-            plt.plot(range(minstep,maxstep),ref_iter_count-iter_count,color=color,label=label,marker=marker,linestyle='',linewidth=lw,markersize=ms)
+            plt.plot(range(nblocks),iter_count-ref_iter_count,color=color,label=label,marker=marker,linestyle='',linewidth=lw,markersize=ms)
 
 
-    plt.xlabel('step', **axis_font)
-    plt.ylabel('saved iterations', **axis_font)
-    plt.xlim(-1+minstep,maxstep+1)
+    plt.xlabel('block', **axis_font)
+    plt.ylabel('$K_\\mathrm{add}$', **axis_font)
+    plt.xlim(-1,nblocks)
     plt.ylim(-1+ymin,ymax+1)
-    ax.set_xticks(np.arange(minstep,maxstep,xtick_dist)+0.5, minor=False)
-    ax.set_xticklabels(np.arange(minstep,maxstep,xtick_dist), minor=False)
     plt.legend(loc=2,numpoints=1,fontsize=fs)
     plt.tick_params(axis='both', which='major', labelsize=fs)
     ax.xaxis.labelpad = -0.5
     ax.yaxis.labelpad = -1
     plt.tight_layout()
 
-    # fname = 'GRAYSCOTT_saved_iteration_vs_NOFAULT_hf.png'
-    fname = 'GRAYSCOTT_saved_iteration_vs_SPREAD_hf.pdf'
+    fname = 'GRAYSCOTT_Kadd_vs_NOFAULT_hf.pdf'
     plt.savefig(fname, bbox_inches='tight')
     os.system('pdfcrop '+fname+' '+fname)
+    # exit()
 
     for file,strategy,label,color,marker in list:
 
@@ -102,10 +102,9 @@ if __name__ == "__main__":
         pcol = plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
         pcol.set_edgecolor('face')
 
-        if not "NOFAULT" in strategy:
-            for item in stats:
-                if item[0] in range(minstep,maxstep):
-                    plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
+        for item in stats:
+            if item[0] in range(minstep,maxstep):
+                plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
 
         plt.axis([0,nsteps,0,maxiter])
 
@@ -134,7 +133,7 @@ if __name__ == "__main__":
         plt.savefig(fname, bbox_inches='tight')
         os.system('pdfcrop '+fname+' '+fname)
 
-    # exit()
+    exit()
 
     fig, ax = plt.subplots(figsize=(20,7))
 

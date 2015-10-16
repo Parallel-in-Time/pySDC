@@ -79,13 +79,18 @@ if __name__ == "__main__":
 
     ft.hard_random = 0.03
 
-    # strategies = ['NOFAULT']
-    strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
+    strategies = ['SPREAD']
+    # strategies = ['NOFAULT','SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
 
     for strategy in strategies:
 
         print('------------------------------------------ working on strategy ',strategy)
         ft.strategy = strategy
+
+        # read in reference data from clean run, will provide reproducable locations for faults
+        if not strategy is 'NOFAULT':
+            reffile = np.load('PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz')
+            ft.refdata = reffile['hard_stats']
 
         # quickly generate block of steps
         MS = mp.generate_steps(num_procs,sparams,description)
@@ -133,6 +138,5 @@ if __name__ == "__main__":
             iter_count[step] = v
         print(iter_count)
 
-        # np.savez('SDC_GRAYSCOTT_stats_hf_'+ft.strategy+'_new',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
         np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_P'+str(num_procs),residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
 
