@@ -15,7 +15,8 @@ if __name__ == "__main__":
     list = [ ('PFASST_BOUSSINESQ_stats_hf_SPREAD_P16.npz','SPREAD','1-sided','red','s'),
              ('PFASST_BOUSSINESQ_stats_hf_INTERP_P16.npz','INTERP','2-sided','orange','o'),
              ('PFASST_BOUSSINESQ_stats_hf_SPREAD_PREDICT_P16.npz','SPREAD_PREDICT','1-sided+corr','blue','^'),
-             ('PFASST_BOUSSINESQ_stats_hf_INTERP_PREDICT_P16.npz','INTERP_PREDICT','2-sided+corr','green','d') ]
+             ('PFASST_BOUSSINESQ_stats_hf_INTERP_PREDICT_P16.npz','INTERP_PREDICT','2-sided+corr','green','d'),
+             ('PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz','NOFAULT','no fault','black','v')]
 
     nprocs = 16
 
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     # maxiter = 14
     nsteps = 0
     maxiter = 0
+    vmax = -99
+    vmin = -8
     for file,strategy,label,color,marker in list:
 
         data = np.load(file)
@@ -38,13 +41,14 @@ if __name__ == "__main__":
         iter_count = data['iter_count'][minstep:maxstep]
         residual = data['residual'][:,minstep:maxstep]
 
-        residual = np.where(residual > 0, np.log10(residual), -99)
-        vmin = -9
-        vmax = int(np.amax(residual))
+        residual[residual <= 0] = 1E-99
+        residual = np.log10(residual)
+        vmax = max(vmax,int(np.amax(residual)))
 
         maxiter = max(maxiter,int(max(iter_count)))
         nsteps = max(nsteps,len(iter_count))
 
+    print(vmin,vmax)
     data = np.load(ref)
     ref_iter_count = data['iter_count'][nprocs-1::nprocs]
 
@@ -90,7 +94,8 @@ if __name__ == "__main__":
         residual = data['residual'][:,minstep:maxstep]
         stats = data['hard_stats']
 
-        residual = np.where(residual > 0, np.log10(residual), -99)
+        residual[residual <= 0] = 1E-99
+        residual = np.log10(residual)
 
         rcParams['figure.figsize'] = 6.0, 2.5
         fig, ax = plt.subplots()
@@ -99,13 +104,14 @@ if __name__ == "__main__":
         pcol = plt.pcolor(residual,cmap=cmap,vmin=vmin,vmax=vmax)
         pcol.set_edgecolor('face')
 
-        for item in stats:
-            if item[0] in range(minstep,maxstep):
-                plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
+        if not file is ref:
+            for item in stats:
+                if item[0] in range(minstep,maxstep):
+                    plt.text(item[0]+0.5-(maxstep-nsteps),item[1]-1+0.5,'x',horizontalalignment='center',verticalalignment='center')
 
         plt.axis([0,nsteps,0,maxiter])
 
-        ticks = np.arange(vmin,vmax+1,2)
+        ticks = np.arange(vmin,vmax+1)
         tickpos = np.linspace(ticks[0]+0.5, ticks[-1]-0.5, len(ticks))
         cax = plt.colorbar(pcol, ticks=tickpos, pad=0.02)
         cax.set_ticklabels(ticks)
