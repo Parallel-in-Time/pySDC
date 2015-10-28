@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import scipy.sparse as sp
 import numpy.polynomial.legendre as leg
+from scipy.linalg import lu
 
 from pySDC.Collocation import CollBase
 
@@ -218,3 +219,16 @@ class CollGaussRadau_Left(CollBase):
         print('WARNING: GaussRadau_Left untested, use at own risk!')
 
         return nodes
+
+class CollGaussRadau_Right_LU_Trick(CollGaussRadau_Right):
+    """
+    Implements Gauss-Radau Quadrature by deriving from CollBase and implementing Gauss-Radau nodes and as
+    preconditioner we implement the LU_Trick
+    """
+    def __init__(self, num_nodes, tleft, tright):
+        super(CollGaussRadau_Right_LU_Trick, self).__init__(num_nodes, tleft, tright)
+
+        Q = self.Qmat
+
+        p, l, u = lu(Q[1:, 1:].transpose())
+        self.QDmat = u.transpose()

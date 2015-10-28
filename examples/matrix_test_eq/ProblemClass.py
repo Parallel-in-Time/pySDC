@@ -75,6 +75,9 @@ class test_eq(ptype):
         fexpl.values = np.zeros(self.nvars)
         return fexpl
 
+    def __get_A(self):
+       return np.eye(1)*self.lamb
+
     def __eval_fimpl(self,u,t):
         """
         Helper routine to evaluate the implicit part of the RHS

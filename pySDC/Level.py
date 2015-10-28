@@ -24,7 +24,7 @@ class level():
         logger: a logging object for level-dependent output
         __step: link to the step where this level is part of (set from the outside by the step)
         __hooks: a private instance of a hooks class
-        __slots__: list of attributes to avoid accidential creation of new class attributes
+        __slots__: list of attributes to avoid accidental creation of new class attributes
     """
 
     class cstatus():

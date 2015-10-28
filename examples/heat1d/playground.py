@@ -66,9 +66,10 @@ if __name__ == "__main__":
     # get initial values on finest level
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-
+    # print MS[0].levels[0].sweep.coll.num_nodes #,MS[0].levels[-1].num_nodes
+    # print MS[0].levels[-1].sweep.coll.num_nodes
     # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

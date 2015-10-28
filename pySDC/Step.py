@@ -19,7 +19,7 @@ class step():
         __transfer_dict: data structure to couple levels and transfer operators
         levels: list of levels
         params: parameters given by the user
-        __slots__: list of attributes to avoid accidential creation of new class attributes
+        __slots__: list of attributes to avoid accidental creation of new class attributes
     """
 
     __slots__ = ('params','levels','__transfer_dict','status','__prev')
