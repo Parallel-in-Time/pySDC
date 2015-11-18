@@ -12,9 +12,6 @@ import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
-# Sharpclaw imports
-from clawpack import pyclaw
-from clawpack import riemann
 from matplotlib import pyplot as plt
 
 
