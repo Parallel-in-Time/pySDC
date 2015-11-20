@@ -61,17 +61,15 @@ class TestCollocation:
     for type in classes:
       for M in range(type[1],type[2]+1):
         coll = getattr(pySDC.CollocationClasses, type[0])(M, t_start, t_end)
-        Q = coll.Qmat
-        Q = Q[1:,1:]
+        Q = coll.Qmat[1:,1:]
         # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
         poly_coeff = np.random.rand(M-1)
         poly_vals  = np.polyval(poly_coeff, coll.nodes)
         poly_int_coeff = np.polyint(poly_coeff)
-        #print Q
         for i in range(0,M):
             int_ex = np.polyval(poly_int_coeff, coll.nodes[i]) - np.polyval(poly_int_coeff, t_start)
-            print np.shape(Q)
-            #int_coll = np.dot(poly_vals, Q[i,:])
+            int_coll = np.dot(poly_vals, Q[i,:])
+            assert abs(int_ex - int_coll)<1e-10, "For node type " + type[0] + ", partial quadrature rule failed to integrate polynomial of degree M-1 exactly for M = " + str(M)
 
     # TEST 4:
     # Check that the quadrature rules for [tau_m, tau_m+1] defined by Smat have order equal to number of nodes M
