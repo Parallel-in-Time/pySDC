@@ -6,8 +6,8 @@ import pytest
 # py.test excludes classes with a constructor by default, so define parameter here
 t_start = 0.0
 t_end   = 1.0
-classes = [ ["CollGaussLegendre", 2, 2]]
-#classes = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12] ]
+#classes = [ ["CollGaussLegendre", 2, 2]]
+classes = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12] ]
 
 class TestCollocation:
 
@@ -45,20 +45,14 @@ class TestCollocation:
     for type in classes:
       for M in range(type[1],type[2]+1):
         coll = getattr(pySDC.CollocationClasses, type[0])(M, t_start, t_end)
-        Q = coll.Qmat
-        Q = Q[1:,1:]
-        S = coll.Smat    
-        S = S[1:,1:]
-        #print Q
-        #print S
+        Q = coll.Qmat[1:,1:]
+        S = coll.Smat[1:,1:]
         assert np.shape(Q) == np.shape(S), "For node type " + type[0] + ", Qmat and Smat have different shape"
         shape = np.shape(Q)
         assert shape[0] == shape[1], "For node type " + type[0] + ", Qmat / Smat are not quadratic"
+        SSum = np.cumsum(S[:,:],axis=0)
         for i in range(0,M):
-            Ssum = np.sum(S[0:i,:], axis=0)
-            #print Ssum
-            #print Q[i,:]
-            # ...the matrices do not have size MxM, but rather (M+1)x(M+1)... how does the summation property look like here
+          assert np.linalg.norm( Q[i,:] - SSum[i,:] ) < 1e-15, "For node type " + type[0] + ", Qmat and Smat did not satisfy the expected summation property."
 
   # TEST 3:
   # Check that the partial quadrature rules from Qmat entries have order equal to number of nodes M
