@@ -13,7 +13,7 @@ class CollGaussLegendre(CollBase):
     """
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussLegendre, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes > 1, "Number of nodes should be at least 1 for Gauss-Legendre, but is %d" % num_nodes
+        assert num_nodes >= 1, "Number of nodes should be at least 1 for Gauss-Legendre, but is %d" % num_nodes
         self.order = 2 * self.num_nodes
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft,tright)
@@ -74,7 +74,7 @@ class CollGaussLobatto(CollBase):
     """
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussLobatto, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes > 1, "Number of nodes should be at least 2 for Gauss-Lobatto, but is %d" % num_nodes
+        assert num_nodes >= 2, "Number of nodes should be at least 2 for Gauss-Lobatto, but is %d" % num_nodes
         self.order = 2 * self.num_nodes - 2
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft,tright)
@@ -111,7 +111,7 @@ class CollGaussRadau_Right(CollBase):
     """
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussRadau_Right, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes > 1, "Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes
+        assert num_nodes >= 2, "Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes
         self.order = 2 * self.num_nodes - 1
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft,tright)
@@ -167,7 +167,7 @@ class CollGaussRadau_Left(CollBase):
     """
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussRadau_Left, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes > 1, "Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes
+        assert num_nodes >= 2, "Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes
         self.order = 2 * self.num_nodes - 1
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft,tright)
