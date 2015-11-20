@@ -1,3 +1,2 @@
-py.test
-numpy
+pytest
 scipy
