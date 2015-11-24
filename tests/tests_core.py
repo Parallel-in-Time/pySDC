@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def test_python_version():
-    import sys
-    assert sys.version_info >= (3, 3), "Need Python 3.3 at least"
+#def test_python_version():
+#    import sys
+#    assert sys.version_info >= (3, 3), "Need Python 3.3 at least"
 
 # def test_return_types():
     # import pySDC.problem as pr
