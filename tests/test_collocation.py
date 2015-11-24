@@ -4,10 +4,12 @@ import numpy as np
 import pytest
 
 # py.test excludes classes with a constructor by default, so define parameter here
-t_start = 0.0
-t_end   = 1.0
-#classes = [ ["CollGaussLegendre", 2, 2]]
-classes = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12] ]
+
+# generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
+t_start  = np.random.rand(1)*0.2
+t_end    = 0.8 + np.random.rand(1)*0.2
+
+classes  = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12] ]
 
 class TestCollocation:
 
