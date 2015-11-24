@@ -1,7 +1,6 @@
 import pySDC.Collocation
 from pySDC.CollocationClasses import *
 import numpy as np
-import pytest
 
 # py.test excludes classes with a constructor by default, so define parameter here
 
