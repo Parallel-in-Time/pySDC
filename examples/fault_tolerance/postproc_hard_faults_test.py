@@ -62,7 +62,7 @@ for file,strategy in fields:
     cax.ax.tick_params(labelsize=fs)
 
     ax.set_xlabel('affected step', labelpad=1, **axis_font)
-    ax.set_ylabel('affected iteration ($K_\mathrm{fail}$)', labelpad=1, **axis_font)
+    ax.set_ylabel('affected iteration ($K_\mathrm{fault}$)', labelpad=1, **axis_font)
     
     ax.set_xticks(np.arange(len(ft_step))+0.5, minor=False)
     ax.set_xticklabels(ft_step, minor=False)
