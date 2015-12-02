@@ -1,7 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from pylab import rcParams
 
-fs     = 18
+fs     = 8
 order  = np.array([])
 nsteps = np.array([])
 error  = np.array([])
@@ -34,15 +35,20 @@ for ii in range(0,3):
     convline[ii,jj]    = error_plot[ii,0]*(float(nsteps_plot[ii,0])/float(nsteps_plot[ii,jj]))**order_plot[ii]
 
 color = [ 'r', 'b', 'g' ]
-fig = plt.figure(figsize=(8,8))
+shape = ['o', 'd', 's']
+rcParams['figure.figsize'] = 2.5, 2.5
+fig = plt.figure()
 for ii in range(0,3):
-  plt.loglog(nsteps_plot[ii,:], error_plot[ii,:], 'o', markersize=12, color=color[ii], label='p='+str(int(order_plot[ii])))
+  plt.loglog(nsteps_plot[ii,:], error_plot[ii,:], shape[ii], markersize=fs, color=color[ii], label='p='+str(int(order_plot[ii])))
   plt.loglog(nsteps_plot[ii,:], convline[ii,:], '-', color=color[ii])
 
-plt.legend()
-plt.xlabel(r'Number of time step $N_t$')
-plt.ylabel('Relative error')
+plt.legend(loc='upper right', fontsize=fs, prop={'size':fs})
+plt.xlabel(r'Number of time step $N_t$', fontsize=fs)
+plt.ylabel('Relative error', fontsize=fs, labelpad=2)
 plt.xlim([0.9*np.min(nsteps_plot), 1.1*np.max(nsteps_plot)])
+plt.ylim([1e-7, 1e1])
+plt.yticks(fontsize=fs)
+plt.xticks(fontsize=fs)
 plt.show()
 fig.savefig('sdc_fwsw_convergence.pdf',bbox_inches='tight')
 

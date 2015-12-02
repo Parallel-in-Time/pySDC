@@ -54,9 +54,9 @@ if __name__ == "__main__":
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
     
-    Nsteps = [65]
+    Nsteps = [20, 25, 30, 35, 40, 45, 50, 55, 60]
     
-    for order in [4]:
+    for order in [2, 3, 4]:
 
       error  = np.zeros(np.size(Nsteps))
     
