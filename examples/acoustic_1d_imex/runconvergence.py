@@ -38,6 +38,7 @@ if __name__ == "__main__":
     pparams['cadv']      = 0.05
     pparams['cs']        = 1.0
     pparams['order_adv'] = 5
+    pparams['waveno']            = 5
 
     # This comes as read-in for the transfer operations
     tparams = {}
