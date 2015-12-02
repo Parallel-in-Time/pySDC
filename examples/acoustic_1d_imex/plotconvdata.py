@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-fs = 18
+fs     = 18
 order  = np.array([])
 nsteps = np.array([])
 error  = np.array([])
