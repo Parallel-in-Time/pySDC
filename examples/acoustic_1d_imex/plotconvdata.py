@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from pylab import rcParams
+from matplotlib.ticker import ScalarFormatter
 
 fs     = 8
 order  = np.array([])
@@ -39,16 +40,19 @@ shape = ['o', 'd', 's']
 rcParams['figure.figsize'] = 2.5, 2.5
 fig = plt.figure()
 for ii in range(0,3):
-  plt.loglog(nsteps_plot[ii,:], error_plot[ii,:], shape[ii], markersize=fs, color=color[ii], label='p='+str(int(order_plot[ii])))
   plt.loglog(nsteps_plot[ii,:], convline[ii,:], '-', color=color[ii])
+  plt.loglog(nsteps_plot[ii,:], error_plot[ii,:], shape[ii], markersize=fs, color=color[ii], label='p='+str(int(order_plot[ii])))
+
 
 plt.legend(loc='upper right', fontsize=fs, prop={'size':fs})
-plt.xlabel(r'Number of time step $N_t$', fontsize=fs)
+plt.xlabel('Number of time steps', fontsize=fs)
 plt.ylabel('Relative error', fontsize=fs, labelpad=2)
 plt.xlim([0.9*np.min(nsteps_plot), 1.1*np.max(nsteps_plot)])
 plt.ylim([1e-7, 1e1])
-plt.yticks(fontsize=fs)
-plt.xticks(fontsize=fs)
+plt.yticks([1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0, 1e1],fontsize=fs)
+plt.xticks([25, 50, 100], fontsize=fs)
+plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
+plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
 plt.show()
 fig.savefig('sdc_fwsw_convergence.pdf',bbox_inches='tight')
 
