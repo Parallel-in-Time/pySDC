@@ -48,7 +48,8 @@ def run_pfasst(MS,u0,t0,dt,Tend):
         MS[p].status.step = p
 
     # determine which steps are still active (time < Tend)
-    active = [MS[p].status.time < Tend - np.finfo(float).eps for p in slots]
+    active = [MS[p].status.time < Tend - 10*np.finfo(float).eps for p in slots]
+
     # compress slots according to active steps, i.e. remove all steps which have times above Tend
     active_slots = list(itertools.compress(slots, active))
 
@@ -78,7 +79,7 @@ def run_pfasst(MS,u0,t0,dt,Tend):
             uend = MS[active_slots[-1]].levels[0].uend
 
             # determine new set of active steps and compress slots accordingly
-            active = [MS[p].status.time+num_procs*MS[p].status.dt < Tend - np.finfo(float).eps for p in slots]
+            active = [MS[p].status.time+num_procs*MS[p].status.dt < Tend - 10*np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # increment timings for now active steps
