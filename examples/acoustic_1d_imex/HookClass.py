@@ -22,6 +22,8 @@ class plot_solution(hooks):
         #        self.fig = plt.figure(figsize=(18,6))
         #self.fig = plt.figure(figsize=(9,9))
 
+    def dump_sweep(self,status):
+        return None
 
     def dump_step(self,status):
         """
