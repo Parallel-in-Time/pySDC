@@ -12,11 +12,11 @@ x_1     = 0.25
 
 nvars = 512
 cs    = 1.0
-cadv  = 0.0
+cadv  = 0.05
 order = 4
 
 def u(x,t, multiscale):
-  u0 = np.exp(-np.square( np.mod( mesh- cs*t, 1.0 ) -x_0 )/(sigma_0*sigma_0)) + multiscale*np.exp(-np.square( np.mod( mesh -cs*t, 1.0 ) -x_1 )/(sigma_0*sigma_0))*np.cos(k*( np.mod( mesh-cs*t, 1.0 ))/sigma_0)
+  u0 = np.exp(-np.square( np.mod( mesh - (cs+cadv)*t, 1.0 ) -x_0 )/(sigma_0*sigma_0)) + multiscale*np.exp(-np.square( np.mod( mesh -(cs+cadv)*t, 1.0 ) -x_1 )/(sigma_0*sigma_0))*np.cos(k*( np.mod( mesh - (cs+cadv)*t, 1.0 ))/sigma_0)
   p0 = u0
   return u0, p0
 
@@ -67,28 +67,29 @@ for i in range(0,Nsteps):
   unew_bdf, pnew_bdf = np.split(ynew_bdf, 2)
   uex, pex = u(mesh, float(i+1)*dt, 0.0)
 
-  fig.gca().clear()
-  #plt.plot(mesh, pnew_bdf, 'b', label='BDF-2')
-  plt.plot(mesh, pnew_tp, 'r', label='Trapezoidal')
-  plt.plot(mesh, pex, 'k', label='Slow Mode')
-  fig.gca().set_xlim([0, 1.0])
-  fig.gca().set_ylim([-0.5, 1.1])
-  fig.gca().legend(loc=3)
-  fig.gca().grid()
-  #plt.draw()
-  plt.pause(0.0001)  
+  if i==Nsteps-1:
+    fig.gca().clear()
+    plt.plot(mesh, pnew_bdf, 'b', label='BDF-2')
+    plt.plot(mesh, pnew_tp, 'r', label='Trapezoidal')
+    plt.plot(mesh, pex, 'k', label='Slow Mode')
+    fig.gca().set_xlim([0, 1.0])
+    fig.gca().set_ylim([-0.5, 1.1])
+    fig.gca().legend(loc=3)
+    fig.gca().grid()
+    plt.draw()
+  #plt.pause(0.0001)  
   #if i==0:
     #plt.gcf().savefig('initial.pdf', bbox_inches='tight')
-  filename = 'images/standard'+"%03d" % i
-  plt.gcf().savefig(filename+'.png', bbox_inches='tight')
-  os.system('convert -quality 100 '+filename+'.png '+filename+'.jpeg')
-  os.system('rm '+filename+'.png')
+  #filename = 'images/standard'+"%03d" % i
+  #plt.gcf().savefig(filename+'.png', bbox_inches='tight')
+  #os.system('convert -quality 100 '+filename+'.png '+filename+'.jpeg')
+  #os.system('rm '+filename+'.png')
 
   y0_ie   = ynew_ie
   y0_tp   = ynew_tp
   ym1_bdf = y0_bdf
   y0_bdf  = ynew_bdf
-#plt.show()
+plt.show()
 #lt.gcf().savefig('final.pdf', bbox_inches='tight')
-os.system('ffmpeg -r 25 -i images/standard-%03d.jpeg -vcodec libx264 -crf 25 movie.avi')
+#os.system('ffmpeg -r 25 -i images/standard-%03d.jpeg -vcodec libx264 -crf 25 movie.avi')
 
