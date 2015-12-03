@@ -35,7 +35,7 @@ if __name__ == "__main__":
     pparams['cadv']      = 0.05
     pparams['cs']        = 1.00
     pparams['order_adv'] = 5
-    pparams['waveno']            = 5
+    pparams['waveno']    = 1
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -47,14 +47,14 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
+    description['collocation_class'] = collclass.CollGaussLobatto
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
     
-    Nsteps = [20, 25, 30, 35, 40, 45, 50, 55, 60]
+    Nsteps = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
     
     for order in [2, 3, 4]:
 
