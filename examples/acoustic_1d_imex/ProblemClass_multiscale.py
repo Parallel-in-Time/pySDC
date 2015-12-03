@@ -19,10 +19,6 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
 
-def u_initial(x):
-    return np.sin(x)
-#    return np.exp(-0.5*(x-0.5)**2/0.1**2)
-
 class acoustic_1d_imex(ptype):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
@@ -48,6 +44,7 @@ class acoustic_1d_imex(ptype):
         assert 'cs' in cparams
         assert 'cadv' in cparams
         assert 'order_adv' in cparams
+        assert 'multiscale' in cparams
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -165,10 +162,12 @@ class acoustic_1d_imex(ptype):
         x_0     = 0.75
         x_1     = 0.25
         
+        ms = 0.0
+        if self.multiscale:
+          ms = 1.0
+
         me             = mesh(self.nvars)
-        #me.values[0,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) + 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
-        #me.values[1,:] = 0.5*u_initial(self.mesh - (self.cadv + self.cs)*t) - 0.5*u_initial(self.mesh - (self.cadv - self.cs)*t)
-        me.values[0,:] = np.exp(-np.square(self.mesh-x_0-self.cs*t)/(sigma_0*sigma_0)) + np.exp(-np.square(self.mesh-x_1-self.cs*t)/(sigma_0*sigma_0))*np.cos(k*(self.mesh-self.cs*t)/sigma_0)
+        me.values[0,:] = np.exp(-np.square(self.mesh-x_0-self.cs*t)/(sigma_0*sigma_0)) + ms*np.exp(-np.square(self.mesh-x_1-self.cs*t)/(sigma_0*sigma_0))*np.cos(k*(self.mesh-self.cs*t)/sigma_0)
         me.values[1,:] = me.values[0,:]
         return me
 
