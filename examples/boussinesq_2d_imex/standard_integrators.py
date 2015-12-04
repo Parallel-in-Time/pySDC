@@ -2,57 +2,20 @@ import numpy as np
 import math
 import scipy.sparse.linalg as LA
 import scipy.sparse as sp
-from ProblemClass import Callback, logging
-#
-# Trapezoidal rule
-#
-class trapezoidal:
- 
-  def __init__(self, M, alpha=0.5):
-    assert np.shape(M)[0]==np.shape(M)[1], "Matrix M must be quadratic"
-    self.Ndof = np.shape(M)[0]
-    self.M = M
-    self.alpha = alpha
+from ProblemClass import Callback, logging, boussinesq_2d_imex
 
-  def timestep(self, u0, dt):
-    M_trap   = sp.eye(self.Ndof) - self.alpha*dt*self.M
-    B_trap   = sp.eye(self.Ndof) + (1.0-self.alpha)*dt*self.M
-    b = B_trap.dot(u0)
-    return LA.spsolve(M_trap, b)
-#
-# A BDF-2 implicit two-step method
-#
-class bdf2:
-
-  def __init__(self, M):
-    assert np.shape(M)[0]==np.shape(M)[1], "Matrix M must be quadratic"
-    self.Ndof = np.shape(M)[0]
-    self.M = M
-
-  def firsttimestep(self, u0, dt):
-    b = u0
-    L = sp.eye(self.Ndof) - dt*self.M
-    return LA.spsolve(L, b)
-
-  def timestep(self, u0, um1, dt):
-    b = (4.0/3.0)*u0 - (1.0/3.0)*um1
-    L = sp.eye(self.Ndof) - (2.0/3.0)*dt*self.M
-    return LA.spsolve(L, b)
 #
 # A diagonally implicit Runge-Kutta method of order 2, 3 or 4
 #
 class dirk:
 
-  def __init__(self, M, order, gmres_maxiter, gmres_restart, gmres_tol):
+  def __init__(self, problem, order):
 
-    assert np.shape(M)[0]==np.shape(M)[1], "Matrix M must be quadratic"
-    self.Ndof = np.shape(M)[0]
-    self.M = M
+    assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
+    self.Ndof = np.shape(problem.M)[0]
     self.order = order
     self.logger = logging()
-    self.gmres_maxiter = gmres_maxiter
-    self.gmres_restart = gmres_restart
-    self.gmres_tol = gmres_tol
+    self.problem = problem
 
     assert self.order in [2,22,3,4], 'Order must be 2,22,3,4'
     
@@ -144,7 +107,7 @@ class dirk:
   # Returns f(u) = c*u
   #  
   def f(self,u):
-    return self.M.dot(u)
+    return self.problem.D_upwind.dot(u)+self.problem.M.dot(u)
     
   
   #
@@ -152,8 +115,7 @@ class dirk:
   #  
   def f_solve(self, b, alpha, u0):
     cb = Callback()
-    L = sp.eye(self.Ndof) - alpha*self.M
-    sol, info = LA.gmres( L, b, x0=u0, tol=self.gmres_tol, restart=self.gmres_restart, maxiter=self.gmres_maxiter, callback=cb)
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
       print "DIRK: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    

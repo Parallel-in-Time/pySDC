@@ -52,8 +52,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,450,30)]
-    #pparams['nvars']    = [(4,150,10)]
+    #pparams['nvars']    = [(4,450,30)]
+    pparams['nvars']    = [(4,150,10)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     pparams['order']    = [4] # [fine_level, coarse_level]
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [50]
-    pparams['gmres_restart'] = [20]
+    pparams['gmres_restart'] = [10]
     pparams['gmres_tol']     = [1e-6]
 
     # This comes as read-in for the transfer operations
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    dirk = dirk(P.D_upwind + P.M, dirk_order, pparams['gmres_maxiter'], pparams['gmres_restart'], pparams['gmres_tol'])
+    dirk = dirk(P, dirk_order)
     u0 = uinit.values.flatten()
 
     for i in range(0,Nsteps):
