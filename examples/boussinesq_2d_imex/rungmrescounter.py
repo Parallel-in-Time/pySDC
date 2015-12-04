@@ -17,6 +17,8 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from pylab import rcParams
+
 from unflatten import unflatten
 
 from standard_integrators import dirk
@@ -30,17 +32,17 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-8
+    lparams['restol'] = 1E-15
     
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['num_nodes'] = 3
-    swparams['do_LU'] = True
+    swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 4
+    sparams['maxiter'] = 3
 
-    dirk_order = 4
+    dirk_order = 2
 
     # setup parameters "in time"
     t0     = 0
@@ -52,8 +54,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    #pparams['nvars']    = [(4,450,30)]
-    pparams['nvars']    = [(4,150,10)]
+    pparams['nvars']    = [(4,300,20)]
+    #pparams['nvars']    = [(4,150,10)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -61,7 +63,7 @@ if __name__ == "__main__":
     pparams['z_bounds'] = [(   0.0,  10.0)]
     pparams['order']    = [4] # [fine_level, coarse_level]
     pparams['order_upw'] = [5]
-    pparams['gmres_maxiter'] = [50]
+    pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol']     = [1e-6]
 
@@ -87,12 +89,6 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    dirk = dirk(P, dirk_order)
-    u0 = uinit.values.flatten()
-
-    for i in range(0,Nsteps):
-      u0 = dirk.timestep(u0, dt)
-    
     cfl_advection    = pparams['u_adv']*dt/P.h[0]
     cfl_acoustic_hor = pparams['c_s']*dt/P.h[0]
     cfl_acoustic_ver = pparams['c_s']*dt/P.h[1]
@@ -100,15 +96,30 @@ if __name__ == "__main__":
     print ("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
     print ("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
+    dirk = dirk(P, dirk_order)
+    u0 = uinit.values.flatten()
+
+    for i in range(0,Nsteps):
+      u0 = dirk.timestep(u0, dt)  
+
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     u0 = unflatten(u0, 4, P.N[0], P.N[1])
+
+    fs = 8
+    rcParams['figure.figsize'] = 5.0, 2.5
     fig = plt.figure()
 
-    plt.plot(P.xx[:,5], uend.values[2,:,5], color='r', marker='+', markevery=3)
-    plt.plot(P.xx[:,5], u0[2,:,5], color='b', markevery=5)
-    plt.show()
+    plt.plot(P.xx[:,5], uend.values[2,:,5], '-', color='b', label='SDC')
+    plt.plot(P.xx[:,5], u0[2,:,5], '+', color='g', markevery=5, markersize=fs-2, label='DIRK')
+    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+    plt.yticks(fontsize=fs)
+    plt.xticks(fontsize=fs)
+    plt.xlabel('x', fontsize=fs, labelpad=0)
+    plt.ylabel('Bouyancy', fontsize=fs, labelpad=1)
+    #plt.show()
+    plt.savefig('boussinesq.pdf', bbox_inches='tight')
 
     print " #### Logging report for DIRK #### "
     print "Number of calls to implicit solver: %5i" % dirk.logger.solver_calls
