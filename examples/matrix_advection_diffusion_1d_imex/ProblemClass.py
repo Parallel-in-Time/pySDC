@@ -5,7 +5,7 @@ import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
+from pySDC.tools.transfer_tools import to_sparse
 from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
 
 
@@ -35,12 +35,19 @@ class advection_diffusion(ptype):
         assert 'order' in cparams
         assert 'nu' in cparams
         assert 't_0' in cparams
+        assert 'u_0' in cparams
+        assert 'imex_factor' in cparams
 
         assert cparams['nvars']%2 == 0
+
+        if 'sparse_format' in cparams:
+            self.sparse_format = cparams['sparse_format']
+        else:
+            self.sparse_format = "array"
         
         # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        for k, v in cparams.items():
+            setattr(self, k, v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(advection_diffusion,self).__init__(self.nvars,dtype_u,dtype_f)
@@ -48,8 +55,9 @@ class advection_diffusion(ptype):
         # compute dx and get discretization matrix A
         self.mesh = np.linspace(0, 1, num=self.nvars, endpoint=False)
         self.dx   = self.mesh[1] - self.mesh[0]
-        self.A    = self.__get_A_laplace(self.nvars, self.nu, self.dx) \
-                    + self.__get_FD(self.nvars, self.c, self.order, self.dx)
+        # self.A_I  = self.__get_A_laplace(self.nvars, self.nu, self.dx)
+        # self.A_E  = self.__get_FD(self.nvars, self.c, self.order, self.dx)
+        self.A    = self.A_I + self.A_E
 
     def __get_A_laplace(self,N,nu,dx):
         """
@@ -69,7 +77,7 @@ class advection_diffusion(ptype):
         A[0, -1] = 1.0
         A[-1, 0] = 1.0
         A *= nu / (dx**2)
-        return A
+        return to_sparse(A, self.sparse_format)
 
     def __get_FD(self, N, c, order, dx):
         """
@@ -79,9 +87,9 @@ class advection_diffusion(ptype):
         :param d:
         :return: Matrix in sparse format
         """
-        return -c*getFDMatrix(N, order, dx)
+        return to_sparse(-c*getFDMatrix(N, order, dx), self.sparse_format)
 
-    def solve_system(self,rhs,factor,u0):
+    def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs
 
@@ -95,7 +103,7 @@ class advection_diffusion(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A_I, rhs.values)
+        me.values = np.linalg.solve(np.eye(self.nvars)-factor*self.A, rhs.values)
         return me
 
 
@@ -179,12 +187,12 @@ class advection_diffusion(ptype):
 
         # take just one peak
         me = mesh(self.nvars)
-        a = 1.0 / np.sqrt(4*np.pi*self.nu*(t + self.t_0))
-        # print a
-        x = self.mesh - 0.5 - t*self.c
-        # print x
-        me.values = a * np.exp(-x*x/(4*self.nu*(t+self.t_0)))
-
+        x = self.mesh + t*self.c
+        if np.abs(self.nu) > 1e-8:
+            a = 1.0 / np.sqrt(4*np.pi*self.nu*(t + self.t_0))
+            me.values = a * np.exp(-x*x/(4*self.nu*(t+self.t_0))) * self.u_0(x)
+        else:
+            me.values = self.u_0(x)
         return me
 
     def get_mesh(self, form="list"):
@@ -203,13 +211,23 @@ class advection_diffusion(ptype):
         """
         return self.A_E + self.A_I
 
+#   eps gives which part is computed
+#   eps = 1.0 -> Laplace implicit , F_D explicit
+#   eps = 0.0 -> Laplace explicit , F_D implicit
+
     @property
     def A_I(self):
-        return self.__get_A_laplace(self.nvars, self.nu, self.dx)
+        eps = self.imex_factor
+        A_L = self.__get_A_laplace(self.nvars, self.nu, self.dx)
+        F_D = self.__get_FD(self.nvars, self.c, self.order, self.dx)
+        return eps*A_L + (1-eps)*F_D
 
     @property
     def A_E(self):
-        return self.__get_FD(self.nvars, self.c, self.order, self.dx)
+        eps = self.imex_factor
+        A_L = self.__get_A_laplace(self.nvars, self.nu, self.dx)
+        F_D = self.__get_FD(self.nvars, self.c, self.order, self.dx)
+        return eps*F_D + (1-eps)*A_L
 
 
     def force_term(self, t):
