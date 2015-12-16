@@ -59,7 +59,7 @@ class swfw_scalar(ptype):
         me = mesh(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
-               me.values[i,j] = rhs.values[i,j]/(1-factor*self.lambda_f[j])
+               me.values[i,j] = rhs.values[i,j]/(1.0-factor*self.lambda_f[j])
 
         return me
 
@@ -130,7 +130,7 @@ class swfw_scalar(ptype):
         Returns:
             exact solution
         """
-
+        
         me = mesh(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
