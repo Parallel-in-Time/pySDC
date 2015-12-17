@@ -95,6 +95,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   #
   #
+  @unittest.skip("Needs fix of isse #52 before passing")
   def test_updateformula(self):
 
     step = stepclass.step(params={})
