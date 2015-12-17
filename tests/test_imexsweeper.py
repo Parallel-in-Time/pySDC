@@ -135,7 +135,7 @@ class TestImexSweeper(unittest.TestCase):
     level.sweep.compute_end_point()
     uend_sweep = level.uend.values
     # Compute end value from matrix formulation
-    uend_mat   = u0.values + step.status.dt*level.sweep.coll.weights.dot(ustages*(problem.lambda_s[0] + problem.lambda_f[0]))
+    uend_mat   = self.pparams['u0'] + step.status.dt*level.sweep.coll.weights.dot(ustages*(problem.lambda_s[0] + problem.lambda_f[0]))
     assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "Update formula in sweeper gives different result than matrix update formula"
 
   #
