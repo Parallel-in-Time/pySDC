@@ -54,7 +54,7 @@ class TestImexSweeper(unittest.TestCase):
     self.pparams['u0'] = np.random.rand()
     self.swparams = {}
     self.swparams['collocation_class'] = collclass.CollGaussLobatto
-    self.swparams['num_nodes'] = 2
+    self.swparams['num_nodes'] = 2+np.random.randint(5)
 
   # ***************
   # **** TESTS ****
