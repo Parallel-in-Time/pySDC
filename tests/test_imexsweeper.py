@@ -234,36 +234,3 @@ class TestImexSweeper(unittest.TestCase):
     update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
     uend_matrix = update*self.pparams['u0']
     assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
-  #
-  #
-  #
-  def test_canrunmatrixsweep(self):
-    step, level, problem, nnodes = self.setupLevelStepProblem()
-
-    QE = level.sweep.QE[1:,1:]
-    QI = level.sweep.QI[1:,1:]
-    Q  = level.sweep.coll.Qmat[1:,1:]
-    
-    P  = np.eye(nnodes) - step.status.dt*problem.lambda_s[0]*QE - step.status.dt*problem.lambda_f[0]*QI
-
-    Pinv = np.linalg.inv(P)
-    M  = np.eye(nnodes) - step.status.dt*( problem.lambda_s[0] + problem.lambda_f[0] )*Q
-    #M = step.status.dt*( (problem.lambda_s[0]+problem.lambda_f[0])*Q - problem.lambda_f[0]*QI - problem.lambda_s[0]*QE )
-    #print QI
-    #print P    
-    #print Pinv
-    #print M
-    #level.sweep.predict()
-    #u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
-    #ufull  = u0full + Pinv.dot( u0full ) - Pinv.dot( M.dot(u0full) )
-    #print u0.values
-    #print Pinv.dot(u0full)
-    #print Pinv.dot(M)
-    #print Pinv.dot(M.dot(u0full))
-    #ufull = Pinv.dot(M.dot(u0full)) + Pinv.dot(u0full)
-    #ufull  = np.linalg.inv(M).dot(u0full)
-    #print ufull
-    #uend   = u0.values + step.status.dt*level.sweep.coll.weights.dot( (problem.lambda_f[0]+problem.lambda_s[0])*ufull )
-    #print "Matrix: %s" % uend
-
-
