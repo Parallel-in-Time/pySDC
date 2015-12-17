@@ -173,6 +173,63 @@ class TestImexSweeper(unittest.TestCase):
     unew_sweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
     assert np.linalg.norm( unew_sweep - ucoll, np.infty )<1e-14, "Collocation solution not invariant under node-to-node sweep"
 
+
+  #
+  # Make sure that K node-to-node sweeps give the same result as K sweeps in matrix form and the single matrix formulation for K sweeps
+  #
+  def test_manysweepsequalmatrix(self):
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    step.levels[0].sweep.predict()
+    u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Perform K node-to-node SDC sweep
+    K = 1 + np.random.randint(6)
+    for i in range(0,K):
+      level.sweep.update_nodes()
+    usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    LHS, RHS = self.setupSweeperMatrices(step, level, problem)
+    unew = u0full
+    for i in range(0,K):
+      unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(unew) )
+    
+    assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"   
+    
+    # Build single matrix representing K sweeps    
+    Pinv = np.linalg.inv(LHS)
+    Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
+    for i in range(0,K):
+      Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
+    usweep_onematrix = Mat_sweep.dot(u0full)
+    assert np.linalg.norm( usweep_onematrix - usweep, np.infty )<1e-14, "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
+    
+  #
+  # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
+  #
+  @unittest.skip("Needs fix of isse #52 before passing")
+  def test_maysweepupdate(self):
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    step.levels[0].sweep.predict()
+    u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Perform K node-to-node SDC sweep
+    K = 1 + np.random.randint(4)
+    for i in range(0,K):
+      level.sweep.update_nodes()
+    # Fetch final value
+    level.sweep.compute_end_point()
+    uend_sweep = level.uend.values
+
+    LHS, RHS = self.setupSweeperMatrices(step, level, problem)
+    # Build single matrix representing K sweeps    
+    Pinv = np.linalg.inv(LHS)
+    Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
+    for i in range(0,K):
+      Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
+    # Now build update function
+    update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+    uend_matrix = update*self.pparams['u0']
+    assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
   #
   #
   #
