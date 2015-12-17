@@ -51,7 +51,7 @@ class TestImexSweeper(unittest.TestCase):
     self.pparams = {}
     self.pparams['lambda_s'] = np.array([-0.1*1j], dtype='complex')
     self.pparams['lambda_f'] = np.array([-1.0*1j], dtype='complex')
-    self.pparams['u0'] = 1.0
+    self.pparams['u0'] = np.random.rand()
     self.swparams = {}
     self.swparams['collocation_class'] = collclass.CollGaussLobatto
     self.swparams['num_nodes'] = 2
@@ -120,7 +120,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   # Make sure the implemented update formula matches the matrix update formula
   #
-  @unittest.skip("Needs fix of isse #52 before passing")
+  @unittest.skip("Needs fix of issue #52 before passing")
   def test_updateformula(self):
 
     step, level, problem, nnodes = self.setupLevelStepProblem()
@@ -206,7 +206,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
   #
-  @unittest.skip("Needs fix of isse #52 before passing")
+  @unittest.skip("Needs fix of issue #52 before passing")
   def test_maysweepupdate(self):
     step, level, problem, nnodes = self.setupLevelStepProblem()
     step.levels[0].sweep.predict()
