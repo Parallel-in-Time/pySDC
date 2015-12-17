@@ -217,7 +217,7 @@ class TestImexSweeper(unittest.TestCase):
     u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
 
     # Perform K node-to-node SDC sweep
-    K = 1 + np.random.randint(4)
+    K = 1 + np.random.randint(6)
     for i in range(0,K):
       level.sweep.update_nodes()
     # Fetch final value
@@ -232,5 +232,6 @@ class TestImexSweeper(unittest.TestCase):
       Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
     # Now build update function
     update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+    # Multiply u0 by value of update function to get end value directly
     uend_matrix = update*self.pparams['u0']
     assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
