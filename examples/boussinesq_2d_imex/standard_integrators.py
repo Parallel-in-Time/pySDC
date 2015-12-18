@@ -5,6 +5,79 @@ import scipy.sparse as sp
 from ProblemClass import Callback, logging, boussinesq_2d_imex
 
 #
+# Trapezoidal rule
+#
+class trapezoidal:
+ 
+  def __init__(self, problem, alpha=0.5):
+    assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
+    self.Ndof = np.shape(problem.M)[0]
+    self.order = 2
+    self.logger = logging()
+    self.problem = problem
+    self.alpha = alpha
+
+  def timestep(self, u0, dt):
+    B_trap   = sp.eye(self.Ndof) + self.alpha*dt*(self.problem.D_upwind + self.problem.M)
+    b         = B_trap.dot(u0)
+    return self.f_solve(b, alpha=(1.0-self.alpha)*dt, u0 = u0)
+
+  # 
+  # Returns f(u) = c*u
+  #  
+  def f(self,u):
+    return self.problem.D_upwind.dot(u)+self.problem.M.dot(u)
+    
+  
+  #
+  # Solves (Id - alpha*c)*u = b for u
+  #  
+  def f_solve(self, b, alpha, u0):
+    cb = Callback()
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    if alpha!=0.0:
+      #print "BDF-2: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
+      self.logger.add(cb.getcounter())    
+    return sol
+
+#
+# A BDF-2 implicit two-step method
+#
+class bdf2:
+
+  def __init__(self, problem):
+    assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
+    self.Ndof = np.shape(problem.M)[0]
+    self.order = 2
+    self.logger = logging()
+    self.problem = problem
+
+  def firsttimestep(self, u0, dt):
+    return self.f_solve(b = u0, alpha = dt, u0 = u0)
+
+  def timestep(self, u0, um1, dt):
+    b = (4.0/3.0)*u0 - (1.0/3.0)*um1
+    return self.f_solve(b = b, alpha = (2.0/3.0)*dt, u0 = u0)
+
+  # 
+  # Returns f(u) = c*u
+  #  
+  def f(self,u):
+    return self.problem.D_upwind.dot(u)+self.problem.M.dot(u)
+    
+  
+  #
+  # Solves (Id - alpha*c)*u = b for u
+  #  
+  def f_solve(self, b, alpha, u0):
+    cb = Callback()
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    if alpha!=0.0:
+      #print "BDF-2: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
+      self.logger.add(cb.getcounter())    
+    return sol
+
+#
 # A diagonally implicit Runge-Kutta method of order 2, 3 or 4
 #
 class dirk:
@@ -117,6 +190,6 @@ class dirk:
     cb = Callback()
     sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
-      print "DIRK: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
+      #print "DIRK-%1i: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( self.order, cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    
     return sol
