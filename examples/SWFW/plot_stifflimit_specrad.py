@@ -64,6 +64,7 @@ if __name__ == "__main__":
     plt.plot(nodes_v, specrad[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f i$' % problem.lambda_f[0].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Spectral radius  $\sigma\left( \mathbf{E} \right)$', fontsize=fs, labelpad=2)
+    #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
     plt.legend(loc='lower right', fontsize=fs, prop={'size':fs})
     plt.xlim([np.min(nodes_v), np.max(nodes_v)])
     plt.ylim([0, 1.0])

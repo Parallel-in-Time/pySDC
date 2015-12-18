@@ -16,10 +16,12 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['num_nodes'] = 3
+    swparams['num_nodes'] = 9
     K = 1
     
-
+    #
+    # ...this is functionality copied from test_imexsweeper. Ideally, it should be available in one place.
+    #
     step = stepclass.step(params={})
     L = lvl.level(problem_class=swfw_scalar, problem_params=pparams, dtype_u=mesh, dtype_f=rhs_imex_mesh, sweeper_class=imex, sweeper_params=swparams, level_params={}, hook_class=hookclass.hooks, id="stability")
     step.register_level(L)
