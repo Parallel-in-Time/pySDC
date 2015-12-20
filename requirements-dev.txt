@@ -1,0 +1,2 @@
+-r requirements-optional.txt
+nose >= 1.2
