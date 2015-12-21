@@ -27,8 +27,8 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['num_nodes'] = 2
-    K = 2
+    swparams['num_nodes'] = 4
+    K = 5
     
     #
     # ...this is functionality copied from test_imexsweeper. Ideally, it should be available in one place.
@@ -80,8 +80,9 @@ if __name__ == "__main__":
     plt.gca().set_xticks([0.0, 1.0, 2.0, 3.0])
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([np.min(lambda_s.imag), np.max(lambda_s.imag)])
-    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
+    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=2.0)
     plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
+    plt.title(r'$M=%1i$, $K=%1i$' % (swparams['num_nodes'],K), fontsize=fs)
     filename = 'sdc-fwsw-stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     fig.savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
