@@ -5,7 +5,7 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 import matplotlib.pyplot as plt
 
-from examples.SWFW.ProblemClass import swfw_scalar
+from examples.fwsw.ProblemClass import swfw_scalar
 from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_stepwise as mp

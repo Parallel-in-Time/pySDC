@@ -21,7 +21,7 @@ from pylab import rcParams
 
 from unflatten import unflatten
 
-from standard_integrators import dirk
+from standard_integrators import dirk, bdf2, trapezoidal
 
 if __name__ == "__main__":
 
@@ -40,16 +40,14 @@ if __name__ == "__main__":
     swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 3
+    sparams['maxiter'] = 4
 
-    dirk_order = 2
+    dirk_order = 4
 
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000
-    Nsteps =  500
-    #Tend   = 30
-    #Nsteps =  5
+    Nsteps =  100
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -92,41 +90,63 @@ if __name__ == "__main__":
     cfl_advection    = pparams['u_adv']*dt/P.h[0]
     cfl_acoustic_hor = pparams['c_s']*dt/P.h[0]
     cfl_acoustic_ver = pparams['c_s']*dt/P.h[1]
+    print "Horizontal resolution: %4.2f" % P.h[0]
+    print "Vertical resolution:   %4.2f" % P.h[1]
     print ("CFL number of advection: %4.2f" % cfl_advection)
     print ("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
     print ("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
-    dirk = dirk(P, dirk_order)
+    dirk4 = dirk(P, 4)
+    dirk2 = dirk(P, 2)
+    trap  = trapezoidal(P)
+    bdf  = bdf2(P)
     u0 = uinit.values.flatten()
-
+    udirk4 = u0
+    udirk2 = u0
+    ubdf  = u0
+    utrap  = u0
     for i in range(0,Nsteps):
-      u0 = dirk.timestep(u0, dt)  
-
+      udirk4 = dirk4.timestep(udirk4, dt)  
+      udirk2 = dirk2.timestep(udirk2, dt)
+      utrap  = trap.timestep(utrap, dt)
+      #if i==0:
+      #  ubdf_new = bdf.firsttimestep(ubdf, dt)
+      #  ubdf_m1  = ubdf
+      #else:        
+      #  ubdf_new  = bdf.timestep(ubdf, ubdf_m1, dt)
+      #ubdf_m1 = ubdf
+      #ubdf    = ubdf_new    
+  
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-    u0 = unflatten(u0, 4, P.N[0], P.N[1])
-
-    fs = 8
-    rcParams['figure.figsize'] = 5.0, 2.5
-    fig = plt.figure()
-
-    plt.plot(P.xx[:,5], uend.values[2,:,5], '-', color='b', label='SDC')
-    plt.plot(P.xx[:,5], u0[2,:,5], '+', color='g', markevery=5, markersize=fs-2, label='DIRK')
-    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
-    plt.yticks(fontsize=fs)
-    plt.xticks(fontsize=fs)
-    plt.xlabel('x', fontsize=fs, labelpad=0)
-    plt.ylabel('Bouyancy', fontsize=fs, labelpad=1)
-    #plt.show()
-    plt.savefig('boussinesq.pdf', bbox_inches='tight')
-
-    print " #### Logging report for DIRK #### "
-    print "Number of calls to implicit solver: %5i" % dirk.logger.solver_calls
-    print "Total number of GMRES iterations: %5i" % dirk.logger.iterations
-    print "Average number of iterations per call: %6.3f" % (float(dirk.logger.iterations)/float(dirk.logger.solver_calls))
+    udirk4 = unflatten(udirk4, 4, P.N[0], P.N[1])
+    udirk2 = unflatten(udirk2, 4, P.N[0], P.N[1])
+    print "Norm of final solution by trapezoidal rule: %5.3f" % np.linalg.norm( utrap, np.inf )    
+    utrap  = unflatten(utrap, 4, P.N[0], P.N[1])
+  
+    np.save('xaxis', P.xx)
+    np.save('sdc', uend.values)
+    np.save('dirk2', udirk2)
+    np.save('dirk4', udirk4)
+    np.save('trap', utrap)
     
-    print " #### Logging report for SDC #### "
+    print " #### Logging report for DIRK-4 #### "
+    print "Number of calls to implicit solver: %5i" % dirk4.logger.solver_calls
+    print "Total number of GMRES iterations: %5i" % dirk4.logger.iterations
+    print "Average number of iterations per call: %6.3f" % (float(dirk4.logger.iterations)/float(dirk4.logger.solver_calls))
+
+    print " #### Logging report for DIRK-2 #### "
+    print "Number of calls to implicit solver: %5i" % dirk2.logger.solver_calls
+    print "Total number of GMRES iterations: %5i" % dirk2.logger.iterations
+    print "Average number of iterations per call: %6.3f" % (float(dirk2.logger.iterations)/float(dirk2.logger.solver_calls))
+
+    #print " #### Logging report for BDF2 #### "
+    #print "Number of calls to implicit solver: %5i" % bdf.logger.solver_calls
+    #print "Total number of GMRES iterations: %5i" % bdf.logger.iterations
+    #print "Average number of iterations per call: %6.3f" % (float(bdf.logger.iterations)/float(bdf.logger.solver_calls))
+
+    print " #### Logging report for SDC-(%1i,%1i) #### " % (swparams['num_nodes'], sparams['maxiter'])
     print "Number of calls to implicit solver: %5i" % P.logger.solver_calls
     print "Total number of GMRES iterations: %5i" % P.logger.iterations
-    print "Average number of iterations per call: %6.3f" % (float(P.logger.iterations)/float(P.logger.solver_calls))
+    print "Average number of iterations per call: %6.3f" % (float(P.logger.iterations)/float(P.logger.solver_calls))  
+

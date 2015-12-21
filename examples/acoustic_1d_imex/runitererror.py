@@ -83,6 +83,9 @@ if __name__ == "__main__":
         # get initial values on finest level
         P = MS[0].levels[0].prob
         uinit = P.u_exact(t0)
+        
+        print "Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx) 
+        print "Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx) 
 
         # call main function to get things done...
         uend,stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
@@ -113,12 +116,12 @@ if __name__ == "__main__":
     for ii in range(0,np.size(cs_v)):
       x = np.arange(1,lastiter[ii,0])
       y = convrate[ii, 0, 0:lastiter[ii,0]-1]
-      plt.plot(x, y, shape[ii], markersize=fs-2, color=color[ii], label=r'$c_{s}$=%4.2f' % cs_v[ii])       
+      plt.plot(x, y, shape[ii], markersize=fs-2, color=color[ii], label=r'$C_{\rm fast}$=%4.2f' % (cs_v[ii]*dt/P.dx))       
       #plt.plot(x, 0.0*y+avg_convrate[ii,0], '--', color=color[ii])
 
     plt.legend(loc='upper right', fontsize=fs, prop={'size':fs})
     plt.xlabel('Iteration', fontsize=fs)
-    plt.ylabel('Convergence rate', fontsize=fs, labelpad=2)
+    plt.ylabel(r'$|| r^{k+1} ||_{\infty}/|| r^k ||_{\infty}$', fontsize=fs, labelpad=2)
     plt.xlim([0, sparams['maxiter']])
     plt.ylim([0, 0.8])
     plt.yticks(fontsize=fs)

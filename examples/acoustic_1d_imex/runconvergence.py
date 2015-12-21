@@ -54,7 +54,7 @@ if __name__ == "__main__":
     #description['transfer_class'] = mesh_to_mesh_1d
     #description['transfer_params'] = tparams
     
-    Nsteps = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
+    Nsteps = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
     
     for order in [2, 3, 4]:
 
@@ -87,6 +87,10 @@ if __name__ == "__main__":
         # get initial values on finest level
         P = MS[0].levels[0].prob
         uinit = P.u_exact(t0)
+        if ii==0:
+          print "Time step: %4.2f" % dt
+          print "Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx) 
+          print "Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx) 
 
         # call main function to get things done...
         uend,stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
