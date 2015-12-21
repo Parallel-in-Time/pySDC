@@ -5,7 +5,7 @@ from pySDC import Step as stepclass
 
 from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from examples.SWFW.ProblemClass import swfw_scalar 
+from examples.fwsw.ProblemClass import swfw_scalar
 
 from nose.tools import *
 import unittest
