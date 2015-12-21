@@ -112,7 +112,7 @@ class dirk:
       self.b[1]   = 1.0 - 1.0/(3.0*alpha*alpha)
       self.b[2]   = 1.0/(6.0*alpha*alpha)
        
-    self.stages  = np.zeros((self.nstages,self.Ndof))
+    self.stages  = np.zeros((self.nstages,self.Ndof), dtype='complex')
 
   def timestep(self, u0, dt):
     
