@@ -134,25 +134,19 @@ class imex_1st_order(sweeper):
         """
         Compute u at the right point of the interval
 
-        The value uend computed here might be a simple copy from u[M] (if right point is a collocation node) or
-        a full evaluation of the Picard formulation (if right point is not a collocation node)
+        The value uend computed here is a full evaluation of the Picard formulation (always!)
         """
 
         # get current level and problem description
         L = self.level
         P = L.prob
 
-        # check if Mth node is equal to right point (flag is set in collocation class)
-        if self.coll.right_is_node:
-            # a copy is sufficient
-            L.uend = P.dtype_u(L.u[-1])
-        else:
-            # start with u0 and add integral over the full interval (using coll.weights)
-            L.uend = P.dtype_u(L.u[0])
-            for m in range(self.coll.num_nodes):
-                L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
-            # add up tau correction of the full interval (last entry)
-            if L.tau is not None:
-                L.uend += L.tau[-1]
+        # start with u0 and add integral over the full interval (using coll.weights)
+        L.uend = P.dtype_u(L.u[0])
+        for m in range(self.coll.num_nodes):
+            L.uend += L.dt*self.coll.weights[m]*(L.f[m+1].impl + L.f[m+1].expl)
+        # add up tau correction of the full interval (last entry)
+        if L.tau is not None:
+            L.uend += L.tau[-1]
 
         return None

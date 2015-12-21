@@ -121,9 +121,6 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_updateformula(self):
 
-    if (self.swparams['collocation_class']==collclass.CollGaussLobatto):
-      raise unittest.SkipTest("Needs fix of issue #52 before passing for Gauss Lobatto nodes")
-
     step, level, problem, nnodes = self.setupLevelStepProblem()
     level.sweep.predict()
     u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -208,9 +205,6 @@ class TestImexSweeper(unittest.TestCase):
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
   #
   def test_maysweepupdate(self):
-
-    if (self.swparams['collocation_class']==collclass.CollGaussLobatto):
-      raise unittest.SkipTest("Needs fix of issue #52 before passing for Gauss Lobatto nodes")
 
     step, level, problem, nnodes = self.setupLevelStepProblem()
     step.levels[0].sweep.predict()
