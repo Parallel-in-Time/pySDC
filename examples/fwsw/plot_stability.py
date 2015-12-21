@@ -8,7 +8,9 @@ from pySDC.sweeper_classes.imex_1st_order import imex_1st_order as imex
 from examples.fwsw.ProblemClass import swfw_scalar 
 import numpy as np
 
+from pylab import rcParams
 import matplotlib.pyplot as plt
+from subprocess import call
 
 if __name__ == "__main__":
 
@@ -16,7 +18,7 @@ if __name__ == "__main__":
     N_f = 400
 
     lambda_s = 1j*np.linspace(0.0, 2.0, N_s)
-    lambda_f = 1j*np.linspace(0.0, 8.0, N_f)
+    lambda_f = 1j*np.linspace(2.0, 8.0, N_f)
 
     pparams = {}
     # the following are not used in the computation
@@ -63,15 +65,24 @@ if __name__ == "__main__":
         stab[j,i] = stab_fh
 
     ###
-    fig  = plt.figure(figsize=(12,12))
+    rcParams['figure.figsize'] = 2.5, 2.5
+    fs = 8
+    fig  = plt.figure()
     #pcol = plt.pcolor(lambda_s.imag, lambda_f.imag, np.absolute(stab), vmin=0.99, vmax=2.01)
     #pcol.set_edgecolor('face')
-    levels = np.array([0.95, 0.99, 1.01])
-    CS = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k')
-    plt.clabel(CS, fontsize=9)
-    plt.plot([0, 4], [0, 4], color='k', linewidth=2.5)
+    levels = np.array([0.95, 0.99, 1.01, 1.05])
+#    levels = np.array([1.0])
+    CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k',linestyles='dashed')
+    CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0], colors='k')
+    plt.clabel(CS1, fontsize=fs-2)
+    plt.clabel(CS2, fontsize=fs-2)
+    #plt.plot([0, 2], [0, 2], color='k', linewidth=1)
     plt.gca().set_xticks([0.0, 1.0, 2.0, 3.0])
+    plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([np.min(lambda_s.imag), np.max(lambda_s.imag)])
-    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=18, labelpad=0.0)
-    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=18)
-    plt.show()
+    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
+    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
+    filename = 'sdc-fwsw-stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
+    fig.savefig(filename, bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
+
