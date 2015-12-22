@@ -204,7 +204,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
   #
-  def test_maysweepupdate(self):
+  def test_manysweepupdate(self):
 
     step, level, problem, nnodes = self.setupLevelStepProblem()
     step.levels[0].sweep.predict()
@@ -229,3 +229,48 @@ class TestImexSweeper(unittest.TestCase):
     # Multiply u0 by value of update function to get end value directly
     uend_matrix = update*self.pparams['u0']
     assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
+
+  #
+  # Make sure that creating a sweeper object with a collocation object with right_is_node=False and do_coll_update=False throws an exception
+  #
+  def test_norightnode_collupdate_fails(self):
+    self.swparams['collocation_class'] = collclass.CollGaussLegendre
+    self.swparams['do_coll_update'] = False
+    # Has to throw an exception
+    with self.assertRaises(AssertionError):
+      step, level, problem, nnodes = self.setupLevelStepProblem()   
+
+  #
+  # Make sure the update with do_coll_update=False reproduces last stage
+  # 
+  def test_update_nocollupdate_laststage(self):
+    self.swparams['do_coll_update'] = False
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    level.sweep.predict()
+    ulaststage = np.random.rand()
+    level.u[nnodes].values = ulaststage
+    level.sweep.compute_end_point()
+    uend = level.uend.values
+    assert abs(uend-ulaststage)<1e-14, "compute_end_point with do_coll_update=False did not reproduce last stage value"
+
+  #
+  # Make sure that update with do_coll_update=False is identical to update formula with q=(0,...,0,1)
+  #
+  def test_updateformula_no_coll_update(self):
+    self.swparams['do_coll_update'] = False
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    level.sweep.predict()
+    u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Perform update step in sweeper
+    level.sweep.update_nodes()
+    ustages = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Compute end value through provided function
+    level.sweep.compute_end_point()
+    uend_sweep = level.uend.values
+    # Compute end value from matrix formulation
+    q = np.zeros(nnodes)
+    q[nnodes-1] = 1.0
+    uend_mat   = q.dot(ustages)
+    assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"
