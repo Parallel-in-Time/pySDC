@@ -30,7 +30,7 @@ own documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filte
 
 Some first, rather rudimentary tests can be found in the tests directory and nose should be able to run those 
 out-of-the-box. Auto-generated test results are here: 
-[![status-img][]](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC/lastCompletedBuild/testReport/) 
+[![status-img][]](https://travis-ci.org/Parallel-in-Time/pySDC)
 
 
 HowTo
@@ -70,4 +70,4 @@ provided with this code), only a custom problem description have to be implement
 Note: all interfaces are subject to changes, if necessary.
 
 
-[status-img]: https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC/badge/icon
+[status-img]: https://travis-ci.org/Parallel-in-Time/pySDC.svg?branch=master
