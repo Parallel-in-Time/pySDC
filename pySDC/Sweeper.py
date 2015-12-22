@@ -31,7 +31,8 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
                 defaults = dict()
                 defaults['do_LU'] = False
-
+                defaults['do_coll_update'] = True
+                
                 for k,v in defaults.items():
                     setattr(self,k,v)
 
@@ -43,6 +44,8 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         coll = params['collocation_class'](params['num_nodes'],0,1)
         assert isinstance(coll, CollBase)
+        if not coll.right_is_node:
+          assert self.params['do_coll_update'], "For nodes where the right end point is not a node, do_coll_update has to be set to True"
 
         # This will be set as soon as the sweeper is instantiated at the level
         self.__level = None
