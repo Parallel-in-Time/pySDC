@@ -16,7 +16,7 @@ from pySDC.Stats import grep_stats, sort_stats
 
 from matplotlib import pyplot as plt
 from pylab import rcParams
-
+from subprocess import call
 
 if __name__ == "__main__":
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
       description['problem_params']    = pparams
       description['dtype_u']           = mesh
       description['dtype_f']           = rhs_imex_mesh
-      description['collocation_class'] = collclass.CollGaussLobatto
+      description['collocation_class'] = collclass.CollGaussLegendre
       description['sweeper_class']     = imex_1st_order
       description['level_params']      = lparams
       description['hook_class']        = plot_solution
@@ -127,6 +127,8 @@ if __name__ == "__main__":
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.show()
-    fig.savefig('sdc_fwsw_iteration.pdf',bbox_inches='tight')
+    filename = 'sdc_fwsw_iteration.pdf'
+    fig.savefig(filename,bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
 
 
