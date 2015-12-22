@@ -1,0 +1,36 @@
+# use 'new'ish container-based infrastructure
+sudo: false
+dist: trusty
+
+language: python
+
+python:
+  - "2.7"
+  - "3.5"
+
+# this anaconda setup is taken from http://stackoverflow.com/a/30175390
+before_install:
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      export PYTHON_VERSION=2;
+      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O $HOME/miniconda2.sh;
+    fi
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then
+      export PYTHON_VERSION=3;
+      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda3.sh;
+    fi
+  - chmod +x $HOME/miniconda${PYTHON_VERSION}.sh
+  - $HOME/miniconda${PYTHON_VERSION}.sh -b;
+  - export PATH=/home/travis/miniconda${PYTHON_VERSION}/bin:$PATH
+  - conda update --yes conda
+
+install:
+  # this line needs to be updated to match the requirements.txt files
+  # the conda installer isn't able to process PIP's requirements.txt files
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose
+  - conda list
+
+script:
+  - which nosetests
+  - nosetests
+
+# TODO: generate documentation
