@@ -272,8 +272,5 @@ class TestImexSweeper(unittest.TestCase):
     # Compute end value from matrix formulation
     q = np.zeros(nnodes)
     q[nnodes-1] = 1.0
-    print q
     uend_mat   = q.dot(ustages)
-    print uend_sweep
-    print uend_mat
     assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"
