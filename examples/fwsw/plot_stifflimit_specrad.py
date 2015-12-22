@@ -10,6 +10,7 @@ import numpy as np
 
 from matplotlib import pyplot as plt
 from pylab import rcParams
+from subprocess import call
 
 if __name__ == "__main__":
 
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([50.0*1j], dtype='complex')
     pparams['u0'] = 1.0
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussLobatto
+    swparams['collocation_class'] = collclass.CollGaussLegendre
 
     nodes_v = np.arange(2,10)
     specrad = np.zeros((2,np.size(nodes_v)))
@@ -53,8 +54,10 @@ if __name__ == "__main__":
         # For Lobatto nodes, first column and row are all zeros, since q_1 = q_0; hence remove them
         QI = QI[1:,1:]
         Q  = Q[1:,1:]
-      # Eigenvalue of error propagation matrix in stiff limit: E = I - inv(QI)*Q
-      evals, evecs = np.linalg.eig( np.eye(nnodes-1) - np.linalg.inv(QI).dot(Q) )
+        # Eigenvalue of error propagation matrix in stiff limit: E = I - inv(QI)*Q
+        evals, evecs = np.linalg.eig( np.eye(nnodes-1) - np.linalg.inv(QI).dot(Q) )
+      else:
+        evals, evecs = np.linalg.eig( np.eye(nnodes) - np.linalg.inv(QI).dot(Q) )
       specrad[0,i] = np.linalg.norm( evals, np.inf )
 
   ### Plot result
@@ -71,5 +74,8 @@ if __name__ == "__main__":
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     #plt.show()
-    fig.savefig('sdc_fwsw_stifflimit_specrad.pdf',bbox_inches='tight')
+    filename = 'sdc_fwsw_stifflimit_specrad.pdf'
+    fig.savefig(filename,bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
+
 

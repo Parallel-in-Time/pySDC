@@ -16,6 +16,7 @@ from standard_integrators import bdf2, dirk, trapezoidal
 
 from matplotlib import pyplot as plt
 from pylab import rcParams
+from subprocess import call
 
 fs = 8
 
@@ -56,11 +57,9 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
-    if sparams['maxiter']==2:
-      description['num_nodes']         = 2
-    else:
-      description['num_nodes']         = 3
+    description['collocation_class'] = collclass.CollGaussLegendre
+    # Number of nodes
+    description['num_nodes']         = 3
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
@@ -137,4 +136,7 @@ if __name__ == "__main__":
     plt.legend(loc='upper left', fontsize=fs, prop={'size':fs})
     fig.gca().grid()
     #plt.show()
-    plt.gcf().savefig('fwsw-sdc-K'+str(sparams['maxiter'])+'-M'+str(description['num_nodes'])+'.pdf', bbox_inches='tight')
+    filename = 'sdc-fwsw-multiscale-K'+str(sparams['maxiter'])+'-M'+str(description['num_nodes'])+'.pdf'
+    plt.gcf().savefig(filename, bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
+
