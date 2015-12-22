@@ -204,7 +204,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
   #
-  def test_maysweepupdate(self):
+  def test_manysweepupdate(self):
 
     step, level, problem, nnodes = self.setupLevelStepProblem()
     step.levels[0].sweep.predict()
@@ -229,3 +229,13 @@ class TestImexSweeper(unittest.TestCase):
     # Multiply u0 by value of update function to get end value directly
     uend_matrix = update*self.pparams['u0']
     assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
+
+  #
+  # Make sure that creating a sweeper object with a collocation object with right_is_node=False and do_coll_update=False throws an exception
+  #
+  def test_norightnode_collupdate_fails(self):
+    self.swparams['collocation_class'] = collclass.CollGaussLegendre
+    self.swparams['do_coll_update'] = False
+    # Has to throw an exception
+    with self.assertRaises(AssertionError):
+      step, level, problem, nnodes = self.setupLevelStepProblem()   
