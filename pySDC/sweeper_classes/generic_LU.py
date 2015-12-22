@@ -135,10 +135,10 @@ class generic_LU(sweeper):
         L = self.level
         P = L.prob
 
--        # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
--        if (self.coll.right_is_node and not self.params['do_coll_update']):
--            # a copy is sufficient
--            L.uend = P.dtype_u(L.u[-1])
+         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
+        if (self.coll.right_is_node and not self.params.do_coll_update):
+          # a copy is sufficient
+          L.uend = P.dtype_u(L.u[-1])
         else:
           # start with u0 and add integral over the full interval (using coll.weights)
           L.uend = P.dtype_u(L.u[0])

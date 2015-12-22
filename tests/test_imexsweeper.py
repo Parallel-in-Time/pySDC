@@ -239,3 +239,41 @@ class TestImexSweeper(unittest.TestCase):
     # Has to throw an exception
     with self.assertRaises(AssertionError):
       step, level, problem, nnodes = self.setupLevelStepProblem()   
+
+  #
+  # Make sure the update with do_coll_update=False reproduces last stage
+  # 
+  def test_update_nocollupdate_laststage(self):
+    self.swparams['do_coll_update'] = False
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    level.sweep.predict()
+    ulaststage = np.random.rand()
+    level.u[nnodes].values = ulaststage
+    level.sweep.compute_end_point()
+    uend = level.uend.values
+    assert abs(uend-ulaststage)<1e-14, "compute_end_point with do_coll_update=False did not reproduce last stage value"
+
+  #
+  # Make sure that update with do_coll_update=False is identical to update formula with q=(0,...,0,1)
+  #
+  def test_updateformula_no_coll_update(self):
+    self.swparams['do_coll_update'] = False
+    step, level, problem, nnodes = self.setupLevelStepProblem()
+    level.sweep.predict()
+    u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Perform update step in sweeper
+    level.sweep.update_nodes()
+    ustages = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+
+    # Compute end value through provided function
+    level.sweep.compute_end_point()
+    uend_sweep = level.uend.values
+    # Compute end value from matrix formulation
+    q = np.zeros(nnodes)
+    q[nnodes-1] = 1.0
+    print q
+    uend_mat   = q.dot(ustages)
+    print uend_sweep
+    print uend_mat
+    assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "For do_coll_update=False, update formula in sweeper gives different result than matrix update formula with q=(0,..,0,1)"
