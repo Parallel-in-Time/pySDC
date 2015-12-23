@@ -31,11 +31,11 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']     = [(2,250)]
+    pparams['nvars']     = [(2,400)]
     pparams['cadv']      = 0.05
     pparams['cs']        = 1.00
     pparams['order_adv'] = 5
-    pparams['waveno']    = 1
+    pparams['waveno']    = 2
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -47,12 +47,11 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLobatto
+    description['collocation_class'] = collclass.CollGaussLegendre
     description['sweeper_class']     = imex_1st_order
+    description['do_coll_update']    = True
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
-    #description['transfer_class'] = mesh_to_mesh_1d
-    #description['transfer_params'] = tparams
     
     Nsteps = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
     

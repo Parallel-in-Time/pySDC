@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pylab import rcParams
 from matplotlib.ticker import ScalarFormatter
+from subprocess import call
 
 fs     = 8
 order  = np.array([])
@@ -54,5 +55,8 @@ plt.xticks([25, 50, 100], fontsize=fs)
 plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
 plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
 plt.show()
-fig.savefig('sdc_fwsw_convergence.pdf',bbox_inches='tight')
+filename = 'sdc_fwsw_convergence.pdf'
+fig.savefig(filename,bbox_inches='tight')
+call(["pdfcrop", filename, filename])
+
 
