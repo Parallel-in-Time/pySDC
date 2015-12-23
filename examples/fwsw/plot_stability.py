@@ -10,15 +10,18 @@ import numpy as np
 
 from pylab import rcParams
 import matplotlib.pyplot as plt
+from matplotlib.patches import Polygon
 from subprocess import call
 
 if __name__ == "__main__":
 
     N_s = 100
     N_f = 400
-
-    lambda_s = 1j*np.linspace(0.0, 2.0, N_s)
-    lambda_f = 1j*np.linspace(2.0, 8.0, N_f)
+    
+    lam_s_max = 5.0
+    lam_f_max = 12.0
+    lambda_s = 1j*np.linspace(0.0, lam_s_max, N_s)
+    lambda_f = 1j*np.linspace(0.0, lam_f_max, N_f)
 
     pparams = {}
     # the following are not used in the computation
@@ -26,9 +29,10 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['num_nodes'] = 4
-    K = 5
+    swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['num_nodes'] = 2
+    K = 3
+    do_coll_update = True
     
     #
     # ...this is functionality copied from test_imexsweeper. Ideally, it should be available in one place.
@@ -61,7 +65,13 @@ if __name__ == "__main__":
         Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
         for k in range(0,K):
           Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),k).dot(Pinv)
+        if do_coll_update:
           stab_fh = 1.0 + (lambda_fast + lambda_slow)*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+        else:
+          q = np.zeros(nnodes)
+          q[nnodes-1] = 1.0
+          stab_fh = q.dot(Mat_sweep.dot(np.ones(nnodes)))
+          #
         stab[j,i] = stab_fh
 
     ###
@@ -70,19 +80,24 @@ if __name__ == "__main__":
     fig  = plt.figure()
     #pcol = plt.pcolor(lambda_s.imag, lambda_f.imag, np.absolute(stab), vmin=0.99, vmax=2.01)
     #pcol.set_edgecolor('face')
-    levels = np.array([0.95, 0.99, 1.01, 1.05])
+    levels = np.array([0.25, 0.5, 0.75, 0.9, 1.1])
 #    levels = np.array([1.0])
-    CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k',linestyles='dashed')
-    CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0], colors='k')
-    plt.clabel(CS1, fontsize=fs-2)
-    plt.clabel(CS2, fontsize=fs-2)
-    #plt.plot([0, 2], [0, 2], color='k', linewidth=1)
-    plt.gca().set_xticks([0.0, 1.0, 2.0, 3.0])
+    CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k', linestyles='dashed')
+    CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0],  colors='k')
+    plt.clabel(CS1, inline=True, fmt='%3.2f', fontsize=fs-2)
+    manual_locations = [(1.5, 2.5)]
+    plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs-2, manual=manual_locations)
+    plt.gca().add_patch(Polygon([[0, 0], [lam_s_max,0], [lam_s_max,lam_s_max]], visible=True, fill=True, facecolor='.75',edgecolor='k', linewidth=1.0,  zorder=11))
+    #plt.plot([0, 2], [0, 2], color='k', linewidth=1, zorder=12)
+    plt.gca().set_xticks(np.arange(0, int(lam_s_max)+1))
+    plt.gca().set_yticks(np.arange(0, int(lam_f_max)+2, 2))
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
-    plt.xlim([np.min(lambda_s.imag), np.max(lambda_s.imag)])
+    plt.xlim([0.0, lam_s_max])
+    plt.ylim([0.0, lam_f_max])
     plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=2.0)
     plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
     plt.title(r'$M=%1i$, $K=%1i$' % (swparams['num_nodes'],K), fontsize=fs)
+    #plt.show()
     filename = 'sdc-fwsw-stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     fig.savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
