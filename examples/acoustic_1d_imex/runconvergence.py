@@ -31,15 +31,11 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']     = [(2,400)]
-    pparams['cadv']      = 0.05
+    pparams['nvars']     = [(2,300)]
+    pparams['cadv']      = 0.1
     pparams['cs']        = 1.00
     pparams['order_adv'] = 5
-    pparams['waveno']    = 2
-
-    # This comes as read-in for the transfer operations
-    tparams = {}
-    tparams['finter'] = True
+    pparams['waveno']    = 5
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -53,7 +49,7 @@ if __name__ == "__main__":
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
     
-    Nsteps = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
+    Nsteps = [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
     
     for order in [2, 3, 4]:
 

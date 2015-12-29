@@ -20,7 +20,7 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
 
 def u_initial(x, k):
-    return np.sin(k*2.0*np.pi*x)
+    return np.sin(k*2.0*np.pi*x) + np.sin(2.0*np.pi*x)
 
 class acoustic_1d_imex(ptype):
     """
