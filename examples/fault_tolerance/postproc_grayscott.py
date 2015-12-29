@@ -96,7 +96,7 @@ if __name__ == "__main__":
         residual[residual <= 0] = 1E-99
         residual = np.log10(residual)
 
-        rcParams['figure.figsize'] = 6.0, 2.5
+        rcParams['figure.figsize'] = 8.0, 2.0
         fig, ax = plt.subplots()
 
         cmap = plt.get_cmap('Reds',vmax-vmin+1)
