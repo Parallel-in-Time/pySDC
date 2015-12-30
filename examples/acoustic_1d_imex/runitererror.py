@@ -46,11 +46,11 @@ if __name__ == "__main__":
 
       # This comes as read-in for the problem class
       pparams = {}
-      pparams['nvars']     = [(2,250)]
-      pparams['cadv']      = 0.05
+      pparams['nvars']     = [(2,300)]
+      pparams['cadv']      = 0.1
       pparams['cs']        = cs_v[cs_ind]
       pparams['order_adv'] = 5
-      pparams['waveno']    = 1
+      pparams['waveno']    = 5
 
       # This comes as read-in for the transfer operations
       tparams = {}
@@ -72,7 +72,7 @@ if __name__ == "__main__":
       for nodes_ind in np.arange(np.size(nodes_v)):
         # setup parameters "in time"
         t0   = 0
-        Tend = 0.05
+        Tend = 0.025
         description['num_nodes'] = nodes_v[nodes_ind]
 
          # quickly generate block of steps
@@ -119,15 +119,15 @@ if __name__ == "__main__":
       plt.plot(x, y, shape[ii], markersize=fs-2, color=color[ii], label=r'$C_{\rm fast}$=%4.2f' % (cs_v[ii]*dt/P.dx))       
       #plt.plot(x, 0.0*y+avg_convrate[ii,0], '--', color=color[ii])
 
-    plt.legend(loc='upper right', fontsize=fs, prop={'size':fs})
+    plt.legend(loc='upper right', fontsize=fs, prop={'size':fs-2})
     plt.xlabel('Iteration', fontsize=fs)
     plt.ylabel(r'$|| r^{k+1} ||_{\infty}/|| r^k ||_{\infty}$', fontsize=fs, labelpad=2)
     plt.xlim([0, sparams['maxiter']])
-    plt.ylim([0, 0.8])
+    plt.ylim([0, 1.0])
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.show()
-    filename = 'sdc_fwsw_iteration.pdf'
+    filename = 'sdc-fwsw-iteration.pdf'
     fig.savefig(filename,bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
