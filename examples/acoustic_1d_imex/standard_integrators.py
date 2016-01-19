@@ -4,6 +4,83 @@ import scipy.sparse.linalg as LA
 import scipy.sparse as sp
 
 #
+# Runge-Kutta IMEX methods of order 1 to 3
+#
+class rk_imex:
+  
+  def __init__(self, M_fast, M_slow, order):
+    assert np.shape(M_fast)[0]==np.shape(M_fast)[1], "A_fast must be square"
+    assert np.shape(M_slow)[0]==np.shape(M_slow)[1], "A_slow must be square"
+    assert np.shape(M_fast)[0]==np.shape(M_slow)[0], "A_fast and A_slow must be of the same size"
+
+    assert order in [1,2,3], "Order must be 1, 2 or 3"
+    self.order = order
+
+    if self.order==1:
+      self.A      = np.array([[0,0],[0,1]])
+      self.A_hat  = np.array([[0,0],[1,0]])
+      self.b      = np.array([0,1])
+      self.b_hat  = np.array([1,0])
+      self.nstages = 2
+
+    elif self.order==2:
+      self.A      = np.array([[0,0],[0,0.5]])
+      self.A_hat  = np.array([[0,0],[0.5,0]])
+      self.b      = np.array([0,1])
+      self.b_hat  = np.array([0,1])
+      self.nstages = 2
+
+    elif self.order==3:
+      # parameter from Pareschi and Russo, J. Sci. Comp. 2005
+      alpha = 0.24169426078821
+      beta  = 0.06042356519705
+      eta   = 0.12915286960590
+      self.A_hat   = np.array([ [0,0,0,0], [0,0,0,0], [0,1.0,0,0], [0, 1.0/4.0, 1.0/4.0, 0] ])
+      self.A       = np.array([ [alpha, 0, 0, 0], [-alpha, alpha, 0, 0], [0, 1.0-alpha, alpha, 0], [beta, eta, 0.5-beta-eta-alpha, alpha] ])
+      self.b_hat   = np.array([0, 1.0/6.0, 1.0/6.0, 2.0/3.0])
+      self.b       = self.b_hat
+      self.nstages = 4
+
+    self.M_fast = sp.csc_matrix(M_fast)
+    self.M_slow = sp.csc_matrix(M_slow)
+    self.ndof   = np.shape(M_fast)[0]
+
+    self.stages = np.zeros((self.nstages, self.ndof), dtype='complex')
+
+  def timestep(self, u0, dt):
+
+    # Solve for stages
+    for i in range(0,self.nstages):
+
+      # Construct RHS
+      rhs = np.copy(u0)
+      for j in range(0,i):
+        rhs += dt*self.A_hat[i,j]*(self.f_slow(self.stages[j,:])) + dt*self.A[i,j]*(self.f_fast(self.stages[j,:]))
+
+      # Solve for stage i
+      if self.A[i,i] == 0:
+        # Avoid call to spsolve with identity matrix
+        self.stages[i,:] = np.copy(rhs)
+      else:
+        self.stages[i,:] = self.f_fast_solve( rhs, dt*self.A[i,i] )
+    
+    # Update 
+    for i in range(0,self.nstages):
+      u0 += dt*self.b_hat[i]*(self.f_slow(self.stages[i,:])) + dt*self.b[i]*(self.f_fast(self.stages[i,:]))
+
+    return u0
+
+  def f_slow(self, u):
+    return self.M_slow.dot(u)
+
+  def f_fast(self, u):
+    return self.M_fast.dot(u)
+
+  def f_fast_solve(self, rhs, alpha):
+    L = sp.eye(self.ndof) - alpha*self.M_fast
+    return LA.spsolve(L, rhs)
+
+#
 # Trapezoidal rule
 #
 class trapezoidal:
