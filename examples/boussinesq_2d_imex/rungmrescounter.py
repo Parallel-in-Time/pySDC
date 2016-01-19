@@ -21,7 +21,7 @@ from pylab import rcParams
 
 from unflatten import unflatten
 
-from standard_integrators import dirk, bdf2, trapezoidal
+from standard_integrators import dirk, bdf2, trapezoidal, rk_imex
 
 if __name__ == "__main__":
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nvars']    = [(4,300,20)]
-    #pparams['nvars']    = [(4,150,10)]
+    #pparams['nvars']    = [(4,100,10)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -102,6 +102,12 @@ if __name__ == "__main__":
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
 
+    rkimex = rk_imex(P, 3)
+    u0 = uinit.values.flatten()
+    urkimex = u0
+    for i in range(0,2*Nsteps):
+      urkimex = rkimex.timestep(urkimex, dt/2.0)
+
     dirkref = dirk(P, 4)
     uref    = u0
     dt_ref  = dt/10.0
@@ -110,21 +116,27 @@ if __name__ == "__main__":
   
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-    udirk = unflatten(udirk, 4, P.N[0], P.N[1])
-    uref  = unflatten(uref,  4, P.N[0], P.N[1])
+    udirk      = unflatten(udirk,   4, P.N[0], P.N[1])
+    urkimex    = unflatten(urkimex, 4, P.N[0], P.N[1])
+    uref       = unflatten(uref,    4, P.N[0], P.N[1])
 
-    np.save('xaxis', P.xx)
-    np.save('sdc', uend.values)
-    np.save('dirk', udirk)
-    np.save('uref', uref)
+    np.save('xaxis',  P.xx)
+    np.save('sdc',    uend.values)
+    np.save('dirk',   udirk)
+    np.save('rkimex', urkimex)
+    np.save('uref',   uref)
     
-    print " #### Logging report for DIRK-%1i #### " % dirk_order
+    print " #### Logging report for DIRK-%1i #### " % dirkp.order
     print "Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls
     print "Total number of GMRES iterations: %5i" % dirkp.logger.iterations
     print "Average number of iterations per call: %6.3f" % (float(dirkp.logger.iterations)/float(dirkp.logger.solver_calls))
-
+    print " "
+    print " #### Logging report for RK-IMEX-%1i #### " % rkimex.order
+    print "Number of calls to implicit solver: %5i" % rkimex.logger.solver_calls
+    print "Total number of GMRES iterations: %5i" % rkimex.logger.iterations
+    print "Average number of iterations per call: %6.3f" % (float(rkimex.logger.iterations)/float(rkimex.logger.solver_calls))
+    print " "
     print " #### Logging report for SDC-(%1i,%1i) #### " % (swparams['num_nodes'], sparams['maxiter'])
     print "Number of calls to implicit solver: %5i" % P.logger.solver_calls
     print "Total number of GMRES iterations: %5i" % P.logger.iterations
     print "Average number of iterations per call: %6.3f" % (float(P.logger.iterations)/float(P.logger.solver_calls))  
-
