@@ -41,8 +41,8 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['num_nodes'] = 3
-    K = 4
+    swparams['num_nodes'] = 2
+    K = 2
     dirk_order = K
     
     c_speed = 1.0
@@ -111,24 +111,27 @@ if __name__ == "__main__":
 
       sol_sdc = findomega(stab_sdc)
       sol_dirk = findomega(stab_dirk)
-      sol_rk_imex = findomega(stab_rk_imex)
+      if dirkts.order<=3:
+        sol_rk_imex = findomega(stab_rk_imex)
       
       # Now solve for discrete phase 
       phase[0,i]      = sol_sdc.real/k_vec[i]
       amp_factor[0,i] = np.exp(sol_sdc.imag)
       phase[1,i]      = sol_dirk.real/k_vec[i]
       amp_factor[1,i] = np.exp(sol_dirk.imag)
-      phase[2,i]      = sol_rk_imex.real/k_vec[i]
-      amp_factor[2,i] = np.exp(sol_rk_imex.imag)
+      if dirkts.order<=3:
+        phase[2,i]      = sol_rk_imex.real/k_vec[i]
+        amp_factor[2,i] = np.exp(sol_rk_imex.imag)
 
     ###
     rcParams['figure.figsize'] = 1.5, 1.5
     fs = 8
     fig  = plt.figure()
     plt.plot(k_vec, (U_speed+c_speed)+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
-    plt.plot(k_vec, phase[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.plot(k_vec, phase[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, phase[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    if dirkts.order<=3:
+      plt.plot(k_vec, phase[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    plt.plot(k_vec, phase[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Phase speed', fontsize=fs, labelpad=0.5)
     plt.xlim([k_vec[0], k_vec[-1:]])
@@ -143,9 +146,10 @@ if __name__ == "__main__":
 
     fig  = plt.figure()
     plt.plot(k_vec, 1.0+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
-    plt.plot(k_vec, amp_factor[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.plot(k_vec, amp_factor[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, amp_factor[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    if dirkts.order<=3:
+      plt.plot(k_vec, amp_factor[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    plt.plot(k_vec, amp_factor[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Amplification factor', fontsize=fs, labelpad=0.5)
     fig.gca().tick_params(axis='both', labelsize=fs)
