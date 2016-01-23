@@ -52,8 +52,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    #pparams['nvars']    = [(4,450,30)]
-    pparams['nvars']    = [(4,300,30)]
+    pparams['nvars']    = [(4,450,30)]
+    #pparams['nvars']    = [(4,300,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol']     = [1e-5]
+    pparams['gmres_tol']     = [1e-3]
 
     # This comes as read-in for the transfer operations
     tparams = {}

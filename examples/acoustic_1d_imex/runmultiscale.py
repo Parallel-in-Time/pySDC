@@ -126,6 +126,10 @@ if __name__ == "__main__":
     x_0     = 0.75
     x_1     = 0.25
 
+    print ('Maximum pressure in SDC: %5.3e' % np.linalg.norm(uend.values[1,:], np.inf))
+    print ('Maximum pressure in DIRK: %5.3e' % np.linalg.norm(pnew_dirk, np.inf))
+    print ('Maximum pressure in RK-IMEX: %5.3e' % np.linalg.norm(pnew_imex, np.inf))
+
     #plt.plot(P.mesh, pnew_tp,  '-', color='c', label='Trapezoidal')
     plt.plot(P.mesh, pnew_imex,  '-', color='c', label='IMEX('+str(rkimex.order)+')')
     plt.plot(P.mesh, uend.values[1,:], '--', color='b', label='SDC('+str(sparams['maxiter'])+')')
