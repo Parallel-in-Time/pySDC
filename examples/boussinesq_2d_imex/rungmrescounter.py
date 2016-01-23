@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol']     = [1e-3]
+    pparams['gmres_tol']     = [1e-5]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -102,6 +102,9 @@ if __name__ == "__main__":
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
 
+    Pref = P
+    # For reference solution, increase GMRES tolerance
+    Pref.gmes_tol = 1e-6
     dirkref = dirk(P, 4)
     uref    = u0
     dt_ref  = dt/10.0
