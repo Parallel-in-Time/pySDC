@@ -126,8 +126,9 @@ if __name__ == "__main__":
     x_0     = 0.75
     x_1     = 0.25
 
-    plt.plot(P.mesh, pnew_tp,  '-', color='c', label='Trapezoidal')
-    plt.plot(P.mesh, uend.values[1,:], '-', color='b', label='SDC('+str(sparams['maxiter'])+')')
+    #plt.plot(P.mesh, pnew_tp,  '-', color='c', label='Trapezoidal')
+    plt.plot(P.mesh, pnew_imex,  '-', color='c', label='IMEX('+str(rkimex.order)+')')
+    plt.plot(P.mesh, uend.values[1,:], '--', color='b', label='SDC('+str(sparams['maxiter'])+')')
     plt.plot(P.mesh, pnew_bdf, '-', color='r', label='BDF-2')
     plt.plot(P.mesh, pnew_dirk, color='g', label='DIRK('+str(dirk.order)+')')
     #plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
