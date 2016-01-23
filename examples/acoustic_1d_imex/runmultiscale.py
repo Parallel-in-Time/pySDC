@@ -12,7 +12,7 @@ import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
-from standard_integrators import bdf2, dirk, trapezoidal
+from standard_integrators import bdf2, dirk, trapezoidal, rk_imex
 
 from matplotlib import pyplot as plt
 from pylab import rcParams
@@ -77,14 +77,16 @@ if __name__ == "__main__":
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # instantiate standard integrators to be run for comparison
-    trap  = trapezoidal( P.A+P.Dx, 0.5 )
+    trap  = trapezoidal( (P.A+P.Dx).astype('complex'), 0.5 )
     bdf2  = bdf2( P.A+P.Dx)
-    dirk  = dirk( P.A+P.Dx, sparams['maxiter'])
-
+    dirk  = dirk( (P.A+P.Dx).astype('complex'), sparams['maxiter'])
+    rkimex = rk_imex(P.A.astype('complex'), P.Dx.astype('complex'), sparams['maxiter'])
+    
     y0_tp = np.concatenate( (uinit.values[0,:], uinit.values[1,:]) )
     y0_bdf  = y0_tp
-    y0_dirk = y0_tp
-      
+    y0_dirk = y0_tp.astype('complex')
+    y0_imex = y0_tp.astype('complex')
+    
     # Perform 154 time steps with standard integrators
     for i in range(0,154):  
 
@@ -101,15 +103,20 @@ if __name__ == "__main__":
       # DIRK scheme
       ynew_dirk = dirk.timestep(y0_dirk, dt)
 
+      # IMEX scheme
+      ynew_imex = rkimex.timestep(y0_imex, dt)
+      
       y0_tp   = ynew_tp
       ym1_bdf = y0_bdf
       y0_bdf  = ynew_bdf
       y0_dirk = ynew_dirk
-
+      y0_imex = ynew_imex
+      
     # Finished running standard integrators
       unew_tp, pnew_tp     = np.split(ynew_tp, 2)
       unew_bdf, pnew_bdf   = np.split(ynew_bdf, 2)
       unew_dirk, pnew_dirk = np.split(ynew_dirk, 2)
+      unew_imex, pnew_imex = np.split(ynew_imex, 2)
 
     rcParams['figure.figsize'] = 5, 2.5
     fig = plt.figure()
