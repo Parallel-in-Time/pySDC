@@ -251,6 +251,7 @@ def pfasst(MS):
                 if len(S.levels) > 1 and S.params.predict:
                     S.status.stage = 'PREDICT'
                 else:
+                    S.levels[0].hooks.dump_pre_iteration(S.status)
                     S.status.stage = 'IT_FINE'
 
             return MS
@@ -263,6 +264,7 @@ def pfasst(MS):
 
             for S in MS:
                 # update stage
+                S.levels[0].hooks.dump_pre_iteration(S.status)
                 S.status.stage = 'IT_FINE'
 
             return MS

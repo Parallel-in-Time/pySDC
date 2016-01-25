@@ -93,7 +93,7 @@ class rk_imex:
 
   def f_fast_solve(self, rhs, alpha, u0):
     cb = Callback()
-    sol, info = LA.gmres( self.problem.Id - alpha*self.problem.M, rhs, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    sol, info = LA.gmres( self.problem.Id - alpha*self.problem.M, rhs, x0=u0, tol=self.problem.gmres_tol_limit, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
       #print "RK-IMEX-%1i: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( self.order, cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    
@@ -129,7 +129,7 @@ class trapezoidal:
   #  
   def f_solve(self, b, alpha, u0):
     cb = Callback()
-    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol_limit, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
       #print "BDF-2: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    
@@ -166,7 +166,7 @@ class bdf2:
   #  
   def f_solve(self, b, alpha, u0):
     cb = Callback()
-    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol_limit, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
       #print "BDF-2: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    
@@ -283,7 +283,7 @@ class dirk:
   #  
   def f_solve(self, b, alpha, u0):
     cb = Callback()
-    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
+    sol, info = LA.gmres( self.problem.Id - alpha*(self.problem.D_upwind + self.problem.M), b, x0=u0, tol=self.problem.gmres_tol_limit, restart=self.problem.gmres_restart, maxiter=self.problem.gmres_maxiter, callback=cb)
     if alpha!=0.0:
       #print "DIRK-%1i: Number of GMRES iterations: %3i --- Final residual: %6.3e" % ( self.order, cb.getcounter(), cb.getresidual() )
       self.logger.add(cb.getcounter())    

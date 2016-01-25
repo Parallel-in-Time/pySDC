@@ -53,6 +53,12 @@ class hooks(object):
         """
         pass
 
+    def dump_pre_iteration(self,status):
+        """
+        Default routine called before iteration starts
+        """
+        pass
+
 
     def dump_sweep(self,status):
         """

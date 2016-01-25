@@ -192,6 +192,7 @@ def pfasst(S):
             if len(S.levels) > 1 and S.params.predict:
                 S.status.stage = 'PREDICT_RESTRICT'
             else:
+                S.levels[0].hooks.dump_pre_iteration(S.status)
                 S.status.stage = 'IT_FINE_SWEEP'
             return S
 
@@ -254,6 +255,7 @@ def pfasst(S):
                 S.transfer(source=S.levels[l],target=S.levels[l-1])
 
             # uodate stage and return
+            S.levels[0].hooks.dump_pre_iteration(S.status)
             S.status.stage = 'IT_FINE_SWEEP'
             return S
 

@@ -66,7 +66,7 @@ class boussinesq_2d_imex(ptype):
         assert 'order' in cparams
         assert 'gmres_maxiter' in cparams
         assert 'gmres_restart' in cparams
-        assert 'gmres_tol' in cparams
+        assert 'gmres_tol_limit' in cparams
         
         # add parameters as attributes for further reference
         for k,v in cparams.items():
@@ -86,6 +86,7 @@ class boussinesq_2d_imex(ptype):
         self.D_upwind   = getBoussinesq2DUpwindMatrix( self.N, self.h[0], self.u_adv , self.order_upw)
     
         self.logger = logging()
+        self.gmres_tol = None
     
     def solve_system(self,rhs,factor,u0,t):
         """
@@ -103,6 +104,8 @@ class boussinesq_2d_imex(ptype):
 
         b         = rhs.values.flatten()
         cb        = Callback()
+        print(self.gmres_tol)
+
         sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=self.gmres_tol, restart=self.gmres_restart, maxiter=self.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor!=0.0:

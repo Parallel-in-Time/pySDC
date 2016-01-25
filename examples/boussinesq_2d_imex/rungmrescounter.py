@@ -37,7 +37,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['num_nodes'] = 3
-    swparams['do_LU'] = False
+    swparams['do_LU'] = True
 
     sparams = {}
     sparams['maxiter'] = 4
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000
-    Nsteps =  500
+    Nsteps =  100
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -63,7 +63,8 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol']     = [1e-9]
+    pparams['gmres_tol_limit'] = [1e-3]
+    pparams['gmres_tol_factor'] = [0.1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -90,11 +91,11 @@ if __name__ == "__main__":
     cfl_advection    = pparams['u_adv']*dt/P.h[0]
     cfl_acoustic_hor = pparams['c_s']*dt/P.h[0]
     cfl_acoustic_ver = pparams['c_s']*dt/P.h[1]
-    print "Horizontal resolution: %4.2f" % P.h[0]
-    print "Vertical resolution:   %4.2f" % P.h[1]
-    print ("CFL number of advection: %4.2f" % cfl_advection)
-    print ("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
-    print ("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
+    print("Horizontal resolution: %4.2f" % P.h[0])
+    print("Vertical resolution:   %4.2f" % P.h[1])
+    print("CFL number of advection: %4.2f" % cfl_advection)
+    print("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
+    print("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
     dirkp = dirk(P, dirk_order)
     u0 = uinit.values.flatten()
@@ -129,18 +130,18 @@ if __name__ == "__main__":
     np.save('rkimex', uimex)
     np.save('uref', uref)
     
-    print " #### Logging report for DIRK-%1i #### " % dirkp.order
-    print "Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls
-    print "Total number of GMRES iterations: %5i" % dirkp.logger.iterations
-    print "Average number of iterations per call: %6.3f" % (float(dirkp.logger.iterations)/float(dirkp.logger.solver_calls))
-    print " "
-    print " #### Logging report for RK-IMEX-%1i #### " % rkimex.order
-    print "Number of calls to implicit solver: %5i" % rkimex.logger.solver_calls
-    print "Total number of GMRES iterations: %5i" % rkimex.logger.iterations
-    print "Average number of iterations per call: %6.3f" % (float(rkimex.logger.iterations)/float(rkimex.logger.solver_calls))
-    print " "
-    print " #### Logging report for SDC-(%1i,%1i) #### " % (swparams['num_nodes'], sparams['maxiter'])
-    print "Number of calls to implicit solver: %5i" % P.logger.solver_calls
-    print "Total number of GMRES iterations: %5i" % P.logger.iterations
-    print "Average number of iterations per call: %6.3f" % (float(P.logger.iterations)/float(P.logger.solver_calls))  
+    print(" #### Logging report for DIRK-%1i #### " % dirkp.order)
+    print("Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls)
+    print("Total number of GMRES iterations: %5i" % dirkp.logger.iterations)
+    print("Average number of iterations per call: %6.3f" % (float(dirkp.logger.iterations)/float(dirkp.logger.solver_calls)))
+    print(" ")
+    print(" #### Logging report for RK-IMEX-%1i #### " % rkimex.order)
+    print("Number of calls to implicit solver: %5i" % rkimex.logger.solver_calls)
+    print("Total number of GMRES iterations: %5i" % rkimex.logger.iterations)
+    print("Average number of iterations per call: %6.3f" % (float(rkimex.logger.iterations)/float(rkimex.logger.solver_calls)))
+    print(" ")
+    print(" #### Logging report for SDC-(%1i,%1i) #### " % (swparams['num_nodes'], sparams['maxiter']))
+    print("Number of calls to implicit solver: %5i" % P.logger.solver_calls)
+    print("Total number of GMRES iterations: %5i" % P.logger.iterations)
+    print("Average number of iterations per call: %6.3f" % (float(P.logger.iterations)/float(P.logger.solver_calls)))
 

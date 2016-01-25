@@ -95,6 +95,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
+        L.status.updated = True
 
         return None
 
