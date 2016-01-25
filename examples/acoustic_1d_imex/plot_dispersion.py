@@ -5,7 +5,7 @@ from pySDC import Step as stepclass
 
 from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from standard_integrators import dirk
+from standard_integrators import dirk, rk_imex
 # for simplicity, import the scalar problem to generate Q matrices
 from examples.fwsw.ProblemClass import swfw_scalar 
 import numpy as np
@@ -41,8 +41,8 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['num_nodes'] = 2
-    K = 2
+    swparams['num_nodes'] = 3
+    K = 4
     dirk_order = K
     
     c_speed = 1.0
@@ -68,8 +68,8 @@ if __name__ == "__main__":
     Nsamples = 30
     k_vec = np.linspace(0, np.pi, Nsamples+1, endpoint=False)
     k_vec = k_vec[1:]
-    phase = np.zeros((2,Nsamples))
-    amp_factor = np.zeros((2,Nsamples))
+    phase = np.zeros((3,Nsamples))
+    amp_factor = np.zeros((3,Nsamples))
     for i in range(0,np.size(k_vec)):
       Cs = -1j*k_vec[i]*np.array([[0.0, c_speed],[c_speed, 0.0]], dtype='complex')
       Uadv = -1j*k_vec[i]*np.array([[U_speed, 0.0], [0.0, U_speed]], dtype='complex')
@@ -85,8 +85,8 @@ if __name__ == "__main__":
       # ---> The update formula for this case need verification!!
       update = step.status.dt*np.kron( level.sweep.coll.weights, Uadv+Cs )
       
-      y1 = np.array([1,0])
-      y2 = np.array([0,1])
+      y1 = np.array([1,0], dtype='complex')
+      y2 = np.array([0,1], dtype='complex')
       e1 = np.kron( np.ones(nnodes), y1 )
       stab_fh_1      = y1 + update.dot( Mat_sweep.dot(e1) )
       e2 = np.kron( np.ones(nnodes), y2 )
@@ -104,21 +104,31 @@ if __name__ == "__main__":
       stab_fh2 = dirkts.timestep(y2, 1.0)
       stab_dirk = np.column_stack((stab_fh1, stab_fh2))
 
+      rkimex = rk_imex(M_fast = Cs, M_slow = Uadv, order = K)
+      stab_fh1 = rkimex.timestep(y1, 1.0)
+      stab_fh2 = rkimex.timestep(y2, 1.0)
+      stab_rk_imex = np.column_stack((stab_fh1, stab_fh2))
+
       sol_sdc = findomega(stab_sdc)
       sol_dirk = findomega(stab_dirk)
+      sol_rk_imex = findomega(stab_rk_imex)
       
       # Now solve for discrete phase 
       phase[0,i]      = sol_sdc.real/k_vec[i]
       amp_factor[0,i] = np.exp(sol_sdc.imag)
       phase[1,i]      = sol_dirk.real/k_vec[i]
       amp_factor[1,i] = np.exp(sol_dirk.imag)
+      phase[2,i]      = sol_rk_imex.real/k_vec[i]
+      amp_factor[2,i] = np.exp(sol_rk_imex.imag)
+
     ###
     rcParams['figure.figsize'] = 1.5, 1.5
     fs = 8
     fig  = plt.figure()
     plt.plot(k_vec, (U_speed+c_speed)+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
-    plt.plot(k_vec, phase[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.plot(k_vec, phase[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
+    plt.plot(k_vec, phase[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    plt.plot(k_vec, phase[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Phase speed', fontsize=fs, labelpad=0.5)
     plt.xlim([k_vec[0], k_vec[-1:]])
@@ -133,8 +143,9 @@ if __name__ == "__main__":
 
     fig  = plt.figure()
     plt.plot(k_vec, 1.0+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
-    plt.plot(k_vec, amp_factor[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.plot(k_vec, amp_factor[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
+    plt.plot(k_vec, amp_factor[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
+    plt.plot(k_vec, amp_factor[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Amplification factor', fontsize=fs, labelpad=0.5)
     fig.gca().tick_params(axis='both', labelsize=fs)

@@ -21,7 +21,7 @@ from pylab import rcParams
 
 from unflatten import unflatten
 
-from standard_integrators import dirk, bdf2, trapezoidal
+from standard_integrators import dirk, bdf2, trapezoidal, rk_imex
 
 if __name__ == "__main__":
 
@@ -47,13 +47,13 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000
-    Nsteps =  100
+    Nsteps =  500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,300,20)]
-    #pparams['nvars']    = [(4,150,10)]
+    pparams['nvars']    = [(4,450,30)]
+    #pparams['nvars']    = [(4,300,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol']     = [1e-6]
+    pparams['gmres_tol']     = [1e-9]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -102,27 +102,43 @@ if __name__ == "__main__":
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
 
+    Pref = P
+    # For reference solution, increase GMRES tolerance
+    Pref.gmes_tol = 1e-6
     dirkref = dirk(P, 4)
     uref    = u0
     dt_ref  = dt/10.0
     for i in range(0,10*Nsteps):
       uref = dirkref.timestep(uref, dt_ref)
+
+    rkimex = rk_imex(P, dirk_order)
+    uimex  = u0
+    dt_imex = dt
+    for i in range(0,Nsteps):
+      uimex = rkimex.timestep(uimex, dt_imex)
   
     # call main function to get things done...
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
     udirk = unflatten(udirk, 4, P.N[0], P.N[1])
+    uimex = unflatten(uimex, 4, P.N[0], P.N[1])
     uref  = unflatten(uref,  4, P.N[0], P.N[1])
 
     np.save('xaxis', P.xx)
     np.save('sdc', uend.values)
     np.save('dirk', udirk)
+    np.save('rkimex', uimex)
     np.save('uref', uref)
     
-    print " #### Logging report for DIRK-%1i #### " % dirk_order
+    print " #### Logging report for DIRK-%1i #### " % dirkp.order
     print "Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls
     print "Total number of GMRES iterations: %5i" % dirkp.logger.iterations
     print "Average number of iterations per call: %6.3f" % (float(dirkp.logger.iterations)/float(dirkp.logger.solver_calls))
-
+    print " "
+    print " #### Logging report for RK-IMEX-%1i #### " % rkimex.order
+    print "Number of calls to implicit solver: %5i" % rkimex.logger.solver_calls
+    print "Total number of GMRES iterations: %5i" % rkimex.logger.iterations
+    print "Average number of iterations per call: %6.3f" % (float(rkimex.logger.iterations)/float(rkimex.logger.solver_calls))
+    print " "
     print " #### Logging report for SDC-(%1i,%1i) #### " % (swparams['num_nodes'], sparams['maxiter'])
     print "Number of calls to implicit solver: %5i" % P.logger.solver_calls
     print "Total number of GMRES iterations: %5i" % P.logger.iterations
