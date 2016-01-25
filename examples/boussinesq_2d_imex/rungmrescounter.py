@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000
-    Nsteps =  100
+    Nsteps =  500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol']     = [1e-3]
+    pparams['gmres_tol']     = [1e-9]
 
     # This comes as read-in for the transfer operations
     tparams = {}
