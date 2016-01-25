@@ -26,7 +26,7 @@ from standard_integrators import dirk, bdf2, trapezoidal, rk_imex
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+    # logger = Log.setup_custom_logger('root')
 
     num_procs = 1
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['num_nodes'] = 3
-    swparams['do_LU'] = True
+    swparams['do_LU'] = False
 
     sparams = {}
     sparams['maxiter'] = 4
@@ -52,8 +52,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']    = [(4,450,30)]
-    #pparams['nvars']    = [(4,300,30)]
+    # pparams['nvars']    = [(4,450,30)]
+    pparams['nvars']    = [(4,300,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
     pparams['Nfreq']    = 0.01
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol_limit'] = [1e-3]
-    pparams['gmres_tol_factor'] = [0.1]
+    pparams['gmres_tol_factor'] = [0.01]
 
     # This comes as read-in for the transfer operations
     tparams = {}

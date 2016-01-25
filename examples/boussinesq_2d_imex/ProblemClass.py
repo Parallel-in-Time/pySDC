@@ -104,7 +104,6 @@ class boussinesq_2d_imex(ptype):
 
         b         = rhs.values.flatten()
         cb        = Callback()
-        print(self.gmres_tol)
 
         sol, info = LA.gmres( self.Id - factor*self.M, b, x0=u0.values.flatten(), tol=self.gmres_tol, restart=self.gmres_restart, maxiter=self.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
