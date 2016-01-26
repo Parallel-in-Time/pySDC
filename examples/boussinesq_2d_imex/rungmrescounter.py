@@ -40,19 +40,18 @@ if __name__ == "__main__":
     swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 4
+    sparams['maxiter'] = 3
 
-    dirk_order = 4
+    dirk_order = 3
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000
+    Tend   = 3000   
     Nsteps =  100
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    # pparams['nvars']    = [(4,450,30)]
     pparams['nvars']    = [(4,300,30)]
     pparams['u_adv']    = 0.02
     pparams['c_s']      = 0.3
@@ -63,8 +62,8 @@ if __name__ == "__main__":
     pparams['order_upw'] = [5]
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
-    pparams['gmres_tol_limit'] = [1e-3]
-    pparams['gmres_tol_factor'] = [0.01]
+    pparams['gmres_tol_limit'] = [1e-5]
+    pparams['gmres_tol_factor'] = [0.05]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -99,27 +98,31 @@ if __name__ == "__main__":
 
     dirkp = dirk(P, dirk_order)
     u0 = uinit.values.flatten()
-    udirk = u0
+    udirk = np.copy(u0)
+    print "Running DIRK ...."
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
 
-    Pref = P
-    # For reference solution, increase GMRES tolerance
-    Pref.gmes_tol = 1e-6
-    dirkref = dirk(P, 4)
-    uref    = u0
-    dt_ref  = dt/10.0
-    for i in range(0,10*Nsteps):
-      uref = dirkref.timestep(uref, dt_ref)
-
     rkimex = rk_imex(P, dirk_order)
-    uimex  = u0
+    uimex  = np.copy(u0)
     dt_imex = dt
+    print "Running RK-IMEX ...."
     for i in range(0,Nsteps):
       uimex = rkimex.timestep(uimex, dt_imex)
-  
+
     # call main function to get things done...
+    print "Running SDC..."
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+    # For reference solution, increase GMRES tolerance
+    P.gmres_tol_limit = 1e-10
+    rkimexref = rk_imex(P, 4)
+    uref      = np.copy(u0)
+    dt_ref    = dt/10.0
+    print "Running RK-IMEX reference...."
+    for i in range(0,10*Nsteps):
+      uref = rkimexref.timestep(uref, dt_ref)
+  
     udirk = unflatten(udirk, 4, P.N[0], P.N[1])
     uimex = unflatten(uimex, 4, P.N[0], P.N[1])
     uref  = unflatten(uref,  4, P.N[0], P.N[1])
