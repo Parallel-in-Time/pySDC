@@ -16,8 +16,8 @@ if __name__ == "__main__":
   uref  = np.load('uref.npy')
 
   print("Estimated discretisation error of DIRK: %5.3e" % ( np.linalg.norm(udirk.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
-  print("Estimated discretisation error of SDC:  %5.3e" % ( np.linalg.norm(uend.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
   print("Estimated discretisation error of RK-IMEX:  %5.3e" % ( np.linalg.norm(uimex.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
+  print("Estimated discretisation error of SDC:  %5.3e" % ( np.linalg.norm(uend.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
 
   fs = 8
   rcParams['figure.figsize'] = 5.0, 2.5
