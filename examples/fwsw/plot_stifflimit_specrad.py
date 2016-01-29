@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     nodes_v = np.arange(2,10)
     specrad = np.zeros((2,np.size(nodes_v)))
+    norm    = np.zeros((2,np.size(nodes_v)))
     for i in range(0,np.size(nodes_v)):
       swparams['num_nodes'] = nodes_v[i]
       #
@@ -49,7 +50,8 @@ if __name__ == "__main__":
       RHS = step.status.dt*( (problem.lambda_f[0]+problem.lambda_s[0])*Q - (problem.lambda_f[0]*QI + problem.lambda_s[0]*QE) )
       evals, evecs = np.linalg.eig( np.linalg.inv(LHS).dot(RHS) )
       specrad[1,i] = np.linalg.norm( evals, np.inf )
-    
+      norm[1,i]    = np.linalg.norm( np.linalg.inv(LHS).dot(RHS), np.inf )
+
       if swparams['collocation_class']==collclass.CollGaussLobatto:
         # For Lobatto nodes, first column and row are all zeros, since q_1 = q_0; hence remove them
         QI = QI[1:,1:]
@@ -59,6 +61,7 @@ if __name__ == "__main__":
       else:
         evals, evecs = np.linalg.eig( np.eye(nnodes) - np.linalg.inv(QI).dot(Q) )
       specrad[0,i] = np.linalg.norm( evals, np.inf )
+      norm[0,i] = np.linalg.norm( np.eye(nnodes) - np.linalg.inv(QI).dot(Q), np.inf )
 
   ### Plot result
     rcParams['figure.figsize'] = 2.5, 2.5
@@ -78,4 +81,18 @@ if __name__ == "__main__":
     fig.savefig(filename,bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
-
+    fig = plt.figure()
+    plt.plot(nodes_v, norm[0,:], 'rd-', markersize=fs-2, label=r'$\lambda_{\rm fast} = \infty$')
+    plt.plot(nodes_v, norm[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f i$' % problem.lambda_f[0].imag)
+    plt.xlabel(r'Number of nodes $M$', fontsize=fs)
+    plt.ylabel(r'Norm  $\left|| \mathbf{E} \right||_{\infty}$', fontsize=fs, labelpad=2)
+    #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
+    plt.legend(loc='lower right', fontsize=fs, prop={'size':fs})
+    plt.xlim([np.min(nodes_v), np.max(nodes_v)])
+    #plt.ylim([0, 1.0])
+    plt.yticks(fontsize=fs)
+    plt.xticks(fontsize=fs)
+    #plt.show()
+    filename = 'sdc_fwsw_stifflimit_norm.pdf'
+    fig.savefig(filename,bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
