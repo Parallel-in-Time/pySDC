@@ -30,6 +30,7 @@ def findomega(stab_fh):
     sol = sol1
   else:
     print "Two roots with real part of same sign..."
+    sol = sol0
   return sol
 
 if __name__ == "__main__":
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['num_nodes'] = 3
-    K = 4
+    K = 5
     dirk_order = K
     
     c_speed = 1.0
@@ -99,7 +100,7 @@ if __name__ == "__main__":
       # For testing, insert exact stability function exp(-dt*i*k*(Cs+Uadv)
       #stab_fh = la.expm(Cs+Uadv)
       
-      dirkts = dirk(Cs+Uadv, dirk_order)
+      dirkts = dirk(Cs+Uadv, np.min([4,dirk_order]))
       stab_fh1 = dirkts.timestep(y1, 1.0)
       stab_fh2 = dirkts.timestep(y2, 1.0)
       stab_dirk = np.column_stack((stab_fh1, stab_fh2))
