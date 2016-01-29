@@ -3,6 +3,7 @@ import math
 import scipy.sparse.linalg as LA
 import scipy.sparse as sp
 from ProblemClass import Callback, logging, boussinesq_2d_imex
+from decimal import *
 
 #
 # Runge-Kutta IMEX methods of order 1 to 3
@@ -11,7 +12,7 @@ class rk_imex:
   
   def __init__(self, problem, order):
 
-    assert order in [1,2,3,4], "Order must be 1, 2, 3 or 4"
+    assert order in [1,2,3,4,5], "Order must be between 1 and 5"
     self.order = order
 
     if self.order==1:
@@ -56,6 +57,102 @@ class rk_imex:
       self.b = np.array([82889./524892.,0,15625./83664.,69875./102672.,-2260./8211,1./4])
       self.b_hat = np.array([4586570599./29645900160.,0,178811875./945068544.,814220225./1159782912.,-3700637./11593932.,61727./225920.])
       self.nstages = 6
+
+    elif self.order==5:
+
+      # from Kennedy and Carpenter
+      # copied from http://www.mcs.anl.gov/petsc/petsc-3.2/src/ts/impls/arkimex/arkimex.c
+      self.A_hat = np.zeros((8,8))
+      getcontext().prec = 56
+      self.A_hat[1,0] = Decimal(41.0)/Decimal(100.0)
+      self.A_hat[2,0] = Decimal(367902744464.)/Decimal(2072280473677.)
+      self.A_hat[2,1] = Decimal(677623207551.)/Decimal(8224143866563.)
+      self.A_hat[3,0] = Decimal(1268023523408.)/Decimal(10340822734521.)
+      self.A_hat[3,1] = 0.0
+      self.A_hat[3,2] = Decimal(1029933939417.)/Decimal(13636558850479.)
+      self.A_hat[4,0] = Decimal(14463281900351.)/Decimal(6315353703477.)
+      self.A_hat[4,1] = 0.0
+      self.A_hat[4,2] = Decimal(66114435211212.)/Decimal(5879490589093.)
+      self.A_hat[4,3] = Decimal(-54053170152839.)/Decimal(4284798021562.)
+      self.A_hat[5,0] = Decimal(14090043504691.)/Decimal(34967701212078.)
+      self.A_hat[5,1] = 0.0
+      self.A_hat[5,2] = Decimal(15191511035443.)/Decimal(11219624916014.)
+      self.A_hat[5,3] = Decimal(-18461159152457.)/Decimal(12425892160975.)
+      self.A_hat[5,4] = Decimal(-281667163811.)/Decimal(9011619295870.)
+      self.A_hat[6,0] = Decimal(19230459214898.)/Decimal(13134317526959.)
+      self.A_hat[6,1] = 0.0
+      self.A_hat[6,2] = Decimal(21275331358303.)/Decimal(2942455364971.)
+      self.A_hat[6,3] = Decimal(-38145345988419.)/Decimal(4862620318723.)
+      self.A_hat[6,4] = Decimal(-1.0)/Decimal(8.0)
+      self.A_hat[6,5] = Decimal(-1.0)/Decimal(8.0)
+      self.A_hat[7,0] = Decimal(-19977161125411.)/Decimal(11928030595625.)
+      self.A_hat[7,1] = 0.0
+      self.A_hat[7,2] = Decimal(-40795976796054.)/Decimal(6384907823539.)
+      self.A_hat[7,3] = Decimal(177454434618887.)/Decimal(12078138498510.)
+      self.A_hat[7,4] = Decimal(782672205425.)/Decimal(8267701900261.)
+      self.A_hat[7,5] = Decimal(-69563011059811.)/Decimal(9646580694205.)
+      self.A_hat[7,6] = Decimal(7356628210526.)/Decimal(4942186776405.)
+      
+      self.b_hat = np.zeros(8)
+      self.b_hat[0] = Decimal(-872700587467.)/Decimal(9133579230613.)
+      self.b_hat[1] = 0.0
+      self.b_hat[2] = 0.0
+      self.b_hat[3] = Decimal(22348218063261.)/Decimal(9555858737531.)
+      self.b_hat[4] = Decimal(-1143369518992.)/Decimal(8141816002931.)
+      self.b_hat[5] = Decimal(-39379526789629.)/Decimal(19018526304540.)
+      self.b_hat[6] = Decimal(32727382324388.)/Decimal(42900044865799.)
+      self.b_hat[7] = Decimal(41.0)/Decimal(200.0)
+      
+      self.A = np.zeros((8,8))
+      self.A[1,0] = Decimal(41.)/Decimal(200.)
+      self.A[1,1] = Decimal(41.)/Decimal(200.)
+      self.A[2,0] = Decimal(41.)/Decimal(400.)
+      self.A[2,1] = Decimal(-567603406766.)/Decimal(11931857230679.)
+      self.A[2,2] = Decimal(41.)/Decimal(200.)
+      self.A[3,0] = Decimal(683785636431.)/Decimal(9252920307686.)
+      self.A[3,1] = 0.0
+      self.A[3,2] = Decimal(-110385047103.)/Decimal(1367015193373.)
+      self.A[3,3] = Decimal(41.)/Decimal(200.)
+      self.A[4,0] = Decimal(3016520224154.)/Decimal(10081342136671.)
+      self.A[4,1] = 0.0
+      self.A[4,2] = Decimal(30586259806659.)/Decimal(12414158314087.)
+      self.A[4,3] = Decimal(-22760509404356.)/Decimal(11113319521817.)
+      self.A[4,4] = Decimal(41.)/Decimal(200.)
+      self.A[5,0] = Decimal(218866479029.)/Decimal(1489978393911.)
+      self.A[5,1] = 0.0
+      self.A[5,2] = Decimal(638256894668.)/Decimal(5436446318841.)
+      self.A[5,3] = Decimal(-1179710474555.)/Decimal(5321154724896.)
+      self.A[5,4] = Decimal(-60928119172.)/Decimal(8023461067671.)
+      self.A[5,5] = Decimal(41.)/Decimal(200.)
+      self.A[6,0] = Decimal(1020004230633.)/Decimal(5715676835656.)
+      self.A[6,1] = 0.0
+      self.A[6,2] = Decimal(25762820946817.)/Decimal(25263940353407.)
+      self.A[6,3] = Decimal(-2161375909145.)/Decimal(9755907335909.)
+      self.A[6,4] = Decimal(-211217309593.)/Decimal(5846859502534.)
+      self.A[6,5] = Decimal(-4269925059573.)/Decimal(7827059040749.)
+      self.A[6,6] = Decimal(41.)/Decimal(200.)
+      self.A[7,0] = Decimal(-872700587467.)/Decimal(9133579230613.)
+      self.A[7,1] = 0.0
+      self.A[7,2] = 0.0
+      self.A[7,3] = Decimal(22348218063261.)/Decimal(9555858737531.)
+      self.A[7,4] = Decimal(-1143369518992.)/Decimal(8141816002931.)
+      self.A[7,5] = Decimal(-39379526789629.)/Decimal(19018526304540.)
+      self.A[7,6] = Decimal(32727382324388.)/Decimal(42900044865799.)
+      self.A[7,7] = Decimal(41.)/Decimal(200.)
+      
+      self.b = np.zeros(8)
+
+      self.b[0] = Decimal(-975461918565.)/Decimal(9796059967033.)
+      self.b[1] = 0.0
+      self.b[2] = 0.0
+      self.b[3] = Decimal(78070527104295.)/Decimal(32432590147079.)
+      self.b[4] = Decimal(-548382580838.)/Decimal(3424219808633.)
+      self.b[5] = Decimal(-33438840321285.)/Decimal(15594753105479.)
+      self.b[6] = Decimal(3629800801594.)/Decimal(4656183773603.)
+      self.b[7] = Decimal(4035322873751.)/Decimal(18575991585200.)
+      
+      self.nstages = 8    
+
 
     self.problem = problem
     self.ndof = np.shape(problem.M)[0]

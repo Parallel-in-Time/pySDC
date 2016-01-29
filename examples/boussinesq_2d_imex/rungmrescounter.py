@@ -40,14 +40,14 @@ if __name__ == "__main__":
     swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 3
+    sparams['maxiter'] = 5
 
-    dirk_order = 3
+    dirk_order = 5
 
     # setup parameters "in time"
     t0     = 0
     Tend   = 3000   
-    Nsteps =  100
+    Nsteps =  500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol_limit'] = [1e-5]
-    pparams['gmres_tol_factor'] = [0.05]
+    pparams['gmres_tol_factor'] = [0.1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     print("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
     print("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
-    dirkp = dirk(P, dirk_order)
+    dirkp = dirk(P, np.min([4,dirk_order]))
     u0 = uinit.values.flatten()
     udirk = np.copy(u0)
     print "Running DIRK ...."
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 
     # For reference solution, increase GMRES tolerance
     P.gmres_tol_limit = 1e-10
-    rkimexref = rk_imex(P, 4)
+    rkimexref = rk_imex(P, 5)
     uref      = np.copy(u0)
     dt_ref    = dt/10.0
     print "Running RK-IMEX reference...."
