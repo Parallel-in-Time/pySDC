@@ -43,7 +43,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['num_nodes'] = 3
-    K = 5
+    K = 4
     dirk_order = K
     
     c_speed = 1.0
@@ -128,14 +128,14 @@ if __name__ == "__main__":
     fig  = plt.figure()
     plt.plot(k_vec, (U_speed+c_speed)+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, phase[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, phase[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
-    plt.plot(k_vec, phase[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
+    plt.plot(k_vec, phase[2,:], '-+', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
+    plt.plot(k_vec, phase[0,:], '-o', color='b', linewidth=1.5, label='SDC('+str(K)+')', markevery=5, markersize=fs/2)
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Phase speed', fontsize=fs, labelpad=0.5)
     plt.xlim([k_vec[0], k_vec[-1:]])
     plt.ylim([0.0, 1.1*(U_speed+c_speed)])
     fig.gca().tick_params(axis='both', labelsize=fs)
-    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs-2})
     plt.xticks([0, 1, 2, 3], fontsize=fs)
     #plt.show()
     filename = 'sdc-fwsw-disprel-phase-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
@@ -145,14 +145,14 @@ if __name__ == "__main__":
     fig  = plt.figure()
     plt.plot(k_vec, 1.0+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, amp_factor[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, amp_factor[2,:], '-', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')')
-    plt.plot(k_vec, amp_factor[0,:], '-', color='b', linewidth=1.5, label='SDC('+str(K)+')')
+    plt.plot(k_vec, amp_factor[2,:], '-+', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
+    plt.plot(k_vec, amp_factor[0,:], '-o', color='b', linewidth=1.5, label='SDC('+str(K)+')', markevery=5, markersize=fs/2)
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Amplification factor', fontsize=fs, labelpad=0.5)
     fig.gca().tick_params(axis='both', labelsize=fs)
     plt.xlim([k_vec[0], k_vec[-1:]])
     plt.ylim([k_vec[0], k_vec[-1:]])
-    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs-2})
     plt.gca().set_ylim([0.0, 1.1])
     plt.xticks([0, 1, 2, 3], fontsize=fs)
     #plt.show()
