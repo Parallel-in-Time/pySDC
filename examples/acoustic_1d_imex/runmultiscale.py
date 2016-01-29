@@ -32,7 +32,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 2
+    sparams['maxiter'] = 4
 
     # setup parameters "in time"
     t0   = 0.0
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     # Number of nodes
-    description['num_nodes']         = 2
+    description['num_nodes']         = 3
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
@@ -118,7 +118,7 @@ if __name__ == "__main__":
       unew_dirk, pnew_dirk = np.split(ynew_dirk, 2)
       unew_imex, pnew_imex = np.split(ynew_imex, 2)
 
-    rcParams['figure.figsize'] = 5, 2.5
+    rcParams['figure.figsize'] = 2.5, 2.5
     fig = plt.figure()
 
     sigma_0 = 0.1
@@ -131,9 +131,11 @@ if __name__ == "__main__":
     print ('Maximum pressure in RK-IMEX: %5.3e' % np.linalg.norm(pnew_imex, np.inf))
 
     #plt.plot(P.mesh, pnew_tp,  '-', color='c', label='Trapezoidal')
-    plt.plot(P.mesh, pnew_imex,  '-', color='c', label='IMEX('+str(rkimex.order)+')')
+    if np.linalg.norm(pnew_imex, np.inf)<=2:
+      plt.plot(P.mesh, pnew_imex,  '-', color='c', label='IMEX('+str(rkimex.order)+')')
     plt.plot(P.mesh, uend.values[1,:], '--', color='b', label='SDC('+str(sparams['maxiter'])+')')
-    plt.plot(P.mesh, pnew_bdf, '-', color='r', label='BDF-2')
+    if dirk.order==2:
+      plt.plot(P.mesh, pnew_bdf, '-', color='r', label='BDF-2')
     plt.plot(P.mesh, pnew_dirk, color='g', label='DIRK('+str(dirk.order)+')')
     #plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
     #plt.plot(P.mesh, uend.values[1,:], '-', color='b', linewidth=2.0, label='p (SDC)')
@@ -152,3 +154,18 @@ if __name__ == "__main__":
     plt.gcf().savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
+    #plt.plot(P.mesh, uend.values[1,:], '-', color='b', linewidth=2.0, label='p (SDC)')
+
+    fig = plt.figure()
+    p_slow = np.exp(-np.square( np.mod( P.mesh-pparams['cadv']*Tend, 1.0 ) -x_0 )/(sigma_0*sigma_0))
+    plt.plot(P.mesh, uinit.values[1,:], '-', color='b')
+    plt.xlabel('x', fontsize=fs, labelpad=0)
+    plt.ylabel('Pressure', fontsize=fs, labelpad=0)
+    fig.gca().set_xlim([0, 1.0])
+    fig.gca().set_ylim([-0.5, 1.1])
+    fig.gca().tick_params(axis='both', labelsize=fs)
+    fig.gca().grid()
+    #plt.show()
+    filename = 'sdc-fwsw-multiscale-initial.pdf'
+    plt.gcf().savefig(filename, bbox_inches='tight')
+    call(["pdfcrop", filename, filename])
