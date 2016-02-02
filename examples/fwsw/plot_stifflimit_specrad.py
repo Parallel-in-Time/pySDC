@@ -67,7 +67,7 @@ if __name__ == "__main__":
     rcParams['figure.figsize'] = 2.5, 2.5
     fig = plt.figure()
     plt.plot(nodes_v, specrad[0,:], 'rd-', markersize=fs-2, label=r'$\lambda_{\rm fast} = \infty$')
-    plt.plot(nodes_v, specrad[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f i$' % problem.lambda_f[0].imag)
+    plt.plot(nodes_v, specrad[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[0].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Spectral radius  $\sigma\left( \mathbf{E} \right)$', fontsize=fs, labelpad=2)
     #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     fig = plt.figure()
     plt.plot(nodes_v, norm[0,:], 'rd-', markersize=fs-2, label=r'$\lambda_{\rm fast} = \infty$')
-    plt.plot(nodes_v, norm[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f i$' % problem.lambda_f[0].imag)
+    plt.plot(nodes_v, norm[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[0].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Norm  $\left|| \mathbf{E} \right||_{\infty}$', fontsize=fs, labelpad=2)
     #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
