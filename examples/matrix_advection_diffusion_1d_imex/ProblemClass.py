@@ -6,7 +6,7 @@ import scipy.sparse.linalg as LA
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.tools.transfer_tools import to_sparse
-from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
+from examples.matrix_advection_diffusion_1d_imex.getFDMatrix import getFDMatrix,getUpwindFDMatrix
 
 
 
@@ -87,7 +87,7 @@ class advection_diffusion(ptype):
         :param d:
         :return: Matrix in sparse format
         """
-        return to_sparse(-c*getFDMatrix(N, order, dx), self.sparse_format)
+        return to_sparse(-c*getUpwindFDMatrix(N, order, dx), self.sparse_format)
 
     def solve_system(self,rhs,factor,u0,t):
         """

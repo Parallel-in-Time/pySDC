@@ -231,4 +231,5 @@ class CollGaussRadau_Right_LU_Trick(CollGaussRadau_Right):
         Q = self.Qmat
 
         p, l, u = lu(Q[1:, 1:].transpose())
+        #print np.diag(l)
         self.QDmat = u.transpose()

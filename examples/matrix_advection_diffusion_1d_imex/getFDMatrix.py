@@ -46,3 +46,36 @@ def getFDMatrix(N, p, dx):
 
   A *= (1.0/dx)
   return sp.csr_matrix(A)
+
+def getUpwindFDMatrix(N, p, dx):
+
+  if (p==1):
+    stencil = [-1.0, 1.0]
+    rg   = [0,1]
+  elif (p==2):
+    stencil = [-3.0/2.0, 4.0/2.0, -1.0/2.0]
+    rg  = [0,1,2]
+  elif (p==3):
+    stencil = [-2.0/6.0, -3.0/6.0, 6.0/6.0, -1.0/6.0]
+    rg = [-1,0,1,2]
+  else:
+    print ("Do not have order %1i implemented." % p)
+    exit()
+
+  A = sp.diags(stencil, rg, shape=(N,N))
+  A = sp.lil_matrix(A)
+
+  if (p==1):
+    A[N-1,0] = stencil[1]
+  elif (p==2):
+    A[N-2,0] = stencil[2]
+    A[N-1,0] = stencil[1]
+    A[N-1,1] = stencil[2]
+  elif (p==3):
+    A[0,N-1] = stencil[0]
+    A[N-2,0] = stencil[3]
+    A[N-1,0] = stencil[2]
+    A[N-1,1] = stencil[3]
+
+  A *= (1.0/dx)
+  return sp.csr_matrix(A)
