@@ -49,24 +49,36 @@ def next_neighbors_periodic(p, ps, k, T=None):
     :param p: value
     :param ps: ndarray, vector where to find the next neighbors
     :param k: integer, number of neighbours
-    :return: ndarray, with the k next neighbors
+    :return: ndarray, with the k next neighbors and an array containing the
     """
     if T is None:
         T = ps[-1]-2*ps[0]+ps[1]
     p_bar = p - np.floor(p/T)*T
     ps = ps - ps[0]
-    distance_to_p = np.asarray(map(lambda tk: min([np.abs(tk+T-p_bar), np.abs(tk-p_bar), np.abs(tk-T-p_bar)]),ps))
-    # print p_bar
-    # print distance_to_p
-    # zip it
+    distance_to_p = []
+    for tk in ps:
+        d1 = tk+T-p_bar
+        d2 = tk-p_bar
+        d3 = tk-T-p_bar
+        min_d = min([np.abs(d1), np.abs(d2), np.abs(d3)])
+        if np.abs(d1) == min_d:
+            distance_to_p.append(d1)
+        elif np.abs(d2) == min_d:
+            distance_to_p.append(d2)
+        else:
+            distance_to_p.append(d3)
+    distance_to_p = np.asarray(distance_to_p)
     value_index = []
     for d,i in zip(distance_to_p, range(distance_to_p.size)):
         value_index.append((d, i))
     # sort by distance
-    value_index_sorted = sorted(value_index, key=lambda s: s[0])
-    # take first k indices with least distance and sort them
-    return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
+    value_index_sorted_by_abs = sorted(value_index,cmp=lambda x,y:cmp(np.abs(x),np.abs(y)), key=lambda s: s[0])
+    if k % 2 == 1:
+        value_index_sorted_by_sign =sorted(value_index_sorted_by_abs[0:k+1], key=lambda s: s[0])[:k]
+    else:
+        value_index_sorted_by_sign =sorted(value_index_sorted_by_abs[0:k], key=lambda s: s[0])
 
+    return map(lambda s: s[1], value_index_sorted_by_sign), map(lambda s: s[0]+p, value_index_sorted_by_sign)
 
 def next_neighbors(p, ps, k):
     """
@@ -119,12 +131,9 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", period
 
     for i, p in zip(range(n_g), coarse_grid):
         if periodic:
-            nn = next_neighbors_periodic(p, fine_grid, k, T)
+            nn, cont_arr = next_neighbors_periodic(p, fine_grid, k, T)
             circulating_one = np.asarray([1.0]+[0.0]*(k-1))
             lag_pol = []
-            cont_arr = continue_periodic_array(fine_grid, nn, T)
-            if p > np.mean(coarse_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
-                cont_arr = cont_arr + T
             for l in range(k):
                 lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
             M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
@@ -154,15 +163,9 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", peri
 
     for i, p in zip(range(n_f), fine_grid):
         if periodic:
-            nn = next_neighbors_periodic(p, coarse_grid, k, T)
+            nn,cont_arr = next_neighbors_periodic(p, coarse_grid, k, T)
             circulating_one = np.asarray([1.0]+[0.0]*(k-1))
             lag_pol = []
-            cont_arr = continue_periodic_array(coarse_grid, nn, T)
-
-            if p > np.mean(fine_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
-                cont_arr = cont_arr + T
-            # print cont_arr
-
             for l in range(k):
                 lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
             M[i, nn] = np.asarray(map(lambda x: x(p), lag_pol))
