@@ -10,6 +10,8 @@ iterators are implemented as well, giving full access to all values at any time.
 News
 ----
 
+* February 2, 2016: the fast-wave slow-wave release, containing all the code for the FWSW-SDC [paper](http://arxiv.org/abs/1602.01626)
+* October 27, 2015: the fault-tolerant release, containing all the code for the FT-PFASST [paper](http://arxiv.org/abs/1510.08334)
 * June 17, 2015: Gray-Scott example using FEniCS is up and running
 * May 7, 2015: added first [FEniCS](http://fenicsproject.org/) example
 * May 5, 2015: added [Clawpack](http://www.clawpack.org/) examples using Sharpclaw

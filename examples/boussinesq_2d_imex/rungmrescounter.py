@@ -99,19 +99,19 @@ if __name__ == "__main__":
     dirkp = dirk(P, np.min([4,dirk_order]))
     u0 = uinit.values.flatten()
     udirk = np.copy(u0)
-    print "Running DIRK ...."
+    print("Running DIRK ....")
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
 
     rkimex = rk_imex(P, dirk_order)
     uimex  = np.copy(u0)
     dt_imex = dt
-    print "Running RK-IMEX ...."
+    print("Running RK-IMEX ....")
     for i in range(0,Nsteps):
       uimex = rkimex.timestep(uimex, dt_imex)
 
     # call main function to get things done...
-    print "Running SDC..."
+    print("Running SDC...")
     uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # For reference solution, increase GMRES tolerance
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     rkimexref = rk_imex(P, 5)
     uref      = np.copy(u0)
     dt_ref    = dt/10.0
-    print "Running RK-IMEX reference...."
+    print("Running RK-IMEX reference....")
     for i in range(0,10*Nsteps):
       uref = rkimexref.timestep(uref, dt_ref)
   

@@ -95,7 +95,7 @@ class mass_matrix_imex(imex_1st_order.imex_1st_order):
             rhs = P.dtype_u(integral[m])
             for j in range(m+1):
                 rhs += L.dt*(self.QI[m+1,j]*L.f[j].impl + self.QE[m+1,j]*L.f[j].expl)
-            # apply mass matrix to rhs
+            # apply mass matrix to rhs #TODO: Hloy crap, I can put this into solve_system right???
             rhs = P.apply_mass_matrix(rhs)
 
             # implicit solve with prefactor stemming from QI
