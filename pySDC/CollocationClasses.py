@@ -3,7 +3,7 @@ import numpy as np
 import scipy.sparse as sp
 import numpy.polynomial.legendre as leg
 from scipy.linalg import lu
-
+import scipy.interpolate as intpl
 from pySDC.Collocation import CollBase
 
 
@@ -233,3 +233,45 @@ class CollGaussRadau_Right_LU_Trick(CollGaussRadau_Right):
         p, l, u = lu(Q[1:, 1:].transpose())
         #print np.diag(l)
         self.QDmat = u.transpose()
+
+
+class CollSplineRight(CollBase):
+    """
+    If a spectral quadrature method is used a order higher than 15 is not applicable,
+    because the underlying interpolation is numerically losses the stability. This collocation class
+    uses spline functions to achieve arbitrary big Q matrices with a band structure.
+    """
+
+    def __init__(self, num_nodes, tleft, tright, order=3):
+        super(CollSplineRight, self).__init__(num_nodes, tleft, tright)
+        self.Q = np.zeros((num_nodes, num_nodes))
+        self.nodes = self._getNodes
+
+        # get the defining tck's for each spline basis function
+        circ_one = np.zeros(self.num_nodes)
+        circ_one[0] = 1.0
+        self.tcks = []
+        for i in range(self.num_nodes):
+            tck = intpl.splrep(self.nodes, np.roll(circ_one, i), xb=tleft, xe=tright, k=order, s=0.0)
+            self.tcks.append(tck)
+
+        self.order = order
+        self.nodes = self._getNodes
+        self.weights = self._getWeights(tleft, tright)
+        self.Qmat = self._gen_Qmatrix
+        self.Smat = self._gen_Smatrix
+        self.delta_m = self._gen_deltas
+        self.left_is_node = False
+        self.right_is_node = True
+        self.QDmat = self._gen_QDmatrix
+
+    @property
+    def _getNodes(self):
+        return np.linspace(self.tleft + 1.0 / self.num_nodes, self.tright, self.num_nodes, endpoint=True)
+
+    def _getWeights(self, a, b):
+        weights = np.zeros(self.num_nodes)
+        for i in range(self.num_nodes):
+            weights[i] = intpl.splint(a, b, self.tcks[i])
+
+        return weights
