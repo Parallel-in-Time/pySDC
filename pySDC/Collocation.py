@@ -74,7 +74,7 @@ class CollBase(object):
         """
         assert a <= b, 'Interval boundaries are corrupt, got %f and %f' % (a,b)
 
-        M = M - 1
+        M = int(M - 1)
         M1 = M + 1
         M2 = M + 2
 
