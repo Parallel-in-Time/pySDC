@@ -35,7 +35,10 @@ def hard_fault_injection(S):
         if doit:
             hard_stats.append((S.status.step,S.status.iter,S.status.time))
     else:
-        doit = np.any(np.all([S.status.step,S.status.iter,S.status.time]==refdata,axis=1))
+        if refdata is not None:
+            doit = np.any(np.all([S.status.step,S.status.iter,S.status.time]==refdata,axis=1))
+        else:
+            doit = False
 
     # print(S.status.step,S.status.iter,hard_step,hard_iter)
 
