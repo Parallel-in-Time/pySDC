@@ -18,8 +18,8 @@ if __name__ == "__main__":
     N_s = 100
     N_f = 400
     
-    lam_s_max = 5.0
-    lam_f_max = 12.0
+    lam_s_max = 12.0
+    lam_f_max = 24.0
     lambda_s = 1j*np.linspace(0.0, lam_s_max, N_s)
     lambda_f = 1j*np.linspace(0.0, lam_f_max, N_f)
 
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['num_nodes'] = 2
-    K = 3
+    swparams['num_nodes'] = 3
+    K = 0
     do_coll_update = True
     
     #
@@ -58,13 +58,19 @@ if __name__ == "__main__":
       for j in range(0,N_f):
         lambda_fast = lambda_f[j]
         lambda_slow = lambda_s[i]
-        LHS = np.eye(nnodes) - step.status.dt*( lambda_fast*QI + lambda_slow*QE )
-        RHS = step.status.dt*( (lambda_fast+lambda_slow)*Q - (lambda_fast*QI + lambda_slow*QE) )
+        if K is not 0:
 
-        Pinv = np.linalg.inv(LHS)
-        Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
-        for k in range(0,K):
-          Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),k).dot(Pinv)
+          LHS = np.eye(nnodes) - step.status.dt*( lambda_fast*QI + lambda_slow*QE )
+          RHS = step.status.dt*( (lambda_fast+lambda_slow)*Q - (lambda_fast*QI + lambda_slow*QE) )
+
+          Pinv = np.linalg.inv(LHS)
+          Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
+          for k in range(0,K):
+            Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),k).dot(Pinv)
+
+        else:
+          # Compute stability function of collocation solution
+          Mat_sweep = np.linalg.inv(np.eye(nnodes)-step.status.dt*(lambda_fast + lambda_slow)*Q)
         if do_coll_update:
           stab_fh = 1.0 + (lambda_fast + lambda_slow)*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
         else:
