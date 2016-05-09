@@ -72,6 +72,9 @@ if __name__ == "__main__":
       specrad[0,i] = np.linalg.norm( evals, np.inf )
       
 
+    print ("Spectral radius of infinitely fast wave case > 1.0 for M=%2i" % nodes_v[np.argmax(specrad[0,:]>1.0)])
+    print ("Spectral radius of > 1.0 for M=%2i" % nodes_v[np.argmax(specrad[1,:]>1.0)])
+
   ### Plot result
     rcParams['figure.figsize'] = 2.5, 2.5
     fig = plt.figure()
@@ -83,7 +86,7 @@ if __name__ == "__main__":
     #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
     plt.legend(loc='lower right', fontsize=fs, prop={'size':fs})
     plt.xlim([np.min(nodes_v), np.max(nodes_v)])
-    plt.ylim([0, 1.0])
+    plt.ylim([0, 1.2])
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     #plt.show()
