@@ -32,14 +32,10 @@ class TestImexSweeper(unittest.TestCase):
     problem = level.prob
     return step, level, problem, nnodes
   
-  def setupQMatrices(self, level):
-    QE, QI, Q = level.sweep.get_sweeper_mats()
-    return QE, QI, Q
-
   def setupSweeperMatrices(self, step, level, problem):
     nnodes  = step.levels[0].sweep.coll.num_nodes
     # Build SDC sweep matrix
-    QE, QI, Q = self.setupQMatrices(level)
+    QE, QI, Q = level.sweep.get_sweeper_mats()
     dt = step.status.dt
     LHS = np.eye(nnodes) - step.status.dt*( problem.lambda_f[0]*QI + problem.lambda_s[0]*QE )
     RHS = step.status.dt*( (problem.lambda_f[0]+problem.lambda_s[0])*Q - (problem.lambda_f[0]*QI + problem.lambda_s[0]*QE) )
@@ -149,11 +145,12 @@ class TestImexSweeper(unittest.TestCase):
   def test_collocationinvariant(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
       
-      QE, QI, Q = self.setupQMatrices(level)
+      QE, QI, Q = level.sweep.get_sweeper_mats()
 
       # Build collocation matrix
       Mcoll = np.eye(nnodes) - step.status.dt*Q*(problem.lambda_s[0] + problem.lambda_f[0])

@@ -160,3 +160,15 @@ class imex_1st_order(sweeper):
       QI = self.QI[1:,1:]
       Q  = self.coll.Qmat[1:,1:]
       return QE, QI, Q
+
+    def get_scalar_problems_sweeper_mats(self, lambdas=[None, None]):
+      QE, QI, Q = self.get_sweeper_mats()
+      if lambdas==[None,None]:
+        pass
+        # should use lambdas from attached problem and make sure it is a scalar IMEX 
+        raise NotImplementedError("At the moment, the values for lambda have to be provided")
+      else:
+        lambda_fast = lambdas[0]
+        lambda_slow = lambdas[1]
+      assert abs(lambda_slow)<=abs(lambda_fast), "First entry in parameter lambdas (lambda_fast) has to be greater than second entry (lambda_slow)"
+      return QE, QI, Q
