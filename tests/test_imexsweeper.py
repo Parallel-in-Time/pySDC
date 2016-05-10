@@ -32,13 +32,9 @@ class TestImexSweeper(unittest.TestCase):
     problem = level.prob
     return step, level, problem, nnodes
   
-  def setupSweeperMatrices(self, step, level, problem):
-    nnodes  = step.levels[0].sweep.coll.num_nodes
-    # Build SDC sweep matrix
-    QE, QI, Q = level.sweep.get_sweeper_mats()
-    dt = step.status.dt
-    LHS = np.eye(nnodes) - step.status.dt*( problem.lambda_f[0]*QI + problem.lambda_s[0]*QE )
-    RHS = step.status.dt*( (problem.lambda_f[0]+problem.lambda_s[0])*Q - (problem.lambda_f[0]*QI + problem.lambda_s[0]*QE) )
+  def setupSweeperMatrices(self, level, problem):
+    lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
+    LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
     return LHS, RHS
 
   #
@@ -112,7 +108,7 @@ class TestImexSweeper(unittest.TestCase):
       # Perform node-to-node SDC sweep
       level.sweep.update_nodes()
 
-      LHS, RHS = self.setupSweeperMatrices(step, level, problem)
+      LHS, RHS = self.setupSweeperMatrices(level, problem)
 
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(u0full) )
       usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -193,7 +189,7 @@ class TestImexSweeper(unittest.TestCase):
         level.sweep.update_nodes()
       usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
 
-      LHS, RHS = self.setupSweeperMatrices(step, level, problem)
+      LHS, RHS = self.setupSweeperMatrices(level, problem)
       unew = u0full
       for i in range(0,K):
         unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(unew) )
@@ -207,6 +203,7 @@ class TestImexSweeper(unittest.TestCase):
         Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
       usweep_onematrix = Mat_sweep.dot(u0full)
       assert np.linalg.norm( usweep_onematrix - usweep, np.infty )<1e-14, "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
+
     
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
@@ -226,7 +223,7 @@ class TestImexSweeper(unittest.TestCase):
       level.sweep.compute_end_point()
       uend_sweep = level.uend.values
 
-      LHS, RHS = self.setupSweeperMatrices(step, level, problem)
+      LHS, RHS = self.setupSweeperMatrices(level, problem)
       # Build single matrix representing K sweeps    
       Pinv = np.linalg.inv(LHS)
       Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
@@ -237,6 +234,7 @@ class TestImexSweeper(unittest.TestCase):
       # Multiply u0 by value of update function to get end value directly
       uend_matrix = update*self.pparams['u0']
       assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
+
 
   #
   # Make sure that creating a sweeper object with a collocation object with right_is_node=False and do_coll_update=False throws an exception
