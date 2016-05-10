@@ -8,7 +8,7 @@ import numpy as np
 t_start  = np.random.rand(1)*0.2
 t_end    = 0.8 + np.random.rand(1)*0.2
 
-classes  = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12] ]
+classes  = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12], ["CollGaussRadau_Left", 2, 12] ]
 
 class TestCollocation:
 

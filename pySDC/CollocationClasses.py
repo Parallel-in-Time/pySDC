@@ -212,6 +212,6 @@ class CollGaussRadau_Left(CollBase):
         nodes = np.concatenate(([-1.0],x))
 
         nodes = (a * (1 - nodes) + b * (1 + nodes)) / 2
-        print('WARNING: GaussRadau_Left untested, use at own risk!')
+        print('WARNING: GaussRadau_Left not fully tested, use at own risk!')
 
         return nodes
