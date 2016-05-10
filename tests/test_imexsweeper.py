@@ -33,9 +33,7 @@ class TestImexSweeper(unittest.TestCase):
     return step, level, problem, nnodes
   
   def setupQMatrices(self, level):
-    QE = level.sweep.QE[1:,1:]
-    QI = level.sweep.QI[1:,1:]
-    Q  = level.sweep.coll.Qmat[1:,1:]
+    QE, QI, Q = level.sweep.get_sweeper_mats()
     return QE, QI, Q
 
   def setupSweeperMatrices(self, step, level, problem):

@@ -129,7 +129,6 @@ class imex_1st_order(sweeper):
 
         return None
 
-
     def compute_end_point(self):
         """
         Compute u at the right point of the interval
@@ -155,3 +154,9 @@ class imex_1st_order(sweeper):
               L.uend += L.tau[-1]
 
         return None
+
+    def get_sweeper_mats(self):
+      QE = self.QE[1:,1:]
+      QI = self.QI[1:,1:]
+      Q  = self.coll.Qmat[1:,1:]
+      return QE, QI, Q
