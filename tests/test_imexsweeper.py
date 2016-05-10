@@ -32,11 +32,6 @@ class TestImexSweeper(unittest.TestCase):
     problem = level.prob
     return step, level, problem, nnodes
   
-  def setupSweeperMatrices(self, level, problem):
-    lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
-    LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
-    return LHS, RHS
-
   #
   # General setUp function used by all tests
   #
@@ -108,7 +103,8 @@ class TestImexSweeper(unittest.TestCase):
       # Perform node-to-node SDC sweep
       level.sweep.update_nodes()
 
-      LHS, RHS = self.setupSweeperMatrices(level, problem)
+      lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
+      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
 
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(u0full) )
       usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -141,7 +137,6 @@ class TestImexSweeper(unittest.TestCase):
   def test_collocationinvariant(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
-
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -163,9 +158,9 @@ class TestImexSweeper(unittest.TestCase):
       # Perform node-to-node SDC sweep
       level.sweep.update_nodes()
 
-      # Build matrices for matrix formulation of sweep
-      LHS = np.eye(nnodes) - step.status.dt*( problem.lambda_f[0]*QI + problem.lambda_s[0]*QE )
-      RHS = step.status.dt*( (problem.lambda_f[0]+problem.lambda_s[0])*Q - (problem.lambda_f[0]*QI + problem.lambda_s[0]*QE) )
+      lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
+      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
+
       # Make sure both matrix and node-to-node sweep leave collocation unaltered
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(ucoll) )
       assert np.linalg.norm( unew - ucoll, np.infty )<1e-14, "Collocation solution not invariant under matrix SDC sweep"
@@ -189,7 +184,9 @@ class TestImexSweeper(unittest.TestCase):
         level.sweep.update_nodes()
       usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
 
-      LHS, RHS = self.setupSweeperMatrices(level, problem)
+      lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
+      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
+
       unew = u0full
       for i in range(0,K):
         unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(unew) )
@@ -223,7 +220,9 @@ class TestImexSweeper(unittest.TestCase):
       level.sweep.compute_end_point()
       uend_sweep = level.uend.values
 
-      LHS, RHS = self.setupSweeperMatrices(level, problem)
+      lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
+      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
+
       # Build single matrix representing K sweeps    
       Pinv = np.linalg.inv(LHS)
       Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
