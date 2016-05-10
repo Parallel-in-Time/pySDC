@@ -116,7 +116,6 @@ class TestImexSweeper(unittest.TestCase):
   def test_updateformula(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
-
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -197,7 +196,6 @@ class TestImexSweeper(unittest.TestCase):
       Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       usweep_onematrix = Mat_sweep.dot(u0full)
       assert np.linalg.norm( usweep_onematrix - usweep, np.infty )<1e-14, "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
-
     
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
@@ -205,7 +203,6 @@ class TestImexSweeper(unittest.TestCase):
   def test_manysweepupdate(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
-
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -228,7 +225,6 @@ class TestImexSweeper(unittest.TestCase):
       # Multiply u0 by value of update function to get end value directly
       uend_matrix = update*self.pparams['u0']
       assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
-
 
   #
   # Make sure that creating a sweeper object with a collocation object with right_is_node=False and do_coll_update=False throws an exception
