@@ -116,6 +116,7 @@ class TestImexSweeper(unittest.TestCase):
   def test_updateformula(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -123,13 +124,13 @@ class TestImexSweeper(unittest.TestCase):
       # Perform update step in sweeper
       level.sweep.update_nodes()
       ustages = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
-
       # Compute end value through provided function
       level.sweep.compute_end_point()
       uend_sweep = level.uend.values
       # Compute end value from matrix formulation
       uend_mat   = self.pparams['u0'] + step.status.dt*level.sweep.coll.weights.dot(ustages*(problem.lambda_s[0] + problem.lambda_f[0]))
       assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "Update formula in sweeper gives different result than matrix update formula"
+
 
   #
   # Compute the exact collocation solution by matrix inversion and make sure it is a fixed point
@@ -193,11 +194,7 @@ class TestImexSweeper(unittest.TestCase):
       
       assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"   
       
-      # Build single matrix representing K sweeps    
-      Pinv = np.linalg.inv(LHS)
-      Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
-      for i in range(0,K):
-        Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
+      Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       usweep_onematrix = Mat_sweep.dot(u0full)
       assert np.linalg.norm( usweep_onematrix - usweep, np.infty )<1e-14, "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
 
@@ -208,6 +205,7 @@ class TestImexSweeper(unittest.TestCase):
   def test_manysweepupdate(self):
     for type in classes:
       self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -224,10 +222,7 @@ class TestImexSweeper(unittest.TestCase):
       LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
 
       # Build single matrix representing K sweeps    
-      Pinv = np.linalg.inv(LHS)
-      Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
-      for i in range(0,K):
-        Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),i).dot(Pinv)
+      Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       # Now build update function
       update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
       # Multiply u0 by value of update function to get end value directly

@@ -169,6 +169,8 @@ class imex_1st_order(sweeper):
       """
       For a scalar problem, an IMEX-SDC sweep can be written in matrix formulation. This function returns the corresponding matrices. 
       See Ruprecht & Speck, ``Spectral deferred corrections with fast-wave slow-wave splitting'', 2016 for the derivation.
+
+      The first entry in lambdas is lambda_fast, the second is lambda_slow.
       """
       QE, QI, Q = self.get_sweeper_mats()
       if lambdas==[None,None]:
@@ -178,9 +180,19 @@ class imex_1st_order(sweeper):
       else:
         lambda_fast = lambdas[0]
         lambda_slow = lambdas[1]
-      assert abs(lambda_slow)<=abs(lambda_fast), "First entry in parameter lambdas (lambda_fast) has to be greater than second entry (lambda_slow)"
       nnodes = self.coll.num_nodes
       dt = self.level.dt
       LHS = np.eye(nnodes) - dt*( lambda_fast*QI + lambda_slow*QE )
       RHS = dt*( (lambda_fast+lambda_slow)*Q - (lambda_fast*QI + lambda_slow*QE) )
       return LHS, RHS
+
+    def get_scalar_problems_manysweep_mat(self, nsweeps, lambdas=[None,None]):
+      """
+      For a scalar problem, K sweeps of IMEX-SDC can be written in matrix form.
+      """
+      LHS, RHS = self.get_scalar_problems_sweeper_mats(lambdas = lambdas)
+      Pinv = np.linalg.inv(LHS)
+      Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), nsweeps)
+      for k in range(0,nsweeps):
+        Mat_sweep += np.linalg.matrix_power(Pinv.dot(RHS), k).dot(Pinv)
+      return Mat_sweep
