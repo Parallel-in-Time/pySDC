@@ -18,8 +18,8 @@ if __name__ == "__main__":
     N_s = 100
     N_f = 400
     
-    lam_s_max = 12.0
-    lam_f_max = 24.0
+    lam_s_max = 3.0
+    lam_f_max = 12.0
     lambda_s = 1j*np.linspace(0.0, lam_s_max, N_s)
     lambda_f = 1j*np.linspace(0.0, lam_f_max, N_f)
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['num_nodes'] = 3
-    K = 0
+    K = 3
     do_coll_update = True
     
     #
@@ -47,10 +47,6 @@ if __name__ == "__main__":
     nnodes  = step.levels[0].sweep.coll.num_nodes
     level   = step.levels[0]
     problem = level.prob
-  
-    QE = level.sweep.QE[1:,1:]
-    QI = level.sweep.QI[1:,1:]
-    Q  = level.sweep.coll.Qmat[1:,1:]
 
     stab = np.zeros((N_f, N_s), dtype='complex')
 
@@ -59,15 +55,9 @@ if __name__ == "__main__":
         lambda_fast = lambda_f[j]
         lambda_slow = lambda_s[i]
         if K is not 0:
-
-          LHS = np.eye(nnodes) - step.status.dt*( lambda_fast*QI + lambda_slow*QE )
-          RHS = step.status.dt*( (lambda_fast+lambda_slow)*Q - (lambda_fast*QI + lambda_slow*QE) )
-
-          Pinv = np.linalg.inv(LHS)
-          Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), K)
-          for k in range(0,K):
-            Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),k).dot(Pinv)
-
+          lambdas = [ lambda_fast, lambda_slow ]
+          LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
+          Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
         else:
           # Compute stability function of collocation solution
           Mat_sweep = np.linalg.inv(np.eye(nnodes)-step.status.dt*(lambda_fast + lambda_slow)*Q)
