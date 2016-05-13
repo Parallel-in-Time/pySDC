@@ -21,7 +21,12 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([50.0*1j], dtype='complex')
     pparams['u0'] = 1.0
     swparams = {}
+    #
+    #
+    #
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
 
     nodes_v = np.arange(2,10)
     specrad = np.zeros((2,np.size(nodes_v)))
@@ -58,10 +63,12 @@ if __name__ == "__main__":
         Q  = Q[1:,1:]
         # Eigenvalue of error propagation matrix in stiff limit: E = I - inv(QI)*Q
         evals, evecs = np.linalg.eig( np.eye(nnodes-1) - np.linalg.inv(QI).dot(Q) )
+        norm[0,i] = np.linalg.norm( np.eye(nnodes-1) - np.linalg.inv(QI).dot(Q), np.inf )
       else:
         evals, evecs = np.linalg.eig( np.eye(nnodes) - np.linalg.inv(QI).dot(Q) )
+        norm[0,i] = np.linalg.norm( np.eye(nnodes) - np.linalg.inv(QI).dot(Q), np.inf )
       specrad[0,i] = np.linalg.norm( evals, np.inf )
-      norm[0,i] = np.linalg.norm( np.eye(nnodes) - np.linalg.inv(QI).dot(Q), np.inf )
+      
 
   ### Plot result
     rcParams['figure.figsize'] = 2.5, 2.5
