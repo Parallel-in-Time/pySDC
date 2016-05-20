@@ -46,8 +46,10 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000 
-    Nsteps = 500
+
+    Tend   = 3000   
+    Nsteps =  100
+
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol_limit'] = [1e-5]
-    pparams['gmres_tol_factor'] = [0.1]
+    pparams['gmres_tol_factor'] = [0.05]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -99,6 +101,7 @@ if __name__ == "__main__":
     method_split = 'MIS4_4'
 #   method_split = 'RK3'
     splitp = SplitExplicit(P, method_split, pparams) 
+
     u0 = uinit.values.flatten()
     usplit = np.copy(u0)
 #   for i in range(0,Nsteps):
@@ -107,7 +110,7 @@ if __name__ == "__main__":
       usplit = splitp.timestep(usplit, dt/2)  
     print(np.linalg.norm(usplit))
 
-    dirkp = dirk(P, np.min([4,dirk_order]))
+    dirkp = dirk(P, dirk_order)
     udirk = np.copy(u0)
     print("Running DIRK ....")
     print(np.linalg.norm(udirk))  

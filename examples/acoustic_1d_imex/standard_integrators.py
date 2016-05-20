@@ -241,7 +241,7 @@ class dirk:
     self.M = M
     self.order = order
 
-    assert self.order in [2,22,3,4], 'Order must be 2,22,3,4'
+    assert self.order in [2,22,3,4,5], 'Order must be 2,22,3,4'
     
     if (self.order==2):
       self.nstages = 1
@@ -302,6 +302,27 @@ class dirk:
       self.b[0]   = 1.0/(6.0*alpha*alpha)
       self.b[1]   = 1.0 - 1.0/(3.0*alpha*alpha)
       self.b[2]   = 1.0/(6.0*alpha*alpha)
+
+    if (self.order==5):
+      # From A. H. Al-Rabeh, "OPTIMAL ORDER DIAGONALLY IMPLICIT RUNGE-KUTTA METHODS"
+      self.nstages = 4
+      self.A   = np.zeros((4,4))
+      self.A[1,0] = 0.1090390091
+      self.A[1,1] = 0.1090390091
+      self.A[2,0] = 0.0177359481 
+      self.A[2,1] = 0.4277445474
+      self.A[2,2] = 0.1090390091
+      self.A[3,0] = 0.1173343519
+      self.A[3,1] = 0.2044057169
+      self.A[3,2] = 0.4601819131
+      self.A[3,3] = 0.1090390091
+
+      self.tau = np.zeros(4)
+      self.b   = np.zeros(4)
+      self.b[0] = 0.0707307044
+      self.b[1] = 0.3078968440
+      self.b[2] = 0.3589454736
+      self.b[3] = 0.2624269779
        
     self.stages  = np.zeros((self.nstages,self.Ndof), dtype='complex')
 
