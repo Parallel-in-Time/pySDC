@@ -14,7 +14,9 @@ if __name__ == "__main__":
   udirk = np.load('dirk.npy')
   uimex = np.load('rkimex.npy')
   uref  = np.load('uref.npy')
+  usplit = np.load('split.npy')
 
+  print("Estimated discretisation error split explicit:  %5.3e" % ( np.linalg.norm(usplit.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
   print("Estimated discretisation error of DIRK: %5.3e" % ( np.linalg.norm(udirk.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
   print("Estimated discretisation error of RK-IMEX:  %5.3e" % ( np.linalg.norm(uimex.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))
   print("Estimated discretisation error of SDC:  %5.3e" % ( np.linalg.norm(uend.flatten() - uref.flatten(), np.inf)/np.linalg.norm(uref.flatten(),np.inf) ))

@@ -270,8 +270,149 @@ class bdf2:
     return sol
 
 #
-# A diagonally implicit Runge-Kutta method of order 2, 3 or 4
+#  Split-Explicit method
 #
+
+class SplitExplicit:
+
+  def __init__(self, problem, method, pparams):
+
+    assert isinstance(problem, boussinesq_2d_imex), "problem is wrong type of object"
+    self.Ndof = np.shape(problem.M)[0]
+    self.method = method
+    self.logger = logging()
+    self.problem = problem
+    self.pparams = pparams
+    self.NdofTher = 2*problem.N[0]*problem.N[1]
+    self.NdofMom = 2*problem.N[0]*problem.N[1]
+
+    print "dx  ",problem.h[0]
+    print "dz  ",problem.h[1]
+
+    assert self.method in ["MIS4_4","RK3"], 'Method must be MIS4_4'
+
+    if (self.method=='RK3'):
+      self.nstages=3
+      self.aRunge=np.zeros((4,4))
+      self.aRunge[0,0]= 1./3.
+      self.aRunge[1,1]= 1./2.
+      self.aRunge[2,2]= 1.
+      self.dRunge=np.zeros((4,4))
+      self.gRunge=np.zeros((4,4))
+    if (self.method=='MIS4_4'):
+      self.nstages=4
+      self.aRunge=np.zeros((4,4))
+      self.aRunge[0,0]=  0.38758444641450318
+      self.aRunge[1,0]=  -2.5318448354142823e-002
+      self.aRunge[1,1]=  0.38668943087310403
+      self.aRunge[2,0]=  0.20899983523553325
+      self.aRunge[2,1]= -0.45856648476371231
+      self.aRunge[2,2]=  0.43423187573425748
+      self.aRunge[3,0]= -0.10048822195663100
+      self.aRunge[3,1]= -0.46186171956333327
+      self.aRunge[3,2]=  0.83045062122462809
+      self.aRunge[3,3]=  0.27014914900250392
+      self.dRunge=np.zeros((4,4))
+      self.dRunge[1,1]=  0.52349249922385610
+      self.dRunge[2,1]=   1.1683374366893629
+      self.dRunge[2,2]= -0.75762080241712637
+      self.dRunge[3,1]=  -3.6477233846797109e-002
+      self.dRunge[3,2]=  0.56936148730740477
+      self.dRunge[3,3]=  0.47746263002599681
+      self.gRunge=np.zeros((4,4))
+      self.gRunge[1,1]=  0.13145089796226542
+      self.gRunge[2,1]= -0.36855857648747881
+      self.gRunge[2,2]=  0.33159232636600550
+      self.gRunge[3,1]=  -6.5767130537473045E-002
+      self.gRunge[3,2]=   4.0591093109036858E-002
+      self.gRunge[3,3]=   6.4902111640806712E-002
+    self.dtRunge=np.zeros(self.nstages);
+    for i in range(0,self.nstages):
+      self.dtRunge[i]=0  
+      temp=1.
+      for j in range(0,i+1):
+        self.dtRunge[i]=self.dtRunge[i]+self.aRunge[i,j]
+        temp=temp-self.dRunge[i,j]
+      self.dRunge[i,0]=temp
+      for j in range(0,i+1):
+        self.aRunge[i,j]=self.aRunge[i,j]/self.dtRunge[i]
+        self.gRunge[i,j]=self.gRunge[i,j]/self.dtRunge[i]
+
+    self.U  = np.zeros((self.Ndof,self.nstages+1))
+    self.F  = np.zeros((self.Ndof,self.nstages))
+    self.FSlow  = np.zeros((self.Ndof))
+    self.nsMin = 8
+    self.logger.nsmall = 0
+
+  def NumSmallTimeSteps(self , dx, dz, dt):   
+    
+    cs = self.pparams['c_s']
+    ns = dt / (.9 / np.sqrt(1/(dx*dx)+1/(dz*dz)) / cs)
+    ns = max(np.int(np.ceil(ns)),self.nsMin)
+#   print " dx " , dx
+#   print " dz " , dz
+#   print " cs " , cs
+#   print 1/np.sqrt(1/(dx*dx)+1/(dz*dz))/cs
+#   print " dt ",dt," ns ",ns
+
+    return ns
+    
+
+  def timestep(self, u0, dt):
+
+    self.U[:,0] = u0
+
+    self.ns = self.NumSmallTimeSteps(self.problem.h[0], self.problem.h[1], dt)
+
+    for i in range(0,self.nstages):
+      self.F[:,i] = self.f_slow(self.U[:,i])    
+      self.FSlow[:] = 0.
+      for j in range(0,i+1):
+        self.FSlow += (self.aRunge[i,j]*self.F[:,j] + self.gRunge[i,j]/dt*(self.U[:,j] - u0))    
+      self.U[:,i+1] = 0
+      for j in range(0,i+1):
+        self.U[:,i+1] += self.dRunge[i,j]*self.U[:,j]
+      nsLoc = np.int(np.ceil(self.ns*self.dtRunge[i]))
+      self.logger.nsmall += nsLoc
+      dtLoc = dt*self.dtRunge[i]
+      dTau = dtLoc/nsLoc
+      self.U[:,i+1] = self.VerletLin(self.U[:,i+1], self.FSlow, nsLoc, dTau)
+    u0 = self.U[:,self.nstages]
+    return  u0
+
+
+  def VerletLin(self, u0, FSlow, ns, dTau):
+    for i in range(0,ns): 
+      u0[0:self.NdofMom] += dTau * (self.f_fastMom(u0) + FSlow[0:self.NdofMom])
+      u0[self.NdofMom:self.Ndof] += dTau * (self.f_fastTher(u0) + FSlow[self.NdofMom:self.Ndof])
+
+    return u0    
+
+  def RK3Lin(self, u0, FSlow, ns, dTau):
+
+    u = u0
+    for i in range(0,ns): 
+      u = u0 + dTau/3.*(self.f_fast(u) + FSlow)
+      u = u0 + dTau/2.*(self.f_fast(u) + FSlow)
+      u = u0 + dTau*(self.f_fast(u) + FSlow)
+      u0 = u
+        
+    return u0    
+
+  def f_slow(self, u):
+    return self.problem.D_upwind.dot(u)
+
+  def f_fast(self, u):
+    return self.problem.M.dot(u)
+
+  def f_fastMom(self, u):
+    return self.problem.M[0:self.NdofMom,self.NdofMom:self.Ndof]\
+                              .dot(u[self.NdofMom:self.Ndof])
+
+  def f_fastTher(self, u):
+    return self.problem.M[self.NdofMom:self.Ndof,0:self.NdofMom]\
+                              .dot(u[0:self.NdofMom])
+
 class dirk:
 
   def __init__(self, problem, order):
@@ -283,7 +424,7 @@ class dirk:
     self.problem = problem
 
     assert self.order in [2,22,3,4], 'Order must be 2,22,3,4'
-    
+   
     if (self.order==2):
       self.nstages = 1
       self.A       = np.zeros((1,1))
