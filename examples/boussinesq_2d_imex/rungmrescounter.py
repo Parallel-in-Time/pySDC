@@ -21,7 +21,7 @@ from pylab import rcParams
 
 from unflatten import unflatten
 
-from standard_integrators import dirk, bdf2, trapezoidal, rk_imex
+from standard_integrators import dirk, bdf2, trapezoidal, rk_imex, SplitExplicit
 
 if __name__ == "__main__":
 
@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0     = 0
-    Tend   = 3000   
-    Nsteps =  500
+    Tend   = 3000 
+    Nsteps = 500
     dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
@@ -96,19 +96,33 @@ if __name__ == "__main__":
     print("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
     print("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
 
-    dirkp = dirk(P, np.min([4,dirk_order]))
+    method_split = 'MIS4_4'
+#   method_split = 'RK3'
+    splitp = SplitExplicit(P, method_split, pparams) 
     u0 = uinit.values.flatten()
+    usplit = np.copy(u0)
+#   for i in range(0,Nsteps):
+    print(np.linalg.norm(usplit))  
+    for i in range(0,2*Nsteps):
+      usplit = splitp.timestep(usplit, dt/2)  
+    print(np.linalg.norm(usplit))
+
+    dirkp = dirk(P, np.min([4,dirk_order]))
     udirk = np.copy(u0)
     print("Running DIRK ....")
+    print(np.linalg.norm(udirk))  
     for i in range(0,Nsteps):
       udirk = dirkp.timestep(udirk, dt)  
+    print np.linalg.norm(udirk)
 
     rkimex = rk_imex(P, dirk_order)
     uimex  = np.copy(u0)
     dt_imex = dt
     print("Running RK-IMEX ....")
     for i in range(0,Nsteps):
+#     print("Running RK-IMEWX Step:  %4.2f" % dt_imex)
       uimex = rkimex.timestep(uimex, dt_imex)
+    print(np.linalg.norm(uimex))  
 
     # call main function to get things done...
     print("Running SDC...")
@@ -123,6 +137,7 @@ if __name__ == "__main__":
     for i in range(0,10*Nsteps):
       uref = rkimexref.timestep(uref, dt_ref)
   
+    usplit = unflatten(usplit, 4, P.N[0], P.N[1])
     udirk = unflatten(udirk, 4, P.N[0], P.N[1])
     uimex = unflatten(uimex, 4, P.N[0], P.N[1])
     uref  = unflatten(uref,  4, P.N[0], P.N[1])
@@ -131,8 +146,17 @@ if __name__ == "__main__":
     np.save('sdc', uend.values)
     np.save('dirk', udirk)
     np.save('rkimex', uimex)
+    np.save('split', usplit)
     np.save('uref', uref)
+
+    print "diff split  ",np.linalg.norm(uref-usplit)
+    print "diff dirk   ",np.linalg.norm(uref-udirk)
+    print "diff rkimex ",np.linalg.norm(uref-uimex)
+    print "diff sdc    ",np.linalg.norm(uref-uend.values)
     
+    print(" #### Logging report for Split    #### " )
+    print("Total number of matrix multiplcations: %5i" % splitp.logger.nsmall)
+
     print(" #### Logging report for DIRK-%1i #### " % dirkp.order)
     print("Number of calls to implicit solver: %5i" % dirkp.logger.solver_calls)
     print("Total number of GMRES iterations: %5i" % dirkp.logger.iterations)
