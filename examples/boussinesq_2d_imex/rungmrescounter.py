@@ -102,6 +102,8 @@ if __name__ == "__main__":
 #   method_split = 'RK3'
     splitp = SplitExplicit(P, method_split, pparams) 
 
+    dirkp = dirk(P, dirk_order)
+
     u0 = uinit.values.flatten()
     usplit = np.copy(u0)
 #   for i in range(0,Nsteps):
