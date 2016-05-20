@@ -32,12 +32,14 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 4
+    sparams['maxiter'] = 5
 
     # setup parameters "in time"
     t0   = 0.0
     Tend = 3.0
-    dt = Tend/float(154)
+    nsteps = 154 # 154 is value in Vater et al.
+    nsteps = 2*154    
+    dt = Tend/float(nsteps)
     
     # This comes as read-in for the problem class
     pparams = {}
@@ -87,8 +89,8 @@ if __name__ == "__main__":
     y0_dirk = y0_tp.astype('complex')
     y0_imex = y0_tp.astype('complex')
     
-    # Perform 154 time steps with standard integrators
-    for i in range(0,154):  
+    # Perform time steps with standard integrators
+    for i in range(0,nsteps):  
 
       # trapezoidal rule step
       ynew_tp = trap.timestep(y0_tp, dt)
