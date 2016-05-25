@@ -4,7 +4,7 @@ import numpy as np
 import scipy.sparse as sp
 from buildFDMatrix import getMatrix, getHorizontalDx, getBCLeft, getBCRight
 
-wave_order = 4
+wave_order = 6
 
 def getWave1DMatrix(N, dx, bc_left, bc_right):
   

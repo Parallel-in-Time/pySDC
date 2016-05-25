@@ -54,6 +54,10 @@ def getMatrix(N, dx, bc_left, bc_right, order):
     stencil = [1.0, -8.0, 0.0, 8.0, -1.0]
     range   = [ -2,   -1,   0,   1,    2]
     coeff   = 1.0/12.0
+  elif order==6:
+    stencil = [-1.0, 9.0, -45.0, 0.0, 45.0, -9.0, 1.0]
+    range   =[ -3, -2, -1, 0, 1, 2, 3]
+    coeff   = 1.0/60.0
 
   A       = sp.diags(stencil, range, shape=(N,N))
   A       = sp.lil_matrix(A)
@@ -73,6 +77,14 @@ def getMatrix(N, dx, bc_left, bc_right, order):
       A[0,N-1] = stencil[1]
       A[1,N-1] = stencil[0]
 
+    elif order==6:
+      A[0,N-3] = stencil[0]
+      A[0,N-2] = stencil[1]
+      A[0,N-1] = stencil[2]
+      A[1,N-2] = stencil[0]
+      A[1,N-1] = stencil[1]
+      A[2,N-1] = stencil[0]
+      
   if bc_right in ['periodic']:
     if order==2:
       A[N-1,0] = stencil[2]
@@ -80,6 +92,13 @@ def getMatrix(N, dx, bc_left, bc_right, order):
       A[N-2,0] = stencil[4]
       A[N-1,0] = stencil[3]
       A[N-1,1] = stencil[4]
+    elif order==6:
+      A[N-3,0] = stencil[6]
+      A[N-2,0] = stencil[5]
+      A[N-2,1] = stencil[6]
+      A[N-1,0] = stencil[4]
+      A[N-1,1] = stencil[5]
+      A[N-1,2] = stencil[6]
 
   #
   # Neumann boundary conditions

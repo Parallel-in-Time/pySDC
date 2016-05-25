@@ -33,7 +33,7 @@ if __name__ == "__main__":
     pparams['cadv']      = 0.1
     pparams['cs']        = 1.00
     pparams['order_adv'] = 5
-    pparams['waveno']    = 0
+    pparams['waveno']    = 5
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
     
-    nsteps = np.zeros((3,7))
-    nsteps[0,:] = [10, 15, 20, 25, 30, 35, 40]
+    nsteps = np.zeros((3,9))
+    nsteps[0,:] = [20, 30, 40, 50, 60, 70, 80, 90, 100]
     nsteps[1,:] = nsteps[0,:]
     nsteps[2,:] = nsteps[0,:]
     
@@ -73,15 +73,16 @@ if __name__ == "__main__":
         description['num_nodes'] = 3
       elif order==5:
         description['num_nodes'] = 3
+      
       sparams['maxiter'] = order
       
       for ii in range(0,np.shape(nsteps)[1]):
       
         ns = nsteps[order-3,ii]
         if ((order==3) or (order==4)):
-          pparams['nvars']     = [(2,4*ns)]
+          pparams['nvars']     = [(2,5*ns)]
         elif order==5:
-          pparams['navrs'] = [(2,3*ns)]
+          pparams['nvars'] = [(2,5*ns)]
           
         # quickly generate block of steps
         MS = mp.generate_steps(num_procs,sparams,description)

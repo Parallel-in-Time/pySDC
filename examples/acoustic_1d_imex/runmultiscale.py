@@ -38,7 +38,7 @@ if __name__ == "__main__":
     t0   = 0.0
     Tend = 3.0
     nsteps = 154 # 154 is value in Vater et al.
-    nsteps = 2*154    
+    #nsteps = 2*154
     dt = Tend/float(nsteps)
     
     # This comes as read-in for the problem class
