@@ -18,7 +18,7 @@ if __name__ == "__main__":
     N_s = 100
     N_f = 400
     
-    lam_s_max = 3.0
+    lam_s_max = 5.0
     lam_f_max = 12.0
     lambda_s = 1j*np.linspace(0.0, lam_s_max, N_s)
     lambda_f = 1j*np.linspace(0.0, lam_f_max, N_f)
@@ -29,8 +29,8 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['num_nodes'] = 3
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['num_nodes'] = 2
     K = 3
     do_coll_update = True
     
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
     plt.title(r'$M=%1i$, $K=%1i$' % (swparams['num_nodes'],K), fontsize=fs)
     #plt.show()
-    filename = 'sdc-fwsw-stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
+    filename = 'stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     fig.savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
