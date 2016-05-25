@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
   plt.plot(xx[:,5], udirk[2,:,5], '--', color='g', markersize=fs-2, label='DIRK(4)', dashes=(3,3))
   plt.plot(xx[:,5], uend[2,:,5], '-', color='b', label='SDC(4)')
-  plt.plot(xx[:,5], uimex[2,:,5], '--', color='r', markersize=fs-2, label='RK-IMEX(4)', dashes=(3,3))
+  plt.plot(xx[:,5], uimex[2,:,5], '--', color='r', markersize=fs-2, label='IMEX(4)', dashes=(3,3))
   #plt.plot(xx[:,5], utrap[2,:,5], '--', color='k', markersize=fs-2, label='Trap', dashes=(3,3))
   plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
   plt.yticks(fontsize=fs)

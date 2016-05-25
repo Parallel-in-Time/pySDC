@@ -42,8 +42,8 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     #swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['collocation_class'] = collclass.CollGaussLegendre
-    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
     K = 5
     dirk_order = K
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     fig  = plt.figure()
     plt.plot(k_vec, (U_speed+c_speed)+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, phase[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, phase[2,:], '-+', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
+    plt.plot(k_vec, phase[2,:], '-+', color='r', linewidth=1.5, label='IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
     plt.plot(k_vec, phase[0,:], '-o', color='b', linewidth=1.5, label='SDC('+str(K)+')', markevery=5, markersize=fs/2)
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Phase speed', fontsize=fs, labelpad=0.5)
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     fig  = plt.figure()
     plt.plot(k_vec, 1.0+np.zeros(np.size(k_vec)), '--', color='k', linewidth=1.5, label='Exact')
     plt.plot(k_vec, amp_factor[1,:], '-', color='g', linewidth=1.5, label='DIRK('+str(dirkts.order)+')')
-    plt.plot(k_vec, amp_factor[2,:], '-+', color='r', linewidth=1.5, label='RK-IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
+    plt.plot(k_vec, amp_factor[2,:], '-+', color='r', linewidth=1.5, label='IMEX('+str(rkimex.order)+')', markevery=5, mew=1.0)
     plt.plot(k_vec, amp_factor[0,:], '-o', color='b', linewidth=1.5, label='SDC('+str(K)+')', markevery=5, markersize=fs/2)
     plt.xlabel('Wave number', fontsize=fs, labelpad=0.25)
     plt.ylabel('Amplification factor', fontsize=fs, labelpad=0.5)
