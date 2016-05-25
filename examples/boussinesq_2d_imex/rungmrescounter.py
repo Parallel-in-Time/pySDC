@@ -44,7 +44,7 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 4
 
-    dirk_order = 4
+    dirk_order = sparams['maxiter']
 
     # setup parameters "in time"
     t0     = 0
