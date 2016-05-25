@@ -304,25 +304,35 @@ class dirk:
       self.b[2]   = 1.0/(6.0*alpha*alpha)
 
     if (self.order==5):
-      # From A. H. Al-Rabeh, "OPTIMAL ORDER DIAGONALLY IMPLICIT RUNGE-KUTTA METHODS"
-      self.nstages = 4
-      self.A   = np.zeros((4,4))
-      self.A[1,0] = 0.1090390091
-      self.A[1,1] = 0.1090390091
-      self.A[2,0] = 0.0177359481 
-      self.A[2,1] = 0.4277445474
-      self.A[2,2] = 0.1090390091
-      self.A[3,0] = 0.1173343519
-      self.A[3,1] = 0.2044057169
-      self.A[3,2] = 0.4601819131
-      self.A[3,3] = 0.1090390091
-
-      self.tau = np.zeros(4)
-      self.b   = np.zeros(4)
-      self.b[0] = 0.0707307044
-      self.b[1] = 0.3078968440
-      self.b[2] = 0.3589454736
-      self.b[3] = 0.2624269779
+      self.nstages = 5
+      # From Kennedy, Carpenter "Diagonally Implicit Runge-Kutta Methods for Ordinary Differential Equations. A Review"
+      self.A   = np.zeros((5,5))
+      self.A[0,0] = 4024571134387./14474071345096.
+    
+      self.A[1,0] = 9365021263232./12572342979331.
+      self.A[1,1] = self.A[0,0]
+    
+      self.A[2,0] = 2144716224527./9320917548702.
+      self.A[2,1] = -397905335951./4008788611757.
+      self.A[2,2] = self.A[0,0]
+    
+      self.A[3,0] = -291541413000./6267936762551.
+      self.A[3,1] = 226761949132./4473940808273.
+      self.A[3,2] = -1282248297070./9697416712681.
+      self.A[3,3] = self.A[0,0]
+    
+      self.A[4,0] = -2481679516057./4626464057815.
+      self.A[4,1] = -197112422687./6604378783090.
+      self.A[4,2] = 3952887910906./9713059315593.
+      self.A[4,3] = 4906835613583./8134926921134.
+      self.A[4,4] = self.A[0,0]
+    
+      self.b = np.zeros(5)
+      self.b[0] = -2522702558582./12162329469185.
+      self.b[1] = 1018267903655./12907234417901.
+      self.b[2] = 4542392826351./13702606430957.
+      self.b[3] = 5001116467727./12224457745473.
+      self.b[4] = 1509636094297./3891594770934.
        
     self.stages  = np.zeros((self.nstages,self.Ndof), dtype='complex')
 
