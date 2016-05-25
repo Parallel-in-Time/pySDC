@@ -49,6 +49,7 @@ if __name__ == "__main__":
     nnodes  = step.levels[0].sweep.coll.num_nodes
     level   = step.levels[0]
     problem = level.prob
+    Q  = level.sweep.coll.Qmat[1:,1:]
 
     stab = np.zeros((N_f, N_s), dtype='complex')
 
@@ -84,7 +85,8 @@ if __name__ == "__main__":
     CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0],  colors='k')
     plt.clabel(CS1, inline=True, fmt='%3.2f', fontsize=fs-2)
     manual_locations = [(1.5, 2.5)]
-    plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs-2, manual=manual_locations)
+    if K>0: # for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason
+      plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs-2, manual=manual_locations)
     plt.gca().add_patch(Polygon([[0, 0], [lam_s_max,0], [lam_s_max,lam_s_max]], visible=True, fill=True, facecolor='.75',edgecolor='k', linewidth=1.0,  zorder=11))
     #plt.plot([0, 2], [0, 2], color='k', linewidth=1, zorder=12)
     plt.gca().set_xticks(np.arange(0, int(lam_s_max)+1))
