@@ -3,7 +3,7 @@ Figure 2: fwsw/plot_stability.py
 Figure 3: acoustic_1d_imex/plot_dispersion.py 
 Figure 4 (left): acoustic_1d_imex/runconvergence.py and then plotconvergence.py
 Figure 4 (right): acoustic_1d_imex/runitererror.py
-Figure 5:
+Figure 5: acoustic_1d_imex/runmultiscale.py
 Figure 6: boussinesq_2d_imex/rungmrescounter.py and then plotgmrescounter.py for sparams['maxiter']=4 and dirk_order=4
 
 Table 1: boussinesq_2d_imex/rungmrescounter.py and then plotgmrescounter.py

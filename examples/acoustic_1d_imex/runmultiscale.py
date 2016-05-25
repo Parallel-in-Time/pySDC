@@ -32,7 +32,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 5
+    sparams['maxiter'] = 2
 
     # setup parameters "in time"
     t0   = 0.0
@@ -59,9 +59,11 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    #description['collocation_class'] = collclass.CollGaussLobatto
+    #description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussRadau_Right
     # Number of nodes
-    description['num_nodes']         = 3
+    description['num_nodes']         = 2
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
@@ -152,7 +154,7 @@ if __name__ == "__main__":
     plt.legend(loc='upper left', fontsize=fs, prop={'size':fs}, handlelength=3)
     fig.gca().grid()
     #plt.show()
-    filename = 'sdc-fwsw-multiscale-K'+str(sparams['maxiter'])+'-M'+str(description['num_nodes'])+'.pdf'
+    filename = 'multiscale-K'+str(sparams['maxiter'])+'-M'+str(description['num_nodes'])+'.pdf'
     plt.gcf().savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
@@ -168,6 +170,6 @@ if __name__ == "__main__":
     fig.gca().tick_params(axis='both', labelsize=fs)
     fig.gca().grid()
     #plt.show()
-    filename = 'sdc-fwsw-multiscale-initial.pdf'
+    filename = 'multiscale-initial.pdf'
     plt.gcf().savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
