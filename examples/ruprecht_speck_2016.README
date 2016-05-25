@@ -1,8 +1,8 @@
 Figure 1: fwsw/plot_stifflimit_specrad.py
 Figure 2: fwsw/plot_stability.py
-Figure 3: 
+Figure 3: acoustic_1d_imex/plot_dispersion.py 
 Figure 4:
 Figure 5:
-Figure 6:
+Figure 6: boussinesq_2d_imex/rungmrescounter.py and then plotgmrescounter.py for sparams['maxiter']=4 and dirk_order=4
 
-Table 1:
+Table 1: boussinesq_2d_imex/rungmrescounter.py and then plotgmrescounter.py

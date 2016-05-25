@@ -41,9 +41,11 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
-    K = 4
+    K = 5
     dirk_order = K
     
     c_speed = 1.0
@@ -66,7 +68,7 @@ if __name__ == "__main__":
     QE = level.sweep.QE[1:,1:]
     QI = level.sweep.QI[1:,1:]
     Q  = level.sweep.coll.Qmat[1:,1:]
-    Nsamples = 30
+    Nsamples = 15
     k_vec = np.linspace(0, np.pi, Nsamples+1, endpoint=False)
     k_vec = k_vec[1:]
     phase = np.zeros((3,Nsamples))
@@ -100,7 +102,7 @@ if __name__ == "__main__":
       # For testing, insert exact stability function exp(-dt*i*k*(Cs+Uadv)
       #stab_fh = la.expm(Cs+Uadv)
       
-      dirkts = dirk(Cs+Uadv, np.min([4,dirk_order]))
+      dirkts = dirk(Cs+Uadv, dirk_order)
       stab_fh1 = dirkts.timestep(y1, 1.0)
       stab_fh2 = dirkts.timestep(y2, 1.0)
       stab_dirk = np.column_stack((stab_fh1, stab_fh2))
@@ -138,7 +140,7 @@ if __name__ == "__main__":
     plt.legend(loc='lower left', fontsize=fs, prop={'size':fs-2})
     plt.xticks([0, 1, 2, 3], fontsize=fs)
     #plt.show()
-    filename = 'sdc-fwsw-disprel-phase-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
+    filename = 'phase-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     plt.gcf().savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
@@ -156,7 +158,7 @@ if __name__ == "__main__":
     plt.gca().set_ylim([0.0, 1.1])
     plt.xticks([0, 1, 2, 3], fontsize=fs)
     #plt.show()
-    filename = 'sdc-fwsw-disprel-ampfac-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
+    filename = 'ampfactor-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     plt.gcf().savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 

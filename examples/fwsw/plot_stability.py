@@ -29,8 +29,10 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
-    swparams['num_nodes'] = 2
+    swparams['num_nodes'] = 3
     K = 3
     do_coll_update = True
     

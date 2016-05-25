@@ -35,14 +35,16 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-15
     
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
     swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 5
+    sparams['maxiter'] = 4
 
-    dirk_order = 5
+    dirk_order = 4
 
     # setup parameters "in time"
     t0     = 0
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol_limit'] = [1e-5]
-    pparams['gmres_tol_factor'] = [0.05]
+    pparams['gmres_tol_factor'] = [0.1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
