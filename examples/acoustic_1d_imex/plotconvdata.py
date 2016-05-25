@@ -15,7 +15,7 @@ while True:
   if not line: break
   items  = str.split(line, "    ", 3)
   order  = np.append(order,  int(items[0]))
-  nsteps = np.append(nsteps, int(items[1]))
+  nsteps = np.append(nsteps, int(float(items[1])))
   error  = np.append(error,  float(items[2]))
 
 assert np.size(order)==np.size(nsteps), 'Found different number of entries in order and nsteps'
@@ -49,13 +49,13 @@ plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
 plt.xlabel('Number of time steps', fontsize=fs)
 plt.ylabel('Relative error', fontsize=fs, labelpad=2)
 plt.xlim([0.9*np.min(nsteps_plot), 1.1*np.max(nsteps_plot)])
-plt.ylim([1e-5, 1e0])
-plt.yticks([1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0],fontsize=fs)
-plt.xticks([30, 40, 60, 80], fontsize=fs)
+plt.ylim([1e-7, 1e0])
+#plt.yticks([1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0],fontsize=fs)
+#plt.xticks([30, 40, 60, 80], fontsize=fs)
 plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
 plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
-plt.show()
-filename = 'sdc-fwsw-convergence.pdf'
+#plt.show()
+filename = 'convergence.pdf'
 fig.savefig(filename,bbox_inches='tight')
 call(["pdfcrop", filename, filename])
 
