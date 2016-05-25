@@ -18,19 +18,19 @@ if __name__ == "__main__":
 
     pparams = {}
     pparams['lambda_s'] = np.array([1.0*1j], dtype='complex')
-    pparams['lambda_f'] = np.array([50.0*1j], dtype='complex')
+    pparams['lambda_f'] = np.array([50.0*1j, 100.0*1j], dtype='complex')
     pparams['u0'] = 1.0
     swparams = {}
     #
     #
     #
-    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
-    swparams['collocation_class'] = collclass.CollGaussLegendre
     #swparams['collocation_class'] = collclass.CollGaussLobatto
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
 
     nodes_v = np.arange(2,10)
-    specrad = np.zeros((2,np.size(nodes_v)))
-    norm    = np.zeros((2,np.size(nodes_v)))
+    specrad = np.zeros((3,np.size(nodes_v)))
+    norm    = np.zeros((3,np.size(nodes_v)))
     for i in range(0,np.size(nodes_v)):
       swparams['num_nodes'] = nodes_v[i]
       #
@@ -51,11 +51,13 @@ if __name__ == "__main__":
       Q  = level.sweep.coll.Qmat[1:,1:]
 
       dt = step.status.dt
-      LHS = np.eye(nnodes) - step.status.dt*( problem.lambda_f[0]*QI + problem.lambda_s[0]*QE )
-      RHS = step.status.dt*( (problem.lambda_f[0]+problem.lambda_s[0])*Q - (problem.lambda_f[0]*QI + problem.lambda_s[0]*QE) )
-      evals, evecs = np.linalg.eig( np.linalg.inv(LHS).dot(RHS) )
-      specrad[1,i] = np.linalg.norm( evals, np.inf )
-      norm[1,i]    = np.linalg.norm( np.linalg.inv(LHS).dot(RHS), np.inf )
+      
+      for j in range(0,2):
+        LHS = np.eye(nnodes) - step.status.dt*( problem.lambda_f[j]*QI + problem.lambda_s[0]*QE )
+        RHS = step.status.dt*( (problem.lambda_f[j]+problem.lambda_s[0])*Q - (problem.lambda_f[j]*QI + problem.lambda_s[0]*QE) )
+        evals, evecs = np.linalg.eig( np.linalg.inv(LHS).dot(RHS) )
+        specrad[j+1,i] = np.linalg.norm( evals, np.inf )
+        norm[j+1,i]    = np.linalg.norm( np.linalg.inv(LHS).dot(RHS), np.inf )
 
       if swparams['collocation_class']==collclass.CollGaussLobatto:
         # For Lobatto nodes, first column and row are all zeros, since q_1 = q_0; hence remove them
@@ -75,6 +77,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     plt.plot(nodes_v, specrad[0,:], 'rd-', markersize=fs-2, label=r'$\lambda_{\rm fast} = \infty$')
     plt.plot(nodes_v, specrad[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[0].imag)
+    plt.plot(nodes_v, specrad[2,:], 'gs-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Spectral radius  $\sigma\left( \mathbf{E} \right)$', fontsize=fs, labelpad=2)
     #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
@@ -84,13 +87,14 @@ if __name__ == "__main__":
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     #plt.show()
-    filename = 'sdc_fwsw_stifflimit_specrad.pdf'
+    filename = 'stifflimit-specrad.pdf'
     fig.savefig(filename,bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
     fig = plt.figure()
     plt.plot(nodes_v, norm[0,:], 'rd-', markersize=fs-2, label=r'$\lambda_{\rm fast} = \infty$')
     plt.plot(nodes_v, norm[1,:], 'bo-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[0].imag)
+    plt.plot(nodes_v, norm[2,:], 'gs-', markersize=fs-2, label=r'$\lambda_{\rm fast} = %2.0f $' % problem.lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Norm  $\left|| \mathbf{E} \right||_{\infty}$', fontsize=fs, labelpad=2)
     #plt.title(r'$\Delta t \left| \lambda_{\rm slow} \right|$ = %2.1f' % step.status.dt*abs(problem.lambda_s[0]), fontsize=fs)
@@ -100,6 +104,6 @@ if __name__ == "__main__":
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     #plt.show()
-    filename = 'sdc_fwsw_stifflimit_norm.pdf'
+    filename = 'stifflimit-norm.pdf'
     fig.savefig(filename,bbox_inches='tight')
     call(["pdfcrop", filename, filename])
