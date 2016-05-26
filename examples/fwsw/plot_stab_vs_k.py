@@ -15,10 +15,11 @@ from subprocess import call
 from matplotlib.ticker import ScalarFormatter
 
 if __name__ == "__main__":
-  mvals = [3]
+  mvals = [2, 3, 4]
   kvals = np.arange(2,10)
-  lambdaratio = [1, 5, 10]
-  stabval = np.zeros((np.size(mvals), np.size(lambdaratio), np.size(kvals)))
+  lambda_fast = 15j
+  lambda_slow = 3j
+  stabval = np.zeros((np.size(mvals), np.size(kvals)))
   
   for i in range(0,np.size(mvals)):
     pparams = {}
@@ -51,29 +52,25 @@ if __name__ == "__main__":
     QI = level.sweep.QI[1:,1:]
     Q  = level.sweep.coll.Qmat[1:,1:]
 
-    for j in range(0,np.size(lambdaratio)):
-      lambda_slow = 1j
-      lambda_fast = lambdaratio[j]*lambda_slow
+    LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = [ lambda_fast, lambda_slow ] )
 
-      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = [ lambda_fast, lambda_slow ] )
-
-      for k in range(0, np.size(kvals)):
-        Kmax = kvals[k]
-        Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = Kmax, lambdas = [ lambda_fast, lambda_slow ] )
-        if do_coll_update:
-          stab_fh = 1.0 + (lambda_fast + lambda_slow)*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
-        else:
-          q = np.zeros(nnodes)
-          q[nnodes-1] = 1.0
-          stab_fh = q.dot(Mat_sweep.dot(np.ones(nnodes)))
-        stabval[i,j,k] = np.absolute(stab_fh)
+    for k in range(0, np.size(kvals)):
+      Kmax = kvals[k]
+      Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = Kmax, lambdas = [ lambda_fast, lambda_slow ] )
+      if do_coll_update:
+        stab_fh = 1.0 + (lambda_fast + lambda_slow)*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+      else:
+        q = np.zeros(nnodes)
+        q[nnodes-1] = 1.0
+        stab_fh = q.dot(Mat_sweep.dot(np.ones(nnodes)))
+      stabval[i,k] = np.absolute(stab_fh)
 
   rcParams['figure.figsize'] = 2.5, 2.5
   fig = plt.figure()
   fs = 8
-  plt.plot(kvals, stabval[0,0,:], 'o-', color='b', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[0]))
-  plt.plot(kvals, stabval[0,1,:], 's-', color='r', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[1]))
-  plt.plot(kvals, stabval[0,2,:], 'd-', color='g', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[2]))
+  plt.plot(kvals, stabval[0,:], 'o-', color='b', label=("M=%2i" % mvals[0]))
+  plt.plot(kvals, stabval[1,:], 's-', color='r', label=("M=%2i" % mvals[1]))
+  plt.plot(kvals, stabval[2,:], 'd-', color='g', label=("M=%2i" % mvals[2]))
   plt.plot(kvals, 1.0+0.0*kvals, '--', color='k')
   plt.xlabel('Number of iterations K', fontsize=fs)
   plt.ylabel(r'Modulus of stability function $\left| R \right|$', fontsize=fs)
@@ -81,10 +78,8 @@ if __name__ == "__main__":
   plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
   plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
   plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
-  plt.title(("M = %1i" % mvals[0]), fontsize=fs)
-  #plt.plot(kvals, stabval[1,0,:], '-',  color='r')
-  #plt.plot(kvals, stabval[1,1,:], '--', color='r')
-  #plt.plot(kvals, stabval[1,2,:], '-.', color='r')
-  filename = 'stablimit-M'+str(mvals[0])+'.pdf'
-  fig.savefig(filename, bbox_inches='tight')
-  call(["pdfcrop", filename, filename])
+  plt.show()
+
+#  filename = 'stablimit-M'+str(mvals[0])+'.pdf'
+#  fig.savefig(filename, bbox_inches='tight')
+#  call(["pdfcrop", filename, filename])
