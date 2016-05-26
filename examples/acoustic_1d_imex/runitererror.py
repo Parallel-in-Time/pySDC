@@ -35,6 +35,8 @@ if __name__ == "__main__":
   
     cs_v = [0.5, 1.0, 1.5, 5.0]
     sparams['maxiter'] = 15
+    
+    ### SET NUMBER OF NODES ###
     nodes_v = [3]
       
     residual = np.zeros((np.size(cs_v), np.size(nodes_v), sparams['maxiter'])) 
@@ -62,9 +64,12 @@ if __name__ == "__main__":
       description['problem_params']    = pparams
       description['dtype_u']           = mesh
       description['dtype_f']           = rhs_imex_mesh
+      
+      ### SELECT TYPE OF QUADRATURE NODES ###
       #description['collocation_class'] = collclass.CollGaussLobatto
       #description['collocation_class'] = collclass.CollGaussLegendre
       description['collocation_class'] = collclass.CollGaussRadau_Right
+      
       description['sweeper_class']     = imex_1st_order
       description['level_params']      = lparams
       description['hook_class']        = plot_solution

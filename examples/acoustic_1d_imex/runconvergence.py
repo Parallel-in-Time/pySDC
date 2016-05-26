@@ -41,9 +41,12 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
+    
+    ### SET TYPE OF QUADRATURE NODES ###
     #description['collocation_class'] = collclass.CollGaussLobatto
     #description['collocation_class'] = collclass.CollGaussLegendre
     description['collocation_class'] = collclass.CollGaussRadau_Right
+    
     description['sweeper_class']     = imex_1st_order
     description['do_coll_update']    = True
     description['level_params']      = lparams
@@ -67,6 +70,7 @@ if __name__ == "__main__":
       else:
         file = open('conv-data.txt', 'a')
 
+      ### SET NUMBER OF NODES DEPENDING ON REQUESTED ORDER ###
       if order==3:
         description['num_nodes'] = 3
       elif order==4:

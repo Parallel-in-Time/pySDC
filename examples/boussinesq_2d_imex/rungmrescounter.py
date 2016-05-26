@@ -35,15 +35,23 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-15
     
     swparams = {}
+    
+    ### SET TYPE OF QUADRATURE NODES ###
     #swparams['collocation_class'] = collclass.CollGaussLobatto
-    #swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    
+    ### SET NUMBER OF NODES ###
     swparams['num_nodes'] = 3
+    
     swparams['do_LU'] = False
 
     sparams = {}
+    
+    ### SET NUMBER OF ITERATIONS ###
     sparams['maxiter'] = 4
 
+    ### ORDER OF DIRK/IMEX EQUAL TO NUMBER OF SDC ITERATIONS AND THUS SDC ORDER ###
     dirk_order = sparams['maxiter']
 
     # setup parameters "in time"

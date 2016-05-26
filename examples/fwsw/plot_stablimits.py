@@ -27,9 +27,9 @@ def get_stab_function(LHS, RHS, Kmax, lambd, do_coll_update):
   return stab_fh
 
 if __name__ == "__main__":
-  mvals = [2, 4]
-  kvals = np.arange(1,15)
-  lambdaratio = [2, 10, 50]
+  mvals = [4]
+  kvals = np.arange(2,9)
+  lambdaratio = [1, 5, 50]
   stabval = np.zeros((np.size(mvals), np.size(lambdaratio), np.size(kvals)))
   
   for i in range(0,np.size(mvals)):
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     step = stepclass.step(params={})
     L = lvl.level(problem_class=swfw_scalar, problem_params=pparams, dtype_u=mesh, dtype_f=rhs_imex_mesh, sweeper_class=imex, sweeper_params=swparams, level_params={}, hook_class=hookclass.hooks, id="stability")
     step.register_level(L)
-    step.status.dt   = 1.0
+    step.status.dt   = 1.0 # Needs to be 1.0, change dt through lambdas
     step.status.time = 0.0
     u0 = step.levels[0].prob.u_exact(step.status.time)
     step.init_step(u0)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     Q  = level.sweep.coll.Qmat[1:,1:]
 
     for j in range(0,np.size(lambdaratio)):
-      lambda_slow = 1j
+      lambda_slow = 0.1*1j
       lambda_fast = lambdaratio[j]*lambda_slow
 
       LHS = np.eye(nnodes) - step.status.dt*( lambda_fast*QI + lambda_slow*QE )
@@ -74,9 +74,13 @@ if __name__ == "__main__":
         stabval[i,j,k] = np.absolute(stab_fh)
 
   fig = plt.figure()
-  plt.plot(kvals, stabval[0,0,:], '-', color='b')
-  plt.plot(kvals, stabval[0,1,:], '-', color='r')
-  plt.plot(kvals, stabval[0,2,:], '-', color='g')
+  fs = 8
+  plt.plot(kvals, stabval[0,0,:], 'o-', color='b', label=("Ratio: %3.0f" % lambdaratio[0]))
+  plt.plot(kvals, stabval[0,1,:], 's-', color='r', label=("Ratio: %3.0f" % lambdaratio[1]))
+  plt.plot(kvals, stabval[0,2,:], 'd-', color='g', label=("Ratio: %3.0f" % lambdaratio[2]))
+  plt.plot(kvals, 1.0+0.0*kvals, '--', color='k')
+  plt.legend(loc='lower right', fontsize=fs, prop={'size':fs})
+
   #plt.plot(kvals, stabval[1,0,:], '-',  color='r')
   #plt.plot(kvals, stabval[1,1,:], '--', color='r')
   #plt.plot(kvals, stabval[1,2,:], '-.', color='r')

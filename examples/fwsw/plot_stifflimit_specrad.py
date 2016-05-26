@@ -17,13 +17,14 @@ if __name__ == "__main__":
     fs = 8
 
     pparams = {}
+    ### SET VALUE FOR lambda_slow AND VALUES FOR lambda_fast ###
     pparams['lambda_s'] = np.array([1.0*1j], dtype='complex')
     pparams['lambda_f'] = np.array([50.0*1j, 100.0*1j], dtype='complex')
     pparams['u0'] = 1.0
     swparams = {}
-    #
-    #
-    #
+    
+    
+    ### SET TYPE OF QUADRATURE NODES ###
     #swparams['collocation_class'] = collclass.CollGaussLobatto
     #swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
