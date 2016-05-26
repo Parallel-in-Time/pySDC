@@ -18,7 +18,7 @@ if __name__ == "__main__":
     N_s = 100
     N_f = 400
     
-    lam_s_max = 3.0
+    lam_s_max = 5.0
     lam_f_max = 12.0
     lambda_s = 1j*np.linspace(0.0, lam_s_max, N_s)
     lambda_f = 1j*np.linspace(0.0, lam_f_max, N_f)
@@ -29,9 +29,17 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
+    ### SET TYPE OF QUADRATURE NODES ###
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    
+    ### SET NUMBER OF QUADRATURE NODES ###
     swparams['num_nodes'] = 3
-    K = 3
+    
+    ### SET NUMBER OF ITERATIONS - SET K=0 FOR COLLOCATION SOLUTION ###
+    K = 4
+    
     do_coll_update = True
     
     #
@@ -47,6 +55,7 @@ if __name__ == "__main__":
     nnodes  = step.levels[0].sweep.coll.num_nodes
     level   = step.levels[0]
     problem = level.prob
+    Q  = level.sweep.coll.Qmat[1:,1:]
 
     stab = np.zeros((N_f, N_s), dtype='complex')
 
@@ -76,13 +85,14 @@ if __name__ == "__main__":
     fig  = plt.figure()
     #pcol = plt.pcolor(lambda_s.imag, lambda_f.imag, np.absolute(stab), vmin=0.99, vmax=2.01)
     #pcol.set_edgecolor('face')
-    levels = np.array([0.25, 0.5, 0.75, 0.9, 1.1])
+    levels = np.array([0.25, 0.5, 0.75, 0.9, 1.01])
 #    levels = np.array([1.0])
     CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k', linestyles='dashed')
     CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0],  colors='k')
     plt.clabel(CS1, inline=True, fmt='%3.2f', fontsize=fs-2)
     manual_locations = [(1.5, 2.5)]
-    plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs-2, manual=manual_locations)
+    if K>0: # for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason
+      plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs-2, manual=manual_locations)
     plt.gca().add_patch(Polygon([[0, 0], [lam_s_max,0], [lam_s_max,lam_s_max]], visible=True, fill=True, facecolor='.75',edgecolor='k', linewidth=1.0,  zorder=11))
     #plt.plot([0, 2], [0, 2], color='k', linewidth=1, zorder=12)
     plt.gca().set_xticks(np.arange(0, int(lam_s_max)+1))
@@ -94,7 +104,7 @@ if __name__ == "__main__":
     plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
     plt.title(r'$M=%1i$, $K=%1i$' % (swparams['num_nodes'],K), fontsize=fs)
     #plt.show()
-    filename = 'sdc-fwsw-stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
+    filename = 'stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
     fig.savefig(filename, bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 

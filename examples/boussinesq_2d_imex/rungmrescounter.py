@@ -35,14 +35,24 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-15
     
     swparams = {}
+    
+    ### SET TYPE OF QUADRATURE NODES ###
+    #swparams['collocation_class'] = collclass.CollGaussLobatto
     swparams['collocation_class'] = collclass.CollGaussLegendre
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    
+    ### SET NUMBER OF NODES ###
     swparams['num_nodes'] = 3
+    
     swparams['do_LU'] = False
 
     sparams = {}
-    sparams['maxiter'] = 5
+    
+    ### SET NUMBER OF ITERATIONS ###
+    sparams['maxiter'] = 4
 
-    dirk_order = 5
+    ### ORDER OF DIRK/IMEX EQUAL TO NUMBER OF SDC ITERATIONS AND THUS SDC ORDER ###
+    dirk_order = sparams['maxiter']
 
     # setup parameters "in time"
     t0     = 0
@@ -65,7 +75,7 @@ if __name__ == "__main__":
     pparams['gmres_maxiter'] = [500]
     pparams['gmres_restart'] = [10]
     pparams['gmres_tol_limit'] = [1e-5]
-    pparams['gmres_tol_factor'] = [0.05]
+    pparams['gmres_tol_factor'] = [0.1]
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -101,6 +111,8 @@ if __name__ == "__main__":
     method_split = 'MIS4_4'
 #   method_split = 'RK3'
     splitp = SplitExplicit(P, method_split, pparams) 
+
+    dirkp = dirk(P, dirk_order)
 
     u0 = uinit.values.flatten()
     usplit = np.copy(u0)

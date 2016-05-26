@@ -28,10 +28,8 @@ if __name__ == "__main__":
 
     sparams = {}
   
-
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars']     = [(2,300)]
     pparams['cadv']      = 0.1
     pparams['cs']        = 1.00
     pparams['order_adv'] = 5
@@ -43,41 +41,57 @@ if __name__ == "__main__":
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
+    
+    ### SET TYPE OF QUADRATURE NODES ###
+    #description['collocation_class'] = collclass.CollGaussLobatto
+    #description['collocation_class'] = collclass.CollGaussLegendre
+    description['collocation_class'] = collclass.CollGaussRadau_Right
+    
     description['sweeper_class']     = imex_1st_order
     description['do_coll_update']    = True
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
     
-    Nsteps = [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
+    nsteps = np.zeros((3,9))
+    nsteps[0,:] = [20, 30, 40, 50, 60, 70, 80, 90, 100]
+    nsteps[1,:] = nsteps[0,:]
+    nsteps[2,:] = nsteps[0,:]
     
-    for order in [2, 3, 4]:
+    for order in [3, 4, 5]:
 
-      error  = np.zeros(np.size(Nsteps))
+      error  = np.zeros(np.shape(nsteps)[1])
     
       # setup parameters "in time"
       t0   = 0
       Tend = 1.0
       
-      if order==2:
+      if order==3:
         file = open('conv-data.txt', 'w')
       else:
         file = open('conv-data.txt', 'a')
 
-      if order==2:
-        description['num_nodes'] = 2
-      elif order==3:
+      ### SET NUMBER OF NODES DEPENDING ON REQUESTED ORDER ###
+      if order==3:
         description['num_nodes'] = 3
       elif order==4:
         description['num_nodes'] = 3
-
+      elif order==5:
+        description['num_nodes'] = 3
+      
       sparams['maxiter'] = order
       
-       # quickly generate block of steps
-      MS = mp.generate_steps(num_procs,sparams,description)
-      for ii in range(0,np.size(Nsteps)):
+      for ii in range(0,np.shape(nsteps)[1]):
       
-        dt = Tend/float(Nsteps[ii])
+        ns = nsteps[order-3,ii]
+        if ((order==3) or (order==4)):
+          pparams['nvars']     = [(2,5*ns)]
+        elif order==5:
+          pparams['nvars'] = [(2,5*ns)]
+          
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs,sparams,description)
+        
+        dt = Tend/float(ns)
 
         # get initial values on finest level
         P = MS[0].levels[0].prob
@@ -94,11 +108,11 @@ if __name__ == "__main__":
         uex = P.u_exact(Tend)
 
         error[ii] = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
-        file.write(str(order)+"    "+str(Nsteps[ii])+"    "+str(error[ii])+"\n")
+        file.write(str(order)+"    "+str(ns)+"    "+str(error[ii])+"\n")
 
       file.close()
 
-    if np.size(Nsteps)==1:
+    if np.shape(nsteps)[1]==1:
       fig = plt.figure(figsize=(8,8))
 
       plt.plot(P.mesh, uex.values[0,:],  '+', color='b', label='u (exact)')
@@ -110,5 +124,5 @@ if __name__ == "__main__":
       plt.ylim([-1.0, 1.0])
       plt.show()
     else:
-      for ii in range(0,np.size(Nsteps)):
-        print('error for nsteps= %s: %s' % (Nsteps[ii], error[ii]))
+      for ii in range(0,np.shape(nsteps)[1]):
+        print('error for nsteps= %s: %s' % (nsteps[order-3,ii], error[ii]))

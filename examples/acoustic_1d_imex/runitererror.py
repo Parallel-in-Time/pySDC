@@ -29,12 +29,14 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-14
+    lparams['restol'] = 1E-10
 
     sparams = {}
   
     cs_v = [0.5, 1.0, 1.5, 5.0]
     sparams['maxiter'] = 15
+    
+    ### SET NUMBER OF NODES ###
     nodes_v = [3]
       
     residual = np.zeros((np.size(cs_v), np.size(nodes_v), sparams['maxiter'])) 
@@ -62,7 +64,12 @@ if __name__ == "__main__":
       description['problem_params']    = pparams
       description['dtype_u']           = mesh
       description['dtype_f']           = rhs_imex_mesh
-      description['collocation_class'] = collclass.CollGaussLegendre
+      
+      ### SELECT TYPE OF QUADRATURE NODES ###
+      #description['collocation_class'] = collclass.CollGaussLobatto
+      #description['collocation_class'] = collclass.CollGaussLegendre
+      description['collocation_class'] = collclass.CollGaussRadau_Right
+      
       description['sweeper_class']     = imex_1st_order
       description['level_params']      = lparams
       description['hook_class']        = plot_solution
@@ -97,7 +104,7 @@ if __name__ == "__main__":
 
         # Compute convergence rates
         for iter in range(0,sparams['maxiter']-1):
-            if residual[cs_ind, nodes_ind, iter]<lparams['restol']:
+            if residual[cs_ind, nodes_ind, iter]< lparams['restol']:
               lastiter[cs_ind,nodes_ind] = iter
             else:
               convrate[cs_ind, nodes_ind, iter] = residual[cs_ind, nodes_ind, iter+1]/residual[cs_ind, nodes_ind, iter]
@@ -127,7 +134,7 @@ if __name__ == "__main__":
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.show()
-    filename = 'sdc-fwsw-iteration.pdf'
+    filename = 'iteration.pdf'
     fig.savefig(filename,bbox_inches='tight')
     call(["pdfcrop", filename, filename])
 
