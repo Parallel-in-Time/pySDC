@@ -12,24 +12,12 @@ from pylab import rcParams
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from subprocess import call
-
-def get_stab_function(LHS, RHS, Kmax, lambd, do_coll_update):
-  Pinv = np.linalg.inv(LHS)
-  Mat_sweep = np.linalg.matrix_power(Pinv.dot(RHS), Kmax)
-  for l in range(0,Kmax):
-    Mat_sweep = Mat_sweep + np.linalg.matrix_power(Pinv.dot(RHS),k).dot(Pinv)
-  if do_coll_update:
-    stab_fh = 1.0 + lambd*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
-  else:
-    q = np.zeros(nnodes)
-    q[nnodes-1] = 1.0
-    stab_fh = q.dot(Mat_sweep.dot(np.ones(nnodes)))
-  return stab_fh
+from matplotlib.ticker import ScalarFormatter
 
 if __name__ == "__main__":
-  mvals = [4]
-  kvals = np.arange(2,9)
-  lambdaratio = [1, 5, 50]
+  mvals = [3]
+  kvals = np.arange(2,10)
+  lambdaratio = [1, 5, 10]
   stabval = np.zeros((np.size(mvals), np.size(lambdaratio), np.size(kvals)))
   
   for i in range(0,np.size(mvals)):
@@ -39,6 +27,8 @@ if __name__ == "__main__":
     pparams['lambda_f'] = np.array([0.0])
     pparams['u0'] = 1.0
     swparams = {}
+#    swparams['collocation_class'] = collclass.CollGaussLobatto
+#    swparams['collocation_class'] = collclass.CollGaussLegendre
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = mvals[i]
     do_coll_update = True  
@@ -62,26 +52,39 @@ if __name__ == "__main__":
     Q  = level.sweep.coll.Qmat[1:,1:]
 
     for j in range(0,np.size(lambdaratio)):
-      lambda_slow = 0.1*1j
+      lambda_slow = 1j
       lambda_fast = lambdaratio[j]*lambda_slow
 
-      LHS = np.eye(nnodes) - step.status.dt*( lambda_fast*QI + lambda_slow*QE )
-      RHS = step.status.dt*( (lambda_fast+lambda_slow)*Q - (lambda_fast*QI + lambda_slow*QE) )
+      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = [ lambda_fast, lambda_slow ] )
 
       for k in range(0, np.size(kvals)):
         Kmax = kvals[k]
-        stab_fh = get_stab_function(LHS, RHS, kvals[k], lambda_fast+lambda_slow, do_coll_update)
+        Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = Kmax, lambdas = [ lambda_fast, lambda_slow ] )
+        if do_coll_update:
+          stab_fh = 1.0 + (lambda_fast + lambda_slow)*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+        else:
+          q = np.zeros(nnodes)
+          q[nnodes-1] = 1.0
+          stab_fh = q.dot(Mat_sweep.dot(np.ones(nnodes)))
         stabval[i,j,k] = np.absolute(stab_fh)
 
+  rcParams['figure.figsize'] = 2.5, 2.5
   fig = plt.figure()
   fs = 8
-  plt.plot(kvals, stabval[0,0,:], 'o-', color='b', label=("Ratio: %3.0f" % lambdaratio[0]))
-  plt.plot(kvals, stabval[0,1,:], 's-', color='r', label=("Ratio: %3.0f" % lambdaratio[1]))
-  plt.plot(kvals, stabval[0,2,:], 'd-', color='g', label=("Ratio: %3.0f" % lambdaratio[2]))
+  plt.plot(kvals, stabval[0,0,:], 'o-', color='b', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[0]))
+  plt.plot(kvals, stabval[0,1,:], 's-', color='r', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[1]))
+  plt.plot(kvals, stabval[0,2,:], 'd-', color='g', label=("$\lambda_{fast}/\lambda_{slow}$=%3.0f" % lambdaratio[2]))
   plt.plot(kvals, 1.0+0.0*kvals, '--', color='k')
-  plt.legend(loc='lower right', fontsize=fs, prop={'size':fs})
-
+  plt.xlabel('Number of iterations K', fontsize=fs)
+  plt.ylabel(r'Modulus of stability function $\left| R \right|$', fontsize=fs)
+  plt.ylim([0.0, 1.2])
+  plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+  plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
+  plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
+  plt.title(("M = %1i" % mvals[0]), fontsize=fs)
   #plt.plot(kvals, stabval[1,0,:], '-',  color='r')
   #plt.plot(kvals, stabval[1,1,:], '--', color='r')
   #plt.plot(kvals, stabval[1,2,:], '-.', color='r')
-  plt.show()
+  filename = 'stablimit-M'+str(mvals[0])+'.pdf'
+  fig.savefig(filename, bbox_inches='tight')
+  call(["pdfcrop", filename, filename])

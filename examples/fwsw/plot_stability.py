@@ -31,14 +31,14 @@ if __name__ == "__main__":
     swparams = {}
     ### SET TYPE OF QUADRATURE NODES ###
     #swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['collocation_class'] = collclass.CollGaussLegendre
-    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
     
     ### SET NUMBER OF QUADRATURE NODES ###
-    swparams['num_nodes'] = 3
+    swparams['num_nodes'] = 4
     
     ### SET NUMBER OF ITERATIONS - SET K=0 FOR COLLOCATION SOLUTION ###
-    K = 4
+    K = 3
     
     do_coll_update = True
     
