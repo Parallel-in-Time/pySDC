@@ -18,6 +18,8 @@ if __name__ == "__main__":
   mvals = [2, 3, 4]
   kvals = np.arange(1,10)
   lambda_fast = 10j
+
+  ### PLOT EITHER FOR lambda_slow = 1 (resolved) OR lambda_slow = 4 (unresolved)
   slow_resolved = False
   if slow_resolved:
     lambda_slow = 1j
