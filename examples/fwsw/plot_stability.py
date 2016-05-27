@@ -31,14 +31,14 @@ if __name__ == "__main__":
     swparams = {}
     ### SET TYPE OF QUADRATURE NODES ###
     #swparams['collocation_class'] = collclass.CollGaussLobatto
-    swparams['collocation_class'] = collclass.CollGaussLegendre
-    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    #swparams['collocation_class'] = collclass.CollGaussLegendre
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
     
     ### SET NUMBER OF QUADRATURE NODES ###
     swparams['num_nodes'] = 3
     
     ### SET NUMBER OF ITERATIONS - SET K=0 FOR COLLOCATION SOLUTION ###
-    K = 4
+    K = 5
     
     do_coll_update = True
     
@@ -89,6 +89,9 @@ if __name__ == "__main__":
 #    levels = np.array([1.0])
     CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k', linestyles='dashed')
     CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0],  colors='k')
+    # Set markers at points used in plot_stab_vs_k
+    plt.plot(4, 10, 'x', color='k', markersize=fs-4)
+    plt.plot(1, 10, 'x', color='k', markersize=fs-4)
     plt.clabel(CS1, inline=True, fmt='%3.2f', fontsize=fs-2)
     manual_locations = [(1.5, 2.5)]
     if K>0: # for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason
