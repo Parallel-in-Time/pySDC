@@ -16,9 +16,13 @@ from matplotlib.ticker import ScalarFormatter
 
 if __name__ == "__main__":
   mvals = [2, 3, 4]
-  kvals = np.arange(2,10)
-  lambda_fast = 15j
-  lambda_slow = 3j
+  kvals = np.arange(1,10)
+  lambda_fast = 10j
+  slow_resolved = False
+  if slow_resolved:
+    lambda_slow = 1j
+  else:
+    lambda_slow = 4j
   stabval = np.zeros((np.size(mvals), np.size(kvals)))
   
   for i in range(0,np.size(mvals)):
@@ -68,18 +72,25 @@ if __name__ == "__main__":
   rcParams['figure.figsize'] = 2.5, 2.5
   fig = plt.figure()
   fs = 8
-  plt.plot(kvals, stabval[0,:], 'o-', color='b', label=("M=%2i" % mvals[0]))
-  plt.plot(kvals, stabval[1,:], 's-', color='r', label=("M=%2i" % mvals[1]))
-  plt.plot(kvals, stabval[2,:], 'd-', color='g', label=("M=%2i" % mvals[2]))
+  plt.plot(kvals, stabval[0,:], 'o-', color='b', label=("M=%2i" % mvals[0]), markersize=fs-2)
+  plt.plot(kvals, stabval[1,:], 's-', color='r', label=("M=%2i" % mvals[1]), markersize=fs-2)
+  plt.plot(kvals, stabval[2,:], 'd-', color='g', label=("M=%2i" % mvals[2]), markersize=fs-2)
   plt.plot(kvals, 1.0+0.0*kvals, '--', color='k')
   plt.xlabel('Number of iterations K', fontsize=fs)
   plt.ylabel(r'Modulus of stability function $\left| R \right|$', fontsize=fs)
   plt.ylim([0.0, 1.2])
-  plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+  if slow_resolved:
+    plt.legend(loc='upper right', fontsize=fs, prop={'size':fs})
+  else:
+    plt.legend(loc='lower left', fontsize=fs, prop={'size':fs})
+
   plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
   plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
-  plt.show()
-
-#  filename = 'stablimit-M'+str(mvals[0])+'.pdf'
-#  fig.savefig(filename, bbox_inches='tight')
-#  call(["pdfcrop", filename, filename])
+  #plt.show()
+  if slow_resolved:
+    filename = 'stab_vs_k_resolved.pdf'
+  else:
+    filename = 'stab_vs_k_unresolved.pdf'
+  
+  fig.savefig(filename, bbox_inches='tight')
+  call(["pdfcrop", filename, filename])

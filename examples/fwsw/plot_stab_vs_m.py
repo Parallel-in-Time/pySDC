@@ -17,8 +17,8 @@ from matplotlib.ticker import ScalarFormatter
 if __name__ == "__main__":
   mvals = np.arange(2,10)
   kvals = [3, 5, 7]
-  lambda_fast = 8j
-  lambda_slow = 4j
+  lambda_fast = 10j
+  lambda_slow = 3j
   stabval = np.zeros((np.size(kvals), np.size(mvals)))
   
   for i in range(0,np.size(mvals)):
