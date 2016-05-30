@@ -30,12 +30,12 @@ if __name__ == "__main__":
     pparams['u0'] = 1.0
     swparams = {}
     ### SET TYPE OF QUADRATURE NODES ###
-    #swparams['collocation_class'] = collclass.CollGaussLobatto
+    swparams['collocation_class'] = collclass.CollGaussLobatto
     #swparams['collocation_class'] = collclass.CollGaussLegendre
-    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    #swparams['collocation_class'] = collclass.CollGaussRadau_Right
     
     ### SET NUMBER OF QUADRATURE NODES ###
-    swparams['num_nodes'] = 3
+    swparams['num_nodes'] = 4
     
     ### SET NUMBER OF ITERATIONS - SET K=0 FOR COLLOCATION SOLUTION ###
     K = 5
@@ -80,12 +80,12 @@ if __name__ == "__main__":
         stab[j,i] = stab_fh
 
     ###
-    rcParams['figure.figsize'] = 2.5, 2.5
+    rcParams['figure.figsize'] = 1.5, 1.5
     fs = 8
     fig  = plt.figure()
     #pcol = plt.pcolor(lambda_s.imag, lambda_f.imag, np.absolute(stab), vmin=0.99, vmax=2.01)
     #pcol.set_edgecolor('face')
-    levels = np.array([0.25, 0.5, 0.75, 0.9, 1.01])
+    levels = np.array([0.25, 0.5, 0.75, 0.9, 1.1])
 #    levels = np.array([1.0])
     CS1 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), levels, colors='k', linestyles='dashed')
     CS2 = plt.contour(lambda_s.imag, lambda_f.imag, np.absolute(stab), [1.0],  colors='k')
@@ -103,8 +103,8 @@ if __name__ == "__main__":
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([0.0, lam_s_max])
     plt.ylim([0.0, lam_f_max])
-    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=2.0)
-    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs)
+    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
+    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
     plt.title(r'$M=%1i$, $K=%1i$' % (swparams['num_nodes'],K), fontsize=fs)
     #plt.show()
     filename = 'stability-K'+str(K)+'-M'+str(swparams['num_nodes'])+'.pdf'
