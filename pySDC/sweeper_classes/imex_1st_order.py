@@ -129,7 +129,7 @@ class imex_1st_order(sweeper):
 
         return None
 
-    def compute_end_point(self):
+    def compute_end_point(self): 
         """
         Compute u at the right point of the interval
 
