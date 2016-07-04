@@ -85,12 +85,7 @@ def next_neighbors(p, ps, k):
     # sort by distance
     value_index_sorted = sorted(value_index, key=lambda s: s[0])
     # take first k indices with least distance and sort them
-    neighbors = sorted(list(map(lambda s: s[1], value_index_sorted[0:k])))
-    if neighbors[0] == 0:
-        neighbors = neighbors[1:]
-    if neighbors[-1] == 1:
-        neighbors = neighbors[:-1]
-    return neighbors
+    return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
 
 
@@ -149,7 +144,7 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", peri
     We construct the interpolation matrix between two 1d grids, using lagrange interpolation.
     :param fine_grid: a one dimensional 1d array containing the nodes of the fine grid
     :param coarse_grid: a one dimensional 1d array containing the nodes of the coarse grid
-    :param k: order of the restriction
+    :param k: order of the interpolation
     :return: a interpolation matrix
     """
     M = np.zeros((fine_grid.size, coarse_grid.size))
@@ -171,9 +166,8 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", peri
             M[i, nn] = np.asarray(list(map(lambda x: x(p), lag_pol)))
         else:
             nn = next_neighbors(p, coarse_grid, k)
-            print(i,nn)
-        # construct the lagrange polynomials for the k neighbors
-            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            # construct the lagrange polynomials for the k neighbors
+            circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
             lag_pol = []
             for l in range(k):
                 lag_pol.append(intpl.lagrange(coarse_grid[nn], np.roll(circulating_one, l)))
@@ -224,3 +218,48 @@ def interpolate_to_t_end(nodes_on_unit, values):
         lag_pol.append(intpl.lagrange(nodes_on_unit, np.roll(circulating_one, i)))
         result += values[i]*lag_pol[-1](1.0)
     return result
+
+def interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=2, return_type="csc"):
+    """
+    Interpolationmatrix is constructed by padding zeros for a dirichlet-0.
+    :param fine_grid:a one dimensional 1d array containing the nodes of the fine grid
+    :param coarse_grid: a one dimensional 1d array containing the nodes of the coarse grid
+    :param k: order of the interpolation
+    :param return_type:
+    :param T: the length of the
+    :return:
+    """
+    M = np.zeros((fine_grid.size, coarse_grid.size + 2 * k))
+    n_f = fine_grid.size
+    padded_c_grid = border_padding(coarse_grid, k, k)
+
+    for i, p in zip(range(n_f), fine_grid):
+        nn = next_neighbors(p, padded_c_grid, k)
+        # construct the lagrange polynomials for the k neighbors
+        circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
+        lag_pol = []
+        for l in range(k):
+            lag_pol.append(intpl.lagrange(padded_c_grid[nn], np.roll(circulating_one, l)))
+        M[i, nn] = np.asarray(list(map(lambda x: x(p), lag_pol)))
+
+    return to_sparse(M[:, k:-k], return_type)
+
+
+def border_padding(grid, l, r, pad_type='mirror'):
+    """ returns an array where the original array is embedded and the borders are enhanced by
+        a certain padding strategy, e.g. mirroring the distances
+    :param grid:
+    :param l:
+    :param r:
+    :param pad_type:
+    :return:
+    """
+    assert l < grid.size and r < grid.size
+    padded_arr = np.zeros(grid.size + l + r)
+    if pad_type is 'mirror':
+        for i in range(l):
+            padded_arr[i] = 2 * grid[0] - grid[l - i]
+        for j in range(r):
+            padded_arr[-j - 1] = 2 * grid[-1] - grid[-r + j - 1]
+    padded_arr[l:-r] = grid
+    return padded_arr

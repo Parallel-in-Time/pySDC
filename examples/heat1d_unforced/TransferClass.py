@@ -34,55 +34,32 @@ class mesh_to_mesh_1d(transfer):
         # invoke super initialization
         super(mesh_to_mesh_1d,self).__init__(fine_level,coarse_level,params)
 
-        assert params['iorder'] == 6
-        assert params['rorder'] == 2
+        fine_grid = np.array([(i + 1) * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
+        coarse_grid = np.array([(i + 1) * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:
             self.Rspace = np.eye(self.init_c)
-        # assemble weighted restriction by hand
+        # assemble restriction as transpose of interpolation
         else:
-            self.Rspace = np.zeros((self.init_f,self.init_c))
-            np.fill_diagonal(self.Rspace[1::2,:],1)
-            np.fill_diagonal(self.Rspace[0::2,:],1/2)
-            np.fill_diagonal(self.Rspace[2::2,:],1/2)
-            self.Rspace = 1/2*self.Rspace.T
+
+            if params['rorder'] == 1:
+
+                self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=1).T
+
+            else:
+
+                self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['rorder']).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
             self.Pspace = np.eye(self.init_f)
         # assemble 7th-order prolongation by hand
         else:
-            self.Pspace = np.zeros((self.init_f,self.init_c))
-
-            np.fill_diagonal(self.Pspace[1::2,:],1)
-
-            # np.fill_diagonal(self.Pspace[0::2,:],1/2)
-            # np.fill_diagonal(self.Pspace[2::2,:],1/2)
-
-            # this would be 3rd-order accurate
-            # c1 = -0.0625
-            # c2 = 0.5625
-            # c3 = c2
-            # c4 = c1
-            # np.fill_diagonal(self.Pspace[0::2,:],c3)
-            # np.fill_diagonal(self.Pspace[2::2,:],c2)
-            # np.fill_diagonal(self.Pspace[0::2,1:],c4)
-            # np.fill_diagonal(self.Pspace[4::2,:],c1)
-            # self.Pspace[0,0:3] = [0.9375, -0.3125, 0.0625]
-            # self.Pspace[-1,-3:self.init_c] = [0.0625, -0.3125, 0.9375]
-
-            np.fill_diagonal(self.Pspace[0::2,:],0.5859375)
-            np.fill_diagonal(self.Pspace[2::2,:],0.5859375)
-            np.fill_diagonal(self.Pspace[0::2,1:],-0.09765625)
-            np.fill_diagonal(self.Pspace[4::2,:],-0.09765625)
-            np.fill_diagonal(self.Pspace[0::2,2:],0.01171875)
-            np.fill_diagonal(self.Pspace[6::2,:],0.01171875)
-            self.Pspace[0,0:5] = [1.23046875, -0.8203125, 0.4921875, -0.17578125, 0.02734375]
-            self.Pspace[2,0:5] = [0.41015625, 0.8203125, -0.2734375, 0.08203125, -0.01171875]
-            self.Pspace[-1,-5:self.init_c] = [0.02734375,  -0.17578125, 0.4921875, -0.8203125, 1.23046875]
-            self.Pspace[-3,-5:self.init_c] = [-0.01171875, 0.08203125, -0.2734375, 0.8203125, 0.41015625]
-
+            self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['iorder'])
+        print(self.Rspace.todense())
+        print(self.Pspace.todense())
+        exit()
         pass
 
 

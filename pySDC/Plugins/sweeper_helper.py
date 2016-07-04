@@ -20,6 +20,7 @@ def get_Qd(cclass, Nnodes, qd_type):
     elif qd_type == 'GS':
         QDmat = np.tril(coll.Qmat)
     elif qd_type == 'PIC':
+        # QDmat = coll.Qmat
         QDmat = np.zeros(coll.Qmat.shape)
     else:
         print('qd_type not implemented...', qd_type)

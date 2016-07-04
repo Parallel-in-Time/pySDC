@@ -37,23 +37,24 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 0.1
-    pparams['nvars'] = [127]
+    pparams['nu'] = 10
+    pparams['nvars'] = [63]
     pparams['k'] = 2
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = False
-    tparams['iorder'] = 6
-    tparams['rorder'] = 2
+    tparams['iorder'] = 2
+    tparams['rorder'] = 1
 
     Nnodes = 5
     cclass = collclass.CollGaussRadau_Right
-    QI = get_Qd(cclass,Nnodes=Nnodes,qd_type='GS')
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['QI'] = QI
+    swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='LU')
+    swparams_coarse = {}
+    swparams_coarse['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -64,7 +65,8 @@ if __name__ == "__main__":
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
     description['sweeper_class'] = generic_implicit
-    description['sweeper_params'] = swparams
+    # description['sweeper_params'] = [swparams,swparams_coarse]
+    description['sweeper_params'] = [swparams]
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
@@ -74,7 +76,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.25
+    dt = 0.1
     Tend = num_procs*dt
 
     # get initial values on finest level
@@ -87,8 +89,7 @@ if __name__ == "__main__":
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values,np.inf)))
+    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)))
 
 
     # show_residual_across_simulation(stats,'res_vis_test.png')

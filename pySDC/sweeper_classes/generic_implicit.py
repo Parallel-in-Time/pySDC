@@ -30,7 +30,7 @@ class generic_implicit(sweeper):
         # LU integration matrix
         self.QI = params['QI']
         assert isinstance(self.QI,np.ndarray)
-        np.testing.assert_array_equal(np.triu(self.QI,k=1),np.zeros(self.QI.shape))
+        np.testing.assert_array_equal(np.triu(self.QI,k=1),np.zeros(self.QI.shape),err_msg='Lower triangular matrix expected!')
         pass
 
     def integrate(self):

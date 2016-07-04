@@ -1,48 +1,41 @@
 import numpy as np
 import scipy.sparse as sp
-import scipy.sparse.linalg as LA
+import scipy.linalg as LA
 
-def getFDMatrix(N, p, dx):
+def getFDMatrix(N, order, dx):
+  if order == 1:
+    stencil = [-1.0, 1.0]
+    zero_pos = 2
+    coeff = 1.0
 
-  if (p==2):
-    stencil = [-0.5, 0.0, 0.5]
-    range   = [-1,0,1]
-  elif (p==4):
-    stencil = [1.0/12.0, -2.0/3.0, 0.0, 2.0/3.0, -1.0/12.0]
-    range  = [-2,-1,0,1,2]
-  elif (p==6):
-    stencil = [-1.0/60.0, 3.0/20.0, -3.0/4.0, 0.0, 3.0/4.0, -3.0/20.0, 1.0/60.0]
-    range = [-3,-2,-1,0,1,2,3]
+  elif order == 2:
+    stencil = [1.0, -4.0, 3.0]
+    coeff = 1.0 / 2.0
+    zero_pos = 3
+
+  elif order == 3:
+    stencil = [1.0, -6.0, 3.0, 2.0]
+    coeff = 1.0 / 6.0
+    zero_pos = 3
+
+  elif order == 4:
+    stencil = [-5.0, 30.0, -90.0, 50.0, 15.0]
+    coeff = 1.0 / 60.0
+    zero_pos = 4
+
+  elif order == 5:
+    stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
+    coeff = 1.0 / 60.0
+    zero_pos = 5
   else:
-    print ("Do not have order %1i implemented." % p)
-    exit()
+    print("Order " + order + " not implemented.")
 
-  A = sp.diags(stencil, range, shape=(N,N))
-  A = sp.lil_matrix(A)
-  # Now insert periodic BC manually.. I am sure there is a cleverer way to do this ... but meh, can't be bothered to find out
-  if (p==2):
-    A[0,N-1] = stencil[0]
-    A[N-1,0] = stencil[2]
-  elif (p==4):
-    A[0,N-2] = stencil[0]
-    A[0,N-1] = stencil[1]
-    A[1,N-1] = stencil[0]
-    A[N-2,0] = stencil[4]
-    A[N-1,0] = stencil[3]
-    A[N-1,1] = stencil[4]
-  elif (p==6):
-    A[0,N-3] = stencil[0]
-    A[0,N-2] = stencil[1]
-    A[0,N-1] = stencil[2]
-    A[1,N-2] = stencil[0]
-    A[1,N-1] = stencil[1]
-    A[2,N-1] = stencil[0]
-    A[N-3,0] = stencil[6]
-    A[N-2,0] = stencil[5]
-    A[N-2,1] = stencil[6]
-    A[N-1,0] = stencil[4]
-    A[N-1,1] = stencil[5]
-    A[N-1,2] = stencil[6]
+  first_col = np.zeros(N)
 
-  A *= (1.0/dx)
-  return sp.csr_matrix(A)
+  # Because we need to specific first column (not row) in circulant, flip stencil array
+  first_col[0:np.size(stencil)] = np.flipud(stencil)
+
+  # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
+  first_col = np.roll(first_col, -np.size(stencil) + zero_pos, axis=0)
+
+  return sp.csc_matrix(coeff * (1.0 / dx) * LA.circulant(first_col))
