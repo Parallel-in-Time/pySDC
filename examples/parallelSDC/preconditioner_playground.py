@@ -46,14 +46,6 @@ if __name__ == "__main__":
     cclass = collclass.CollGaussRadau_Right
     dt = 0.1
 
-    description = {}
-    description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
-    description['collocation_class'] = cclass
-    description['num_nodes'] = Nnodes
-    description['sweeper_class'] = generic_implicit
-    description['level_params'] = lparams
-
     qd_list = [ 'LU', 'IE', 'IEpar', 'Qpar', 'PIC' ]
 
     setup_list = [ ('heat',63, [10.0**i for i in range(-3,3)]),
@@ -69,7 +61,6 @@ if __name__ == "__main__":
         # This comes as read-in for the sweeper class
         swparams = {}
         swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type)
-        description['sweeper_params'] = swparams
 
         for setup, nvars, param_list in setup_list:
 
@@ -78,6 +69,15 @@ if __name__ == "__main__":
 
             for param in param_list:
 
+                description = {}
+                description['dtype_u'] = mesh
+                description['dtype_f'] = mesh
+                description['collocation_class'] = cclass
+                description['num_nodes'] = Nnodes
+                description['sweeper_class'] = generic_implicit
+                description['sweeper_params'] = swparams
+                description['level_params'] = lparams
+
                 print('working on: %s - %s - %s' % (qd_type, setup, param))
 
                 if setup == 'heat':
@@ -85,6 +85,7 @@ if __name__ == "__main__":
                     pparams['nu'] = param
                     pparams['k'] = 2
                     description['problem_class'] = heat1d_unforced
+                    dt = 0.1
 
                 elif setup == 'advection':
 
@@ -92,15 +93,17 @@ if __name__ == "__main__":
                     pparams['nvars'] = nvars
                     pparams['order'] = 2
                     description['problem_class'] = advection
+                    dt = 0.1
 
 
                 elif setup == 'vanderpol':
 
                     pparams['newton_tol'] = 1E-12
                     pparams['maxiter'] = 50
-                    pparams['mu'] = param
+                    pparams['mu'] = 5.0
                     pparams['u0'] = np.array([2.0, 0])
                     description['problem_class'] = vanderpol
+                    dt = param
 
                 else:
                     print('Setup not implemented..',setup)
