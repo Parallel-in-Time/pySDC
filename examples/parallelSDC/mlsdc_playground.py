@@ -3,10 +3,12 @@ from pySDC import CollocationClasses as collclass
 import numpy as np
 
 from examples.heat1d_unforced.ProblemClass import heat1d_unforced
+from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
 from examples.advection_1d_implicit.ProblemClass import advection
-from examples.vanderpol.ProblemClass import vanderpol
-
+from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
 from pySDC.datatype_classes.mesh import mesh
+
+
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.PFASST_blockwise as mp
 
@@ -36,15 +38,21 @@ if __name__ == "__main__":
     sparams['maxiter'] = 100
     sparams['fine_comm'] = True
 
+    # This comes as read-in for the transfer operations (this is optional!)
+    tparams = {}
+    tparams['finter'] = False
+    tparams['iorder'] = 2
+    tparams['rorder'] = 2
+
     Nnodes = 3
     cclass = collclass.CollGaussRadau_Right
     dt = 0.1
 
-    qd_list = [ 'LU', 'IE', 'IEpar', 'Qpar', 'PIC' ]
+    qd_list = [ 'LU', 'IE', ('LU','LU'), ('IE','IE'), ('IEpar','IE'), ('IEpar','LU'), ('LU','IEpar'), ('IE','IEpar') ]
+                # ('LU','Qpar'), ('IE','Qpar'), ('Qpar', 'IE'), ('Qpar', 'LU'), ('PIC','IE'), ('PIC','LU') ]
 
-    setup_list = [ ('heat',63, [10.0**i for i in range(-3,3)]),
-                   ('advection',64, [10.0**i for i in range(-3,3)]),
-                   ('vanderpol',2, [0.1*2**i for i in range(0,10)]) ]
+    setup_list = [ ('heat',(63, 31), [10.0**i for i in range(-3,3)]),
+                   ('advection',(64, 32), [10.0**i for i in range(-3,3)]) ]
 
     results = {}
     for setup, nvars, param_list in setup_list:
@@ -54,12 +62,20 @@ if __name__ == "__main__":
 
         # This comes as read-in for the sweeper class
         swparams = {}
-        swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type)
+        if not type(qd_type) == str:
+            swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type[0])
+            swparams_c = {}
+            swparams_c['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type[1])
+        else:
+            swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type)
 
         for setup, nvars, param_list in setup_list:
 
             pparams = {}
-            pparams['nvars'] = nvars
+            if not type(qd_type) == str:
+                pparams['nvars'] = [nvars[0], nvars[1]]
+            else:
+                pparams['nvars'] = nvars[0]
 
             for param in param_list:
 
@@ -69,7 +85,10 @@ if __name__ == "__main__":
                 description['collocation_class'] = cclass
                 description['num_nodes'] = Nnodes
                 description['sweeper_class'] = generic_implicit
-                description['sweeper_params'] = swparams
+                if not type(qd_type) == str:
+                    description['sweeper_params'] = [swparams, swparams_c]
+                else:
+                    description['sweeper_params'] = swparams
                 description['level_params'] = lparams
 
                 print('working on: %s - %s - %s' % (qd_type, setup, param))
@@ -79,6 +98,7 @@ if __name__ == "__main__":
                     pparams['nu'] = param
                     pparams['k'] = 2
                     description['problem_class'] = heat1d_unforced
+                    description['transfer_class'] = mesh_to_mesh_1d
                     dt = 0.1
 
                 elif setup == 'advection':
@@ -86,22 +106,15 @@ if __name__ == "__main__":
                     pparams['c'] = param
                     pparams['order'] = 2
                     description['problem_class'] = advection
+                    description['transfer_class'] = mesh_to_mesh_1d_periodic
                     dt = 0.1
 
-
-                elif setup == 'vanderpol':
-
-                    pparams['newton_tol'] = 1E-12
-                    pparams['maxiter'] = 50
-                    pparams['mu'] = 5.0
-                    pparams['u0'] = np.array([2.0, 0])
-                    description['problem_class'] = vanderpol
-                    dt = param
 
                 else:
                     print('Setup not implemented..',setup)
                     exit()
 
+                description['transfer_params'] = tparams
                 description['problem_params'] = pparams
 
                 # quickly generate block of steps
@@ -123,5 +136,5 @@ if __name__ == "__main__":
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    file = open('results_iterations_precond.pkl', 'wb')
+    file = open('results_iterations_mlsdc.pkl', 'wb')
     pickle.dump(results, file)

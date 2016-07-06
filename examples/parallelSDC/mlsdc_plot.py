@@ -7,7 +7,7 @@ import pickle
 if __name__ == "__main__":
 
     ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
-    file = open('results_iterations_precond.pkl','rb')
+    file = open('results_iterations_mlsdc.pkl','rb')
     results = pickle.load(file)
 
     qd_type_list = []

@@ -3,14 +3,14 @@ import numpy as np
 
 from pySDC.Transfer import transfer
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+import pySDC.Plugins.transfer_helper as th
 
 # FIXME: extend this to ndarrays
 class mesh_to_mesh_1d_periodic(transfer):
     """
     Custon transfer class, implements Transfer.py
 
-    This implementation can restrict and prolong between 1d meshes, using weigthed restriction and 7th-order prologation
-    via matrix-vector multiplication.
+    This implementation can restrict and prolong between 1d meshes via matrix-vector products
 
     Attributes:
         fine: reference to the fine level
@@ -24,7 +24,6 @@ class mesh_to_mesh_1d_periodic(transfer):
     def __init__(self,fine_level,coarse_level,params):
         """
         Initialization routine
-
         Args:
             fine_level: fine level connected with the transfer operations (passed to parent)
             coarse_level: coarse level connected with the transfer operations (passed to parent)
@@ -34,43 +33,33 @@ class mesh_to_mesh_1d_periodic(transfer):
         # invoke super initialization
         super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level,params)
 
+        fine_grid = np.array([i * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
+        coarse_grid = np.array([i * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
+
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:
             self.Rspace = np.eye(self.init_c)
-        # assemble weighted restriction by hand
+        # assemble restriction as transpose of interpolation
         else:
-            self.Rspace = np.zeros((self.init_c,self.init_f))
-            np.fill_diagonal(self.Rspace[:,0::2],1)
-            np.fill_diagonal(self.Rspace[:,1::2],1/2)
-            np.fill_diagonal(self.Rspace[1:,1::2],1/2)
-            self.Rspace[0,-1] = 1/2
-            self.Rspace = 1/2*self.Rspace
+
+            if params['rorder'] == 1:
+
+                self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=1, periodic=True)
+
+            else:
+
+                self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['rorder'], periodic=True).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
             self.Pspace = np.eye(self.init_f)
-        # assemble 7th-order prolongation by hand
         else:
-            self.Pspace = np.zeros((self.init_f,self.init_c))
-
-            np.fill_diagonal(self.Pspace[0::2,:],1)
-            np.fill_diagonal(self.Pspace[1::2,:],0.5859375)
-            np.fill_diagonal(self.Pspace[1::2,1:],0.5859375)
-            np.fill_diagonal(self.Pspace[3::2,:],-0.09765625)
-            np.fill_diagonal(self.Pspace[1::2,2:],-0.09765625)
-            np.fill_diagonal(self.Pspace[5::2,:],0.01171875)
-            np.fill_diagonal(self.Pspace[1::2,3:],0.01171875)
-            self.Pspace[1,-1] = -0.09765625
-            self.Pspace[1,-2] = 0.01171875
-            self.Pspace[3,-1] = 0.01171875
-            self.Pspace[-1,0] = 0.5859375
-            self.Pspace[-1,1] = -0.09765625
-            self.Pspace[-1,2] = 0.01171875
-            self.Pspace[-3,0] = -0.09765625
-            self.Pspace[-3,1] = 0.01171875
-            self.Pspace[-5,0] = 0.01171875
-
+            self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['iorder'], periodic=True)
+        # print(self.Rspace.todense())
+        # print(self.Pspace.todense())
+        # exit()
         pass
+
 
     def restrict_space(self,F):
         """
@@ -82,11 +71,11 @@ class mesh_to_mesh_1d_periodic(transfer):
 
         if isinstance(F,mesh):
             u_coarse = mesh(self.init_c,val=0)
-            u_coarse.values = np.dot(self.Rspace,F.values)
+            u_coarse.values = self.Rspace.dot(F.values)
         elif isinstance(F,rhs_imex_mesh):
             u_coarse = rhs_imex_mesh(self.init_c)
-            u_coarse.impl.values = np.dot(self.Rspace,F.impl.values)
-            u_coarse.expl.values = np.dot(self.Rspace,F.expl.values)
+            u_coarse.impl.values = self.Rspace.dot(F.impl.values)
+            u_coarse.expl.values = self.Rspace.dot(F.expl.values)
 
         return u_coarse
 
@@ -100,10 +89,10 @@ class mesh_to_mesh_1d_periodic(transfer):
 
         if isinstance(G,mesh):
             u_fine = mesh(self.init_c,val=0)
-            u_fine.values = np.dot(self.Pspace,G.values)
+            u_fine.values = self.Pspace.dot(G.values)
         elif isinstance(G,rhs_imex_mesh):
             u_fine = rhs_imex_mesh(self.init_c)
-            u_fine.impl.values = np.dot(self.Pspace,G.impl.values)
-            u_fine.expl.values = np.dot(self.Pspace,G.expl.values)
+            u_fine.impl.values = self.Pspace.dot(G.impl.values)
+            u_fine.expl.values = self.Pspace.dot(G.expl.values)
 
         return u_fine

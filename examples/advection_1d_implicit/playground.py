@@ -24,18 +24,20 @@ if __name__ == "__main__":
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
-    sparams['maxiter'] = 50
+    sparams['maxiter'] = 10
     sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['c'] = 10
-    pparams['nvars'] = [64]
+    pparams['c'] = 1
+    pparams['nvars'] = [8,4]
     pparams['order'] = [2]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = True
+    tparams['iorder'] = 2
+    tparams['rorder'] = 1
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

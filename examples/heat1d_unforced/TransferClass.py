@@ -10,8 +10,7 @@ class mesh_to_mesh_1d(transfer):
     """
     Custon transfer class, implements Transfer.py
 
-    This implementation can restrict and prolong between 1d meshes, using weigthed restriction and 7th-order prologation
-    via matrix-vector multiplication.
+    This implementation can restrict and prolong between 1d meshes via matrix-vector products
 
     Attributes:
         fine: reference to the fine level
@@ -57,9 +56,7 @@ class mesh_to_mesh_1d(transfer):
         # assemble 7th-order prolongation by hand
         else:
             self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['iorder'])
-        print(self.Rspace.todense())
-        print(self.Pspace.todense())
-        exit()
+
         pass
 
 
