@@ -7,6 +7,7 @@ from pySDC import CollocationClasses as collclass
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.sweeper_classes.generic_LU import generic_LU
 from pySDC.sweeper_classes.linearized_implicit import linearized_implicit
+from pySDC.sweeper_classes.linearized_implicit_fixed import linearized_implicit_fixed
 from pySDC.datatype_classes.mesh import mesh
 from examples.vanderpol.HookClass import vanderpol_output
 import pySDC.PFASST_stepwise as mp
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
 
     sparams = {}
-    sparams['maxiter'] = 100
+    sparams['maxiter'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -41,6 +42,7 @@ if __name__ == "__main__":
 
     swparams = {}
     swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+    swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -51,7 +53,8 @@ if __name__ == "__main__":
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
     # description['sweeper_class'] = generic_LU
-    description['sweeper_class'] = linearized_implicit
+    # description['sweeper_class'] = linearized_implicit
+    description['sweeper_class'] = linearized_implicit_fixed
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['hook_class'] = vanderpol_output # this is optional
