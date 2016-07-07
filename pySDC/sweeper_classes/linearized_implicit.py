@@ -1,11 +1,11 @@
 
 import numpy as np
 
-from pySDC.Sweeper import sweeper
+from pySDC.sweeper_classes.generic_implicit import generic_implicit
 
 
 
-class generic_implicit(sweeper):
+class linearized_implicit(generic_implicit):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -15,22 +15,16 @@ class generic_implicit(sweeper):
         QI: lower triangular matrix
     """
 
-    def __init__(self,params):
-        """
-        Initialization routine for the custom sweeper
-
-        Args:
-            coll: collocation object
-        """
-
-        # call parent's initialization routine
-        super(generic_implicit,self).__init__(params)
-
-        assert 'QI' in params
-        self.QI = params['QI']
-        assert isinstance(self.QI,np.ndarray)
-        np.testing.assert_array_equal(np.triu(self.QI,k=1),np.zeros(self.QI.shape),err_msg='Lower triangular matrix expected!')
-        pass
+    # def __init__(self,params):
+    #     """
+    #     Initialization routine for the custom sweeper
+    #
+    #     Args:
+    #         coll: collocation object
+    #     """
+    #
+    #     # call parent's initialization routine
+    #     super(linearized_implicit,self).__init__(params)
 
     def integrate(self):
         """
@@ -74,6 +68,10 @@ class generic_implicit(sweeper):
         # get number of collocation nodes for easier access
         M = self.coll.num_nodes
 
+        dfdu = []
+        for m in range(M+1):
+            dfdu.append( P.eval_jacobian(L.u[m]) )
+
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to u0 + QF(u^k) - QdF(u^k) + tau
 
@@ -83,7 +81,7 @@ class generic_implicit(sweeper):
 
             # get -QdF(u^k)_m
             for j in range(M+1):
-                integral[m] -= L.dt*self.QI[m+1,j]*L.f[j]
+                integral[m] -= L.dt*self.QI[m+1,j]*P.apply_jacobian(dfdu[j],L.u[j])
 
             # add initial value
             integral[m] += L.u[0]
@@ -96,10 +94,10 @@ class generic_implicit(sweeper):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
             for j in range(m+1):
-                rhs += L.dt*self.QI[m+1,j]*L.f[j]
+                rhs += L.dt*self.QI[m+1,j]*P.apply_jacobian(dfdu[j],L.u[j])
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            L.u[m+1] = P.solve_system(rhs,L.dt*self.QI[m+1,m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
+            L.u[m+1] = P.solve_system_jacobian(dfdu[m+1],rhs,L.dt*self.QI[m+1,m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
             # update function values
             L.f[m+1] = P.eval_f(L.u[m+1],L.time+L.dt*self.coll.nodes[m])
 

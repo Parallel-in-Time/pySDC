@@ -6,12 +6,14 @@ import matplotlib.pyplot as plt
 from pySDC import CollocationClasses as collclass
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.sweeper_classes.generic_LU import generic_LU
+from pySDC.sweeper_classes.linearized_implicit import linearized_implicit
 from pySDC.datatype_classes.mesh import mesh
 from examples.vanderpol.HookClass import vanderpol_output
 import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
+from pySDC.Plugins.sweeper_helper import get_Qd
 
 if __name__ == "__main__":
 
@@ -34,15 +36,23 @@ if __name__ == "__main__":
     pparams['mu'] = 5
     pparams['u0'] = np.array([2.0,0])
 
+    Nnodes = 5
+    cclass = collclass.CollGaussRadau_Right
+
+    swparams = {}
+    swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = vanderpol
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
-    description['num_nodes'] = [3]
-    description['sweeper_class'] = generic_LU
+    description['collocation_class'] = cclass
+    description['num_nodes'] = Nnodes
+    # description['sweeper_class'] = generic_LU
+    description['sweeper_class'] = linearized_implicit
+    description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['hook_class'] = vanderpol_output # this is optional
 

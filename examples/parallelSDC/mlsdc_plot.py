@@ -34,7 +34,7 @@ if __name__ == "__main__":
                         niter_heat[xvalue] = results[key]
             plt.semilogx(results[setup][1],niter_heat, label=qd_type, lw=2)
 
-        plt.ylim([0,100])
+        plt.ylim([0,50])
         plt.legend()
         plt.title(setup)
 
