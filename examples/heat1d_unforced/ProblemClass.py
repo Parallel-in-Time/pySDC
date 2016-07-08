@@ -4,7 +4,8 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+# from pySDC.datatype_classes.mesh import mesh
+from pySDC.datatype_classes.complex_mesh import mesh
 
 class heat1d_unforced(ptype):
     """
@@ -113,4 +114,37 @@ class heat1d_unforced(ptype):
         me = mesh(self.nvars)
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
         me.values = np.sin(np.pi*self.k*xvalues)*np.exp(-t*self.nu*(np.pi*self.k)**2)
+        return me
+
+
+    def eval_jacobian(self, u):
+
+        dfdu = self.A
+        return dfdu
+
+
+    def apply_jacobian(self, dfdu, u):
+        dfduxu = mesh(self.nvars)
+        dfduxu.values = dfdu.dot(u.values)
+
+        return dfduxu
+
+
+    def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-dtA)u = rhs
+
+        Args:
+            dfdu: the Jacobian of the RHS of the ODE
+            rhs: right-hand side for the linear system
+            factor: abbrev. for the node-to-node stepsize (or any other factor required)
+            u0: initial guess for the iterative solver (not used here so far)
+            t: current time (e.g. for time-dependent BCs)
+
+        Returns:
+            solution as mesh
+        """
+
+        me = mesh(self.nvars)
+        me.values = LA.spsolve(sp.eye(self.nvars) - factor * dfdu, rhs.values)
         return me

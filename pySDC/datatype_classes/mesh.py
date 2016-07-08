@@ -91,7 +91,7 @@ class mesh():
             mesh object, copy of original values scaled by factor
         """
 
-        if isinstance(other, float):
+        if isinstance(other, float) or isinstance(other, complex):
             # always create new mesh, since otherwise c = f*a changes a as well!
             me = mesh(np.shape(self.values))
             me.values = self.values*other

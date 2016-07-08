@@ -5,9 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from examples.generalized_fisher.ProblemClass import generalized_fisher
-from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.complex_mesh import mesh
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.sweeper_classes.linearized_implicit import linearized_implicit
+from pySDC.sweeper_classes.linearized_implicit_fixed import linearized_implicit_fixed
+from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
@@ -36,17 +39,11 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 1.0
+    pparams['nu'] = 1
     pparams['nvars'] = [64]
     pparams['lambda0'] = 1.0
     pparams['maxiter'] = 50
     pparams['newton_tol'] = 1E-12
-
-    # This comes as read-in for the transfer operations (this is optional!)
-    tparams = {}
-    tparams['finter'] = False
-    tparams['iorder'] = 2
-    tparams['rorder'] = 2
 
     Nnodes = 5
     cclass = collclass.CollGaussRadau_Right
@@ -54,8 +51,7 @@ if __name__ == "__main__":
     # This comes as read-in for the sweeper class
     swparams = {}
     swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='LU')
-    swparams_coarse = {}
-    swparams_coarse['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+    swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -65,12 +61,10 @@ if __name__ == "__main__":
     description['dtype_f'] = mesh
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
-    description['sweeper_class'] = generic_implicit
-    # description['sweeper_params'] = [swparams,swparams_coarse]
+    # description['sweeper_class'] = generic_implicit
+    description['sweeper_class'] = linearized_implicit_fixed_parallel
     description['sweeper_params'] = [swparams]
     description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_1d
-    description['transfer_params'] = tparams
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
@@ -95,7 +89,7 @@ if __name__ == "__main__":
 
     plt.plot(uend.values,'bs',lw=2)
     plt.plot(uex.values,'gd',lw=2)
-    plt.show()
+    # plt.show()
     # show_residual_across_simulation(stats,'res_vis_test.png')
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')

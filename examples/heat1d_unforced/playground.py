@@ -5,7 +5,8 @@ import numpy as np
 
 from examples.heat1d_unforced.ProblemClass import heat1d_unforced
 from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
-from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.mesh import mesh
+from pySDC.datatype_classes.complex_mesh import mesh
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
@@ -14,6 +15,7 @@ from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
 
 from pySDC.Plugins.sweeper_helper import get_Qd
+from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 
 from pySDC.Plugins.visualization_tools import show_residual_across_simulation
 
@@ -55,6 +57,7 @@ if __name__ == "__main__":
     swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='LU')
     swparams_coarse = {}
     swparams_coarse['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+    swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -65,6 +68,7 @@ if __name__ == "__main__":
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
     description['sweeper_class'] = generic_implicit
+    description['sweeper_class'] = linearized_implicit_fixed_parallel
     # description['sweeper_params'] = [swparams,swparams_coarse]
     description['sweeper_params'] = [swparams]
     description['level_params'] = lparams

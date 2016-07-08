@@ -5,6 +5,7 @@ import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
 from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.complex_mesh import mesh
 
 class generalized_fisher(ptype):
     """
@@ -144,4 +145,39 @@ class generalized_fisher(ptype):
         lam1 = self.lambda0/2.0*((self.nu/2.0 + 1)**0.5 + (self.nu/2.0 + 1)**(-0.5))
         sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
         me.values = (1 + (2**(self.nu/2.0) - 1) * np.exp(-self.nu/2.0*sig1*(xvalues + 2*lam1*t)))**(-2.0/self.nu)
+        return me
+
+
+    def eval_jacobian(self, u):
+
+        dfdu = self.A[:-1,:-1] + sp.diags(self.lambda0**2-self.lambda0**2*(self.nu+1)*u.values**self.nu)
+
+        return dfdu
+
+
+    def apply_jacobian(self, dfdu, u):
+
+
+        dfduxu = mesh(self.nvars)
+        dfduxu.values = dfdu.dot(u.values)
+
+        return dfduxu
+
+    def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-dtA)u = rhs
+
+        Args:
+            dfdu: the Jacobian of the RHS of the ODE
+            rhs: right-hand side for the linear system
+            factor: abbrev. for the node-to-node stepsize (or any other factor required)
+            u0: initial guess for the iterative solver (not used here so far)
+            t: current time (e.g. for time-dependent BCs)
+
+        Returns:
+            solution as mesh
+        """
+
+        me = mesh(self.nvars)
+        me.values = LA.spsolve(sp.eye(self.nvars) - factor * dfdu, rhs.values)
         return me
