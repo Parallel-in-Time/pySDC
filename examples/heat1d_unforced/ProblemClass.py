@@ -123,13 +123,6 @@ class heat1d_unforced(ptype):
         return dfdu
 
 
-    def apply_jacobian(self, dfdu, u):
-        dfduxu = mesh(self.nvars)
-        dfduxu.values = dfdu.dot(u.values)
-
-        return dfduxu
-
-
     def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
         """
         Simple linear solver for (I-dtA)u = rhs

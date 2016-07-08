@@ -8,8 +8,7 @@ from examples.generalized_fisher.ProblemClass import generalized_fisher
 from pySDC.datatype_classes.mesh import mesh
 # from pySDC.datatype_classes.complex_mesh import mesh
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.sweeper_classes.linearized_implicit import linearized_implicit
-from pySDC.sweeper_classes.linearized_implicit_fixed import linearized_implicit_fixed
+from pySDC.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
 from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from pySDC import CollocationClasses as collclass
 from examples.vanderpol.ProblemClass import vanderpol
 from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.sweeper_classes.linearized_implicit import linearized_implicit
-from pySDC.sweeper_classes.linearized_implicit_fixed import linearized_implicit_fixed
+from pySDC.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
+from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from pySDC.datatype_classes.mesh import mesh
 from examples.vanderpol.HookClass import vanderpol_output
 import pySDC.PFASST_stepwise as mp
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
     # description['sweeper_class'] = generic_LU
-    # description['sweeper_class'] = linearized_implicit
-    description['sweeper_class'] = linearized_implicit_fixed
+    # description['sweeper_class'] = linearized_implicit_parallel
+    description['sweeper_class'] = linearized_implicit_fixed_parallel
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['hook_class'] = vanderpol_output # this is optional
