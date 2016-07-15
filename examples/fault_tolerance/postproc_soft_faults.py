@@ -14,13 +14,15 @@ if __name__ == "__main__":
     #          ('HEAT_SDC_soft_faults_corr5x_N1000.pkl', 'SDC, correction, a = 5'),
     #          ('HEAT_SDC_soft_faults_corr1x_N1000.pkl','SDC, correction, a = 1') ]
 
-    list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
-             ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl', 'MLSDC, correction, a = 10') ,
+    # list = [ ('HEAT_MLSDC_soft_faults_nocorr_N1000.pkl', 'MLSDC, no correction'),
+    #          ('HEAT_MLSDC_soft_faults_corr10x_N1000.pkl', 'MLSDC, correction, a = 10') ,
     #          ('HEAT_MLSDC_soft_faults_corr5x_N1000.pkl', 'MLSDC, correction, a = 5'),
-             ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl','MLSDC, correction, a = 1') ]
+    #          ('HEAT_MLSDC_soft_faults_corr1x_N1000.pkl','MLSDC, correction, a = 1') ]
 
     # list = [ ('HEAT_PFASST_soft_faults_corr10x_N1000_NOCOARSE.pkl','PFASST, correction, a = 10'),
     #          ('HEAT_PFASST_soft_faults_nocorr_N1000_NOCOARSE.pkl','PFASST, no correction')]
+
+    list = [ ('HEAT_SDC_soft_faults_test.pkl', 'SDC, test') ]
 
     iterhist = []
     legendhist = []
@@ -67,7 +69,7 @@ if __name__ == "__main__":
         #     param = stats.gamma.fit(iters)
         #     print(param[1],ref_res[l])
 
-        # continue
+        continue
 
         #####
 
@@ -120,26 +122,26 @@ if __name__ == "__main__":
         iterhist.append([item[4] for item in soft_stats_cleaned])
         legendhist.append(title)
 
-    fig, ax = plt.subplots(figsize=(10,10))
-
-    # bins = np.arange(min_iter,51,1)
-    plt.hist(iterhist,bins=15,normed=False,histtype='bar',rwidth=0.7,log=True,label=legendhist)
-
-    # plt.xlim((min_iter-1,51))
-    plt.ylim((0,nruns))
-    plt.legend()
-    # print(bins)
-    # plt.xticks(bins+1.5,bins)
-
-    plt.xlabel('number of iterations')
-    plt.ylabel('number of runs')
-    # plt.title()
-
-    plt.tight_layout()
-
-    fname = 'iterations_MLSDC_histogram.png'
-
-    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    # fig, ax = plt.subplots(figsize=(10,10))
+    #
+    # # bins = np.arange(min_iter,51,1)
+    # plt.hist(iterhist,bins=15,normed=False,histtype='bar',rwidth=0.7,log=True,label=legendhist)
+    #
+    # # plt.xlim((min_iter-1,51))
+    # plt.ylim((0,nruns))
+    # plt.legend()
+    # # print(bins)
+    # # plt.xticks(bins+1.5,bins)
+    #
+    # plt.xlabel('number of iterations')
+    # plt.ylabel('number of runs')
+    # # plt.title()
+    #
+    # plt.tight_layout()
+    #
+    # fname = 'iterations_MLSDC_histogram.png'
+    #
+    # plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
     plt.show()
 

@@ -38,11 +38,13 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.5
-    pparams['nvars'] = [255,127]
+    pparams['nvars'] = [255]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
     tparams['finter'] = True
+    tparams['iorder'] = 6
+    tparams['rorder'] = 2
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -106,7 +108,7 @@ if __name__ == "__main__":
     ft.soft_safety_factor = 10.0
     ft.soft_do_correction = True
 
-    nsim = 1000
+    nsim = 100
 
     for k in range(nsim):
 
@@ -155,12 +157,14 @@ if __name__ == "__main__":
     # fname = 'HEAT_MLSDC_soft_faults_nocorr_N1000.pkl'
     # fname = 'HEAT_MLSDC_soft_faults_corr1x_N1000.pkl'
     # fname = 'HEAT_MLSDC_soft_faults_corr5x_N1000.pkl'
-    fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
+    # fname = 'HEAT_MLSDC_soft_faults_corr10x_N1000.pkl'
 
     # fname = 'HEAT_SDC_soft_faults_nocorr_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr1x_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr5x_N1000.pkl'
     # fname = 'HEAT_SDC_soft_faults_corr10x_N1000.pkl'
+
+    fname = 'HEAT_SDC_soft_faults_test.pkl'
 
     pkl.dump(ft.soft_stats, open(fname,'wb'))
 
