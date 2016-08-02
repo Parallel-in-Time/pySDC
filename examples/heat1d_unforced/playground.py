@@ -5,8 +5,8 @@ import numpy as np
 
 from examples.heat1d_unforced.ProblemClass import heat1d_unforced
 from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
-# from pySDC.datatype_classes.mesh import mesh
-from pySDC.datatype_classes.complex_mesh import mesh
+from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.complex_mesh import mesh
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nu'] = 10
+    pparams['nu'] = 1
     pparams['nvars'] = [63]
     pparams['k'] = 2
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='LU')
+    swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='Qpar')
     swparams_coarse = {}
     swparams_coarse['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
     swparams['fixed_time_in_jacobian'] = 0
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     description['dtype_f'] = mesh
     description['collocation_class'] = cclass
     description['num_nodes'] = Nnodes
-    description['sweeper_class'] = generic_implicit
+    # description['sweeper_class'] = generic_implicit
     description['sweeper_class'] = linearized_implicit_fixed_parallel
     # description['sweeper_params'] = [swparams,swparams_coarse]
     description['sweeper_params'] = [swparams]

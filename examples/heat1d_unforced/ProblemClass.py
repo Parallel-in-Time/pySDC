@@ -4,8 +4,8 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
-# from pySDC.datatype_classes.mesh import mesh
-from pySDC.datatype_classes.complex_mesh import mesh
+from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.complex_mesh import mesh
 
 class heat1d_unforced(ptype):
     """

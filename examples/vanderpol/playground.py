@@ -41,7 +41,7 @@ if __name__ == "__main__":
     cclass = collclass.CollGaussRadau_Right
 
     swparams = {}
-    swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+    swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='IEpar')
     swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.1
+    dt = 20*0.1
     Tend = 2
 
     P = MS[0].levels[0].prob
