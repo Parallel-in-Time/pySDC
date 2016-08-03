@@ -16,9 +16,7 @@ if __name__ == "__main__":
               }
     plt.rcParams.update(params)
 
-    # file_list = ['fenics_heat_unforced_sdc.pkl', 'fenics_heat_unforced_mlsdc.pkl']
-    # file_list = ['fenics_heat_unforced_sdc_CG4.pkl', 'fenics_heat_unforced_mlsdc_CG4.pkl']
-    file_list = ['fenics_heat_unforced_sdc_CG2.pkl', 'fenics_heat_unforced_mlsdc_CG2.pkl']
+    file_list = ['fd_heat_unforced_sdc.pkl', 'fd_heat_unforced_mlsdc.pkl']
 
     for file in file_list:
 
@@ -52,18 +50,16 @@ if __name__ == "__main__":
         plt.ylabel('rel. error')
         plt.grid()
 
-        # Here are guides for checking the order in space and time.
-        # Currently, 2nd order in space and 5th order in time are fixed
-        # id = ID(c_nvars=c_nvars_list[0], dt=dt_list[-1])
-        # base_error = results[id][1]
-        # order_guide_time = [base_error/(2**(5*i))/5 for i in range(len(dt_list)-1,-1,-1)]
-        # plt.loglog(dt_list,order_guide_time,marker='', color='k', ls='--',label='5th order (time)')
-        #
-        # id = ID(c_nvars=c_nvars_list[0], dt=dt_list[1])
-        # base_error = results[id][1]
-        # order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(c_nvars_list))]
-        # xvars = [dt_list[1] for i in range(0, len(order_guide_space))]
-        # plt.plot(xvars, order_guide_space, marker='o', color='k', markersize=10, ls='--', label='2nd order (space)')
+        id = ID(c_nvars=c_nvars_list[0], dt=dt_list[-1])
+        base_error = results[id][1]
+        order_guide_time = [base_error/(2**(5*i))/5 for i in range(len(dt_list)-1,-1,-1)]
+        plt.loglog(dt_list,order_guide_time,marker='', color='k', ls='--',label='5th order (time)')
+
+        id = ID(c_nvars=c_nvars_list[0], dt=dt_list[1])
+        base_error = results[id][1]
+        order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(c_nvars_list))]
+        xvars = [dt_list[1] for i in range(0, len(order_guide_space))]
+        plt.plot(xvars, order_guide_space, marker='o', color='k', markersize=10, ls='--', label='2nd order (space)')
 
         min_err = 1E99
         max_err = 0E00
@@ -127,16 +123,14 @@ if __name__ == "__main__":
             niter_list.append(niter_mean)
             xvars.append(dt)
 
-        plt.errorbar(xvars,niter_list,yerr=[niter_lower,niter_upper], elinewidth=2, ecolor='r', capthick=2, capsize=6, label='mean niter and deviation')
+        plt.errorbar(xvars,niter_list,yerr=[niter_lower,niter_upper])#, label=c_nvars)
 
 
         plt.ylim([min_niter-1, max_niter+1])
         plt.xscale('log')
-        plt.legend(loc=2, ncol=2, numpoints=1)
-
         fname = 'niter_' + filename + '.pdf'
         plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
-
+        # plt.legend(loc=2, ncol=2, numpoints=1)
 
     # plt.show()

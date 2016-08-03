@@ -1,16 +1,14 @@
 
 from pySDC import CollocationClasses as collclass
 
-from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh
-from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
+from examples.heat1d.ProblemClass_unforced import heat1d_unforced
+from pySDC.datatype_classes.mesh import mesh
+from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.sweeper_classes.generic_LU import generic_LU
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
-
-import dolfin as df
 
 from collections import namedtuple
 import pickle
@@ -19,7 +17,7 @@ import pickle
 
 if __name__ == "__main__":
 
-    ID = namedtuple('ID', ['c_nvars', 'dt'])
+    ID = namedtuple('ID', ['nvars', 'dt'])
 
     # set global logger (remove this if you do not want the output at all)
     # logger = Log.setup_custom_logger('root')
@@ -39,44 +37,44 @@ if __name__ == "__main__":
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
 
-    # This comes as read-in for the transfer operations
-    tparams = {}
-    tparams['finter'] = False
-
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 0.1
     pparams['k'] = 1
-    pparams['family'] = 'CG'
-    pparams['order'] = [2]
-    pparams['refinements'] = [1,0]
+
+    # This comes as read-in for the transfer operations (this is optional!)
+    tparams = {}
+    tparams['finter'] = False
+    tparams['iorder'] = 6
+    tparams['rorder'] = 2
 
     # setup parameters "in time"
     t0 = 0.0
     Tend = 2.0
 
     dt_list = [Tend/(2**i) for i in range(0,7,1)]
-    c_nvars_list = [2**i for i in range(2,7)]
-    # dt_list = [2.0]
-    # c_nvars_list = [512]
+    # nvars_list = [2**i-1 for i in range(8,14)]
+    nvars_list = [[2**i-1, 2**(i-1)-1] for i in range(8, 14)]
+    # dt_list = [2.0,1.0]
+    # nvars_list = [511]
 
     results = {}
     # results['description'] = (pparams,swparams)
 
-    for c_nvars in c_nvars_list:
+    for nvars in nvars_list:
 
-        pparams['c_nvars'] = c_nvars
+        pparams['nvars'] = nvars
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
-        description['problem_class'] = fenics_heat_unforced
+        description['problem_class'] = heat1d_unforced
         description['problem_params'] = pparams
-        description['dtype_u'] = fenics_mesh
-        description['dtype_f'] = fenics_mesh
+        description['dtype_u'] = mesh
+        description['dtype_f'] = mesh
         description['sweeper_class'] = generic_LU
         description['sweeper_params'] = swparams
         description['level_params'] = lparams
-        description['transfer_class'] = mesh_to_mesh_fenics
+        description['transfer_class'] = mesh_to_mesh_1d
         description['transfer_params'] = tparams
 
         # quickly generate block of steps
@@ -91,24 +89,26 @@ if __name__ == "__main__":
 
         for dt in dt_list:
 
-            print('Working on: c_nvars = %s, dt = %s' %(c_nvars,dt))
+            print('Working on: c_nvars = %s, dt = %s' %(nvars,dt))
 
             # call main function to get things done...
             uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
-            err_classical_rel = abs(uex-uend)/abs(uex)
-            err_fenics = df.errornorm(uex.values,uend.values)
+            err_rel = abs(uex-uend)/abs(uex)
 
-            print('(classical/fenics) error at time %s: %s / %s' % (Tend,err_classical_rel,err_fenics))
+            print('error at time %s: %s' % (Tend,err_rel))
 
             extract_stats = grep_stats(stats, level=-1, type='niter')
             sortedlist_stats = sort_stats(extract_stats, sortby='step')
             niter = sortedlist_stats[0][1]
-            print('niter = %s' %niter)
 
-            id = ID(c_nvars=c_nvars, dt=dt)
-            results[id] = (niter,err_classical_rel,err_fenics)
-            file = open('fenics_heat_unforced_mlsdc_CG2.pkl', 'wb')
+            if type(nvars) is list:
+                id = ID(nvars=nvars[0], dt=dt)
+            else:
+                id = ID(nvars=nvars, dt=dt)
+            results[id] = (niter,err_rel)
+            # file = open('fd_heat_unforced_sdc.pkl', 'wb')
+            file = open('fd_heat_unforced_mlsdc.pkl', 'wb')
             pickle.dump(results, file)
 
     print(results)
