@@ -34,31 +34,38 @@ if __name__ == "__main__":
     sparams = {}
     sparams['maxiter'] = 20
 
+    # This comes as read-in for the sweeper class
+    swparams = {}
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['num_nodes'] = 3
+
     # This comes as read-in for the transfer operations
     tparams = {}
     tparams['finter'] = False
+
+    # This comes as read-in for the problem class
+    pparams = {}
+    pparams['nu'] = 0.1
+    pparams['k'] = 1
+    pparams['family'] = 'CG'
+    pparams['order'] = [1]
+    pparams['refinements'] = [1,0]
 
     # setup parameters "in time"
     t0 = 0.0
     Tend = 2.0
 
-    dt_list = [Tend/(2**i) for i in range(0,9,1)]
+    dt_list = [Tend/(2**i) for i in range(0,8,1)]
     c_nvars_list = [2**i for i in range(8,14)]
     # dt_list = [2.0]
     # c_nvars_list = [512]
 
     results = {}
+    # results['description'] = (pparams,swparams)
 
     for c_nvars in c_nvars_list:
 
-        # This comes as read-in for the problem class
-        pparams = {}
-        pparams['nu'] = 0.1
-        pparams['k'] = 1
         pparams['c_nvars'] = c_nvars
-        pparams['family'] = 'CG'
-        pparams['order'] = [1]
-        pparams['refinements'] = [1]
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
@@ -66,9 +73,8 @@ if __name__ == "__main__":
         description['problem_params'] = pparams
         description['dtype_u'] = fenics_mesh
         description['dtype_f'] = fenics_mesh
-        description['collocation_class'] = collclass.CollGaussRadau_Right
-        description['num_nodes'] = 3
         description['sweeper_class'] = generic_LU
+        description['sweeper_params'] = swparams
         description['level_params'] = lparams
         description['transfer_class'] = mesh_to_mesh_fenics
         description['transfer_params'] = tparams
@@ -101,10 +107,12 @@ if __name__ == "__main__":
 
             id = ID(c_nvars=c_nvars, dt=dt)
             results[id] = (niter,err_classical_rel,err_fenics)
+            file = open('fenics_heat_unforced_mlsdc.pkl', 'wb')
+            pickle.dump(results, file)
 
     print(results)
-    file = open('fenics_heat_unforced_sdc.pkl', 'wb')
-    pickle.dump(results, file)
+    # file = open('fenics_heat_unforced_sdc.pkl', 'wb')
+    # pickle.dump(results, file)
 
 
 
