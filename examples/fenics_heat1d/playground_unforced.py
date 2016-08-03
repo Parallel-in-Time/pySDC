@@ -11,79 +11,106 @@ from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
 import dolfin as df
-import numpy as np
+
+from collections import namedtuple
+import pickle
+
 
 
 if __name__ == "__main__":
 
+    ID = namedtuple('ID', ['c_nvars', 'dt'])
+
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+    # logger = Log.setup_custom_logger('root')
 
     num_procs = 1
-
-    # assert num_procs == 1,'turn on predictor!'
 
     # This comes as read-in for the level class
     lparams = {}
     lparams['restol'] = 5E-09
 
+    # This comes as read-in for the steps
     sparams = {}
     sparams['maxiter'] = 20
 
-    # This comes as read-in for the problem class
-    pparams = {}
-    pparams['nu'] = 0.1
-    pparams['k'] = 1
-    pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    pparams['c_nvars'] = [512]
-    pparams['family'] = 'CG'
-    pparams['order'] = [1]
-    pparams['refinements'] = [1]
-
-
     # This comes as read-in for the transfer operations
     tparams = {}
-    tparams['finter'] = True
-
-    # Fill description dictionary for easy hierarchy creation
-    description = {}
-    description['problem_class'] = fenics_heat_unforced
-    description['problem_params'] = pparams
-    description['dtype_u'] = fenics_mesh
-    description['dtype_f'] = fenics_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
-    description['num_nodes'] = 3
-    description['sweeper_class'] = generic_LU
-    description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_fenics
-    description['transfer_params'] = tparams
-
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    tparams['finter'] = False
 
     # setup parameters "in time"
-    t0 = MS[0].levels[0].prob.t0
-    dt = 0.5
-    Tend = 1*dt
+    t0 = 0.0
+    Tend = 2.0
 
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
+    dt_list = [Tend/(2**i) for i in range(0,9,1)]
+    c_nvars_list = [2**i for i in range(8,14)]
+    # dt_list = [2.0]
+    # c_nvars_list = [512]
 
-    # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    results = {}
 
-    # df.plot(uend.values,interactive=True)
+    for c_nvars in c_nvars_list:
 
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
+        # This comes as read-in for the problem class
+        pparams = {}
+        pparams['nu'] = 0.1
+        pparams['k'] = 1
+        pparams['c_nvars'] = c_nvars
+        pparams['family'] = 'CG'
+        pparams['order'] = [1]
+        pparams['refinements'] = [1]
 
-    print('(classical) error at time %s: %s' %(Tend,abs(uex-uend)/abs(uex)))
+        # Fill description dictionary for easy hierarchy creation
+        description = {}
+        description['problem_class'] = fenics_heat_unforced
+        description['problem_params'] = pparams
+        description['dtype_u'] = fenics_mesh
+        description['dtype_f'] = fenics_mesh
+        description['collocation_class'] = collclass.CollGaussRadau_Right
+        description['num_nodes'] = 3
+        description['sweeper_class'] = generic_LU
+        description['level_params'] = lparams
+        description['transfer_class'] = mesh_to_mesh_fenics
+        description['transfer_params'] = tparams
+
+        # quickly generate block of steps
+        MS = mp.generate_steps(num_procs, sparams, description)
+
+        # get initial values on finest level
+        P = MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
+
+        # compute exact solution to compare
+        uex = P.u_exact(Tend)
+
+        for dt in dt_list:
+
+            print('Working on: c_nvars = %s, dt = %s' %(c_nvars,dt))
+
+            # call main function to get things done...
+            uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
+
+            err_classical_rel = abs(uex-uend)/abs(uex)
+            err_fenics = df.errornorm(uex.values,uend.values)
+
+            print('(classical/fenics) error at time %s: %s / %s' % (Tend,err_classical_rel,err_fenics))
+
+            extract_stats = grep_stats(stats, level=-1, type='niter')
+            sortedlist_stats = sort_stats(extract_stats, sortby='step')
+            niter = sortedlist_stats[0][1]
+
+            id = ID(c_nvars=c_nvars, dt=dt)
+            results[id] = (niter,err_classical_rel,err_fenics)
+
+    print(results)
+    file = open('fenics_heat_unforced_sdc.pkl', 'wb')
+    pickle.dump(results, file)
 
 
-    uex = df.Expression('sin(a*x[0]) * cos(t)',a=np.pi,t=Tend)
-    print('(fenics-style) error at time %s: %s' %(Tend,df.errornorm(uex,uend.values)))
 
-    extract_stats = grep_stats(stats,iter=-1,type='residual')
-    sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    print(extract_stats,sortedlist_stats)
+
+
+
+
+
+

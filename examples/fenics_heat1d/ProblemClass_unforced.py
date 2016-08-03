@@ -34,7 +34,6 @@ class fenics_heat_unforced(ptype):
         # these parameters will be used later, so assert their existence
         assert 'c_nvars' in cparams
         assert 'nu' in cparams
-        assert 't0' in cparams
         assert 'family' in cparams
         assert 'order' in cparams
         assert 'refinements' in cparams
