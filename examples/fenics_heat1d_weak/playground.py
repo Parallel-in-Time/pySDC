@@ -2,7 +2,7 @@
 from pySDC import CollocationClasses as collclass
 
 from examples.fenics_heat1d_weak.ProblemClass import fenics_heat
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh
 from examples.fenics_heat1d_weak.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.generic_LU import generic_LU
 import pySDC.PFASST_blockwise as mp

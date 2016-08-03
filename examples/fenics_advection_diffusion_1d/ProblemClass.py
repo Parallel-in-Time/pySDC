@@ -103,6 +103,7 @@ class fenics_adv_diff_1d(ptype):
 
         A = self.M - factor*self.K
         b = fenics_mesh(rhs)
+        b = self.__apply_mass_matrix(b)
 
         u = fenics_mesh(u0)
         df.solve(A,u.values.vector(),b.values.vector())
@@ -165,7 +166,7 @@ class fenics_adv_diff_1d(ptype):
         return f
 
 
-    def apply_mass_matrix(self,u):
+    def __apply_mass_matrix(self,u):
         """
         Routine to apply mass matrix
 

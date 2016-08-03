@@ -95,6 +95,7 @@ class fenics_heat(ptype):
 
         A = self.M - factor*self.K
         b = fenics_mesh(rhs)
+        b = self.__apply_mass_matrix(b)
 
         self.bc.apply(A,b.values.vector())
 
@@ -159,7 +160,7 @@ class fenics_heat(ptype):
         return f
 
 
-    def apply_mass_matrix(self,u):
+    def __apply_mass_matrix(self,u):
         """
         Routine to apply mass matrix
 

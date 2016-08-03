@@ -22,8 +22,6 @@ ToDo list
 
 * add temporal coarsening
 
-* remove mass_matrix sweeper, since this can all be done within solve_system 
-
 * full weak formulation for finite element examples?
 
 * one matrix to rule them all: can we extract the very costly matrix buildups? 

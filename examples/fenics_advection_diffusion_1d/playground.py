@@ -4,7 +4,7 @@ from pySDC import CollocationClasses as collclass
 from examples.fenics_advection_diffusion_1d.ProblemClass import fenics_adv_diff_1d
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 1
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     description['dtype_f'] = rhs_fenics_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 3
-    description['sweeper_class'] = mass_matrix_imex
+    description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams

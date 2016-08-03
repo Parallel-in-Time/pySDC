@@ -115,6 +115,7 @@ class fenics_vortex_2d(ptype):
 
         A = self.M + self.nu*factor*self.K
         b = fenics_mesh(rhs)
+        b = self.__apply_mass_matrix(b)
 
         u = fenics_mesh(u0)
         df.solve(A,u.values.vector(),b.values.vector())
@@ -136,7 +137,7 @@ class fenics_vortex_2d(ptype):
 
 
         A = 1.0*self.K
-        b = self.apply_mass_matrix(u)
+        b = self.__apply_mass_matrix(u)
         psi = fenics_mesh(self.V)
         df.solve(A,psi.values.vector(),b.values.vector())
 
@@ -183,7 +184,7 @@ class fenics_vortex_2d(ptype):
         return f
 
 
-    def apply_mass_matrix(self,u):
+    def __apply_mass_matrix(self,u):
         """
         Routine to apply mass matrix
 

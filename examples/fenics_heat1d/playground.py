@@ -4,7 +4,7 @@ from pySDC import CollocationClasses as collclass
 from examples.fenics_heat1d.ProblemClass import fenics_heat
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.mass_matrix_imex import mass_matrix_imex
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 8
+    num_procs = 1
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
     # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [512]
+    pparams['c_nvars'] = [128]
     pparams['family'] = 'CG'
     pparams['order'] = [1]
     pparams['refinements'] = [1,0]
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     description['dtype_f'] = rhs_fenics_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 3
-    description['sweeper_class'] = mass_matrix_imex
+    description['sweeper_class'] = imex_1st_order
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = MS[0].levels[0].prob.t0
     dt = 0.5
-    Tend = 8*dt
+    Tend = 1*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
