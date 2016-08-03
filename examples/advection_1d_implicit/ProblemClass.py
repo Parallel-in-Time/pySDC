@@ -44,7 +44,7 @@ class advection(ptype):
         # compute dx and get discretization matrix A
         self.mesh = np.linspace(0, 1, num=self.nvars, endpoint=False)
         self.dx   = self.mesh[1] - self.mesh[0]
-        self.A    = -getFDMatrix(self.nvars, self.order, self.dx)
+        self.A    = -self.c*getFDMatrix(self.nvars, self.order, self.dx)
     
     def solve_system(self,rhs,factor,u0,t):
         """
@@ -64,22 +64,6 @@ class advection(ptype):
         me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
         return me
 
-
-    def __eval_fexpl(self,u,t):
-        """
-        Helper routine to evaluate the explicit part of the RHS
-
-        Args:
-            u: current values (not used here)
-            t: current time
-
-        Returns:
-            explicit part of RHS
-        """
-
-        fexpl        = mesh(self.nvars)
-        fexpl.values = 0.0*self.mesh
-        return fexpl
 
     def __eval_fimpl(self,u,t):
         """
@@ -110,9 +94,8 @@ class advection(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_imex_mesh(self.nvars)
-        f.impl = self.__eval_fimpl(u,t)
-        f.expl = self.__eval_fexpl(u,t)
+        f = mesh(self.nvars)
+        f.values = self.A.dot(u.values)
         return f
 
 

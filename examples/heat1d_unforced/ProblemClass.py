@@ -4,11 +4,12 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.datatype_classes.mesh import mesh
+# from pySDC.datatype_classes.complex_mesh import mesh
 
-class heat1d(ptype):
+class heat1d_unforced(ptype):
     """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
+    Example implementing the unforced 1D heat equation with Dirichlet-0 BC in [0,1]
 
     Attributes:
         A: second-order FD discretization of the 1D laplace operator
@@ -22,12 +23,13 @@ class heat1d(ptype):
         Args:
             cparams: custom parameters for the example
             dtype_u: mesh data type (will be passed parent class)
-            dtype_f: rhs mesh data type (will be passed parent class)
+            dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
         assert 'nvars' in cparams
         assert 'nu' in cparams
+        assert 'k' in cparams
 
         assert (cparams['nvars']+1)%2 == 0
 
@@ -36,7 +38,7 @@ class heat1d(ptype):
             setattr(self,k,v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(heat1d_unforced,self).__init__(self.nvars,dtype_u,dtype_f)
 
         # compute dx and get discretization matrix A
         self.dx = 1/(self.nvars + 1)
@@ -81,55 +83,20 @@ class heat1d(ptype):
         return me
 
 
-    def __eval_fexpl(self,u,t):
-        """
-        Helper routine to evaluate the explicit part of the RHS
-
-        Args:
-            u: current values (not used here)
-            t: current time
-
-        Returns:
-            explicit part of RHS
-        """
-
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
-        fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
-        return fexpl
-
-    def __eval_fimpl(self,u,t):
-        """
-        Helper routine to evaluate the implicit part of the RHS
-
-        Args:
-            u: current values
-            t: current time (not used here)
-
-        Returns:
-            implicit part of RHS
-        """
-
-        fimpl = mesh(self.nvars)
-        fimpl.values = self.A.dot(u.values)
-        return fimpl
-
-
     def eval_f(self,u,t):
         """
-        Routine to evaluate both parts of the RHS
+        Routine to evaluate the RHS
 
         Args:
             u: current values
             t: current time
 
         Returns:
-            the RHS divided into two parts
+            the RHS
         """
 
-        f = rhs_imex_mesh(self.nvars)
-        f.impl = self.__eval_fimpl(u,t)
-        f.expl = self.__eval_fexpl(u,t)
+        f = mesh(self.nvars)
+        f.values = self.A.dot(u.values)
         return f
 
 
@@ -146,5 +113,31 @@ class heat1d(ptype):
 
         me = mesh(self.nvars)
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*xvalues)*np.cos(t)
+        me.values = np.sin(np.pi*self.k*xvalues)*np.exp(-t*self.nu*(np.pi*self.k)**2)
+        return me
+
+
+    def eval_jacobian(self, u):
+
+        dfdu = self.A
+        return dfdu
+
+
+    def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-dtA)u = rhs
+
+        Args:
+            dfdu: the Jacobian of the RHS of the ODE
+            rhs: right-hand side for the linear system
+            factor: abbrev. for the node-to-node stepsize (or any other factor required)
+            u0: initial guess for the iterative solver (not used here so far)
+            t: current time (e.g. for time-dependent BCs)
+
+        Returns:
+            solution as mesh
+        """
+
+        me = mesh(self.nvars)
+        me.values = LA.spsolve(sp.eye(self.nvars) - factor * dfdu, rhs.values)
         return me

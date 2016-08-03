@@ -6,7 +6,7 @@ from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 import pySDC.Plugins.transfer_helper as th
 
 # FIXME: extend this to ndarrays
-class mesh_to_mesh_1d_periodic(transfer):
+class mesh_to_mesh_1d(transfer):
     """
     Custon transfer class, implements Transfer.py
 
@@ -31,10 +31,10 @@ class mesh_to_mesh_1d_periodic(transfer):
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level,params)
+        super(mesh_to_mesh_1d,self).__init__(fine_level,coarse_level,params)
 
-        fine_grid = np.array([i * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
-        coarse_grid = np.array([i * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
+        fine_grid = np.array([(i + 1) * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
+        coarse_grid = np.array([(i + 1) * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_c == self.init_f:
@@ -44,20 +44,19 @@ class mesh_to_mesh_1d_periodic(transfer):
 
             if params['rorder'] == 1:
 
-                self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=1, periodic=True)
+                self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=1).T
 
             else:
 
-                self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['rorder'], periodic=True).T
+                self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['rorder']).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
             self.Pspace = np.eye(self.init_f)
+        # assemble 7th-order prolongation by hand
         else:
-            self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['iorder'], periodic=True)
-        # print(self.Rspace.todense())
-        # print(self.Pspace.todense())
-        # exit()
+            self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['iorder'])
+
         pass
 
 
