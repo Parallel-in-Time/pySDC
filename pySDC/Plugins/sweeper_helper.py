@@ -2,8 +2,7 @@ import scipy.linalg as LA
 import numpy as np
 
 
-def get_Qd(cclass, Nnodes, qd_type):
-    coll = cclass(Nnodes,0,1)
+def get_Qd(coll, Nnodes, qd_type):
     QDmat = np.zeros(coll.Qmat.shape)
     if qd_type == 'LU':
         QT = coll.Qmat[1:,1:].T

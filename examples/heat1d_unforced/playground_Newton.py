@@ -8,7 +8,6 @@ from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh
 # from pySDC.datatype_classes.complex_mesh import mesh
 from pySDC.sweeper_classes.generic_implicit import generic_implicit
-from examples.heat1d_unforced.HookClass import error_output
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
@@ -25,7 +24,7 @@ from pySDC.Plugins.visualization_tools import show_residual_across_simulation
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    # logger = Log.setup_custom_logger('root')
+    logger = Log.setup_custom_logger('root')
 
     num_procs = 1
 
@@ -36,12 +35,13 @@ if __name__ == "__main__":
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
     sparams['maxiter'] = 20
+    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1
-    pparams['nvars'] = [31]
-    pparams['k'] = 1
+    pparams['nvars'] = [63]
+    pparams['k'] = 2
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -49,11 +49,16 @@ if __name__ == "__main__":
     tparams['iorder'] = 2
     tparams['rorder'] = 1
 
+    Nnodes = 5
+    cclass = collclass.CollGaussRadau_Right
+
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['QI'] = 'LU'
-    swparams['collocation_class'] = collclass.CollGaussRadau_Right
-    swparams['num_nodes'] = 5
+    swparams['QI'] = 'Qpar'
+    swparams_coarse = {}
+    swparams_coarse['QI'] = 'LU'
+    swparams['fixed_time_in_jacobian'] = 0
+    swparams_coarse['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -61,19 +66,22 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = mesh
-    description['sweeper_class'] = generic_implicit
-    description['sweeper_params'] = swparams
+    description['collocation_class'] = cclass
+    description['num_nodes'] = Nnodes
+    # description['sweeper_class'] = generic_implicit
+    description['sweeper_class'] = linearized_implicit_fixed_parallel
+    description['sweeper_params'] = [swparams,swparams_coarse]
+    # description['sweeper_params'] = [swparams]
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
-    description['hook_class'] = error_output
 
     # quickly generate block of steps
     MS = mp.generate_steps(num_procs,sparams,description)
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.5
+    dt = 0.1
     Tend = num_procs*dt
 
     # get initial values on finest level

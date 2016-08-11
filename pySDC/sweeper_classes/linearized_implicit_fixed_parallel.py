@@ -29,8 +29,8 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
 
         assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes+1)
 
-        self.D, self.V = np.linalg.eig(self.coll.Qmat[1:,1:])
-        # self.D, self.V = np.linalg.eig(self.QI[1:, 1:])
+        # self.D, self.V = np.linalg.eig(self.coll.Qmat[1:,1:])
+        self.D, self.V = np.linalg.eig(self.QI[1:, 1:])
         self.Vi = np.linalg.inv(self.V)
 
     def update_nodes(self):

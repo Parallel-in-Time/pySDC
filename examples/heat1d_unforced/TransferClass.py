@@ -53,7 +53,6 @@ class mesh_to_mesh_1d(transfer):
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
             self.Pspace = np.eye(self.init_f)
-        # assemble 7th-order prolongation by hand
         else:
             self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['iorder'])
 
