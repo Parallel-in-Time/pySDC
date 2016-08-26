@@ -12,6 +12,8 @@ import pySDC.PFASST_stepwise as mp
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 
+from standard_integrators import bdf2, dirk, trapezoidal, rk_imex
+
 from matplotlib import pyplot as plt
 
 
@@ -66,9 +68,9 @@ if __name__ == "__main__":
       Tend = 1.0
       
       if order==3:
-        file = open('conv-data.txt', 'w')
+        file = open('conv-data-rk.txt', 'w')
       else:
-        file = open('conv-data.txt', 'a')
+        file = open('conv-data-rk.txt', 'a')
 
       ### SET NUMBER OF NODES DEPENDING ON REQUESTED ORDER ###
       if order==3:
@@ -95,34 +97,24 @@ if __name__ == "__main__":
 
         # get initial values on finest level
         P = MS[0].levels[0].prob
+        rkimex = rk_imex(P.A.astype('complex'), P.Dx.astype('complex'), order)
+      
         uinit = P.u_exact(t0)
+        y0 = np.concatenate( (uinit.values[0,:], uinit.values[1,:]) )
+        y0 = y0.astype('complex')
         if ii==0:
           print "Time step: %4.2f" % dt
           print "Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx) 
           print "Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx) 
 
         # call main function to get things done...
-        uend,stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
+        for n in range(int(ns)):
+          y0 = rkimex.timestep(y0, dt)
 
         # compute exact solution and compare
         uex = P.u_exact(Tend)
-
-        error[ii] = np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(uex.values,np.inf)
+        uend = np.split(y0, 2)
+        error[ii] = np.linalg.norm(uex.values-uend,np.inf)/np.linalg.norm(uex.values,np.inf)
         file.write(str(order)+"    "+str(ns)+"    "+str(error[ii])+"\n")
 
       file.close()
-
-    if np.shape(nsteps)[1]==1:
-      fig = plt.figure(figsize=(8,8))
-
-      plt.plot(P.mesh, uex.values[0,:],  '+', color='b', label='u (exact)')
-      plt.plot(P.mesh, uend.values[0,:], '-', color='b', label='u (SDC)')
-      plt.plot(P.mesh, uex.values[1,:],  '+', color='r', label='p (exact)')
-      plt.plot(P.mesh, uend.values[1,:], '-', color='r', label='p (SDC)')
-      plt.legend()
-      plt.xlim([0.0, 1.0])
-      plt.ylim([-1.0, 1.0])
-      plt.show()
-    else:
-      for ii in range(0,np.shape(nsteps)[1]):
-        print('error for nsteps= %s: %s' % (nsteps[order-3,ii], error[ii]))
