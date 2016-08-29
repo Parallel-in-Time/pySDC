@@ -8,7 +8,7 @@ import numpy as np
 t_start  = np.random.rand(1)*0.2
 t_end    = 0.8 + np.random.rand(1)*0.2
 
-classes  = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12], ["CollGaussRadau_Left", 2, 12] ]
+classes  = [ ["CollGaussLegendre", 2, 12], ["CollGaussLobatto", 2, 12], ["CollGaussRadau_Right", 2, 12], ["CollGaussRadau_Left", 2, 12], ["EquidistantInner", 2, 12], ["EquidistantNoLeft", 2, 12] ]
 
 class TestCollocation:
 
@@ -23,7 +23,6 @@ class TestCollocation:
         # some basic consistency tests
         assert np.size(coll.nodes)==np.size(coll.weights), "For node type " + type[0] + ", number of entries in nodes and weights is different"
         assert np.size(coll.nodes)==M, "For node type " + type[0] + ", requesting M nodes did not produce M entries in nodes and weights"
-
 
         # generate random set of polynomial coefficients
         poly_coeff = np.random.rand(coll.order-1)
