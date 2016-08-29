@@ -259,7 +259,7 @@ class EquidistantNoLeft(CollBase):
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
         self.left_is_node = False
-        self.right_is_node = False
+        self.right_is_node = True
 
     @property
     def _getNodes(self):
