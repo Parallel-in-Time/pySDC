@@ -5,6 +5,7 @@ from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
 from pySDC.datatype_classes.fenics_mesh import fenics_mesh
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC.sweeper_classes.generic_LU import generic_LU
+from pySDC.sweeper_classes.generic_implicit import generic_implicit
 import pySDC.PFASST_blockwise as mp
 # import pySDC.PFASST_stepwise as mp
 from pySDC import Log
@@ -14,6 +15,7 @@ import dolfin as df
 
 from collections import namedtuple
 import pickle
+from pySDC.Plugins.sweeper_helper import get_Qd
 
 
 
@@ -38,6 +40,7 @@ if __name__ == "__main__":
     swparams = {}
     swparams['collocation_class'] = collclass.CollGaussRadau_Right
     swparams['num_nodes'] = 3
+    swparams['QI'] = 'LU'
 
     # This comes as read-in for the transfer operations
     tparams = {}
@@ -48,17 +51,17 @@ if __name__ == "__main__":
     pparams['nu'] = 0.1
     pparams['k'] = 1
     pparams['family'] = 'CG'
-    pparams['order'] = [2]
+    pparams['order'] = [1]
     pparams['refinements'] = [1,0]
 
     # setup parameters "in time"
     t0 = 0.0
     Tend = 2.0
 
-    dt_list = [Tend/(2**i) for i in range(0,7,1)]
-    c_nvars_list = [2**i for i in range(2,7)]
-    # dt_list = [2.0]
-    # c_nvars_list = [512]
+    # dt_list = [Tend/(2**i) for i in range(0,7,1)]
+    # c_nvars_list = [2**i for i in range(2,7)]
+    dt_list = [0.1]
+    c_nvars_list = [256]
 
     results = {}
     # results['description'] = (pparams,swparams)
@@ -73,7 +76,7 @@ if __name__ == "__main__":
         description['problem_params'] = pparams
         description['dtype_u'] = fenics_mesh
         description['dtype_f'] = fenics_mesh
-        description['sweeper_class'] = generic_LU
+        description['sweeper_class'] = generic_implicit
         description['sweeper_params'] = swparams
         description['level_params'] = lparams
         description['transfer_class'] = mesh_to_mesh_fenics
