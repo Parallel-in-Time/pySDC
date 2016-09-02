@@ -1,22 +1,13 @@
-
-from pySDC import CollocationClasses as collclass
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
+import pySDC.deprecated.PFASST_blockwise_old as mp
 from examples.generalized_fisher.ProblemClass import generalized_fisher
-from pySDC.datatype_classes.mesh import mesh
-# from pySDC.datatype_classes.complex_mesh import mesh
-from pySDC.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
-from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
-# import pySDC.Methods as mp
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
-# from pySDC.Stats import grep_stats, sort_stats
-
 from pySDC.Plugins.sweeper_helper import get_Qd
+from pySDC.datatype_classes.mesh import mesh
+from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 
 
 

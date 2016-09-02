@@ -1,24 +1,16 @@
-from pySDC import CollocationClasses as collclass
+import pickle
+from collections import namedtuple
 
-import numpy as np
-
-from examples.heat1d_unforced.ProblemClass import heat1d_unforced
-from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
+import pySDC.deprecated.PFASST_blockwise_old as mp
 from examples.advection_1d_implicit.ProblemClass import advection
 from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
-from pySDC.datatype_classes.mesh import mesh
-
-
-from pySDC.sweeper_classes.generic_implicit import generic_implicit
-import pySDC.PFASST_blockwise as mp
-
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
+from examples.heat1d_unforced.ProblemClass import heat1d_unforced
+from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
+from pySDC import CollocationClasses as collclass
 from pySDC.Plugins.sweeper_helper import get_Qd
-
-from collections import namedtuple
-import pickle
+from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.mesh import mesh
+from pySDC.sweeper_classes.generic_implicit import generic_implicit
 
 if __name__ == "__main__":
 

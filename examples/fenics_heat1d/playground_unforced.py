@@ -1,23 +1,15 @@
-
-from pySDC import CollocationClasses as collclass
-
-from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh
-from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.sweeper_classes.generic_implicit import generic_implicit
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
+import pickle
+from collections import namedtuple
 
 import dolfin as df
 
-from collections import namedtuple
-import pickle
-from pySDC.Plugins.sweeper_helper import get_Qd
-
-
+import pySDC.deprecated.PFASST_blockwise_old as mp
+from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
+from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
+from pySDC import CollocationClasses as collclass
+from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.sweeper_classes.generic_implicit import generic_implicit
 
 if __name__ == "__main__":
 

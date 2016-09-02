@@ -1,14 +1,21 @@
+
+from pySDC import CollocationClasses as collclass
+
+from examples.fenics_heat1d.ProblemClass import fenics_heat
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
+from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_blockwise_parallel as mp
+# import pySDC.PFASST_stepwise as mp
+from pySDC import Log
+from pySDC.Stats import grep_stats, sort_stats
+
 import dolfin as df
 import numpy as np
 
-import pySDC.deprecated.PFASST_blockwise_old as mp
-from examples.fenics_heat1d.ProblemClass import fenics_heat
-from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
-from pySDC import CollocationClasses as collclass
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
+from mpi4py import MPI
+from pySDC.Step import step
 
 
 if __name__ == "__main__":
@@ -16,7 +23,11 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
+
+    num_procs = 4
 
     # assert num_procs == 1,'turn on predictor!'
 
@@ -55,20 +66,19 @@ if __name__ == "__main__":
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
 
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
-
     # setup parameters "in time"
-    t0 = MS[0].levels[0].prob.t0
+    t0 = 0
     dt = 0.5
-    Tend = 1*dt
+    Tend = num_procs * dt
 
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
+    # quickly generate block of steps
+    S = step(sparams)
+    S.generate_hierarchy(description)
+
+    P = S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = mp.run_pfasst(S, uinit, t0, dt, Tend, comm)
 
     # df.plot(uend.values,interactive=True)
 

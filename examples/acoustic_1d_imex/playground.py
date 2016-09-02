@@ -1,21 +1,13 @@
-
-from pySDC import CollocationClasses as collclass
-
 import numpy as np
+from matplotlib import pyplot as plt
 
+import pySDC.deprecated.PFASST_stepwise as mp
 from ProblemClass import acoustic_1d_imex
 from examples.acoustic_1d_imex.HookClass import plot_solution
-
+from pySDC import CollocationClasses as collclass
+from pySDC import Log
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_stepwise as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-# Sharpclaw imports
-#from clawpack import pyclaw
-#from clawpack import riemann
-from matplotlib import pyplot as plt
 
 
 if __name__ == "__main__":

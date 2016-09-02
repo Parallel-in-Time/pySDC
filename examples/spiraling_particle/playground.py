@@ -1,18 +1,16 @@
 from __future__ import division
-from subprocess import call
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rc
+import numpy as np
 
-from pySDC import CollocationClasses as collclass
-from examples.spiraling_particle.ProblemClass import planewave_single
-from pySDC.datatype_classes.particles import particles, fields
-from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
+import pySDC.deprecated.PFASST_stepwise as mp
 from examples.spiraling_particle.HookClass import particles_output
-import pySDC.PFASST_stepwise as mp
+from examples.spiraling_particle.ProblemClass import planewave_single
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.particles import particles, fields
+from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 
 
 if __name__ == "__main__":

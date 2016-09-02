@@ -1,19 +1,11 @@
-
-from pySDC import CollocationClasses as collclass
-
-from examples.fenics_grayscott.ProblemClass import fenics_grayscott
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh
-from examples.fenics_grayscott.TransferClass import mesh_to_mesh_fenics
+import pySDC.deprecated.PFASST_blockwise_old as mp
 from examples.fenics_grayscott.HookClass import fenics_output
-from pySDC.sweeper_classes.generic_LU import generic_LU
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+from examples.fenics_grayscott.ProblemClass import fenics_grayscott
+from examples.fenics_grayscott.TransferClass import mesh_to_mesh_fenics
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-import dolfin as df
-import numpy as np
-
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.sweeper_classes.generic_LU import generic_LU
 
 if __name__ == "__main__":
 

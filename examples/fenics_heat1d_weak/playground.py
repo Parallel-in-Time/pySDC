@@ -1,18 +1,10 @@
-
-from pySDC import CollocationClasses as collclass
-
+import pySDC.deprecated.PFASST_blockwise_old as mp
 from examples.fenics_heat1d_weak.ProblemClass import fenics_heat
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh
 from examples.fenics_heat1d_weak.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.generic_LU import generic_LU
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-import dolfin as df
-import numpy as np
-
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.sweeper_classes.generic_LU import generic_LU
 
 if __name__ == "__main__":
 

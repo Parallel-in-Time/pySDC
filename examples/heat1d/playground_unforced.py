@@ -1,17 +1,13 @@
-
-from pySDC import CollocationClasses as collclass
-
-from examples.heat1d.ProblemClass_unforced import heat1d_unforced
-from pySDC.datatype_classes.mesh import mesh
-from examples.heat1d.TransferClass import mesh_to_mesh_1d
-from pySDC.sweeper_classes.generic_LU import generic_LU
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-from collections import namedtuple
 import pickle
+from collections import namedtuple
+
+import pySDC.deprecated.PFASST_blockwise_old as mp
+from examples.heat1d.ProblemClass_unforced import heat1d_unforced
+from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from pySDC import CollocationClasses as collclass
+from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.mesh import mesh
+from pySDC.sweeper_classes.generic_LU import generic_LU
 
 
 

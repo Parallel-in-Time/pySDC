@@ -1,3 +1,4 @@
+
 from pySDC import CollocationClasses as collclass
 
 import numpy as np
@@ -6,17 +7,25 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
+# import pySDC.PFASST_blockwise as mp
+import pySDC.PFASST_blockwise_parallel as mp
+# import pySDC.Methods as mp
 from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
 
-from pySDC.Plugins.visualization_tools import show_residual_across_simulation
+from mpi4py import MPI
+from pySDC.Step import step
+
 
 
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
+
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
 
     num_procs = 4
 
@@ -55,29 +64,25 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    # MS = mp.generate_steps(num_procs,sparams,description)
 
     # setup parameters "in time"
     t0 = 0
     dt = 0.1
     Tend = 4*dt
 
-    # get initial values on finest level
-    P = MS[0].levels[0].prob
+    S = step(sparams)
+    S.generate_hierarchy(description)
+
+    P = S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = mp.run_pfasst(S,uinit,t0,dt,Tend,comm)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values,np.inf)))
+    print('error at time %s: %s' % (Tend, np.linalg.norm(uex.values - uend.values, np.inf) / np.linalg.norm(
+        uex.values, np.inf)))
 
 
-    # show_residual_across_simulation(stats,'res_vis_test.png')
-
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)

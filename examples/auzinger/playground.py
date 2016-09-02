@@ -2,17 +2,14 @@ from __future__ import print_function
 
 import numpy as np
 
-from pySDC import CollocationClasses as collclass
+import pySDC.deprecated.PFASST_stepwise as mp
 from examples.auzinger.ProblemClass import auzinger
-from pySDC.datatype_classes.mesh import mesh
-from pySDC.sweeper_classes.generic_LU import generic_LU
-from pySDC.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
-from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-import pySDC.PFASST_stepwise as mp
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
 from pySDC.Plugins.sweeper_helper import get_Qd
+from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.mesh import mesh
+from pySDC.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
 
 if __name__ == "__main__":
 

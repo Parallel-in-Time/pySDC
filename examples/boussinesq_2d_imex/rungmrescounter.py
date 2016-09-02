@@ -1,27 +1,13 @@
-
-from pySDC import CollocationClasses as collclass
-
 import numpy as np
 
+import pySDC.deprecated.PFASST_stepwise as mp
 from ProblemClass import boussinesq_2d_imex
-from examples.boussinesq_2d_imex.TransferClass import mesh_to_mesh_2d
 from examples.boussinesq_2d_imex.HookClass import plot_solution
-
+from pySDC import CollocationClasses as collclass
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_stepwise as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from pylab import rcParams
-
+from standard_integrators import dirk, rk_imex, SplitExplicit
 from unflatten import unflatten
-
-from standard_integrators import dirk, bdf2, trapezoidal, rk_imex, SplitExplicit
 
 if __name__ == "__main__":
 

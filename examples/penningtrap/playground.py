@@ -1,17 +1,15 @@
-from pySDC import CollocationClasses as collclass
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
+import pySDC.deprecated.PFASST_blockwise_old as mp
+from examples.penningtrap.HookClass import particles_output
 from examples.penningtrap.ProblemClass import penningtrap,penningtrap_coarse
 from examples.penningtrap.TransferClass import particles_to_particles
-from pySDC.datatype_classes.particles import particles, fields
-from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
-from examples.penningtrap.HookClass import particles_output
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
+from pySDC.datatype_classes.particles import particles, fields
+from pySDC.sweeper_classes.boris_2nd_order import boris_2nd_order
 
 
 if __name__ == "__main__":

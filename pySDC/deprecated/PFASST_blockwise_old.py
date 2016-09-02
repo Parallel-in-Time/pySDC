@@ -7,6 +7,12 @@ from pySDC.Stats import stats
 from pySDC.PFASST_helper import *
 
 
+#TODO:
+#  - restore MSSDC
+#  - stop iterating if done to avoid noise
+#  - ring parallelization...?
+
+
 def run_pfasst(MS,u0,t0,dt,Tend):
     """
     Main driver for running the serial version of SDC, MLSDC and PFASST (virtual parallelism)
@@ -24,6 +30,9 @@ def run_pfasst(MS,u0,t0,dt,Tend):
     """
 
     # fixme: use error classes for send/recv and stage errors
+
+    assert MS[0].levels[0].sweep.coll.right_is_node and not MS[0].levels[0].sweep.params.do_coll_update,\
+        "For this PFASST version to work, we assume uend = u_M, so do not use Legendre node nor enforce collocation update"
 
     # some initializations
     uend = None
@@ -278,6 +287,10 @@ def pfasst(MS):
 
                 S.levels[0].hooks.dump_iteration(S.status)
 
+                # send updated values forward (non-blocking)
+                if S.params.fine_comm:
+                    send(S.levels[0],tag=(0,S.status.iter,S.status.slot))
+
                 # update stage
                 S.status.stage = 'IT_CHECK'
 
@@ -368,16 +381,12 @@ def pfasst(MS):
                 # receive and sweep on middle levels (except for coarsest level)
                 for l in range(len(S.levels)-1,0,-1):
 
-                    # prolong values
-                    S.transfer(source=S.levels[l],target=S.levels[l-1])
-
-                    # send updated values forward
-                    if S.params.fine_comm:
-                        send(S.levels[l-1], tag=(l-1, S.status.iter, S.status.slot))
-
-                    # # receive values
+                    # # receive values from IT_UP (non-blocking)
                     if S.params.fine_comm and not S.status.first:
                         recv(S.levels[l-1],S.prev.levels[l-1],tag=(l-1,S.status.iter,S.prev.status.slot))
+
+                    # prolong values
+                    S.transfer(source=S.levels[l],target=S.levels[l-1])
 
                     # on middle levels: do sweep as usual
                     if l-1 > 0:

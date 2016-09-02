@@ -1,22 +1,17 @@
-
-from pySDC import CollocationClasses as collclass
+from subprocess import call
 
 import numpy as np
-
-from ProblemClass_multiscale import acoustic_1d_imex
-from examples.acoustic_1d_imex.HookClass import plot_solution
-
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_stepwise as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-from standard_integrators import bdf2, dirk, trapezoidal, rk_imex
-
 from matplotlib import pyplot as plt
 from pylab import rcParams
-from subprocess import call
+
+import pySDC.deprecated.PFASST_stepwise as mp
+from ProblemClass_multiscale import acoustic_1d_imex
+from examples.acoustic_1d_imex.HookClass import plot_solution
+from pySDC import CollocationClasses as collclass
+from pySDC import Log
+from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
+from standard_integrators import bdf2, dirk, trapezoidal, rk_imex
 
 fs = 8
 

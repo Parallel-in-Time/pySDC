@@ -27,6 +27,9 @@ def run_pfasst(MS,u0,t0,dt,Tend):
     # fixme: use error classes for send/recv and stage errors
     # fixme: last need to be able to send even if values have not been fetched yet (ring!)
 
+    assert MS[0].levels[0].sweep.coll.right_is_node and not MS[0].levels[0].sweep.params.do_coll_update,\
+        "For this PFASST version to work, we assume uend = u_M, so do not use Legendre node nor enforce collocation update"
+
     # some initializations
     uend = None
     num_procs = len(MS)
@@ -145,6 +148,9 @@ def recv(target,source):
     """
     # simply do a deepcopy of the values uend to become the new u0 at the target
     target.u[0] = target.prob.dtype_u(source.uend)
+    # re-evaluate f on left interval boundary
+    target.f[0] = target.prob.eval_f(target.u[0], target.time)
+
 
 
 def send(source,tag):
@@ -332,7 +338,7 @@ def pfasst(S):
                     if S.params.fine_comm:
                         send(S.levels[l],tag=True)
                 else:
-                    print('SEND ERROR',l,p,S.levels[l].tag)
+                    print('SEND ERROR',l,S.levels[l].tag)
                     exit()
 
                 # transfer further up the hierarchy

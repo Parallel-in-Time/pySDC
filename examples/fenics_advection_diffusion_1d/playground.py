@@ -1,18 +1,10 @@
-
-from pySDC import CollocationClasses as collclass
-
+import pySDC.deprecated.PFASST_blockwise_old as mp
 from examples.fenics_advection_diffusion_1d.ProblemClass import fenics_adv_diff_1d
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
 from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fenics
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
-# import pySDC.PFASST_stepwise as mp
+from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-import dolfin as df
-import numpy as np
-
+from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
+from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 
 if __name__ == "__main__":
 
