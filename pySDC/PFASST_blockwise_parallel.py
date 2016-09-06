@@ -6,6 +6,7 @@ from pySDC.Stats import stats
 
 from pySDC.PFASST_helper import *
 
+from mpi4py import MPI
 
 def run_pfasst(S,u0,t0,dt,Tend,comm):
     """
@@ -27,38 +28,43 @@ def run_pfasst(S,u0,t0,dt,Tend,comm):
 
     rank = comm.Get_rank()
     num_procs = comm.Get_size()
-
     all_dt = comm.allgather(dt)
-
     S.status.dt = dt
     S.status.time = t0 + sum(all_dt[0:rank])
     S.status.step = rank
     S.status.slot = rank
-
     active = S.status.time < Tend - 10*np.finfo(float).eps
+    comm_active = comm.Split(active)
 
     uend = u0
+
     while active:
+
+        rank = comm_active.Get_rank()
+        num_procs = comm_active.Get_size()
+
         # initialize block of steps with u0
         S = restart_block(S,num_procs,uend)
         # call pre-start hook
         S.levels[0].hooks.dump_pre(S.status)
-        all_done = comm.allgather(S.status.done)
 
-        while not all(all_done):
-            S = pfasst(S,comm)
-            all_done = comm.allgather(S.status.done)
+        while not S.status.done:
+            S = pfasst(S,comm_active)
 
-        if all(all_done):
-            tend = comm.bcast(S.status.time, root=num_procs-1)
-            stepend = comm.bcast(S.status.step, root=num_procs-1)
-            all_dt = comm.allgather(dt)
-            S.status.time = tend + all_dt[-1] + sum(all_dt[0:rank])
-            S.status.step = stepend + rank + 1
-            uend = comm.bcast(S.levels[0].uend, root=num_procs-1)
-            active = S.status.time < Tend - 10 * np.finfo(float).eps
+        tend = comm_active.bcast(S.status.time+S.status.dt, root=num_procs-1)
+        uend = comm_active.bcast(S.levels[0].uend, root=num_procs-1)
+        stepend = comm_active.bcast(S.status.step, root=num_procs-1)
 
-    return uend,stats.return_stats()
+        all_dt = comm_active.allgather(dt)
+        S.status.time = stepend + rank + 1
+        S.status.time = tend + sum(all_dt[0:rank])
+        active =  S.status.time < Tend - 10 * np.finfo(float).eps
+        comm_active = comm_active.Split(active)
+
+    comm_active.Free()
+    uend = comm.bcast(uend, root=num_procs-1)
+
+    return uend, stats.return_stats()
 
 
 def restart_block(S,size,u0):

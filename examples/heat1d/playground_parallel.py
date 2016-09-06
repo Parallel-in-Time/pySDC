@@ -24,8 +24,6 @@ if __name__ == "__main__":
     logger = Log.setup_custom_logger('root')
 
     comm = MPI.COMM_WORLD
-    size = comm.Get_size()
-    rank = comm.Get_rank()
 
     num_procs = 4
 
@@ -80,9 +78,12 @@ if __name__ == "__main__":
     uend, stats = mp.run_pfasst(S,uinit,t0,dt,Tend,comm)
 
     # compute exact solution and compare
-    uex = P.u_exact(Tend)
+    num_procs = comm.Get_size()
+    rank = comm.Get_rank()
+    if rank == 0:
+        uex = P.u_exact(Tend)
 
-    print('error at time %s: %s' % (Tend, np.linalg.norm(uex.values - uend.values, np.inf) / np.linalg.norm(
-        uex.values, np.inf)))
+        print('error at time %s: %s' % (Tend, np.linalg.norm(uex.values - uend.values, np.inf) / np.linalg.norm(
+            uex.values, np.inf)))
 
 
