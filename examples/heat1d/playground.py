@@ -1,16 +1,14 @@
-from pySDC import CollocationClasses as collclass
-
 import numpy as np
 
+from pySDC.controller_classes.PFASST_blockwise_serial import PFASST_blockwise_serial
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from pySDC import CollocationClasses as collclass
+from pySDC import Log
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-import pySDC.PFASST_blockwise as mp
-from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
-
-from pySDC.Plugins.visualization_tools import show_residual_across_simulation
+from pySDC.PFASST_helper import generate_steps
 
 
 if __name__ == "__main__":
@@ -55,7 +53,7 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    MS = generate_steps(num_procs,sparams,description) #TODO: can we put this into the controller init? What about u_exact?
 
     # setup parameters "in time"
     t0 = 0
@@ -66,8 +64,11 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    PFASST = PFASST_blockwise_serial(MS=MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = PFASST.run()
+
     # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    # uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

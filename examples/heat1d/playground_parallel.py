@@ -1,20 +1,14 @@
-
-from pySDC import CollocationClasses as collclass
-
 import numpy as np
+from mpi4py import MPI
 
+import pySDC.controller_classes.PFASST_blockwise_parallel as mp
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from pySDC import CollocationClasses as collclass
+from pySDC import Log
+from pySDC.Step import step
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-# import pySDC.PFASST_blockwise as mp
-import pySDC.PFASST_blockwise_parallel as mp
-# import pySDC.Methods as mp
-from pySDC import Log
-# from pySDC.Stats import grep_stats, sort_stats
-
-from mpi4py import MPI
-from pySDC.Step import step
 
 
 
