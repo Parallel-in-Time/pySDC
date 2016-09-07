@@ -48,11 +48,6 @@ class PFASST_blockwise_serial(controller):
         uend = None
         num_procs = len(self.MS)
 
-        #TODO: won't need this, right? MSSDC?
-        #TODO: MSSDC will run, but give wrong results!!
-        if num_procs > 1:
-            assert len(self.MS[0].levels) > 1
-
         # initial ordering of the steps: 0,1,...,Np-1
         slots = [p for p in range(num_procs)]
 
@@ -136,7 +131,7 @@ class PFASST_blockwise_serial(controller):
                 self.MS[p].init_step(u0)
                 # reset some values
                 self.MS[p].status.done = False
-                self.MS[p].status.iter = 0
+                self.MS[p].status.iter = 1
                 self.MS[p].status.stage = 'SPREAD'
                 for l in self.MS[p].levels:
                     l.tag = None
@@ -254,11 +249,17 @@ class PFASST_blockwise_serial(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if len(S.levels) > 1 and S.params.predict:
+                if (len(S.levels) > 1 or len(MS) > 1) and S.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
-                else:
+                elif len(MS) > 1: # MSSDC
+                    S.levels[0].hooks.dump_pre_iteration(S.status)
+                    S.status.stage = 'IT_COARSE'
+                elif len(MS) == 1: # SDC
                     S.levels[0].hooks.dump_pre_iteration(S.status)
                     S.status.stage = 'IT_FINE'
+                else:
+                    print("Don't know what to do after spread, aborting")
+                    exit()
 
             return MS
 
@@ -270,7 +271,10 @@ class PFASST_blockwise_serial(controller):
             for S in MS:
                 # update stage
                 S.levels[0].hooks.dump_pre_iteration(S.status)
-                S.status.stage = 'IT_FINE'
+                if len(MS) > 1: # MSSDC
+                    S.status.stage = 'IT_COARSE'
+                elif len(MS) == 1: # SDC
+                    S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -278,15 +282,11 @@ class PFASST_blockwise_serial(controller):
             # do fine sweep for all steps (virtually parallel)
 
             for S in MS:
-                # increment iteration count here (and only here)
-                S.status.iter += 1
 
                 # standard sweep workflow: update nodes, compute residual, log progress
                 S.levels[0].sweep.update_nodes()
                 S.levels[0].sweep.compute_residual()
                 S.levels[0].hooks.dump_sweep(S.status)
-
-                S.levels[0].hooks.dump_iteration(S.status)
 
                 # update stage
                 S.status.stage = 'IT_CHECK'
@@ -298,6 +298,9 @@ class PFASST_blockwise_serial(controller):
             # check whether to stop iterating (parallel)
 
             for S in MS:
+                # increment iteration count here (and only here)
+                S.status.iter += 1
+                S.levels[0].hooks.dump_iteration(S.status)
                 S.status.done = self.check_convergence(S)
 
             # if not everyone is ready yet, keep doing stuff
@@ -306,9 +309,11 @@ class PFASST_blockwise_serial(controller):
                 for S in MS:
                     S.status.done = False
                     # multi-level or single-level?
-                    if len(S.levels) > 1:
+                    if len(S.levels) > 1: # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
-                    else:
+                    elif len(MS) > 1: # MSSDC
+                        S.status.stage = 'IT_COARSE'
+                    elif len(MS) == 1: # SDC
                         S.status.stage = 'IT_FINE'
 
             else:
@@ -359,7 +364,11 @@ class PFASST_blockwise_serial(controller):
                 self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
 
                 # update stage
-                S.status.stage = 'IT_DOWN'
+                if len(S.levels) > 1: # MLSDC or PFASST
+                    S.status.stage = 'IT_DOWN'
+                else: # MSSDC
+                    S.status.stage = 'IT_CHECK'
+
 
             return MS
 
