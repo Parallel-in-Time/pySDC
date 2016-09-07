@@ -12,29 +12,31 @@ class PFASST_blockwise_parallel(controller):
 
     """
 
-    def __init__(self, S, u0, t0, dt, Tend, comm):
+    def __init__(self, S, comm):
         """
        Initialization routine for PFASST controller
 
        Args:
            S: local steps
-           u0: initial values
-           t0: starting time
-           dt: (initial) time step
-           Tend: ending time
            comm: MPI communicator
        """
 
         # call parent's initialization routine
-        super(PFASST_blockwise_parallel, self).__init__(u0, t0, dt, Tend)
+        super(PFASST_blockwise_parallel, self).__init__()
 
         # pass list of steps to instance
         self.S = S
         self.comm = comm
 
-    def run(self):
+    def run(self, u0, t0, dt, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
+
+        Args:
+            u0: initial values
+            t0: starting time
+            dt: (initial) time step
+            Tend: ending time
 
         Returns:
             end values on the finest level
@@ -45,15 +47,15 @@ class PFASST_blockwise_parallel(controller):
 
         rank = self.comm.Get_rank()
         num_procs = self.comm.Get_size()
-        all_dt = self.comm.allgather(self.dt)
-        self.S.status.dt = self.dt
-        self.S.status.time = self.t0 + sum(all_dt[0:rank])
+        all_dt = self.comm.allgather(dt)
+        self.S.status.dt = dt
+        self.S.status.time = t0 + sum(all_dt[0:rank])
         self.S.status.step = rank
         self.S.status.slot = rank
-        active = self.S.status.time < self.Tend - 10*np.finfo(float).eps
+        active = self.S.status.time < Tend - 10*np.finfo(float).eps
         comm_active = self.comm.Split(active)
 
-        uend = self.u0
+        uend = u0
 
         while active:
 
@@ -72,10 +74,10 @@ class PFASST_blockwise_parallel(controller):
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
             stepend = comm_active.bcast(self.S.status.step, root=num_procs-1)
 
-            all_dt = comm_active.allgather(self.dt)
+            all_dt = comm_active.allgather(self.S.status.dt)
             self.S.status.time = stepend + rank + 1
             self.S.status.time = tend + sum(all_dt[0:rank])
-            active =  self.S.status.time < self.Tend - 10 * np.finfo(float).eps
+            active =  self.S.status.time < Tend - 10 * np.finfo(float).eps
             comm_active = comm_active.Split(active)
 
         comm_active.Free()

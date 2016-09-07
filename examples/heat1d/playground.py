@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 2
+    num_procs = 1
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
@@ -64,10 +64,11 @@ if __name__ == "__main__":
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    PFASST = PFASST_blockwise_serial(MS=MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-    uend, stats = PFASST.run()
-
+    PFASST = PFASST_blockwise_serial(MS=MS)
     # call main function to get things done...
+    uend, stats = PFASST.run(u0=uinit,t0=t0,dt=dt,Tend=Tend)
+
+
     # uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare

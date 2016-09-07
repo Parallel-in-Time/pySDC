@@ -5,30 +5,13 @@ from future.utils import with_metaclass
 class controller(with_metaclass(abc.ABCMeta)):
     """
     Base abstract controller class
-
-    Attributes:
-        u0: initial values
-        t0: starting time
-        dt: (initial) time step
-        Tend: ending time
     """
 
-    def __init__(self, u0, t0, dt, Tend):
+    def __init__(self):
         """
         Initialization routine for the base controller
-
-        Args:
-            u0: initial values
-            t0: starting time
-            dt: (initial) time step
-            Tend: ending time
-
         """
-
-        self.u0 = u0
-        self.t0 = t0
-        self.dt = dt
-        self.Tend = Tend
+        pass
 
 
     def check_convergence(self, S):
@@ -53,9 +36,15 @@ class controller(with_metaclass(abc.ABCMeta)):
         return converged
 
     @abc.abstractmethod
-    def run(self):
+    def run(self, u0, t0, dt, Tend):
         """
         Abstract interface to the run() method
+
+        Args:
+            u0: initial values
+            t0: starting time
+            dt: (initial) time step
+            Tend: ending time
         """
         return None
 

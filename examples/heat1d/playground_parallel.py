@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63]
+    pparams['nvars'] = [63,31]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     P = S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    PFASST = PFASST_blockwise_parallel(S=S,u0=uinit,t0=t0,dt=dt,Tend=Tend,comm=comm)
-    uend, stats = PFASST.run()
+    PFASST = PFASST_blockwise_parallel(S=S,comm=comm)
+    uend, stats = PFASST.run(u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     num_procs = comm.Get_size()

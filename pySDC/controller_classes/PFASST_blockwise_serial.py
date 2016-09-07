@@ -14,28 +14,30 @@ class PFASST_blockwise_serial(controller):
 
     """
 
-    def __init__(self, MS, u0, t0, dt, Tend):
+    def __init__(self, MS):
         """
        Initialization routine for PFASST controller
 
        Args:
            MS: block of steps (list)
-           u0: initial values
-           t0: starting time
-           dt: (initial) time step
-           Tend: ending time
        """
 
         # call parent's initialization routine
-        super(PFASST_blockwise_serial, self).__init__(u0, t0, dt, Tend)
+        super(PFASST_blockwise_serial, self).__init__()
 
         # pass list of steps to instance
         self.MS = MS
 
 
-    def run(self):
+    def run(self, u0, t0, dt, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
+
+        Args:
+           u0: initial values
+           t0: starting time
+           dt: (initial) time step
+           Tend: ending time
 
         Returns:
             end values on the finest level
@@ -53,18 +55,18 @@ class PFASST_blockwise_serial(controller):
 
         # initialize time variables of each step
         for p in slots:
-            self.MS[p].status.dt = self.dt # could have different dt per step here
-            self.MS[p].status.time = self.t0 + sum(self.MS[j].status.dt for j in range(p))
+            self.MS[p].status.dt = dt # could have different dt per step here
+            self.MS[p].status.time = t0 + sum(self.MS[j].status.dt for j in range(p))
             self.MS[p].status.step = p
 
         # determine which steps are still active (time < Tend)
-        active = [self.MS[p].status.time < self.Tend - 10*np.finfo(float).eps for p in slots]
+        active = [self.MS[p].status.time < Tend - 10*np.finfo(float).eps for p in slots]
 
         # compress slots according to active steps, i.e. remove all steps which have times above Tend
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
-        self.restart_block(active_slots,self.u0)
+        self.restart_block(active_slots,u0)
 
         # call pre-start hook
         self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[p].status)
@@ -89,7 +91,7 @@ class PFASST_blockwise_serial(controller):
                 uend = self.MS[active_slots[-1]].levels[0].uend
 
                 # determine new set of active steps and compress slots accordingly
-                active = [self.MS[p].status.time+num_procs*self.MS[p].status.dt < self.Tend - 10*np.finfo(float).eps for p in slots]
+                active = [self.MS[p].status.time+num_procs*self.MS[p].status.dt < Tend - 10*np.finfo(float).eps for p in slots]
                 active_slots = list(itertools.compress(slots, active))
 
                 # increment timings for now active steps
