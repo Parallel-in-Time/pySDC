@@ -1,7 +1,7 @@
 import numpy as np
 from mpi4py import MPI
 
-import pySDC.controller_classes.PFASST_blockwise_parallel as mp
+from pySDC.controller_classes.PFASST_blockwise_parallel import PFASST_blockwise_parallel
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC import CollocationClasses as collclass
@@ -18,8 +18,6 @@ if __name__ == "__main__":
     logger = Log.setup_custom_logger('root')
 
     comm = MPI.COMM_WORLD
-
-    num_procs = 4
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
@@ -61,7 +59,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.1
-    Tend = 4*dt
+    Tend = 3*dt
 
     S = step(sparams)
     S.generate_hierarchy(description)
@@ -69,7 +67,8 @@ if __name__ == "__main__":
     P = S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    uend, stats = mp.run_pfasst(S,uinit,t0,dt,Tend,comm)
+    PFASST = PFASST_blockwise_parallel(S=S,u0=uinit,t0=t0,dt=dt,Tend=Tend,comm=comm)
+    uend, stats = PFASST.run()
 
     # compute exact solution and compare
     num_procs = comm.Get_size()

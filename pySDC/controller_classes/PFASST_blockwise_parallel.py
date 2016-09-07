@@ -1,359 +1,344 @@
-import itertools
-import copy as cp
+
 import numpy as np
+
+from pySDC.Controller import controller
 
 from pySDC.Stats import stats
 
-from pySDC.PFASST_helper import *
-
-from mpi4py import MPI
-
-def run_pfasst(S,u0,t0,dt,Tend,comm):
-    """
-    Main driver for running the serial version of SDC, MLSDC and PFASST (virtual parallelism)
-
-    Args:
-        MS: block of steps (list)
-        u0: initial values on the finest level
-        t0: initial time
-        dt: step size (could be changed here e.g. for adaptivity)
-        Tend: end time
-
-    Returns:
-        end values on the finest level
-        stats object containing statistics for each step, each level and each iteration
+class PFASST_blockwise_parallel(controller):
     """
 
-    # fixme: use error classes for send/recv and stage errors
+    PFASST controller, running parallel version of PFASST in blocks (MG-style)
 
-    rank = comm.Get_rank()
-    num_procs = comm.Get_size()
-    all_dt = comm.allgather(dt)
-    S.status.dt = dt
-    S.status.time = t0 + sum(all_dt[0:rank])
-    S.status.step = rank
-    S.status.slot = rank
-    active = S.status.time < Tend - 10*np.finfo(float).eps
-    comm_active = comm.Split(active)
-
-    uend = u0
-
-    while active:
-
-        rank = comm_active.Get_rank()
-        num_procs = comm_active.Get_size()
-
-        # initialize block of steps with u0
-        S = restart_block(S,num_procs,uend)
-        # call pre-start hook
-        S.levels[0].hooks.dump_pre(S.status)
-
-        while not S.status.done:
-            S = pfasst(S,comm_active,num_procs)
-
-        tend = comm_active.bcast(S.status.time+S.status.dt, root=num_procs-1)
-        uend = comm_active.bcast(S.levels[0].uend, root=num_procs-1)
-        stepend = comm_active.bcast(S.status.step, root=num_procs-1)
-
-        all_dt = comm_active.allgather(dt)
-        S.status.time = stepend + rank + 1
-        S.status.time = tend + sum(all_dt[0:rank])
-        active =  S.status.time < Tend - 10 * np.finfo(float).eps
-        comm_active = comm_active.Split(active)
-
-    comm_active.Free()
-    uend = comm.bcast(uend, root=num_procs-1)
-
-    return uend, stats.return_stats()
-
-
-def restart_block(S,size,u0):
-    """
-    Helper routine to reset/restart block of (active) steps
-
-    Args:
-        MS: block of (all) steps
-        active_slots: list of active steps
-        u0: initial value to distribute across the steps
-
-    Returns:
-        block of (all) steps
     """
 
-    # store link to previous step
-    S.prev = S.status.slot - 1
-    S.next = S.status.slot + 1
-    # resets step
-    S.reset_step()
-    # determine whether I am the first and/or last in line
-    S.status.first = S.prev == -1
-    S.status.last = S.next == size
-    # intialize step with u0
-    S.init_step(u0)
-    # reset some values
-    S.status.done = False
-    S.status.iter = 1
-    S.status.stage = 'SPREAD'
-    for l in S.levels:
-        l.tag = None
+    def __init__(self, S, u0, t0, dt, Tend, comm):
+        """
+       Initialization routine for PFASST controller
 
-    return S
+       Args:
+           S: local steps
+           u0: initial values
+           t0: starting time
+           dt: (initial) time step
+           Tend: ending time
+           comm: MPI communicator
+       """
 
+        # call parent's initialization routine
+        super(PFASST_blockwise_parallel, self).__init__(u0, t0, dt, Tend)
 
-def recv(target,source,tag,comm):
-    """
-    Receive function
+        # pass list of steps to instance
+        self.S = S
+        self.comm = comm
 
-    Args:
-        target: level which will receive the values
-        source: level which initiated the send
-        tag: identifier to check if this message is really for me
-    """
+    def run(self):
+        """
+        Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
 
-    target.u[0] = comm.recv(source=source, tag=tag)
-    target.f[0] = target.prob.eval_f(target.u[0], target.time)
+        Returns:
+            end values on the finest level
+            stats object containing statistics for each step, each level and each iteration
+        """
 
+        # fixme: use error classes for send/recv and stage errors
 
-def send(source,target,tag,comm):
-    """
-    Send function
+        rank = self.comm.Get_rank()
+        num_procs = self.comm.Get_size()
+        all_dt = self.comm.allgather(self.dt)
+        self.S.status.dt = self.dt
+        self.S.status.time = self.t0 + sum(all_dt[0:rank])
+        self.S.status.step = rank
+        self.S.status.slot = rank
+        active = self.S.status.time < self.Tend - 10*np.finfo(float).eps
+        comm_active = self.comm.Split(active)
 
-    Args:
-        source: level which has the new values
-        tag: identifier for this message
-    """
-    # sending here means computing uend ("one-sided communication")
-    source.sweep.compute_end_point()
-    comm.send(source.uend, dest = target, tag = tag)
+        uend = self.u0
 
+        while active:
 
-def predictor(S, comm):
-    """
-    Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
+            rank = comm_active.Get_rank()
+            num_procs = comm_active.Get_size()
 
-    Args:
-        MS: multiple steps
+            # initialize block of steps with u0
+            self.restart_block(num_procs,uend)
+            # call pre-start hook
+            self.S.levels[0].hooks.dump_pre(self.S.status)
 
-    Returns:
-        block of steps with initial values
-    """
+            while not self.S.status.done:
+                self.pfasst(comm_active,num_procs)
 
-    # restrict to coarsest level
-    for l in range(1, len(S.levels)):
-        S.transfer(source=S.levels[l-1],target=S.levels[l])
+            tend = comm_active.bcast(self.S.status.time+self.S.status.dt, root=num_procs-1)
+            uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
+            stepend = comm_active.bcast(self.S.status.step, root=num_procs-1)
 
+            all_dt = comm_active.allgather(self.dt)
+            self.S.status.time = stepend + rank + 1
+            self.S.status.time = tend + sum(all_dt[0:rank])
+            active =  self.S.status.time < self.Tend - 10 * np.finfo(float).eps
+            comm_active = comm_active.Split(active)
 
-    for p in range(S.status.slot+1):
+        comm_active.Free()
+        uend = self.comm.bcast(uend, root=num_procs-1)
 
-        if not p == 0 and not S.status.first:
-            recv(target=S.levels[-1], source=S.prev, tag=S.status.iter, comm=comm)
-
-        # do the sweep with new values
-        S.levels[-1].sweep.update_nodes()
-
-        if not S.status.last:
-            send(source=S.levels[-1], target=S.next, tag=S.status.iter, comm=comm)
-
-    # interpolate back to finest level
-    for l in range(len(S.levels)-1,0,-1):
-        S.transfer(source=S.levels[l],target=S.levels[l-1])
-
-    return S
+        return uend, stats.return_stats()
 
 
-def pfasst(S,comm,num_procs):
-    """
-    Main function including the stages of SDC, MLSDC and PFASST (the "controller")
+    def restart_block(self,size,u0):
+        """
+        Helper routine to reset/restart block of (active) steps
 
-    For the workflow of this controller, check out one of our PFASST talks
+        Args:
+            size: number of active time steps
+            u0: initial value to distribute across the steps
 
-    Args:
-        MS: all active steps
+        Returns:
+            block of (all) steps
+        """
 
-    Returns:
-        all active steps
-    """
+        # store link to previous step
+        self.S.prev = self.S.status.slot - 1
+        self.S.next = self.S.status.slot + 1
+        # resets step
+        self.S.reset_step()
+        # determine whether I am the first and/or last in line
+        self.S.status.first = self.S.prev == -1
+        self.S.status.last = self.S.next == size
+        # intialize step with u0
+        self.S.init_step(u0)
+        # reset some values
+        self.S.status.done = False
+        self.S.status.iter = 1
+        self.S.status.stage = 'SPREAD'
+        for l in self.S.levels:
+            l.tag = None
 
-    # if all stages are the same, continue, otherwise abort
-    all_stage = comm.allgather(S.status.stage)
+    @staticmethod
+    def recv(target,source,tag,comm):
+        """
+        Receive function
 
-    if not all(all_stage):
-        print('not all stages are equal, aborting..')
-        exit()
+        Args:
+            target: level which will receive the values
+            source: level which initiated the send
+            tag: identifier to check if this message is really for me
+        """
 
-    # print(S.status.slot,stage)
+        target.u[0] = comm.recv(source=source, tag=tag)
+        target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
-    for case in switch(S.status.stage):
+    @staticmethod
+    def send(source,target,tag,comm):
+        """
+        Send function
 
-        if case('SPREAD'):
+        Args:
+            source: level which has the new values
+            tag: identifier for this message
+        """
+        # sending here means computing uend ("one-sided communication")
+        source.sweep.compute_end_point()
+        comm.send(source.uend, dest = target, tag = tag)
+
+
+    def predictor(self,comm):
+        """
+        Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
+
+        """
+
+        # restrict to coarsest level
+        for l in range(1, len(self.S.levels)):
+            self.S.transfer(source=self.S.levels[l-1],target=self.S.levels[l])
+
+
+        for p in range(self.S.status.slot+1):
+
+            if not p == 0 and not self.S.status.first:
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+            # do the sweep with new values
+            self.S.levels[-1].sweep.update_nodes()
+
+            if not self.S.status.last:
+                self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
+
+        # interpolate back to finest level
+        for l in range(len(self.S.levels)-1,0,-1):
+            self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
+
+    def pfasst(self,comm,num_procs):
+        """
+        Main function including the stages of SDC, MLSDC and PFASST (the "controller")
+
+        For the workflow of this controller, check out one of our PFASST talks
+
+        Args:
+            MS: all active steps
+
+        Returns:
+            all active steps
+        """
+
+        # if all stages are the same, continue, otherwise abort
+        all_stage = comm.allgather(self.S.status.stage)
+
+        if not all(all_stage):
+            print('not all stages are equal, aborting..')
+            exit()
+
+        stage = self.S.status.stage
+
+        if stage == 'SPREAD':
             # (potentially) serial spreading phase
 
             # first stage: spread values
-            S.levels[0].hooks.pre_step(S.status)
+            self.S.levels[0].hooks.pre_step(self.S.status)
 
             # call predictor from sweeper
-            S.levels[0].sweep.predict()
+            self.S.levels[0].sweep.predict()
 
             # update stage
-            # update stage
-            if (len(S.levels) > 1 or num_procs > 1) and S.params.predict:  # MLSDC or PFASST
-                S.status.stage = 'PREDICT'
+            if (len(self.S.levels) > 1 or num_procs > 1) and self.S.params.predict:  # MLSDC or PFASST
+                self.S.status.stage = 'PREDICT'
             elif num_procs > 1:  # MSSDC
-                S.levels[0].hooks.dump_pre_iteration(S.status)
-                S.status.stage = 'IT_COARSE'
+                self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
+                self.S.status.stage = 'IT_COARSE'
             elif num_procs == 1:  # SDC
-                S.levels[0].hooks.dump_pre_iteration(S.status)
-                S.status.stage = 'IT_FINE'
+                self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
+                self.S.status.stage = 'IT_FINE'
             else:
                 print("Don't know what to do after spread, aborting")
                 exit()
-            return S
 
+        elif stage == 'PREDICT':
 
-        if case('PREDICT'):
             # call predictor (serial)
 
-            S = predictor(S, comm)
+            self.predictor(comm)
 
             # update stage
-            S.levels[0].hooks.dump_pre_iteration(S.status)
+            self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
             if num_procs > 1:  # MSSDC
-                S.status.stage = 'IT_COARSE'
+                self.S.status.stage = 'IT_COARSE'
             else:  # MLSDC or PFASST
-                S.status.stage = 'IT_FINE'
+                self.S.status.stage = 'IT_FINE'
 
-            return S
+        elif stage == 'IT_FINE':
 
-
-        if case('IT_FINE'):
             # do fine sweep
 
             # standard sweep workflow: update nodes, compute residual, log progress
-            S.levels[0].sweep.update_nodes()
-            S.levels[0].sweep.compute_residual()
-            S.levels[0].hooks.dump_sweep(S.status)
+            self.S.levels[0].sweep.update_nodes()
+            self.S.levels[0].sweep.compute_residual()
+            self.S.levels[0].hooks.dump_sweep(self.S.status)
 
             # update stage
-            S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_CHECK'
 
-            return S
+        elif stage == 'IT_CHECK':
 
-
-        if case('IT_CHECK'):
             # check whether to stop iterating (parallel)
 
             # increment iteration count here (and only here)
-            S.status.iter += 1
-            S.levels[0].hooks.dump_iteration(S.status)
-            S.status.done = check_convergence(S)
-            all_done = comm.allgather(S.status.done)
+            self.S.status.iter += 1
+            self.S.levels[0].hooks.dump_iteration(self.S.status)
+            self.S.status.done = self.check_convergence(self.S)
+            all_done = comm.allgather(self.S.status.done)
 
             # if not everyone is ready yet, keep doing stuff
             if not all(all_done):
-                S.status.done = False
+                self.S.status.done = False
                 # multi-level or single-level?
-                if len(S.levels) > 1:  # MLSDC or PFASST
-                    S.status.stage = 'IT_UP'
+                if len(self.S.levels) > 1:  # MLSDC or PFASST
+                    self.S.status.stage = 'IT_UP'
                 elif num_procs > 1:  # MSSDC
-                    S.status.stage = 'IT_COARSE'
+                    self.S.status.stage = 'IT_COARSE'
                 elif num_procs == 1:  # SDC
-                    S.status.stage = 'IT_FINE'
+                    self.S.status.stage = 'IT_FINE'
 
             else:
-                S.levels[0].sweep.compute_end_point()
-                S.levels[0].hooks.dump_step(S.status)
-                S.status.stage = 'DONE'
+                self.S.levels[0].sweep.compute_end_point()
+                self.S.levels[0].hooks.dump_step(self.S.status)
+                self.S.status.stage = 'DONE'
 
-            return S
+        elif stage == 'IT_UP':
 
-
-        if case('IT_UP'):
             # go up the hierarchy from finest to coarsest level (parallel)
 
 
-            S.transfer(source=S.levels[0],target=S.levels[1])
+            self.S.transfer(source=self.S.levels[0],target=self.S.levels[1])
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
-            for l in range(1,len(S.levels)-1):
-                S.levels[l].sweep.update_nodes()
-                S.levels[l].sweep.compute_residual()
-                S.levels[l].hooks.dump_sweep(S.status)
+            for l in range(1,len(self.S.levels)-1):
+                self.S.levels[l].sweep.update_nodes()
+                self.S.levels[l].sweep.compute_residual()
+                self.S.levels[l].hooks.dump_sweep(self.S.status)
 
                 # transfer further up the hierarchy
-                S.transfer(source=S.levels[l],target=S.levels[l+1])
+                self.S.transfer(source=self.S.levels[l],target=self.S.levels[l+1])
 
             # update stage
-            S.status.stage = 'IT_COARSE'
+            self.S.status.stage = 'IT_COARSE'
 
-            return S
+        elif stage == 'IT_COARSE':
 
-
-        if case('IT_COARSE'):
             # sweeps on coarsest level (serial/blocking)
 
 
             # receive from previous step (if not first)
-            if not S.status.first:
-                recv(target=S.levels[-1], source=S.prev, tag=S.status.iter, comm=comm)
+            if not self.S.status.first:
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep
-            S.levels[-1].sweep.update_nodes()
-            S.levels[-1].sweep.compute_residual()
-            S.levels[-1].hooks.dump_sweep(S.status)
-            S.levels[-1].sweep.compute_end_point()
+            self.S.levels[-1].sweep.update_nodes()
+            self.S.levels[-1].sweep.compute_residual()
+            self.S.levels[-1].hooks.dump_sweep(self.S.status)
+            self.S.levels[-1].sweep.compute_end_point()
 
             # send to next step
-            if not S.status.last:
-                send(source=S.levels[-1], target=S.next, tag=S.status.iter, comm=comm)
+            if not self.S.status.last:
+                self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
 
             # update stage
-            if len(S.levels) > 1:  # MLSDC or PFASST
-                S.status.stage = 'IT_DOWN'
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_DOWN'
             else:  # MSSDC
-                S.status.stage = 'IT_CHECK'
+                self.S.status.stage = 'IT_CHECK'
 
-            # return
-            return S
+        elif stage == 'IT_DOWN':
 
-
-        if case('IT_DOWN'):
             # prolong corrections down to finest level (parallel)
 
             # receive and sweep on middle levels (except for coarsest level)
-            for l in range(len(S.levels)-1,0,-1):
+            for l in range(len(self.S.levels)-1,0,-1):
 
                 # prolong values
-                S.transfer(source=S.levels[l],target=S.levels[l-1])
-                S.levels[l-1].sweep.compute_end_point()
+                self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
+                self.S.levels[l-1].sweep.compute_end_point()
 
-                if not S.status.last and S.params.fine_comm:
-                    req_send = comm.isend(S.levels[l-1].uend,dest=S.next,tag=S.status.iter)
+                if not self.S.status.last and self.S.params.fine_comm:
+                    req_send = comm.isend(self.S.levels[l-1].uend,dest=self.S.next,tag=self.S.status.iter)
 
-                if not S.status.first and S.params.fine_comm:
-                    recv(target=S.levels[l-1], source=S.prev, tag=S.status.iter, comm=comm)
+                if not self.S.status.first and self.S.params.fine_comm:
+                    self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
-                if not S.status.last and S.params.fine_comm:
+                if not self.S.status.last and self.S.params.fine_comm:
                     req_send.wait()
 
                 # on middle levels: do sweep as usual
                 if l-1 > 0:
-                    S.levels[l-1].sweep.update_nodes()
-                    S.levels[l-1].sweep.compute_residual()
-                    S.levels[l-1].hooks.dump_sweep(S.status)
+                    self.S.levels[l-1].sweep.update_nodes()
+                    self.S.levels[l-1].sweep.compute_residual()
+                    self.S.levels[l-1].hooks.dump_sweep(self.S.status)
 
             # update stage
-            S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_FINE'
 
-            return S
-
-
-
-        #fixme: use meaningful error object here
-        print('Something is wrong here, you should have hit one case statement!')
-        exit()
-    #fixme: use meaningful error object here
-    print('Something is wrong here, you should have hit one case statement!')
-    exit()
+        else:
+            #fixme: use meaningful error object here
+            print('Something is wrong here, you should have hit one case statement!')
+            exit()
 
 
 

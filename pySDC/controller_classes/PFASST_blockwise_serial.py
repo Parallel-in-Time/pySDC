@@ -10,7 +10,7 @@ from pySDC.Stats import stats
 class PFASST_blockwise_serial(controller):
     """
 
-    PFASST controller, running serialized verison of PFASST in blocks (MG-style)
+    PFASST controller, running serialized version of PFASST in blocks (MG-style)
 
     """
 
@@ -35,7 +35,7 @@ class PFASST_blockwise_serial(controller):
 
     def run(self):
         """
-        Main driver for running the serial version of SDC, MLSDC and PFASST (virtual parallelism)
+        Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
 
         Returns:
             end values on the finest level
