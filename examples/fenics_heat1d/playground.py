@@ -1,7 +1,7 @@
 import dolfin as df
 import numpy as np
 
-import pySDC.deprecated.PFASST_blockwise_old as mp
+from pySDC.controller_classes.PFASST_blockwise_serial import PFASST_blockwise_serial
 from examples.fenics_heat1d.ProblemClass import fenics_heat
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC import CollocationClasses as collclass
@@ -17,8 +17,6 @@ if __name__ == "__main__":
     logger = Log.setup_custom_logger('root')
 
     num_procs = 1
-
-    # assert num_procs == 1,'turn on predictor!'
 
     # This comes as read-in for the level class
     lparams = {}
@@ -37,10 +35,14 @@ if __name__ == "__main__":
     pparams['order'] = [1]
     pparams['refinements'] = [1,0]
 
-
     # This comes as read-in for the transfer operations
     tparams = {}
     tparams['finter'] = True
+
+    # This comes as read-in for the sweeper class
+    swparams = {}
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['num_nodes'] = 3
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -48,29 +50,26 @@ if __name__ == "__main__":
     description['problem_params'] = pparams
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
-    description['collocation_class'] = collclass.CollGaussLegendre
-    description['num_nodes'] = 3
     description['sweeper_class'] = imex_1st_order
+    description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_fenics
     description['transfer_params'] = tparams
 
-    # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    # initialize controller
+    PFASST = PFASST_blockwise_serial(num_procs=num_procs, step_params=sparams, description=description)
 
     # setup parameters "in time"
-    t0 = MS[0].levels[0].prob.t0
+    t0 = PFASST.MS[0].levels[0].prob.t0
     dt = 0.5
     Tend = 1*dt
 
     # get initial values on finest level
-    P = MS[0].levels[0].prob
+    P = PFASST.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-    # df.plot(uend.values,interactive=True)
+    uend, stats = PFASST.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

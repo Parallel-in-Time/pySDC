@@ -69,7 +69,7 @@ class fenics_heat(ptype):
         a_K = -1.0*df.inner(df.nabla_grad(u), self.nu*df.nabla_grad(v))*df.dx
 
         # Mass term
-        a_M = u*v*df.dx
+        a_M = u*v*df.dx 
 
         self.M = df.assemble(a_M)
         self.K = df.assemble(a_K)

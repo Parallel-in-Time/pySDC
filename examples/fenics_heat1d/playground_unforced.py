@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import dolfin as df
 
-import pySDC.deprecated.PFASST_blockwise_old as mp
+from pySDC.controller_classes.PFASST_blockwise_serial import PFASST_blockwise_serial
 from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC import CollocationClasses as collclass
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     # logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 5
 
     # This comes as read-in for the level class
     lparams = {}
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0.0
-    Tend = 2.0
+    Tend = 0.4
 
     # dt_list = [Tend/(2**i) for i in range(0,7,1)]
     # c_nvars_list = [2**i for i in range(2,7)]
@@ -74,11 +74,11 @@ if __name__ == "__main__":
         description['transfer_class'] = mesh_to_mesh_fenics
         description['transfer_params'] = tparams
 
-        # quickly generate block of steps
-        MS = mp.generate_steps(num_procs, sparams, description)
+        # initialize controller
+        PFASST = PFASST_blockwise_serial(num_procs=num_procs, step_params=sparams, description=description)
 
         # get initial values on finest level
-        P = MS[0].levels[0].prob
+        P = PFASST.MS[0].levels[0].prob
         uinit = P.u_exact(t0)
 
         # compute exact solution to compare
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             print('Working on: c_nvars = %s, dt = %s' %(c_nvars,dt))
 
             # call main function to get things done...
-            uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
+            uend, stats = PFASST.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
             err_classical_rel = abs(uex-uend)/abs(uex)
             err_fenics = df.errornorm(uex.values,uend.values)

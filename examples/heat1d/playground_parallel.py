@@ -6,7 +6,6 @@ from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Step import step
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 
@@ -40,34 +39,35 @@ if __name__ == "__main__":
     tparams['iorder'] = 6
     tparams['rorder'] = 2
 
+    # This comes as read-in for the sweeper class
+    swparams = {}
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['num_nodes'] = 5
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
-    description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
+    description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
 
-    # quickly generate block of steps
-    # MS = mp.generate_steps(num_procs,sparams,description)
+    # initialize controller
+    PFASST = PFASST_blockwise_parallel(step_params=sparams, description=description, comm=comm)
 
     # setup parameters "in time"
     t0 = 0
     dt = 0.1
     Tend = 3*dt
 
-    S = step(sparams)
-    S.generate_hierarchy(description)
-
-    P = S.levels[0].prob
+    # set initial condition
+    P = PFASST.S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    PFASST = PFASST_blockwise_parallel(S=S,comm=comm)
     uend, stats = PFASST.run(u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare

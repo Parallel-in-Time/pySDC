@@ -3,7 +3,7 @@ import copy as cp
 import numpy as np
 
 from pySDC.Controller import controller
-
+from pySDC import Step as stepclass
 from pySDC.Stats import stats
 
 
@@ -14,19 +14,24 @@ class PFASST_blockwise_serial(controller):
 
     """
 
-    def __init__(self, MS):
+    def __init__(self, num_procs, step_params, description):
         """
        Initialization routine for PFASST controller
 
        Args:
-           MS: block of steps (list)
+           num_procs: number of parallel time steps (still serial, though), can be 1
+           step_params: parameter set for the step class
+           description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
         # call parent's initialization routine
         super(PFASST_blockwise_serial, self).__init__()
 
-        # pass list of steps to instance
-        self.MS = MS
+        self.MS = []
+        # simply append step after step and generate the hierarchies
+        for p in range(num_procs):
+            self.MS.append(stepclass.step(step_params))
+            self.MS[-1].generate_hierarchy(description)
 
 
     def run(self, u0, t0, dt, Tend):

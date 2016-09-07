@@ -39,21 +39,25 @@ if __name__ == "__main__":
     tparams['iorder'] = 6
     tparams['rorder'] = 2
 
+    # This comes as read-in for the sweeper class
+    swparams = {}
+    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['num_nodes'] = 5
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
-    description['num_nodes'] = 5
     description['sweeper_class'] = imex_1st_order
+    description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
 
-    # quickly generate block of steps
-    MS = generate_steps(num_procs,sparams,description) #TODO: can we put this into the controller init? What about u_exact?
+    # initialize controller
+    PFASST = PFASST_blockwise_serial(num_procs=num_procs, step_params=sparams, description=description)
 
     # setup parameters "in time"
     t0 = 0
@@ -61,25 +65,14 @@ if __name__ == "__main__":
     Tend = 3*dt
 
     # get initial values on finest level
-    P = MS[0].levels[0].prob
+    P = PFASST.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    PFASST = PFASST_blockwise_serial(MS=MS)
     # call main function to get things done...
-    uend, stats = PFASST.run(u0=uinit,t0=t0,dt=dt,Tend=Tend)
-
-
-    # uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = PFASST.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
     print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
         uex.values,np.inf)))
-
-
-    # show_residual_across_simulation(stats,'res_vis_test.png')
-
-    # extract_stats = grep_stats(stats,iter=-1,type='residual')
-    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
-    # print(extract_stats,sortedlist_stats)

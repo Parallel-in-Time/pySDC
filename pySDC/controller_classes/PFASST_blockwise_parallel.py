@@ -2,7 +2,7 @@
 import numpy as np
 
 from pySDC.Controller import controller
-
+from pySDC.Step import step
 from pySDC.Stats import stats
 
 class PFASST_blockwise_parallel(controller):
@@ -12,7 +12,7 @@ class PFASST_blockwise_parallel(controller):
 
     """
 
-    def __init__(self, S, comm):
+    def __init__(self, step_params, description, comm):
         """
        Initialization routine for PFASST controller
 
@@ -24,8 +24,11 @@ class PFASST_blockwise_parallel(controller):
         # call parent's initialization routine
         super(PFASST_blockwise_parallel, self).__init__()
 
-        # pass list of steps to instance
-        self.S = S
+        # create single step per processor
+        self.S = step(step_params)
+        self.S.generate_hierarchy(description)
+
+        # pass communicator for future use
         self.comm = comm
 
     def run(self, u0, t0, dt, Tend):
