@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63,31]
+    pparams['nvars'] = [63]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}

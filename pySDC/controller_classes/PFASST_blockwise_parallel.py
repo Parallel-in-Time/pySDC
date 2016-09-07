@@ -49,7 +49,7 @@ def run_pfasst(S,u0,t0,dt,Tend,comm):
         S.levels[0].hooks.dump_pre(S.status)
 
         while not S.status.done:
-            S = pfasst(S,comm_active)
+            S = pfasst(S,comm_active,num_procs)
 
         tend = comm_active.bcast(S.status.time+S.status.dt, root=num_procs-1)
         uend = comm_active.bcast(S.levels[0].uend, root=num_procs-1)
@@ -92,7 +92,7 @@ def restart_block(S,size,u0):
     S.init_step(u0)
     # reset some values
     S.status.done = False
-    S.status.iter = 0
+    S.status.iter = 1
     S.status.stage = 'SPREAD'
     for l in S.levels:
         l.tag = None
@@ -161,7 +161,7 @@ def predictor(S, comm):
     return S
 
 
-def pfasst(S,comm):
+def pfasst(S,comm,num_procs):
     """
     Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -195,11 +195,18 @@ def pfasst(S,comm):
             S.levels[0].sweep.predict()
 
             # update stage
-            if len(S.levels) > 1 and S.params.predict:
+            # update stage
+            if (len(S.levels) > 1 or num_procs > 1) and S.params.predict:  # MLSDC or PFASST
                 S.status.stage = 'PREDICT'
-            else:
+            elif num_procs > 1:  # MSSDC
+                S.levels[0].hooks.dump_pre_iteration(S.status)
+                S.status.stage = 'IT_COARSE'
+            elif num_procs == 1:  # SDC
                 S.levels[0].hooks.dump_pre_iteration(S.status)
                 S.status.stage = 'IT_FINE'
+            else:
+                print("Don't know what to do after spread, aborting")
+                exit()
             return S
 
 
@@ -210,7 +217,10 @@ def pfasst(S,comm):
 
             # update stage
             S.levels[0].hooks.dump_pre_iteration(S.status)
-            S.status.stage = 'IT_FINE'
+            if num_procs > 1:  # MSSDC
+                S.status.stage = 'IT_COARSE'
+            else:  # MLSDC or PFASST
+                S.status.stage = 'IT_FINE'
 
             return S
 
@@ -218,15 +228,10 @@ def pfasst(S,comm):
         if case('IT_FINE'):
             # do fine sweep
 
-            # increment iteration count here (and only here)
-            S.status.iter += 1
-
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
             S.levels[0].hooks.dump_sweep(S.status)
-
-            S.levels[0].hooks.dump_iteration(S.status)
 
             # update stage
             S.status.stage = 'IT_CHECK'
@@ -237,6 +242,9 @@ def pfasst(S,comm):
         if case('IT_CHECK'):
             # check whether to stop iterating (parallel)
 
+            # increment iteration count here (and only here)
+            S.status.iter += 1
+            S.levels[0].hooks.dump_iteration(S.status)
             S.status.done = check_convergence(S)
             all_done = comm.allgather(S.status.done)
 
@@ -244,13 +252,15 @@ def pfasst(S,comm):
             if not all(all_done):
                 S.status.done = False
                 # multi-level or single-level?
-                if len(S.levels) > 1:
+                if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_UP'
-                else:
+                elif num_procs > 1:  # MSSDC
+                    S.status.stage = 'IT_COARSE'
+                elif num_procs == 1:  # SDC
                     S.status.stage = 'IT_FINE'
 
             else:
-                # S.levels[0].sweep.compute_end_point()
+                S.levels[0].sweep.compute_end_point()
                 S.levels[0].hooks.dump_step(S.status)
                 S.status.stage = 'DONE'
 
@@ -297,7 +307,10 @@ def pfasst(S,comm):
                 send(source=S.levels[-1], target=S.next, tag=S.status.iter, comm=comm)
 
             # update stage
-            S.status.stage = 'IT_DOWN'
+            if len(S.levels) > 1:  # MLSDC or PFASST
+                S.status.stage = 'IT_DOWN'
+            else:  # MSSDC
+                S.status.stage = 'IT_CHECK'
 
             # return
             return S

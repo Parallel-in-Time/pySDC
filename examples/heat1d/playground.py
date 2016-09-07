@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 4
+    num_procs = 3
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     # setup parameters "in time"
     t0 = 0
     dt = 0.1
-    Tend = 3*dt
+    Tend = 4*dt
 
     # get initial values on finest level
     P = MS[0].levels[0].prob
