@@ -47,5 +47,3 @@ class controller(with_metaclass(abc.ABCMeta)):
             Tend: ending time
         """
         return None
-
-

@@ -9,7 +9,6 @@ from pySDC import Log
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 # from pySDC.Stats import grep_stats, sort_stats
-from pySDC.PFASST_helper import generate_steps
 
 
 if __name__ == "__main__":
@@ -17,7 +16,7 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 1
+    num_procs = 3
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
@@ -32,7 +31,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63]
+    pparams['nvars'] = [63, 31]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}

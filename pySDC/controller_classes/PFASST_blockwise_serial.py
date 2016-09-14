@@ -244,6 +244,7 @@ class PFASST_blockwise_serial(controller):
         else:
             print('not all stages are equal, aborting..')
             exit()
+
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
             for S in MS:
