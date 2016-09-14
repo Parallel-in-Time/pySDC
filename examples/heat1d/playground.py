@@ -1,6 +1,7 @@
 import numpy as np
 
 from pySDC.controller_classes.PFASST_blockwise_serial import PFASST_blockwise_serial
+from pySDC.controller_classes.PFASST_stepwise_serial import PFASST_stepwise_serial
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC import CollocationClasses as collclass
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63,31]
+    pparams['nvars'] = [63]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -58,10 +59,11 @@ if __name__ == "__main__":
 
     # initialize controller
     PFASST = PFASST_blockwise_serial(num_procs=num_procs, step_params=sparams, description=description)
+    # PFASST = PFASST_stepwise_serial(num_procs=num_procs, step_params=sparams, description=description)
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.1
+    dt = 0.12
     Tend = 3*dt
 
     # get initial values on finest level

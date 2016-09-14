@@ -27,8 +27,7 @@ Documentation and Testing
 -------------------------
 
 Most of the source code is documented (besides some of the examples, at least for now). 
-For doxygen generated documentation a Doxyfile is provided. The latest, auto-generated documentation can be found on 
-the [PinT server](https://pint.fz-juelich.de/ci/view/pySDC/job/PYSDC_DOCU/doxygen). To compile your 
+For doxygen generated documentation a Doxyfile is provided. To compile your 
 own documentation, use the [doxypypy](https://github.com/Feneric/doxypypy) filter. 
 
 Some first, rather rudimentary tests can be found in the tests directory and nose should be able to run those 

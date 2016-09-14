@@ -244,7 +244,6 @@ class PFASST_blockwise_serial(controller):
         else:
             print('not all stages are equal, aborting..')
             exit()
-
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
             for S in MS:
@@ -256,9 +255,12 @@ class PFASST_blockwise_serial(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if (len(S.levels) > 1 or len(MS) > 1) and S.params.predict: # MLSDC or PFASST
+                if (len(S.levels) > 1 and len(MS) > 1) and S.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
-                elif len(MS) > 1: # MSSDC
+                elif len(MS) > 1 and len(S.levels) > 1: # PFASST
+                    S.levels[0].hooks.dump_pre_iteration(S.status)
+                    S.status.stage = 'IT_FINE'
+                elif len(MS) > 1 and len(S.levels) == 1: # MSSDC
                     S.levels[0].hooks.dump_pre_iteration(S.status)
                     S.status.stage = 'IT_COARSE'
                 elif len(MS) == 1: # SDC
@@ -278,10 +280,7 @@ class PFASST_blockwise_serial(controller):
             for S in MS:
                 # update stage
                 S.levels[0].hooks.dump_pre_iteration(S.status)
-                if len(MS) > 1: # MSSDC
-                    S.status.stage = 'IT_COARSE'
-                elif len(MS) == 1: # SDC
-                    S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_FINE'
 
             return MS
 
