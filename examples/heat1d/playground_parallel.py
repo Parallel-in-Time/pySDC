@@ -1,8 +1,8 @@
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.controller_classes.allinclusive_blockwise_MPI import allinclusive_blockwise_MPI
-from pySDC.controller_classes.allinclusive_stepwise_MPI import allinclusive_stepwise_MPI
+from pySDC.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC import CollocationClasses as collclass
@@ -58,8 +58,8 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    # PFASST = allinclusive_blockwise_MPI(step_params=sparams, description=description, comm=comm)
-    PFASST = allinclusive_stepwise_MPI(step_params=sparams, description=description, comm=comm)
+    # PFASST = allinclusive_multigrid_MPI(step_params=sparams, description=description, comm=comm)
+    PFASST = allinclusive_classic_MPI(step_params=sparams, description=description, comm=comm)
 
     # setup parameters "in time"
     t0 = 0

@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import dolfin as df
 
-from pySDC.controller_classes.allinclusive_blockwise_nonMPI import allinclusive_blockwise_nonMPI
+from pySDC.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC import CollocationClasses as collclass
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         description['transfer_params'] = tparams
 
         # initialize controller
-        PFASST = allinclusive_blockwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
+        PFASST = allinclusive_multigrid_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
 
         # get initial values on finest level
         P = PFASST.MS[0].levels[0].prob

@@ -7,7 +7,7 @@ from pySDC import Step as stepclass
 from pySDC.Stats import stats
 
 
-class allinclusive_blockwise_nonMPI(controller):
+class allinclusive_multigrid_nonMPI(controller):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
@@ -25,7 +25,7 @@ class allinclusive_blockwise_nonMPI(controller):
        """
 
         # call parent's initialization routine
-        super(allinclusive_blockwise_nonMPI, self).__init__()
+        super(allinclusive_multigrid_nonMPI, self).__init__()
 
         self.MS = []
         # simply append step after step and generate the hierarchies

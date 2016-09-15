@@ -2,7 +2,7 @@ import dolfin as df
 import numpy as np
 from mpi4py import MPI
 
-import pySDC.controller_classes.allinclusive_blockwise_MPI as mp
+import pySDC.controller_classes.allinclusive_multigrid_MPI as mp
 from examples.fenics_heat1d.ProblemClass import fenics_heat
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
 from pySDC import CollocationClasses as collclass

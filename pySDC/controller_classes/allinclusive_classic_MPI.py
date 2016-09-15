@@ -5,7 +5,7 @@ from pySDC.Controller import controller
 from pySDC.Step import step
 from pySDC.Stats import stats
 
-class allinclusive_stepwise_MPI(controller):
+class allinclusive_classic_MPI(controller):
     """
 
     PFASST controller, running parallel version of PFASST in blocks (MG-style)
@@ -22,7 +22,7 @@ class allinclusive_stepwise_MPI(controller):
        """
 
         # call parent's initialization routine
-        super(allinclusive_stepwise_MPI, self).__init__()
+        super(allinclusive_classic_MPI, self).__init__()
 
         # create single step per processor
         self.S = step(step_params)
