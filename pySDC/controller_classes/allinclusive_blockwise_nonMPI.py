@@ -7,7 +7,7 @@ from pySDC import Step as stepclass
 from pySDC.Stats import stats
 
 
-class PFASST_blockwise_serial(controller):
+class allinclusive_blockwise_nonMPI(controller):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
@@ -25,7 +25,7 @@ class PFASST_blockwise_serial(controller):
        """
 
         # call parent's initialization routine
-        super(PFASST_blockwise_serial, self).__init__()
+        super(allinclusive_blockwise_nonMPI, self).__init__()
 
         self.MS = []
         # simply append step after step and generate the hierarchies
@@ -367,7 +367,7 @@ class PFASST_blockwise_serial(controller):
                 S.levels[-1].sweep.compute_residual()
                 S.levels[-1].hooks.dump_sweep(S.status)
 
-                # send to next step
+                # send to succ step
                 self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
 
                 # update stage

@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.controller_classes.PFASST_blockwise_serial import PFASST_blockwise_serial
-from pySDC.controller_classes.PFASST_stepwise_serial import PFASST_stepwise_serial
+from pySDC.controller_classes.allinclusive_blockwise_nonMPI import allinclusive_blockwise_nonMPI
+from pySDC.controller_classes.allinclusive_stepwise_nonMPI import allinclusive_stepwise_nonMPI
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from pySDC import CollocationClasses as collclass
@@ -57,8 +57,8 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    PFASST = PFASST_blockwise_serial(num_procs=num_procs, step_params=sparams, description=description)
-    # PFASST = PFASST_stepwise_serial(num_procs=num_procs, step_params=sparams, description=description)
+    # controller = allinclusive_blockwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
+    controller = allinclusive_stepwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
 
     # setup parameters "in time"
     t0 = 0
@@ -66,11 +66,11 @@ if __name__ == "__main__":
     Tend = 3*dt
 
     # get initial values on finest level
-    P = PFASST.MS[0].levels[0].prob
+    P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend, stats = PFASST.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
+    uend, stats = controller.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

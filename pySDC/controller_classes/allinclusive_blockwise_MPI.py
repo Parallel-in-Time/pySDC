@@ -5,7 +5,7 @@ from pySDC.Controller import controller
 from pySDC.Step import step
 from pySDC.Stats import stats
 
-class PFASST_blockwise_parallel(controller):
+class allinclusive_blockwise_MPI(controller):
     """
 
     PFASST controller, running parallel version of PFASST in blocks (MG-style)
@@ -22,7 +22,7 @@ class PFASST_blockwise_parallel(controller):
        """
 
         # call parent's initialization routine
-        super(PFASST_blockwise_parallel, self).__init__()
+        super(allinclusive_blockwise_MPI, self).__init__()
 
         # create single step per processor
         self.S = step(step_params)
@@ -204,9 +204,12 @@ class PFASST_blockwise_parallel(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if (len(self.S.levels) > 1 or num_procs > 1) and self.S.params.predict:  # MLSDC or PFASST
+            if (len(self.S.levels) > 1 and num_procs > 1) and self.S.params.predict:  # MLSDC or PFASST
                 self.S.status.stage = 'PREDICT'
-            elif num_procs > 1:  # MSSDC
+            elif num_procs > 1 and len(self.S.levels) > 1:  # PFASST
+                self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
+                self.S.status.stage = 'IT_FINE'
+            elif num_procs > 1 and len(self.S.levels) == 1:  # MSSDC
                 self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
                 self.S.status.stage = 'IT_COARSE'
             elif num_procs == 1:  # SDC
@@ -224,10 +227,7 @@ class PFASST_blockwise_parallel(controller):
 
             # update stage
             self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
-            if num_procs > 1:  # MSSDC
-                self.S.status.stage = 'IT_COARSE'
-            else:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_FINE'
 
         elif stage == 'IT_FINE':
 
