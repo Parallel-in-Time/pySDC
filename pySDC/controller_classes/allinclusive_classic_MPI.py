@@ -269,11 +269,11 @@ class allinclusive_classic_MPI(controller):
                 self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # recv status
-            if not self.S.status.first and not self.S.status.prec_done:
-                self.S.status.prec_done = comm.recv(source=self.S.prev, tag=99)
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
-            if not self.S.status.done or not self.S.status.prec_done:
+            if not self.S.status.done or not self.S.status.prev_cone:
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
@@ -319,7 +319,7 @@ class allinclusive_classic_MPI(controller):
             # sweeps on coarsest level (serial/blocking)
 
             # receive from previous step (if not first)
-            if not self.S.status.first and not self.S.status.prec_done:
+            if not self.S.status.first and not self.S.status.prev_cone:
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels)-1, comm=comm)
 
             # do the sweep

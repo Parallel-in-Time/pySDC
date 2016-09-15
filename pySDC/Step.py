@@ -62,7 +62,7 @@ class step():
                 self.time = None
                 self.dt = None
                 self.step = None
-                self.prec_done = None
+                self.prev_done = None
 
         # set params and status
         self.params = pars(params)
