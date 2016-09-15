@@ -127,7 +127,10 @@ class TestImexSweeper(unittest.TestCase):
       level.sweep.compute_end_point()
       uend_sweep = level.uend.values
       # Compute end value from matrix formulation
-      uend_mat   = self.pparams['u0'] + step.status.dt*level.sweep.coll.weights.dot(ustages*(problem.lambda_s[0] + problem.lambda_f[0]))
+      if level.sweep.params.do_coll_update:
+        uend_mat   = self.pparams['u0'] + step.status.dt*level.sweep.coll.weights.dot(ustages*(problem.lambda_s[0] + problem.lambda_f[0]))
+      else:
+        uend_mat = ustages[-1]
       assert np.linalg.norm(uend_sweep - uend_mat, np.infty)<1e-14, "Update formula in sweeper gives different result than matrix update formula"
 
 
@@ -216,27 +219,19 @@ class TestImexSweeper(unittest.TestCase):
       uend_sweep = level.uend.values
 
       lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
-      LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
 
       # Build single matrix representing K sweeps    
       Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       # Now build update function
-      update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
-      # Multiply u0 by value of update function to get end value directly
-      uend_matrix = update*self.pparams['u0']
+      if level.sweep.params.do_coll_update:
+        update = 1.0 + (problem.lambda_s[0] + problem.lambda_f[0])*level.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
+        # Multiply u0 by value of update function to get end value directly
+        uend_matrix = update * self.pparams['u0']
+      else:
+        update = Mat_sweep.dot(np.ones(nnodes))
+        uend_matrix = (update * self.pparams['u0'])[-1]
+      print(abs(uend_matrix - uend_sweep))
       assert abs(uend_matrix - uend_sweep)<1e-14, "Node-to-node sweep plus update yields different result than update function computed through K-sweep matrix"
-
-  #
-  # Make sure that creating a sweeper object with a collocation object with right_is_node=False and do_coll_update=False throws an exception
-  #
-  def test_norightnode_collupdate_fails(self):
-    for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
-      self.swparams['collocation_class'] = collclass.CollGaussLegendre
-      self.swparams['do_coll_update'] = False
-      # Has to throw an exception
-      with self.assertRaises(AssertionError):
-        step, level, problem, nnodes = self.setupLevelStepProblem()   
 
   #
   # Make sure the update with do_coll_update=False reproduces last stage

@@ -32,6 +32,8 @@ class allinclusive_stepwise_MPI(controller):
         self.comm = comm
         # add request handle container for isend
         self.req_send = []
+        # add request handler for status send
+        self.req_status = None
 
     def run(self, u0, t0, dt, Tend):
         """
@@ -119,6 +121,8 @@ class allinclusive_stepwise_MPI(controller):
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
+        self.req_status = None
+        self.req_send = []
 
     @staticmethod
     def recv(target,source,tag,comm):
@@ -144,7 +148,6 @@ class allinclusive_stepwise_MPI(controller):
             tag: identifier for this message
         """
         # sending here means computing uend ("one-sided communication")
-        source.sweep.compute_end_point()
         comm.send(source.uend, dest = target, tag = tag)
 
 
@@ -166,6 +169,7 @@ class allinclusive_stepwise_MPI(controller):
 
             # do the sweep with new values
             self.S.levels[-1].sweep.update_nodes()
+            self.S.levels[-1].sweep.compute_end_point()
 
             if not self.S.status.last:
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -187,15 +191,8 @@ class allinclusive_stepwise_MPI(controller):
             all active steps
         """
 
-        # if all stages are the same, continue, otherwise abort
-        all_stage = comm.allgather(self.S.status.stage)
-
-        if not all(all_stage):
-            print('not all stages are equal, aborting..')
-            exit()
-
         stage = self.S.status.stage
-
+        # print(self.comm.Get_rank(),stage)
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
 
@@ -240,6 +237,10 @@ class allinclusive_stepwise_MPI(controller):
             self.S.levels[0].sweep.compute_residual()
             self.S.levels[0].hooks.dump_sweep(self.S.status)
 
+            # wait for pending sends before computing uend, if any
+            if len(self.req_send) > 0 and not self.S.status.last and self.S.params.fine_comm:
+                self.req_send[0].wait()
+
             self.S.levels[0].sweep.compute_end_point()
 
             if not self.S.status.last and self.S.params.fine_comm:
@@ -255,13 +256,24 @@ class allinclusive_stepwise_MPI(controller):
             # increment iteration count here (and only here)
             self.S.status.iter += 1
             self.S.levels[0].hooks.dump_iteration(self.S.status)
-            self.S.status.done = self.check_convergence(self.S)
-            # all_done = comm.allgather(self.S.status.done)
 
-            # if not everyone is ready yet, keep doing stuff
-            if not self.S.status.done:
-            # if not all(all_done):
-                self.S.status.done = False
+            # check if an open request of the status send is pending
+            if not self.req_status is None:
+                self.req_status.wait()
+
+            # check for convergence or abort
+            self.S.status.done = self.check_convergence(self.S)
+
+            # send status forward
+            if not self.S.status.last:
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
+
+            # recv status
+            if not self.S.status.first and not self.S.status.prec_done:
+                self.S.status.prec_done = comm.recv(source=self.S.prev, tag=99)
+
+            # if I'm not done or the guy left of me is not done, keep doing stuff
+            if not self.S.status.done or not self.S.status.prec_done:
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
@@ -279,7 +291,6 @@ class allinclusive_stepwise_MPI(controller):
 
             # go up the hierarchy from finest to coarsest level (parallel)
 
-
             self.S.transfer(source=self.S.levels[0],target=self.S.levels[1])
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
@@ -287,6 +298,12 @@ class allinclusive_stepwise_MPI(controller):
                 self.S.levels[l].sweep.update_nodes()
                 self.S.levels[l].sweep.compute_residual()
                 self.S.levels[l].hooks.dump_sweep(self.S.status)
+
+                # wait for pending sends before computing uend, if any
+                if len(self.req_send) > l and not self.S.status.last and self.S.params.fine_comm:
+                    self.req_send[l].wait()
+
+                self.S.levels[l].sweep.compute_end_point()
 
                 if not self.S.status.last and self.S.params.fine_comm:
                     self.req_send.append(comm.isend(self.S.levels[l].uend,dest=self.S.next,tag=l))
@@ -301,9 +318,8 @@ class allinclusive_stepwise_MPI(controller):
 
             # sweeps on coarsest level (serial/blocking)
 
-
             # receive from previous step (if not first)
-            if not self.S.status.first:
+            if not self.S.status.first and not self.S.status.prec_done:
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels)-1, comm=comm)
 
             # do the sweep
@@ -331,9 +347,6 @@ class allinclusive_stepwise_MPI(controller):
 
                 if not self.S.status.first and self.S.params.fine_comm:
                     self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=l-1, comm=comm)
-
-                if not self.S.status.last and self.S.params.fine_comm:
-                    self.req_send[l-1].wait()
 
                 # prolong values
                 self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
