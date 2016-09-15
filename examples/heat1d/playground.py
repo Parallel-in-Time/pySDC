@@ -57,8 +57,8 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    # controller = allinclusive_blockwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
-    controller = allinclusive_stepwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
+    controller = allinclusive_blockwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
+    # controller = allinclusive_stepwise_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
 
     # setup parameters "in time"
     t0 = 0

@@ -195,7 +195,6 @@ class allinclusive_stepwise_MPI(controller):
             exit()
 
         stage = self.S.status.stage
-        print(self.comm.Get_rank(),stage)
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
@@ -244,9 +243,7 @@ class allinclusive_stepwise_MPI(controller):
             self.S.levels[0].sweep.compute_end_point()
 
             if not self.S.status.last and self.S.params.fine_comm:
-                print(self.comm.Get_rank(), 0, 'pre-send')
-                self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=self.S.status.iter))
-                print(self.comm.Get_rank(), 0, 'post-send', self.req_send[0])
+                self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
 
             # update stage
             self.S.status.stage = 'IT_CHECK'
@@ -259,10 +256,11 @@ class allinclusive_stepwise_MPI(controller):
             self.S.status.iter += 1
             self.S.levels[0].hooks.dump_iteration(self.S.status)
             self.S.status.done = self.check_convergence(self.S)
-            all_done = comm.allgather(self.S.status.done)
+            # all_done = comm.allgather(self.S.status.done)
 
             # if not everyone is ready yet, keep doing stuff
-            if not all(all_done):
+            if not self.S.status.done:
+            # if not all(all_done):
                 self.S.status.done = False
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
@@ -291,7 +289,7 @@ class allinclusive_stepwise_MPI(controller):
                 self.S.levels[l].hooks.dump_sweep(self.S.status)
 
                 if not self.S.status.last and self.S.params.fine_comm:
-                    self.req_send.append(comm.isend(self.S.levels[l].uend,dest=self.S.next,tag=self.S.status.iter))
+                    self.req_send.append(comm.isend(self.S.levels[l].uend,dest=self.S.next,tag=l))
 
                 # transfer further up the hierarchy
                 self.S.transfer(source=self.S.levels[l],target=self.S.levels[l+1])
@@ -306,7 +304,7 @@ class allinclusive_stepwise_MPI(controller):
 
             # receive from previous step (if not first)
             if not self.S.status.first:
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels)-1, comm=comm)
 
             # do the sweep
             self.S.levels[-1].sweep.update_nodes()
@@ -316,7 +314,7 @@ class allinclusive_stepwise_MPI(controller):
 
             # send to next step
             if not self.S.status.last:
-                self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
+                self.send(source=self.S.levels[-1], target=self.S.next, tag=len(self.S.levels)-1, comm=comm)
 
             # update stage
             if len(self.S.levels) > 1:  # MLSDC or PFASST
@@ -332,12 +330,9 @@ class allinclusive_stepwise_MPI(controller):
             for l in range(len(self.S.levels)-1,0,-1):
 
                 if not self.S.status.first and self.S.params.fine_comm:
-                    print(self.comm.Get_rank(), l-1, 'pre-recv')
-                    self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-                    print(self.comm.Get_rank(), l - 1, 'post-recv')
+                    self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=l-1, comm=comm)
 
                 if not self.S.status.last and self.S.params.fine_comm:
-                    print(self.comm.Get_rank(), l-1, 'wait', self.req_send[l-1])
                     self.req_send[l-1].wait()
 
                 # prolong values
