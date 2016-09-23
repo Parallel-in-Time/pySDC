@@ -5,7 +5,7 @@ from pySDC.controller_classes.allinclusive_multigrid_MPI import allinclusive_mul
 from pySDC.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
-from pySDC import CollocationClasses as collclass
+from pySDC.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC import Log
 from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['collocation_class'] = collclass.CollGaussRadau_Right
+    swparams['collocation_class'] = CollGaussRadau_Right
     swparams['num_nodes'] = 5
 
     # Fill description dictionary for easy hierarchy creation
