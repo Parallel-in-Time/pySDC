@@ -10,34 +10,58 @@ from pySDC.datatype_classes.mesh import mesh
 
 
 def run_accuracy_test(nvars_list):
+    """
+    Routine to check the error of the Laplacian vs. its FD discretization
+
+    Args:
+        nvars_list: list of nvars to do the testing with
+
+    Returns:
+        a dictionary containing the errors and a header (with nvars_list)
+    """
 
     results = {}
+    # loop over all nvars
     for nvars in nvars_list:
-        problem_params['nvars'] = nvars
 
+        # setup problem
+        problem_params['nvars'] = nvars
         prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
+        # create x values, use only inner points
         xvalues = np.array([(i + 1) * prob.dx for i in range(prob.nvars)])
 
+        # create a mesh instance and fill it with a sine wave
         u = prob.dtype_u(init=prob.nvars)
         u.values = np.sin(np.pi * prob.freq * xvalues)
 
+        # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.nvars)
         u_lap.values = -(np.pi * prob.freq) ** 2 * prob.nu * np.sin(np.pi * prob.freq * xvalues)
 
+        # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
 
+        # get id for this nvars and put error into dictionary
         id = ID(nvars=nvars)
         results[id] = err
 
+    # add nvars_list to dictionary for easier access later on
     results['nvars_list'] = nvars_list
+
     return results
 
 
 def plot_accuracy(results):
+    """
+    Routine to visualize the errors as well as the expected errors
 
+    Args:
+        results: the dictionary containing the errors
+    """
+
+    # retrieve the list of nvars from results
     assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
-
     nvars_list = sorted(results['nvars_list'])
 
     # Set up plotting parameters
@@ -51,34 +75,40 @@ def plot_accuracy(results):
               }
     plt.rcParams.update(params)
 
+    # create new figure
     plt.figure()
+    # take x-axis limits from nvars_list + some spacning left and right
     plt.xlim([min(nvars_list) / 2, max(nvars_list) * 2])
     plt.xlabel('nvars')
     plt.ylabel('abs. error')
     plt.grid()
 
+    # get guide for the order of accuracy, i.e. the errors to expect
+    # get error for first entry in nvars_list
     id = ID(nvars=nvars_list[0])
     base_error = results[id]
+    # assemble optimal errors for 2nd order method and plot
     order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(nvars_list))]
     plt.loglog(nvars_list, order_guide_space, color='k', ls='--', label='2nd order')
+
 
     min_err = 1E99
     max_err = 0E00
     err_list = []
-    xvars = []
+    # loop over nvars, get errors and find min/max error for y-axis limits
     for nvars in nvars_list:
         id = ID(nvars=nvars)
         err = results[id]
         min_err = min(err, min_err)
         max_err = max(err, max_err)
         err_list.append(err)
-        xvars.append(nvars)
+    plt.loglog(nvars_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
 
-    plt.loglog(xvars, err_list, ls=' ', marker='o', markersize=10, label='experiment')
-
+    # adjust y-axis limits, add legend
     plt.ylim([min_err / 10, max_err * 10])
     plt.legend(loc=1, ncol=1, numpoints=1)
 
+    # save plot as PDF, beautify
     fname = 'accuracy_test.pdf'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
@@ -86,15 +116,23 @@ def plot_accuracy(results):
 
 
 if __name__ == "__main__":
+    """
+    A simple test program to visualize the errors and the expected order of accuracy ("points on a line")
+    """
 
+    # setup id for gathering the results (will sort by nvars)
     ID = namedtuple('ID', 'nvars')
 
+    # initialize problem parameters
     problem_params = {}
-    problem_params['nu'] = 0.1
-    problem_params['freq'] = 4
+    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['freq'] = 4  # frequency for the test value
 
-    nvars_list = [2**p-1 for p in range(3,15)]
+    # create list of nvars to do the accuracy test with
+    nvars_list = [2 ** p - 1 for p in range(3, 15)]
 
+    # run accuracy test for all nvars
     results = run_accuracy_test(nvars_list=nvars_list)
 
+    # visualize results
     plot_accuracy(results)
