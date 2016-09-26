@@ -2,15 +2,17 @@ import unittest
 
 import numpy as np
 
-import pySDC.Collocation
+from tests.test_helpers import get_derived_from_in_package
+from pySDC.Collocation import CollBase
+
 from examples.fwsw.ProblemClass import swfw_scalar
-from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 from pySDC import Hooks as hookclass
 from pySDC import Level as lvl
 from pySDC import Step as stepclass
 
-classes  = [ "CollGaussLegendre", "CollGaussLobatto", "CollGaussRadau_Right", "CollGaussRadau_Left" ]
+classes = get_derived_from_in_package(CollBase,'implementations/collocation_classes')
 
 class TestImexSweeper(unittest.TestCase):
 
@@ -50,7 +52,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_caninstantiate(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       L = lvl.level(problem_class=swfw_scalar, problem_params=self.pparams, dtype_u=mesh, dtype_f=rhs_imex_mesh, sweeper_class=imex, sweeper_params=self.swparams, level_params={}, hook_class=hookclass.hooks, id="imextest")
       assert isinstance(L.sweep, imex), "sweeper in generated level is not an object of type imex"
 
@@ -59,7 +61,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_canregisterlevel(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step = stepclass.step(params={})
       L = lvl.level(problem_class=swfw_scalar, problem_params=self.pparams, dtype_u=mesh, dtype_f=rhs_imex_mesh, sweeper_class=imex, sweeper_params=self.swparams, level_params={}, hook_class=hookclass.hooks, id="imextest")
       step.register_level(L)
@@ -76,10 +78,10 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_canrunsweep(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       # After running setupLevelStepProblem, the functions predict, update_nodes and compute_end_point should run
-      step, level, problem, nnodes = self.setupLevelStepProblem()   
-      assert level.u[0] is not None, "After init_step, level.u[0] should no longer be of type None" 
+      step, level, problem, nnodes = self.setupLevelStepProblem()
+      assert level.u[0] is not None, "After init_step, level.u[0] should no longer be of type None"
       assert level.u[1] is None, "Before predict, level.u[1] and following should be of type None"
       level.sweep.predict()
       # Should now be able to run update nodes
@@ -93,7 +95,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_sweepequalmatrix(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -106,14 +108,14 @@ class TestImexSweeper(unittest.TestCase):
 
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(u0full) )
       usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
-      assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Single SDC sweeps in matrix and node-to-node formulation yield different results"        
+      assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Single SDC sweeps in matrix and node-to-node formulation yield different results"
 
   #
   # Make sure the implemented update formula matches the matrix update formula
   #
   def test_updateformula(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -137,11 +139,11 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_collocationinvariant(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
-      
+
       QE, QI, Q = level.sweep.get_sweeper_mats()
 
       # Build collocation matrix
@@ -149,7 +151,7 @@ class TestImexSweeper(unittest.TestCase):
 
       # Solve collocation problem directly
       ucoll = np.linalg.inv(Mcoll).dot(u0full)
-      
+
       # Put stages of collocation solution into level
       for l in range(0,nnodes):
         level.u[l+1].values = ucoll[l]
@@ -166,6 +168,7 @@ class TestImexSweeper(unittest.TestCase):
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(ucoll) )
       assert np.linalg.norm( unew - ucoll, np.infty )<1e-14, "Collocation solution not invariant under matrix SDC sweep"
       unew_sweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      print(np.linalg.norm( unew_sweep - ucoll, np.infty ))
       assert np.linalg.norm( unew_sweep - ucoll, np.infty )<1e-14, "Collocation solution not invariant under node-to-node sweep"
 
 
@@ -174,7 +177,7 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_manysweepsequalmatrix(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -191,19 +194,19 @@ class TestImexSweeper(unittest.TestCase):
       unew = u0full
       for i in range(0,K):
         unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(unew) )
-      
-      assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"   
-      
+
+      assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Doing multiple node-to-node sweeps yields different result than same number of matrix-form sweeps"
+
       Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       usweep_onematrix = Mat_sweep.dot(u0full)
       assert np.linalg.norm( usweep_onematrix - usweep, np.infty )<1e-14, "Single-matrix multiple sweep formulation yields different result than multiple sweeps in node-to-node or matrix form form"
-    
+
   #
   # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
   #
   def test_manysweepupdate(self):
     for type in classes:
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
@@ -218,7 +221,7 @@ class TestImexSweeper(unittest.TestCase):
 
       lambdas = [ problem.lambda_f[0] , problem.lambda_s[0] ]
 
-      # Build single matrix representing K sweeps    
+      # Build single matrix representing K sweeps
       Mat_sweep = level.sweep.get_scalar_problems_manysweep_mat( nsweeps = K, lambdas = lambdas )
       # Now build update function
       if level.sweep.params.do_coll_update:
@@ -233,14 +236,14 @@ class TestImexSweeper(unittest.TestCase):
 
   #
   # Make sure the update with do_coll_update=False reproduces last stage
-  # 
+  #
   def test_update_nocollupdate_laststage(self):
     for type in classes:
-      # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
-      if type=="CollGaussLegendre": break
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       self.swparams['do_coll_update'] = False
       step, level, problem, nnodes = self.setupLevelStepProblem()
+      # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
+      if not level.sweep.coll.right_is_node: break
       level.sweep.predict()
       ulaststage = np.random.rand()
       level.u[nnodes].values = ulaststage
@@ -253,11 +256,11 @@ class TestImexSweeper(unittest.TestCase):
   #
   def test_updateformula_no_coll_update(self):
     for type in classes:
-      # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
-      if type=="CollGaussLegendre": break
-      self.swparams['collocation_class'] = getattr(pySDC.CollocationClasses, type)
+      self.swparams['collocation_class'] = type
       self.swparams['do_coll_update'] = False
       step, level, problem, nnodes = self.setupLevelStepProblem()
+      # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
+      if not level.sweep.coll.right_is_node: break
       level.sweep.predict()
       u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
 

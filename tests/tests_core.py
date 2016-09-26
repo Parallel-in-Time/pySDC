@@ -1,5 +1,7 @@
 import numpy as np
 
+from tests.test_helpers import get_derived_from_in_package
+from pySDC.Collocation import CollBase
 
 #def test_python_version():
 #    import sys
@@ -15,23 +17,6 @@ import numpy as np
     #
     # u = prob.u_exact(1)
     # assert type(u) == list
-
-
-def test_collocation():
-    classes = ['CollGaussLobatto','CollGaussLegendre']
-    for M in range(2,5):
-        for subclass in classes:
-            yield check_collocation, subclass, M
-
-def check_collocation(subclass,M):
-    import pySDC.CollocationClasses
-
-    coll = getattr(pySDC.CollocationClasses, subclass)(M,0,1)
-
-    for m in np.arange(coll.num_nodes):
-        assert np.abs(np.sum(coll.Qmat[m+1,:],axis=0) - np.sum(coll.delta_m[0:m+1])) < 5E-12, 'got a discrepancy of %12.8e' % np.abs(np.sum(coll.Qmat[m+1,:],axis=0) - np.sum(coll.delta_m[0:m+1]))
-        assert np.abs(np.sum(coll.Smat[m+1,:],axis=0) - coll.delta_m[m]) < 5E-12, 'got a discrepancy of %12.8e' % np.abs(np.sum(coll.Smat[m+1,:],axis=0) - coll.delta_m[m])
-
 
 
 def test_errors():

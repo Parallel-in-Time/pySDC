@@ -2,7 +2,6 @@ from __future__ import division
 
 import numpy as np
 
-from implementations.datatype_classes import mesh, rhs_imex_mesh
 from pySDC.Problem import ptype
 
 class swfw_scalar(ptype):
@@ -54,7 +53,7 @@ class swfw_scalar(ptype):
             solution as mesh
         """
 
-        me = mesh(self.nvars)
+        me = self.dtype_u(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
                me.values[i,j] = rhs.values[i,j]/(1.0-factor*self.lambda_f[j])
@@ -74,7 +73,7 @@ class swfw_scalar(ptype):
             explicit part of RHS
         """
 
-        fexpl = mesh(self.nvars)
+        fexpl = self.dtype_u(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
                 fexpl.values[i,j] = self.lambda_s[i]*u.values[i,j]
@@ -92,7 +91,7 @@ class swfw_scalar(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
+        fimpl = self.dtype_u(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
                 fimpl.values[i,j] = self.lambda_f[j]*u.values[i,j]
@@ -112,7 +111,7 @@ class swfw_scalar(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_imex_mesh(self.nvars)
+        f = self.dtype_f(self.nvars)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -129,7 +128,7 @@ class swfw_scalar(ptype):
             exact solution
         """
         
-        me = mesh(self.nvars)
+        me = self.dtype_u(self.nvars)
         for i in range(self.lambda_s.size):
             for j in range(self.lambda_f.size):
                 me.values[i,j] = self.u0*np.exp((self.lambda_f[j]+self.lambda_s[i])*t)
