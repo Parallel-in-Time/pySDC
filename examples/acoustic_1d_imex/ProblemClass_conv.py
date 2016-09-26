@@ -11,13 +11,12 @@ r"""
 """
 
 import numpy as np
-import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.Problem import ptype
+
 
 def u_initial(x, k):
     return np.sin(k*2.0*np.pi*x) + np.sin(2.0*np.pi*x)

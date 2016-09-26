@@ -1,16 +1,14 @@
-from pySDC import Level as lvl
-from pySDC import Hooks as hookclass
-from pySDC import CollocationClasses as collclass
-from pySDC import Step as stepclass
-import pySDC.Collocation
-
-from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from examples.fwsw.ProblemClass import swfw_scalar
-
-from nose.tools import *
 import unittest
+
 import numpy as np
+
+import pySDC.Collocation
+from examples.fwsw.ProblemClass import swfw_scalar
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+from pySDC import Hooks as hookclass
+from pySDC import Level as lvl
+from pySDC import Step as stepclass
 
 classes  = [ "CollGaussLegendre", "CollGaussLobatto", "CollGaussRadau_Right", "CollGaussRadau_Left" ]
 

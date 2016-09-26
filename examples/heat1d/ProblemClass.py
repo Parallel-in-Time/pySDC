@@ -1,10 +1,11 @@
 from __future__ import division
+
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
 from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 
 class heat1d(ptype):
     """
@@ -76,7 +77,7 @@ class heat1d(ptype):
             solution as mesh
         """
 
-        me = mesh(self.nvars)
+        me = self.dtype_u(self.nvars)
         me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
         return me
 
@@ -94,7 +95,7 @@ class heat1d(ptype):
         """
 
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = mesh(self.nvars)
+        fexpl = self.dtype_u(self.nvars)
         fexpl.values = -np.sin(np.pi*xvalues)*(np.sin(t)-self.nu*np.pi**2*np.cos(t))
         return fexpl
 
@@ -110,7 +111,7 @@ class heat1d(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars)
+        fimpl = self.dtype_u(self.nvars)
         fimpl.values = self.A.dot(u.values)
         return fimpl
 
@@ -127,7 +128,7 @@ class heat1d(ptype):
             the RHS divided into two parts
         """
 
-        f = rhs_imex_mesh(self.nvars)
+        f = self.dtype_f(self.nvars)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -144,7 +145,7 @@ class heat1d(ptype):
             exact solution
         """
 
-        me = mesh(self.nvars)
+        me = self.dtype_u(self.nvars)
         xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
         me.values = np.sin(np.pi*xvalues)*np.cos(t)
         return me

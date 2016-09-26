@@ -1,15 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
 import pySDC.deprecated.PFASST_blockwise_old as mp
+
 from examples.generalized_fisher.ProblemClass import generalized_fisher
+from implementations.datatype_classes import mesh
+from implementations.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
 from pySDC.Plugins.sweeper_helper import get_Qd
-from pySDC.datatype_classes.mesh import mesh
-from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-
-
 
 if __name__ == "__main__":
 

@@ -2,16 +2,15 @@ import dolfin as df
 import numpy as np
 from mpi4py import MPI
 
-import pySDC.controller_classes.allinclusive_multigrid_MPI as mp
+import implementations.controller_classes.allinclusive_multigrid_MPI as mp
 from examples.fenics_heat1d.ProblemClass import fenics_heat
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
+from implementations.datatype_classes import fenics_mesh,rhs_fenics_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
 from pySDC.Stats import grep_stats, sort_stats
 from pySDC.Step import step
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-
 
 if __name__ == "__main__":
 

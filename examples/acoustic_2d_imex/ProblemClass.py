@@ -1,11 +1,10 @@
 import numpy as np
-import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from build2DFDMatrix import get2DMesh
-from buildWave2DMatrix import getWave2DMatrix, getWaveBCHorizontal, getWaveBCVertical, getWave2DUpwindMatrix
+from buildWave2DMatrix import getWave2DMatrix, getWave2DUpwindMatrix
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.Problem import ptype
 from unflatten import unflatten
 
 

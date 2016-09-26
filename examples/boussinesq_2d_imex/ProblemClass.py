@@ -1,12 +1,12 @@
 import numpy as np
-import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
 from build2DFDMatrix import get2DMesh
-from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesqBCHorizontal, getBoussinesqBCVertical, getBoussinesq2DUpwindMatrix
+from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesq2DUpwindMatrix
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.Problem import ptype
 from unflatten import unflatten
+
 
 class logging(object):
 

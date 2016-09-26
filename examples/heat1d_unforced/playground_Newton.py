@@ -1,12 +1,12 @@
 import numpy as np
-
 import pySDC.deprecated.PFASST_blockwise_old as mp
+
 from examples.heat1d_unforced.ProblemClass import heat1d_unforced
 from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
+from implementations.datatype_classes.mesh import mesh
+from implementations.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.datatype_classes.mesh import mesh
-from pySDC.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 
 if __name__ == "__main__":
 

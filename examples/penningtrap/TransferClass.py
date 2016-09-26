@@ -1,5 +1,6 @@
+from implementations.datatype_classes.particles import particles, fields
 from pySDC.Transfer import transfer
-from pySDC.datatype_classes.particles import particles, fields
+
 
 class particles_to_particles(transfer):
     """

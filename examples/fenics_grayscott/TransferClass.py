@@ -1,9 +1,9 @@
 from __future__ import division
 
-from pySDC.Transfer import transfer
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh,rhs_fenics_mesh
-
 import dolfin as df
+
+from implementations.datatype_classes import fenics_mesh,rhs_fenics_mesh
+from pySDC.Transfer import transfer
 
 class mesh_to_mesh_fenics(transfer):
     """

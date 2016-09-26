@@ -1,11 +1,12 @@
-import numpy as np
-import scipy.sparse as sp
 from collections import namedtuple
 
-from examples.tutorial.step_1.HeatEquation_1D_FD import heat1d
-from pySDC.datatype_classes.mesh import mesh
+import numpy as np
+import scipy.sparse as sp
 
-from pySDC.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.datatype_classes.mesh import mesh
+from implementations.probem_classes.HeatEquation_1D_FD import heat1d
+
 
 def run_accuracy_test(prob, coll, dt_list):
     """

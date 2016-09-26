@@ -1,22 +1,12 @@
-
-from pySDC import CollocationClasses as collclass
-
-import numpy as np
-
-from ProblemClass import advection_2d_explicit
-#from examples.sharpclaw_burgers1d.TransferClass import mesh_to_mesh_1d
-from examples.advection_2d_explicit.HookClass import plot_solution
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 import pySDC.Methods as mp
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
-
-# Sharpclaw imports
-from clawpack import pyclaw
-from clawpack import riemann
 from matplotlib import pyplot as plt
 
+from ProblemClass import advection_2d_explicit
+from examples.advection_2d_explicit.HookClass import plot_solution
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC import CollocationClasses as collclass
+from pySDC import Log
 
 if __name__ == "__main__":
 

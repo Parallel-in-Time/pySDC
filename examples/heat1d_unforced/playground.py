@@ -1,12 +1,13 @@
 import numpy as np
-
 import pySDC.deprecated.PFASST_blockwise_old as mp
+
 from examples.heat1d_unforced.HookClass import error_output
 from examples.heat1d_unforced.ProblemClass import heat1d_unforced
 from examples.heat1d_unforced.TransferClass import mesh_to_mesh_1d
+from implementations.datatype_classes import mesh
+from implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC import CollocationClasses as collclass
-from pySDC.datatype_classes.mesh import mesh
-from pySDC.sweeper_classes.generic_implicit import generic_implicit
+
 # import pySDC.PFASST_stepwise as mp
 # import pySDC.Methods as mp
 # from pySDC.Stats import grep_stats, sort_stats

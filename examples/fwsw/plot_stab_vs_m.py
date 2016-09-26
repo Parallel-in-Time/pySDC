@@ -1,18 +1,15 @@
-from pySDC import Level as lvl
-from pySDC import Hooks as hookclass
-from pySDC import CollocationClasses as collclass
-from pySDC import Step as stepclass
-
-from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from examples.fwsw.ProblemClass import swfw_scalar 
-import numpy as np
-
-from pylab import rcParams
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon
-from subprocess import call
+import numpy as np
 from matplotlib.ticker import ScalarFormatter
+from pylab import rcParams
+
+from examples.fwsw.ProblemClass import swfw_scalar
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+from pySDC import CollocationClasses as collclass
+from pySDC import Hooks as hookclass
+from pySDC import Level as lvl
+from pySDC import Step as stepclass
 
 if __name__ == "__main__":
   mvals = np.arange(2,10)

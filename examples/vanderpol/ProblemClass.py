@@ -4,8 +4,8 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
+from implementations.datatype_classes import mesh
 from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh
 
 
 class vanderpol(ptype):

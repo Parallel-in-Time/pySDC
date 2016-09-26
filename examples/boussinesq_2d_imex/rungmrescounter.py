@@ -1,11 +1,11 @@
 import numpy as np
-
 import pySDC.deprecated.PFASST_stepwise as mp
+
 from ProblemClass import boussinesq_2d_imex
 from examples.boussinesq_2d_imex.HookClass import plot_solution
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 from standard_integrators import dirk, rk_imex, SplitExplicit
 from unflatten import unflatten
 

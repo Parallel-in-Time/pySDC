@@ -1,16 +1,13 @@
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from pySDC.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
-from pySDC.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import Log
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-
-
 
 if __name__ == "__main__":
 

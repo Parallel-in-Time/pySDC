@@ -3,13 +3,13 @@ from collections import namedtuple
 
 import dolfin as df
 
-from pySDC.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from examples.fenics_heat1d.ProblemClass_unforced import fenics_heat_unforced
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
+from implementations.controller_classes import allinclusive_multigrid_nonMPI
+from implementations.datatype_classes import fenics_mesh
+from implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC import CollocationClasses as collclass
 from pySDC.Stats import grep_stats, sort_stats
-from pySDC.datatype_classes.fenics_mesh import fenics_mesh
-from pySDC.sweeper_classes.generic_implicit import generic_implicit
 
 if __name__ == "__main__":
 

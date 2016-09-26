@@ -1,13 +1,12 @@
 import numpy as np
+import pySDC.deprecated.PFASST_stepwise as mp
 from matplotlib import pyplot as plt
 
-import pySDC.deprecated.PFASST_stepwise as mp
 from ProblemClass import sharpclaw
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
-
 
 if __name__ == "__main__":
 

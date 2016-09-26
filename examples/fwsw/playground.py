@@ -2,13 +2,13 @@ from __future__ import print_function
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 import pySDC.deprecated.PFASST_stepwise as mp
+
 from examples.fwsw.ProblemClass import swfw_scalar
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
-from pySDC.sweeper_classes.imex_1st_order import imex_1st_order
 
 
 

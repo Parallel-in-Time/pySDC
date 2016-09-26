@@ -1,14 +1,9 @@
 import numpy as np
-import scipy.sparse as sp
-import scipy.sparse.linalg as LA
-
-from pySDC.Problem import ptype
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
-# Sharpclaw imports
 from clawpack import pyclaw
 from clawpack import riemann
 
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.Problem import ptype
 from unflatten import unflatten
 
 class advection_2d_explicit(ptype):

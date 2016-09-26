@@ -1,8 +1,9 @@
-import numpy as np
 from collections import namedtuple
 
-from examples.tutorial.step_1.HeatEquation_1D_FD import heat1d
-from pySDC.datatype_classes.mesh import mesh
+import numpy as np
+
+from implementations.datatype_classes.mesh import mesh
+from implementations.probem_classes.HeatEquation_1D_FD import heat1d
 
 
 def run_accuracy_test(nvars_list):

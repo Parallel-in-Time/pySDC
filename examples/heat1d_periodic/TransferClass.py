@@ -1,10 +1,11 @@
 from __future__ import division
+
 import numpy as np
 
-from pySDC.Transfer import transfer
-from pySDC.datatype_classes.mesh import mesh, rhs_imex_mesh
-
 import pySDC.Plugins.transfer_helper as th
+from implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.Transfer import transfer
+
 
 # FIXME: extend this to ndarrays
 # FIXME: extend this to ndarrays

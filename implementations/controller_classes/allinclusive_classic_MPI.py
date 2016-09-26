@@ -273,7 +273,7 @@ class allinclusive_classic_MPI(controller):
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
-            if not self.S.status.done or not self.S.status.prev_cone:
+            if not self.S.status.done or not self.S.status.prev_done:
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
