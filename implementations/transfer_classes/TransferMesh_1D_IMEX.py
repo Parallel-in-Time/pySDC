@@ -12,7 +12,7 @@ class mesh_to_mesh_1d(transfer):
     """
     Custon transfer class, implements Transfer.py
 
-    This implementation can restrict and prolong between 1d meshes via matrix-vector products
+    This implementation can restrict and prolong between 1d meshes with dirichlet-0 boundaries via matrix-vector products
 
     Attributes:
         fine: reference to the fine level
@@ -43,14 +43,7 @@ class mesh_to_mesh_1d(transfer):
             self.Rspace = np.eye(self.init_c)
         # assemble restriction as transpose of interpolation
         else:
-
-            if params['rorder'] == 1:
-
-                self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=1).T
-
-            else:
-
-                self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['rorder']).T
+            self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['rorder']).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:

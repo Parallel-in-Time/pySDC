@@ -2,11 +2,11 @@ import numpy as np
 
 from examples.heat1d.ProblemClass import heat1d
 from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-# from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d
-from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d
+# from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 # from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
+# from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    # swparams['collocation_class'] = CollGaussRadau_Right
-    swparams['collocation_class'] = EquidistantSpline_Right
+    swparams['collocation_class'] = CollGaussRadau_Right
+    # swparams['collocation_class'] = EquidistantSpline_Right
     swparams['num_nodes'] = 2
 
     # Fill description dictionary for easy hierarchy creation
