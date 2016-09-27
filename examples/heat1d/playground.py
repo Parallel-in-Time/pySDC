@@ -1,7 +1,9 @@
 import numpy as np
 
 from examples.heat1d.ProblemClass import heat1d
-from examples.heat1d.TransferClass import mesh_to_mesh_1d
+from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d
+# from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
@@ -31,6 +33,7 @@ if __name__ == "__main__":
     pparams = {}
     pparams['nu'] = 1.0
     pparams['nvars'] = [63, 31]
+    pparams['freq'] = 2
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -45,7 +48,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = heat1d
+    description['problem_class'] = heat1d_forced
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh

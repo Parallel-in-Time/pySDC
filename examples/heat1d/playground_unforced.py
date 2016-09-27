@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import pySDC.deprecated.PFASST_blockwise_old as mp
 
-from examples.heat1d.ProblemClass_unforced import heat1d_unforced
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from implementations.datatype_classes import mesh
 from implementations.sweeper_classes.generic_LU import generic_LU
@@ -47,11 +47,11 @@ if __name__ == "__main__":
     t0 = 0.0
     Tend = 2.0
 
-    dt_list = [Tend/(2**i) for i in range(0,7,1)]
+    # dt_list = [Tend/(2**i) for i in range(0,7,1)]
     # nvars_list = [2**i-1 for i in range(8,14)]
-    nvars_list = [[2**i-1, 2**(i-1)-1] for i in range(8, 14)]
-    # dt_list = [2.0,1.0]
-    # nvars_list = [511]
+    # nvars_list = [[2**i-1, 2**(i-1)-1] for i in range(8, 14)]
+    dt_list = [2.0,1.0]
+    nvars_list = [511]
 
     results = {}
     # results['description'] = (pparams,swparams)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
         # Fill description dictionary for easy hierarchy creation
         description = {}
-        description['problem_class'] = heat1d_unforced
+        description['problem_class'] = heat1d
         description['problem_params'] = pparams
         description['dtype_u'] = mesh
         description['dtype_f'] = mesh

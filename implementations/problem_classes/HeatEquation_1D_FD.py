@@ -83,6 +83,24 @@ class heat1d(ptype):
         f.values = self.A.dot(u.values)
         return f
 
+    def solve_system(self,rhs,factor,u0,t):
+        """
+        Simple linear solver for (I-factor*A)u = rhs
+
+        Args:
+            rhs: right-hand side for the linear system
+            factor: abbrev. for the node-to-node stepsize (or any other factor required)
+            u0: initial guess for the iterative solver (not used here so far)
+            t: current time (e.g. for time-dependent BCs)
+
+        Returns:
+            solution as mesh
+        """
+
+        me = self.dtype_u(self.nvars)
+        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        return me
+
     def u_exact(self,t):
         """
         Routine to compute the exact solution at time t

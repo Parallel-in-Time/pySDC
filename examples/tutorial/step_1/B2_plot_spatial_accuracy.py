@@ -5,7 +5,7 @@ import numpy as np
 from collections import namedtuple
 import matplotlib.pylab as plt
 
-from implementations.probem_classes.HeatEquation_1D_FD import heat1d
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from implementations.datatype_classes.mesh import mesh
 
 

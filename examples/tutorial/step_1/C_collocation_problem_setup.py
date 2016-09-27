@@ -3,7 +3,7 @@ import scipy.sparse as sp
 
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.datatype_classes.mesh import mesh
-from implementations.probem_classes.HeatEquation_1D_FD import heat1d
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 
 def solve_collocation_problem(prob, coll, dt):
