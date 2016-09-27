@@ -82,13 +82,14 @@ def check_partialquadraturewithQ(collclass, M, t_start, t_end):
     coll = collclass(M, t_start, t_end)
     Q = coll.Qmat[1:,1:]
     # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
-    poly_coeff = np.random.rand(M-1)
+    degree = min(coll.order,M-1)
+    poly_coeff = np.random.rand(degree)
     poly_vals  = np.polyval(poly_coeff, coll.nodes)
     poly_int_coeff = np.polyint(poly_coeff)
     for i in range(0,M):
         int_ex = np.polyval(poly_int_coeff, coll.nodes[i]) - np.polyval(poly_int_coeff, t_start)
         int_coll = np.dot(poly_vals, Q[i,:])
-        assert abs(int_ex - int_coll)<1e-12, "For node type " + type[0] + ", partial quadrature from Qmat rule failed to integrate polynomial of degree M-1 exactly for M = " + str(M)
+        assert abs(int_ex - int_coll)<1e-12, "For node type " + collclass + ", partial quadrature from Qmat rule failed to integrate polynomial of degree M-1 exactly for M = " + str(M)
 
 # TEST 3:
 # Check that the partial quadrature rules from Smat entries have order equal to number of nodes M
@@ -103,7 +104,8 @@ def check_partialquadraturewithS(collclass, M, t_start, t_end):
     coll = collclass(M, t_start, t_end)
     S = coll.Smat[1:,1:]
     # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1
-    poly_coeff = np.random.rand(M-1)
+    degree = min(coll.order, M - 1)
+    poly_coeff = np.random.rand(degree)
     poly_vals  = np.polyval(poly_coeff, coll.nodes)
     poly_int_coeff = np.polyint(poly_coeff)
     for i in range(1,M):
