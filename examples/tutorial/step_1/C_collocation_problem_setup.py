@@ -5,6 +5,31 @@ from implementations.collocation_classes.gauss_radau_right import CollGaussRadau
 from implementations.datatype_classes.mesh import mesh
 from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
+def main():
+    """
+    A simple test program to create and solve a collocation problem directly
+    """
+
+    # initialize problem parameters
+    problem_params = {}
+    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['freq'] = 4  # frequency for the test value
+    problem_params['nvars'] = 1023  # number of degrees of freedom
+
+    # instantiate problem
+    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+
+    # instantiate collocation class, relative to the time interval [0,1]
+    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
+
+    # set time-step size (warning: the collocation matrices are relative to [0,1], see above)
+    dt = 0.1
+
+    # solve collocation problem
+    err = solve_collocation_problem(prob=prob, coll=coll, dt=dt)
+
+    assert err <= 4E-04, "ERROR: did not get collocation error as expected, got %s" %err
+
 
 def solve_collocation_problem(prob, coll, dt):
     """
@@ -42,29 +67,5 @@ def solve_collocation_problem(prob, coll, dt):
 
 
 if __name__ == "__main__":
-    """
-    A simple test program to create and solve a collocation problem directly
-    """
-
-    # initialize problem parameters
-    problem_params = {}
-    problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
-    problem_params['nvars'] = 1023  # number of degrees of freedom
-
-    # instantiate problem
-    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
-
-    # instantiate collocation class, relative to the time interval [0,1]
-    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
-
-    # set time-step size (warning: the collocation matrices are relative to [0,1], see above)
-    dt = 0.1
-
-    # solve collocation problem
-    err = solve_collocation_problem(prob=prob, coll=coll, dt=dt)
-
-    print(err, err <= 4E-04)
-
-    assert err <= 4E-04
+    main()
 

@@ -5,7 +5,7 @@ In this step, we create a spatial problem and play with it a little bit. No SDC,
 
 Part A
 ------
-We start as simple as possible by creating a first, very simple problem using `HeatEquation_1D_FD`. 
+We start as simple as possible by creating a first, very simple problem using one of the `problem_classes`, namely `HeatEquation_1D_FD`. 
 This basically consists only of the matrix `A`, which represents a finite difference discretization of the 1D Laplacian.
 This is tested for one particular example.
 
@@ -30,7 +30,7 @@ Important things to note:
 
 Part C
 ------
-Here, we set up our first collocation problem using one of the `CollocationClasses`, namely `GaussRadau_Right`.
+Here, we set up our first collocation problem using one of the `collocation_classes`, namely `GaussRadau_Right`.
 Using the spatial operator, we can build the **collocation problem** which in this case is linear.
 This fully coupled system is then solved directly and the error is compared to the exact solution.
  

@@ -8,13 +8,37 @@ import matplotlib.pylab as plt
 from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from implementations.datatype_classes.mesh import mesh
 
+# setup id for gathering the results (will sort by nvars)
+ID = namedtuple('ID', 'nvars')
 
-def run_accuracy_test(nvars_list):
+
+def main():
+    """
+    A simple test program to visualize the errors and the expected order of accuracy ("points on a line")
+    """
+
+    # initialize problem parameters
+    problem_params = {}
+    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['freq'] = 4  # frequency for the test value
+
+    # create list of nvars to do the accuracy test with
+    nvars_list = [2 ** p - 1 for p in range(3, 15)]
+
+    # run accuracy test for all nvars
+    results = run_accuracy_check(nvars_list=nvars_list,problem_params=problem_params)
+
+    # visualize results
+    plot_accuracy(results)
+
+
+def run_accuracy_check(nvars_list,problem_params):
     """
     Routine to check the error of the Laplacian vs. its FD discretization
 
     Args:
         nvars_list: list of nvars to do the testing with
+        problem_params: dictionary containing the problem-dependent parameters
 
     Returns:
         a dictionary containing the errors and a header (with nvars_list)
@@ -116,23 +140,4 @@ def plot_accuracy(results):
 
 
 if __name__ == "__main__":
-    """
-    A simple test program to visualize the errors and the expected order of accuracy ("points on a line")
-    """
-
-    # setup id for gathering the results (will sort by nvars)
-    ID = namedtuple('ID', 'nvars')
-
-    # initialize problem parameters
-    problem_params = {}
-    problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
-
-    # create list of nvars to do the accuracy test with
-    nvars_list = [2 ** p - 1 for p in range(3, 15)]
-
-    # run accuracy test for all nvars
-    results = run_accuracy_test(nvars_list=nvars_list)
-
-    # visualize results
-    plot_accuracy(results)
+    main()

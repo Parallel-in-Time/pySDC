@@ -7,8 +7,38 @@ from implementations.collocation_classes.gauss_radau_right import CollGaussRadau
 from implementations.datatype_classes.mesh import mesh
 from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
+# setup id for gathering the results (will sort by dt)
+ID = namedtuple('ID', 'dt')
 
-def run_accuracy_test(prob, coll, dt_list):
+def main():
+    """
+        A simple test program to compute the order of accuracy in time
+        """
+
+    # initialize problem parameters
+    problem_params = {}
+    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['freq'] = 4  # frequency for the test value
+    problem_params['nvars'] = 16383  # number of DOFs in space
+
+    # instantiate problem
+    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+
+    # instantiate collocation class, relative to the time interval [0,1]
+    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
+
+    # assemble list of dt
+    dt_list = [0.1 / 2 ** p for p in range(0, 4)]
+
+    # run accuracy test for all dt
+    results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
+
+    # get order of accuracy
+    order = get_accuracy_order(results)
+
+    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %order
+
+def run_accuracy_check(prob, coll, dt_list):
     """
     Routine to build and solve the linear collocation problem
 
@@ -80,38 +110,7 @@ def get_accuracy_order(results):
     return order
 
 
-
 if __name__ == "__main__":
-    """
-    A simple test program to compute the order of accuracy in time
-    """
-
-    # setup id for gathering the results (will sort by dt)
-    ID = namedtuple('ID', 'dt')
-
-    # initialize problem parameters
-    problem_params = {}
-    problem_params['nu'] = 0.1      # diffusion coefficient
-    problem_params['freq'] = 4      # frequency for the test value
-    problem_params['nvars'] = 16383 # number of DOFs in space
-
-    # instantiate problem
-    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
-
-    # instantiate collocation class, relative to the time interval [0,1]
-    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
-
-    # assemble list of dt
-    dt_list = [0.1/2**p for p in range(0,4)]
-
-    # run accuracy test for all dt
-    results = run_accuracy_test(prob=prob, coll=coll, dt_list=dt_list)
-
-    # get order of accuracy
-    order = get_accuracy_order(results)
-
-    print(order, np.isclose(order,2*coll.num_nodes-1,rtol=0.4))
-
-    assert all(np.isclose(order,2*coll.num_nodes-1,rtol=0.4))
+    main()
 
 
