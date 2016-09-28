@@ -241,7 +241,7 @@ def interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=2, pad=1, r
         bary_pol = []
         for l in range(k):
             bary_pol.append(BarycentricInterpolator(padded_c_grid[nn], np.roll(circulating_one, l)))
-        M[i, nn] = np.asarray(map(lambda x: x(p), bary_pol))
+        M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
     return sprs.csc_matrix(M[:, pad:-pad])
 
