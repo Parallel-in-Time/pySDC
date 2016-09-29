@@ -4,7 +4,7 @@ from mpi4py import MPI
 from examples.heat1d.ProblemClass import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import Log
@@ -19,12 +19,13 @@ if __name__ == "__main__":
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
+    lparams['dt'] = 0.12
 
-    # This comes as read-in for the step class (this is optional!)
-    sparams = {}
-    sparams['maxiter'] = 20
-    sparams['fine_comm'] = True
-    sparams['predict'] = True
+    # This comes as read-in for the controller
+    cparams = {}
+    cparams['maxiter'] = 20
+    cparams['fine_comm'] = True
+    cparams['predict'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -55,19 +56,18 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    # PFASST = allinclusive_multigrid_MPI(step_params=sparams, description=description, comm=comm)
-    PFASST = allinclusive_classic_MPI(step_params=sparams, description=description, comm=comm)
+    PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)
+    # PFASST = allinclusive_classic_MPI(controller_params=cparams, description=description, comm=comm)
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.1
-    Tend = 3*dt
+    Tend = 3*0.12
 
     # set initial condition
     P = PFASST.S.levels[0].prob
     uinit = P.u_exact(t0)
 
-    uend, stats = PFASST.run(u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = PFASST.run(u0=uinit,t0=t0,Tend=Tend)
 
     # compute exact solution and compare
     num_procs = comm.Get_size()

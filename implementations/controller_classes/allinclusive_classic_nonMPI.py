@@ -14,18 +14,20 @@ class allinclusive_classic_nonMPI(controller):
 
     """
 
-    def __init__(self, num_procs, step_params, description):
+    def __init__(self, num_procs, controller_params, description):
         """
        Initialization routine for PFASST controller
 
        Args:
            num_procs: number of parallel time steps (still serial, though), can be 1
-           step_params: parameter set for the step class
+           controller_params: parameter set for the controller and the step class
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
         # call parent's initialization routine
-        super(allinclusive_classic_nonMPI, self).__init__()
+        super(allinclusive_classic_nonMPI, self).__init__(controller_params)
+
+        step_params = {key: controller_params[key] for key in ['maxiter']}
 
         self.MS = []
         # simply append step after step and generate the hierarchies
@@ -41,14 +43,13 @@ class allinclusive_classic_nonMPI(controller):
                     "use the blockwise controllers."
 
 
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
 
         Args:
            u0: initial values
            t0: starting time
-           dt: (initial) time step
            Tend: ending time
 
         Returns:
@@ -66,22 +67,19 @@ class allinclusive_classic_nonMPI(controller):
         slots = [p for p in range(num_procs)]
 
         # initialize time variables of each step
-        for p in slots:
-            self.MS[p].status.dt = dt # could have different dt per step here
-            self.MS[p].status.time = t0 + sum(self.MS[j].status.dt for j in range(p))
-            self.MS[p].status.step = p
+        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = [self.MS[p].status.time < Tend - 10*np.finfo(float).eps for p in slots]
+        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
         # compress slots according to active steps, i.e. remove all steps which have times above Tend
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
-        self.restart_block(active_slots,u0)
+        self.restart_block(active_slots,time,u0)
 
         # call pre-start hook
-        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[p].status)
+        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[active_slots[0]].status)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -91,32 +89,32 @@ class allinclusive_classic_nonMPI(controller):
                 # print(p,MS[p].status.stage)
                 self.MS[p] = self.pfasst(self.MS[p],len(active_slots))
 
-            # if all active steps are done
-            if all([self.MS[p].status.done for p in active_slots]):
+                # if all active steps are done
+                if all([self.MS[p].status.done for p in active_slots]):
 
-                # uend is uend of the last active step in the list
-                uend = self.MS[active_slots[-1]].levels[0].uend
+                    # uend is uend of the last active step in the list
+                    uend = self.MS[active_slots[-1]].levels[0].uend
 
-                # determine new set of active steps and compress slots accordingly
-                active = [self.MS[p].status.time+num_procs*self.MS[p].status.dt < Tend - 10*np.finfo(float).eps for p in slots]
-                active_slots = list(itertools.compress(slots, active))
+                    for p in active_slots:
+                        time[p] += num_procs * self.MS[p].dt
 
-                # increment timings for now active steps
-                for p in active_slots:
-                    self.MS[p].status.time += num_procs*self.MS[p].status.dt
-                    self.MS[p].status.step += num_procs
-                # restart active steps (reset all values and pass uend to u0)
-                self.restart_block(active_slots,uend)
+                    # determine new set of active steps and compress slots accordingly
+                    active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+                    active_slots = list(itertools.compress(slots, active))
+
+                    # restart active steps (reset all values and pass uend to u0)
+                    self.restart_block(active_slots, time, uend)
 
         return uend,stats.return_stats()
 
 
-    def restart_block(self,active_slots,u0):
+    def restart_block(self,active_slots,time,u0):
         """
         Helper routine to reset/restart block of (active) steps
 
         Args:
             active_slots: list of active steps
+            time: new times for the steps
             u0: initial value to distribute across the steps
 
         """
@@ -145,6 +143,10 @@ class allinclusive_classic_nonMPI(controller):
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
                 l.tag = False
+
+        for p in active_slots:
+            for lvl in self.MS[p].levels:
+                lvl.status.time = time[p]
 
 
     @staticmethod
@@ -207,7 +209,7 @@ class allinclusive_classic_nonMPI(controller):
             S.levels[0].sweep.predict()
 
             # update stage
-            if (len(S.levels) > 1 and num_procs > 1) and S.params.predict:  # MLSDC or PFASST
+            if (len(S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
                 S.status.stage = 'PREDICT_RESTRICT'
             elif num_procs > 1 and len(S.levels) > 1: # PFASST
                 S.levels[0].hooks.dump_pre_iteration(S.status)
@@ -306,7 +308,7 @@ class allinclusive_classic_nonMPI(controller):
 
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
             if not S.levels[0].tag or S.status.last:
-                if S.params.fine_comm:
+                if self.params.fine_comm:
                     self.send(S.levels[0], tag=True)
                 S.status.stage = 'IT_CHECK'
             else:
@@ -355,7 +357,7 @@ class allinclusive_classic_nonMPI(controller):
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
                 if not S.levels[l].tag or S.status.last:
-                    if S.params.fine_comm:
+                    if self.params.fine_comm:
                         self.send(S.levels[l], tag=True)
                 else:
                     print('SEND ERROR', l, S.levels[l].tag)
@@ -434,7 +436,7 @@ class allinclusive_classic_nonMPI(controller):
             for l in range(len(S.levels) - 1, 0, -1):
 
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
-                if S.params.fine_comm and not S.status.first and not S.prev.status.done:
+                if self.params.fine_comm and not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l - 1].tag:
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1])
                         S.prev.levels[l - 1].tag = False

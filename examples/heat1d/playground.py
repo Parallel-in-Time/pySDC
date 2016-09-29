@@ -8,6 +8,7 @@ from implementations.collocation_classes.gauss_radau_right import CollGaussRadau
 # from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 # from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import Log
@@ -26,11 +27,11 @@ if __name__ == "__main__":
     lparams['restol'] = 1E-10
     lparams['dt'] = 0.12
 
-    # This comes as read-in for the step class (this is optional!)
-    sparams = {}
-    sparams['maxiter'] = 20
-    sparams['fine_comm'] = True
-    sparams['predict'] = True
+    # This comes as read-in for the controller
+    cparams = {}
+    cparams['maxiter'] = 20
+    cparams['fine_comm'] = True
+    cparams['predict'] = True
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -63,20 +64,19 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
-    # controller = allinclusive_classic_nonMPI(num_procs=num_procs, step_params=sparams, description=description)
+    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    # controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
 
     # setup parameters "in time"
     t0 = 0
-    dt = 0.12
-    Tend = 3*dt
+    Tend = 3*0.12
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, dt=dt, Tend=Tend)
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

@@ -7,10 +7,30 @@ class controller(with_metaclass(abc.ABCMeta)):
     Base abstract controller class
     """
 
-    def __init__(self):
+    def __init__(self, controller_params):
         """
         Initialization routine for the base controller
+
+        Args:
+            controller_params: parameter set for the controller and the steps
         """
+
+        # short helper class to add params as attributes
+        class pars():
+            def __init__(self, params):
+
+                defaults = dict()
+                defaults['maxiter'] = 0
+                defaults['fine_comm'] = True
+                defaults['predict'] = True
+
+                for k, v in defaults.items():
+                    setattr(self, k, v)
+                for k, v in params.items():
+                    setattr(self, k, v)
+                pass
+
+        self.params = pars(controller_params)
         pass
 
 
@@ -36,14 +56,13 @@ class controller(with_metaclass(abc.ABCMeta)):
         return converged
 
     @abc.abstractmethod
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Abstract interface to the run() method
 
         Args:
             u0: initial values
             t0: starting time
-            dt: (initial) time step
             Tend: ending time
         """
         return None

@@ -14,18 +14,20 @@ class allinclusive_multigrid_nonMPI(controller):
 
     """
 
-    def __init__(self, num_procs, step_params, description):
+    def __init__(self, num_procs, controller_params, description):
         """
        Initialization routine for PFASST controller
 
        Args:
            num_procs: number of parallel time steps (still serial, though), can be 1
-           step_params: parameter set for the step class
+           controller_params: parameter set for the controller and the steps
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
         # call parent's initialization routine
-        super(allinclusive_multigrid_nonMPI, self).__init__()
+        super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
+
+        step_params = {key:controller_params[key] for key in ['maxiter']}
 
         self.MS = []
         # simply append step after step and generate the hierarchies
@@ -34,14 +36,13 @@ class allinclusive_multigrid_nonMPI(controller):
             self.MS[-1].generate_hierarchy(description)
 
 
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
 
         Args:
            u0: initial values
            t0: starting time
-           dt: (initial) time step
            Tend: ending time
 
         Returns:
@@ -84,7 +85,6 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for p in range(len(MS_active)):
                 self.MS[active_slots[p]] = MS_active[p]
-
 
             # if all active steps are done
             if all([self.MS[p].status.done for p in active_slots]):
@@ -257,7 +257,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if (len(S.levels) > 1 and len(MS) > 1) and S.params.predict: # MLSDC or PFASST
+                if (len(S.levels) > 1 and len(MS) > 1) and self.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
                 elif len(MS) > 1 and len(S.levels) > 1: # PFASST
                     S.levels[0].hooks.dump_pre_iteration(S.status)
@@ -392,11 +392,11 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
                     # send updated values forward
-                    if S.params.fine_comm:
+                    if self.params.fine_comm:
                         self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                     # # receive values
-                    if S.params.fine_comm and not S.status.first:
+                    if self.params.fine_comm and not S.status.first:
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter, S.prev.status.slot))
 
                     # on middle levels: do sweep as usual

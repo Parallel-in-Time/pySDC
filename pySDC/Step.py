@@ -1,8 +1,6 @@
 from pySDC import Level as levclass
-from pySDC import Stats as statclass
 from pySDC import Hooks as hookclass
 
-import copy as cp
 import sys
 
 class step():
@@ -38,8 +36,6 @@ class step():
 
                 defaults = dict()
                 defaults['maxiter'] = 20
-                defaults['fine_comm'] = True
-                defaults['predict'] = True
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
@@ -93,7 +89,7 @@ class step():
         # single entry per key, one dict per level
         pparams_list = self.__dict_to_list(descr['problem_params'])
         # put this newly generated list into the description dictionary (copy to avoid changing the original one)
-        descr_new = cp.deepcopy(descr)
+        descr_new = descr.copy()
         descr_new['problem_params'] = pparams_list
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
