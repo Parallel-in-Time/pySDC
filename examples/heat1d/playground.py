@@ -19,11 +19,12 @@ if __name__ == "__main__":
     # set global logger (remove this if you do not want the output at all)
     logger = Log.setup_custom_logger('root')
 
-    num_procs = 3
+    num_procs = 2
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
+    lparams['dt'] = 0.12
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}

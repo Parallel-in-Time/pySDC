@@ -43,13 +43,13 @@ class level():
 
             """
 
-            self.residual = None #FIXME: isn't that obsolete?
+            self.residual = None
             self.unlocked = False
             self.updated = False
+            self.time = None
 
 
-    __slots__ = ('__prob','__sweep','uend','u','uold','f','fold','tau','status','params','id','__step','id','__tag',
-                 '__hooks')
+    __slots__ = ('__prob','__sweep','uend','u','uold','f','fold','tau','status','params','id','id','__tag','__hooks')
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class,
@@ -75,6 +75,7 @@ class level():
 
                 defaults = dict()
                 defaults['restol'] = 0.0
+                defaults['dt'] = None
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
@@ -102,8 +103,6 @@ class level():
         # set name
         self.id = id
 
-        # dummy step variable, will be defined by registration at step
-        self.__step = None
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
@@ -141,12 +140,6 @@ class level():
             raise WTF #FIXME
 
 
-    def __set_step(self,S):
-        """
-        Defines the step this level belongs to (no explicit setter)
-        """
-        self.__step = S
-
     @property
     def sweep(self):
         """
@@ -171,30 +164,16 @@ class level():
     @property
     def time(self):
         """
-        Meta-getter for the current time (only passing the step's time)
+        Meta-getter for the current time (only referencing status time for convenience)
         """
-        return self.__step.status.time
+        return self.status.time
 
     @property
     def dt(self):
         """
-        Meta-getter for the step size (only passing the step's step size)
+        Meta-getter for the time-step size (only referencng dt from parameters for convenience)
         """
-        return self.__step.status.dt
-
-    @property
-    def iter(self):
-        """
-        Meta-getter for the iteration (only passing the step's iteration)
-        """
-        return self.__step.status.iter
-
-    @property
-    def dt(self):
-        """
-        Meta-getter for the step size (only passing the step's step size)
-        """
-        return self.__step.status.dt
+        return self.params.dt
 
     @property
     def tag(self):

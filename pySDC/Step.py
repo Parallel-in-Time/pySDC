@@ -50,7 +50,7 @@ class step():
 
         # short helper class to bundle all status variables
         class status():
-            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','time','dt','step','prev_done')
+            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','prev_done')
             def __init__(self):
                 self.iter = None
                 self.stage = None
@@ -59,9 +59,6 @@ class step():
                 self.last = None
                 self.pred_cnt = None
                 self.done = None
-                self.time = None
-                self.dt = None
-                self.step = None
                 self.prev_done = None
 
         # set params and status
@@ -196,8 +193,6 @@ class step():
         assert isinstance(L,levclass.level)
         # add level to level list
         self.levels.append(L)
-        # pass this step to the registered level
-        self.levels[-1]._level__set_step(self)
         # if this is not the finest level, allocate tau correction
         if len(self.levels) > 1:
             L._level__add_tau()
@@ -304,3 +299,21 @@ class step():
         """
         assert type(p) is type(self)
         self.__next = p
+
+    @property
+    def dt(self):
+        """
+        Getter for current time-step size
+        Returns:
+            dt
+        """
+        return self.levels[0].dt
+
+    @property
+    def time(self):
+        """
+        Getter for current time-step size
+        Returns:
+            dt
+        """
+        return self.levels[0].time
