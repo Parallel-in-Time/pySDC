@@ -50,7 +50,8 @@ if __name__ == "__main__":
         k += 1
         L.sweep.update_nodes()
         L.sweep.compute_residual()
-        L.hooks.dump_iteration(L.status)
+        logger.info('time %8.6f of %s -- Iteration: %2i -- Residual: %12.8e',
+                    L.time, L.id, k, L.status.residual)
 
     print(L.status.residual,k)
     L.sweep.compute_end_point()
