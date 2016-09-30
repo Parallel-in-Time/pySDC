@@ -56,9 +56,6 @@ def main():
     # now the description contains more or less everything we need to create a step
     S = step(description=description)
 
-    for lvl in S.levels:
-        print(lvl.params.dt,lvl.prob.nvars,lvl.sweep.coll.num_nodes)
-
     # we only have a single level, make a shortcut
     L = S.levels[0]
 

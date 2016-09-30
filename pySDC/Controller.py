@@ -1,6 +1,8 @@
 import abc
 from future.utils import with_metaclass
 
+from pySDC.Plugins.pysdc_helper import FrozenClass
+
 
 class controller(with_metaclass(abc.ABCMeta)):
     """
@@ -16,19 +18,16 @@ class controller(with_metaclass(abc.ABCMeta)):
         """
 
         # short helper class to add params as attributes
-        class pars():
+        class pars(FrozenClass):
             def __init__(self, params):
 
-                defaults = dict()
-                defaults['maxiter'] = 0
-                defaults['fine_comm'] = True
-                defaults['predict'] = True
+                self.fine_comm = True
+                self.predict = True
 
-                for k, v in defaults.items():
-                    setattr(self, k, v)
                 for k, v in params.items():
                     setattr(self, k, v)
-                pass
+
+                self._freeze()
 
         self.params = pars(controller_params)
         pass

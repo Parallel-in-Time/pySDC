@@ -33,16 +33,12 @@ class step(FrozenClass):
         class pars(FrozenClass):
             def __init__(self,params):
 
-                defaults = dict()
-                defaults['maxiter'] = 0
+                self.maxiter = None
 
-                for k,v in defaults.items():
-                    setattr(self,k,v)
                 for k,v in params.items():
                     setattr(self,k,v)
-                self._freeze()
-                pass
 
+                self._freeze()
 
         # short helper class to bundle all status variables
         class status(FrozenClass):
@@ -125,8 +121,19 @@ class step(FrozenClass):
             else:
                 hook = hookclass.hooks
 
+            # check if transfer parameters are needed
+            if 'transfer_params' in descr_list[l]:
+                tparams = descr_list[l]['transfer_params']
+            else:
+                tparams = {}
+
+            if 'problem_params' in descr_list[l]:
+                pparams = descr_list[l]['problem_params']
+            else:
+                pparams = {}
+
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
-                               problem_params     =   descr_list[l]['problem_params'],
+                               problem_params     =   pparams,
                                dtype_u            =   descr_list[l]['dtype_u'],
                                dtype_f            =   descr_list[l]['dtype_f'],
                                sweeper_class      =   descr_list[l]['sweeper_class'],
@@ -139,7 +146,7 @@ class step(FrozenClass):
 
             if l > 0:
                 self.connect_levels(transfer_class  = descr_list[l]['transfer_class'],
-                                    transfer_params = descr_list[l]['transfer_params'],
+                                    transfer_params = tparams,
                                     fine_level      = self.levels[l-1],
                                     coarse_level    = self.levels[l])
 

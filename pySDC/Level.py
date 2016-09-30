@@ -64,18 +64,16 @@ class level(FrozenClass):
         """
 
         # short helper class to add params as attributes
-        class pars():
+        class pars(FrozenClass):
             def __init__(self,params):
 
-                defaults = dict()
-                defaults['restol'] = 0.0
-                defaults['dt'] = None
-
-                for k,v in defaults.items():
-                    setattr(self,k,v)
+                self.dt = None
+                self.restol = 0.0
 
                 for k,v in params.items():
                     setattr(self,k,v)
+
+                self._freeze()
 
         # instantiate sweeper, problem and hooks
         self.__sweep = sweeper_class(sweeper_params)
@@ -96,7 +94,6 @@ class level(FrozenClass):
 
         # set name
         self.id = id
-
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)

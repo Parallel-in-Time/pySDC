@@ -8,7 +8,7 @@ from pySDC.Plugins.pysdc_helper import FrozenClass
 from future.utils import with_metaclass
 
 
-class sweeper(FrozenClass,with_metaclass(abc.ABCMeta)):
+class sweeper(with_metaclass(abc.ABCMeta)):
     """
     Base abstract sweeper class
 
@@ -27,18 +27,16 @@ class sweeper(FrozenClass,with_metaclass(abc.ABCMeta)):
         """
 
         # short helper class to add params as attributes
-        class pars():
+        class pars(FrozenClass):
             def __init__(self,params):
 
-                defaults = dict()
-                defaults['do_coll_update'] = False
-                
-                for k,v in defaults.items():
-                    setattr(self,k,v)
+                self.do_coll_update = False
 
                 for k,v in params.items():
                     if not k is 'collocation_class':
                         setattr(self,k,v)
+
+                self._freeze()
 
         assert 'collocation_class' in params
         assert 'num_nodes' in params
@@ -111,7 +109,6 @@ class sweeper(FrozenClass,with_metaclass(abc.ABCMeta)):
 
         # get current level and problem description
         L = self.level
-        P = L.prob
 
         # check if there are new values (e.g. from a sweep)
         assert L.status.updated

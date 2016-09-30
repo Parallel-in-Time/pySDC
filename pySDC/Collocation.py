@@ -33,6 +33,8 @@ class CollBase(object):
         self.Qmat = None
         self.Smat = None
         self.delta_m = None
+        self.right_is_node = None
+        self.left_is_node = None
 
 
     @staticmethod

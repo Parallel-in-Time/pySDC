@@ -47,7 +47,6 @@ class heat1d(ptype):
         self.dx = 1/(self.nvars + 1)
         self.A = self.__get_A(self.nvars, self.nu, self.dx)
 
-
     def __get_A(self,N,nu,dx):
         """
         Helper function to assemble FD matrix A in sparse format
@@ -65,7 +64,6 @@ class heat1d(ptype):
         A = sp.diags(stencil,[-1,0,1],shape=(N,N))
         A *= nu / (dx**2)
         return A.tocsc()
-
 
     def eval_f(self,u,t):
         """

@@ -62,7 +62,9 @@ def run_imex_sdc(S):
         S: an instance of a step representing the time step
 
     Returns:
-
+        the error of SDC vs. exact solution
+        the residual after the SDC sweeps
+        the number of iterations
     """
     # make shortcuts for the level and the problem
     L = S.levels[0]

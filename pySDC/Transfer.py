@@ -1,8 +1,8 @@
 import abc
 import numpy as np
-import copy as cp
 
 from future.utils import with_metaclass
+from pySDC.Plugins.pysdc_helper import FrozenClass
 
 
 class transfer(with_metaclass(abc.ABCMeta)):
@@ -27,19 +27,17 @@ class transfer(with_metaclass(abc.ABCMeta)):
         """
 
         # short helper class to add params as attributes
-        class pars():
+        class pars(FrozenClass):
             def __init__(self,params):
 
-                defaults = dict()
-                defaults['finter'] = False
-                defaults['iorder'] = 6
-                defaults['rorder'] = 2
+                self.finter = False
+                self.iorder = 6
+                self.rorder = 2
 
-                for k,v in defaults.items():
-                    setattr(self,k,v)
                 for k,v in params.items():
                     setattr(self,k,v)
-                pass
+
+                self._freeze()
 
         self.params = pars(params)
 
