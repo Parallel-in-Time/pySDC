@@ -4,10 +4,8 @@ from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from implementations.datatype_classes.mesh import mesh
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.sweeper_classes.generic_LU import generic_LU
-from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d
 
 from examples.tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
-
 
 def main():
     """
@@ -34,12 +32,6 @@ def main():
     step_params = {}
     step_params['maxiter'] = 20
 
-    # This comes as read-in for the transfer operations (this is optional!)
-    tparams = {}
-    tparams['finter'] = False
-    tparams['iorder'] = 6
-    tparams['rorder'] = 2
-
     # fill description dictionary for easy step instantiation
     description = {}
     description['problem_class'] = heat1d               # pass problem class
@@ -50,14 +42,9 @@ def main():
     description['sweeper_params'] = sweeper_params      # pass sweeper parameters
     description['level_params'] = level_params          # pass level parameters
     description['step_params'] = step_params            # pass step parameters
-    description['transfer_class'] = mesh_to_mesh_1d
-    description['transfer_params'] = tparams
 
     # now the description contains more or less everything we need to create a step
     S = step(description=description)
-
-    for lvl in S.levels:
-        print(lvl.params.dt,lvl.prob.nvars,lvl.sweep.coll.num_nodes)
 
     # we only have a single level, make a shortcut
     L = S.levels[0]

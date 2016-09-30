@@ -3,11 +3,12 @@ import numpy as np
 
 from pySDC.Collocation import CollBase
 from pySDC.Level import level
+from pySDC.Plugins.pysdc_helper import FrozenClass
 
 from future.utils import with_metaclass
 
 
-class sweeper(with_metaclass(abc.ABCMeta)):
+class sweeper(FrozenClass,with_metaclass(abc.ABCMeta)):
     """
     Base abstract sweeper class
 
@@ -30,7 +31,6 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             def __init__(self,params):
 
                 defaults = dict()
-                defaults['do_LU'] = False
                 defaults['do_coll_update'] = False
                 
                 for k,v in defaults.items():
@@ -39,6 +39,9 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 for k,v in params.items():
                     if not k is 'collocation_class':
                         setattr(self,k,v)
+
+        assert 'collocation_class' in params
+        assert 'num_nodes' in params
 
         self.params = pars(params)
 

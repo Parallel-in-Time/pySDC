@@ -21,6 +21,9 @@ class imex_1st_order(sweeper):
             coll: collocation object
         """
 
+        if not 'do_LU' in params:
+            params['do_LU'] = False
+
         # call parent's initialization routine
         super(imex_1st_order,self).__init__(params)
 

@@ -25,11 +25,8 @@ class allinclusive_multigrid_MPI(controller):
         # call parent's initialization routine
         super(allinclusive_multigrid_MPI, self).__init__(controller_params)
 
-        step_params = {key: controller_params[key] for key in ['maxiter']}
-
         # create single step per processor
-        self.S = step(step_params)
-        self.S.generate_hierarchy(description)
+        self.S = step(description)
 
         # pass communicator for future use
         self.comm = comm

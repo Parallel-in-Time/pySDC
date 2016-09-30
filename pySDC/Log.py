@@ -1,11 +1,12 @@
 import logging
 
-def setup_custom_logger(name):
+def setup_custom_logger(name, level=None):
     """
     Helper function to set main parameters for the logging facility
 
     Args:
         name: name for later reference
+        level: level of logging
     Returns:
         logger to work with
     """
@@ -18,7 +19,10 @@ def setup_custom_logger(name):
     # instantiate logger
     logger = logging.getLogger(name)
     # set level of logging and join with format
-    logger.setLevel(logging.INFO)
+    if level == "info":
+        logger.setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.WARNING)
     logger.addHandler(handler)
 
     return logger

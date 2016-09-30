@@ -1,9 +1,11 @@
 from pySDC import Level as levclass
 from pySDC import Hooks as hookclass
+from pySDC.Plugins.pysdc_helper import FrozenClass
 
 import sys
 
-class step():
+
+class step(FrozenClass):
     """
     Step class, referencing most of the structure needed for the time-stepping
 
@@ -17,36 +19,33 @@ class step():
         __transfer_dict: data structure to couple levels and transfer operators
         levels: list of levels
         params: parameters given by the user
-        __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    __slots__ = ('params','levels','__transfer_dict','status','__prev','__next')
-
-    def __init__(self, params):
+    def __init__(self, description):
         """
         Initialization routine
 
         Args:
-            params: parameters given by the user, will be added as attributes
+            description: parameters given by the user, will be added as attributes
         """
 
         # short helper class to add params as attributes
-        class pars():
+        class pars(FrozenClass):
             def __init__(self,params):
 
                 defaults = dict()
-                defaults['maxiter'] = 20
+                defaults['maxiter'] = 0
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
                 for k,v in params.items():
                     setattr(self,k,v)
+                self._freeze()
                 pass
 
 
         # short helper class to bundle all status variables
-        class status():
-            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','prev_done')
+        class status(FrozenClass):
             def __init__(self):
                 self.iter = None
                 self.stage = None
@@ -56,9 +55,15 @@ class step():
                 self.pred_cnt = None
                 self.done = None
                 self.prev_done = None
+                self._freeze()
+
+        if 'step_params' in description:
+            step_params = description['step_params']
+        else:
+            step_params = {}
 
         # set params and status
-        self.params = pars(params)
+        self.params = pars(step_params)
         self.status = status()
 
         # empty attributes
@@ -67,7 +72,12 @@ class step():
         self.__prev = None
         self.__next = None
 
-    def generate_hierarchy(self,descr):
+        self._freeze()
+
+        self.__generate_hierarchy(description)
+
+
+    def __generate_hierarchy(self,descr):
         """
         Routine to generate the level hierarchy for a single step
 
@@ -83,14 +93,19 @@ class step():
         assert 'dtype_u' in descr
         assert 'dtype_f' in descr
         assert 'sweeper_class' in descr
+        assert 'sweeper_params' in descr
         assert 'level_params' in descr
 
         # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
         # single entry per key, one dict per level
         pparams_list = self.__dict_to_list(descr['problem_params'])
+        lparams_list = self.__dict_to_list(descr['level_params'])
+        swparams_list = self.__dict_to_list(descr['sweeper_params'])
         # put this newly generated list into the description dictionary (copy to avoid changing the original one)
         descr_new = descr.copy()
         descr_new['problem_params'] = pparams_list
+        descr_new['level_params'] = lparams_list
+        descr_new['sweeper_params'] = swparams_list
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
 
@@ -110,25 +125,12 @@ class step():
             else:
                 hook = hookclass.hooks
 
-            if 'sweeper_params' in descr_list[l]:
-                swparams = descr_list[l]['sweeper_params']
-            else:
-                swparams = {}
-
-            if not 'collocation_class' in swparams:
-                assert 'collocation_class' in descr_list[l]
-                swparams['collocation_class'] = descr_list[l]['collocation_class']
-
-            if not 'num_nodes' in swparams:
-                assert 'num_nodes' in descr_list[l]
-                swparams['num_nodes'] = descr_list[l]['num_nodes']
-
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   descr_list[l]['problem_params'],
                                dtype_u            =   descr_list[l]['dtype_u'],
                                dtype_f            =   descr_list[l]['dtype_f'],
                                sweeper_class      =   descr_list[l]['sweeper_class'],
-                               sweeper_params     =   swparams,
+                               sweeper_params     =   descr_list[l]['sweeper_params'],
                                level_params       =   descr_list[l]['level_params'],
                                hook_class         =   hook,
                                id                 =   'L'+str(l))
@@ -274,7 +276,6 @@ class step():
         Args:
             p: new previous step
         """
-        assert type(p) is type(self)
         self.__prev = p
 
     @property
@@ -293,7 +294,6 @@ class step():
         Args:
             p: new previous step
         """
-        assert type(p) is type(self)
         self.__next = p
 
     @property

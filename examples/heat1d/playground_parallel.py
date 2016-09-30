@@ -12,7 +12,7 @@ from pySDC import Log
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+    logger = Log.setup_custom_logger('root','info')
 
     comm = MPI.COMM_WORLD
 
@@ -23,7 +23,6 @@ if __name__ == "__main__":
 
     # This comes as read-in for the controller
     cparams = {}
-    cparams['maxiter'] = 20
     cparams['fine_comm'] = True
     cparams['predict'] = True
 
@@ -43,6 +42,10 @@ if __name__ == "__main__":
     swparams['collocation_class'] = CollGaussRadau_Right
     swparams['num_nodes'] = 5
 
+    # step parameters
+    sparams = {}
+    sparams['maxiter'] = 20
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d
@@ -52,6 +55,7 @@ if __name__ == "__main__":
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
+    description['step_params'] = sparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
 

@@ -18,7 +18,7 @@ from pySDC import Log
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+    logger = Log.setup_custom_logger('root','info')
 
     num_procs = 2
 
@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     # This comes as read-in for the controller
     cparams = {}
-    cparams['maxiter'] = 20
     cparams['fine_comm'] = True
     cparams['predict'] = True
 
@@ -51,6 +50,10 @@ if __name__ == "__main__":
     # swparams['collocation_class'] = EquidistantSpline_Right
     swparams['num_nodes'] = 2
 
+    # Step parameters
+    sparams = {}
+    sparams['maxiter'] = 20
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d_forced
@@ -60,12 +63,13 @@ if __name__ == "__main__":
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
+    description['step_params'] = sparams
     description['transfer_class'] = mesh_to_mesh_1d
     description['transfer_params'] = tparams
 
     # initialize controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
-    # controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    # controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
 
     # setup parameters "in time"
     t0 = 0

@@ -27,13 +27,10 @@ class allinclusive_multigrid_nonMPI(controller):
         # call parent's initialization routine
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
 
-        step_params = {key:controller_params[key] for key in ['maxiter']}
-
         self.MS = []
         # simply append step after step and generate the hierarchies
         for p in range(num_procs):
-            self.MS.append(stepclass.step(step_params))
-            self.MS[-1].generate_hierarchy(description)
+            self.MS.append(stepclass.step(description))
 
 
     def run(self, u0, t0, Tend):

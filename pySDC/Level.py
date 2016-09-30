@@ -1,10 +1,6 @@
-import copy as cp
-import logging
+from pySDC.Plugins.pysdc_helper import FrozenClass
 
-from pySDC import Stats as statclass
-
-
-class level():
+class level(FrozenClass):
     """
     Level class containing all management functionality for a single level
 
@@ -24,10 +20,9 @@ class level():
         logger: a logging object for level-dependent output
         __step: link to the step where this level is part of (set from the outside by the step)
         __hooks: a private instance of a hooks class
-        __slots__: list of attributes to avoid accidential creation of new class attributes
     """
 
-    class cstatus():
+    class cstatus(FrozenClass):
         """
         Helper class for status objects
 
@@ -48,8 +43,7 @@ class level():
             self.updated = False
             self.time = None
 
-
-    __slots__ = ('__prob','__sweep','uend','u','uold','f','fold','tau','status','params','id','id','__tag','__hooks')
+            self._freeze()
 
 
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class,
@@ -109,6 +103,8 @@ class level():
         self.hooks._hooks__set_level(self)
 
         self.__tag = None
+
+        self._freeze()
 
 
     def reset_level(self):
