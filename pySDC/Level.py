@@ -1,5 +1,6 @@
 from pySDC.Plugins.pysdc_helper import FrozenClass
 
+
 class level(FrozenClass):
     """
     Level class containing all management functionality for a single level
@@ -17,8 +18,6 @@ class level(FrozenClass):
         f: RHS values at the nodes (+fold for saving data during restriction)
         tau: FAS correction, allocated via step class if necessary
         id: custom string naming this level
-        logger: a logging object for level-dependent output
-        __step: link to the step where this level is part of (set from the outside by the step)
         __hooks: a private instance of a hooks class
     """
 
@@ -45,7 +44,6 @@ class level(FrozenClass):
 
             self._freeze()
 
-
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class,
                  sweeper_params, level_params, hook_class, id):
         """
@@ -65,19 +63,18 @@ class level(FrozenClass):
 
         # short helper class to add params as attributes
         class pars(FrozenClass):
-            def __init__(self,params):
-
+            def __init__(self, params):
                 self.dt = None
                 self.restol = 0.0
 
-                for k,v in params.items():
-                    setattr(self,k,v)
+                for k, v in params.items():
+                    setattr(self, k, v)
 
                 self._freeze()
 
         # instantiate sweeper, problem and hooks
         self.__sweep = sweeper_class(sweeper_params)
-        self.__prob = problem_class(problem_params,dtype_u,dtype_f)
+        self.__prob = problem_class(problem_params, dtype_u, dtype_f)
         self.__hooks = hook_class()
 
         # set level parameters and status
@@ -86,10 +83,10 @@ class level(FrozenClass):
 
         # empty data the nodes, the right end point and tau
         self.uend = None
-        self.u = [None] * (self.sweep.coll.num_nodes+1)
-        self.uold = [None] * (self.sweep.coll.num_nodes+1)
-        self.f = [None] * (self.sweep.coll.num_nodes+1)
-        self.fold = [None] * (self.sweep.coll.num_nodes+1)
+        self.u = [None] * (self.sweep.coll.num_nodes + 1)
+        self.uold = [None] * (self.sweep.coll.num_nodes + 1)
+        self.f = [None] * (self.sweep.coll.num_nodes + 1)
+        self.fold = [None] * (self.sweep.coll.num_nodes + 1)
         self.tau = None
 
         # set name
@@ -103,7 +100,6 @@ class level(FrozenClass):
 
         self._freeze()
 
-
     def reset_level(self):
         """
         Routine to clean-up the level for the next time step
@@ -114,11 +110,10 @@ class level(FrozenClass):
 
         # all data back to None
         self.uend = None
-        self.u = [None] * (self.sweep.coll.num_nodes+1)
-        self.uold = [None] * (self.sweep.coll.num_nodes+1)
-        self.f = [None] * (self.sweep.coll.num_nodes+1)
-        self.fold = [None] * (self.sweep.coll.num_nodes+1)
-
+        self.u = [None] * (self.sweep.coll.num_nodes + 1)
+        self.uold = [None] * (self.sweep.coll.num_nodes + 1)
+        self.f = [None] * (self.sweep.coll.num_nodes + 1)
+        self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
     def __add_tau(self):
         """
@@ -130,8 +125,7 @@ class level(FrozenClass):
         if self.tau is None:
             self.tau = [None] * self.sweep.coll.num_nodes
         else:
-            raise WTF #FIXME
-
+            raise WTF  # FIXME
 
     @property
     def sweep(self):
@@ -178,10 +172,10 @@ class level(FrozenClass):
         return self.__tag
 
     @tag.setter
-    def tag(self,t):
+    def tag(self, t):
         """
         Setter for tag
         Args:
-            s: new tag
+            t: new tag
         """
         self.__tag = t

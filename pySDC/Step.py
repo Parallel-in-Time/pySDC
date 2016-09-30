@@ -292,14 +292,14 @@ class step(FrozenClass):
         Returns:
             prev
         """
-        return self.__prev
+        return self.__next
 
     @next.setter
     def next(self, p):
         """
-        Setter for previous step
+        Setter for next step
         Args:
-            p: new previous step
+            p: new next step
         """
         self.__next = p
 

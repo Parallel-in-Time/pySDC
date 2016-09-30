@@ -1,5 +1,6 @@
 
 import numpy as np
+import logging
 
 from pySDC.Controller import controller
 from pySDC.Step import step
@@ -30,6 +31,8 @@ class allinclusive_multigrid_MPI(controller):
 
         # pass communicator for future use
         self.comm = comm
+
+        self.logger = logging.getLogger('controller')
 
     def run(self, u0, t0, Tend):
         """
@@ -109,6 +112,7 @@ class allinclusive_multigrid_MPI(controller):
         # store link to previous step
         self.S.prev = self.S.status.slot - 1
         self.S.next = self.S.status.slot + 1
+
         # resets step
         self.S.reset_step()
         # determine whether I am the first and/or last in line
@@ -138,7 +142,6 @@ class allinclusive_multigrid_MPI(controller):
             source: level which initiated the send
             tag: identifier to check if this message is really for me
         """
-
         target.u[0] = comm.recv(source=source, tag=tag)
         target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
@@ -155,7 +158,6 @@ class allinclusive_multigrid_MPI(controller):
         source.sweep.compute_end_point()
         comm.send(source.uend, dest = target, tag = tag)
 
-
     def predictor(self,comm):
         """
         Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
@@ -165,7 +167,6 @@ class allinclusive_multigrid_MPI(controller):
         # restrict to coarsest level
         for l in range(1, len(self.S.levels)):
             self.S.transfer(source=self.S.levels[l-1],target=self.S.levels[l])
-
 
         for p in range(self.S.status.slot+1):
 
@@ -203,6 +204,8 @@ class allinclusive_multigrid_MPI(controller):
             exit()
 
         stage = self.S.status.stage
+
+        self.logger.debug(stage)
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase

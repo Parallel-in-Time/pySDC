@@ -13,12 +13,13 @@ from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import Log
 # from pySDC.Stats import grep_stats, sort_stats
+import logging
 
 
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root','info')
+    Log.setup_custom_logger(20)
 
     num_procs = 2
 
@@ -68,8 +69,8 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    # controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
-    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    # controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
 
     # setup parameters "in time"
     t0 = 0

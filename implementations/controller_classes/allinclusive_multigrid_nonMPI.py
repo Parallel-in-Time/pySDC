@@ -1,6 +1,7 @@
 import itertools
 import copy as cp
 import numpy as np
+import logging
 
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
@@ -31,6 +32,8 @@ class allinclusive_multigrid_nonMPI(controller):
         # simply append step after step and generate the hierarchies
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
+
+        self.logger = logging.getLogger('controller')
 
 
     def run(self, u0, t0, Tend):
@@ -242,6 +245,8 @@ class allinclusive_multigrid_nonMPI(controller):
         else:
             print('not all stages are equal, aborting..')
             exit()
+
+        self.logger.debug(stage)
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase

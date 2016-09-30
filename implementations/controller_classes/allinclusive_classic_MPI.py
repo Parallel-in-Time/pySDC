@@ -1,5 +1,6 @@
 
 import numpy as np
+import logging
 
 from pySDC.Controller import controller
 from pySDC.Step import step
@@ -34,6 +35,8 @@ class allinclusive_classic_MPI(controller):
         self.req_send = []
         # add request handler for status send
         self.req_status = None
+
+        self.logger = logging.getLogger('controller')
 
     def run(self, u0, t0, Tend):
         """
@@ -200,7 +203,9 @@ class allinclusive_classic_MPI(controller):
         """
 
         stage = self.S.status.stage
-        # print(self.comm.Get_rank(),stage)
+
+        self.logger.debug(stage)
+
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
 

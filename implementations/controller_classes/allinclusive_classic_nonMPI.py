@@ -5,6 +5,7 @@ import numpy as np
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
 from pySDC.Stats import stats
+import logging
 
 
 class allinclusive_classic_nonMPI(controller):
@@ -38,6 +39,8 @@ class allinclusive_classic_nonMPI(controller):
                     "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
                     "use Legendre node nor enforce collocation update. If you need/want this, " \
                     "use the blockwise controllers."
+
+        self.logger = logging.getLogger('controller')
 
 
     def run(self, u0, t0, Tend):
@@ -198,6 +201,8 @@ class allinclusive_classic_nonMPI(controller):
 
         stage = S.status.stage
 
+        self.logger.debug(stage)
+
         if stage == 'SPREAD':
             # first stage: spread values
             S.levels[0].hooks.pre_step(S.status)
@@ -293,8 +298,6 @@ class allinclusive_classic_nonMPI(controller):
             S.levels[0].sweep.compute_residual()
             S.levels[0].hooks.dump_sweep(S.status)
 
-            S.levels[0].hooks.dump_iteration(S.status)
-
             # update stage and return
             S.status.stage = 'IT_FINE_SEND'
 
@@ -316,6 +319,8 @@ class allinclusive_classic_nonMPI(controller):
         elif stage == 'IT_CHECK':
 
             # check whether to stop iterating
+
+            S.levels[0].hooks.dump_iteration(S.status)
 
             # increment iteration count here (and only here)
             S.status.iter += 1
