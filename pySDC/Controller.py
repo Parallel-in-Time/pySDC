@@ -1,6 +1,8 @@
 import abc
 from future.utils import with_metaclass
+import logging
 
+from pySDC.Log import setup_custom_logger
 from pySDC.Plugins.pysdc_helper import FrozenClass
 
 
@@ -23,6 +25,7 @@ class controller(with_metaclass(abc.ABCMeta)):
 
                 self.fine_comm = True
                 self.predict = True
+                self.logger_level = 20
 
                 for k, v in params.items():
                     setattr(self, k, v)
@@ -30,6 +33,11 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self._freeze()
 
         self.params = pars(controller_params)
+
+        setup_custom_logger(self.params.logger_level)
+
+        self.logger = logging.getLogger('controller')
+
         pass
 
 

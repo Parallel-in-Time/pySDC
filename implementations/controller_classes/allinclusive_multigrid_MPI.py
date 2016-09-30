@@ -1,6 +1,5 @@
-
 import numpy as np
-import logging
+
 
 from pySDC.Controller import controller
 from pySDC.Step import step
@@ -31,8 +30,6 @@ class allinclusive_multigrid_MPI(controller):
 
         # pass communicator for future use
         self.comm = comm
-
-        self.logger = logging.getLogger('controller')
 
     def run(self, u0, t0, Tend):
         """

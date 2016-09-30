@@ -18,9 +18,6 @@ import logging
 
 if __name__ == "__main__":
 
-    # set global logger (remove this if you do not want the output at all)
-    Log.setup_custom_logger(20)
-
     num_procs = 2
 
     # This comes as read-in for the level class  (this is optional!)
@@ -32,6 +29,7 @@ if __name__ == "__main__":
     cparams = {}
     cparams['fine_comm'] = True
     cparams['predict'] = True
+    cparams['logger_level'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}

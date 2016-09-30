@@ -5,7 +5,6 @@ import numpy as np
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
 from pySDC.Stats import stats
-import logging
 
 
 class allinclusive_classic_nonMPI(controller):
@@ -39,8 +38,6 @@ class allinclusive_classic_nonMPI(controller):
                     "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
                     "use Legendre node nor enforce collocation update. If you need/want this, " \
                     "use the blockwise controllers."
-
-        self.logger = logging.getLogger('controller')
 
 
     def run(self, u0, t0, Tend):
