@@ -23,12 +23,12 @@ if __name__ == "__main__":
     cparams = {}
     cparams['fine_comm'] = True
     cparams['predict'] = True
-    cparams['logger_level'] = 20
+    cparams['logger_level'] = 10
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63,31]
+    pparams['nvars'] = [63,31,15]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
@@ -59,8 +59,8 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # initialize controller
-    # PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)
-    PFASST = allinclusive_classic_MPI(controller_params=cparams, description=description, comm=comm)
+    PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)
+    # PFASST = allinclusive_classic_MPI(controller_params=cparams, description=description, comm=comm)
 
     # setup parameters "in time"
     t0 = 0

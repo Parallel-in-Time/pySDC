@@ -13,87 +13,82 @@ class hooks(object):
         """
         Initialization routine
         """
-        self.__level = None
         self.t0 = None
         self.logger = logging.getLogger('hooks')
         pass
 
-
-    def __set_level(self,L):
-        """
-        Sets a reference to the current level (done in the initialization of the level)
-
-        Args:
-            L: current level
-        """
-        assert isinstance(L,level)
-        self.__level = L
-
-
-    @property
-    def level(self):
-        """
-        Getter for the current level
-        Returns:
-            level
-        """
-        return self.__level
-
-
-    def pre_step(self,status):
+    def pre_step(self, step, level_number):
         """
         Hook called before each step
+        Args:
+            step: the current step
+            level_number: the current level number
         """
         self.t0 = time.time()
         pass
 
 
-    def dump_pre(self,status):
+    def dump_pre(self, step, level_number):
         """
         Default routine called before time-loop starts
+        Args:
+            step: the current step
+            level_number: the current level number
         """
         pass
 
-    def dump_pre_iteration(self,status):
+    def dump_pre_iteration(self, step, level_number):
         """
         Default routine called before iteration starts
+        Args:
+            step: the current step
+            level_number: the current level number
         """
         pass
 
 
-    def dump_sweep(self,status):
+    def dump_sweep(self, step, level_number):
         """
         Default routine called after each sweep
+        Args:
+            step: the current step
+            level_number: the current level number
         """
-        L = self.level
+        L = step.levels[level_number]
 
         self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                         status.slot,L.time,status.stage,L.id,status.iter,L.status.residual)
+                         step.status.slot,L.time,step.status.stage,L.id,step.status.iter,L.status.residual)
 
-        stats.add_to_stats(step=status.slot, time=L.time, level=L.id, iter=status.iter,
+        stats.add_to_stats(step=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='residual',  value=L.status.residual)
 
         pass
 
 
-    def dump_iteration(self,status):
+    def dump_iteration(self, step, level_number):
         """
         Default routine called after each iteration
+        Args:
+            step: the current step
+            level_number: the current level number
         """
-        L = self.level
-        stats.add_to_stats(step=status.slot, time=L.time, iter=status.iter, type='residual',
+        L = step.levels[level_number]
+        stats.add_to_stats(step=step.status.slot, time=L.time, iter=step.status.iter, type='residual',
                            value=L.status.residual)
         pass
 
 
-    def dump_step(self,status):
+    def dump_step(self, step, level_number):
         """
         Default routine called after each step
+        Args:
+            step: the current step
+            level_number: the current level number
         """
 
-        L = self.level
-        stats.add_to_stats(step=status.slot, time=L.time, type='timing_step', value=time.time()-self.t0)
-        stats.add_to_stats(step=status.slot, time=L.time, type='niter', value=status.iter)
-        stats.add_to_stats(step=status.slot, time=L.time, type='residual', value=L.status.residual)
+        L = step.levels[level_number]
+        stats.add_to_stats(step=step.status.slot, time=L.time, type='timing_step', value=time.time()-self.t0)
+        stats.add_to_stats(step=step.status.slot, time=L.time, type='niter', value=step.status.iter)
+        stats.add_to_stats(step=step.status.slot, time=L.time, type='residual', value=L.status.residual)
 
         pass

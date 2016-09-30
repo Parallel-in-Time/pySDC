@@ -13,6 +13,7 @@ class stats_class():
         Simple initialization
         """
         self.__stats = {}
+        self.entry = namedtuple('Entry',['step','time','level','iter','type'])
 
     def add_to_stats(self,step=-1,time=-1,level=-1,iter=-1,type=-1,value=-1):
         """
@@ -26,8 +27,7 @@ class stats_class():
             value: the actual data
         """
         # create named tuple for the key and add to dict
-        Entry = namedtuple('Entry',['step','time','level','iter','type'])
-        self.__stats[Entry(step=step,time=time,level=level,iter=iter,type=type)] = value
+        self.__stats[self.entry(step=step,time=time,level=level,iter=iter,type=type)] = value
 
     def return_stats(self):
         """

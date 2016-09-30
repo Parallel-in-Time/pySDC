@@ -76,7 +76,7 @@ class allinclusive_classic_nonMPI(controller):
         self.restart_block(active_slots,time,u0)
 
         # call pre-start hook
-        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[active_slots[0]].status)
+        self.hooks.dump_pre(step=self.MS[active_slots[0]], level_number=0)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -202,7 +202,7 @@ class allinclusive_classic_nonMPI(controller):
 
         if stage == 'SPREAD':
             # first stage: spread values
-            S.levels[0].hooks.pre_step(S.status)
+            self.hooks.pre_step(step=S, level_number=0)
 
             # call predictor from sweeper
             S.levels[0].sweep.predict()
@@ -211,13 +211,13 @@ class allinclusive_classic_nonMPI(controller):
             if (len(S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
                 S.status.stage = 'PREDICT_RESTRICT'
             elif num_procs > 1 and len(S.levels) > 1: # PFASST
-                S.levels[0].hooks.dump_pre_iteration(S.status)
+                self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'
             elif num_procs > 1 and len(S.levels) == 1: # MSSDC
-                S.levels[0].hooks.dump_pre_iteration(S.status)
+                self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_COARSE_RECV'
             elif num_procs == 1:  # SDC
-                S.levels[0].hooks.dump_pre_iteration(S.status)
+                self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'
             else:
                 print("Don't know what to do after spread, aborting")
@@ -282,8 +282,8 @@ class allinclusive_classic_nonMPI(controller):
             for l in range(len(S.levels) - 1, 0, -1):
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
-            # uodate stage and return
-            S.levels[0].hooks.dump_pre_iteration(S.status)
+            # update stage and return
+            self.hooks.dump_pre_iteration(step=S, level_number=0)
             S.status.stage = 'IT_FINE_SWEEP'
             return S
 
@@ -293,7 +293,8 @@ class allinclusive_classic_nonMPI(controller):
             # standard sweep workflow: update nodes, compute residual, log progress
             S.levels[0].sweep.update_nodes()
             S.levels[0].sweep.compute_residual()
-            S.levels[0].hooks.dump_sweep(S.status)
+
+            self.hooks.dump_sweep(step=S, level_number=0)
 
             # update stage and return
             S.status.stage = 'IT_FINE_SEND'
@@ -317,7 +318,7 @@ class allinclusive_classic_nonMPI(controller):
 
             # check whether to stop iterating
 
-            S.levels[0].hooks.dump_iteration(S.status)
+            self.hooks.dump_iteration(step=S, level_number=0)
 
             # increment iteration count here (and only here)
             S.status.iter += 1
@@ -331,7 +332,7 @@ class allinclusive_classic_nonMPI(controller):
             # if I am done, signal accordingly, otherwise proceed
             if S.status.done:
                 S.levels[0].sweep.compute_end_point()
-                S.levels[0].hooks.dump_step(S.status)
+                self.hooks.dump_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
             else:
                 if len(S.levels) > 1:
@@ -352,7 +353,7 @@ class allinclusive_classic_nonMPI(controller):
             for l in range(1, len(S.levels) - 1):
                 S.levels[l].sweep.update_nodes()
                 S.levels[l].sweep.compute_residual()
-                S.levels[l].hooks.dump_sweep(S.status)
+                self.hooks.dump_sweep(step=S, level_number=l)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
                 if not S.levels[l].tag or S.status.last:
@@ -406,7 +407,7 @@ class allinclusive_classic_nonMPI(controller):
             S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
 
-            S.levels[-1].hooks.dump_sweep(S.status)
+            self.hooks.dump_sweep(step=S, level_number=len(S.levels)-1)
 
             # update stage and return
             S.status.stage = 'IT_COARSE_SEND'
@@ -450,7 +451,7 @@ class allinclusive_classic_nonMPI(controller):
                 if l - 1 > 0:
                     S.levels[l - 1].sweep.update_nodes()
                     S.levels[l - 1].sweep.compute_residual()
-                    S.levels[l - 1].hooks.dump_sweep(S.status)
+                    self.hooks.dump_sweep(step=S, level_number=l-1)
 
             # update stage and return
             S.status.stage = 'IT_FINE_SWEEP'

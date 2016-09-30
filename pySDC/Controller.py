@@ -4,6 +4,7 @@ import logging
 
 from pySDC.Log import setup_custom_logger
 from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC import Hooks as hookclass
 
 
 class controller(with_metaclass(abc.ABCMeta)):
@@ -35,8 +36,15 @@ class controller(with_metaclass(abc.ABCMeta)):
         self.params = pars(controller_params)
 
         setup_custom_logger(self.params.logger_level)
-
         self.logger = logging.getLogger('controller')
+
+        # check if we have a hook on this list. if not, use default class.
+        if 'hook_class' in controller_params:
+            hook = controller_params['hook_class']
+        else:
+            hook = hookclass.hooks
+
+        self.__hooks = hook()
 
         pass
 
@@ -73,3 +81,10 @@ class controller(with_metaclass(abc.ABCMeta)):
             Tend: ending time
         """
         return None
+
+    @property
+    def hooks(self):
+        """
+        Getter for the hooks
+        """
+        return self.__hooks

@@ -68,7 +68,7 @@ class allinclusive_multigrid_nonMPI(controller):
         self.restart_block(active_slots, time, u0)
 
         # call pre-start hook
-        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[active_slots[0]].status)
+        self.hooks.dump_pre(step=self.MS[active_slots[0]], level_number=0)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -249,7 +249,7 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
 
                 # first stage: spread values
-                S.levels[0].hooks.pre_step(S.status)
+                self.hooks.pre_step(step=S, level_number=0)
 
                 # call predictor from sweeper
                 S.levels[0].sweep.predict()
@@ -258,13 +258,13 @@ class allinclusive_multigrid_nonMPI(controller):
                 if (len(S.levels) > 1 and len(MS) > 1) and self.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
                 elif len(MS) > 1 and len(S.levels) > 1: # PFASST
-                    S.levels[0].hooks.dump_pre_iteration(S.status)
+                    self.hooks.dump_pre_iteration(step=S, level_number=0)
                     S.status.stage = 'IT_FINE'
                 elif len(MS) > 1 and len(S.levels) == 1: # MSSDC
-                    S.levels[0].hooks.dump_pre_iteration(S.status)
+                    self.hooks.dump_pre_iteration(step=S, level_number=0)
                     S.status.stage = 'IT_COARSE'
                 elif len(MS) == 1: # SDC
-                    S.levels[0].hooks.dump_pre_iteration(S.status)
+                    self.hooks.dump_pre_iteration(step=S, level_number=0)
                     S.status.stage = 'IT_FINE'
                 else:
                     print("Don't know what to do after spread, aborting")
@@ -279,7 +279,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.levels[0].hooks.dump_pre_iteration(S.status)
+                self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE'
 
             return MS
@@ -292,7 +292,8 @@ class allinclusive_multigrid_nonMPI(controller):
                 # standard sweep workflow: update nodes, compute residual, log progress
                 S.levels[0].sweep.update_nodes()
                 S.levels[0].sweep.compute_residual()
-                S.levels[0].hooks.dump_sweep(S.status)
+
+                self.hooks.dump_sweep(step=S, level_number=0)
 
                 # update stage
                 S.status.stage = 'IT_CHECK'
@@ -306,7 +307,7 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
                 # increment iteration count here (and only here)
                 S.status.iter += 1
-                S.levels[0].hooks.dump_iteration(S.status)
+                self.hooks.dump_iteration(step=S, level_number=0)
                 S.status.done = self.check_convergence(S)
 
             # if not everyone is ready yet, keep doing stuff
@@ -326,7 +327,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 # if everyone is ready, end
                 for S in MS:
                     S.levels[0].sweep.compute_end_point()
-                    S.levels[0].hooks.dump_step(S.status)
+                    self.hooks.dump_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
 
             return MS
@@ -342,7 +343,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 for l in range(1, len(S.levels) - 1):
                     S.levels[l].sweep.update_nodes()
                     S.levels[l].sweep.compute_residual()
-                    S.levels[l].hooks.dump_sweep(S.status)
+                    self.hooks.dump_sweep(step=S, level_number=l)
 
                     # transfer further up the hierarchy
                     S.transfer(source=S.levels[l], target=S.levels[l + 1])
@@ -364,7 +365,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 # do the sweep
                 S.levels[-1].sweep.update_nodes()
                 S.levels[-1].sweep.compute_residual()
-                S.levels[-1].hooks.dump_sweep(S.status)
+                self.hooks.dump_sweep(step=S, level_number=len(S.levels)-1)
 
                 # send to succ step
                 self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
@@ -401,7 +402,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     if l - 1 > 0:
                         S.levels[l - 1].sweep.update_nodes()
                         S.levels[l - 1].sweep.compute_residual()
-                        S.levels[l - 1].hooks.dump_sweep(S.status)
+                        self.hooks.dump_sweep(step=S, level_number=l - 1)
 
                 # update stage
                 S.status.stage = 'IT_FINE'

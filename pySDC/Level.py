@@ -18,7 +18,6 @@ class level(FrozenClass):
         f: RHS values at the nodes (+fold for saving data during restriction)
         tau: FAS correction, allocated via step class if necessary
         id: custom string naming this level
-        __hooks: a private instance of a hooks class
     """
 
     class cstatus(FrozenClass):
@@ -44,8 +43,7 @@ class level(FrozenClass):
 
             self._freeze()
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class,
-                 sweeper_params, level_params, hook_class, id):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params, level_params, id):
         """
         Initialization routine
 
@@ -57,7 +55,6 @@ class level(FrozenClass):
             sweeper_class: sweeper class
             sweeper_params: parameters for the sweeper (contains collocation)
             level_params: parameters given by the user, will be added as attributes
-            hook_class: class to add hooks (e.g. for output and diag)
             id: custom string naming this level
         """
 
@@ -75,7 +72,6 @@ class level(FrozenClass):
         # instantiate sweeper, problem and hooks
         self.__sweep = sweeper_class(sweeper_params)
         self.__prob = problem_class(problem_params, dtype_u, dtype_f)
-        self.__hooks = hook_class()
 
         # set level parameters and status
         self.params = pars(level_params)
@@ -94,7 +90,6 @@ class level(FrozenClass):
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
-        self.hooks._hooks__set_level(self)
 
         self.__tag = None
 
@@ -133,13 +128,6 @@ class level(FrozenClass):
         Getter for the sweeper
         """
         return self.__sweep
-
-    @property
-    def hooks(self):
-        """
-        Getter for the hooks
-        """
-        return self.__hooks
 
     @property
     def prob(self):
