@@ -12,17 +12,20 @@ class allinclusive_multigrid_MPI(controller):
 
     """
 
-    def __init__(self, step_params, description, comm):
+    def __init__(self, controller_params, description, comm):
         """
        Initialization routine for PFASST controller
 
        Args:
-           S: local steps
+           controller_params: parameter set for the controller and the step class
+           description: all the parameters to set up the rest (levels, problems, transfer, ...)
            comm: MPI communicator
        """
 
         # call parent's initialization routine
-        super(allinclusive_multigrid_MPI, self).__init__()
+        super(allinclusive_multigrid_MPI, self).__init__(controller_params)
+
+        step_params = {key: controller_params[key] for key in ['maxiter']}
 
         # create single step per processor
         self.S = step(step_params)
@@ -31,14 +34,13 @@ class allinclusive_multigrid_MPI(controller):
         # pass communicator for future use
         self.comm = comm
 
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
 
         Args:
             u0: initial values
             t0: starting time
-            dt: (initial) time step
             Tend: ending time
 
         Returns:
@@ -49,39 +51,44 @@ class allinclusive_multigrid_MPI(controller):
         # fixme: use error classes for send/recv and stage errors
 
         rank = self.comm.Get_rank()
-        num_procs = self.comm.Get_size()
-        all_dt = self.comm.allgather(dt)
-        self.S.status.dt = dt
-        self.S.status.time = t0 + sum(all_dt[0:rank])
-        self.S.status.step = rank
-        self.S.status.slot = rank
-        active = self.S.status.time < Tend - 10*np.finfo(float).eps
-        comm_active = self.comm.Split(active)
+        all_dt = self.comm.allgather(self.S.dt)
+        time = t0 + sum(all_dt[0:rank])
+        active = time < Tend - 10 * np.finfo(float).eps
 
+        comm_active = self.comm.Split(active)
+        rank = comm_active.Get_rank()
+        num_procs = comm_active.Get_size()
+        self.S.status.slot = rank
+
+        # initialize block of steps with u0
+        self.restart_block(num_procs, time, u0)
         uend = u0
 
         while active:
 
-            rank = comm_active.Get_rank()
-            num_procs = comm_active.Get_size()
-
-            # initialize block of steps with u0
-            self.restart_block(num_procs,uend)
             # call pre-start hook
             self.S.levels[0].hooks.dump_pre(self.S.status)
 
             while not self.S.status.done:
-                self.pfasst(comm_active,num_procs)
+                self.pfasst(comm_active, num_procs)
 
-            tend = comm_active.bcast(self.S.status.time+self.S.status.dt, root=num_procs-1)
-            uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
-            stepend = comm_active.bcast(self.S.status.step, root=num_procs-1)
+            time += self.S.dt
+            tend = comm_active.bcast(time, root=num_procs - 1)
+            uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
+            stepend = comm_active.bcast(self.S.status.slot, root=num_procs - 1)
 
-            all_dt = comm_active.allgather(self.S.status.dt)
-            self.S.status.time = stepend + rank + 1
-            self.S.status.time = tend + sum(all_dt[0:rank])
-            active =  self.S.status.time < Tend - 10 * np.finfo(float).eps
+            all_dt = comm_active.allgather(self.S.dt)
+            time = tend + sum(all_dt[0:rank])
+
+            active = time < Tend - 10 * np.finfo(float).eps
             comm_active = comm_active.Split(active)
+
+            rank = comm_active.Get_rank()
+            num_procs = comm_active.Get_size()
+            self.S.status.slot = rank
+
+            # initialize block of steps with u0
+            self.restart_block(num_procs, time, uend)
 
         comm_active.Free()
         uend = self.comm.bcast(uend, root=num_procs-1)
@@ -89,12 +96,13 @@ class allinclusive_multigrid_MPI(controller):
         return uend, stats.return_stats()
 
 
-    def restart_block(self,size,u0):
+    def restart_block(self,size,time,u0):
         """
         Helper routine to reset/restart block of (active) steps
 
         Args:
             size: number of active time steps
+            time: current time
             u0: initial value to distribute across the steps
 
         Returns:
@@ -117,6 +125,11 @@ class allinclusive_multigrid_MPI(controller):
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
+        self.req_status = None
+        self.req_send = []
+
+        for lvl in self.S.levels:
+            lvl.status.time = time
 
     @staticmethod
     def recv(target,source,tag,comm):
@@ -204,7 +217,7 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if (len(self.S.levels) > 1 and num_procs > 1) and self.S.params.predict:  # MLSDC or PFASST
+            if (len(self.S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
                 self.S.status.stage = 'PREDICT'
             elif num_procs > 1 and len(self.S.levels) > 1:  # PFASST
                 self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
@@ -322,13 +335,13 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
                 self.S.levels[l-1].sweep.compute_end_point()
 
-                if not self.S.status.last and self.S.params.fine_comm:
+                if not self.S.status.last and self.params.fine_comm:
                     req_send = comm.isend(self.S.levels[l-1].uend,dest=self.S.next,tag=self.S.status.iter)
 
-                if not self.S.status.first and self.S.params.fine_comm:
+                if not self.S.status.first and self.params.fine_comm:
                     self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
-                if not self.S.status.last and self.S.params.fine_comm:
+                if not self.S.status.last and self.params.fine_comm:
                     req_send.wait()
 
                 # on middle levels: do sweep as usual

@@ -1,8 +1,6 @@
 from pySDC import Level as levclass
-from pySDC import Stats as statclass
 from pySDC import Hooks as hookclass
 
-import copy as cp
 import sys
 
 class step():
@@ -38,8 +36,6 @@ class step():
 
                 defaults = dict()
                 defaults['maxiter'] = 20
-                defaults['fine_comm'] = True
-                defaults['predict'] = True
 
                 for k,v in defaults.items():
                     setattr(self,k,v)
@@ -50,7 +46,7 @@ class step():
 
         # short helper class to bundle all status variables
         class status():
-            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','time','dt','step','prev_done')
+            __slots__ = ('iter','stage','slot','first','last','pred_cnt','done','prev_done')
             def __init__(self):
                 self.iter = None
                 self.stage = None
@@ -59,9 +55,6 @@ class step():
                 self.last = None
                 self.pred_cnt = None
                 self.done = None
-                self.time = None
-                self.dt = None
-                self.step = None
                 self.prev_done = None
 
         # set params and status
@@ -96,7 +89,7 @@ class step():
         # single entry per key, one dict per level
         pparams_list = self.__dict_to_list(descr['problem_params'])
         # put this newly generated list into the description dictionary (copy to avoid changing the original one)
-        descr_new = cp.deepcopy(descr)
+        descr_new = descr.copy()
         descr_new['problem_params'] = pparams_list
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
@@ -196,8 +189,6 @@ class step():
         assert isinstance(L,levclass.level)
         # add level to level list
         self.levels.append(L)
-        # pass this step to the registered level
-        self.levels[-1]._level__set_step(self)
         # if this is not the finest level, allocate tau correction
         if len(self.levels) > 1:
             L._level__add_tau()
@@ -304,3 +295,21 @@ class step():
         """
         assert type(p) is type(self)
         self.__next = p
+
+    @property
+    def dt(self):
+        """
+        Getter for current time-step size
+        Returns:
+            dt
+        """
+        return self.levels[0].dt
+
+    @property
+    def time(self):
+        """
+        Getter for current time-step size
+        Returns:
+            dt
+        """
+        return self.levels[0].time

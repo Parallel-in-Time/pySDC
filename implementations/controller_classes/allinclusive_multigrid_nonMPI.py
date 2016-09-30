@@ -14,18 +14,20 @@ class allinclusive_multigrid_nonMPI(controller):
 
     """
 
-    def __init__(self, num_procs, step_params, description):
+    def __init__(self, num_procs, controller_params, description):
         """
        Initialization routine for PFASST controller
 
        Args:
            num_procs: number of parallel time steps (still serial, though), can be 1
-           step_params: parameter set for the step class
+           controller_params: parameter set for the controller and the steps
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
         # call parent's initialization routine
-        super(allinclusive_multigrid_nonMPI, self).__init__()
+        super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
+
+        step_params = {key:controller_params[key] for key in ['maxiter']}
 
         self.MS = []
         # simply append step after step and generate the hierarchies
@@ -34,14 +36,13 @@ class allinclusive_multigrid_nonMPI(controller):
             self.MS[-1].generate_hierarchy(description)
 
 
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
 
         Args:
            u0: initial values
            t0: starting time
-           dt: (initial) time step
            Tend: ending time
 
         Returns:
@@ -59,22 +60,19 @@ class allinclusive_multigrid_nonMPI(controller):
         slots = [p for p in range(num_procs)]
 
         # initialize time variables of each step
-        for p in slots:
-            self.MS[p].status.dt = dt # could have different dt per step here
-            self.MS[p].status.time = t0 + sum(self.MS[j].status.dt for j in range(p))
-            self.MS[p].status.step = p
+        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = [self.MS[p].status.time < Tend - 10*np.finfo(float).eps for p in slots]
+        active = [time[p] < Tend - 10*np.finfo(float).eps for p in slots]
 
         # compress slots according to active steps, i.e. remove all steps which have times above Tend
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
-        self.restart_block(active_slots,u0)
+        self.restart_block(active_slots, time, u0)
 
         # call pre-start hook
-        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[p].status)
+        self.MS[active_slots[0]].levels[0].hooks.dump_pre(self.MS[active_slots[0]].status)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -88,33 +86,32 @@ class allinclusive_multigrid_nonMPI(controller):
             for p in range(len(MS_active)):
                 self.MS[active_slots[p]] = MS_active[p]
 
-
             # if all active steps are done
             if all([self.MS[p].status.done for p in active_slots]):
 
                 # uend is uend of the last active step in the list
                 uend = self.MS[active_slots[-1]].levels[0].uend
 
+                for p in active_slots:
+                    time[p] += num_procs*self.MS[p].dt
+
                 # determine new set of active steps and compress slots accordingly
-                active = [self.MS[p].status.time+num_procs*self.MS[p].status.dt < Tend - 10*np.finfo(float).eps for p in slots]
+                active = [time[p] < Tend - 10*np.finfo(float).eps for p in slots]
                 active_slots = list(itertools.compress(slots, active))
 
-                # increment timings for now active steps
-                for p in active_slots:
-                    self.MS[p].status.time += num_procs*self.MS[p].status.dt
-                    self.MS[p].status.step += num_procs
                 # restart active steps (reset all values and pass uend to u0)
-                self.restart_block(active_slots,uend)
+                self.restart_block(active_slots,time,uend)
 
         return uend,stats.return_stats()
 
 
-    def restart_block(self,active_slots,u0):
+    def restart_block(self,active_slots,time,u0):
         """
         Helper routine to reset/restart block of (active) steps
 
         Args:
             active_slots: list of active steps
+            time: list of new times
             u0: initial value to distribute across the steps
 
         """
@@ -142,6 +139,10 @@ class allinclusive_multigrid_nonMPI(controller):
                 self.MS[p].status.stage = 'SPREAD'
                 for l in self.MS[p].levels:
                     l.tag = None
+
+        for p in active_slots:
+            for lvl in self.MS[p].levels:
+                lvl.status.time = time[p]
 
     @staticmethod
     def recv(target,source,tag=None):
@@ -256,7 +257,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if (len(S.levels) > 1 and len(MS) > 1) and S.params.predict: # MLSDC or PFASST
+                if (len(S.levels) > 1 and len(MS) > 1) and self.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
                 elif len(MS) > 1 and len(S.levels) > 1: # PFASST
                     S.levels[0].hooks.dump_pre_iteration(S.status)
@@ -391,11 +392,11 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
                     # send updated values forward
-                    if S.params.fine_comm:
+                    if self.params.fine_comm:
                         self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                     # # receive values
-                    if S.params.fine_comm and not S.status.first:
+                    if self.params.fine_comm and not S.status.first:
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter, S.prev.status.slot))
 
                     # on middle levels: do sweep as usual

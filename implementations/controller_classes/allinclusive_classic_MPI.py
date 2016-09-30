@@ -12,17 +12,20 @@ class allinclusive_classic_MPI(controller):
 
     """
 
-    def __init__(self, step_params, description, comm):
+    def __init__(self, controller_params, description, comm):
         """
        Initialization routine for PFASST controller
 
        Args:
-           S: local steps
+           controller_params: parameter set for the controller and the step class
+           description: all the parameters to set up the rest (levels, problems, transfer, ...)
            comm: MPI communicator
        """
 
         # call parent's initialization routine
-        super(allinclusive_classic_MPI, self).__init__()
+        super(allinclusive_classic_MPI, self).__init__(controller_params)
+
+        step_params = {key: controller_params[key] for key in ['maxiter']}
 
         # create single step per processor
         self.S = step(step_params)
@@ -35,14 +38,13 @@ class allinclusive_classic_MPI(controller):
         # add request handler for status send
         self.req_status = None
 
-    def run(self, u0, t0, dt, Tend):
+    def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
 
         Args:
             u0: initial values
             t0: starting time
-            dt: (initial) time step
             Tend: ending time
 
         Returns:
@@ -53,39 +55,44 @@ class allinclusive_classic_MPI(controller):
         # fixme: use error classes for send/recv and stage errors
 
         rank = self.comm.Get_rank()
-        num_procs = self.comm.Get_size()
-        all_dt = self.comm.allgather(dt)
-        self.S.status.dt = dt
-        self.S.status.time = t0 + sum(all_dt[0:rank])
-        self.S.status.step = rank
-        self.S.status.slot = rank
-        active = self.S.status.time < Tend - 10*np.finfo(float).eps
-        comm_active = self.comm.Split(active)
+        all_dt = self.comm.allgather(self.S.dt)
+        time = t0 + sum(all_dt[0:rank])
+        active = time < Tend - 10*np.finfo(float).eps
 
+        comm_active = self.comm.Split(active)
+        rank = comm_active.Get_rank()
+        num_procs = comm_active.Get_size()
+        self.S.status.slot = rank
+
+        # initialize block of steps with u0
+        self.restart_block(num_procs, time, u0)
         uend = u0
 
         while active:
 
-            rank = comm_active.Get_rank()
-            num_procs = comm_active.Get_size()
-
-            # initialize block of steps with u0
-            self.restart_block(num_procs,uend)
             # call pre-start hook
             self.S.levels[0].hooks.dump_pre(self.S.status)
 
             while not self.S.status.done:
                 self.pfasst(comm_active,num_procs)
 
-            tend = comm_active.bcast(self.S.status.time+self.S.status.dt, root=num_procs-1)
+            time += self.S.dt
+            tend = comm_active.bcast(time, root=num_procs-1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
-            stepend = comm_active.bcast(self.S.status.step, root=num_procs-1)
+            stepend = comm_active.bcast(self.S.status.slot, root=num_procs-1)
 
-            all_dt = comm_active.allgather(self.S.status.dt)
-            self.S.status.time = stepend + rank + 1
-            self.S.status.time = tend + sum(all_dt[0:rank])
-            active =  self.S.status.time < Tend - 10 * np.finfo(float).eps
+            all_dt = comm_active.allgather(self.S.dt)
+            time = tend + sum(all_dt[0:rank])
+
+            active =  time < Tend - 10 * np.finfo(float).eps
             comm_active = comm_active.Split(active)
+
+            rank = comm_active.Get_rank()
+            num_procs = comm_active.Get_size()
+            self.S.status.slot = rank
+
+            # initialize block of steps with u0
+            self.restart_block(num_procs, time, uend)
 
         comm_active.Free()
         uend = self.comm.bcast(uend, root=num_procs-1)
@@ -93,12 +100,13 @@ class allinclusive_classic_MPI(controller):
         return uend, stats.return_stats()
 
 
-    def restart_block(self,size,u0):
+    def restart_block(self,size,time,u0):
         """
         Helper routine to reset/restart block of (active) steps
 
         Args:
             size: number of active time steps
+            time: current time
             u0: initial value to distribute across the steps
 
         Returns:
@@ -123,6 +131,9 @@ class allinclusive_classic_MPI(controller):
             l.tag = None
         self.req_status = None
         self.req_send = []
+
+        for lvl in self.S.levels:
+            lvl.status.time = time
 
     @staticmethod
     def recv(target,source,tag,comm):
@@ -203,7 +214,7 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if (len(self.S.levels) > 1 and num_procs > 1) and self.S.params.predict:  # MLSDC or PFASST
+            if (len(self.S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
                 self.S.status.stage = 'PREDICT'
             elif num_procs > 1 and len(self.S.levels) > 1:  # PFASST
                 self.S.levels[0].hooks.dump_pre_iteration(self.S.status)
@@ -238,12 +249,12 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].hooks.dump_sweep(self.S.status)
 
             # wait for pending sends before computing uend, if any
-            if len(self.req_send) > 0 and not self.S.status.last and self.S.params.fine_comm:
+            if len(self.req_send) > 0 and not self.S.status.last and self.params.fine_comm:
                 self.req_send[0].wait()
 
             self.S.levels[0].sweep.compute_end_point()
 
-            if not self.S.status.last and self.S.params.fine_comm:
+            if not self.S.status.last and self.params.fine_comm:
                 self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
 
             # update stage
@@ -300,12 +311,12 @@ class allinclusive_classic_MPI(controller):
                 self.S.levels[l].hooks.dump_sweep(self.S.status)
 
                 # wait for pending sends before computing uend, if any
-                if len(self.req_send) > l and not self.S.status.last and self.S.params.fine_comm:
+                if len(self.req_send) > l and not self.S.status.last and self.params.fine_comm:
                     self.req_send[l].wait()
 
                 self.S.levels[l].sweep.compute_end_point()
 
-                if not self.S.status.last and self.S.params.fine_comm:
+                if not self.S.status.last and self.params.fine_comm:
                     self.req_send.append(comm.isend(self.S.levels[l].uend,dest=self.S.next,tag=l))
 
                 # transfer further up the hierarchy
@@ -319,7 +330,7 @@ class allinclusive_classic_MPI(controller):
             # sweeps on coarsest level (serial/blocking)
 
             # receive from previous step (if not first)
-            if not self.S.status.first and not self.S.status.prev_cone:
+            if not self.S.status.first and not self.S.status.prev_done:
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels)-1, comm=comm)
 
             # do the sweep
@@ -345,7 +356,7 @@ class allinclusive_classic_MPI(controller):
             # receive and sweep on middle levels (except for coarsest level)
             for l in range(len(self.S.levels)-1,0,-1):
 
-                if not self.S.status.first and self.S.params.fine_comm:
+                if not self.S.status.first and self.params.fine_comm:
                     self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=l-1, comm=comm)
 
                 # prolong values
