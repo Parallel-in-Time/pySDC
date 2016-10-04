@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import numpy as np
+import os.path
 from collections import namedtuple
 import matplotlib.pylab as plt
 
@@ -30,6 +31,10 @@ def main():
 
     # visualize results
     plot_accuracy(results)
+
+    assert os.path.isfile('accuracy_test.pdf')
+
+
 
 
 def run_accuracy_check(nvars_list,problem_params):
