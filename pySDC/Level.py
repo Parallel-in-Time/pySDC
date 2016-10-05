@@ -55,7 +55,7 @@ class level(FrozenClass):
             sweeper_class: sweeper class
             sweeper_params: parameters for the sweeper (contains collocation)
             level_params: parameters given by the user, will be added as attributes
-            id: custom string naming this level
+            id: custom name for this level
         """
 
         # short helper class to add params as attributes

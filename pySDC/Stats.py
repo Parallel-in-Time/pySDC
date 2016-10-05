@@ -13,9 +13,9 @@ class stats_class():
         Simple initialization
         """
         self.__stats = {}
-        self.entry = namedtuple('Entry',['step','time','level','iter','type'])
+        self.entry = namedtuple('Entry',['process','time','level','iter','type'])
 
-    def add_to_stats(self,step=-1,time=-1,level=-1,iter=-1,type=-1,value=-1):
+    def add_to_stats(self,process,time,level,iter,type,value):
         """
         Routine to add data to the statistics dict
 
@@ -27,7 +27,7 @@ class stats_class():
             value: the actual data
         """
         # create named tuple for the key and add to dict
-        self.__stats[self.entry(step=step,time=time,level=level,iter=iter,type=type)] = value
+        self.__stats[self.entry(process=process,time=time,level=level,iter=iter,type=type)] = value
 
     def return_stats(self):
         """
@@ -38,7 +38,7 @@ class stats_class():
         return self.__stats
 
 
-def grep_stats(stats,step=None,time=None,level=None,iter=None,type=None):
+def filter_stats(stats,process=None,time=None,level=None,iter=None,type=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -55,7 +55,7 @@ def grep_stats(stats,step=None,time=None,level=None,iter=None,type=None):
     for k,v in stats.items():
         # get data if key matches the filter (if specified)
         if (k.time == time or time is None) and \
-                (k.step == step or step is None) and \
+                (k.process == process or process is None) and \
                 (k.level == level or level is None) and \
                 (k.iter == iter or iter is None) and \
                 (k.type == type or type is None):
@@ -64,7 +64,7 @@ def grep_stats(stats,step=None,time=None,level=None,iter=None,type=None):
     return result
 
 
-def sort_stats(stats,sortby='time'):
+def sort_stats(stats,sortby):
     """
     Helper function to transform stats dictionary to sorted list of tuples
 
@@ -76,10 +76,30 @@ def sort_stats(stats,sortby='time'):
     result = []
     for k,v in stats.items():
         # convert string to attribute and append key + value to result as tuple
-        result.append((getattr(k,sortby),v))
+        item = getattr(k,sortby)
+        result.append((item,v))
 
     # sort by first element of the tuple (which is the sortby key) and return
     return sorted(result,key=lambda tup: tup[0])
+
+
+def get_list_of_types(stats):
+    """
+    Helper function to get list of types registered in stats
+
+    Args:
+        stats: dictionary with statistics
+
+    Returns:
+        list of types registered
+
+    """
+
+    type_list = []
+    for k, v in stats.items():
+        if not k.type in type_list:
+            type_list.append(k.type)
+    return type_list
 
 
 # global variable here for much easier access (no passing around)

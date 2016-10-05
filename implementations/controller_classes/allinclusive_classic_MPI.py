@@ -262,8 +262,6 @@ class allinclusive_classic_MPI(controller):
 
             # check whether to stop iterating (parallel)
 
-            # increment iteration count here (and only here)
-            self.S.status.iter += 1
             self.hooks.dump_iteration(step=self.S, level_number=0)
 
             # check if an open request of the status send is pending
@@ -283,6 +281,8 @@ class allinclusive_classic_MPI(controller):
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
             if not self.S.status.done or not self.S.status.prev_done:
+                # increment iteration count here (and only here)
+                self.S.status.iter += 1
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'

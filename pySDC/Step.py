@@ -132,7 +132,7 @@ class step(FrozenClass):
                                sweeper_class      =   descr_list[l]['sweeper_class'],
                                sweeper_params     =   descr_list[l]['sweeper_params'],
                                level_params       =   descr_list[l]['level_params'],
-                               id                 =   'L'+str(l))
+                               id                 =   l)
 
             self.register_level(L)
 

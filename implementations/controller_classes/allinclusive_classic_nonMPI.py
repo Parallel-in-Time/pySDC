@@ -320,9 +320,6 @@ class allinclusive_classic_nonMPI(controller):
 
             self.hooks.dump_iteration(step=S, level_number=0)
 
-            # increment iteration count here (and only here)
-            S.status.iter += 1
-
             S.status.done = self.check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
@@ -335,6 +332,8 @@ class allinclusive_classic_nonMPI(controller):
                 self.hooks.dump_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
             else:
+                # increment iteration count here (and only here)
+                S.status.iter += 1
                 if len(S.levels) > 1:
                     S.status.stage = 'IT_UP'
                 elif num_procs > 1:  # MSSDC

@@ -59,7 +59,7 @@ class hooks(object):
         self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                          step.status.slot,L.time,step.status.stage,L.id,step.status.iter,L.status.residual)
 
-        stats.add_to_stats(step=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='residual',  value=L.status.residual)
 
         pass
@@ -73,8 +73,8 @@ class hooks(object):
             level_number: the current level number
         """
         L = step.levels[level_number]
-        stats.add_to_stats(step=step.status.slot, time=L.time, iter=step.status.iter, type='residual',
-                           value=L.status.residual)
+        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+                           type='residual', value=L.status.residual)
         pass
 
 
@@ -87,8 +87,9 @@ class hooks(object):
         """
 
         L = step.levels[level_number]
-        stats.add_to_stats(step=step.status.slot, time=L.time, type='timing_step', value=time.time()-self.t0)
-        stats.add_to_stats(step=step.status.slot, time=L.time, type='niter', value=step.status.iter)
-        stats.add_to_stats(step=step.status.slot, time=L.time, type='residual', value=L.status.residual)
+        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+                           type='timing_step', value=time.time()-self.t0)
+        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+                           type='niter', value=step.status.iter)
 
         pass

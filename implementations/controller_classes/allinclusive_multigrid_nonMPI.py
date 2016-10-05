@@ -305,8 +305,6 @@ class allinclusive_multigrid_nonMPI(controller):
             # check whether to stop iterating (parallel)
 
             for S in MS:
-                # increment iteration count here (and only here)
-                S.status.iter += 1
                 self.hooks.dump_iteration(step=S, level_number=0)
                 S.status.done = self.check_convergence(S)
 
@@ -315,6 +313,8 @@ class allinclusive_multigrid_nonMPI(controller):
 
                 for S in MS:
                     S.status.done = False
+                    # increment iteration count here (and only here)
+                    S.status.iter += 1
                     # multi-level or single-level?
                     if len(S.levels) > 1: # MLSDC or PFASST
                         S.status.stage = 'IT_UP'

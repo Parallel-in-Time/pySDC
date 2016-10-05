@@ -255,8 +255,6 @@ class allinclusive_multigrid_MPI(controller):
 
             # check whether to stop iterating (parallel)
 
-            # increment iteration count here (and only here)
-            self.S.status.iter += 1
             self.hooks.dump_iteration(step=self.S, level_number=0)
             self.S.status.done = self.check_convergence(self.S)
             all_done = comm.allgather(self.S.status.done)
@@ -264,6 +262,8 @@ class allinclusive_multigrid_MPI(controller):
             # if not everyone is ready yet, keep doing stuff
             if not all(all_done):
                 self.S.status.done = False
+                # increment iteration count here (and only here)
+                self.S.status.iter += 1
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
