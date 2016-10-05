@@ -2,10 +2,7 @@ import logging
 import time
 from collections import namedtuple
 
-from pySDC.Plugins.pysdc_helper import FrozenClass
-
-
-class hooks(FrozenClass):
+class hooks(object):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
@@ -27,8 +24,6 @@ class hooks(FrozenClass):
         self.__stats = {}
         self.__entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'type'])
 
-        # don't allow adding more stuff to this class
-        self._freeze()
         pass
 
     def add_to_stats(self,process,time,level,iter,type,value):

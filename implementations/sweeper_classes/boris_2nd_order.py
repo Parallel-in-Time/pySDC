@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np
+import scipy.linalg as LA
 
 from pySDC.Sweeper import sweeper
 
@@ -26,6 +27,7 @@ class boris_2nd_order(sweeper):
         """
 
          # call parent's initialization routine
+
         super(boris_2nd_order,self).__init__(params)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
@@ -48,8 +50,10 @@ class boris_2nd_order(sweeper):
         for m in np.arange(self.coll.num_nodes+1):
             QI[m, 1:m+1] = self.coll.delta_m[0:m]
             QE[m, 0:m] = self.coll.delta_m[0:m]
+
         # trapezoidal rule
         QT = 1/2*(QI+QE)
+
         # Qx as in the paper
         Qx = np.dot(QE,QT) + 1/2*QE*QE
 

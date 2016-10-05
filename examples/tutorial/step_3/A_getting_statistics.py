@@ -5,7 +5,7 @@ from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.Stats import filter_stats, sort_stats, get_list_of_types
+from pySDC.Plugins.stats_helper import filter_stats, sort_stats, get_list_of_types
 
 def main():
 
