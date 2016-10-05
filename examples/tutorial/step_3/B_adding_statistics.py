@@ -7,13 +7,13 @@ from implementations.problem_classes.PenningTrap_3D import penningtrap
 from implementations.datatype_classes.particles import particles, fields
 from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
-from examples.tutorial.step_3.B_HookClass import particles_output
+from examples.tutorial.step_3.HookClass_Particles import particles_output
 
 from pySDC.Plugins.stats_helper import filter_stats, sort_stats, get_list_of_types
 
 def main():
 
-    err, stats = run_simulation()
+    err, stats = run_penning_trap_simulation()
 
     # filter statistics type (etot)
     filtered_stats = filter_stats(stats, type='etot')
@@ -29,7 +29,7 @@ def main():
     assert abs(base_energy - energy[-1][1]) < 15 , 'ERROR: energy deviated too much, got %s' %(base_energy-energy[-1][1])
     assert err < 5E-04, "ERROR: solution is not as exact as expected, got %s" %err
 
-def run_simulation():
+def run_penning_trap_simulation():
     """
     A simple test program to run IMEX SDC for a single time step
     """
@@ -43,21 +43,21 @@ def run_simulation():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
 
-    # initialize problem parameters
+    # initialize problem parameters for the Penning trap
     problem_params = {}
-    problem_params['omega_E'] = 4.9
-    problem_params['omega_B'] = 25.0
-    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])
-    problem_params['nparts'] = 100
-    problem_params['sig'] = 0.1
+    problem_params['omega_E'] = 4.9    # E-field frequency
+    problem_params['omega_B'] = 25.0   # B-field frequency
+    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]]) # initial coordinates for the center of positions
+    problem_params['nparts'] = 1    # number of particles in the trap
+    problem_params['sig'] = 0.1     # smoothing parameter for the forces
 
     # initialize step parameters
     step_params = {}
     step_params['maxiter'] = 20
 
-    # initialize controller parameters
+    # initialize controller parameters (<-- this is new!)
     controller_params = {}
-    controller_params['hook_class'] = particles_output
+    controller_params['hook_class'] = particles_output # specialized hook class for more statistics and output
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -89,7 +89,6 @@ def run_simulation():
     err = np.linalg.norm(uex.pos.values - uend.pos.values, np.inf) / np.linalg.norm(uex.pos.values, np.inf)
 
     return err, stats
-
 
 if __name__ == "__main__":
     main()

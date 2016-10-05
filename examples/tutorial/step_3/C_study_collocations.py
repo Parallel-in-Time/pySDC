@@ -9,7 +9,7 @@ from implementations.problem_classes.PenningTrap_3D import penningtrap
 from implementations.datatype_classes.particles import particles, fields
 from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
-from examples.tutorial.step_3.B_HookClass import particles_output
+from examples.tutorial.step_3.HookClass_Particles import particles_output
 
 from pySDC.Plugins.stats_helper import filter_stats, sort_stats, get_list_of_types
 
@@ -28,11 +28,11 @@ def main():
         ediff[cclass] = abs(base_energy-final_energy)
         print("Energy deviation for %s: %12.8e" %(cclass,ediff[cclass]))
 
+    # set expected differences and check
     ediff_expect = {}
     ediff_expect['CollGaussRadau_Right'] = 15
     ediff_expect['CollGaussLobatto'] = 1E-05
     ediff_expect['CollGaussLegendre'] = 3E-05
-
     for k,v in ediff.items():
         assert v < ediff_expect[k], "ERROR: energy deviated too much, got %s" %ediff[k]
 
@@ -64,8 +64,8 @@ def run_simulation():
 
     # initialize controller parameters
     controller_params = {}
-    controller_params['hook_class'] = particles_output
-    controller_params['logger_level'] = 30
+    controller_params['hook_class'] = particles_output  # specialized hook class for more statistics and output
+    controller_params['logger_level'] = 30              # reduce verbosity of each run, see https://docs.python.org/2/library/logging.html#logging-levels
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -77,6 +77,7 @@ def run_simulation():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
+    # assemble and loop over list of collocation classes
     coll_list = [CollGaussRadau_Right, CollGaussLegendre, CollGaussLobatto]
     stats_dict = {}
     for cclass in coll_list:
@@ -98,6 +99,7 @@ def run_simulation():
         # call main function to get things done...
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+        # gather stats in dictionary, collocation classes being the keys
         stats_dict[cclass.__name__] = stats
 
     return stats_dict
