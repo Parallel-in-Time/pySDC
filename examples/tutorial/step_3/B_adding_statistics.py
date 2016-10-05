@@ -7,9 +7,9 @@ from implementations.problem_classes.PenningTrap_3D import penningtrap
 from implementations.datatype_classes.particles import particles, fields
 from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
-from examples.tutorial.step_3.HookClass_Particles import particles_output
+from examples.tutorial.step_3.HookClass_Particles import particle_hook
 
-from pySDC.Plugins.stats_helper import filter_stats, sort_stats, get_list_of_types
+from pySDC.Plugins.stats_helper import filter_stats, sort_stats
 
 def main():
 
@@ -55,9 +55,9 @@ def run_penning_trap_simulation():
     step_params = {}
     step_params['maxiter'] = 20
 
-    # initialize controller parameters (<-- this is new!)
+    # initialize controller parameters
     controller_params = {}
-    controller_params['hook_class'] = particles_output # specialized hook class for more statistics and output
+    controller_params['hook_class'] = particle_hook # specialized hook class for more statistics and output
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

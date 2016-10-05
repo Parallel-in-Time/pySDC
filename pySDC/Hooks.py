@@ -123,5 +123,7 @@ class hooks(object):
                            type='timing_step', value=time.time()-self.__t0)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='niter', value=step.status.iter)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=-1,
+                          type='residual', value=L.status.residual)
 
         pass

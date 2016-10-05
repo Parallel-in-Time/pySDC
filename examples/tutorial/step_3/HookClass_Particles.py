@@ -4,13 +4,13 @@ import numpy as np
 from pySDC.Hooks import hooks
 
 
-class particles_output(hooks):
+class particle_hook(hooks):
 
     def __init__(self):
         """
         Initialization of particles output
         """
-        super(particles_output,self).__init__()
+        super(particle_hook, self).__init__()
 
 
     def dump_pre(self, step, level_number):
@@ -20,7 +20,7 @@ class particles_output(hooks):
             step: the current step
             level_number: the current level number
         """
-        super(particles_output,self).dump_pre(step, level_number)
+        super(particle_hook, self).dump_pre(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
@@ -60,7 +60,7 @@ class particles_output(hooks):
             level_number: the current level number
         """
 
-        super(particles_output,self).dump_step(step, level_number)
+        super(particle_hook, self).dump_step(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]

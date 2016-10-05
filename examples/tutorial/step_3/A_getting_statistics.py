@@ -47,7 +47,6 @@ def run_simulation():
     sweeper_params = {}
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    # sweeper_params['do_LU'] = True      # for this sweeper we can use the LU trick for the implicit part!
 
     # initialize problem parameters
     problem_params = {}
@@ -58,6 +57,10 @@ def run_simulation():
     # initialize step parameters
     step_params = {}
     step_params['maxiter'] = 20
+
+    # initialize controller parameters (<-- this is new!)
+    controller_params = {}
+    controller_params['logger_level'] = 30  # reduce verbosity of each run, see https://docs.python.org/2/library/logging.html#logging-levels
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
@@ -71,11 +74,11 @@ def run_simulation():
     description['step_params'] = step_params
 
     # instantiate the controller (no controller parameters used here)
-    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params={}, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
     t0 = 0.1
-    Tend = 0.9  # note that we are requesting 8 time steps here (dt is 0.1)
+    Tend = 0.9
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

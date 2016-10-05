@@ -1,5 +1,5 @@
-Introduction
-============
+Step-1: A first spatial problem
+===============================
 
 In this step, we create a spatial problem and play with it a little bit. No SDC, no multi-level here so far.
 

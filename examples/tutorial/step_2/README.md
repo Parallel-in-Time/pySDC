@@ -1,5 +1,5 @@
-Introduction
-============
+Step-2: Data structures and my first sweeper
+============================================
 
 In this step, we will dig a bit deeper into the data structures of `pySDC` and work with our first SDC sweeper.
 
