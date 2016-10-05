@@ -1,9 +1,8 @@
 import numpy as np
 
-
 from pySDC.Controller import controller
 from pySDC.Step import step
-from pySDC.Stats import stats
+
 
 class allinclusive_multigrid_MPI(controller):
     """
@@ -90,7 +89,7 @@ class allinclusive_multigrid_MPI(controller):
         comm_active.Free()
         uend = self.comm.bcast(uend, root=num_procs-1)
 
-        return uend, stats.return_stats()
+        return uend, self.hooks.return_stats()
 
 
     def restart_block(self,size,time,u0):

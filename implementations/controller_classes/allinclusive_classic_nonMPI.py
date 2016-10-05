@@ -4,7 +4,6 @@ import numpy as np
 
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
-from pySDC.Stats import stats
 
 
 class allinclusive_classic_nonMPI(controller):
@@ -102,7 +101,7 @@ class allinclusive_classic_nonMPI(controller):
                     # restart active steps (reset all values and pass uend to u0)
                     self.restart_block(active_slots, time, uend)
 
-        return uend,stats.return_stats()
+        return uend, self.hooks.return_stats()
 
 
     def restart_block(self,active_slots,time,u0):

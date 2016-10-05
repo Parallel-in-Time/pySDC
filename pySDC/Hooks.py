@@ -1,21 +1,58 @@
-from pySDC.Level import level
 import logging
 import time
+from collections import namedtuple
 
-from pySDC.Stats import stats
+from pySDC.Plugins.pysdc_helper import FrozenClass
 
 
-class hooks(object):
+class hooks(FrozenClass):
+    """
+    Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
-    __slots__ = ('__level','t0','logger')
+    Attributes:
+        __t0: private variable to get starting time of the step
+        logger: logger instance for output
+        __stats: dictionary for gathering the statistics of a run
+        __entry: statistics entry containign all information to identify the value
+    """
 
     def __init__(self):
         """
         Initialization routine
         """
-        self.t0 = None
+        self.__t0 = None
         self.logger = logging.getLogger('hooks')
+
+        # create statistics and entry elements
+        self.__stats = {}
+        self.__entry = namedtuple('Entry', ['process', 'time', 'level', 'iter', 'type'])
+
+        # don't allow adding more stuff to this class
+        self._freeze()
         pass
+
+    def add_to_stats(self,process,time,level,iter,type,value):
+        """
+        Routine to add data to the statistics dict
+
+        Args:
+            process: the current process recording this data
+            time: the current simulation time
+            level: the current level id
+            iter: the current iteration count
+            type: string to describe the type of value
+            value: the actual data
+        """
+        # create named tuple for the key and add to dict
+        self.__stats[self.__entry(process=process,time=time,level=level,iter=iter,type=type)] = value
+
+    def return_stats(self):
+        """
+        Getter for the stats
+        Returns:
+            stats
+        """
+        return self.__stats
 
     def pre_step(self, step, level_number):
         """
@@ -24,7 +61,7 @@ class hooks(object):
             step: the current step
             level_number: the current level number
         """
-        self.t0 = time.time()
+        self.__t0 = time.time()
         pass
 
 
@@ -59,7 +96,7 @@ class hooks(object):
         self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
                          step.status.slot,L.time,step.status.stage,L.id,step.status.iter,L.status.residual)
 
-        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='residual',  value=L.status.residual)
 
         pass
@@ -73,7 +110,7 @@ class hooks(object):
             level_number: the current level number
         """
         L = step.levels[level_number]
-        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='residual', value=L.status.residual)
         pass
 
@@ -87,9 +124,9 @@ class hooks(object):
         """
 
         L = step.levels[level_number]
-        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
-                           type='timing_step', value=time.time()-self.t0)
-        stats.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+                           type='timing_step', value=time.time()-self.__t0)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
                            type='niter', value=step.status.iter)
 
         pass
