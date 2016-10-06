@@ -34,6 +34,16 @@ class allinclusive_classic_MPI(controller):
         # add request handler for status send
         self.req_status = None
 
+        num_procs = comm.Get_size()
+
+        if num_procs > 1:
+            for L in self.S.levels:
+                assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
+                    "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
+                    "use Legendre node nor enforce collocation update. If you need/want this, " \
+                    "use the multigrid controllers."
+
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST

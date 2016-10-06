@@ -31,12 +31,13 @@ class allinclusive_classic_nonMPI(controller):
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
 
-        for S in self.MS:
-            for L in S.levels:
-                assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
-                    "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
-                    "use Legendre node nor enforce collocation update. If you need/want this, " \
-                    "use the blockwise controllers."
+        if num_procs > 1:
+            for S in self.MS:
+                for L in S.levels:
+                    assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
+                        "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
+                        "use Legendre node nor enforce collocation update. If you need/want this, " \
+                        "use the blockwise controllers."
 
 
     def run(self, u0, t0, Tend):

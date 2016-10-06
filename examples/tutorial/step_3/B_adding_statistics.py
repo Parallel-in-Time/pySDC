@@ -1,6 +1,6 @@
 import numpy as np
 
-from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.problem_classes.PenningTrap_3D import penningtrap
@@ -71,7 +71,7 @@ def run_penning_trap_simulation():
     description['step_params'] = step_params
 
     # instantiate the controller (no controller parameters used here)
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
     t0 = 0.0
