@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy
 from pylab import rcParams
+from standard_integrators import dirk, rk_imex
 
-from examples.fwsw.ProblemClass import swfw_scalar
 from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_scalar
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 from pySDC import CollocationClasses as collclass
 from pySDC import Hooks as hookclass
 from pySDC import Level as lvl
 from pySDC import Step as stepclass
-from standard_integrators import dirk, rk_imex
 
 
 def findomega(stab_fh):

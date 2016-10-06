@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pySDC.deprecated.PFASST_stepwise as mp
 
-from examples.fwsw.ProblemClass import swfw_scalar
 from implementations.datatype_classes import mesh, rhs_imex_mesh
+from implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_scalar
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
