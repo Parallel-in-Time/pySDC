@@ -1,5 +1,6 @@
 from pySDC import Level as levclass
 from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.BaseTransfer import base_transfer
 
 import sys
 
@@ -8,14 +9,14 @@ class step(FrozenClass):
     """
     Step class, referencing most of the structure needed for the time-stepping
 
-    This class bundles multiple levels and the corresponding transfer operators and is used by the methods
+    This class bundles multiple levels and the corresponding base_transfer operators and is used by the methods
     (e.g. SDC and MLSDC). Status variables like the current time are hidden via properties and setters methods.
 
     Attributes:
         __t: current time (property time)
         __dt: current step size (property dt)
         __k: current iteration (property iter)
-        __transfer_dict: data structure to couple levels and transfer operators
+        __transfer_dict: data structure to couple levels and base_transfer operators
         levels: list of levels
         params: parameters given by the user
     """
@@ -104,26 +105,37 @@ class step(FrozenClass):
         # generate list of dictionaries out of the description
         descr_list = self.__dict_to_list(descr_new)
 
-        # sanity check: is there a transfer class? is there one even if only a single level is specified?
+        # sanity check: is there a base_transfer class? is there one even if only a single level is specified?
         if len(descr_list) > 1:
-            assert 'transfer_class' in descr_new
-            assert 'transfer_params' in descr_new
+            if 'base_transfer_class' in descr_new:
+                base_transfer_class = descr_new['base_transfer_class']
+            else:
+                base_transfer_class = base_transfer
+            assert 'space_transfer_class' in descr_new
         elif 'transfer_class' in descr_new:
-            print('WARNING: you have specified transfer classes, but only a single level...')
+            print('WARNING: you have specified base_transfer classes, but only a single level...')
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
 
-            # check if transfer parameters are needed
-            if 'transfer_params' in descr_list[l]:
-                tparams = descr_list[l]['transfer_params']
+            # check if base_transfer parameters are needed
+            if 'base_transfer_params' in descr_list[l]:
+                base_transfer_params = descr_list[l]['base_transfer_params']
             else:
-                tparams = {}
+                base_transfer_params = {}
+
+            # check if space_transfer parameters are needed
+            if 'space_transfer_params' in descr_list[l]:
+                space_transfer_params = descr_list[l]['space_transfer_params']
+            else:
+                space_transfer_params = {}
 
             if 'problem_params' in descr_list[l]:
                 pparams = descr_list[l]['problem_params']
             else:
                 pparams = {}
+
+
 
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   pparams,
@@ -137,8 +149,10 @@ class step(FrozenClass):
             self.register_level(L)
 
             if l > 0:
-                self.connect_levels(transfer_class  = descr_list[l]['transfer_class'],
-                                    transfer_params = tparams,
+                self.connect_levels(base_transfer_class  = base_transfer_class,
+                                    base_transfer_params = base_transfer_params,
+                                    space_transfer_class = descr_list[l]['space_transfer_class'],
+                                    space_transfer_params = space_transfer_params,
                                     fine_level      = self.levels[l-1],
                                     coarse_level    = self.levels[l])
 
@@ -195,20 +209,22 @@ class step(FrozenClass):
             L._level__add_tau()
 
 
-    def connect_levels(self, transfer_class, transfer_params, fine_level, coarse_level):
+    def connect_levels(self, base_transfer_class, base_transfer_params, space_transfer_class, space_transfer_params, fine_level, coarse_level):
         """
-        Routine to couple levels with transfer operators
+        Routine to couple levels with base_transfer operators
 
         Args:
-            transfer_class: the class which can transfer between the two levels
-            transfer_params: parameters for the transfer class
+            base_transfer_class: the class which can do transfer between the two space-time levels
+            base_transfer_params: parameters for the space_transfer class
+            space_transfer_class: the user-defined class which can do spatial transfer
+            space_transfer_params: parameters for the base_transfer class
             fine_level: the fine level
             coarse_level: the coarse level
         """
 
-        # create new instance of the specific transfer class
-        T = transfer_class(fine_level,coarse_level,transfer_params)
-        # use transfer dictionary twice to set restrict and prolong operator
+        # create new instance of the specific base_transfer class
+        T = base_transfer_class(fine_level,coarse_level,base_transfer_params,space_transfer_class,space_transfer_params)
+        # use base_transfer dictionary twice to set restrict and prolong operator
         self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
 
         if T.params.finter:
@@ -220,10 +236,10 @@ class step(FrozenClass):
 
     def transfer(self,source,target):
         """
-        Wrapper routine to ease the call of the transfer functions
+        Wrapper routine to ease the call of the base_transfer functions
 
         This function can be called in the multilevel stepper (e.g. MLSDC), passing a source and a target level.
-        Using the transfer dictionary, the calling stepper does not need to specify whether to use restrict of prolong.
+        Using the base_transfer dictionary, the calling stepper does not need to specify whether to use restrict of prolong.
 
         Args:
             source: source level

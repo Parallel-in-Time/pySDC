@@ -1,13 +1,12 @@
 import abc
 import numpy as np
 
-from future.utils import with_metaclass
 from pySDC.Plugins.pysdc_helper import FrozenClass
 
 
-class transfer(with_metaclass(abc.ABCMeta)):
+class base_transfer(object):
     """
-    Abstract transfer class
+    Standard base_transfer class
 
     Attributes:
         fine: reference to the fine level
@@ -16,14 +15,16 @@ class transfer(with_metaclass(abc.ABCMeta)):
         init_c: number of variables on the coarse level (whatever init represents there)
     """
 
-    def __init__(self,fine_level,coarse_level,params):
+    def __init__(self,fine_level,coarse_level,base_transfer_params,space_transfer_class,space_transfer_params):
         """
         Initialization routine
 
         Args:
-            fine_level: fine level connected with the transfer operations
-            coarse_level: coarse level connected with the transfer operations
-            params: parameters for the transfer operations
+            fine_level: fine level connected with the base_transfer operations
+            coarse_level: coarse level connected with the base_transfer operations
+            base_transfer_params: parameters for the base_transfer operations
+            space_transfer_class: class to perform spatial transfer
+            space_transfer_params: parameters for the space_transfer operations
         """
 
         # short helper class to add params as attributes
@@ -31,21 +32,19 @@ class transfer(with_metaclass(abc.ABCMeta)):
             def __init__(self,params):
 
                 self.finter = False
-                self.iorder = 6
-                self.rorder = 2
 
                 for k,v in params.items():
                     setattr(self,k,v)
 
                 self._freeze()
 
-        self.params = pars(params)
+        self.params = pars(base_transfer_params)
 
         # just copy by object
         self.fine = fine_level
         self.coarse = coarse_level
-        self.init_c = self.coarse.prob.init
-        self.init_f = self.fine.prob.init
+
+        self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob, params=space_transfer_params)
 
     # FIXME: add time restriction
     def restrict(self):
@@ -74,10 +73,10 @@ class transfer(with_metaclass(abc.ABCMeta)):
         assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
         # restrict fine values in space, reevaluate f on coarse level
-        G.u[0] = self.restrict_space(F.u[0])
+        G.u[0] = self.space_transfer.restrict(F.u[0])
         G.f[0] = PG.eval_f(G.u[0],G.time)
         for m in range(1,SG.coll.num_nodes+1):
-            G.u[m] = self.restrict_space(F.u[m])
+            G.u[m] = self.space_transfer.restrict(F.u[m])
             G.f[m] = PG.eval_f(G.u[m],G.time+G.dt*SG.coll.nodes[m-1])
 
         # build coarse level tau correction part
@@ -89,13 +88,13 @@ class transfer(with_metaclass(abc.ABCMeta)):
         # restrict fine level tau correction part
         tauFG = []
         for m in range(SG.coll.num_nodes):
-            tauFG.append(self.restrict_space(tauF[m]))
+            tauFG.append(self.space_transfer.restrict(tauF[m]))
 
         # build tau correction, also restrict possible tau correction from fine
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
             if F.tau is not None:
-                G.tau[m] += self.restrict_space(F.tau[m])
+                G.tau[m] += self.space_transfer.restrict(F.tau[m])
 
         # save u and rhs evaluations for interpolation
         for m in range(SG.coll.num_nodes+1):
@@ -135,13 +134,13 @@ class transfer(with_metaclass(abc.ABCMeta)):
         # we need to update u0 here for the predictor step, since here the new values for the fine sweep are not received
         # from the previous processor but interpolated from the coarse level.
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        G.uold[0] = self.restrict_space(F.u[0])
+        G.uold[0] = self.space_transfer.restrict(F.u[0])
 
-        F.u[0] += self.prolong_space(G.u[0] - G.uold[0])
+        F.u[0] += self.space_transfer.prolong(G.u[0] - G.uold[0])
         F.f[0] = PF.eval_f(F.u[0],F.time)
 
         for m in range(1,SF.coll.num_nodes+1):
-            F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
+            F.u[m] += self.space_transfer.prolong(G.u[m] - G.uold[m])
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 
         return None
@@ -173,35 +172,11 @@ class transfer(with_metaclass(abc.ABCMeta)):
 
         # build coarse correction
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        G.uold[0] = self.restrict_space(F.u[0])
+        G.uold[0] = self.space_transfer.restrict(F.u[0])
         G.fold[0] = PG.eval_f(G.uold[0],G.time)
 
         for m in range(0,SF.coll.num_nodes+1):
-            F.u[m] += self.prolong_space(G.u[m] - G.uold[m])
-            F.f[m] += self.prolong_space(G.f[m] - G.fold[m])
+            F.u[m] += self.space_transfer.prolong(G.u[m] - G.uold[m])
+            F.f[m] += self.space_transfer.prolong(G.f[m] - G.fold[m])
 
         return None
-
-
-    @abc.abstractmethod
-    def restrict_space(self,F):
-        """
-        Abstract interface for restriction in space
-
-        Args:
-            F: the fine level data (easier to access than via the fine attribute)
-        """
-        pass
-
-    @abc.abstractmethod
-    def prolong_space(self,G):
-        """
-        Abstract interface for prolongation in space
-
-        Args:
-            G: the coarse level data (easier to access than via the coarse attribute)
-        """
-        pass
-
-
-
