@@ -33,20 +33,12 @@ class heat1d(ptype):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         assert (problem_params['nvars']+1)%2 == 0, 'ERROR: the setup requires nvars = 2^p-1'
 
-        self.nvars = None
-        self.nu = None
-        self.freq = None
-
-        # add parameters as attributes for further reference
-        for k,v in problem_params.items():
-            setattr(self,k,v)
-
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d,self).__init__(self.nvars, dtype_u, dtype_f)
+        super(heat1d,self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 1/(self.nvars + 1)
-        self.A = self.__get_A(self.nvars, self.nu, self.dx)
+        self.dx = 1/(self.params.nvars + 1)
+        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
 
     def __get_A(self,N,nu,dx):
         """
@@ -78,7 +70,7 @@ class heat1d(ptype):
             the RHS
         """
 
-        f = self.dtype_f(self.nvars)
+        f = self.dtype_f(self.init)
         f.values = self.A.dot(u.values)
         return f
 
@@ -96,8 +88,8 @@ class heat1d(ptype):
             solution as mesh
         """
 
-        me = self.dtype_u(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me = self.dtype_u(self.init)
+        me.values = LA.spsolve(sp.eye(self.params.nvars)-factor*self.A,rhs.values)
         return me
 
     def u_exact(self,t):
@@ -111,9 +103,9 @@ class heat1d(ptype):
             exact solution
         """
 
-        me = self.dtype_u(self.nvars)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*self.freq*xvalues)*np.exp(-t*self.nu*(np.pi*self.freq)**2)
+        me = self.dtype_u(self.init)
+        xvalues = np.array([(i+1)*self.dx for i in range(self.params.nvars)])
+        me.values = np.sin(np.pi*self.params.freq*xvalues)*np.exp(-t*self.params.nu*(np.pi*self.params.freq)**2)
         return me
 
 

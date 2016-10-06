@@ -58,7 +58,7 @@ def run_accuracy_check(prob, coll, dt_list):
         Q = coll.Qmat[1:, 1:]
 
         # build system matrix M of collocation problem
-        M = sp.eye(prob.nvars * coll.num_nodes) - dt * sp.kron(Q, prob.A)
+        M = sp.eye(prob.params.nvars * coll.num_nodes) - dt * sp.kron(Q, prob.A)
 
         # get initial value at t0 = 0
         u0 = prob.u_exact(t=0)
@@ -71,7 +71,7 @@ def run_accuracy_check(prob, coll, dt_list):
         u_coll = sp.linalg.spsolve(M, u0_coll)
 
         # compute error
-        err = np.linalg.norm(u_coll[-prob.nvars:] - uend.values, np.inf)
+        err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend.values, np.inf)
         # get id for this dt and store error in results
         id = ID(dt=dt)
         results[id] = err
