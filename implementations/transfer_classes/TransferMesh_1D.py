@@ -3,7 +3,6 @@ from __future__ import division
 import numpy as np
 
 import pySDC.Plugins.transfer_helper as th
-from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.Transfer import transfer
 
 
@@ -63,13 +62,12 @@ class mesh_to_mesh_1d_dirichlet(transfer):
         """
 
         u_coarse = None
-        if isinstance(F,mesh):
-            u_coarse = mesh(self.init_c,val=0)
+        if isinstance(F,self.fine_level.prob.dtype_u):
+            u_coarse = self.fine_level.prob.dtype_u(self.init_c,val=0)
             u_coarse.values = self.Rspace.dot(F.values)
-        elif isinstance(F,rhs_imex_mesh):
-            u_coarse = rhs_imex_mesh(self.init_c)
-            u_coarse.impl.values = self.Rspace.dot(F.impl.values)
-            u_coarse.expl.values = self.Rspace.dot(F.expl.values)
+        elif isinstance(F,self.fine_level.prob.dtype_f):
+            u_coarse = self.fine_level.prob.dtype_f(self.init_c)
+            u_coarse.values = self.Rspace.dot(F.values)
 
         return u_coarse
 
@@ -81,12 +79,11 @@ class mesh_to_mesh_1d_dirichlet(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
         u_fine = None
-        if isinstance(G,mesh):
-            u_fine = mesh(self.init_c,val=0)
+        if isinstance(G,self.coarse_level.prob.dtype_u):
+            u_fine = self.coarse_level.prob.dtype_u(self.init_c,val=0)
             u_fine.values = self.Pspace.dot(G.values)
-        elif isinstance(G,rhs_imex_mesh):
-            u_fine = rhs_imex_mesh(self.init_c)
-            u_fine.impl.values = self.Pspace.dot(G.impl.values)
-            u_fine.expl.values = self.Pspace.dot(G.expl.values)
+        elif isinstance(G,self.coarse_level.prob.dtype_f):
+            u_fine = self.coarse_level.prob.dtype_f(self.init_c)
+            u_fine.values = self.Pspace.dot(G.values)
 
         return u_fine

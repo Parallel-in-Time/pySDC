@@ -67,7 +67,7 @@ if __name__ == "__main__":
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
-    #description['transfer_class'] = mesh_to_mesh_1d
+    #description['transfer_class'] = mesh_to_mesh_1d_dirichlet
     #description['transfer_params'] = tparams
 
     # quickly generate block of steps
