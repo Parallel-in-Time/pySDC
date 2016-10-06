@@ -13,6 +13,12 @@ Important things to note:
 
 * Many (most) parameters for pySDC are passed using dictionaries
 * Data types are encapsulated: the real values are stored in `values`, meta-information can be stored separately in the data structure
+* A quick peak into `HeatEquation_1D_FD` reveals that the `init` and the `params.nvars` attribute contain the same values (namely `nvars`). 
+Yet, sometime the one or the other is used here (and throughout the code). 
+The reason is this: the data structure (`mesh` in this case) needs some form of standard initialization. 
+For this, pySDC uses the `init` attribute each problem class has. 
+In our simple example, this is he same as `nvars`, but e.g. for Finite Elements, the function space is stored in the `init` attribute.
+Thus, whenever a data type is created, use `init`, otherwise do whatever looks nice.
 * We happily pass classes around so that they can be used to instantiate things within subroutines
 
 

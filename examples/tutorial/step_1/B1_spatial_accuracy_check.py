@@ -52,15 +52,15 @@ def run_accuracy_check(nvars_list,problem_params):
         prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
-        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.nvars)])
+        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])
 
         # create a mesh instance and fill it with a sine wave
-        u = prob.dtype_u(init=prob.nvars)
-        u.values = np.sin(np.pi * prob.freq * xvalues)
+        u = prob.dtype_u(init=prob.init)
+        u.values = np.sin(np.pi * prob.params.freq * xvalues)
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
-        u_lap = prob.dtype_u(init=prob.nvars)
-        u_lap.values = -(np.pi * prob.freq) ** 2 * prob.nu * np.sin(np.pi * prob.freq * xvalues)
+        u_lap = prob.dtype_u(init=prob.init)
+        u_lap.values = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
 
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)

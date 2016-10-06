@@ -30,7 +30,7 @@ class heat1d_forced(heat1d):
             the RHS divided into two parts
         """
 
-        f = self.dtype_f(self.nvars)
+        f = self.dtype_f(self.init)
         f.impl = self.__eval_fimpl(u,t)
         f.expl = self.__eval_fexpl(u,t)
         return f
@@ -47,9 +47,9 @@ class heat1d_forced(heat1d):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        fexpl = self.dtype_u(self.nvars)
-        fexpl.values = -np.sin(np.pi*self.freq*xvalues)*(np.sin(t)-self.nu*(np.pi*self.freq)**2*np.cos(t))
+        xvalues = np.array([(i+1)*self.dx for i in range(self.params.nvars)])
+        fexpl = self.dtype_u(self.init)
+        fexpl.values = -np.sin(np.pi*self.params.freq*xvalues)*(np.sin(t)-self.params.nu*(np.pi*self.params.freq)**2*np.cos(t))
         return fexpl
 
     def __eval_fimpl(self,u,t):
@@ -64,7 +64,7 @@ class heat1d_forced(heat1d):
             implicit part of RHS
         """
 
-        fimpl = self.dtype_u(self.nvars)
+        fimpl = self.dtype_u(self.init)
         fimpl.values = self.A.dot(u.values)
         return fimpl
 
@@ -79,9 +79,9 @@ class heat1d_forced(heat1d):
             exact solution
         """
 
-        me = self.dtype_u(self.nvars)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.nvars)])
-        me.values = np.sin(np.pi*self.freq*xvalues)*np.cos(t)
+        me = self.dtype_u(self.init)
+        xvalues = np.array([(i+1)*self.dx for i in range(self.params.nvars)])
+        me.values = np.sin(np.pi*self.params.freq*xvalues)*np.cos(t)
         return me
 
 

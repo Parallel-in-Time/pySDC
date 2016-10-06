@@ -48,7 +48,7 @@ def solve_collocation_problem(prob, coll, dt):
     Q = coll.Qmat[1:, 1:]
 
     # build system matrix M of collocation problem
-    M = sp.eye(prob.nvars * coll.num_nodes) - dt * sp.kron(Q, prob.A)
+    M = sp.eye(prob.params.nvars * coll.num_nodes) - dt * sp.kron(Q, prob.A)
 
     # get initial value at t0 = 0
     u0 = prob.u_exact(t=0)
@@ -61,7 +61,7 @@ def solve_collocation_problem(prob, coll, dt):
     u_coll = sp.linalg.spsolve(M, u0_coll)
 
     # compute error
-    err = np.linalg.norm(u_coll[-prob.nvars:] - uend.values, np.inf)
+    err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend.values, np.inf)
 
     return err
 

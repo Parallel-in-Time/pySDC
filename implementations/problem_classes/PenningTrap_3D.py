@@ -34,10 +34,8 @@ class penningtrap(ptype):
         for k,v in cparams.items():
             setattr(self,k,v)
 
-        # set number of particles
-        self.nparts = cparams['nparts']
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(penningtrap,self).__init__(self.nparts, dtype_u, dtype_f)
+        super(penningtrap,self).__init__(cparams['nparts'], dtype_u, dtype_f, cparams)
 
     def get_interactions(self,part):
         """
@@ -50,7 +48,7 @@ class penningtrap(ptype):
 
         """
 
-        N = self.nparts
+        N = self.params.nparts
 
         Efield = np.zeros(3*N)
 
@@ -77,18 +75,18 @@ class penningtrap(ptype):
             Fields for the particles (internal and external)
         """
 
-        N = self.nparts
+        N = self.params.nparts
 
         Emat = np.diag([1,1,-2])
-        f = fields(self.nparts)
+        f = fields(self.params.nparts)
 
         f.elec.values = self.get_interactions(part)
 
 
         for n in range(N):
-            f.elec.values[3*n:3*n+3] += self.omega_E**2 / (part.q[n]/part.m[n]) * np.dot(Emat,part.pos.values[
+            f.elec.values[3*n:3*n+3] += self.params.omega_E**2 / (part.q[n]/part.m[n]) * np.dot(Emat,part.pos.values[
                                                                                               3*n:3*n+3])
-            f.magn.values[3*n:3*n+3] = self.omega_B * np.array([0,0,1])
+            f.magn.values[3*n:3*n+3] = self.params.omega_B * np.array([0,0,1])
 
         return f
 
@@ -101,8 +99,8 @@ class penningtrap(ptype):
             particle set filled with initial data
         """
 
-        u0 = self.u0
-        N = self.nparts
+        u0 = self.params.u0
+        N = self.params.nparts
 
         u = particles(N)
 
@@ -167,10 +165,10 @@ class penningtrap(ptype):
         """
 
         # some abbreviations
-        wE = self.omega_E
-        wB = self.omega_B
-        N = self.nparts
-        u0 = self.u0
+        wE = self.params.omega_E
+        wB = self.params.omega_B
+        N = self.params.nparts
+        u0 = self.params.u0
 
         assert N == 1
 
@@ -218,9 +216,9 @@ class penningtrap(ptype):
 
         assert isinstance(part,particles)
 
-        N = self.nparts
+        N = self.params.nparts
 
-        rhs = acceleration(self.nparts)
+        rhs = acceleration(self.params.nparts)
 
         for n in range(N):
             rhs.values[3*n:3*n+3] = part.q[n]/part.m[n]*(f.elec.values[3*n:3*n+3] + np.cross(part.vel.values[3*n:3*n+3],
@@ -243,7 +241,7 @@ class penningtrap(ptype):
             the velocities at the (m+1)th node
         """
 
-        N = self.nparts
+        N = self.params.nparts
         vel = particles.velocity(N)
 
         Emean = 1/2*(old_fields.elec + new_fields.elec)
