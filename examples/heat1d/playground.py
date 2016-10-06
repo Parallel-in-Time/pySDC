@@ -37,9 +37,8 @@ if __name__ == "__main__":
     pparams['nvars'] = [63, 31]
     pparams['freq'] = 1
 
-    # This comes as read-in for the transfer operations (this is optional!)
+    # This comes as read-in for the base_transfer operations (this is optional!)
     tparams = {}
-    tparams['finter'] = False
     tparams['iorder'] = 6
     tparams['rorder'] = 2
 
@@ -63,8 +62,8 @@ if __name__ == "__main__":
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['step_params'] = sparams
-    description['transfer_class'] = mesh_to_mesh_1d_dirichlet
-    description['transfer_params'] = tparams
+    description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet
+    description['space_transfer_params'] = tparams
 
     # initialize controller
     controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)

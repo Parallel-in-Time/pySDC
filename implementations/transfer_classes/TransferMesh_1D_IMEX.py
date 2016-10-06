@@ -3,14 +3,13 @@ from __future__ import division
 import numpy as np
 
 import pySDC.Plugins.transfer_helper as th
-from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.Transfer import transfer
+from pySDC.SpaceTransfer import space_transfer
 
 
 # FIXME: extend this to ndarrays
-class mesh_to_mesh_1d_dirichlet(transfer):
+class mesh_to_mesh_1d_dirichlet(space_transfer):
     """
-    Custon transfer class, implements Transfer.py
+    Custon base_transfer class, implements Transfer.py
 
     This implementation can restrict and prolong between 1d meshes with dirichlet-0 boundaries via matrix-vector products
 
@@ -23,38 +22,40 @@ class mesh_to_mesh_1d_dirichlet(transfer):
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
 
-    def __init__(self,fine_level,coarse_level,params):
+    def __init__(self,fine_prob,coarse_prob,params):
         """
         Initialization routine
         Args:
-            fine_level: fine level connected with the transfer operations (passed to parent)
-            coarse_level: coarse level connected with the transfer operations (passed to parent)
-            params: parameters for the transfer operators
+            fine_level: fine level connected with the base_transfer operations (passed to parent)
+            coarse_level: coarse level connected with the base_transfer operations (passed to parent)
+            params: parameters for the base_transfer operators
         """
 
-        # invoke super initialization
-        super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_level, coarse_level, params)
+        assert 'rorder' in params
+        assert 'iorder' in params
 
-        fine_grid = np.array([(i + 1) * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
-        coarse_grid = np.array([(i + 1) * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
+        # invoke super initialization
+        super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_prob, coarse_prob, params)
+
+        fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+        coarse_grid = np.array([(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
-        if self.init_c == self.init_f:
-            self.Rspace = np.eye(self.init_c)
+        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+            self.Rspace = np.eye(self.coarse_prob.params.nvars)
         # assemble restriction as transpose of interpolation
         else:
-            self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['rorder']).T
+            self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=self.params.rorder).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
-        if self.init_f == self.init_c:
-            self.Pspace = np.eye(self.init_f)
+        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+            self.Pspace = np.eye(self.fine_prob.params.nvars)
         else:
-            self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=params['iorder'])
+            self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=self.params.iorder)
 
         pass
 
-
-    def restrict_space(self,F):
+    def restrict(self,F):
         """
         Restriction implementation
 
@@ -63,17 +64,17 @@ class mesh_to_mesh_1d_dirichlet(transfer):
         """
 
         u_coarse = None
-        if isinstance(F,mesh):
-            u_coarse = mesh(self.init_c,val=0)
+        if isinstance(F,self.fine_prob.dtype_u):
+            u_coarse = self.coarse_prob.dtype_u(self.coarse_prob.init,val=0)
             u_coarse.values = self.Rspace.dot(F.values)
-        elif isinstance(F,rhs_imex_mesh):
-            u_coarse = rhs_imex_mesh(self.init_c)
+        elif isinstance(F,self.fine_prob.dtype_f):
+            u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
             u_coarse.impl.values = self.Rspace.dot(F.impl.values)
             u_coarse.expl.values = self.Rspace.dot(F.expl.values)
 
         return u_coarse
 
-    def prolong_space(self,G):
+    def prolong(self,G):
         """
         Prolongation implementation
 
@@ -81,11 +82,11 @@ class mesh_to_mesh_1d_dirichlet(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
         u_fine = None
-        if isinstance(G,mesh):
-            u_fine = mesh(self.init_c,val=0)
+        if isinstance(G,self.coarse_prob.dtype_u):
+            u_fine = self.fine_prob.dtype_u(self.fine_prob.init,val=0)
             u_fine.values = self.Pspace.dot(G.values)
-        elif isinstance(G,rhs_imex_mesh):
-            u_fine = rhs_imex_mesh(self.init_c)
+        elif isinstance(G,self.coarse_prob.dtype_f):
+            u_fine = self.fine_prob.dtype_f(self.fine_prob.init)
             u_fine.impl.values = self.Pspace.dot(G.impl.values)
             u_fine.expl.values = self.Pspace.dot(G.expl.values)
 
