@@ -1,10 +1,8 @@
 import numpy as np
 from collections import namedtuple
 
-from pySDC.Step import step
 from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from implementations.datatype_classes.mesh import mesh
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
 
 
@@ -106,7 +104,7 @@ def get_accuracy_orders(results):
             id = ID(nvars_fine=nvars_fine_list[i], iorder=iorder)
             id_prev = ID(nvars_fine=nvars_fine_list[i-1], iorder=iorder)
 
-            # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
+            # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars)
             computed_order = np.log(results[id_prev]/results[id])/np.log(nvars_fine_list[i]/nvars_fine_list[i-1])
             order.append((nvars_fine_list[i], iorder, computed_order))
 

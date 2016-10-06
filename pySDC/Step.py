@@ -72,7 +72,6 @@ class step(FrozenClass):
 
         self.__generate_hierarchy(description)
 
-
     def __generate_hierarchy(self,descr):
         """
         Routine to generate the level hierarchy for a single step
@@ -112,8 +111,11 @@ class step(FrozenClass):
             else:
                 base_transfer_class = base_transfer
             assert 'space_transfer_class' in descr_new
-        elif 'transfer_class' in descr_new:
-            print('WARNING: you have specified base_transfer classes, but only a single level...')
+        elif 'space_transfer_class' in descr_new:
+            base_transfer_class = None
+            print('WARNING: you have specified space_base_transfer classes, but only a single level...')
+        else:
+            base_transfer_class = None
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
@@ -135,8 +137,6 @@ class step(FrozenClass):
             else:
                 pparams = {}
 
-
-
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
                                problem_params     =   pparams,
                                dtype_u            =   descr_list[l]['dtype_u'],
@@ -156,7 +156,6 @@ class step(FrozenClass):
                                     fine_level      = self.levels[l-1],
                                     coarse_level    = self.levels[l])
 
-
     @staticmethod
     def __dict_to_list(dict):
         """
@@ -171,9 +170,6 @@ class step(FrozenClass):
         max_val = 1
         for k,v in dict.items():
             if type(v) is list:
-                if len(v) > 1 and (max_val > 1 and len(v) is not max_val):
-                    #FIXME: get a real error here
-                    sys.exit('All lists in cparams need to be of length 1 or %i.. key %s has this list: %s' %(max_val,k,v))
                 max_val = max(max_val,len(v))
 
         ld = [{} for l in range(max_val)]
@@ -182,12 +178,8 @@ class step(FrozenClass):
                 if type(v) is not list:
                     ld[d][k] = v
                 else:
-                    if len(v) == 1:
-                        ld[d][k] = v[0]
-                    else:
-                        ld[d][k] = v[d]
+                    ld[d][k] = v[min(d,len(v)-1)]
         return ld
-
 
     def register_level(self,L):
         """
@@ -207,7 +199,6 @@ class step(FrozenClass):
         # if this is not the finest level, allocate tau correction
         if len(self.levels) > 1:
             L._level__add_tau()
-
 
     def connect_levels(self, base_transfer_class, base_transfer_params, space_transfer_class, space_transfer_params, fine_level, coarse_level):
         """
@@ -232,8 +223,6 @@ class step(FrozenClass):
         else:
             self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
 
-
-
     def transfer(self,source,target):
         """
         Wrapper routine to ease the call of the base_transfer functions
@@ -247,7 +236,6 @@ class step(FrozenClass):
         """
         self.__transfer_dict[tuple([source,target])]()
 
-
     def reset_step(self):
         """
         Routine so clean-up step structure and the corresp. levels for further uses
@@ -255,7 +243,6 @@ class step(FrozenClass):
         # reset all levels
         for l in self.levels:
             l.reset_level()
-
 
     def init_step(self,u0):
         """
@@ -282,7 +269,6 @@ class step(FrozenClass):
             prev
         """
         return self.__prev
-
 
     @prev.setter
     def prev(self,p):
