@@ -4,10 +4,11 @@ from collections import namedtuple
 from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from implementations.datatype_classes.mesh import mesh
 from implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
-
+from examples.tutorial.step_1.B1_spatial_accuracy_check import get_accuracy_order
 
 # setup id for gathering the results (will sort by nvars)
-ID = namedtuple('ID', ('nvars_fine', 'iorder'))
+ID = namedtuple('ID', 'nvars_fine')
+
 
 def main():
     """
@@ -22,93 +23,54 @@ def main():
     # initialize transfer parameters
     space_transfer_params = {}
     space_transfer_params['rorder'] = 2
+    space_transfer_params['iorder'] = 4
 
-    iorder_list = [2,4,6,8]
-    nvars_fine_list = [2**p-1 for p in range(5,9)]
+    nvars_fine_list = [2**p-1 for p in range(5,10)]
 
     # set up dictionary to store results (plus lists)
     results = {}
-    results['nvars_fine_list'] = nvars_fine_list
-    results['iorder_list'] = iorder_list
+    results['nvars_list'] = nvars_fine_list
 
-    # loop over interpolation orders and number of DOFs
-    for iorder in iorder_list:
+    for nvars_fine in nvars_fine_list:
 
-        space_transfer_params['iorder'] = iorder
+        print('Working on nvars_fine = %4i...' %(nvars_fine))
 
-        for nvars_fine in nvars_fine_list:
+        # instantiate fine problem
+        problem_params['nvars'] = nvars_fine  # number of degrees of freedom
+        Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
-            print('Working on iorder = %2i and nvars_fine = %4i...' %(iorder,nvars_fine))
+        # instantiate coarse problem using half of the DOFs
+        problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
+        Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
-            # instantiate fine problem
-            problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        # instantiate spatial interpolation
+        T = mesh_to_mesh_1d_dirichlet(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
-            # instantiate coarse problem
-            problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
-            Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        # set exact fine solution to compare with
+        xvalues_fine = np.array([(i + 1) * Pfine.dx for i in range(Pfine.params.nvars)])
+        uexact_fine = Pfine.dtype_u(0)
+        uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
 
-            # instantiate spatial interpolation
-            T = mesh_to_mesh_1d_dirichlet(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+        # set exact coarse solution as source
+        xvalues_coarse = np.array([(i + 1) * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
+        uexact_coarse = Pfine.dtype_u(0)
+        uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
 
-            # set exact fine solution to compare with
-            xvalues_fine = np.array([(i + 1) * Pfine.dx for i in range(Pfine.params.nvars)])
-            uexact_fine = Pfine.dtype_u(0)
-            uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
+        # do the interpolation/prolongation
+        uinter = T.prolong(uexact_coarse)
 
-            # set exact coarse solution as source
-            xvalues_coarse = np.array([(i + 1) * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
-            uexact_coarse = Pfine.dtype_u(0)
-            uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
-
-            # do the interpolation/prolongation
-            uinter = T.prolong(uexact_coarse)
-
-            # compute error and store
-            err = abs(uinter-uexact_fine)
-            id = ID(nvars_fine=nvars_fine, iorder=iorder)
-            results[id] = err
+        # compute error and store
+        id = ID(nvars_fine=nvars_fine)
+        results[id] = abs(uinter-uexact_fine)
 
     print('Running order checks...')
-    orders = get_accuracy_orders(results)
+    orders = get_accuracy_order(results)
     for p in range(len(orders)):
-        print('Expected order %2i, got order %5.2f, deviation of %5.2f%%' %(orders[p][1],orders[p][2],100*abs(orders[p][1]-orders[p][2])/orders[p][1]))
-        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.138, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
+        print('Expected order %2i, got order %5.2f, deviation of %5.2f%%'\
+              %(space_transfer_params['iorder'], orders[p], 100*abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder']))
+        assert abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'] < 0.02, \
+            'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
     print('...got what we expected!')
-
-
-def get_accuracy_orders(results):
-    """
-    Routine to compute the order of accuracy in space
-
-    Args:
-        results: the dictionary containing the errors
-
-    Returns:
-        the list of orders
-    """
-
-    # retrieve the list of nvars from results
-    assert 'nvars_fine_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
-    assert 'iorder_list' in results, 'ERROR: expecting the list of iorders in the results dictionary'
-    nvars_fine_list = sorted(results['nvars_fine_list'])
-    iorder_list = sorted(results['iorder_list'])
-
-    order = []
-    # loop over list of interpolation orders
-    for iorder in iorder_list:
-        # loop over two consecutive errors/nvars pairs
-        for i in range(1,len(nvars_fine_list)):
-
-            # get ids
-            id = ID(nvars_fine=nvars_fine_list[i], iorder=iorder)
-            id_prev = ID(nvars_fine=nvars_fine_list[i-1], iorder=iorder)
-
-            # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars)
-            computed_order = np.log(results[id_prev]/results[id])/np.log(nvars_fine_list[i]/nvars_fine_list[i-1])
-            order.append((nvars_fine_list[i], iorder, computed_order))
-
-    return order
 
 
 if __name__ == "__main__":

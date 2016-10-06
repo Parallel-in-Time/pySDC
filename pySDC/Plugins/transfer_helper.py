@@ -220,7 +220,7 @@ def next_neighbors(p, ps, k):
 #         result += values[i]*lag_pol[-1](1.0)
 #     return result
 
-def interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=2, pad=1, return_type="csc"):
+def interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=2, pad=1):
     """
     Interpolationmatrix is constructed by padding zeros for a dirichlet-0 boundary.
     :param fine_grid:a one dimensional 1d array containing the nodes of the fine grid

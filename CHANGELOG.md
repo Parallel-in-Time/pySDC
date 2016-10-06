@@ -31,5 +31,6 @@ Minor changes
 * New collocation class: `EquidistantSpline_Right` for spline-based quadrature
 * Collocation tests are realized by generators and not by classes
 * Multi-step SDC (aka single-level PFASST) now works as expected
+* Reworked many of the internal structures for consistency and simplicity
 
 

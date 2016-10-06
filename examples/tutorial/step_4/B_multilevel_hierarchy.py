@@ -6,8 +6,6 @@ from implementations.collocation_classes.gauss_radau_right import CollGaussRadau
 from implementations.sweeper_classes.generic_LU import generic_LU
 from implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
 
-from examples.tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
-
 def main():
     """
     A simple test program to setup a full step hierarchy
