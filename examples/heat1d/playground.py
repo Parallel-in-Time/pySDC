@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63, 31]
+    pparams['nvars'] = [63]
     pparams['freq'] = 1
 
     # This comes as read-in for the base_transfer operations (this is optional!)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     swparams['collocation_class'] = CollGaussRadau_Right
     # swparams['collocation_class'] = CollGaussLobatto
     # swparams['collocation_class'] = CollGaussLegendre
-    swparams['num_nodes'] = [5, 3]
+    swparams['num_nodes'] = [5]
     swparams['do_LU'] = True
 
     # Step parameters

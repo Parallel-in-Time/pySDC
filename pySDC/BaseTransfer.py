@@ -134,13 +134,22 @@ class base_transfer(object):
             for m in range(1, SF.coll.num_nodes):
                 tauFG[-1] += self.Rcoll[n+1, m+1] * tmp_tau[m]
 
-        # build tau correction, also restrict possible tau correction from fine
+        # build tau correction
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
-            if F.tau is not None: #FIXME: add Q-coarsening here!!
-                print('ERROR: multiple levels with coarsening in Q not implemented')
-                exit()
-                G.tau[m] += self.space_transfer.restrict(F.tau[m])
+
+
+        if F.tau is not None:
+            # restrict possible tau correction from fine in space
+            tmp_tau = []
+            for m in range(0, SF.coll.num_nodes):
+                tmp_tau.append(self.space_transfer.restrict(F.tau[m]))
+
+            # restrict possible tau correction from fine in collocation
+            for n in range(0, SG.coll.num_nodes):
+                G.tau[n] += self.Rcoll[n + 1, 1] * tmp_tau[0]
+                for m in range(1, SF.coll.num_nodes):
+                    G.tau[n] += self.Rcoll[n + 1, m + 1] * tmp_tau[m]
 
         # save u and rhs evaluations for interpolation
         for m in range(SG.coll.num_nodes+1):
