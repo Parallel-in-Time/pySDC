@@ -102,4 +102,4 @@ def test_mesh_to_mesh_1d_dirichlet():
 
     orders = get_accuracy_orders(results)
     for p in range(len(orders)):
-        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.138, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
+        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.151, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
