@@ -48,12 +48,16 @@ class base_transfer(object):
         self.fine = fine_level
         self.coarse = coarse_level
 
-        fine_grid = np.concatenate(([0], self.fine.sweep.coll.nodes))
-        coarse_grid = np.concatenate(([0], self.coarse.sweep.coll.nodes))
+        if self.fine.sweep.coll.left_is_node:
+            fine_grid = np.concatenate(([0], self.fine.sweep.coll.nodes))
+            coarse_grid = np.concatenate(([0], self.coarse.sweep.coll.nodes))
+        else:
+            fine_grid = self.fine.sweep.coll.nodes
+            coarse_grid = self.coarse.sweep.coll.nodes
 
-        if self.params.coll_iorder is None or self.params.coll_iorder > self.coarse.sweep.coll.num_nodes+1:
-            print('WARNING: requested order of Q-interpolation is not valid, resetting to %s' %(self.coarse.sweep.coll.num_nodes+1))
-            self.params.coll_iorder = self.coarse.sweep.coll.num_nodes+1
+        if self.params.coll_iorder is None or self.params.coll_iorder > len(coarse_grid):
+            print('WARNING: requested order of Q-interpolation is not valid, resetting to %s' %len(coarse_grid))
+            self.params.coll_iorder = len(coarse_grid)
         if self.params.coll_rorder != 1:
             print('WARNING: requested order of Q-restriction is != 1, can lead to weird behavior!')
 

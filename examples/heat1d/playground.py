@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
-    lparams['dt'] = 0.12
+    lparams['dt'] = 0.1
 
     # This comes as read-in for the controller
     cparams = {}
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.12
+    Tend = 0.1
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
