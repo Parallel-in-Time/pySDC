@@ -6,6 +6,7 @@ from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1
 # from examples.heat1d.TransferClass import mesh_to_mesh_1d_dirichlet
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+from implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 # from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
@@ -45,8 +46,10 @@ if __name__ == "__main__":
     # This comes as read-in for the sweeper class
     swparams = {}
     swparams['collocation_class'] = CollGaussRadau_Right
+    # swparams['collocation_class'] = CollGaussLobatto
     # swparams['collocation_class'] = CollGaussLegendre
     swparams['num_nodes'] = [5, 3]
+    swparams['do_LU'] = True
 
     # Step parameters
     sparams = {}
