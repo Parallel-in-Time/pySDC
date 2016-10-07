@@ -5,7 +5,8 @@ from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_for
 from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
 # from examples.heat1d.TransferClass import mesh_to_mesh_1d_dirichlet
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-# from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+from implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 # from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
@@ -18,12 +19,12 @@ import logging
 
 if __name__ == "__main__":
 
-    num_procs = 2
+    num_procs = 1
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
-    lparams['dt'] = 0.12
+    lparams['dt'] = 0.1
 
     # This comes as read-in for the controller
     cparams = {}
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63, 31]
+    pparams['nvars'] = [63]
     pparams['freq'] = 1
 
     # This comes as read-in for the base_transfer operations (this is optional!)
@@ -45,8 +46,10 @@ if __name__ == "__main__":
     # This comes as read-in for the sweeper class
     swparams = {}
     swparams['collocation_class'] = CollGaussRadau_Right
-    # swparams['collocation_class'] = EquidistantSpline_Right
-    swparams['num_nodes'] = 5
+    # swparams['collocation_class'] = CollGaussLobatto
+    # swparams['collocation_class'] = CollGaussLegendre
+    swparams['num_nodes'] = [5]
+    swparams['do_LU'] = True
 
     # Step parameters
     sparams = {}
@@ -71,7 +74,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 3*0.12
+    Tend = 0.1
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

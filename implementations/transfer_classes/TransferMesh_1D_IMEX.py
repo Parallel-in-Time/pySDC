@@ -1,6 +1,7 @@
 from __future__ import division
 
 import numpy as np
+import scipy.sparse as sp
 
 import pySDC.Plugins.transfer_helper as th
 from pySDC.SpaceTransfer import space_transfer
@@ -42,14 +43,14 @@ class mesh_to_mesh_1d_dirichlet(space_transfer):
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-            self.Rspace = np.eye(self.coarse_prob.params.nvars)
+            self.Rspace = sp.eye(self.coarse_prob.params.nvars)
         # assemble restriction as transpose of interpolation
         else:
             self.Rspace = 0.5 * th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=self.params.rorder).T
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-            self.Pspace = np.eye(self.fine_prob.params.nvars)
+            self.Pspace = sp.eye(self.fine_prob.params.nvars)
         else:
             self.Pspace = th.interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=self.params.iorder)
 

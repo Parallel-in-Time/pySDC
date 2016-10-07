@@ -9,7 +9,7 @@ class EquidistantInner(CollBase):
     """
     def __init__(self, num_nodes, tleft, tright):
         super(EquidistantInner, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes > 1, "Number of nodes should be at least 1 for EquidistantInner, but is %d" % num_nodes
+        assert num_nodes >= 1, "Number of nodes should be at least 1 for EquidistantInner, but is %d" % num_nodes
         self.order = self.num_nodes
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft,tright)

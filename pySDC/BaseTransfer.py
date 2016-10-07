@@ -1,7 +1,9 @@
 import abc
 import numpy as np
+import scipy.sparse as sp
 
 from pySDC.Plugins.pysdc_helper import FrozenClass
+import pySDC.Plugins.transfer_helper as th
 
 
 class base_transfer(object):
@@ -32,6 +34,8 @@ class base_transfer(object):
             def __init__(self,params):
 
                 self.finter = False
+                self.coll_iorder = None
+                self.coll_rorder = 1
 
                 for k,v in params.items():
                     setattr(self,k,v)
@@ -43,6 +47,31 @@ class base_transfer(object):
         # just copy by object
         self.fine = fine_level
         self.coarse = coarse_level
+
+        if not self.fine.sweep.coll.left_is_node:
+            fine_grid = np.concatenate(([0], self.fine.sweep.coll.nodes))
+            coarse_grid = np.concatenate(([0], self.coarse.sweep.coll.nodes))
+        else:
+            fine_grid = self.fine.sweep.coll.nodes
+            coarse_grid = self.coarse.sweep.coll.nodes
+
+        if self.params.coll_iorder is None or self.params.coll_iorder > len(coarse_grid):
+            print('WARNING: requested order of Q-interpolation is not valid, resetting to %s' %len(coarse_grid))
+            self.params.coll_iorder = len(coarse_grid)
+        if self.params.coll_rorder != 1:
+            print('WARNING: requested order of Q-restriction is != 1, can lead to weird behavior!')
+
+        Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder).toarray()
+        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder).toarray()
+
+        if self.fine.sweep.coll.left_is_node:
+            self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))
+            self.Rcoll = self.Pcoll.T
+            self.Pcoll[1:,1:] = Pcoll
+            self.Rcoll[1:,1:] = Rcoll
+        else:
+            self.Pcoll = Pcoll
+            self.Rcoll = Rcoll
 
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob, params=space_transfer_params)
 
@@ -69,14 +98,22 @@ class base_transfer(object):
 
         # only of the level is unlocked at least by prediction
         assert F.status.unlocked
-        # can only do space-restriction so far
-        assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
-        # restrict fine values in space, reevaluate f on coarse level
-        G.u[0] = self.space_transfer.restrict(F.u[0])
+        # restrict fine values in space
+        tmp_u = [self.space_transfer.restrict(F.u[0])]
+        for m in range(1,SF.coll.num_nodes+1):
+            tmp_u.append(self.space_transfer.restrict(F.u[m]))
+
+        # restrict collocation values
+        G.u[0] = tmp_u[0]
+        for n in range(1, SG.coll.num_nodes + 1):
+            G.u[n] = self.Rcoll[n,0]*tmp_u[0]
+            for m in range(1, SF.coll.num_nodes + 1):
+                G.u[n] += self.Rcoll[n,m]*tmp_u[m]
+
+        # re-evaluate f on coarse level
         G.f[0] = PG.eval_f(G.u[0],G.time)
-        for m in range(1,SG.coll.num_nodes+1):
-            G.u[m] = self.space_transfer.restrict(F.u[m])
+        for m in range(1, SG.coll.num_nodes + 1):
             G.f[m] = PG.eval_f(G.u[m],G.time+G.dt*SG.coll.nodes[m-1])
 
         # build coarse level tau correction part
@@ -85,16 +122,34 @@ class base_transfer(object):
         # build fine level tau correction part
         tauF = F.sweep.integrate()
 
-        # restrict fine level tau correction part
-        tauFG = []
-        for m in range(SG.coll.num_nodes):
-            tauFG.append(self.space_transfer.restrict(tauF[m]))
+        # restrict fine level tau correction part in space
+        tmp_tau = []
+        for m in range(0, SF.coll.num_nodes):
+            tmp_tau.append(self.space_transfer.restrict(tauF[m]))
 
-        # build tau correction, also restrict possible tau correction from fine
+        # restrict fine level tau correction part in collocation
+        tauFG = [tmp_tau[0]]
+        for n in range(1, SG.coll.num_nodes):
+            tauFG.append(self.Rcoll[n+1, 1] * tmp_tau[0])
+            for m in range(1, SF.coll.num_nodes):
+                tauFG[-1] += self.Rcoll[n+1, m+1] * tmp_tau[m]
+
+        # build tau correction
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
-            if F.tau is not None:
-                G.tau[m] += self.space_transfer.restrict(F.tau[m])
+
+
+        if F.tau is not None:
+            # restrict possible tau correction from fine in space
+            tmp_tau = []
+            for m in range(0, SF.coll.num_nodes):
+                tmp_tau.append(self.space_transfer.restrict(F.tau[m]))
+
+            # restrict possible tau correction from fine in collocation
+            for n in range(0, SG.coll.num_nodes):
+                G.tau[n] += self.Rcoll[n + 1, 1] * tmp_tau[0]
+                for m in range(1, SF.coll.num_nodes):
+                    G.tau[n] += self.Rcoll[n + 1, m + 1] * tmp_tau[m]
 
         # save u and rhs evaluations for interpolation
         for m in range(SG.coll.num_nodes+1):
@@ -106,7 +161,6 @@ class base_transfer(object):
 
         return None
 
-    # FIXME: add time prolongation
     def prolong(self):
         """
         Space-time prolongation routine
@@ -126,8 +180,6 @@ class base_transfer(object):
 
         # only of the level is unlocked at least by prediction or restriction
         assert G.status.unlocked
-        # can only do space-restriction so far
-        assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
         # build coarse correction
 
@@ -136,11 +188,20 @@ class base_transfer(object):
         # need to restrict F.u[0] again here, since it might have changed in PFASST
         G.uold[0] = self.space_transfer.restrict(F.u[0])
 
-        F.u[0] += self.space_transfer.prolong(G.u[0] - G.uold[0])
-        F.f[0] = PF.eval_f(F.u[0],F.time)
+        # interpolate values in space first
+        tmp_u = [self.space_transfer.prolong(G.u[0] - G.uold[0])]
+        for m in range(1, SG.coll.num_nodes+1):
+            tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
 
+        # interpolate values in collocation
+        F.u[0] += tmp_u[0]
+        for n in range(1, SF.coll.num_nodes + 1):
+            for m in range(0, SG.coll.num_nodes+1):
+                F.u[n] += self.Pcoll[n, m] * tmp_u[m]
+
+        # re-evaluate f on fine level
+        F.f[0] = PF.eval_f(F.u[0], F.time)
         for m in range(1,SF.coll.num_nodes+1):
-            F.u[m] += self.space_transfer.prolong(G.u[m] - G.uold[m])
             F.f[m] = PF.eval_f(F.u[m],F.time+F.dt*SF.coll.nodes[m-1])
 
         return None
