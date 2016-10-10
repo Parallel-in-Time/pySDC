@@ -88,6 +88,26 @@ class particles():
             else:
                 raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
 
+        def __rmul__(self, other):
+            """
+            Overloading the right multiply by factor operator for position types
+
+            Args:
+                other: float factor
+            Raises:
+                DataError: is other is not a float
+            Returns:
+                position object, original values scaled by factor
+            """
+
+            if isinstance(other, float):
+                # create new position
+                pos = particles.position(int(np.size(self.values)/3))
+                pos.values = self.values*other
+                return pos
+            else:
+                raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
+
         def __abs__(self):
             """
             Overloading the abs operator for position types
@@ -280,6 +300,29 @@ class particles():
             return p
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
+
+    def __rmul__(self, other):
+        """
+        Overloading the right multiply by factor operator for particles types
+
+        Args:
+            other: float factor
+        Raises:
+            DataError: if other is not a particles object
+        Returns:
+            scaled particle's velocity and position as new particle
+        """
+
+        if isinstance(other, float):
+            # always create new particles
+            p = particles(int(np.size(self.pos.values)/3))
+            p.pos = other*self.pos
+            p.vel.values = other*self.vel.values
+            p.m = self.m
+            p.q = self.q
+            return p
+        else:
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
 
 
     def __abs__(self):
@@ -626,3 +669,24 @@ class fields():
             return p
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
+
+    def __rmul__(self, other):
+        """
+        Overloading the multiply with factor from right operator for fields types
+
+        Args:
+            other: fields object to be scaled
+        Raises:
+            DataError: if other is not a fields object
+        Returns:
+            scaled fields
+        """
+
+        if isinstance(other, float):
+            # always create new fields, since otherwise c = a - b changes a as well!
+            p = fields(int(np.size(self.elec.values)/3))
+            p.elec = other*self.elec
+            p.magn = other*self.magn
+            return p
+        else:
+            raise DataError("Type error: cannot multiply %s with %s" % (type(other),type(self)))

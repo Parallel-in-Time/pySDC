@@ -1,6 +1,4 @@
-import abc
 import numpy as np
-import scipy.sparse as sp
 
 from pySDC.Plugins.pysdc_helper import FrozenClass
 import pySDC.Plugins.transfer_helper as th
@@ -34,7 +32,7 @@ class base_transfer(object):
             def __init__(self,params):
 
                 self.finter = False
-                self.coll_iorder = None
+                self.coll_iorder = 1
                 self.coll_rorder = 1
 
                 for k,v in params.items():
@@ -55,7 +53,7 @@ class base_transfer(object):
             fine_grid = self.fine.sweep.coll.nodes
             coarse_grid = self.coarse.sweep.coll.nodes
 
-        if self.params.coll_iorder is None or self.params.coll_iorder > len(coarse_grid):
+        if self.params.coll_iorder > len(coarse_grid):
             print('WARNING: requested order of Q-interpolation is not valid, resetting to %s' %len(coarse_grid))
             self.params.coll_iorder = len(coarse_grid)
         if self.params.coll_rorder != 1:
@@ -75,7 +73,6 @@ class base_transfer(object):
 
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob, params=space_transfer_params)
 
-    # FIXME: add time restriction
     def restrict(self):
         """
         Space-time restriction routine
@@ -205,8 +202,6 @@ class base_transfer(object):
 
         return None
 
-
-    # FIXME: add time prolongation
     def prolong_f(self):
         """
         Space-time prolongation routine w.r.t. the rhs f
@@ -227,16 +222,25 @@ class base_transfer(object):
 
         # only of the level is unlocked at least by prediction or restriction
         assert G.status.unlocked
-        # can only do space-restriction so far
-        assert np.array_equal(SF.coll.nodes,SG.coll.nodes)
 
         # build coarse correction
         # need to restrict F.u[0] again here, since it might have changed in PFASST
         G.uold[0] = self.space_transfer.restrict(F.u[0])
-        G.fold[0] = PG.eval_f(G.uold[0],G.time)
+        G.fold[0] = PG.eval_f(G.uold[0], G.time)
 
-        for m in range(0,SF.coll.num_nodes+1):
-            F.u[m] += self.space_transfer.prolong(G.u[m] - G.uold[m])
-            F.f[m] += self.space_transfer.prolong(G.f[m] - G.fold[m])
+        # interpolate values in space first
+        tmp_u = [self.space_transfer.prolong(G.u[0] - G.uold[0])]
+        tmp_f = [self.space_transfer.prolong(G.f[0] - G.fold[0])]
+        for m in range(1, SG.coll.num_nodes + 1):
+            tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
+            tmp_f.append(self.space_transfer.prolong(G.f[m] - G.fold[m]))
+
+        # interpolate values in collocation
+        F.u[0] += tmp_u[0]
+        F.f[0] += tmp_f[0]
+        for n in range(1, SF.coll.num_nodes + 1):
+            for m in range(0, SG.coll.num_nodes + 1):
+                F.u[n] += self.Pcoll[n, m] * tmp_u[m]
+                F.f[n] += self.Pcoll[n, m] * tmp_f[m]
 
         return None

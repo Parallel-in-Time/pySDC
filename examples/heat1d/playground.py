@@ -48,7 +48,7 @@ if __name__ == "__main__":
     swparams['collocation_class'] = CollGaussRadau_Right
     # swparams['collocation_class'] = CollGaussLobatto
     # swparams['collocation_class'] = CollGaussLegendre
-    swparams['num_nodes'] = [5]
+    swparams['num_nodes'] = [5,3]
     swparams['do_LU'] = True
 
     # Step parameters
@@ -67,6 +67,7 @@ if __name__ == "__main__":
     description['step_params'] = sparams
     description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet
     description['space_transfer_params'] = tparams
+
 
     # initialize controller
     controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
