@@ -68,7 +68,7 @@ def main():
     for p in range(len(orders)):
         print('Expected order %2i, got order %5.2f, deviation of %5.2f%%'\
               %(space_transfer_params['iorder'], orders[p], 100*abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder']))
-        assert abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'] < 0.02, \
+        assert abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'] < 0.05, \
             'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
     print('...got what we expected!')
 
