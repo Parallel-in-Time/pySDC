@@ -51,7 +51,7 @@ def main():
     controller_params = {}
     controller_params['logger_level'] = 30
 
-    # fill description dictionary for easy step instantiation
+    # fill description dictionary for SDC
     description_sdc = {}
     description_sdc['problem_class'] = heat1d                           # pass problem class
     description_sdc['problem_params'] = problem_params_sdc              # pass problem parameters
@@ -62,7 +62,7 @@ def main():
     description_sdc['level_params'] = level_params                      # pass level parameters
     description_sdc['step_params'] = step_params                        # pass step parameters
 
-    # fill description dictionary for easy step instantiation
+    # fill description dictionary for MLSDC
     description_mlsdc = {}
     description_mlsdc['problem_class'] = heat1d                           # pass problem class
     description_mlsdc['problem_params'] = problem_params_mlsdc            # pass problem parameters
