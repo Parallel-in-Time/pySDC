@@ -2,6 +2,7 @@ import logging
 import time
 from collections import namedtuple
 
+
 class hooks(object):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
@@ -44,6 +45,7 @@ class hooks(object):
     def return_stats(self):
         """
         Getter for the stats
+
         Returns:
             stats
         """
@@ -52,6 +54,7 @@ class hooks(object):
     def pre_step(self, step, level_number):
         """
         Hook called before each step
+
         Args:
             step: the current step
             level_number: the current level number
@@ -63,6 +66,7 @@ class hooks(object):
     def dump_pre(self, step, level_number):
         """
         Default routine called before time-loop starts
+
         Args:
             step: the current step
             level_number: the current level number
@@ -72,6 +76,7 @@ class hooks(object):
     def dump_pre_iteration(self, step, level_number):
         """
         Default routine called before iteration starts
+
         Args:
             step: the current step
             level_number: the current level number
@@ -82,6 +87,7 @@ class hooks(object):
     def dump_sweep(self, step, level_number):
         """
         Default routine called after each sweep
+
         Args:
             step: the current step
             level_number: the current level number
@@ -96,10 +102,10 @@ class hooks(object):
 
         pass
 
-
     def dump_iteration(self, step, level_number):
         """
         Default routine called after each iteration
+
         Args:
             step: the current step
             level_number: the current level number
@@ -113,6 +119,7 @@ class hooks(object):
     def dump_step(self, step, level_number):
         """
         Default routine called after each step
+
         Args:
             step: the current step
             level_number: the current level number

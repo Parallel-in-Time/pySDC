@@ -161,7 +161,7 @@ class imex_1st_order(sweeper):
     def get_sweeper_mats(self):
       """
       Returns the three matrices Q, QI, QE which define the sweeper. The first row and column, corresponding to the left starting value, are removed to correspond to the notation
-      introduced in Ruprecht & Speck, ``Spectral deferred corrections with fast-wave slow-wave splitting'', 2016
+      introduced in Ruprecht & Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016
       """
       QE = self.QE[1:,1:]
       QI = self.QI[1:,1:]
@@ -171,7 +171,7 @@ class imex_1st_order(sweeper):
     def get_scalar_problems_sweeper_mats(self, lambdas=[None, None]):
       """
       For a scalar problem, an IMEX-SDC sweep can be written in matrix formulation. This function returns the corresponding matrices. 
-      See Ruprecht & Speck, ``Spectral deferred corrections with fast-wave slow-wave splitting'', 2016 for the derivation.
+      See Ruprecht & Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016 for the derivation.
 
       The first entry in lambdas is lambda_fast, the second is lambda_slow.
       """

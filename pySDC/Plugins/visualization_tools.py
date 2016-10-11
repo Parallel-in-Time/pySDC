@@ -1,4 +1,4 @@
-from pySDC.Stats import grep_stats
+from pySDC.Plugins.stats_helper import filter_stats
 
 import numpy as np
 
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 def show_residual_across_simulation(stats,fname):
 
-    extract_stats = grep_stats(stats,type='residual')
+    extract_stats = filter_stats(stats,type='residual')
 
     maxsteps = 0
     maxiter = 0
