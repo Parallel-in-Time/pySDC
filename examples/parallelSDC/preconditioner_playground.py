@@ -10,7 +10,7 @@ from examples.vanderpol.ProblemClass import vanderpol
 from implementations.datatype_classes import mesh
 from implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC import CollocationClasses as collclass
-from pySDC.Plugins.sweeper_helper import get_Qd
+from pySDC.plugins.sweeper_helper import get_Qd
 from pySDC.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":

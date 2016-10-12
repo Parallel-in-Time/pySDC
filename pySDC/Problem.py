@@ -1,5 +1,5 @@
 
-from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.plugins.pysdc_helper import FrozenClass
 
 class ptype(object):
     """

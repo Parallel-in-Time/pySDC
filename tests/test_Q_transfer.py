@@ -2,7 +2,7 @@ import numpy as np
 import nose
 from numpy.polynomial.polynomial import polyval
 
-import pySDC.Plugins.transfer_helper as th
+import pySDC.plugins.transfer_helper as th
 
 from tests.test_helpers import get_derived_from_in_package
 from pySDC.Collocation import CollBase

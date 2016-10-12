@@ -1,5 +1,5 @@
 from pySDC import Level as levclass
-from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC.BaseTransfer import base_transfer
 
 import sys

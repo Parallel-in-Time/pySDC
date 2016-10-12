@@ -3,7 +3,7 @@ from future.utils import with_metaclass
 import logging
 
 from pySDC.Log import setup_custom_logger
-from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC import Hooks as hookclass
 
 

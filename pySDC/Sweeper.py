@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.Collocation import CollBase
 from pySDC.Level import level
-from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.plugins.pysdc_helper import FrozenClass
 
 from future.utils import with_metaclass
 

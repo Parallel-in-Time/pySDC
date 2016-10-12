@@ -10,7 +10,7 @@ from implementations.datatype_classes import mesh
 from implementations.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Plugins.sweeper_helper import get_Qd
+from pySDC.plugins.sweeper_helper import get_Qd
 from pySDC.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":

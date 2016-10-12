@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.Plugins.pysdc_helper import FrozenClass
-import pySDC.Plugins.transfer_helper as th
+from pySDC.plugins.pysdc_helper import FrozenClass
+import pySDC.plugins.transfer_helper as th
 
 
 class base_transfer(object):

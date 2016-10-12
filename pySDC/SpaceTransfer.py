@@ -1,7 +1,7 @@
 import abc
 from future.utils import with_metaclass
 
-from pySDC.Plugins.pysdc_helper import FrozenClass
+from pySDC.plugins.pysdc_helper import FrozenClass
 
 
 class space_transfer(with_metaclass(abc.ABCMeta)):
