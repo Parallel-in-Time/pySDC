@@ -33,6 +33,7 @@ install:
 script:
 #  - which nosetests
 #  - nosetests tests -v --with-id
+  - ./doc/update_apidocs.sh
   - travis-sphinx --branches=pySDC_v2,master build
 
 after_success:
