@@ -265,6 +265,7 @@ class step(FrozenClass):
     def prev(self):
         """
         Getter for previous step
+
         Returns:
             prev
         """
@@ -274,6 +275,7 @@ class step(FrozenClass):
     def prev(self,p):
         """
         Setter for previous step
+
         Args:
             p: new previous step
         """
@@ -283,6 +285,7 @@ class step(FrozenClass):
     def next(self):
         """
         Getter for previous step
+
         Returns:
             prev
         """
@@ -292,6 +295,7 @@ class step(FrozenClass):
     def next(self, p):
         """
         Setter for next step
+
         Args:
             p: new next step
         """
@@ -301,6 +305,7 @@ class step(FrozenClass):
     def dt(self):
         """
         Getter for current time-step size
+
         Returns:
             dt
         """
@@ -310,6 +315,7 @@ class step(FrozenClass):
     def time(self):
         """
         Getter for current time-step size
+
         Returns:
             dt
         """

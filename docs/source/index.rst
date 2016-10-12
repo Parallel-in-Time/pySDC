@@ -11,8 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   pySDC/modules.rst
-   implementations/modules.rst
+   pySDC/modules
+   implementations/modules
 
 
 Indices and tables

@@ -154,6 +154,7 @@ class level(FrozenClass):
     def tag(self):
         """
         Getter for tag
+
         Returns:
             tag
         """
@@ -163,6 +164,7 @@ class level(FrozenClass):
     def tag(self, t):
         """
         Setter for tag
+
         Args:
             t: new tag
         """

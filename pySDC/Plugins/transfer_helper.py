@@ -249,11 +249,6 @@ def interpolation_matrix_1d_dirichlet_null(fine_grid, coarse_grid, k=2, pad=1):
 def border_padding(grid, l, r, pad_type='mirror'):
     """ returns an array where the original array is embedded and the borders are enhanced by
         a certain padding strategy, e.g. mirroring the distances
-    :param grid:
-    :param l:
-    :param r:
-    :param pad_type:
-    :return:
     """
     assert l < grid.size and r < grid.size
     padded_arr = np.zeros(grid.size + l + r)
