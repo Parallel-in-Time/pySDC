@@ -23,6 +23,11 @@ two by two class: `MPI` and `NonMPI` for real or virtual parallelisim as well
 as `classic` and `multigrid` for the standard and multigrid-like implementation 
 of PFASST and the likes. Initialization has been simplified a lot, too.
 
+* **Collocation-based coarsening** As the standard PFASST libraries 
+[libpfasst](https://bitbucket.org/memmett/libpfasst) and [PFASST++](https://github.com/Parallel-in-Time/PFASST) 
+`pySDC` now offers collocation-based coarsening, i.e. the number of collocation nodes can be reduced during coarsening.
+Also, time-step coarsening is in preparation, but not implemented yet.
+
 
 Minor changes
 -------------

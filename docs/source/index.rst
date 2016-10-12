@@ -6,7 +6,26 @@
 Welcome to pySDC's documentation!
 =================================
 
-Contents:
+The pySDC project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors,
+esp. the multilevel extension MLSDC and PFASST.
+It is intended for rapid prototyping and educational purposes.
+New ideas like e.g. sweepers or predictors can be tested and first toy problems can be easily implemented.
+
+
+Tutorial
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorial/step_1.rst
+   tutorial/step_2.rst
+   tutorial/step_3.rst
+   tutorial/step_4.rst
+
+
+API documentation
+-----------------
 
 .. toctree::
    :maxdepth: 2
@@ -15,7 +34,7 @@ Contents:
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
