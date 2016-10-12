@@ -26,11 +26,17 @@ before_install:
 install:
   # this line needs to be updated to match the requirements.txt files
   # the conda installer isn't able to process PIP's requirements.txt files
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx
   - conda list
+  - pip install --user travis-sphinx
 
 script:
-  - which nosetests
-  - nosetests
+#  - which nosetests
+#  - nosetests tests -v --with-id
+  - ./docs/update_apidocs.sh
+  - travis-sphinx --branches=pySDC_v2,master build
+
+after_success:
+    - travis-sphinx deploy
 
 # TODO: generate documentation
