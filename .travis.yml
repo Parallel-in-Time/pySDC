@@ -34,9 +34,8 @@ script:
 #  - which nosetests
 #  - nosetests tests -v --with-id
   - ./docs/update_apidocs.sh
-  - travis-sphinx --branches=pySDC_v2,master build
+  - travis-sphinx -n build
 
 after_success:
     - travis-sphinx deploy
 
-# TODO: generate documentation
