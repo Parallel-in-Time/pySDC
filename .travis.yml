@@ -31,8 +31,8 @@ install:
   - pip install --user travis-sphinx
 
 script:
-#  - which nosetests
-#  - nosetests tests -v --with-id
+  - which nosetests
+  - nosetests tests -v --with-id
   - ./docs/update_apidocs.sh
   - travis-sphinx --branches=pySDC_v2,master --outdir=docs/build build
 
