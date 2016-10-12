@@ -2,7 +2,8 @@ from __future__ import division
 
 import dolfin as df
 
-from implementations.datatype_classes import fenics_mesh,rhs_fenics_mesh
+from implementations.datatype_classes import rhs_fenics_mesh
+from pySDC.implementations.datatype_classes import fenics_mesh
 from pySDC.Transfer import transfer
 
 class mesh_to_mesh_fenics(transfer):
@@ -40,7 +41,7 @@ class mesh_to_mesh_fenics(transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
-        if isinstance(F,fenics_mesh):
+        if isinstance(F, fenics_mesh):
             u_coarse = fenics_mesh(self.init_c)
             u_coarse.values = df.interpolate(F.values,u_coarse.V)
         elif isinstance(F,rhs_fenics_mesh):
@@ -58,7 +59,7 @@ class mesh_to_mesh_fenics(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        if isinstance(G,fenics_mesh):
+        if isinstance(G, fenics_mesh):
             u_fine = fenics_mesh(self.init_f)
             u_fine.values = df.interpolate(G.values,u_fine.V)
         elif isinstance(G,rhs_fenics_mesh):

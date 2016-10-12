@@ -14,7 +14,7 @@ def setup():
     # generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
     t_start = np.random.rand(1) * 0.2
     t_end = 0.8 + np.random.rand(1) * 0.2
-    classes = get_derived_from_in_package(CollBase, 'implementations/collocation_classes')
+    classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 
 
 # TEST 1:

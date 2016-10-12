@@ -2,7 +2,8 @@ import pySDC.deprecated.PFASST_blockwise_old as mp
 
 from examples.fenics_advection_diffusion_1d.ProblemClass import fenics_adv_diff_1d
 from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fenics
-from implementations.datatype_classes import fenics_mesh,rhs_fenics_mesh
+from implementations.datatype_classes import rhs_fenics_mesh
+from pySDC.implementations.datatype_classes import fenics_mesh
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log

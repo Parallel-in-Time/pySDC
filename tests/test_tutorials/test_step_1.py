@@ -1,8 +1,8 @@
-from examples.tutorial.step_1.A_spatial_problem_setup import main as main_A
-from examples.tutorial.step_1.B1_spatial_accuracy_check import main as main_B1
-from examples.tutorial.step_1.B2_plot_spatial_accuracy import main as main_B2
-from examples.tutorial.step_1.C_collocation_problem_setup import main as main_C
-from examples.tutorial.step_1.D_collocation_accuracy_check import main as main_D
+from tutorial.step_1.A_spatial_problem_setup import main as main_A
+from tutorial.step_1.B1_spatial_accuracy_check import main as main_B1
+from tutorial.step_1.B2_plot_spatial_accuracy import main as main_B2
+from tutorial.step_1.C_collocation_problem_setup import main as main_C
+from tutorial.step_1.D_collocation_accuracy_check import main as main_D
 
 def test_A():
     main_A()

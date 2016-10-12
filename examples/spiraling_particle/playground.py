@@ -3,14 +3,14 @@ from __future__ import division
 import matplotlib.pyplot as plt
 import numpy as np
 import pySDC.deprecated.PFASST_stepwise as mp
+from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
+from pySDC.Stats import grep_stats, sort_stats
 
 from examples.spiraling_particle.HookClass import particles_output
 from examples.spiraling_particle.ProblemClass import planewave_single
-from implementations.datatype_classes.particles import particles, fields
-from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
+from pySDC.implementations.datatype_classes.particles import particles, fields
 
 
 if __name__ == "__main__":

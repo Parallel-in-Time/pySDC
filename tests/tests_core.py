@@ -1,7 +1,5 @@
 import numpy as np
 
-from tests.test_helpers import get_derived_from_in_package
-from pySDC.Collocation import CollBase
 
 #def test_python_version():
 #    import sys
@@ -46,7 +44,7 @@ def test_datatypes_mesh():
 
 
 def check_datatypes_mesh(init):
-    import implementations.datatype_classes.mesh as m
+    import pySDC.implementations.datatype_classes.mesh as m
 
 
     m1 = m.mesh(init)
@@ -97,8 +95,8 @@ def test_datatypes_particles():
 
 
 def check_datatypes_particles(init):
-    from implementations.datatype_classes.particles import particles
-    from implementations.datatype_classes.particles import acceleration
+    from pySDC.implementations.datatype_classes.particles import particles
+    from pySDC.implementations.datatype_classes.particles import acceleration
 
 
     p1 = particles(init)

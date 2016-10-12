@@ -2,8 +2,8 @@ from __future__ import division
 
 import numpy as np
 
-from implementations.datatype_classes.particles import particles, fields, acceleration
 from pySDC.Problem import ptype
+from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
 class penningtrap(ptype):

@@ -1,20 +1,12 @@
 import numpy as np
-
-from examples.heat1d.ProblemClass import heat1d
-from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
-# from examples.heat1d.TransferClass import mesh_to_mesh_1d_dirichlet
 from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-# from implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
 from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC import Log
+from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
+
 # from pySDC.Stats import grep_stats, sort_stats
-import logging
 
 
 if __name__ == "__main__":

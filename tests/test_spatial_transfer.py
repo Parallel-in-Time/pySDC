@@ -1,9 +1,9 @@
 import numpy as np
 from collections import namedtuple
 
-from implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from implementations.datatype_classes.mesh import mesh
-from implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', ('nvars_fine', 'iorder'))
