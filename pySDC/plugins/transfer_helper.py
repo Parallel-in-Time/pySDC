@@ -42,30 +42,30 @@ from scipy.interpolate import BarycentricInterpolator
 #     elif isinstance(D, np.ndarray):
 #         return D
 #
-# def next_neighbors_periodic(p, ps, k, T=None):
-#     """
-#     This function gives for a value p the k points next to it which are found in
-#     in the vector ps and the points which are found periodically.
-#     :param p: value
-#     :param ps: ndarray, vector where to find the next neighbors
-#     :param k: integer, number of neighbours
-#     :return: ndarray, with the k next neighbors
-#     """
-#     if T is None:
-#         T = ps[-1]-2*ps[0]+ps[1]
-#     p_bar = p - np.floor(p/T)*T
-#     ps = ps - ps[0]
-#     distance_to_p = np.asarray(list(map(lambda tk: min([np.abs(tk+T-p_bar), np.abs(tk-p_bar), np.abs(tk-T-p_bar)]),ps)))
-#     # print p_bar
-#     # print distance_to_p
-#     # zip it
-#     value_index = []
-#     for d,i in zip(distance_to_p, range(distance_to_p.size)):
-#         value_index.append((d, i))
-#     # sort by distance
-#     value_index_sorted = sorted(value_index, key=lambda s: s[0])
-#     # take first k indices with least distance and sort them
-#     return sorted(list(map(lambda s: s[1], value_index_sorted[0:k])))
+def next_neighbors_periodic(p, ps, k, T=None):
+    """
+    This function gives for a value p the k points next to it which are found in
+    in the vector ps and the points which are found periodically.
+    :param p: value
+    :param ps: ndarray, vector where to find the next neighbors
+    :param k: integer, number of neighbours
+    :return: ndarray, with the k next neighbors
+    """
+    if T is None:
+        T = ps[-1]-2*ps[0]+ps[1]
+    p_bar = p - np.floor(p/T)*T
+    ps = ps - ps[0]
+    distance_to_p = np.asarray(list(map(lambda tk: min([np.abs(tk+T-p_bar), np.abs(tk-p_bar), np.abs(tk-T-p_bar)]),ps)))
+    # print p_bar
+    # print distance_to_p
+    # zip it
+    value_index = []
+    for d,i in zip(distance_to_p, range(distance_to_p.size)):
+        value_index.append((d, i))
+    # sort by distance
+    value_index_sorted = sorted(value_index, key=lambda s: s[0])
+    # take first k indices with least distance and sort them
+    return sorted(list(map(lambda s: s[1], value_index_sorted[0:k])))
 #
 #
 
@@ -88,24 +88,24 @@ def next_neighbors(p, ps, k):
     # take first k indices with least distance and sort them
     return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
-#
-#
-# def continue_periodic_array(arr,nn,T):
-#     nn = np.asarray(nn)
-#     d_nn = nn[1:]-nn[:-1]
-#     if np.all(d_nn == np.ones(nn.shape[0]-1)):
-#         return arr[nn]
-#     else:
-#         cont_arr = [arr[nn[0]]]
-#         shift = 0.
-#         for n,d in zip(nn[1:],d_nn):
-#             if d != 1:
-#                 shift = -T
-#             cont_arr.append(arr[n]+shift)
-#
-#         return np.asarray(cont_arr)
-#
-#
+
+
+def continue_periodic_array(arr,nn,T):
+    nn = np.asarray(nn)
+    d_nn = nn[1:]-nn[:-1]
+    if np.all(d_nn == np.ones(nn.shape[0]-1)):
+        return arr[nn]
+    else:
+        cont_arr = [arr[nn[0]]]
+        shift = 0.
+        for n,d in zip(nn[1:],d_nn):
+            if d != 1:
+                shift = -T
+            cont_arr.append(arr[n]+shift)
+
+        return np.asarray(cont_arr)
+
+
 def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", periodic=False, T=1.0):
     """
     We construct the restriction matrix between two 1d grids, using lagrange interpolation.
@@ -118,23 +118,23 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", period
     n_g = coarse_grid.size
 
     for i, p in zip(range(n_g), coarse_grid):
-        # if periodic:
-        #     nn = next_neighbors_periodic(p, fine_grid, k, T)
-        #     circulating_one = np.asarray([1.0]+[0.0]*(k-1))
-        #     lag_pol = []
-        #     cont_arr = continue_periodic_array(fine_grid, nn, T)
-        #     if p > np.mean(coarse_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
-        #         cont_arr = cont_arr + T
-        #     for l in range(k):
-        #         lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
-        #     M[i, nn] = np.asarray(list(map(lambda x: x(p), lag_pol)))
-        # else:
-        nn = next_neighbors(p, fine_grid, k)
-        # construct the lagrange polynomials for the k neighbors
-        circulating_one = np.asarray([1.0]+[0.0]*(k-1))
-        bary_pol = []
-        for l in range(k):
-            bary_pol.append(BarycentricInterpolator(fine_grid[nn], np.roll(circulating_one, l)))
+        if periodic:
+            nn = next_neighbors_periodic(p, fine_grid, k, T)
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            cont_arr = continue_periodic_array(fine_grid, nn, T)
+            if p > np.mean(coarse_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
+                cont_arr = cont_arr + T
+            bary_pol = []
+            for l in range(k):
+                bary_pol.append(BarycentricInterpolator(cont_arr, np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+        else:
+            nn = next_neighbors(p, fine_grid, k)
+            # construct the lagrange polynomials for the k neighbors
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            bary_pol = []
+            for l in range(k):
+                bary_pol.append(BarycentricInterpolator(fine_grid[nn], np.roll(circulating_one, l)))
         M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
     return sprs.csc_matrix(M)
@@ -152,27 +152,26 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, return_type="csc", peri
     n_f = fine_grid.size
 
     for i, p in zip(range(n_f), fine_grid):
-        # if periodic:
-        #     nn = next_neighbors_periodic(p, coarse_grid, k, T)
-        #     circulating_one = np.asarray([1.0]+[0.0]*(k-1))
-        #     lag_pol = []
-        #     cont_arr = continue_periodic_array(coarse_grid, nn, T)
-        #
-        #     if p > np.mean(fine_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
-        #         cont_arr = cont_arr + T
-        #     # print cont_arr
-        #
-        #     for l in range(k):
-        #         lag_pol.append(intpl.lagrange(cont_arr, np.roll(circulating_one, l)))
-        #     M[i, nn] = np.asarray(list(map(lambda x: x(p), lag_pol)))
+        if periodic:
+            nn = next_neighbors_periodic(p, coarse_grid, k, T)
+            circulating_one = np.asarray([1.0]+[0.0]*(k-1))
+            cont_arr = continue_periodic_array(coarse_grid, nn, T)
 
-        nn = next_neighbors(p, coarse_grid, k)
-        # construct the lagrange polynomials for the k neighbors
-        circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
-        bary_pol = []
-        for l in range(k):
-            bary_pol.append(BarycentricInterpolator(coarse_grid[nn], np.roll(circulating_one, l)))
-        M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+            if p > np.mean(fine_grid) and not (p >= cont_arr[0] and p <= cont_arr[-1]):
+                cont_arr = cont_arr + T
+
+            bary_pol = []
+            for l in range(k):
+                bary_pol.append(BarycentricInterpolator(cont_arr, np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+        else:
+            nn = next_neighbors(p, coarse_grid, k)
+            # construct the lagrange polynomials for the k neighbors
+            circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
+            bary_pol = []
+            for l in range(k):
+                bary_pol.append(BarycentricInterpolator(coarse_grid[nn], np.roll(circulating_one, l)))
+            M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
     return sprs.csc_matrix(M)
 #
 #
