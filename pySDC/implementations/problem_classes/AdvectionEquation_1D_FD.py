@@ -36,16 +36,18 @@ class advection1d(ptype):
 
         if not 'order' in problem_params:
             problem_params['order'] = 1
+        if not 'type' in problem_params:
+            problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(advection1d,self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0/self.params.nvars
-        self.A = self.__get_A(self.params.nvars, self.params.c, self.dx, self.params.order)
+        self.A = self.__get_A(self.params.nvars, self.params.c, self.dx, self.params.order, self.params.type)
 
     @staticmethod
-    def __get_A(N, c, dx, order):
+    def __get_A(N, c, dx, order, type):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -54,6 +56,7 @@ class advection1d(ptype):
             c: diffusion coefficient
             dx: distance between two spatial nodes
             order: specifies order of discretization
+            type: upwind or centered differences
 
         Returns:
          matrix A in CSC format
@@ -63,43 +66,95 @@ class advection1d(ptype):
         stencil = None
         zero_pos = None
 
-        if order == 1:
-            stencil = [-1.0, 1.0]
-            coeff = 1.0
-            zero_pos = 2
+        if type == 'center':
 
-        elif order == 2:
-            stencil = [1.0, -4.0, 3.0]
-            coeff = 1.0 / 2.0
-            zero_pos = 3
+            range = None
+            if order == 2:
+                stencil = [-1.0, 0.0, 1.0]
+                range = [-1, 0, 1]
+                coeff = 1.0 / 2.0
+            elif order == 4:
+                stencil = [1.0, -8.0, 0.0, 8.0, -1.0]
+                range = [-2, -1, 0, 1, 2]
+                coeff = 1.0 / 12.0
+            elif order == 6:
+                stencil = [-1.0, 9.0, -45.0, 0.0, 45.0, -9.0, 1.0]
+                range = [-3, -2, -1, 0, 1, 2, 3]
+                coeff = 1.0 / 60.0
 
-        elif order == 3:
-            stencil = [1.0, -6.0, 3.0, 2.0]
-            coeff = 1.0 / 6.0
-            zero_pos = 3
+            A = sp.diags(stencil, range, shape=(N, N))
+            A = sp.lil_matrix(A)
 
-        elif order == 4:
-            stencil = [-5.0, 30.0, -90.0, 50.0, 15.0]
-            coeff = 1.0 / 60.0
-            zero_pos = 4
+            if order == 2:
+                A[0, N - 1] = stencil[0]
+                A[N - 1, 0] = stencil[2]
 
-        elif order == 5:
-            stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
-            coeff = 1.0 / 60.0
-            zero_pos = 5
+            elif order == 4:
+                A[0, N - 2] = stencil[0]
+                A[0, N - 1] = stencil[1]
+                A[1, N - 1] = stencil[0]
+                A[N - 2, 0] = stencil[4]
+                A[N - 1, 0] = stencil[3]
+                A[N - 1, 1] = stencil[4]
+
+            elif order == 6:
+                A[0, N - 3] = stencil[0]
+                A[0, N - 2] = stencil[1]
+                A[0, N - 1] = stencil[2]
+                A[1, N - 2] = stencil[0]
+                A[1, N - 1] = stencil[1]
+                A[2, N - 1] = stencil[0]
+                A[N - 3, 0] = stencil[6]
+                A[N - 2, 0] = stencil[5]
+                A[N - 2, 1] = stencil[6]
+                A[N - 1, 0] = stencil[4]
+                A[N - 1, 1] = stencil[5]
+                A[N - 1, 2] = stencil[6]
+
+            A = c* coeff * (1.0 / dx) * A
+            return sp.csc_matrix(A)
+
         else:
-            print("Order " + order + " not implemented.")
-            exit()
 
-        first_col = np.zeros(N)
+            if order == 1:
+                stencil = [-1.0, 1.0]
+                coeff = 1.0
+                zero_pos = 2
 
-        # Because we need to specific first column (not row) in circulant, flip stencil array
-        first_col[0:np.size(stencil)] = np.flipud(stencil)
+            elif order == 2:
+                stencil = [1.0, -4.0, 3.0]
+                coeff = 1.0 / 2.0
+                zero_pos = 3
 
-        # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
-        first_col = np.roll(first_col, -np.size(stencil) + zero_pos, axis=0)
+            elif order == 3:
+                stencil = [1.0, -6.0, 3.0, 2.0]
+                coeff = 1.0 / 6.0
+                zero_pos = 3
 
-        return sp.csc_matrix(c * coeff * (1.0 / dx) * LA.circulant(first_col))
+            elif order == 4:
+                stencil = [-5.0, 30.0, -90.0, 50.0, 15.0]
+                coeff = 1.0 / 60.0
+                zero_pos = 4
+
+            elif order == 5:
+                stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
+                coeff = 1.0 / 60.0
+                zero_pos = 5
+            else:
+                print("Order " + order + " not implemented.")
+                exit()
+
+            first_col = np.zeros(N)
+
+            # Because we need to specific first column (not row) in circulant, flip stencil array
+            first_col[0:np.size(stencil)] = np.flipud(stencil)
+
+            # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
+            first_col = np.roll(first_col, -np.size(stencil) + zero_pos, axis=0)
+
+            A = c * coeff * (1.0 / dx) * LA.circulant(first_col)
+
+        return sp.csc_matrix(A)
 
 
     def eval_f(self,u,t):

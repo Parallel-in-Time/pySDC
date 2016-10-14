@@ -23,6 +23,8 @@ class imex_1st_order(sweeper):
 
         if not 'do_LU' in params:
             params['do_LU'] = False
+        if not 'do_GS' in params:
+            params['do_GS'] = False
 
         # call parent's initialization routine
         super(imex_1st_order,self).__init__(params)
@@ -54,6 +56,10 @@ class imex_1st_order(sweeper):
             # enrich QT by initial value u0
             QI = np.zeros(np.shape(self.coll.Qmat))
             QI[1:,1:] = U.T
+
+        if self.params.do_GS:
+            QI = np.tril(self.coll.Qmat, k=0)
+            QE = np.tril(self.coll.Qmat, k=-1)
 
         return QI, QE
 

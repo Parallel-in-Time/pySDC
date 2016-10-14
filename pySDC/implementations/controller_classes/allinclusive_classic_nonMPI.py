@@ -198,7 +198,7 @@ class allinclusive_classic_nonMPI(controller):
 
         stage = S.status.stage
 
-        self.logger.debug(stage)
+        self.logger.debug("Process %2i at stage %s" %(S.status.slot,stage))
 
         if stage == 'SPREAD':
             # first stage: spread values
@@ -215,7 +215,7 @@ class allinclusive_classic_nonMPI(controller):
                 S.status.stage = 'IT_FINE_SWEEP'
             elif num_procs > 1 and len(S.levels) == 1: # MSSDC
                 self.hooks.dump_pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_COARSE_RECV'
+                S.status.stage = 'IT_COARSE_SWEEP'
             elif num_procs == 1:  # SDC
                 self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'

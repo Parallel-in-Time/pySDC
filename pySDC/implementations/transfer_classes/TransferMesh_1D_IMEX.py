@@ -92,3 +92,39 @@ class mesh_to_mesh_1d_dirichlet(space_transfer):
             u_fine.expl.values = self.Pspace.dot(G.expl.values)
 
         return u_fine
+
+
+class mesh_to_mesh_1d_periodic(mesh_to_mesh_1d_dirichlet):
+
+    def __init__(self,fine_prob,coarse_prob,params):
+        """
+        Initialization routine
+        Args:
+            fine_prob: fine level connected with the base_transfer operations (passed to parent)
+            coarse_prob: coarse level connected with the base_transfer operations (passed to parent)
+            params: parameters for the base_transfer operators
+        """
+
+        assert 'rorder' in params
+        assert 'iorder' in params
+
+        # invoke super initialization
+        super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_prob, coarse_prob, params)
+
+        fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+        coarse_grid = np.array([i  * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+
+        # if number of variables is the same on both levels, Rspace and Pspace are identity
+        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+            self.Rspace = sp.eye(self.coarse_prob.params.nvars)
+        # assemble restriction as transpose of interpolation
+        else:
+            self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder, periodic=True).T
+
+        # if number of variables is the same on both levels, Rspace and Pspace are identity
+        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+            self.Pspace = sp.eye(self.fine_prob.params.nvars)
+        else:
+            self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder, periodic=True)
+
+        pass
