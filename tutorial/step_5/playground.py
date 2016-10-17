@@ -31,9 +31,9 @@ def main():
     problem_params = {}
     problem_params['c'] = 1.0  # advection coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [64]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [32,16]  # number of degrees of freedom for each level
     problem_params['order'] = [4]
-    problem_params['type'] = 'upwind'
+    problem_params['type'] = 'center'
 
     # initialize step parameters
     step_params = {}

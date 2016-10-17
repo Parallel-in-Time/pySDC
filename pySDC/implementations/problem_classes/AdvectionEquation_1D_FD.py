@@ -68,51 +68,21 @@ class advection1d(ptype):
 
         if type == 'center':
 
-            range = None
             if order == 2:
                 stencil = [-1.0, 0.0, 1.0]
-                range = [-1, 0, 1]
+                zero_pos = 2
                 coeff = 1.0 / 2.0
             elif order == 4:
                 stencil = [1.0, -8.0, 0.0, 8.0, -1.0]
-                range = [-2, -1, 0, 1, 2]
+                zero_pos = 3
                 coeff = 1.0 / 12.0
             elif order == 6:
                 stencil = [-1.0, 9.0, -45.0, 0.0, 45.0, -9.0, 1.0]
-                range = [-3, -2, -1, 0, 1, 2, 3]
+                zero_pos = 4
                 coeff = 1.0 / 60.0
-
-            A = sp.diags(stencil, range, shape=(N, N))
-            A = sp.lil_matrix(A)
-
-            if order == 2:
-                A[0, N - 1] = stencil[0]
-                A[N - 1, 0] = stencil[2]
-
-            elif order == 4:
-                A[0, N - 2] = stencil[0]
-                A[0, N - 1] = stencil[1]
-                A[1, N - 1] = stencil[0]
-                A[N - 2, 0] = stencil[4]
-                A[N - 1, 0] = stencil[3]
-                A[N - 1, 1] = stencil[4]
-
-            elif order == 6:
-                A[0, N - 3] = stencil[0]
-                A[0, N - 2] = stencil[1]
-                A[0, N - 1] = stencil[2]
-                A[1, N - 2] = stencil[0]
-                A[1, N - 1] = stencil[1]
-                A[2, N - 1] = stencil[0]
-                A[N - 3, 0] = stencil[6]
-                A[N - 2, 0] = stencil[5]
-                A[N - 2, 1] = stencil[6]
-                A[N - 1, 0] = stencil[4]
-                A[N - 1, 1] = stencil[5]
-                A[N - 1, 2] = stencil[6]
-
-            A = c* coeff * (1.0 / dx) * A
-            return sp.csc_matrix(A)
+            else:
+                print("Order " + order + " not implemented.")
+                exit()
 
         else:
 
@@ -144,17 +114,13 @@ class advection1d(ptype):
                 print("Order " + order + " not implemented.")
                 exit()
 
-            first_col = np.zeros(N)
+        dstencil = np.concatenate((stencil, np.delete(stencil,zero_pos-1)))
+        offsets = np.concatenate(([N-i-1 for i in reversed(range(zero_pos-1))],[i-zero_pos+1 for i in range(zero_pos-1,len(stencil))]))
+        doffsets = np.concatenate((offsets, np.delete(offsets,zero_pos-1)-N))
 
-            # Because we need to specific first column (not row) in circulant, flip stencil array
-            first_col[0:np.size(stencil)] = np.flipud(stencil)
+        A = c * coeff * (1.0/dx) * sp.diags(dstencil,doffsets,shape=(N,N),format='csc')
 
-            # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
-            first_col = np.roll(first_col, -np.size(stencil) + zero_pos, axis=0)
-
-            A = c * coeff * (1.0 / dx) * LA.circulant(first_col)
-
-        return sp.csc_matrix(A)
+        return A
 
 
     def eval_f(self,u,t):
