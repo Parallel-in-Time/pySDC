@@ -63,9 +63,6 @@ def main():
 
     controller = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params, description=description)
 
-
-
-
     # set time parameters
     t0 = 0.0
     Tend = 1.0

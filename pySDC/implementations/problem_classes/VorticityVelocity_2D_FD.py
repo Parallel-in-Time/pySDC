@@ -116,7 +116,8 @@ class vortex2d(ptype):
         """
 
         fimpl = self.dtype_u(self.init)
-        fimpl.values = self.A.dot(u.values)
+        print(self.A.shape, u.values.shape)
+        fimpl.values = self.A.dot(u.values.flatten()).reshape(u.values.shape)
         return fimpl
 
     def u_exact(self,t):
@@ -131,7 +132,7 @@ class vortex2d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        xvalues = np.array([(i+1)*self.dx for i in range(self.params.nvars)])
+        xvalues = np.array([i*self.dx for i in range(self.params.nvars[0])])
         me.values = np.sin(np.pi*self.params.freq*xvalues)*np.cos(t)
         return me
 
