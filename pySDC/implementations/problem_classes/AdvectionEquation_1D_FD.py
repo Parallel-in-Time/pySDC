@@ -32,7 +32,7 @@ class advection1d(ptype):
         assert 'freq' in problem_params, 'ERROR: need frequency parameter for the problem class'
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        assert (problem_params['nvars'])%2 == 0, 'ERROR: the setup requires nvars = 2^p'
+        assert (problem_params['nvars'][0])%2 == 0, 'ERROR: the setup requires nvars = 2^p'
 
         if not 'order' in problem_params:
             problem_params['order'] = 1

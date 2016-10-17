@@ -1,6 +1,7 @@
 from pySDC.Step import step
 
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.VorticityVelocity_2D_FD import vortex2d
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
@@ -31,7 +32,7 @@ def main():
     problem_params = {}
     problem_params['c'] = 1.0  # advection coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [32,16]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(4,4)]  # number of degrees of freedom for each level
     problem_params['order'] = [4]
     problem_params['type'] = 'center'
 
@@ -49,7 +50,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = advection1d                      # pass problem class
+    description['problem_class'] = vortex2d                      # pass problem class
     description['problem_params'] = problem_params                  # pass problem parameters
     description['dtype_u'] = mesh                                   # pass data type for u
     description['dtype_f'] = mesh                                   # pass data type for f
@@ -61,6 +62,9 @@ def main():
     description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     controller = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params, description=description)
+
+
+
 
     # set time parameters
     t0 = 0.0

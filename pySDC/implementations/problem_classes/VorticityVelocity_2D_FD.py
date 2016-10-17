@@ -1,7 +1,9 @@
+from __future__ import division
+
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
-from __future__ import division
+
 
 from pySDC.Problem import ptype
 
@@ -37,7 +39,7 @@ class vortex2d(ptype):
                                        params=problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 1 / self.params.nvars
+        self.dx = 1 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
 
     def __get_A(self,N,nu,dx):
@@ -54,9 +56,17 @@ class vortex2d(ptype):
         """
 
         stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
+        zero_pos = 2
+        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
+        offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
+
+        A = sp.diags(dstencil,doffsets,shape=(N[0],N[0]), format='csc')
+        A = sp.kron(A,sp.eye(N[0])) + sp.kron(sp.eye(N[1]),A)
         A *= nu / (dx**2)
-        return A.tocsc()
+
+        return A
 
     def eval_f(self,u,t):
         """
@@ -87,9 +97,10 @@ class vortex2d(ptype):
             explicit part of RHS
         """
 
-        xvalues = np.array([(i+1)*self.dx for i in range(self.params.nvars)])
         fexpl = self.dtype_u(self.init)
-        fexpl.values = -np.sin(np.pi*self.params.freq*xvalues)*(np.sin(t)-self.params.nu*(np.pi*self.params.freq)**2*np.cos(t))
+
+        psi = LA.spsolve(-self.A, u.values.flatten())
+
         return fexpl
 
     def __eval_fimpl(self,u,t):
