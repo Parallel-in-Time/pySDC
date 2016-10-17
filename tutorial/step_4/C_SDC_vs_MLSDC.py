@@ -50,6 +50,7 @@ def main():
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
+    controller_params['predict'] = False         # can turn on/off predictor here!
 
     # fill description dictionary for SDC
     description_sdc = {}
@@ -107,7 +108,7 @@ def main():
     print('Number of iterations SDC and MLSDC: %2i -- %2i' %(niter_sdc, niter_mlsdc))
 
     assert diff < 6E-10, "ERROR: difference between MLSDC and SDC is higher than expected, got %s" %diff
-    assert niter_sdc-niter_mlsdc >= 6, "ERROR: MLSDC required more iterations than expected, got %s" %niter_mlsdc
+    assert niter_sdc-niter_mlsdc <= 6, "ERROR: MLSDC required more iterations than expected, got %s" %niter_mlsdc
 
 
 if __name__ == "__main__":
