@@ -1,22 +1,23 @@
 import numpy as np
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
 
 # from pySDC.Stats import grep_stats, sort_stats
 
 
 if __name__ == "__main__":
 
-    num_procs = 1
+    num_procs = 3
 
     # This comes as read-in for the level class  (this is optional!)
     lparams = {}
     lparams['restol'] = 1E-10
-    lparams['dt'] = 0.1
+    lparams['dt'] = 0.12
 
     # This comes as read-in for the controller
     cparams = {}
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63]
+    pparams['nvars'] = [1023]
     pparams['freq'] = 1
 
     # This comes as read-in for the base_transfer operations (this is optional!)
@@ -40,8 +41,8 @@ if __name__ == "__main__":
     swparams['collocation_class'] = CollGaussRadau_Right
     # swparams['collocation_class'] = CollGaussLobatto
     # swparams['collocation_class'] = CollGaussLegendre
-    swparams['num_nodes'] = [5,3]
-    swparams['do_LU'] = True
+    swparams['num_nodes'] = [5]
+    # swparams['do_LU'] = True
 
     # Step parameters
     sparams = {}
@@ -67,7 +68,7 @@ if __name__ == "__main__":
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.1
+    Tend = 3*0.12
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

@@ -208,12 +208,12 @@ class allinclusive_classic_nonMPI(controller):
             S.levels[0].sweep.predict()
 
             # update stage
-            if (len(S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
+            if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT_RESTRICT'
-            elif num_procs > 1 and len(S.levels) > 1: # PFASST
+            elif len(S.levels) > 1: # MLSDC or PFASST without predict
                 self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'
-            elif num_procs > 1 and len(S.levels) == 1: # MSSDC
+            elif num_procs > 1: # MSSDC
                 self.hooks.dump_pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_COARSE_SWEEP'
             elif num_procs == 1:  # SDC

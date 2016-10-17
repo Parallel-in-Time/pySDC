@@ -222,12 +222,12 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if (len(self.S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
+            if len(self.S.levels) > 1 and self.params.predict:   # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
-            elif num_procs > 1 and len(self.S.levels) > 1:  # PFASST
+            elif len(self.S.levels) > 1:   # MLSDC or PFASST without predict
                 self.hooks.dump_pre_iteration(step=self.S, level_number=0)
                 self.S.status.stage = 'IT_FINE'
-            elif num_procs > 1 and len(self.S.levels) == 1:  # MSSDC
+            elif num_procs > 1:  # MSSDC
                 self.hooks.dump_pre_iteration(step=self.S, level_number=0)
                 self.S.status.stage = 'IT_COARSE'
             elif num_procs == 1:  # SDC
@@ -297,7 +297,7 @@ class allinclusive_classic_MPI(controller):
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
                 elif num_procs > 1:  # MSSDC
-                    self.S.status.stage = 'IT_COARSE'
+                    self.S.status.stage = 'IT_COARSE_RECV'
                 elif num_procs == 1:  # SDC
                     self.S.status.stage = 'IT_FINE'
 
@@ -331,15 +331,21 @@ class allinclusive_classic_MPI(controller):
                 self.S.transfer(source=self.S.levels[l],target=self.S.levels[l+1])
 
             # update stage
+            self.S.status.stage = 'IT_COARSE_RECV'
+
+        elif stage == 'IT_COARSE_RECV':
+
+            # receive from previous step (if not first)
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels) - 1, comm=comm)
+
+            # update stage
             self.S.status.stage = 'IT_COARSE'
+
 
         elif stage == 'IT_COARSE':
 
             # sweeps on coarsest level (serial/blocking)
-
-            # receive from previous step (if not first)
-            if not self.S.status.first and not self.S.status.prev_done:
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels)-1, comm=comm)
 
             # do the sweep
             self.S.levels[-1].sweep.update_nodes()

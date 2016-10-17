@@ -30,6 +30,8 @@ class allinclusive_multigrid_MPI(controller):
         # pass communicator for future use
         self.comm = comm
 
+        # assert not (comm.Get_size() > 1 and len(self.S.levels) == 1), "ERROR: multigrid cannot do MSSDC"
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
@@ -71,7 +73,7 @@ class allinclusive_multigrid_MPI(controller):
             time += self.S.dt
             tend = comm_active.bcast(time, root=num_procs - 1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
-            stepend = comm_active.bcast(self.S.status.slot, root=num_procs - 1)
+            # stepend = comm_active.bcast(self.S.status.slot, root=num_procs - 1)
 
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])
@@ -192,13 +194,6 @@ class allinclusive_multigrid_MPI(controller):
             all active steps
         """
 
-        # if all stages are the same, continue, otherwise abort
-        all_stage = comm.allgather(self.S.status.stage)
-
-        if not all(all_stage):
-            print('not all stages are equal, aborting..')
-            exit()
-
         stage = self.S.status.stage
 
         self.logger.debug(stage)
@@ -213,9 +208,9 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if (len(self.S.levels) > 1 and num_procs > 1) and self.params.predict:  # MLSDC or PFASST
+            if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
-            elif num_procs > 1 and len(self.S.levels) > 1:  # PFASST
+            elif len(self.S.levels) > 1:  # MLSDC or PFASST without predict
                 self.hooks.dump_pre_iteration(step=self.S, level_number=0)
                 self.S.status.stage = 'IT_FINE'
             elif num_procs > 1 and len(self.S.levels) == 1:  # MSSDC
@@ -267,7 +262,7 @@ class allinclusive_multigrid_MPI(controller):
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
                 elif num_procs > 1:  # MSSDC
-                    self.S.status.stage = 'IT_COARSE'
+                    self.S.status.stage = 'IT_COARSE_RECV'
                 elif num_procs == 1:  # SDC
                     self.S.status.stage = 'IT_FINE'
 
@@ -293,16 +288,21 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.transfer(source=self.S.levels[l],target=self.S.levels[l+1])
 
             # update stage
+            self.S.status.stage = 'IT_COARSE_RECV'
+
+        elif stage == 'IT_COARSE_RECV':
+
+            # receive from previous step (if not first)
+
+            if not self.S.status.first:
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+            # update stage
             self.S.status.stage = 'IT_COARSE'
 
         elif stage == 'IT_COARSE':
 
             # sweeps on coarsest level (serial/blocking)
-
-
-            # receive from previous step (if not first)
-            if not self.S.status.first:
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep
             self.S.levels[-1].sweep.update_nodes()

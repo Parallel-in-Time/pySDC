@@ -1,13 +1,13 @@
 import numpy as np
 from mpi4py import MPI
 
-from examples.heat1d.ProblemClass import heat1d
-from examples.heat1d.TransferClass import mesh_to_mesh_1d
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
-from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC import Log
 
 if __name__ == "__main__":
@@ -23,16 +23,17 @@ if __name__ == "__main__":
     cparams = {}
     cparams['fine_comm'] = True
     cparams['predict'] = True
-    cparams['logger_level'] = 10
+    cparams['logger_level'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
     pparams['nu'] = 1.0
-    pparams['nvars'] = [63,31,15]
+    pparams['freq'] = 1.0
+    pparams['nvars'] = [1023,511]
 
     # This comes as read-in for the transfer operations (this is optional!)
     tparams = {}
-    tparams['finter'] = False
+    # tparams['finter'] = False
     tparams['iorder'] = 6
     tparams['rorder'] = 2
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class'] = heat1d
+    description['problem_class'] = heat1d_forced
     description['problem_params'] = pparams
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
@@ -55,8 +56,8 @@ if __name__ == "__main__":
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['step_params'] = sparams
-    description['transfer_class'] = mesh_to_mesh_1d
-    description['transfer_params'] = tparams
+    description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet
+    description['space_transfer_params'] = tparams
 
     # initialize controller
     PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)

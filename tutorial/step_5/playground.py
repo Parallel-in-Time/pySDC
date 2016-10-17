@@ -45,6 +45,7 @@ def main():
     space_transfer_params['iorder'] = 6
 
     controller_params = {}
+    controller_params['logger_level'] = 30
 
     # fill description dictionary for easy step instantiation
     description = {}

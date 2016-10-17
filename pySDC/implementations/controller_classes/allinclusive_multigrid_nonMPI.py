@@ -31,6 +31,8 @@ class allinclusive_multigrid_nonMPI(controller):
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
 
+        assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: multigrid cannot do MSSDC"
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -254,20 +256,11 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if (len(S.levels) > 1 and len(MS) > 1) and self.params.predict: # MLSDC or PFASST
+                if len(S.levels) > 1 and self.params.predict: # MLSDC or PFASST
                     S.status.stage = 'PREDICT'
-                elif len(MS) > 1 and len(S.levels) > 1: # PFASST
-                    self.hooks.dump_pre_iteration(step=S, level_number=0)
-                    S.status.stage = 'IT_FINE'
-                elif len(MS) > 1 and len(S.levels) == 1: # MSSDC
-                    self.hooks.dump_pre_iteration(step=S, level_number=0)
-                    S.status.stage = 'IT_COARSE'
-                elif len(MS) == 1: # SDC
-                    self.hooks.dump_pre_iteration(step=S, level_number=0)
-                    S.status.stage = 'IT_FINE'
                 else:
-                    print("Don't know what to do after spread, aborting")
-                    exit()
+                    self.hooks.dump_pre_iteration(step=S, level_number=0)
+                    S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -317,9 +310,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     # multi-level or single-level?
                     if len(S.levels) > 1: # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
-                    elif len(MS) > 1: # MSSDC
-                        S.status.stage = 'IT_COARSE'
-                    elif len(MS) == 1: # SDC
+                    else: # SDC
                         S.status.stage = 'IT_FINE'
 
             else:
