@@ -22,6 +22,7 @@ Tutorial
    tutorial/step_2.rst
    tutorial/step_3.rst
    tutorial/step_4.rst
+   tutorial/step_5.rst
 
 
 API documentation

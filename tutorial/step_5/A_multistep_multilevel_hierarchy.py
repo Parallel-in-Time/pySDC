@@ -54,8 +54,10 @@ def main():
     description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
+    # instantiate controller
     controller = allinclusive_classic_nonMPI(num_procs=10, controller_params={}, description=description)
 
+    # check number of levels
     for i in range(len(controller.MS)):
         print("Process %2i has %2i levels" %(i,len(controller.MS[i].levels)))
 

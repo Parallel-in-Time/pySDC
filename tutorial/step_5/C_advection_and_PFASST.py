@@ -12,7 +12,7 @@ from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
 def main():
     """
-    A simple test program to setup a full step hierarchy
+    A simple test program to run PFASST for the advection equation in multiple ways...
     """
 
     # initialize level parameters
@@ -35,7 +35,7 @@ def main():
 
     # initialize step parameters
     step_params = {}
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 50
 
     # initialize space transfer parameters
     space_transfer_params = {}
@@ -62,9 +62,11 @@ def main():
     t0 = 0.0
     Tend = 1.0
 
+    # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend / level_params['dt'])
     num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
 
+    # set up list of types of implicit SDC sweepers: LU and implicit Euler here
     QI_list = ['LU', 'IE']
     niters_min_all = {}
     niters_max_all = {}
@@ -81,6 +83,7 @@ def main():
 
         for num_proc in num_proc_list:
             print('Working with QI = %s on %2i processes...' %(QI,num_proc))
+            # instantiate controller
             controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
                                                      description=description)
 
@@ -102,11 +105,10 @@ def main():
             # convert filtered statistics to list of iterations count, sorted by process
             iter_counts = sort_stats(filtered_stats, sortby='time')
 
+            # compute and print statistics
             niters = np.array([item[1] for item in iter_counts])
-
             niters_min_all[QI] = min(np.mean(niters),niters_min_all[QI])
             niters_max_all[QI] = max(np.mean(niters), niters_max_all[QI])
-
             print('   Mean number of iterations: %4.2f' % np.mean(niters))
             print('   Range of values for number of iterations: %2i ' % np.ptp(niters))
             print('   Position of max/min number of iterations: %2i -- %2i' % (np.argmax(niters), np.argmin(niters)))

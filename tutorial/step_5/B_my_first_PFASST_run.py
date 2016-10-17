@@ -24,12 +24,12 @@ def main():
     sweeper_params = {}
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['do_LU'] = True
+    sweeper_params['do_LU'] = True      # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
     problem_params = {}
-    problem_params['nu'] = 0.1      # diffusion coefficient
-    problem_params['freq'] = 8      # frequency for the test value
+    problem_params['nu'] = 0.1           # diffusion coefficient
+    problem_params['freq'] = 8           # frequency for the test value
     problem_params['nvars'] = [511,255]  # number of degrees of freedom for each level
 
     # initialize step parameters
@@ -62,11 +62,13 @@ def main():
     t0 = 0.0
     Tend = 4.0
 
+    # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend/level_params['dt'])
     num_proc_list = [2**i for i in range(int(np.log2(nsteps)+1))]
 
     for num_proc in num_proc_list:
         print('Working with %2i processes...' %num_proc)
+        # instantiate controller
         controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
 
         # get initial values on finest level
@@ -87,9 +89,9 @@ def main():
         # convert filtered statistics to list of iterations count, sorted by process
         iter_counts = sort_stats(filtered_stats, sortby='time')
 
+        # compute and print statistics
         for item in iter_counts:
             print('Number of iterations for time %4.2f: %2i' % item)
-
         print()
         niters = np.array([item[1] for item in iter_counts])
         print('   Mean number of iterations: %4.2f' %np.mean(niters))
