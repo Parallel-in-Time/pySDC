@@ -65,6 +65,7 @@ Important things to note:
 -  In this case, the number of iterations is halved when using MLSDC.
    This is the best case and in many situations, this cannot be
    achieved. In particular, the interpolation order is crucial.
+-  Using the controller parameter ``predict``, we can turn the coarse level predictor on (default) or off in the case of MLSDC or PFASST.
 -  While MLSDC looks less expensive, the number of evaluations of the
    right-hand side of the ODE is basically the same: This is due to the
    fact that after each coarse grid correction (i.e. after the
