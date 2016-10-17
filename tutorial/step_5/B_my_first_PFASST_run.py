@@ -12,7 +12,7 @@ from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
 def main():
     """
-    A simple test program to setup a full step hierarchy
+    A simple test program to do PFASST runs for the heat equation
     """
 
     # initialize level parameters
@@ -25,7 +25,6 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['do_LU'] = True
-    # sweeper_params['do_GS'] = True
 
     # initialize problem parameters
     problem_params = {}
@@ -90,7 +89,19 @@ def main():
 
         for item in iter_counts:
             print('Number of iterations for time %4.2f: %2i' % item)
+
         print()
+        niters = np.array([item[1] for item in iter_counts])
+        print('   Mean number of iterations: %4.2f' %np.mean(niters))
+        print('   Range of values for number of iterations: %2i ' %np.ptp(niters))
+        print('   Position of max/min number of iterations: %2i -- %2i' %(np.argmax(niters), np.argmin(niters)))
+        print('   Std and var for number of iterations: %4.2f -- %4.2f' %(np.std(niters), np.var(niters)))
+        print()
+        print()
+
+        assert err < 1.3504644E-04, "ERROR: error is too high, got %s" % err
+        assert np.ptp(niters) < 2, "ERROR: range of number of iterations is too high, got %s" %np.ptp(niters)
+        assert np.mean(niters) <= 6.5, "ERROR: mean number of iteratiobs is too high, got %s" %np.mean(niters)
 
 if __name__ == "__main__":
     main()
