@@ -1,6 +1,5 @@
 import numpy as np
 from collections import namedtuple
-import matplotlib.pylab as plt
 
 from pySDC.implementations.problem_classes.VorticityVelocity_2D_FD import vortex2d
 from pySDC.implementations.datatype_classes.mesh import mesh
