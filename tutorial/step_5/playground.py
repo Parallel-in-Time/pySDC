@@ -2,6 +2,7 @@ from pySDC.Step import step
 
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.VorticityVelocity_2D_FD import vortex2d
+from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
@@ -30,11 +31,9 @@ def main():
 
     # initialize problem parameters
     problem_params = {}
-    problem_params['c'] = 1.0  # advection coefficient
-    problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(4,4)]  # number of degrees of freedom for each level
-    problem_params['order'] = [4]
-    problem_params['type'] = 'center'
+    problem_params['nu'] = 1.0               # diffusion coefficient
+    problem_params['freq'] = 2               # frequency for the test value
+    problem_params['nvars'] = [(16,16),(8,8)]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = {}
@@ -46,11 +45,11 @@ def main():
     space_transfer_params['iorder'] = 6
 
     controller_params = {}
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = vortex2d                      # pass problem class
+    description['problem_class'] = heat2d_periodic                  # pass problem class
     description['problem_params'] = problem_params                  # pass problem parameters
     description['dtype_u'] = mesh                                   # pass data type for u
     description['dtype_f'] = mesh                                   # pass data type for f

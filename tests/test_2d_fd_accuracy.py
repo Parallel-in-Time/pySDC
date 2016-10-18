@@ -7,11 +7,11 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
 
+
 def test_spatial_accuracy():
     """
     A simple test program to check order of accuracy in space for a simple 2d test problem
     """
-
 
     # initialize problem parameters
     problem_params = {}
@@ -102,5 +102,5 @@ def get_accuracy_order(results):
     return order
 
 
-if __name__ == "__main__":
-    test_spatial_accuracy()
+# if __name__ == "__main__":
+#     test_spatial_accuracy()

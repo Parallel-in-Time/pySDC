@@ -22,6 +22,10 @@ class heat2d_periodic(ptype):
         # these parameters will be used later, so assert their existence
         if not 'nu' in problem_params:
             problem_params['nu'] = 1
+        if not 'freq' in problem_params:
+            problem_params['freq'] = 2
+        else:
+            assert problem_params['freq'] % 2 == 0, "ERROR: need even number of frequencies due to periodic BCs"
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         assert 'nvars' in problem_params, 'ERROR: need number of nvars for the problem class'
