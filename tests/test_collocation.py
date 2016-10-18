@@ -45,7 +45,7 @@ def check_canintegratepolynomials(collclass,t_start,t_end):
         # use quadrature rule to compute integral
         int_coll = coll.evaluate(coll.weights, poly_vals)
         # For large values of M, substantial differences from different round of error have to be considered
-        assert abs(int_ex - int_coll) < 1e-14, "For node type " + coll.__class__.__name__ + ", failed to integrate polynomial of degree " + str(coll.order-1) + " exactly. Error: %5.3e" % abs(int_ex - int_coll)
+        assert abs(int_ex - int_coll) < 2e-14, "For node type " + coll.__class__.__name__ + ", failed to integrate polynomial of degree " + str(coll.order-1) + " exactly. Error: %5.3e" % abs(int_ex - int_coll)
 
 
 # TEST 2:
