@@ -111,8 +111,8 @@ def test_mesh_to_mesh_1d_dirichlet():
 
     orders = get_accuracy_orders(results)
     for p in range(len(orders)):
-        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.151, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
-
+        # print(abs(orders[p][1]-orders[p][2])/orders[p][1])
+        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.138, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
 
 def test_mesh_to_mesh_1d_periodic():
     """
@@ -155,14 +155,10 @@ def test_mesh_to_mesh_1d_periodic():
             T = mesh_to_mesh_1d_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
-            xvalues_fine = np.array([i * Pfine.dx for i in range(Pfine.params.nvars)])
-            uexact_fine = Pfine.dtype_u(0)
-            uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
+            uexact_fine = Pfine.u_exact(t=0)
 
             # set exact coarse solution as source
-            xvalues_coarse = np.array([i * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
-            uexact_coarse = Pfine.dtype_u(0)
-            uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
+            uexact_coarse = Pcoarse.u_exact(t=0)
 
             # do the interpolation/prolongation
             uinter = T.prolong(uexact_coarse)
@@ -183,7 +179,7 @@ def test_mesh_to_mesh_1d_periodic():
 
 def test_mesh_to_mesh_2d_periodic():
     """
-        A simple test program to test periodic interpolation order in space
+        A simple test program to test periodic interpolation order in 2d
         """
 
     # initialize problem parameters
@@ -244,5 +240,4 @@ def test_mesh_to_mesh_2d_periodic():
             1] < 0.115, 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
 
 if __name__ == "__main__":
-    test_mesh_to_mesh_1d_periodic()
-    test_mesh_to_mesh_2d_periodic()
+    pass
