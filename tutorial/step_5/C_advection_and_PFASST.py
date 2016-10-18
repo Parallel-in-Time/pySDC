@@ -4,7 +4,7 @@ from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advect
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_periodic
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
@@ -41,6 +41,7 @@ def main():
     space_transfer_params = {}
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
+    space_transfer_params['periodic'] = True
 
     # initialize controller parameters
     controller_params = {}
@@ -48,14 +49,14 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = {}
-    description['problem_class'] = advection1d                    # pass problem class
+    description['problem_class'] = advection1d                      # pass problem class
     description['problem_params'] = problem_params                  # pass problem parameters
     description['dtype_u'] = mesh                                   # pass data type for u
-    description['dtype_f'] = mesh                                  # pass data type for f
-    description['sweeper_class'] = generic_implicit                  # pass sweeper (see part B)
+    description['dtype_f'] = mesh                                   # pass data type for f
+    description['sweeper_class'] = generic_implicit                 # pass sweeper (see part B)
     description['level_params'] = level_params                      # pass level parameters
     description['step_params'] = step_params                        # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh_periodic # pass spatial transfer class
+    description['space_transfer_class'] = mesh_to_mesh              # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     # set time parameters

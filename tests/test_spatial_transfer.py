@@ -5,7 +5,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet, mesh_to_mesh_periodic
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', ('nvars_fine', 'iorder'))
@@ -89,7 +89,7 @@ def test_mesh_to_mesh_1d_dirichlet():
             Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_dirichlet(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
             uexact_fine = Pfine.u_exact(t=0)
@@ -108,7 +108,7 @@ def test_mesh_to_mesh_1d_dirichlet():
     orders = get_accuracy_orders(results)
     for p in range(len(orders)):
         # print(abs(orders[p][1]-orders[p][2])/orders[p][1])
-        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.138, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
+        assert abs(orders[p][1]-orders[p][2])/orders[p][1] < 0.151, 'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
 
 def test_mesh_to_mesh_1d_periodic():
     """
@@ -123,6 +123,7 @@ def test_mesh_to_mesh_1d_periodic():
     # initialize transfer parameters
     space_transfer_params = {}
     space_transfer_params['rorder'] = 2
+    space_transfer_params['periodic'] = True
 
     iorder_list = [2,4,6,8]
     nvars_fine_list = [2**p for p in range(5,9)]
@@ -148,7 +149,7 @@ def test_mesh_to_mesh_1d_periodic():
             Pcoarse = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
             uexact_fine = Pfine.u_exact(t=0)
@@ -186,6 +187,7 @@ def test_mesh_to_mesh_2d_periodic():
     # initialize transfer parameters
     space_transfer_params = {}
     space_transfer_params['rorder'] = 2
+    space_transfer_params['periodic'] = True
 
     iorder_list = [2, 4, 6, 8]
     nvars_fine_list = [(2 ** p, 2 ** p) for p in range(5, 9)]
@@ -210,7 +212,7 @@ def test_mesh_to_mesh_2d_periodic():
             Pcoarse = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
             uexact_fine = Pfine.u_exact(t=0)
@@ -236,4 +238,5 @@ def test_mesh_to_mesh_2d_periodic():
             1] < 0.115, 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
 
 if __name__ == "__main__":
+    test_mesh_to_mesh_1d_dirichlet()
     pass

@@ -59,8 +59,8 @@ class base_transfer(object):
         if self.params.coll_rorder != 1:
             print('WARNING: requested order of Q-restriction is != 1, can lead to weird behavior!')
 
-        Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder).toarray()
-        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder).toarray()
+        Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder,pad=0).toarray()
+        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder,pad=0).toarray()
 
         if self.fine.sweep.coll.left_is_node:
             self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))

@@ -46,7 +46,7 @@ if __name__ == "__main__":
     description['num_nodes']         = 5
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
-    #description['transfer_class'] = mesh_to_mesh_dirichlet
+    #description['transfer_class'] = mesh_to_mesh
     #description['transfer_params'] = tparams
 
     # quickly generate block of steps
