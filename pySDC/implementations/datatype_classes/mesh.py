@@ -113,6 +113,23 @@ class mesh():
         # return maximum
         return np.amax(absval)
 
+    def apply_mat(self,A):
+        """
+        Matrix multiplication operator
+
+        Args:
+            A: a matrix
+
+        Returns:
+            mesh object, component multiplied by the matrix A
+        """
+        assert A.shape[1] == self.values.shape[0], "ERROR: cannot apply operator %s to %s" %(A,self)
+
+        me = mesh(A.shape[0])
+        me.values = A.dot(self.values)
+
+        return me
+
 
 class rhs_imex_mesh():
 
@@ -213,3 +230,23 @@ class rhs_imex_mesh():
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
+
+    def apply_mat(self,A):
+        """
+        Matrix multiplication operator
+
+        Args:
+            A: a matrix
+
+        Returns:
+            rhs_imex_mesh object, each component multiplied by the matrix A
+        """
+
+        assert A.shape[1] == self.impl.values.shape[0], "ERROR: cannot apply operator %s to %s" % (A, self.impl)
+        assert A.shape[1] == self.expl.values.shape[0], "ERROR: cannot apply operator %s to %s" % (A, self.expl)
+
+        me = rhs_imex_mesh(A.shape[1])
+        me.impl.values = A.dot(self.impl.values)
+        me.expl.values = A.dot(self.expl.values)
+
+        return me

@@ -5,7 +5,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet, mesh_to_mesh_1d_periodic
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet, mesh_to_mesh_periodic
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', ('nvars_fine', 'iorder'))
@@ -89,17 +89,13 @@ def test_mesh_to_mesh_1d_dirichlet():
             Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_1d_dirichlet(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh_dirichlet(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
-            xvalues_fine = np.array([(i + 1) * Pfine.dx for i in range(Pfine.params.nvars)])
-            uexact_fine = Pfine.dtype_u(0)
-            uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
+            uexact_fine = Pfine.u_exact(t=0)
 
             # set exact coarse solution as source
-            xvalues_coarse = np.array([(i + 1) * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
-            uexact_coarse = Pfine.dtype_u(0)
-            uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
+            uexact_coarse = Pcoarse.u_exact(t=0)
 
             # do the interpolation/prolongation
             uinter = T.prolong(uexact_coarse)
@@ -152,7 +148,7 @@ def test_mesh_to_mesh_1d_periodic():
             Pcoarse = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_1d_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
             uexact_fine = Pfine.u_exact(t=0)
@@ -214,7 +210,7 @@ def test_mesh_to_mesh_2d_periodic():
             Pcoarse = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
-            T = mesh_to_mesh_1d_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
+            T = mesh_to_mesh_periodic(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
             # set exact fine solution to compare with
             uexact_fine = Pfine.u_exact(t=0)

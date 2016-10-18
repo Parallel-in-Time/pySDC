@@ -7,8 +7,7 @@ import pySDC.plugins.transfer_helper as th
 from pySDC.SpaceTransfer import space_transfer
 
 
-# FIXME: extend this to ndarrays
-class mesh_to_mesh_1d_dirichlet(space_transfer):
+class mesh_to_mesh_dirichlet(space_transfer):
     """
     Custon base_transfer class, implements Transfer.py
 
@@ -36,7 +35,7 @@ class mesh_to_mesh_1d_dirichlet(space_transfer):
         assert 'iorder' in params
 
         # invoke super initialization
-        super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_prob, coarse_prob, params)
+        super(mesh_to_mesh_dirichlet, self).__init__(fine_prob, coarse_prob, params)
 
         if type(self.fine_prob.params.nvars) is tuple:
             assert type(self.coarse_prob.params.nvars) is tuple
@@ -102,15 +101,15 @@ class mesh_to_mesh_1d_dirichlet(space_transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
-        u_coarse = None
-        if isinstance(F,self.fine_prob.dtype_u):
-            u_coarse = self.coarse_prob.dtype_u(self.coarse_prob.init,val=0)
-            u_coarse.values = self.Rspace.dot(F.values)
-        elif isinstance(F,self.fine_prob.dtype_f):
-            u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            u_coarse.values = self.Rspace.dot(F.values)
+        # u_coarse = None
+        # if isinstance(F,self.fine_prob.dtype_u):
+        #     u_coarse = self.coarse_prob.dtype_u(self.coarse_prob.init,val=0)
+        #     u_coarse.values = self.Rspace.dot(F.values)
+        # elif isinstance(F,self.fine_prob.dtype_f):
+        #     u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
+        #     u_coarse.values = self.Rspace.dot(F.values)
 
-        return u_coarse
+        return F.apply_mat(self.Rspace)
 
     def prolong(self,G):
         """
@@ -119,18 +118,18 @@ class mesh_to_mesh_1d_dirichlet(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        u_fine = None
-        if isinstance(G,self.coarse_prob.dtype_u):
-            u_fine = self.fine_prob.dtype_u(self.fine_prob.init,val=0)
-            u_fine.values = self.Pspace.dot(G.values)
-        elif isinstance(G,self.coarse_prob.dtype_f):
-            u_fine = self.fine_prob.dtype_f(self.fine_prob.init)
-            u_fine.values = self.Pspace.dot(G.values)
+        # u_fine = None
+        # if isinstance(G,self.coarse_prob.dtype_u):
+        #     u_fine = self.fine_prob.dtype_u(self.fine_prob.init,val=0)
+        #     u_fine.values = self.Pspace.dot(G.values)
+        # elif isinstance(G,self.coarse_prob.dtype_f):
+        #     u_fine = self.fine_prob.dtype_f(self.fine_prob.init)
+        #     u_fine.values = self.Pspace.dot(G.values)
 
-        return u_fine
+        return G.apply_mat(self.Pspace)
 
 
-class mesh_to_mesh_1d_periodic(mesh_to_mesh_1d_dirichlet):
+class mesh_to_mesh_periodic(mesh_to_mesh_dirichlet):
 
     def __init__(self,fine_prob,coarse_prob,params):
         """
@@ -145,7 +144,7 @@ class mesh_to_mesh_1d_periodic(mesh_to_mesh_1d_dirichlet):
         assert 'iorder' in params
 
         # invoke super initialization
-        super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_prob, coarse_prob, params)
+        super(mesh_to_mesh_dirichlet, self).__init__(fine_prob, coarse_prob, params)
 
         if type(self.fine_prob.params.nvars) is tuple:
             assert type(self.coarse_prob.params.nvars) is tuple

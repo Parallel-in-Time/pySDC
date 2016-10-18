@@ -2,7 +2,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
@@ -73,7 +73,7 @@ def main():
     description_mlsdc['sweeper_params'] = sweeper_params_mlsdc            # pass sweeper parameters
     description_mlsdc['level_params'] = level_params                      # pass level parameters
     description_mlsdc['step_params'] = step_params                        # pass step parameters
-    description_mlsdc['space_transfer_class'] = mesh_to_mesh_1d_dirichlet # pass spatial transfer class
+    description_mlsdc['space_transfer_class'] = mesh_to_mesh_dirichlet # pass spatial transfer class
     description_mlsdc['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     # instantiate the controller (no controller parameters used here)

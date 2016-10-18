@@ -5,7 +5,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet
 
 # from pySDC.Stats import grep_stats, sort_stats
 
@@ -58,13 +58,13 @@ if __name__ == "__main__":
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['step_params'] = sparams
-    description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet
+    description['space_transfer_class'] = mesh_to_mesh_dirichlet
     description['space_transfer_params'] = tparams
 
 
     # initialize controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
-    # controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    # controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=cparams, description=description)
 
     # setup parameters "in time"
     t0 = 0

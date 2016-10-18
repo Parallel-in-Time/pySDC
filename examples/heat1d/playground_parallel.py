@@ -2,7 +2,7 @@ import numpy as np
 from mpi4py import MPI
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from pySDC.implementations.transfer_classes.TransferMesh_1D_IMEX import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     description['sweeper_params'] = swparams
     description['level_params'] = lparams
     description['step_params'] = sparams
-    description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet
+    description['space_transfer_class'] = mesh_to_mesh_dirichlet
     description['space_transfer_params'] = tparams
 
     # initialize controller

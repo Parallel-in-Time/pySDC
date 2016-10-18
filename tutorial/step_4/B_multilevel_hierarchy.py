@@ -4,7 +4,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.transfer_classes.TransferMesh_1D import mesh_to_mesh_1d_dirichlet
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh_dirichlet
 
 def main():
     """
@@ -46,7 +46,7 @@ def main():
     description['sweeper_params'] = sweeper_params                  # pass sweeper parameters
     description['level_params'] = level_params                      # pass level parameters
     description['step_params'] = step_params                        # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh_1d_dirichlet # pass spatial transfer class
+    description['space_transfer_class'] = mesh_to_mesh_dirichlet # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     # now the description contains more or less everything we need to create a step with multiple levels
