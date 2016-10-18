@@ -110,21 +110,63 @@ class mesh_to_mesh_1d_periodic(mesh_to_mesh_1d_dirichlet):
         # invoke super initialization
         super(mesh_to_mesh_1d_dirichlet, self).__init__(fine_prob, coarse_prob, params)
 
-        fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
-        coarse_grid = np.array([i  * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
-
-        # if number of variables is the same on both levels, Rspace and Pspace are identity
-        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-            self.Rspace = sp.eye(self.coarse_prob.params.nvars)
-        # assemble restriction as transpose of interpolation
+        if type(self.fine_prob.params.nvars) is tuple:
+            assert type(self.coarse_prob.params.nvars) is tuple
+            assert len(self.fine_prob.params.nvars) == len(self.coarse_prob.params.nvars)
+        elif type(self.fine_prob.params.nvars) is int:
+            assert type(self.coarse_prob.params.nvars) is int
         else:
-            self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder, periodic=True).T
+            print("ERROR: unknow type of nvars for transfer, got %s" %self.fine_prob.params.nvars)
+            exit()
 
-        # if number of variables is the same on both levels, Rspace and Pspace are identity
-        if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-            self.Pspace = sp.eye(self.fine_prob.params.nvars)
+        if type(self.fine_prob.params.nvars) is int:
+            fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+            coarse_grid = np.array([i  * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+
+            # if number of variables is the same on both levels, Rspace and Pspace are identity
+            if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+                self.Rspace = sp.eye(self.coarse_prob.params.nvars)
+            # assemble restriction as transpose of interpolation
+            else:
+                self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder, periodic=True).T
+
+            # if number of variables is the same on both levels, Rspace and Pspace are identity
+            if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+                self.Pspace = sp.eye(self.fine_prob.params.nvars)
+            else:
+                self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder, periodic=True)
+
         else:
-            self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder, periodic=True)
+
+            Rspace = []
+            Pspace = []
+            for i in range(len(self.fine_prob.params.nvars)):
+
+                fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])])
+                coarse_grid = np.array([j * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
+
+                # if number of variables is the same on both levels, Rspace and Pspace are identity
+                if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+                    Rspace.append(sp.eye(self.coarse_prob.params.nvars[i]))
+                # assemble restriction as transpose of interpolation
+                else:
+                    Rspace.append(0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
+                                                                   periodic=True).T)
+
+                # if number of variables is the same on both levels, Rspace and Pspace are identity
+                if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
+                    Pspace.append(sp.eye(self.fine_prob.params.nvars[i]))
+                else:
+                    Pspace.append(th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
+                                                             periodic=True))
+
+            self.Pspace = Pspace[0]
+            for i in range(1,len(Pspace)):
+                self.Pspace = sp.kron(self.Pspace,Pspace[i],format='csc')
+
+            self.Rspace = Rspace[0]
+            for i in range(1, len(Rspace)):
+                self.Rspace = sp.kron(self.Rspace, Rspace[i], format='csc')
 
         pass
 
