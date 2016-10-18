@@ -28,7 +28,7 @@ def main():
     # compute order of accuracy
     order = get_accuracy_order(results)
 
-    assert (all(np.isclose(order, 2, rtol=0.1))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
+    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
 
 
 def run_accuracy_check(nvars_list,problem_params):
@@ -55,8 +55,7 @@ def run_accuracy_check(nvars_list,problem_params):
         xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])
 
         # create a mesh instance and fill it with a sine wave
-        u = prob.dtype_u(init=prob.init)
-        u.values = np.sin(np.pi * prob.params.freq * xvalues)
+        u = prob.u_exact(t=0)
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
@@ -99,7 +98,9 @@ def get_accuracy_order(results):
         id_prev = ID(nvars=nvars_list[i-1])
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
-        order.append(np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1]))
+        tmp = np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1])
+        print('Expected order: %2i -- Computed order %4.3f' %(2,tmp))
+        order.append(tmp)
 
     return order
 
