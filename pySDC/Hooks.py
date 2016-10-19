@@ -95,9 +95,9 @@ class hooks(object):
         L = step.levels[level_number]
 
         self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
-                         step.status.slot,L.time,step.status.stage,L.id,step.status.iter,L.status.residual)
+                         step.status.slot,L.time,step.status.stage,L.level_index,step.status.iter,L.status.residual)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                            type='residual',  value=L.status.residual)
 
         pass
@@ -111,7 +111,7 @@ class hooks(object):
             level_number: the current level number
         """
         L = step.levels[level_number]
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                            type='residual', value=L.status.residual)
         pass
 
@@ -126,11 +126,11 @@ class hooks(object):
         """
 
         L = step.levels[level_number]
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                            type='timing_step', value=time.time()-self.__t0)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                            type='niter', value=step.status.iter)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=-1,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
                           type='residual', value=L.status.residual)
 
         pass

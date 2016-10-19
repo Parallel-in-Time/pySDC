@@ -2,7 +2,8 @@ from pySDC import Level as levclass
 from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC.BaseTransfer import base_transfer
 
-import sys
+import pySDC.Errors as ERR
+import logging
 
 
 class step(FrozenClass):
@@ -62,6 +63,8 @@ class step(FrozenClass):
         self.params = pars(step_params)
         self.status = status()
 
+        self.logger = logging.getLogger('step')
+
         # empty attributes
         self.__transfer_dict = {}
         self.levels = []
@@ -83,13 +86,15 @@ class step(FrozenClass):
             descr: dictionary containing the description of the levels as list per key
         """
         # assert the existence of all the keys we need to set up at least on level
-        assert 'problem_class' in descr
-        assert 'problem_params' in descr
-        assert 'dtype_u' in descr
-        assert 'dtype_f' in descr
-        assert 'sweeper_class' in descr
-        assert 'sweeper_params' in descr
-        assert 'level_params' in descr
+
+        essential_keys = ['problem_class', 'dtype_u', 'dtype_f', 'sweeper_class', 'sweeper_params', 'level_params']
+        for key in essential_keys:
+            if key not in descr:
+                msg = 'need %s to instantiate step, only got %s' %(key, str(descr.keys()))
+                self.logger.error(msg)
+                raise ERR.ParameterError(msg)
+
+        descr['problem_params'] = descr.get('problem_params',{})
 
         # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
         # single entry per key, one dict per level
@@ -106,55 +111,43 @@ class step(FrozenClass):
 
         # sanity check: is there a base_transfer class? is there one even if only a single level is specified?
         if len(descr_list) > 1:
-            if 'base_transfer_class' in descr_new:
-                base_transfer_class = descr_new['base_transfer_class']
-            else:
-                base_transfer_class = base_transfer
-            assert 'space_transfer_class' in descr_new
+            descr_new['base_transfer_class'] = descr_new.get('base_transfer_class', base_transfer)
+            if 'space_transfer_class' not in descr:
+                msg = 'need %s to instantiate step, only got %s' %('space_transfer_class', str(descr.keys()))
+                self.logger.error(msg)
+                raise ERR.ParameterError(msg)
         elif 'space_transfer_class' in descr_new:
-            base_transfer_class = None
-            print('WARNING: you have specified space_base_transfer classes, but only a single level...')
+            descr_new['base_transfer_class'] = None
+            self.logger.warning('you have specified space_base_transfer classes, but only a single level')
         else:
-            base_transfer_class = None
+            descr_new['base_transfer_class'] = None
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
 
             # check if base_transfer parameters are needed
-            if 'base_transfer_params' in descr_list[l]:
-                base_transfer_params = descr_list[l]['base_transfer_params']
-            else:
-                base_transfer_params = {}
-
+            descr_list[l]['base_transfer_params'] = descr_list[l].get('base_transfer_params', {})
             # check if space_transfer parameters are needed
-            if 'space_transfer_params' in descr_list[l]:
-                space_transfer_params = descr_list[l]['space_transfer_params']
-            else:
-                space_transfer_params = {}
-
-            if 'problem_params' in descr_list[l]:
-                pparams = descr_list[l]['problem_params']
-            else:
-                pparams = {}
+            descr_list[l]['space_transfer_params'] = descr_list[l].get('space_transfer_params', {})
 
             L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
-                               problem_params     =   pparams,
+                               problem_params     =   descr_list[l]['problem_params'],
                                dtype_u            =   descr_list[l]['dtype_u'],
                                dtype_f            =   descr_list[l]['dtype_f'],
                                sweeper_class      =   descr_list[l]['sweeper_class'],
                                sweeper_params     =   descr_list[l]['sweeper_params'],
                                level_params       =   descr_list[l]['level_params'],
-                               id                 =   l)
+                               level_index        =   l)
 
-            self.register_level(L)
+            self.levels.append(L)
 
             if l > 0:
-                self.connect_levels(base_transfer_class  = base_transfer_class,
-                                    base_transfer_params = base_transfer_params,
-                                    space_transfer_class = descr_list[l]['space_transfer_class'],
-                                    space_transfer_params = space_transfer_params,
-                                    fine_level      = self.levels[l-1],
-                                    coarse_level    = self.levels[l])
+                self.connect_levels(base_transfer_class   = descr_new['base_transfer_class'],
+                                    base_transfer_params  = descr_list[l]['base_transfer_params'],
+                                    space_transfer_class  = descr_list[l]['space_transfer_class'],
+                                    space_transfer_params = descr_list[l]['space_transfer_params'],
+                                    fine_level            = self.levels[l-1],
+                                    coarse_level          = self.levels[l])
 
     @staticmethod
     def __dict_to_list(dict):
@@ -180,25 +173,6 @@ class step(FrozenClass):
                 else:
                     ld[d][k] = v[min(d,len(v)-1)]
         return ld
-
-    def register_level(self,L):
-        """
-        Routine to register levels
-
-        This routine will append levels to the level list of the step instance and link the step to the newly
-        registered level (Level 0 will be considered as the finest level). It will also allocate the tau correction,
-        if this level is not the finest one.
-
-        Args:
-            L: level to be registered
-        """
-
-        assert isinstance(L,levclass.level)
-        # add level to level list
-        self.levels.append(L)
-        # if this is not the finest level, allocate tau correction
-        if len(self.levels) > 1:
-            L._level__add_tau()
 
     def connect_levels(self, base_transfer_class, base_transfer_params, space_transfer_class, space_transfer_params, fine_level, coarse_level):
         """

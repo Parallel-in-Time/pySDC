@@ -27,6 +27,7 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self.fine_comm = True
                 self.predict = True
                 self.logger_level = 20
+                self.log_to_file = False
 
                 for k, v in params.items():
                     setattr(self, k, v)
@@ -35,7 +36,7 @@ class controller(with_metaclass(abc.ABCMeta)):
 
         self.params = pars(controller_params)
 
-        setup_custom_logger(self.params.logger_level)
+        setup_custom_logger(self.params.logger_level, self.params.log_to_file)
         self.logger = logging.getLogger('controller')
 
         # check if we have a hook on this list. if not, use default class.

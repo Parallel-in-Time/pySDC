@@ -43,7 +43,7 @@ class level(FrozenClass):
 
             self._freeze()
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params, level_params, id):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params, level_params, level_index):
         """
         Initialization routine
 
@@ -83,10 +83,13 @@ class level(FrozenClass):
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
-        self.tau = None
 
         # set name
-        self.id = id
+        self.level_index = level_index
+        if self.level_index > 0:
+            self.tau = [None] * self.sweep.coll.num_nodes
+        else:
+            self.tau = None
 
         # pass this level to the sweeper for easy access
         self.sweep._sweeper__set_level(self)
@@ -109,18 +112,6 @@ class level(FrozenClass):
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
-
-    def __add_tau(self):
-        """
-        Routine to add memory for the FAS correction
-
-        This will be called by the step if this level is not the finest one.
-        """
-
-        if self.tau is None:
-            self.tau = [None] * self.sweep.coll.num_nodes
-        else:
-            raise WTF  # FIXME
 
     @property
     def sweep(self):
