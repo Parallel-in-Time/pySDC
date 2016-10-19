@@ -46,7 +46,7 @@ def main():
     description['sweeper_params'] = sweeper_params                  # pass sweeper parameters
     description['level_params'] = level_params                      # pass level parameters
     description['step_params'] = step_params                        # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh # pass spatial transfer class
+    description['space_transfer_class'] = mesh_to_mesh              # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     # now the description contains more or less everything we need to create a step with multiple levels

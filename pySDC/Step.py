@@ -2,7 +2,7 @@ from pySDC import Level as levclass
 from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC.BaseTransfer import base_transfer
 
-import pySDC.Errors as ERR
+import pySDC.Errors as Err
 import logging
 
 
@@ -10,16 +10,17 @@ class step(FrozenClass):
     """
     Step class, referencing most of the structure needed for the time-stepping
 
-    This class bundles multiple levels and the corresponding base_transfer operators and is used by the methods
+    This class bundles multiple levels and the corresponding transfer operators and is used by the controller
     (e.g. SDC and MLSDC). Status variables like the current time are hidden via properties and setters methods.
 
     Attributes:
-        __t: current time (property time)
-        __dt: current step size (property dt)
-        __k: current iteration (property iter)
-        __transfer_dict: data structure to couple levels and base_transfer operators
-        levels: list of levels
         params: parameters given by the user
+        status: status class for the step
+        logger: custom logger for step-related logging
+        levels: list of levels
+        __prev: link to previous step (protected via setter/getter)
+        __next: link to next step (protected via setter/getter)
+        __transfer_dict: data structure to couple levels and base_transfer operators
     """
 
     def __init__(self, description):
@@ -31,18 +32,16 @@ class step(FrozenClass):
         """
 
         # short helper class to add params as attributes
-        class pars(FrozenClass):
-            def __init__(self,params):
-
+        class __Pars(FrozenClass):
+            def __init__(self, params):
                 self.maxiter = None
-
-                for k,v in params.items():
-                    setattr(self,k,v)
-
+                for k, v in params.items():
+                    setattr(self, k, v)
+                # freeze class, no further attributes allowed from this point
                 self._freeze()
 
         # short helper class to bundle all status variables
-        class status(FrozenClass):
+        class __Status(FrozenClass):
             def __init__(self):
                 self.iter = None
                 self.stage = None
@@ -52,17 +51,14 @@ class step(FrozenClass):
                 self.pred_cnt = None
                 self.done = None
                 self.prev_done = None
+                # freeze class, no further attributes allowed from this point
                 self._freeze()
 
-        if 'step_params' in description:
-            step_params = description['step_params']
-        else:
-            step_params = {}
-
         # set params and status
-        self.params = pars(step_params)
-        self.status = status()
+        self.params = __Pars(description.get('step_params', {}))
+        self.status = __Status()
 
+        # set up logger
         self.logger = logging.getLogger('step')
 
         # empty attributes
@@ -71,11 +67,13 @@ class step(FrozenClass):
         self.__prev = None
         self.__next = None
 
+        # freeze class, no further attributes allowed from this point
         self._freeze()
 
+        # create hierarchy of levels
         self.__generate_hierarchy(description)
 
-    def __generate_hierarchy(self,descr):
+    def __generate_hierarchy(self, descr):
         """
         Routine to generate the level hierarchy for a single step
 
@@ -85,16 +83,16 @@ class step(FrozenClass):
         Args:
             descr: dictionary containing the description of the levels as list per key
         """
-        # assert the existence of all the keys we need to set up at least on level
 
+        # assert the existence of all the keys we need to set up at least on level
         essential_keys = ['problem_class', 'dtype_u', 'dtype_f', 'sweeper_class', 'sweeper_params', 'level_params']
         for key in essential_keys:
             if key not in descr:
-                msg = 'need %s to instantiate step, only got %s' %(key, str(descr.keys()))
+                msg = 'need %s to instantiate step, only got %s' % (key, str(descr.keys()))
                 self.logger.error(msg)
-                raise ERR.ParameterError(msg)
+                raise Err.ParameterError(msg)
 
-        descr['problem_params'] = descr.get('problem_params',{})
+        descr['problem_params'] = descr.get('problem_params', {})
 
         # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
         # single entry per key, one dict per level
@@ -113,9 +111,9 @@ class step(FrozenClass):
         if len(descr_list) > 1:
             descr_new['base_transfer_class'] = descr_new.get('base_transfer_class', base_transfer)
             if 'space_transfer_class' not in descr:
-                msg = 'need %s to instantiate step, only got %s' %('space_transfer_class', str(descr.keys()))
+                msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr.keys()))
                 self.logger.error(msg)
-                raise ERR.ParameterError(msg)
+                raise Err.ParameterError(msg)
         elif 'space_transfer_class' in descr_new:
             descr_new['base_transfer_class'] = None
             self.logger.warning('you have specified space_base_transfer classes, but only a single level')
@@ -130,51 +128,52 @@ class step(FrozenClass):
             # check if space_transfer parameters are needed
             descr_list[l]['space_transfer_params'] = descr_list[l].get('space_transfer_params', {})
 
-            L = levclass.level(problem_class      =   descr_list[l]['problem_class'],
-                               problem_params     =   descr_list[l]['problem_params'],
-                               dtype_u            =   descr_list[l]['dtype_u'],
-                               dtype_f            =   descr_list[l]['dtype_f'],
-                               sweeper_class      =   descr_list[l]['sweeper_class'],
-                               sweeper_params     =   descr_list[l]['sweeper_params'],
-                               level_params       =   descr_list[l]['level_params'],
-                               level_index        =   l)
+            L = levclass.level(problem_class=descr_list[l]['problem_class'],
+                               problem_params=descr_list[l]['problem_params'],
+                               dtype_u=descr_list[l]['dtype_u'],
+                               dtype_f=descr_list[l]['dtype_f'],
+                               sweeper_class=descr_list[l]['sweeper_class'],
+                               sweeper_params=descr_list[l]['sweeper_params'],
+                               level_params=descr_list[l]['level_params'],
+                               level_index=l)
 
             self.levels.append(L)
 
             if l > 0:
-                self.connect_levels(base_transfer_class   = descr_new['base_transfer_class'],
-                                    base_transfer_params  = descr_list[l]['base_transfer_params'],
-                                    space_transfer_class  = descr_list[l]['space_transfer_class'],
-                                    space_transfer_params = descr_list[l]['space_transfer_params'],
-                                    fine_level            = self.levels[l-1],
-                                    coarse_level          = self.levels[l])
+                self.connect_levels(base_transfer_class=descr_new['base_transfer_class'],
+                                    base_transfer_params=descr_list[l]['base_transfer_params'],
+                                    space_transfer_class=descr_list[l]['space_transfer_class'],
+                                    space_transfer_params=descr_list[l]['space_transfer_params'],
+                                    fine_level=self.levels[l - 1],
+                                    coarse_level=self.levels[l])
 
     @staticmethod
-    def __dict_to_list(dict):
+    def __dict_to_list(in_dict):
         """
         Straightforward helper function to convert dictionary of list to list of dictionaries
 
         Args:
-            dict: dictionary of lists
+            in_dict: dictionary of lists
         Returns:
             list of dictionaries
         """
 
         max_val = 1
-        for k,v in dict.items():
+        for k, v in in_dict.items():
             if type(v) is list:
-                max_val = max(max_val,len(v))
+                max_val = max(max_val, len(v))
 
-        ld = [{} for l in range(max_val)]
+        ld = [{} for _ in range(max_val)]
         for d in range(len(ld)):
-            for k,v in dict.items():
+            for k, v in in_dict.items():
                 if type(v) is not list:
                     ld[d][k] = v
                 else:
-                    ld[d][k] = v[min(d,len(v)-1)]
+                    ld[d][k] = v[min(d, len(v) - 1)]
         return ld
 
-    def connect_levels(self, base_transfer_class, base_transfer_params, space_transfer_class, space_transfer_params, fine_level, coarse_level):
+    def connect_levels(self, base_transfer_class, base_transfer_params, space_transfer_class, space_transfer_params,
+                       fine_level, coarse_level):
         """
         Routine to couple levels with base_transfer operators
 
@@ -188,27 +187,29 @@ class step(FrozenClass):
         """
 
         # create new instance of the specific base_transfer class
-        T = base_transfer_class(fine_level,coarse_level,base_transfer_params,space_transfer_class,space_transfer_params)
+        T = base_transfer_class(fine_level, coarse_level, base_transfer_params, space_transfer_class,
+                                space_transfer_params)
         # use base_transfer dictionary twice to set restrict and prolong operator
-        self.__transfer_dict[tuple([fine_level,coarse_level])] = T.restrict
+        self.__transfer_dict[tuple([fine_level, coarse_level])] = T.restrict
 
         if T.params.finter:
-            self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong_f
+            self.__transfer_dict[tuple([coarse_level, fine_level])] = T.prolong_f
         else:
-            self.__transfer_dict[tuple([coarse_level,fine_level])] = T.prolong
+            self.__transfer_dict[tuple([coarse_level, fine_level])] = T.prolong
 
-    def transfer(self,source,target):
+    def transfer(self, source, target):
         """
         Wrapper routine to ease the call of the base_transfer functions
 
         This function can be called in the multilevel stepper (e.g. MLSDC), passing a source and a target level.
-        Using the base_transfer dictionary, the calling stepper does not need to specify whether to use restrict of prolong.
+        Using the base_transfer dictionary, the calling stepper does not need to specify whether to use restrict of
+        prolong.
 
         Args:
             source: source level
             target: target level
         """
-        self.__transfer_dict[tuple([source,target])]()
+        self.__transfer_dict[tuple([source, target])]()
 
     def reset_step(self):
         """
@@ -218,7 +219,7 @@ class step(FrozenClass):
         for l in self.levels:
             l.reset_level()
 
-    def init_step(self,u0):
+    def init_step(self, u0):
         """
         Initialization routine for a new step.
 
@@ -228,8 +229,8 @@ class step(FrozenClass):
             u0: initial values
         """
 
-        assert len(self.levels) >=1
-        assert len(self.levels[0].u) >=1
+        assert len(self.levels) >= 1
+        assert len(self.levels[0].u) >= 1
 
         # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
@@ -246,7 +247,7 @@ class step(FrozenClass):
         return self.__prev
 
     @prev.setter
-    def prev(self,p):
+    def prev(self, p):
         """
         Setter for previous step
 
@@ -258,7 +259,7 @@ class step(FrozenClass):
     @property
     def next(self):
         """
-        Getter for previous step
+        Getter for next step
 
         Returns:
             prev
@@ -281,16 +282,16 @@ class step(FrozenClass):
         Getter for current time-step size
 
         Returns:
-            dt
+            dt of level[0]
         """
         return self.levels[0].dt
 
     @property
     def time(self):
         """
-        Getter for current time-step size
+        Getter for current time
 
         Returns:
-            dt
+            time of level[0]
         """
         return self.levels[0].time

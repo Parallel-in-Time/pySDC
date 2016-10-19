@@ -50,7 +50,7 @@ class particle_hook(hooks):
 
         print('Initial energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=0, type='etot', value=epot+ekin)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, type='etot', value=epot+ekin)
 
     def dump_step(self, step, level_number):
         """
@@ -91,6 +91,6 @@ class particle_hook(hooks):
 
         print('Energy (pot/kin/tot) at time %4.2f: %12.4f / %12.4f / %12.4f' %(L.time,epot,ekin,epot+ekin))
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.id, iter=step.status.iter, type='etot', value=epot+ekin)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter, type='etot', value=epot+ekin)
 
         return None

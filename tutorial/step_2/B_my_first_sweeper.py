@@ -90,7 +90,7 @@ def run_imex_sdc(S):
         L.sweep.compute_residual()
         # increment the iteration counter
         S.status.iter += 1
-        print('Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (L.time, L.id, S.status.iter, L.status.residual))
+        print('Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (L.time, L.level_index, S.status.iter, L.status.residual))
 
     # compute the interval's endpoint: this (and only this) will set uend, depending on the collocation nodes
     L.sweep.compute_end_point()

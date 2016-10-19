@@ -73,7 +73,7 @@ def main():
     description_mlsdc['sweeper_params'] = sweeper_params_mlsdc            # pass sweeper parameters
     description_mlsdc['level_params'] = level_params                      # pass level parameters
     description_mlsdc['step_params'] = step_params                        # pass step parameters
-    description_mlsdc['space_transfer_class'] = mesh_to_mesh # pass spatial transfer class
+    description_mlsdc['space_transfer_class'] = mesh_to_mesh              # pass spatial transfer class
     description_mlsdc['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
 
     # instantiate the controller (no controller parameters used here)
