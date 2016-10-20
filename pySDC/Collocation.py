@@ -1,33 +1,54 @@
 from __future__ import division
-from abc import ABCMeta, abstractmethod
+import abc
+from future.utils import with_metaclass
 from scipy.interpolate import BarycentricInterpolator
 from scipy.integrate import quad
 import numpy as np
 
-class CollBase(object):
+from pySDC.Errors import CollocationError
+
+
+class CollBase(with_metaclass(abc.ABCMeta)):
     """
     Abstract class for collocation
-    -> derived classes will contain everything to do integration over intervals and between nodes
-    -> abstract class contains already Gauss-Legendre collocation to compute weights for arbitrary nodes
-    -> child class only needs to implement the set of nodes, the rest is done here
+
+    Derived classes will contain everything to do integration over intervals and between nodes, they only need to
+    provide the set of nodes, the rest is done here (awesome!)
+
+    Attributes:
+        num_nodes (int): number of collocation nodes
+        tleft (float): left interval point
+        tright (float): right interval point
+        nodes (numpy.ndarray): array of quadrature nodes
+        weights (numpy.ndarray): array of quadrature weights for the full interval
+        Qmat (numpy.ndarray): matrix containing the weights for tleft to node
+        Smat (numpy.ndarray): matrix containing the weights for node to node
+        delta_m (numpy.ndarray): array of distances between nodes
+        right_is_node (bool): flag to indicate whether right point is collocation node
+        left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes, tleft, tright):
+    def __init__(self, num_nodes, tleft=0, tright=1):
         """
         Initialization routine for an collocation object
-        ------
-        Input:
-        :param num_nodes: specify number of collocation nodes
-        :param tleft: left interval boundary
-        :param tright: right interval boundary
+
+        Args:
+            num_nodes (int): number of collocation nodes
+            tleft (float): left interval point
+            tright (float): right interval point
         """
+
+        if not num_nodes > 0:
+            raise CollocationError('At least one quadrature node required, got %s' % num_nodes)
+        if not tleft < tright:
+            raise CollocationError('Interval boundaries are corrupt, got %s and %s' % (tleft, tright))
+
         # Set number of nodes, left and right interval boundaries
-        assert num_nodes > 0, 'At least one quadrature node required, got %d' % num_nodes
-        assert tleft < tright, 'Interval boundaries are corrupt, got %f and %f' % (tleft,tright)
         self.num_nodes = num_nodes
         self.tleft = tleft
         self.tright = tright
-        # Set dummy nodes and weights
+
+        # Dummy values for the rest
         self.nodes = None
         self.weights = None
         self.Qmat = None
@@ -36,27 +57,37 @@ class CollBase(object):
         self.right_is_node = None
         self.left_is_node = None
 
-
     @staticmethod
     def evaluate(weights, data):
         """
-        :param weights: integration weights
-        :param data: f(x) to be integrated
-        :return: integral over f(x), where the boundaries are implicitly given by the definition of the weights
+        Evaluates the quadrature over the full interval
+
+        Args:
+            weights (numpy.ndarray): array of quadrature weights for the full interval
+            data (numpy.ndarray): f(x) to be integrated
+
+        Returns:
+            numpy.ndarray: integral over f(x) between tleft and tright
         """
-        assert np.size(weights) == np.size(data), \
-            "Input size does not match number of weights, but is %d" % np.size(data)
+        if not np.size(weights) == np.size(data):
+            raise CollocationError("Input size does not match number of weights, but is %s" % np.size(data))
+
         return np.dot(weights, data)
 
     def _getWeights(self, a, b):
         """
-        Evaluate weights using barycentric interpolation
-        :param a: left interval boundary
-        :param b: right interval boundary
-        :return: weights of the collocation formula given by the nodes
+        Computes weights using barycentric interpolation
+
+        Args:
+            a (float): left interval boundary
+            b (float): right interval boundary
+
+        Returns:
+            numpy.ndarray: weights of the collocation formula given by the nodes
         """
-        assert self.num_nodes > 0, "Need number of nodes before computing weights, got %d" % self.num_nodes
-        assert self.nodes is not None, "Need nodes before computing weights, got %d" % self.nodes
+        if self.nodes is None:
+            raise CollocationError("Need nodes before computing weights, got %s" % self.nodes)
+
         circ_one = np.zeros(self.num_nodes)
         circ_one[0] = 1.0
         tcks = []
@@ -69,11 +100,10 @@ class CollBase(object):
 
         return weights
 
-    @abstractmethod
+    @abc.abstractmethod
     def _getNodes(self):
         """
         Dummy method for generating the collocation nodes.
-        Will be overridden by child classes
         """
         pass
 
@@ -81,7 +111,9 @@ class CollBase(object):
     def _gen_Qmatrix(self):
         """
         Compute tleft-to-node integration matrix for later use in collocation formulation
-        :return: Q matrix
+
+        Returns:
+            numpy.ndarray: matrix containing the weights for tleft to node
         """
         M = self.num_nodes
         Q = np.zeros([M+1, M+1])
@@ -95,8 +127,10 @@ class CollBase(object):
     @property
     def _gen_Smatrix(self):
         """
-        Compute node-to-node inetgration matrix for later use in collocation formulation
-        :return: S matrix
+        Compute node-to-node integration matrix for later use in collocation formulation
+
+        Returns:
+            numpy.ndarray: matrix containing the weights for node to node
         """
         M = self.num_nodes
         Q = self.Qmat
@@ -110,11 +144,16 @@ class CollBase(object):
 
     @property
     def _gen_deltas(self):
+        """
+        Compute distances between the nodes
 
+        Returns:
+            numpy.ndarray: distances between the nodes
+        """
         M = self.num_nodes
         delta = np.zeros(M)
         delta[0] = self.nodes[0] - self.tleft
-        for m in np.arange(1,M):
+        for m in np.arange(1, M):
             delta[m] = self.nodes[m] - self.nodes[m-1]
 
         return delta

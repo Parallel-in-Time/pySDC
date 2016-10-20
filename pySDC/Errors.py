@@ -1,58 +1,27 @@
 
 class DataError(Exception):
     """
-    Custom error class for data error, e.g. during initialization of data type operations
-
-    Attributes:
-        value: a string which will contain the message provided by the user/caller
+    Error Class handling/indicating problems with data types
     """
-
-    def __init__(self, value):
-        """
-        Initialization routine
-
-        Args:
-            value: a string which will contain the message provided by the user/caller
-        """
-
-        self.value = value
-
-    def __str__(self):
-        """
-        Returns the string
-
-        Returns
-            value attribute
-        """
-
-        return repr(self.value)
+    pass
 
 
 class ParameterError(Exception):
     """
-    Custom error class for data error, e.g. during initialization of data type operations
-
-    Attributes:
-        value: a string which will contain the message provided by the user/caller
+    Error Class handling/indicating problems with parameters (mostly within dictionaries)
     """
+    pass
 
-    def __init__(self, value):
-        """
-        Initialization routine
 
-        Args:
-            value: a string which will contain the message provided by the user/caller
-        """
+class UnlockError(Exception):
+    """
+    Error class handling/indicating unlocked levels
+    """
+    pass
 
-        self.value = value
 
-    def __str__(self):
-        """
-        Returns the string
-
-        Returns
-            value attribute
-        """
-
-        return repr(self.value)
-
+class CollocationError(Exception):
+    """
+    Error class handling/indicating problems with the collocation
+    """
+    pass

@@ -39,7 +39,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 self._freeze()
 
         # set up logger
-        self.logger = logging.getLogger('step')
+        self.logger = logging.getLogger('sweeper')
 
         essential_keys = ['collocation_class', 'num_nodes']
         for key in essential_keys:
