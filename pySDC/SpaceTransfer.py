@@ -1,5 +1,6 @@
 import abc
 from future.utils import with_metaclass
+import logging
 
 from pySDC.plugins.pysdc_helper import FrozenClass
 
@@ -9,40 +10,42 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
     Abstract space_transfer class
 
     Attributes:
-        fine: reference to the fine level
-        coarse: reference to the coarse level
-        init_f: number of variables on the fine level (whatever init represents there)
-        init_c: number of variables on the coarse level (whatever init represents there)
+        params (__Pars): parameters given by the user
+        logger: custom logger for transfer-related logging
+        fine_prob (pySDC.Problem.ptype): reference to the fine problem
+        coarse_prob (pySDC.Problem.ptype): reference to the coarse problem
     """
 
-    def __init__(self,fine_prob,coarse_prob,space_transfer_params):
+    def __init__(self, fine_prob, coarse_prob, space_transfer_params):
         """
         Initialization routine
 
         Args:
-
+            fine_prob (pySDC.Problem.ptype): reference to the fine problem
+            coarse_prob (pySDC.Problem.ptype): reference to the coarse problem
+            space_transfer_params (dict): user-defined parameters
         """
 
         # short helper class to add params as attributes
-        class pars(FrozenClass):
-            def __init__(self,params):
-
+        class __Pars(FrozenClass):
+            def __init__(self, pars):
                 self.finter = False
-
-                for k,v in params.items():
-                    setattr(self,k,v)
-
+                for k, v in pars.items():
+                    setattr(self, k, v)
+                # freeze class, no further attributes allowed from this point
                 self._freeze()
 
-        self.params = pars(space_transfer_params)
+        self.params = __Pars(space_transfer_params)
+
+        # set up logger
+        self.logger = logging.getLogger('space-transfer')
 
         # just copy by object
         self.fine_prob = fine_prob
         self.coarse_prob = coarse_prob
 
-
     @abc.abstractmethod
-    def restrict(self,F):
+    def restrict(self, F):
         """
         Abstract interface for restriction in space
 
@@ -52,7 +55,7 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
         pass
 
     @abc.abstractmethod
-    def prolong(self,G):
+    def prolong(self, G):
         """
         Abstract interface for prolongation in space
 
@@ -60,6 +63,3 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
         pass
-
-
-

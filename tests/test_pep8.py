@@ -11,9 +11,11 @@ BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..'))
 def check_files(dir):
     style = pep8.StyleGuide()
     style.options.max_line_length = 120
-    python_files = []
-    for root, _, files in os.walk(dir):
-        python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
+    # python_files = []
+    # for root, _, files in os.walk(dir):
+    #     python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
+    python_files = [os.path.join(dir, f) for f in os.listdir(dir) if f.endswith('.py') and f != '__init__.py']
+    print(python_files)
 
     for file in python_files:
         report = style.check_files([os.path.join(BASE_PATH, file)])
