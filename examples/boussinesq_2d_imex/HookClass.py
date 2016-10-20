@@ -23,35 +23,35 @@ class plot_solution(hooks):
         #self.fig = plt.figure(figsize=(15,5))
         #self.counter = 0
 
-    def dump_sweep(self,status):
+    def post_sweep(self, status):
         """
         Set new GMRES tolerance depending on the previous SDC residual
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_sweep(status)
+        super(plot_solution,self).post_sweep(status)
         self.level.prob.gmres_tol = max(self.level.status.residual*self.level.prob.gmres_tol_factor,self.level.prob.gmres_tol_limit)
 
-    def dump_pre_iteration(self,status):
+    def pre_iteration(self, status):
         """
         Set new GMRES tolerance depending on the initial SDC residual
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_pre_iteration(status)
+        super(plot_solution,self).pre_iteration(status)
         self.level.sweep.compute_residual()
         self.level.prob.gmres_tol = max(self.level.status.residual*self.level.prob.gmres_tol_factor,self.level.prob.gmres_tol_limit)
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_step(status)
+        super(plot_solution,self).post_step(status)
 
         #yplot = self.level.uend.values
         #xx    = self.level.prob.xx

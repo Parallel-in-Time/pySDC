@@ -13,9 +13,9 @@ class error_output(hooks):
         super(error_output,self).__init__()
 
 
-    def dump_iteration(self,status):
+    def post_iteration(self, status):
 
-        super(error_output,self).dump_iteration(status)
+        super(error_output,self).post_iteration(status)
 
         L = self.level
         P = L.prob

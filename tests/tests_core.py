@@ -1,21 +1,6 @@
 import numpy as np
 
 
-#def test_python_version():
-#    import sys
-#    assert sys.version_info >= (3, 3), "Need Python 3.3 at least"
-
-# def test_return_types():
-    # import pySDC.problem as pr
-    # import CollocationClasses as collclass
-    # import sweeper as sw
-    #
-    # # coll = collclass.CollGaussLobatto(5,0,1)
-    # prob = pr.forced_heat_1d(15,0.1)
-    #
-    # u = prob.u_exact(1)
-    # assert type(u) == list
-
 
 def test_errors():
     classes = ['DataError']

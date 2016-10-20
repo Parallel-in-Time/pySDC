@@ -23,14 +23,14 @@ class plot_solution(hooks):
         self.fig = plt.figure(figsize=(9,9))
 
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_step(status)
+        super(plot_solution,self).post_step(status)
 
         #yplot = self.level.uend.values
         #xx    = self.level.prob.xx

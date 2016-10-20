@@ -24,14 +24,14 @@ class particles_output(hooks):
         self.sframe = None
 
 
-    def dump_pre(self,status):
+    def pre_run(self, status):
         """
         Overwrite standard dump at the beginning
 
         Args:
             status: status object per step
         """
-        super(particles_output,self).dump_pre(status)
+        super(particles_output,self).pre_run(status)
 
         # some abbreviations
         L = self.level
@@ -65,14 +65,14 @@ class particles_output(hooks):
 
 
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(particles_output,self).dump_step(status)
+        super(particles_output,self).post_step(status)
 
         # some abbreviations
         L = self.level

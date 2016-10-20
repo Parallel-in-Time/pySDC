@@ -23,14 +23,14 @@ class particles_output(hooks):
 
 
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(particles_output,self).dump_step(status)
+        super(particles_output,self).post_step(status)
 
         # some abbreviations
         L = self.level

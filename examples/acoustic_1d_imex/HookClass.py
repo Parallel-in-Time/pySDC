@@ -24,17 +24,17 @@ class plot_solution(hooks):
         #self.fig = plt.figure(figsize=(9,9))
         self.file = open('energy-sdc.txt', 'w')
 
-    def dump_sweep(self,status):
+    def post_sweep(self, status):
         return None
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_step(status)
+        super(plot_solution,self).post_step(status)
         
         xx = self.level.uend.values
         E  = np.sum(np.square(xx[0,:]) + np.square(xx[1,:]))

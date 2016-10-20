@@ -11,14 +11,14 @@ class fenics_output(hooks):
         super(fenics_output,self).__init__()
         pass
 
-    def dump_pre(self,status):
+    def pre_run(self, status):
         """
         Overwrite standard dump at the beginning
 
         Args:
             status: status object per step
         """
-        super(fenics_output,self).dump_pre(status)
+        super(fenics_output,self).pre_run(status)
 
         L = self.level
         v = L.u[0].values
@@ -28,14 +28,14 @@ class fenics_output(hooks):
 
 
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(fenics_output,self).dump_step(status)
+        super(fenics_output,self).post_step(status)
 
         L = self.level
         # u1,u2 = df.split(L.uend.values)

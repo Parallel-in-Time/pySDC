@@ -24,14 +24,14 @@ class plot_solution(hooks):
       
         self.counter = 0
 
-    def dump_step(self,status):
+    def post_step(self, status):
         """
         Overwrite standard dump per step
 
         Args:
             status: status object per step
         """
-        super(plot_solution,self).dump_step(status)
+        super(plot_solution,self).post_step(status)
 
         if False:
           yplot = self.level.uend.values

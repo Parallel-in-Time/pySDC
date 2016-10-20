@@ -13,14 +13,14 @@ class particle_hook(hooks):
         super(particle_hook, self).__init__()
 
 
-    def dump_pre(self, step, level_number):
+    def pre_run(self, step, level_number):
         """
         Overwrite default routine called before time-loop starts
         Args:
             step: the current step
             level_number: the current level number
         """
-        super(particle_hook, self).dump_pre(step, level_number)
+        super(particle_hook, self).pre_run(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
@@ -52,7 +52,7 @@ class particle_hook(hooks):
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, type='etot', value=epot+ekin)
 
-    def dump_step(self, step, level_number):
+    def post_step(self, step, level_number):
         """
         Default routine called after each iteration
         Args:
@@ -60,7 +60,7 @@ class particle_hook(hooks):
             level_number: the current level number
         """
 
-        super(particle_hook, self).dump_step(step, level_number)
+        super(particle_hook, self).post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
