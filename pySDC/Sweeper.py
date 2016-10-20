@@ -1,11 +1,10 @@
 import abc
-import numpy as np
+from future.utils import with_metaclass
+import logging
 
-from pySDC.Collocation import CollBase
 from pySDC.Level import level
 from pySDC.plugins.pysdc_helper import FrozenClass
-
-from future.utils import with_metaclass
+from pySDC.Errors import ParameterError
 
 
 class sweeper(with_metaclass(abc.ABCMeta)):
@@ -13,40 +12,49 @@ class sweeper(with_metaclass(abc.ABCMeta)):
     Base abstract sweeper class
 
     Attributes:
-        __level: current level
-        coll: collocation object
+        logger: custom logger for sweeper-related logging
+        params (__Pars): parameter object containing the custom parameters passed by the user
+        coll (pySDC.Collocation.CollBase): collocation object
     """
 
-    def __init__(self,params):
+    def __init__(self, params):
         """
         Initialization routine for the base sweeper
 
         Args:
-            params: parameter object
+            params (dict): parameter object
 
         """
 
         # short helper class to add params as attributes
-        class pars(FrozenClass):
-            def __init__(self,params):
+        class __Pars(FrozenClass):
+            def __init__(self, pars):
 
                 self.do_coll_update = False
 
-                for k,v in params.items():
-                    if not k is 'collocation_class':
-                        setattr(self,k,v)
+                for k, v in pars.items():
+                    if k is not 'collocation_class':
+                        setattr(self, k, v)
 
                 self._freeze()
 
-        assert 'collocation_class' in params
-        assert 'num_nodes' in params
+        # set up logger
+        self.logger = logging.getLogger('step')
 
-        self.params = pars(params)
+        essential_keys = ['collocation_class', 'num_nodes']
+        for key in essential_keys:
+            if key not in params:
+                msg = 'need %s to instantiate step, only got %s' % (key, str(params.keys()))
+                self.logger.error(msg)
+                raise ParameterError(msg)
 
-        coll = params['collocation_class'](params['num_nodes'],0,1)
-        assert isinstance(coll, CollBase)
+        self.params = __Pars(params)
+
+        coll = params['collocation_class'](params['num_nodes'], 0, 1)
+
         if not coll.right_is_node and not self.params.do_coll_update:
-            print('WARNING: we need to do a collocation update here, since the right end point is not a node. Changing this!')
+            self.logger.warning('we need to do a collocation update here, since the right end point is not a node. '
+                                'Changing this!')
             self.params.do_coll_update = True
 
         # This will be set as soon as the sweeper is instantiated at the level
@@ -55,25 +63,26 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         # collocation object
         self.coll = coll
 
-
-    def __set_level(self,L):
-        """
-        Sets a reference to the current level (done in the initialization of the level)
-
-        Args:
-            L: current level
-        """
-        assert isinstance(L,level)
-        self.__level = L
-
-
     @property
     def level(self):
         """
         Returns the current level
+
+        Returns:
+            pySDC.Level.level: the current level
         """
         return self.__level
 
+    @level.setter
+    def level(self, L):
+        """
+        Sets a reference to the current level (done in the initialization of the level)
+
+        Args:
+            L (pySDC.Level.level): current level
+        """
+        assert isinstance(L, level)
+        self.__level = L
 
     def predict(self):
         """
@@ -88,19 +97,16 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         P = L.prob
 
         # evaluate RHS at left point
-        L.f[0] = P.eval_f(L.u[0],L.time)
+        L.f[0] = P.eval_f(L.u[0], L.time)
 
         # copy u[0] to all collocation nodes, evaluate RHS
-        for m in range(1,self.coll.num_nodes+1):
+        for m in range(1, self.coll.num_nodes + 1):
             L.u[m] = P.dtype_u(L.u[0])
-            L.f[m] = P.eval_f(L.u[m],L.time+L.dt*self.coll.nodes[m-1])
+            L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True
-
-        return None
-
 
     def compute_residual(self):
         """
@@ -120,7 +126,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         res = self.integrate()
         for m in range(self.coll.num_nodes):
             # add u0 and subtract u at current node
-            res[m] += L.u[0] - L.u[m+1]
+            res[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
             if L.tau is not None:
                 res[m] += L.tau[m]
@@ -142,14 +148,12 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         """
         return None
 
-
     @abc.abstractmethod
     def integrate(self):
         """
         Abstract interface to right-hand side integration
         """
         return None
-
 
     @abc.abstractmethod
     def update_nodes(self):

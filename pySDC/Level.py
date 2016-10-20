@@ -9,64 +9,51 @@ class level(FrozenClass):
     know about other levels.
 
     Attributes:
-        __sweep: a private instance of a sweeper class (accessed via property)
-        __prob: a private instance of a problem class (accessed via property)
-        params: parameter object containing the custom parameters passed by the user
-        status: status object
+        params (__Pars): parameter object containing the custom parameters passed by the user
+        status (__Status): status object
+        level_index (int): custom string naming this level
         uend: dof values at the right end point of the interval
-        u: dof values at the nodes (+uold for saving data during restriction)
-        f: RHS values at the nodes (+fold for saving data during restriction)
-        tau: FAS correction, allocated via step class if necessary
-        id: custom string naming this level
+        u (list of dtype_u): dof values at the nodes
+        uold (list of dtype_u): copy of dof values for saving data during restriction)
+        f (list of dtype_f): RHS values at the nodes
+        fold (list of dtype_f): copy of RHS values for saving data during restriction
+        tau (list of dtype_u): FAS correction, allocated via step class if necessary
     """
 
-    class cstatus(FrozenClass):
-        """
-        Helper class for status objects
-
-        Attributes:
-            residual: current residual
-            unlocked: indicates if the data on this level can be used
-            updated: indicates if the data on this level is new
-        """
-
+    # short helper class to bundle all status variables
+    class __Status(FrozenClass):
         def __init__(self):
-            """
-            Initialization routine
-
-            """
-
             self.residual = None
             self.unlocked = False
             self.updated = False
             self.time = None
-
+            # freeze class, no further attributes allowed from this point
             self._freeze()
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params, level_params, level_index):
+    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params,
+                 level_params, level_index):
         """
         Initialization routine
 
         Args:
             problem_class: problem class
-            problem_params: parameters for the problem to be initialized
+            problem_params (dict): parameters for the problem to be initialized
             dtype_u: data type of the dofs
             dtype_f: data type of the RHS
             sweeper_class: sweeper class
-            sweeper_params: parameters for the sweeper (contains collocation)
-            level_params: parameters given by the user, will be added as attributes
-            id: custom name for this level
+            sweeper_params (dict): parameters for the sweeper (contains collocation)
+            level_params (dict): parameters given by the user, will be added as attributes
+            level_index (int): custom name for this level
         """
 
         # short helper class to add params as attributes
-        class pars(FrozenClass):
+        class __Pars(FrozenClass):
             def __init__(self, params):
                 self.dt = None
                 self.restol = 0.0
-
                 for k, v in params.items():
                     setattr(self, k, v)
-
+                # freeze class, no further attributes allowed from this point
                 self._freeze()
 
         # instantiate sweeper, problem and hooks
@@ -74,28 +61,30 @@ class level(FrozenClass):
         self.__prob = problem_class(problem_params, dtype_u, dtype_f)
 
         # set level parameters and status
-        self.params = pars(level_params)
-        self.status = level.cstatus()
+        self.params = __Pars(level_params)
+        self.status = level.__Status()
 
-        # empty data the nodes, the right end point and tau
+        # set name
+        self.level_index = level_index
+
+        # empty data at the nodes, the right end point and tau
         self.uend = None
         self.u = [None] * (self.sweep.coll.num_nodes + 1)
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
-        # set name
-        self.level_index = level_index
         if self.level_index > 0:
             self.tau = [None] * self.sweep.coll.num_nodes
         else:
             self.tau = None
 
         # pass this level to the sweeper for easy access
-        self.sweep._sweeper__set_level(self)
+        self.sweep.level = self
 
         self.__tag = None
 
+        # freeze class, no further attributes allowed from this point
         self._freeze()
 
     def reset_level(self):
@@ -104,7 +93,7 @@ class level(FrozenClass):
         """
 
         # reset status
-        self.status = level.cstatus()
+        self.status = level.__Status()
 
         # all data back to None
         self.uend = None
@@ -117,6 +106,9 @@ class level(FrozenClass):
     def sweep(self):
         """
         Getter for the sweeper
+
+        Returns:
+            pySDC.Sweeper.sweeper: the sweeper associated to this level
         """
         return self.__sweep
 
@@ -124,20 +116,29 @@ class level(FrozenClass):
     def prob(self):
         """
         Getter for the problem
+
+        Returns:
+            pySDC.Problem.ptype: the problem associated to this level
         """
         return self.__prob
 
     @property
     def time(self):
         """
-        Meta-getter for the current time (only referencing status time for convenience)
+        Meta-getter for the current time
+
+        Returns:
+            float: referencing status time for convenience
         """
         return self.status.time
 
     @property
     def dt(self):
         """
-        Meta-getter for the time-step size (only referencng dt from parameters for convenience)
+        Meta-getter for the time-step size
+
+        Returns:
+            float: referencing dt from parameters for convenience
         """
         return self.params.dt
 
@@ -147,7 +148,7 @@ class level(FrozenClass):
         Getter for tag
 
         Returns:
-            tag
+            tag for sending/receiving
         """
         return self.__tag
 
@@ -157,6 +158,6 @@ class level(FrozenClass):
         Setter for tag
 
         Args:
-            t: new tag
+            t: new tag for sending/receiving
         """
         self.__tag = t

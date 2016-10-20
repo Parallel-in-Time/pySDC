@@ -1,9 +1,9 @@
+import logging
+
 from pySDC import Level as levclass
 from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC.BaseTransfer import base_transfer
-
-import pySDC.Errors as Err
-import logging
+from pySDC.Errors import ParameterError
 
 
 class step(FrozenClass):
@@ -14,13 +14,10 @@ class step(FrozenClass):
     (e.g. SDC and MLSDC). Status variables like the current time are hidden via properties and setters methods.
 
     Attributes:
-        params: parameters given by the user
-        status: status class for the step
+        params (__Pars): parameters given by the user
+        status (__Status): status class for the step
         logger: custom logger for step-related logging
-        levels: list of levels
-        __prev: link to previous step (protected via setter/getter)
-        __next: link to next step (protected via setter/getter)
-        __transfer_dict: data structure to couple levels and base_transfer operators
+        levels (list): list of levels
     """
 
     def __init__(self, description):
@@ -28,7 +25,7 @@ class step(FrozenClass):
         Initialization routine
 
         Args:
-            description: parameters given by the user, will be added as attributes
+            description (dict): parameters given by the user, will be added as attributes
         """
 
         # short helper class to add params as attributes
@@ -81,7 +78,7 @@ class step(FrozenClass):
         there.
 
         Args:
-            descr: dictionary containing the description of the levels as list per key
+            descr (dict): dictionary containing the description of the levels as list per key
         """
 
         # assert the existence of all the keys we need to set up at least on level
@@ -90,7 +87,7 @@ class step(FrozenClass):
             if key not in descr:
                 msg = 'need %s to instantiate step, only got %s' % (key, str(descr.keys()))
                 self.logger.error(msg)
-                raise Err.ParameterError(msg)
+                raise ParameterError(msg)
 
         descr['problem_params'] = descr.get('problem_params', {})
 
@@ -113,7 +110,7 @@ class step(FrozenClass):
             if 'space_transfer_class' not in descr:
                 msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr.keys()))
                 self.logger.error(msg)
-                raise Err.ParameterError(msg)
+                raise ParameterError(msg)
         elif 'space_transfer_class' in descr_new:
             descr_new['base_transfer_class'] = None
             self.logger.warning('you have specified space_base_transfer classes, but only a single level')
@@ -153,7 +150,7 @@ class step(FrozenClass):
         Straightforward helper function to convert dictionary of list to list of dictionaries
 
         Args:
-            in_dict: dictionary of lists
+            in_dict (dict): dictionary of lists
         Returns:
             list of dictionaries
         """
@@ -162,6 +159,8 @@ class step(FrozenClass):
         for k, v in in_dict.items():
             if type(v) is list:
                 max_val = max(max_val, len(v))
+            else:
+                pass
 
         ld = [{} for _ in range(max_val)]
         for d in range(len(ld)):
@@ -179,11 +178,11 @@ class step(FrozenClass):
 
         Args:
             base_transfer_class: the class which can do transfer between the two space-time levels
-            base_transfer_params: parameters for the space_transfer class
+            base_transfer_params (dict): parameters for the space_transfer class
             space_transfer_class: the user-defined class which can do spatial transfer
-            space_transfer_params: parameters for the base_transfer class
-            fine_level: the fine level
-            coarse_level: the coarse level
+            space_transfer_params (dict): parameters for the base_transfer class
+            fine_level (pySDC.Level.level): the fine level
+            coarse_level (pySDC.Level.level): the coarse level
         """
 
         # create new instance of the specific base_transfer class
@@ -199,15 +198,15 @@ class step(FrozenClass):
 
     def transfer(self, source, target):
         """
-        Wrapper routine to ease the call of the base_transfer functions
+        Wrapper routine to ease the call of the transfer functions
 
         This function can be called in the multilevel stepper (e.g. MLSDC), passing a source and a target level.
-        Using the base_transfer dictionary, the calling stepper does not need to specify whether to use restrict of
+        Using the transfer dictionary, the calling stepper does not need to specify whether to use restrict of
         prolong.
 
         Args:
-            source: source level
-            target: target level
+            source (pySDC.Level.level): source level
+            target (pySDC.Level.level): target level
         """
         self.__transfer_dict[tuple([source, target])]()
 
@@ -226,7 +225,7 @@ class step(FrozenClass):
         This routine uses initial values u0 to set up the u[0] values at the finest level
 
         Args:
-            u0: initial values
+            u0 (dtype_u): initial values
         """
 
         assert len(self.levels) >= 1
@@ -282,7 +281,7 @@ class step(FrozenClass):
         Getter for current time-step size
 
         Returns:
-            dt of level[0]
+            float: dt of level[0]
         """
         return self.levels[0].dt
 
@@ -292,6 +291,6 @@ class step(FrozenClass):
         Getter for current time
 
         Returns:
-            time of level[0]
+            float: time of level[0]
         """
         return self.levels[0].time

@@ -1,7 +1,9 @@
+import abc
+from future.utils import with_metaclass
 
 from pySDC.plugins.pysdc_helper import FrozenClass
 
-class ptype(object):
+class ptype(with_metaclass(abc.ABCMeta)):
     """
     Prototype class for problems, just defines the attributes essential to get started
 
@@ -36,4 +38,11 @@ class ptype(object):
         self.init = init
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
+
+    @abc.abstractmethod
+    def eval_f(self, u, t):
+        """
+        Abstract interface to RHS computation of the ODE
+        """
+        return None
 
