@@ -387,21 +387,19 @@ class allinclusive_classic_nonMPI(controller):
                 if S.prev.levels[-1].tag:
                     self.recv(S.levels[-1], S.prev.levels[-1])
                     S.prev.levels[-1].tag = False
-                    if len(S.levels) > 1:
+                    if len(S.levels) > 1 or num_procs > 1:
                         S.status.stage = 'IT_COARSE_SWEEP'
-                    elif num_procs > 1:  # MSSDC
-                        S.status.stage = 'IT_COARSE_SWEEP'
-                    elif num_procs == 1:  # SDC
-                        S.status.stage = 'IT_FINE_SWEEP'
+                    else:
+                        print('you should not be here')
+                        exit()
                 else:
                     S.status.stage = 'IT_COARSE_RECV'
             else:
-                if len(S.levels) > 1:
+                if len(S.levels) > 1 or num_procs > 1:
                     S.status.stage = 'IT_COARSE_SWEEP'
-                elif num_procs > 1:  # MSSDC
-                    S.status.stage = 'IT_COARSE_SWEEP'
-                elif num_procs == 1:  # SDC
-                    S.status.stage = 'IT_FINE_SWEEP'
+                else:
+                    print('you should not be here')
+                    exit()
             # return
             return S
 

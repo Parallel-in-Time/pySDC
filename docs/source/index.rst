@@ -11,6 +11,8 @@ esp. the multilevel extension MLSDC and PFASST.
 It is intended for rapid prototyping and educational purposes.
 New ideas like e.g. sweepers or predictors can be tested and first toy problems can be easily implemented.
 
+See `test coverage results <test_coverage/index.html>`_
+
 
 Tutorial
 --------
