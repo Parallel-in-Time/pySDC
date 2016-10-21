@@ -36,7 +36,7 @@ script:
   - ./docs/update_apidocs.sh
   - which nosetests
   - nosetests tests -v --with-id --with-coverage --cover-package=pySDC --cover-html --cover-html-dir=docs/build/test_coverage
-  - travis-sphinx --branches=pySDC_v2,master --outdir=docs/build --nowarn build
+  - travis-sphinx --branches=pySDC_v2,master --nowarn build
 
 after_success:
     - travis-sphinx deploy
