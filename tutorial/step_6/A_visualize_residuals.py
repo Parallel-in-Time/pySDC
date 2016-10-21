@@ -1,16 +1,14 @@
 import numpy as np
+import os
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
-
 from pySDC.plugins.visualization_tools import show_residual_across_simulation
 
 
@@ -53,8 +51,8 @@ def main():
     description['problem_class'] = heat1d                           # pass problem class
     description['problem_params'] = problem_params                  # pass problem parameters
     description['dtype_u'] = mesh                                   # pass data type for u
-    description['dtype_f'] = mesh                          # pass data type for f
-    description['sweeper_class'] = generic_LU                  # pass sweeper (see part B)
+    description['dtype_f'] = mesh                                   # pass data type for f
+    description['sweeper_class'] = generic_LU                       # pass sweeper
     description['sweeper_params'] = sweeper_params                  # pass sweeper parameters
     description['level_params'] = level_params                      # pass level parameters
     description['step_params'] = step_params                        # pass step parameters
@@ -92,20 +90,10 @@ def main():
     # compute and print statistics
     for item in iter_counts:
         print('Number of iterations for time %4.2f: %2i' % item)
-    print()
-    niters = np.array([item[1] for item in iter_counts])
-    print('   Mean number of iterations: %4.2f' %np.mean(niters))
-    print('   Range of values for number of iterations: %2i ' %np.ptp(niters))
-    print('   Position of max/min number of iterations: %2i -- %2i' %(np.argmax(niters), np.argmin(niters)))
-    print('   Std and var for number of iterations: %4.2f -- %4.2f' %(np.std(niters), np.var(niters)))
-    print()
-    print()
 
-    show_residual_across_simulation(stats,'test.pdf')
+    show_residual_across_simulation(stats,'residuals.pdf')
 
-    # assert err < 1.3504644E-04, "ERROR: error is too high, got %s" % err
-    # assert np.ptp(niters) < 2, "ERROR: range of number of iterations is too high, got %s" %np.ptp(niters)
-    # assert np.mean(niters) <= 6.5, "ERROR: mean number of iteratiobs is too high, got %s" %np.mean(niters)
+    assert os.path.isfile('residuals.pdf')
 
 if __name__ == "__main__":
     main()

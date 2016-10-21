@@ -33,6 +33,11 @@ class allinclusive_multigrid_nonMPI(controller):
 
         assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: multigrid cannot do MSSDC"
 
+        if num_procs > 1:
+            for S in self.MS:
+                for L in S.levels:
+                    assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -364,7 +369,8 @@ class allinclusive_multigrid_nonMPI(controller):
                 self.hooks.post_sweep(step=S, level_number=len(S.levels) - 1)
 
                 # send to succ step
-                self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
+                if not S.status.last:
+                    self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
 
                 # update stage
                 if len(S.levels) > 1: # MLSDC or PFASST
@@ -387,7 +393,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
                     # send updated values forward
-                    if self.params.fine_comm:
+                    if self.params.fine_comm and not S.status.last:
                         self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                     # # receive values

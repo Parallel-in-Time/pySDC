@@ -35,9 +35,7 @@ class allinclusive_classic_nonMPI(controller):
             for S in self.MS:
                 for L in S.levels:
                     assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
-                        "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
-                        "use Legendre node nor enforce collocation update. If you need/want this, " \
-                        "use the blockwise controllers."
+                        "For PFASST to work, we assume uend^k = u_M^k"
 
 
     def run(self, u0, t0, Tend):
