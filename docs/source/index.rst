@@ -11,6 +11,10 @@ esp. the multilevel extension MLSDC. It is intended for rapid prototyping and ed
 sweepers or predictors can be tested and first toy problems can be easily implemented. Two virtually parallel PFASST
 iterators are implemented as well, giving full access to all values at any time.
 
+See `test coverage results <test_coverage/index.html>`_
+
+.. literalinclude:: ../../output.txt
+
 Contents:
 
 .. toctree::

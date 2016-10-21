@@ -16,10 +16,11 @@ class TestCollocation:
   # Check that the quadrature rule integrates polynomials up to order p-1 exactly
   # -----------------------------------------------------------------------------
   def test_1(self):
+    f = open('output.txt', 'w')
     for type in classes:
       for M in range(type[1],type[2]+1):
         coll = getattr(pySDC.CollocationClasses, type[0])(M, t_start, t_end)
-        
+
         # some basic consistency tests
         assert np.size(coll.nodes)==np.size(coll.weights), "For node type " + type[0] + ", number of entries in nodes and weights is different"
         assert np.size(coll.nodes)==M, "For node type " + type[0] + ", requesting M nodes did not produce M entries in nodes and weights"
@@ -36,6 +37,9 @@ class TestCollocation:
         int_coll = coll.evaluate(coll.weights, poly_vals)
         # For large values of M, substantial differences from different round of error have to be considered
         assert abs(int_ex - int_coll) < 1e-10, "For node type " + type[0] + ", failed to integrate polynomial of degree " + str(coll.order-1) + " exactly. Error: %5.3e" % abs(int_ex - int_coll)
+        f.write("For node type " + type[0] + ", failed to integrate polynomial of degree " + str(
+        coll.order - 1) + " exactly. Error: %5.3e\n" % abs(int_ex - int_coll))
+    f.close()
 
 
   # TEST 2:

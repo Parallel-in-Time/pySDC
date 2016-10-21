@@ -26,7 +26,7 @@ before_install:
 install:
   # this line needs to be updated to match the requirements.txt files
   # the conda installer isn't able to process PIP's requirements.txt files
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx pep8 coverage
   - conda list
   - pip install --user travis-sphinx
 
@@ -34,7 +34,9 @@ script:
 #  - which nosetests
 #  - nosetests tests -v --with-id
   - ./docs/update_apidocs.sh
-  - travis-sphinx -n build
+  - which nosetests
+  - nosetests tests -v --with-id --with-coverage --cover-package=pySDC --cover-html --cover-html-dir=docs/build/test_coverage
+  - travis-sphinx --branches=pySDC_v2,master --outdir=docs/build build
 
 after_success:
     - travis-sphinx deploy
