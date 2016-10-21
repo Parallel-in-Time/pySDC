@@ -7,6 +7,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 from pySDC.plugins.visualization_tools import show_residual_across_simulation
@@ -67,38 +68,45 @@ def main():
     num_proc = 8
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
+    controller_classic = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
+    controller_multigrid = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                     description=description)
 
     # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
+    P = controller_classic.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    uend_classic, stats_classic = controller_classic.run(u0=uinit, t0=t0, Tend=Tend)
+    uend_multigrid, stats_multigrid = controller_multigrid.run(u0=uinit, t0=t0, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
-    err = abs(uex - uend)
-    print('Error: %12.8e' % (err))
+    err_classic = abs(uex - uend_classic)
+    err_multigrid = abs(uex - uend_multigrid)
+    diff = abs(uend_classic-uend_multigrid)
+
+    print('Error classic: %12.8e' % (err_classic))
+    print('Error multigrid: %12.8e' % (err_multigrid))
+    print('Diff: %12.8e' % diff)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
+    filtered_stats_classic = filter_stats(stats_classic, type='niter')
+    filtered_stats_multigrid = filter_stats(stats_multigrid, type='niter')
 
     # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts_classic = sort_stats(filtered_stats_classic, sortby='time')
+    iter_counts_multigrid = sort_stats(filtered_stats_multigrid, sortby='time')
 
     # compute and print statistics
-    min_iter = 99
-    max_iter = 0
-    for item in iter_counts:
-        print('Number of iterations for time %4.2f: %1i' % item)
-        min_iter = min(min_iter,item[1])
-        max_iter = max(max_iter,item[1])
+    for item_classic, item_multigrid in zip(iter_counts_classic,iter_counts_multigrid):
+        print('Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % (item_classic[0], item_classic[1], item_multigrid[1]))
 
-    show_residual_across_simulation(stats,'residuals.png')
+    show_residual_across_simulation(stats_multigrid, 'residuals_multigrid.png')
 
-    assert os.path.isfile('residuals.png')
-    assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" %(min_iter, max_iter)
+    assert os.path.isfile('residuals_multigrid.png')
+    assert all([item[1] == 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
+    assert diff < 2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
 
 if __name__ == "__main__":
     main()
