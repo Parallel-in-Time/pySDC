@@ -34,7 +34,7 @@ if __name__ == "__main__":
     cclass = collclass.CollGaussRadau_Right
 
     swparams = {}
-    swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type='LU')
+    swparams['QI'] = get_Qd(cclass, qd_type='LU')
     swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation

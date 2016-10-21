@@ -56,11 +56,11 @@ if __name__ == "__main__":
         # This comes as read-in for the sweeper class
         swparams = {}
         if not type(qd_type) == str:
-            swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type[0])
+            swparams['QI'] = get_Qd(cclass, qd_type=qd_type[0])
             swparams_c = {}
-            swparams_c['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type[1])
+            swparams_c['QI'] = get_Qd(cclass, qd_type=qd_type[1])
         else:
-            swparams['QI'] = get_Qd(cclass, Nnodes=Nnodes, qd_type=qd_type)
+            swparams['QI'] = get_Qd(cclass, qd_type=qd_type)
 
         for setup, nvars, param_list in setup_list:
 

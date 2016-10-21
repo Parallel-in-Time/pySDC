@@ -28,7 +28,7 @@ class generic_implicit(sweeper):
         super(generic_implicit,self).__init__(params)
 
         assert 'QI' in params
-        self.QI = get_Qd(self.coll,Nnodes=self.coll.num_nodes,qd_type=params['QI'])
+        self.QI = get_Qd(self.coll, qd_type=params['QI'])
         assert isinstance(self.QI,np.ndarray)
         np.testing.assert_array_equal(np.triu(self.QI,k=1),np.zeros(self.QI.shape),err_msg='Lower triangular matrix expected!')
         pass

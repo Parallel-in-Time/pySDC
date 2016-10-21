@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the sweeper class
     swparams = {}
-    swparams['QI'] = get_Qd(cclass,Nnodes=Nnodes,qd_type='LU')
+    swparams['QI'] = get_Qd(cclass, qd_type='LU')
     swparams['fixed_time_in_jacobian'] = 0
 
     # Fill description dictionary for easy hierarchy creation
