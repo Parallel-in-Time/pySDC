@@ -6,37 +6,45 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 
 
-def show_residual_across_simulation(stats,fname):
+def show_residual_across_simulation(stats, fname='residuals.pdf'):
+    """
+    Helper routine to visualize the residuals across the simulation (one block of PFASST)
 
+    Args:
+        stats (dict): statistics object from a PFASST run
+        fname (str): filename
+    """
+
+    # get residuals of the run
     extract_stats = filter_stats(stats,type='residual')
 
-    maxsteps = 0
+    # find boundaries for x-,y- and c-axis as well as arrays
+    maxprocs = 0
     maxiter = 0
     minres = 0
     maxres = -99
     for k,v in extract_stats.items():
-        maxsteps = max(maxsteps,getattr(k,'step'))
+        maxprocs = max(maxprocs,getattr(k,'process'))
         maxiter = max(maxiter,getattr(k,'iter'))
         minres = min(minres,np.log10(v))
         maxres = max(maxres,np.log10(v))
 
-    residual = np.zeros((maxiter,maxsteps+1))
+    # grep residuals and put into array
+    residual = np.zeros((maxiter,maxprocs+1))
     residual[:] = -99
-
     for k,v in extract_stats.items():
-        step = getattr(k,'step')
+        step = getattr(k,'process')
         iter = getattr(k,'iter')
         if iter is not -1:
             residual[iter-1,step] = np.log10(v)
 
     # Set up latex stuff and fonts
-    # rc('text', usetex=True)
     rc('font', **{"sans-serif": ["Arial"], "size": 30})
-    # rc('font', family='serif',size=30)
     rc('legend', fontsize='small')
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
 
+    # create plot and save
     fig, ax = plt.subplots(figsize=(15,10))
 
     cmap = plt.get_cmap('Reds')
@@ -46,13 +54,11 @@ def show_residual_across_simulation(stats,fname):
     cax.set_label('log10(residual)')
 
     ax.set_xlabel('iteration')
-    ax.set_ylabel('step')
+    ax.set_ylabel('process')
 
     ax.set_xticks(np.arange(maxiter)+0.5, minor=False)
-    ax.set_yticks(np.arange(maxsteps+1)+0.5, minor=False)
+    ax.set_yticks(np.arange(maxprocs+1)+0.5, minor=False)
     ax.set_xticklabels(np.arange(maxiter)+1, minor=False)
-    ax.set_yticklabels(np.arange(maxsteps+1), minor=False)
-
-    plt.tight_layout()
+    ax.set_yticklabels(np.arange(maxprocs+1), minor=False)
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')

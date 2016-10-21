@@ -12,11 +12,11 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
 
+
 def main():
     """
     A simple test program to check order of accuracy in space for a simple test problem
     """
-
 
     # initialize problem parameters
     problem_params = {}

@@ -1,18 +1,21 @@
-def filter_stats(stats,process=None,time=None,level=None,iter=None,type=None):
+
+def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
     Args:
-        time: the requested simulation time
-        level: the requested level id
-        iter: the requested iteration count
-        type: string to describe the requested type of value
+        stats (dict): raw statistics from a controller run
+        process (int): process number
+        time (float): the requested simulation time
+        level (int): the requested level index
+        iter (int): the requested iteration count
+        type (str): string to describe the requested type of value
     Returns:
-        dictionary containing only the entries corresponding to the filter
+        dict: dictionary containing only the entries corresponding to the filter
     """
 
     result = {}
-    for k,v in stats.items():
+    for k, v in stats.items():
         # get data if key matches the filter (if specified)
         if (k.time == time or time is None) and \
                 (k.process == process or process is None) and \
@@ -24,23 +27,26 @@ def filter_stats(stats,process=None,time=None,level=None,iter=None,type=None):
     return result
 
 
-def sort_stats(stats,sortby):
+def sort_stats(stats, sortby):
     """
     Helper function to transform stats dictionary to sorted list of tuples
 
     Args:
-        stats: dictionary of statistics
-        sortby: string to specify which key to use for sorting
+        stats (dict): dictionary of statistics
+        sortby (str): string to specify which key to use for sorting
+
+    Returns:
+        list: list of tuples containing the sortby item and the value
     """
 
     result = []
-    for k,v in stats.items():
+    for k, v in stats.items():
         # convert string to attribute and append key + value to result as tuple
-        item = getattr(k,sortby)
-        result.append((item,v))
+        item = getattr(k, sortby)
+        result.append((item, v))
 
     # sort by first element of the tuple (which is the sortby key) and return
-    return sorted(result,key=lambda tup: tup[0])
+    return sorted(result, key=lambda tup: tup[0])
 
 
 def get_list_of_types(stats):
@@ -48,15 +54,15 @@ def get_list_of_types(stats):
     Helper function to get list of types registered in stats
 
     Args:
-        stats: dictionary with statistics
+        stats (dict): dictionary with statistics
 
     Returns:
-        list of types registered
+        list: list of types registered
 
     """
 
     type_list = []
     for k, v in stats.items():
-        if not k.type in type_list:
+        if k.type not in type_list:
             type_list.append(k.type)
     return type_list
