@@ -38,14 +38,21 @@ def main():
     results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
 
     # get order of accuracy
-    orders = get_accuracy_order(results)
+    order = get_accuracy_order(results)
+
+    f = open('step_1_D_out.txt', 'w')
+    for l in range(len(order)):
+        out = 'Expected order: %2i -- Computed order %4.3f' % (5, order[l])
+        f.write(out + '\n')
+        print(out)
+    f.close()
 
     # visualize results
     plot_accuracy(results)
 
     assert os.path.isfile('step_1_accuracy_test_coll.png')
 
-    assert all(np.isclose(orders, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %orders
+    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %order
 
 def run_accuracy_check(prob, coll, dt_list):
     """
@@ -105,7 +112,6 @@ def get_accuracy_order(results):
     assert 'dt_list' in results, 'ERROR: expecting the list of dt in the results dictionary'
     dt_list = sorted(results['dt_list'], reverse=True)
 
-    f = open('step_1_D_out.txt', 'w')
     order = []
     # loop over two consecutive errors/dt pairs
     for i in range(1,len(dt_list)):
@@ -116,12 +122,7 @@ def get_accuracy_order(results):
 
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
         tmp = np.log(results[id]/results[id_prev])/np.log(dt_list[i]/dt_list[i-1])
-        out = 'Expected order: %2i -- Computed order %4.3f' % (5, tmp)
-        f.write(out + '\n')
-        print(out)
         order.append(tmp)
-
-    f.close()
 
     return order
 

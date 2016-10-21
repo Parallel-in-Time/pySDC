@@ -32,6 +32,13 @@ def main():
     # compute order of accuracy
     order = get_accuracy_order(results)
 
+    f = open('step_1_B_out.txt', 'w')
+    for l in range(len(order)):
+        out = 'Expected order: %2i -- Computed order %4.3f' %(2,order[l])
+        f.write(out+'\n')
+        print(out)
+    f.close()
+
     # visualize results
     plot_accuracy(results)
 
@@ -98,7 +105,6 @@ def get_accuracy_order(results):
     assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
     nvars_list = sorted(results['nvars_list'])
 
-    f = open('step_1_B_out.txt', 'w')
     order = []
     # loop over two consecutive errors/nvars pairs
     for i in range(1,len(nvars_list)):
@@ -109,11 +115,7 @@ def get_accuracy_order(results):
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
         tmp = np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1])
-        out = 'Expected order: %2i -- Computed order %4.3f' %(2,tmp)
-        f.write(out+'\n')
-        print(out)
         order.append(tmp)
-    f.close()
 
     return order
 

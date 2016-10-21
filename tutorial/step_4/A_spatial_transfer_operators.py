@@ -66,11 +66,15 @@ def main():
 
     print('Running order checks...')
     orders = get_accuracy_order(results)
+    f = open('step_4_A_out.txt', 'w')
     for p in range(len(orders)):
-        print('Expected order %2i, got order %5.2f, deviation of %5.2f%%'\
-              %(space_transfer_params['iorder'], orders[p], 100*abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder']))
+        out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%'\
+              %(space_transfer_params['iorder'], orders[p], 100*abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'])
+        f.write(out + '\n')
+        print(out)
         assert abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'] < 0.05, \
             'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
+    f.close()
     print('...got what we expected!')
 
 
