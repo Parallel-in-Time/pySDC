@@ -36,6 +36,10 @@ Full code: `tutorial/step_1/A_spatial_problem_setup.py <https://github.com/Paral
 
 .. literalinclude:: ../../../tutorial/step_1/A_spatial_problem_setup.py
 
+Results:
+
+.. literalinclude:: ../../../tutorial/step_1/A_out.txt
+
 Part B: Spatial accuracy check
 ------------------------------
 
@@ -54,6 +58,13 @@ Important things to note:
 Full code: `tutorial/step_1/B_spatial_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/B_spatial_accuracy_check.py>`_
 
 .. literalinclude:: ../../../tutorial/step_1/B_spatial_accuracy_check.py
+
+Results:
+
+.. literalinclude:: ../../../tutorial/step_1/B_out.txt
+
+.. image:: ../../../tutorial/step_1/accuracy_test_space.png
+   :scale: 50 %
 
 Part C: Collocation problem setup
 ---------------------------------
@@ -84,6 +95,10 @@ Full code: `tutorial/step_1/C_collocation_problem_setup.py <https://github.com/P
 
 .. literalinclude:: ../../../tutorial/step_1/C_collocation_problem_setup.py
 
+Results:
+
+.. literalinclude:: ../../../tutorial/step_1/C_out.txt
+
 Part D: Collocation accuracy test
 ---------------------------------
 
@@ -102,3 +117,10 @@ Important things to note:
 Full code: `tutorial/step_1/D_collocation_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/D_collocation_accuracy_check.py>`_
 
 .. literalinclude:: ../../../tutorial/step_1/D_collocation_accuracy_check.py
+
+Results:
+
+.. literalinclude:: ../../../tutorial/step_1/D_out.txt
+
+.. image:: ../../../tutorial/step_1/accuracy_test_coll.png
+   :scale: 50 %

@@ -6,7 +6,7 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 
 
-def show_residual_across_simulation(stats, fname='residuals.pdf'):
+def show_residual_across_simulation(stats, fname='residuals.png'):
     """
     Helper routine to visualize the residuals across the simulation (one block of PFASST)
 

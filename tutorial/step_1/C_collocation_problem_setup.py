@@ -28,6 +28,12 @@ def main():
     # solve collocation problem
     err = solve_collocation_problem(prob=prob, coll=coll, dt=dt)
 
+    f = open('C_out.txt', 'w')
+    out = 'Error of the collocation problem: %8.6e' %err
+    f.write(out+'\n')
+    print(out)
+    f.close()
+
     assert err <= 4E-04, "ERROR: did not get collocation error as expected, got %s" %err
 
 

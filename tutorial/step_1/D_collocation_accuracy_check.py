@@ -1,6 +1,10 @@
-from collections import namedtuple
+import matplotlib
+matplotlib.use('Agg')
 
+from collections import namedtuple
+import matplotlib.pylab as plt
 import numpy as np
+import os.path
 import scipy.sparse as sp
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -12,8 +16,8 @@ ID = namedtuple('ID', 'dt')
 
 def main():
     """
-        A simple test program to compute the order of accuracy in time
-        """
+    A simple test program to compute the order of accuracy in time
+    """
 
     # initialize problem parameters
     problem_params = {}
@@ -34,9 +38,14 @@ def main():
     results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
 
     # get order of accuracy
-    order = get_accuracy_order(results)
+    orders = get_accuracy_order(results)
 
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %order
+    # visualize results
+    plot_accuracy(results)
+
+    assert os.path.isfile('accuracy_test_coll.png')
+
+    assert all(np.isclose(orders, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %orders
 
 def run_accuracy_check(prob, coll, dt_list):
     """
@@ -96,6 +105,7 @@ def get_accuracy_order(results):
     assert 'dt_list' in results, 'ERROR: expecting the list of dt in the results dictionary'
     dt_list = sorted(results['dt_list'], reverse=True)
 
+    f = open('D_out.txt', 'w')
     order = []
     # loop over two consecutive errors/dt pairs
     for i in range(1,len(dt_list)):
@@ -105,9 +115,78 @@ def get_accuracy_order(results):
         id_prev = ID(dt=dt_list[i-1])
 
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
-        order.append(np.log(results[id]/results[id_prev])/np.log(dt_list[i]/dt_list[i-1]))
+        tmp = np.log(results[id]/results[id_prev])/np.log(dt_list[i]/dt_list[i-1])
+        out = 'Expected order: %2i -- Computed order %4.3f' % (5, tmp)
+        f.write(out + '\n')
+        print(out)
+        order.append(tmp)
+
+    f.close()
 
     return order
+
+
+def plot_accuracy(results):
+    """
+    Routine to visualize the errors as well as the expected errors
+
+    Args:
+        results: the dictionary containing the errors
+    """
+
+    # retrieve the list of nvars from results
+    assert 'dt_list' in results, 'ERROR: expecting the list of dts in the results dictionary'
+    dt_list = sorted(results['dt_list'])
+
+    # Set up plotting parameters
+    params = {'legend.fontsize': 20,
+              'figure.figsize': (12, 8),
+              'axes.labelsize': 20,
+              'axes.titlesize': 20,
+              'xtick.labelsize': 16,
+              'ytick.labelsize': 16,
+              'lines.linewidth': 3
+              }
+    plt.rcParams.update(params)
+
+    # create new figure
+    plt.figure()
+    # take x-axis limits from nvars_list + some spacning left and right
+    plt.xlim([min(dt_list) / 2, max(dt_list) * 2])
+    plt.xlabel('dt')
+    plt.ylabel('abs. error')
+    plt.grid()
+
+    # get guide for the order of accuracy, i.e. the errors to expect
+    # get error for first entry in nvars_list
+    id = ID(dt=dt_list[0])
+    base_error = results[id]
+    # assemble optimal errors for 5th order method and plot
+    order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
+    plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
+
+
+    min_err = 1E99
+    max_err = 0E00
+    err_list = []
+    # loop over nvars, get errors and find min/max error for y-axis limits
+    for dt in dt_list:
+        id = ID(dt=dt)
+        err = results[id]
+        min_err = min(err, min_err)
+        max_err = max(err, max_err)
+        err_list.append(err)
+    plt.loglog(dt_list, err_list, ls=' ', marker='o', markersize=10, label='experiment')
+
+    # adjust y-axis limits, add legend
+    plt.ylim([min_err / 10, max_err * 10])
+    plt.legend(loc=2, ncol=1, numpoints=1)
+
+    # save plot as PDF, beautify
+    fname = 'accuracy_test_coll.png'
+    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+
+    return None
 
 
 if __name__ == "__main__":

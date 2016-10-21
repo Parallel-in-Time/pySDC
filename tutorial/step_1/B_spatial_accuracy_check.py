@@ -35,7 +35,7 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('accuracy_test.pdf')
+    assert os.path.isfile('accuracy_test_space.png')
 
     assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
 
@@ -98,6 +98,7 @@ def get_accuracy_order(results):
     assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
     nvars_list = sorted(results['nvars_list'])
 
+    f = open('B_out.txt', 'w')
     order = []
     # loop over two consecutive errors/nvars pairs
     for i in range(1,len(nvars_list)):
@@ -108,8 +109,11 @@ def get_accuracy_order(results):
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
         tmp = np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1])
-        print('Expected order: %2i -- Computed order %4.3f' %(2,tmp))
+        out = 'Expected order: %2i -- Computed order %4.3f' %(2,tmp)
+        f.write(out+'\n')
+        print(out)
         order.append(tmp)
+    f.close()
 
     return order
 
@@ -171,7 +175,7 @@ def plot_accuracy(results):
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'accuracy_test.pdf'
+    fname = 'accuracy_test_space.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     return None

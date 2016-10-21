@@ -91,9 +91,9 @@ def main():
     for item in iter_counts:
         print('Number of iterations for time %4.2f: %2i' % item)
 
-    show_residual_across_simulation(stats,'residuals.pdf')
+    show_residual_across_simulation(stats,'residuals.png')
 
-    assert os.path.isfile('residuals.pdf')
+    assert os.path.isfile('residuals.png')
 
 if __name__ == "__main__":
     main()
