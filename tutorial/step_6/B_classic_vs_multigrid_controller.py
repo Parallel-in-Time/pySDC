@@ -114,9 +114,9 @@ def main():
 
     f.close()
 
-    show_residual_across_simulation(stats_multigrid, 'residuals_multigrid.png')
+    show_residual_across_simulation(stats_multigrid, 'step_6_residuals_multigrid.png')
 
-    assert os.path.isfile('residuals_multigrid.png')
+    assert os.path.isfile('step_6_residuals_multigrid.png')
     assert all([item[1] == 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
     assert diff < 2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
 

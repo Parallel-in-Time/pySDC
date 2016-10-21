@@ -23,9 +23,7 @@ Results:
 
 .. literalinclude:: ../../../step_6_A_out.txt
 
-Results:
-
-.. image:: ../../../tutorial/step_6/residuals.png
+.. image:: ../../../step_6_residuals.png
    :scale: 50 %
 
 Part B: Classical vs. multigrid controller
@@ -51,6 +49,9 @@ Full code: `tutorial/step_6/B_classic_vs_multigrid_controller.py <https://github
 Results:
 
 .. literalinclude:: ../../../step_6_B_out.txt
+
+.. image:: ../../../step_6_residuals_multigrid.png
+   :scale: 50 %
 
 Part C: Multi-step SDC
 ----------------------
