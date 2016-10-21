@@ -28,7 +28,7 @@ def main():
     # solve collocation problem
     err = solve_collocation_problem(prob=prob, coll=coll, dt=dt)
 
-    f = open('C_out.txt', 'w')
+    f = open('step_1_C_out.txt', 'w')
     out = 'Error of the collocation problem: %8.6e' %err
     f.write(out+'\n')
     print(out)

@@ -35,7 +35,7 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('accuracy_test_space.png')
+    assert os.path.isfile('step_1_accuracy_test_space.png')
 
     assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
 
@@ -98,7 +98,7 @@ def get_accuracy_order(results):
     assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
     nvars_list = sorted(results['nvars_list'])
 
-    f = open('B_out.txt', 'w')
+    f = open('step_1_B_out.txt', 'w')
     order = []
     # loop over two consecutive errors/nvars pairs
     for i in range(1,len(nvars_list)):
@@ -175,7 +175,7 @@ def plot_accuracy(results):
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'accuracy_test_space.png'
+    fname = 'step_1_accuracy_test_space.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     return None

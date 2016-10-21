@@ -29,8 +29,7 @@ iterations.
 
 Important things to note:
 
--  We now make use of ``controller_parameters``. Here, we use those to
-   control the logging verbosity.
+-  Here, we use the ``controller_params`` to control the logging verbosity.
 -  Admittedly, the ``stats`` dictionary is a complex thing, but it
    allows users to add other details to it without changing its
    definition (see next part).

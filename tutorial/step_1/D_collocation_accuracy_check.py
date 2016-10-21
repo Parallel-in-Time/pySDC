@@ -43,7 +43,7 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('accuracy_test_coll.png')
+    assert os.path.isfile('step_1_accuracy_test_coll.png')
 
     assert all(np.isclose(orders, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %orders
 
@@ -105,7 +105,7 @@ def get_accuracy_order(results):
     assert 'dt_list' in results, 'ERROR: expecting the list of dt in the results dictionary'
     dt_list = sorted(results['dt_list'], reverse=True)
 
-    f = open('D_out.txt', 'w')
+    f = open('step_1_D_out.txt', 'w')
     order = []
     # loop over two consecutive errors/dt pairs
     for i in range(1,len(dt_list)):
@@ -183,7 +183,7 @@ def plot_accuracy(results):
     plt.legend(loc=2, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'accuracy_test_coll.png'
+    fname = 'step_1_accuracy_test_coll.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     return None

@@ -10,7 +10,10 @@ def main():
 
     stats = run_simulation()
 
-    print('List of registered statistic types:', get_list_of_types(stats))
+    f = open('step_3_A_out.txt', 'w')
+    out = 'List of registered statistic types: %s' %get_list_of_types(stats)
+    f.write(out+'\n')
+    print(out)
 
     # filter statistics by first time intervall and type (residual)
     filtered_stats = filter_stats(stats, time=0.1, type='residual')
@@ -19,7 +22,9 @@ def main():
     residuals = sort_stats(filtered_stats, sortby='iter')
 
     for item in residuals:
-        print('Residual in iteration %2i: %8.4e' %item)
+        out = 'Residual in iteration %2i: %8.4e' %item
+        f.write(out+'\n')
+        print(out)
 
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
@@ -28,7 +33,11 @@ def main():
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
     for item in iter_counts:
-        print('Number of iterations at time %4.2f: %2i' %item)
+        out = 'Number of iterations at time %4.2f: %2i' %item
+        f.write(out + '\n')
+        print(out)
+
+    f.close()
 
     assert all([item[1] == 12 for item in iter_counts]), 'ERROR: number of iterations are not as expected, got %s' %iter_counts
 

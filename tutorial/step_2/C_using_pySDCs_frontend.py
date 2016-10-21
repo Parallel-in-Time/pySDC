@@ -31,6 +31,11 @@ def main():
     step_params = {}
     step_params['maxiter'] = 20
 
+    # initialize controller parameters
+    controller_params = {}
+    controller_params['log_to_file'] = True
+    controller_params['fname'] = 'step_2_C_out.txt'
+
     # Fill description dictionary for easy hierarchy creation
     description = {}
     description['problem_class'] = heat1d_forced
@@ -43,7 +48,7 @@ def main():
     description['step_params'] = step_params
 
     # instantiate the controller (no controller parameters used here)
-    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params={}, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
     t0 = 0.1
@@ -59,7 +64,12 @@ def main():
     # compute exact solution and compare
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
-    print('Error: %12.8e' %(err))
+
+    f = open('step_2_C_out.txt', 'a')
+    out = 'Error after SDC iterations: %8.6e' % err
+    f.write(out)
+    print(out)
+    f.close()
 
     assert err <= 2E-5,"ERROR: controller doing IMEX SDC iteration did not reduce the error enough, got %s" %err
 

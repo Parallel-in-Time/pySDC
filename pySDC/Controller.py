@@ -17,7 +17,7 @@ class controller(with_metaclass(abc.ABCMeta)):
         Initialization routine for the base controller
 
         Args:
-            controller_params: parameter set for the controller and the steps
+            controller_params (dict): parameter set for the controller and the steps
         """
 
         # short helper class to add params as attributes
@@ -28,6 +28,7 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self.predict = True
                 self.logger_level = 20
                 self.log_to_file = False
+                self.fname = 'run_pid' + str(os.getpid()) + '.log'
 
                 for k, v in params.items():
                     setattr(self, k, v)
@@ -36,7 +37,7 @@ class controller(with_metaclass(abc.ABCMeta)):
 
         self.params = pars(controller_params)
 
-        self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file)
+        self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger = logging.getLogger('controller')
 
         # check if we have a hook on this list. if not, use default class.
@@ -50,13 +51,14 @@ class controller(with_metaclass(abc.ABCMeta)):
         pass
 
     @staticmethod
-    def __setup_custom_logger(level=None, log_to_file=None):
+    def __setup_custom_logger(level=None, log_to_file=None, fname=None):
         """
         Helper function to set main parameters for the logging facility
 
         Args:
-            level: level of logging (int)
-            log_to_file: flag to turn on/off logging to file
+            level (int): level of logging
+            log_to_file (bool): flag to turn on/off logging to file
+            fname (str):
         """
 
         assert type(level) is int
@@ -65,11 +67,10 @@ class controller(with_metaclass(abc.ABCMeta)):
         if log_to_file:
             file_formatter = logging.Formatter(
                 fmt='%(asctime)s - %(name)s - %(module)s - %(funcName)s - %(lineno)d - %(levelname)s: %(message)s')
-            filename = 'run_pid' + str(os.getpid()) + '.log'
-            if os.path.isfile(filename):
-                file_handler = logging.FileHandler(filename, mode='a')
+            if os.path.isfile(fname):
+                file_handler = logging.FileHandler(fname, mode='a')
             else:
-                file_handler = logging.FileHandler(filename, mode='w')
+                file_handler = logging.FileHandler(fname, mode='w')
             file_handler.setFormatter(file_formatter)
         else:
             file_handler = None
@@ -98,10 +99,10 @@ class controller(with_metaclass(abc.ABCMeta)):
         Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)
 
         Args:
-            S: current step
+            S (pySDC.Step.step): current step
 
         Returns:
-            converged, true or false
+            bool: converged, true or false
 
         """
 
@@ -121,8 +122,8 @@ class controller(with_metaclass(abc.ABCMeta)):
 
         Args:
             u0: initial values
-            t0: starting time
-            Tend: ending time
+            t0 (float): starting time
+            Tend (float): ending time
         """
         return None
 
@@ -130,5 +131,8 @@ class controller(with_metaclass(abc.ABCMeta)):
     def hooks(self):
         """
         Getter for the hooks
+
+        Returns:
+            pySDC.Hooks.hooks: hooks
         """
         return self.__hooks

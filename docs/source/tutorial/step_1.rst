@@ -38,7 +38,7 @@ Full code: `tutorial/step_1/A_spatial_problem_setup.py <https://github.com/Paral
 
 Results:
 
-.. literalinclude:: ../../../tutorial/step_1/A_out.txt
+.. literalinclude:: ../../../step_1_A_out.txt
 
 Part B: Spatial accuracy check
 ------------------------------
@@ -61,9 +61,9 @@ Full code: `tutorial/step_1/B_spatial_accuracy_check.py <https://github.com/Para
 
 Results:
 
-.. literalinclude:: ../../../tutorial/step_1/B_out.txt
+.. literalinclude:: ../../../step_1_B_out.txt
 
-.. image:: ../../../tutorial/step_1/accuracy_test_space.png
+.. image:: ../../../step_1_accuracy_test_space.png
    :scale: 50 %
 
 Part C: Collocation problem setup
@@ -97,7 +97,7 @@ Full code: `tutorial/step_1/C_collocation_problem_setup.py <https://github.com/P
 
 Results:
 
-.. literalinclude:: ../../../tutorial/step_1/C_out.txt
+.. literalinclude:: ../../../step_1_C_out.txt
 
 Part D: Collocation accuracy test
 ---------------------------------
@@ -120,7 +120,7 @@ Full code: `tutorial/step_1/D_collocation_accuracy_check.py <https://github.com/
 
 Results:
 
-.. literalinclude:: ../../../tutorial/step_1/D_out.txt
+.. literalinclude:: ../../../step_1_D_out.txt
 
-.. image:: ../../../tutorial/step_1/accuracy_test_coll.png
+.. image:: ../../../step_1_accuracy_test_coll.png
    :scale: 50 %

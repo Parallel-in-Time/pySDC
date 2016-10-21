@@ -54,6 +54,12 @@ def main():
     # now we can do e.g. what we did before with the problem
     err = run_accuracy_check(P)
 
+    f = open('step_2_A_out.txt', 'w')
+    out = 'Error of the spatial accuracy test: %8.6e' % err
+    f.write(out)
+    print(out)
+    f.close()
+
     assert err <= 2E-04, "ERROR: the spatial accuracy is higher than expected, got %s" % err
 
 

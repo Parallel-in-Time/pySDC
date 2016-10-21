@@ -83,6 +83,7 @@ Important things to note:
 -  By using one of the controllers, the whole code relevant for the user
    is reduced to setting up the ``description`` dictionary, some pre-
    and some post-processing.
+-  We make use of ``controller_parameters`` in order to provide logging to file capabilities.
 -  In contrast to Part B, we do not have direct access to residuals or
    iteration counts for now. We will deal with these later.
 -  This example is the prototype for a user to work with pySDC. Most of

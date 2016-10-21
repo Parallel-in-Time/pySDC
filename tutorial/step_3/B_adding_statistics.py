@@ -21,8 +21,12 @@ def main():
 
     # get base energy and show difference
     base_energy = energy[0][1]
+    f = open('step_3_B_out.txt', 'a')
     for item in energy:
-        print('Total energy and deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])))
+        out = 'Total energy and deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1]))
+        f.write(out + '\n')
+        print(out)
+    f.close()
 
     assert abs(base_energy - energy[-1][1]) < 15 , 'ERROR: energy deviated too much, got %s' %(base_energy-energy[-1][1])
     assert err < 5E-04, "ERROR: solution is not as exact as expected, got %s" %err
@@ -56,6 +60,8 @@ def run_penning_trap_simulation():
     # initialize controller parameters
     controller_params = {}
     controller_params['hook_class'] = particle_hook # specialized hook class for more statistics and output
+    controller_params['log_to_file'] = True
+    controller_params['fname'] = 'step_3_B_out.txt'
 
     # Fill description dictionary for easy hierarchy creation
     description = {}

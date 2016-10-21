@@ -83,6 +83,7 @@ def run_imex_sdc(S):
     # reset iteration counter
     S.status.iter = 0
     # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
+    f = open('step_2_B_out.txt', 'w')
     while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
         # this is where the nodes are actually updated according to the SDC formulas
         L.sweep.update_nodes()
@@ -90,7 +91,10 @@ def run_imex_sdc(S):
         L.sweep.compute_residual()
         # increment the iteration counter
         S.status.iter += 1
-        print('Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (L.time, L.level_index, S.status.iter, L.status.residual))
+        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (L.time, L.level_index, S.status.iter, L.status.residual)
+        f.write(out+'\n')
+        print(out)
+    f.close()
 
     # compute the interval's endpoint: this (and only this) will set uend, depending on the collocation nodes
     L.sweep.compute_end_point()

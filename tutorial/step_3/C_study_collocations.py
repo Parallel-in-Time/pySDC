@@ -16,6 +16,7 @@ def main():
     stats_dict = run_simulation()
 
     ediff = {}
+    f = open('step_3_C_out.txt', 'w')
     for cclass, stats in stats_dict.items():
         # filter and convert/sort statistics by etot and iterations
         filtered_stats = filter_stats(stats, type='etot')
@@ -24,7 +25,10 @@ def main():
         base_energy = energy[0][1]
         final_energy = energy[-1][1]
         ediff[cclass] = abs(base_energy-final_energy)
-        print("Energy deviation for %s: %12.8e" %(cclass,ediff[cclass]))
+        out = "Energy deviation for %s: %12.8e" %(cclass,ediff[cclass])
+        f.write(out + '\n')
+        print(out)
+    f.close()
 
     # set expected differences and check
     ediff_expect = {}

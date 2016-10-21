@@ -48,7 +48,7 @@ class particle_hook(hooks):
             epot += part.q[n]*fpot[n]
             ekin += part.m[n]/2.0*np.dot(part.vel.values[3*n:3*n+3],part.vel.values[3*n:3*n+3])
 
-        print('Initial energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
+        # print('Initial energy (pot/kin/tot): %12.4f / %12.4f / %12.4f' %(epot,ekin,epot+ekin))
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, type='etot', value=epot+ekin)
 
@@ -89,7 +89,7 @@ class particle_hook(hooks):
             epot += part.q[n]*fpot[n]
             ekin += part.m[n]/2.0*np.dot(part.vel.values[3*n:3*n+3],part.vel.values[3*n:3*n+3])
 
-        print('Energy (pot/kin/tot) at time %4.2f: %12.4f / %12.4f / %12.4f' %(L.time,epot,ekin,epot+ekin))
+        # print('Energy (pot/kin/tot) at time %4.2f: %12.4f / %12.4f / %12.4f' %(L.time,epot,ekin,epot+ekin))
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter, type='etot', value=epot+ekin)
 
