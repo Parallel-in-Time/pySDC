@@ -43,6 +43,10 @@ Full code: `tutorial/step_3/A_getting_statistics.py <https://github.com/Parallel
 
 .. literalinclude:: ../../../tutorial/step_3/A_getting_statistics.py
 
+Results:
+
+.. literalinclude:: ../../../step_3_A_out.txt
+
 Part B: Adding statistics
 -------------------------
 
@@ -73,6 +77,10 @@ Full code: `tutorial/step_3/B_adding_statistics.py <https://github.com/Parallel-
 
 .. literalinclude:: ../../../tutorial/step_3/B_adding_statistics.py
 
+Results:
+
+.. literalinclude:: ../../../step_3_B_out.txt
+
 Part C: Studying collocation node types
 ---------------------------------------
 
@@ -101,3 +109,7 @@ Important things to note:
 Full code: `tutorial/step_3/C_study_collocations.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_3/C_study_collocations.py>`_
 
 .. literalinclude:: ../../../tutorial/step_3/C_study_collocations.py
+
+Results:
+
+.. literalinclude:: ../../../step_3_D_out.txt

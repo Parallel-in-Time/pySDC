@@ -27,6 +27,10 @@ Full code: `tutorial/step_4/A_spatial_transfer_operators.py <https://github.com/
 
 .. literalinclude:: ../../../tutorial/step_4/A_spatial_transfer_operators.py
 
+Results:
+
+.. literalinclude:: ../../../step_4_A_out.txt
+
 Part B: Multilevel hierarchy
 ----------------------------
 
@@ -59,6 +63,10 @@ Full code: `tutorial/step_4/B_multilevel_hierarchy.py <https://github.com/Parall
 
 .. literalinclude:: ../../../tutorial/step_4/B_multilevel_hierarchy.py
 
+Results:
+
+.. literalinclude:: ../../../step_4_B_out.txt
+
 Part C: SDC vs. MLSDC
 ---------------------
 
@@ -87,6 +95,10 @@ Important things to note:
 Full code: `tutorial/step_4/C_SDC_vs_MLSDC.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_4/C_SDC_vs_MLSDC.py>`_
 
 .. literalinclude:: ../../../tutorial/step_4/C_SDC_vs_MLSDC.py
+
+Results:
+
+.. literalinclude:: ../../../step_4_C_out.txt
 
 Part D: MLSDC with particles
 ----------------------------
@@ -123,3 +135,7 @@ Important things to note:
 Full code: `tutorial/step_4/D_MLSDC_with_particles.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_4/D_MLSDC_with_particles.py>`_
 
 .. literalinclude:: ../../../tutorial/step_4/D_MLSDC_with_particles.py
+
+Results:
+
+.. literalinclude:: ../../../step_4_D_out.txt

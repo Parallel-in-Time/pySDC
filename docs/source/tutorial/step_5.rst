@@ -22,6 +22,10 @@ Full code: `tutorial/step_5/A_multistep_multilevel_hierarchy.py <https://github.
 
 .. literalinclude:: ../../../tutorial/step_5/A_multistep_multilevel_hierarchy.py
 
+Results:
+
+.. literalinclude:: ../../../step_5_A_out.txt
+
 Part B: My first PFASST run
 ---------------------------
 
@@ -39,6 +43,10 @@ We see that PFASST performs very well in this case, the iteration counts do not 
 Full code: `tutorial/step_5/B_my_first_PFASST_run.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_5/B_my_first_PFASST_run.py>`_
 
 .. literalinclude:: ../../../tutorial/step_5/B_my_first_PFASST_run.py
+
+Results:
+
+.. literalinclude:: ../../../step_5_B_out.txt
 
 
 Part C: Advection and PFASST
@@ -59,3 +67,7 @@ Important things to note:
 Full code: `tutorial/step_5/C_advection_and_PFASST.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_5/C_advection_and_PFASST.py>`_
 
 .. literalinclude:: ../../../tutorial/step_5/C_advection_and_PFASST.py
+
+Results:
+
+.. literalinclude:: ../../../step_5_C_out.txt
