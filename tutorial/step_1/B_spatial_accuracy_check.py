@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+
 from collections import namedtuple
 import matplotlib.pylab as plt
 import numpy as np
