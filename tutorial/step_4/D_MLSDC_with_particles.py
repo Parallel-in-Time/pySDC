@@ -23,7 +23,10 @@ def main():
     stats_mlsdc, time_mlsdc = run_penning_trap_simulation(mlsdc=True)
     stats_mlsdc_finter, time_mlsdc_finter = run_penning_trap_simulation(mlsdc=True, finter=True)
 
-    print('Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' %(time_sdc, time_mlsdc, time_mlsdc_finter))
+    f = open('step_4_D_out.txt', 'w')
+    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' %(time_sdc, time_mlsdc, time_mlsdc_finter)
+    f.write(out+'\n')
+    print(out)
 
     # filter statistics type (etot)
     filtered_stats_sdc = filter_stats(stats_sdc, type='etot')
@@ -38,12 +41,18 @@ def main():
     # get base energy and show differences
     base_energy = energy_sdc[0][1]
     for item in energy_sdc:
-        print('Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy))
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy)
+        f.write(out + '\n')
+        print(out)
     for item in energy_mlsdc:
-        print('Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy))
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy)
+        f.write(out + '\n')
+        print(out)
     for item in energy_mlsdc_finter:
-        print('Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
-        item[0], item[1], abs(base_energy - item[1]) / base_energy))
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        f.write(out + '\n')
+        print(out)
+    f.close()
 
     assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1])/base_energy < 6E-10 , \
         'ERROR: energy deviated too much between SDC and MLSDC, got %s' %(abs(energy_sdc[-1][1] - energy_mlsdc[-1][1])/base_energy)
@@ -81,6 +90,7 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     controller_params = {}
     controller_params['hook_class'] = particle_hook # specialized hook class for more statistics and output
     controller_params['predict'] = False
+    controller_params['logger_level'] = 30
 
     transfer_params = {}
     transfer_params['finter'] = finter

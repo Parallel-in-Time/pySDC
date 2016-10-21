@@ -58,8 +58,12 @@ def main():
     controller = allinclusive_classic_nonMPI(num_procs=10, controller_params={}, description=description)
 
     # check number of levels
+    f = open('step_5_A_out.txt', 'w')
     for i in range(len(controller.MS)):
-        print("Process %2i has %2i levels" %(i,len(controller.MS[i].levels)))
+        out = "Process %2i has %2i levels" %(i,len(controller.MS[i].levels))
+        f.write(out+'\n')
+        print(out)
+    f.close()
 
     assert all([len(S.levels) == 3 for S in controller.MS]), "ERROR: not all steps have the same number of levels"
 

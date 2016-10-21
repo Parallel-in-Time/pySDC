@@ -86,9 +86,17 @@ def main():
     err_multigrid = abs(uex - uend_multigrid)
     diff = abs(uend_classic-uend_multigrid)
 
-    print('Error classic: %12.8e' % (err_classic))
-    print('Error multigrid: %12.8e' % (err_multigrid))
-    print('Diff: %12.8e' % diff)
+    f = open('step_6_B_out.txt', 'w')
+
+    out = 'Error classic: %12.8e' % (err_classic)
+    f.write(out + '\n')
+    print(out)
+    out = 'Error multigrid: %12.8e' % (err_multigrid)
+    f.write(out + '\n')
+    print(out)
+    out = 'Diff: %12.8e' % diff
+    f.write(out + '\n')
+    print(out)
 
     # filter statistics by type (number of iterations)
     filtered_stats_classic = filter_stats(stats_classic, type='niter')
@@ -100,7 +108,11 @@ def main():
 
     # compute and print statistics
     for item_classic, item_multigrid in zip(iter_counts_classic,iter_counts_multigrid):
-        print('Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % (item_classic[0], item_classic[1], item_multigrid[1]))
+        out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % (item_classic[0], item_classic[1], item_multigrid[1])
+        f.write(out + '\n')
+        print(out)
+
+    f.close()
 
     show_residual_across_simulation(stats_multigrid, 'residuals_multigrid.png')
 

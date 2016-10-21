@@ -72,6 +72,8 @@ def main():
     niters_min_all = {}
     niters_max_all = {}
 
+    f = open('step_5_C_out.txt', 'w')
+
     for QI in QI_list:
 
         # define and set preconditioner for the implicit sweeper
@@ -83,7 +85,9 @@ def main():
         niters_max_all[QI] = 0
 
         for num_proc in num_proc_list:
-            print('Working with QI = %s on %2i processes...' %(QI,num_proc))
+            out = 'Working with QI = %s on %2i processes...' %(QI,num_proc)
+            f.write(out + '\n')
+            print(out)
             # instantiate controller
             controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
                                                      description=description)
@@ -98,7 +102,6 @@ def main():
             # compute exact solution and compare
             uex = P.u_exact(Tend)
             err = abs(uex - uend)
-            print('Error: %12.8e' % (err))
 
             # filter statistics by type (number of iterations)
             filtered_stats = filter_stats(stats, type='niter')
@@ -110,17 +113,33 @@ def main():
             niters = np.array([item[1] for item in iter_counts])
             niters_min_all[QI] = min(np.mean(niters),niters_min_all[QI])
             niters_max_all[QI] = max(np.mean(niters), niters_max_all[QI])
-            print('   Mean number of iterations: %4.2f' % np.mean(niters))
-            print('   Range of values for number of iterations: %2i ' % np.ptp(niters))
-            print('   Position of max/min number of iterations: %2i -- %2i' % (np.argmax(niters), np.argmin(niters)))
-            print('   Std and var for number of iterations: %4.2f -- %4.2f' % (np.std(niters), np.var(niters)))
+            out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+            f.write(out + '\n')
+            print(out)
+            out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+            f.write(out + '\n')
+            print(out)
+            out = '   Position of max/min number of iterations: %2i -- %2i' % (np.argmax(niters), np.argmin(niters))
+            f.write(out + '\n')
+            print(out)
+            out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (np.std(niters), np.var(niters))
+            f.write(out + '\n')
+            print(out)
+
+            f.write('\n')
             print()
 
             assert err < 5.0716135e-04, "ERROR: error is too high, got %s" % err
 
-        print('Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' %(niters_min_all[QI], niters_max_all[QI], QI))
+        out = 'Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' %(niters_min_all[QI], niters_max_all[QI], QI)
+        f.write(out + '\n')
+        print(out)
+
+        f.write('\n\n')
         print()
         print()
+
+    f.close()
 
 if __name__ == "__main__":
     main()

@@ -103,9 +103,17 @@ def main():
     err_sdc = abs(uex - uend_sdc)
     err_mlsdc = abs(uex - uend_mlsdc)
     diff = abs(uend_mlsdc-uend_sdc)
-    print('Error SDC and MLSDC: %12.8e -- %12.8e' % (err_sdc, err_mlsdc))
-    print('Difference SDC vs. MLSDC: %12.8e' % (diff))
-    print('Number of iterations SDC and MLSDC: %2i -- %2i' %(niter_sdc, niter_mlsdc))
+
+    f = open('step_4_C_out.txt', 'a')
+    out = 'Error SDC and MLSDC: %12.8e -- %12.8e' % (err_sdc, err_mlsdc)
+    f.write(out+'\n')
+    print(out)
+    out = 'Difference SDC vs. MLSDC: %12.8e' % (diff)
+    f.write(out+'\n')
+    print(out)
+    out = 'Number of iterations SDC and MLSDC: %2i -- %2i' %(niter_sdc, niter_mlsdc)
+    f.write(out+'\n')
+    print(out)
 
     assert diff < 6E-10, "ERROR: difference between MLSDC and SDC is higher than expected, got %s" %diff
     assert niter_sdc-niter_mlsdc <= 6, "ERROR: MLSDC required more iterations than expected, got %s" %niter_mlsdc

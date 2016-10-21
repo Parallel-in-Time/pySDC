@@ -79,7 +79,6 @@ def main():
     # compute exact solution and compare
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
-    print('Error: %12.8e' % (err))
 
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
@@ -90,13 +89,18 @@ def main():
     # compute and print statistics
     min_iter = 99
     max_iter = 0
+    f = open('step_6_A_out.txt', 'w')
     for item in iter_counts:
-        print('Number of iterations for time %4.2f: %1i' % item)
+        out = 'Number of iterations for time %4.2f: %1i' % item
+        f.write(out + '\n')
+        print(out)
         min_iter = min(min_iter,item[1])
         max_iter = max(max_iter,item[1])
+    f.close()
 
     show_residual_across_simulation(stats,'residuals.png')
 
+    assert err < 6.155222e-05, 'ERROR: error is too large, got %s' %err
     assert os.path.isfile('residuals.png')
     assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" %(min_iter, max_iter)
 
