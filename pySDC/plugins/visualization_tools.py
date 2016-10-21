@@ -19,9 +19,6 @@ def show_residual_across_simulation(stats,fname):
         maxiter = max(maxiter,getattr(k,'iter'))
         minres = min(minres,np.log10(v))
         maxres = max(maxres,np.log10(v))
-        # print(getattr(k,'step'),getattr(k,'iter'),v)
-
-    # print(maxsteps,maxiter,minres,maxres)
 
     residual = np.zeros((maxiter,maxsteps+1))
     residual[:] = -99
@@ -34,8 +31,8 @@ def show_residual_across_simulation(stats,fname):
 
     # Set up latex stuff and fonts
     # rc('text', usetex=True)
-    # rc('font', **{"sans-serif": ["Arial"], "size": 30})
-    rc('font', family='serif',size=30)
+    rc('font', **{"sans-serif": ["Arial"], "size": 30})
+    # rc('font', family='serif',size=30)
     rc('legend', fontsize='small')
     rc('xtick', labelsize='small')
     rc('ytick', labelsize='small')
@@ -59,7 +56,3 @@ def show_residual_across_simulation(stats,fname):
     plt.tight_layout()
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
-
-    plt.show()
-
-    pass

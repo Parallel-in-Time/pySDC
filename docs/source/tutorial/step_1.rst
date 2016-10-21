@@ -32,14 +32,17 @@ Important things to note:
 -  We happily pass classes around so that they can be used to
    instantiate things within subroutines
 
+Full code: `tutorial/step_1/A_spatial_problem_setup.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/A_spatial_problem_setup.py>`_
+
+.. literalinclude:: ../../../tutorial/step_1/A_spatial_problem_setup.py
+
 Part B: Spatial accuracy check
 ------------------------------
 
 We now do a more thorough test of the accuracy of the spatial
 discretization. We loop over a set of ``nvars``, compute the Laplacian
 of our test vector and look at the error. Then, the order of accuracy in
-space is checked by looking at the numbers (part ``B1``) and by looking
-at "points on a line" (part ``B2``).
+space is checked by looking at the numbers and by looking at "points on a line".
 
 Important things to note:
 
@@ -47,6 +50,10 @@ Important things to note:
    break!
 -  Add your results into a dictionary for later usage. Use IDs to find
    the data! Also, use headers to store meta-information.
+
+Full code: `tutorial/step_1/B_spatial_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/B_spatial_accuracy_check.py>`_
+
+.. literalinclude:: ../../../tutorial/step_1/B_spatial_accuracy_check.py
 
 Part C: Collocation problem setup
 ---------------------------------
@@ -73,6 +80,10 @@ Important things to note:
    need in space? How large/small does dt have to be? What frequency in
    space is fine? ...
 
+Full code: `tutorial/step_1/C_collocation_problem_setup.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/C_collocation_problem_setup.py>`_
+
+.. literalinclude:: ../../../tutorial/step_1/C_collocation_problem_setup.py
+
 Part D: Collocation accuracy test
 ---------------------------------
 
@@ -87,3 +98,7 @@ Important things to note:
 -  Orders of convergence are not as stable as for the space-only test.
    One of the problems of this example is that we are actually trying to
    compute 0 very, very thorougly...
+
+Full code: `tutorial/step_1/D_collocation_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_1/D_collocation_accuracy_check.py>`_
+
+.. literalinclude:: ../../../tutorial/step_1/D_collocation_accuracy_check.py

@@ -40,6 +40,10 @@ Important things to note:
    values are registered in the statistics. This can be helpful, if
    users register their own types, see below.
 
+Full code: `tutorial/step_3/A_getting_statistics.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_3/A_getting_statistics.py>`_
+
+.. literalinclude:: ../../../tutorial/step_3/A_getting_statistics.py
+
 Part B: Adding statistics
 -------------------------
 
@@ -66,6 +70,10 @@ Important things to note:
    iterations in the spatial solver) and access it during the hook call
    using the level.
 
+Full code: `tutorial/step_3/B_adding_statistics.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_3/B_adding_statistics.py>`_
+
+.. literalinclude:: ../../../tutorial/step_3/B_adding_statistics.py
+
 Part C: Studying collocation node types
 ---------------------------------------
 
@@ -90,3 +98,7 @@ Important things to note:
    Yet, putting them into a meta-dictionary is useful (as done here).
    Alternatively, each ``stats`` can be processed on the fly and only
    the relevant information can be stored.
+
+Full code: `tutorial/step_3/C_study_collocations.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_3/C_study_collocations.py>`_
+
+.. literalinclude:: ../../../tutorial/step_3/C_study_collocations.py

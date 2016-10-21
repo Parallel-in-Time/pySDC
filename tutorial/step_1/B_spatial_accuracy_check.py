@@ -1,22 +1,19 @@
-import matplotlib
-matplotlib.use('Agg')
-
-import numpy as np
-import os.path
 from collections import namedtuple
 import matplotlib.pylab as plt
+import numpy as np
+import os.path
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
 
-
 def main():
     """
-    A simple test program to visualize the errors and the expected order of accuracy ("points on a line")
+    A simple test program to check order of accuracy in space for a simple test problem
     """
+
 
     # initialize problem parameters
     problem_params = {}
@@ -24,17 +21,20 @@ def main():
     problem_params['freq'] = 4  # frequency for the test value
 
     # create list of nvars to do the accuracy test with
-    nvars_list = [2 ** p - 1 for p in range(3, 15)]
+    nvars_list = [2 ** p - 1 for p in range(4, 15)]
 
     # run accuracy test for all nvars
     results = run_accuracy_check(nvars_list=nvars_list,problem_params=problem_params)
+
+    # compute order of accuracy
+    order = get_accuracy_order(results)
 
     # visualize results
     plot_accuracy(results)
 
     assert os.path.isfile('accuracy_test.pdf')
 
-
+    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
 
 
 def run_accuracy_check(nvars_list,problem_params):
@@ -61,8 +61,7 @@ def run_accuracy_check(nvars_list,problem_params):
         xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])
 
         # create a mesh instance and fill it with a sine wave
-        u = prob.dtype_u(init=prob.init)
-        u.values = np.sin(np.pi * prob.params.freq * xvalues)
+        u = prob.u_exact(t=0)
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
@@ -79,6 +78,37 @@ def run_accuracy_check(nvars_list,problem_params):
     results['nvars_list'] = nvars_list
 
     return results
+
+
+def get_accuracy_order(results):
+    """
+    Routine to compute the order of accuracy in space
+
+    Args:
+        results: the dictionary containing the errors
+
+    Returns:
+        the list of orders
+    """
+
+    # retrieve the list of nvars from results
+    assert 'nvars_list' in results, 'ERROR: expecting the list of nvars in the results dictionary'
+    nvars_list = sorted(results['nvars_list'])
+
+    order = []
+    # loop over two consecutive errors/nvars pairs
+    for i in range(1,len(nvars_list)):
+
+        # get ids
+        id = ID(nvars=nvars_list[i])
+        id_prev = ID(nvars=nvars_list[i-1])
+
+        # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
+        tmp = np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1])
+        print('Expected order: %2i -- Computed order %4.3f' %(2,tmp))
+        order.append(tmp)
+
+    return order
 
 
 def plot_accuracy(results):
@@ -146,3 +176,4 @@ def plot_accuracy(results):
 
 if __name__ == "__main__":
     main()
+
