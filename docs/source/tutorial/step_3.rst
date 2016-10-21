@@ -112,4 +112,4 @@ Full code: `tutorial/step_3/C_study_collocations.py <https://github.com/Parallel
 
 Results:
 
-.. literalinclude:: ../../../step_3_D_out.txt
+.. literalinclude:: ../../../step_3_C_out.txt

@@ -36,6 +36,8 @@ Therefore, we loop over the number of parallel time-steps in this eample to see 
 We compute and check the error as well as multiple statistical quantaties, e.g. the mean number of iterations, the range of iterations counts and so on.
 We see that PFASST performs very well in this case, the iteration counts do not increase significantly.
 
+Important things to note:
+
 - In the IMEX sweeper, we can activate the LU-trick for the implicit part by specifying ``do_LU`` as ``True``. For stiff parabolic problems with Gauss-Radau nodes, this is usually a very good idea!
 - As usual for MLSDC and PFASST, the success depends heavily on the choice of parameters.
   Making the problem more complicated, less/more stiff, changing the order of the spatial interpolation etc. can give completely different results.
