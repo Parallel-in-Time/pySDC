@@ -35,9 +35,8 @@ class allinclusive_multigrid_MPI(controller):
         assert not (num_procs > 1 and num_levels == 1), "ERROR: multigrid cannot do MSSDC"
 
         if num_procs > 1 and num_levels > 1:
-            for S in self.MS:
-                for L in S.levels:
-                    assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
+            for L in self.S.levels:
+                assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
 
     def run(self, u0, t0, Tend):
         """

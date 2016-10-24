@@ -8,7 +8,6 @@ from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import 
 from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC import Log
 
 if __name__ == "__main__":
 
