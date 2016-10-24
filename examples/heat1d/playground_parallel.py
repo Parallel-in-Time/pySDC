@@ -22,7 +22,7 @@ if __name__ == "__main__":
     cparams = {}
     cparams['fine_comm'] = True
     cparams['predict'] = True
-    cparams['logger_level'] = 20
+    cparams['logger_level'] = 30
 
     # This comes as read-in for the problem class
     pparams = {}
