@@ -33,7 +33,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
         assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: multigrid cannot do MSSDC"
 
-        if num_procs > 1:
+        if num_procs > 1 and len(self.MS[0].levels) > 1:
             for S in self.MS:
                 for L in S.levels:
                     assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
@@ -264,7 +264,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if len(S.levels) > 1 and self.params.predict: # MLSDC or PFASST
+                if len(S.levels) > 1 and self.params.predict: # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
                     self.hooks.pre_iteration(step=S, level_number=0)

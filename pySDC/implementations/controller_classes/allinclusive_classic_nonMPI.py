@@ -31,7 +31,9 @@ class allinclusive_classic_nonMPI(controller):
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
 
-        if num_procs > 1:
+        num_levels = len(self.MS[0].levels)
+
+        if num_procs > 1 and num_levels > 1:
             for S in self.MS:
                 for L in S.levels:
                     assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \

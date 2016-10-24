@@ -35,8 +35,9 @@ class allinclusive_classic_MPI(controller):
         self.req_status = None
 
         num_procs = comm.Get_size()
+        num_levels = len(self.S.levels)
 
-        if num_procs > 1:
+        if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
                 assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
                     "For this PFASST version to work, we assume uend^k = u_M^k, so do not " \
