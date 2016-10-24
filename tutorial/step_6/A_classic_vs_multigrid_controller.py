@@ -65,60 +65,69 @@ def main():
     Tend = 1.0
 
     # set up list of parallel time-steps to run PFASST with
-    num_proc = 8
 
-    # instantiate controller
-    controller_classic = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
-    controller_multigrid = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                     description=description)
+    # set up list of parallel time-steps to run PFASST with
+    nsteps = int(Tend / level_params['dt'])
+    num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
 
-    # get initial values on finest level
-    P = controller_classic.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
+    f = open('step_6_A_out.txt', 'w')
+    for num_proc in num_proc_list:
+        out = 'Working with %2i processes...' % num_proc
+        f.write(out + '\n')
+        print(out)
+        # instantiate controller
+        controller_classic = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
+        controller_multigrid = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                             description=description)
 
-    # call main function to get things done...
-    uend_classic, stats_classic = controller_classic.run(u0=uinit, t0=t0, Tend=Tend)
-    uend_multigrid, stats_multigrid = controller_multigrid.run(u0=uinit, t0=t0, Tend=Tend)
+        # get initial values on finest level
+        P = controller_classic.MS[0].levels[0].prob
+        uinit = P.u_exact(t0)
 
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
-    err_classic = abs(uex - uend_classic)
-    err_multigrid = abs(uex - uend_multigrid)
-    diff = abs(uend_classic-uend_multigrid)
+        # call main function to get things done...
+        uend_classic, stats_classic = controller_classic.run(u0=uinit, t0=t0, Tend=Tend)
+        uend_multigrid, stats_multigrid = controller_multigrid.run(u0=uinit, t0=t0, Tend=Tend)
 
-    f = open('step_6_B_out.txt', 'w')
+        # compute exact solution and compare
+        uex = P.u_exact(Tend)
+        err_classic = abs(uex - uend_classic)
+        err_multigrid = abs(uex - uend_multigrid)
+        diff = abs(uend_classic-uend_multigrid)
 
-    out = 'Error classic: %12.8e' % (err_classic)
-    f.write(out + '\n')
-    print(out)
-    out = 'Error multigrid: %12.8e' % (err_multigrid)
-    f.write(out + '\n')
-    print(out)
-    out = 'Diff: %12.8e' % diff
-    f.write(out + '\n')
-    print(out)
-
-    # filter statistics by type (number of iterations)
-    filtered_stats_classic = filter_stats(stats_classic, type='niter')
-    filtered_stats_multigrid = filter_stats(stats_multigrid, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts_classic = sort_stats(filtered_stats_classic, sortby='time')
-    iter_counts_multigrid = sort_stats(filtered_stats_multigrid, sortby='time')
-
-    # compute and print statistics
-    for item_classic, item_multigrid in zip(iter_counts_classic,iter_counts_multigrid):
-        out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % (item_classic[0], item_classic[1], item_multigrid[1])
+        out = 'Error classic: %12.8e' % (err_classic)
+        f.write(out + '\n')
+        print(out)
+        out = 'Error multigrid: %12.8e' % (err_multigrid)
+        f.write(out + '\n')
+        print(out)
+        out = 'Diff: %12.8e' % diff
         f.write(out + '\n')
         print(out)
 
+        # filter statistics by type (number of iterations)
+        filtered_stats_classic = filter_stats(stats_classic, type='niter')
+        filtered_stats_multigrid = filter_stats(stats_multigrid, type='niter')
+
+        # convert filtered statistics to list of iterations count, sorted by process
+        iter_counts_classic = sort_stats(filtered_stats_classic, sortby='time')
+        iter_counts_multigrid = sort_stats(filtered_stats_multigrid, sortby='time')
+
+        # compute and print statistics
+        for item_classic, item_multigrid in zip(iter_counts_classic,iter_counts_multigrid):
+            out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % (item_classic[0], item_classic[1], item_multigrid[1])
+            f.write(out + '\n')
+            print(out)
+
+        f.write('\n')
+        print()
+
+        assert all([item[1] <= 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
+        assert diff < 1E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
+
     f.close()
 
-    show_residual_across_simulation(stats_multigrid, 'step_6_residuals_multigrid.png')
-
-    assert os.path.isfile('step_6_residuals_multigrid.png')
-    assert all([item[1] == 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
-    assert diff < 2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
+    # assert all([item[1] == 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
+    # assert diff < 2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
 
 if __name__ == "__main__":
     main()

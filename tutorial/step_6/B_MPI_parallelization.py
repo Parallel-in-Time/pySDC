@@ -10,10 +10,10 @@ def main(cwd):
     my_env['PYTHONPATH'] = '../..:.'
 
     # set lit of number of parallel steps
-    num_procs_list = [2**i for i in range(int(np.log2(16)+1))]
+    num_procs_list = [2**i for i in range(int(np.log2(8)+1))]
 
     # set up new/empty file for output
-    f = open(cwd+'/step_6_D_out.txt', 'w')
+    f = open(cwd+'/step_6_B_out.txt', 'w')
     f.close()
 
     # run code with different number of MPI processes

@@ -1,32 +1,8 @@
-Step-6: Advanced topics
-=======================
+Step-6: Multigrid and MPI parallelization
+=========================================
 
-Since we now have explored the basic features of pySDC, we are actually ready to do some serious science (e.g. in the projects).
-However, we gather here further interesting cases, e.g. special flags or more alternative implementations of components.
 
-Part A: Visualizing Residuals
------------------------------
-
-In this part, we briefly introduce the visualization of residuals, built in into pySDC's plugins.
-The application is (supposed) to be simple: merely put the ``stats`` object into the function ``show_residual_across_simulation`` and look at the resulting figure.
-
-Important things to note:
-
-- The function visualizes simply the residuals over all processes and all iterations, but only for a single block.
-- The function itself is pretty straightforward and does not require passing the number of processes or iterations.
-
-Full code: `tutorial/step_6/A_visualize_residuals.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/A_visualize_residuals.py>`_
-
-.. literalinclude:: ../../../tutorial/step_6/A_visualize_residuals.py
-
-Results:
-
-.. literalinclude:: ../../../step_6_A_out.txt
-
-.. image:: ../../../step_6_residuals.png
-   :scale: 50 %
-
-Part B: Classical vs. multigrid controller
+Part A: Classical vs. multigrid controller
 ------------------------------------------
 
 Besides the ``allinclusive_classic_nonMPI`` controller we have used so far, pySDC comes with (at least) three more controllers.
@@ -40,41 +16,17 @@ Important things to note:
 - If only SDC or MLSDC are run, classical and multigrid controller do not differ.
   The difference is only in the communication scheme and the stopping criterion for multiple processes.
 - One major advantage of having the multigrid controller at hand is that some MPI implementations on certain machines do not work well with overlapping.
-- The multigrid controller cannot handle multi-step SDC (see Part C) due to design decisions.
+- The multigrid controller cannot handle multi-step SDC (see step 7) due to design decisions.
 
-Full code: `tutorial/step_6/B_classic_vs_multigrid_controller.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/B_classic_vs_multigrid_controller.py>`_
+Full code: `tutorial/step_6/A_classic_vs_multigrid_controller.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/A_classic_vs_multigrid_controller.py>`_
 
-.. literalinclude:: ../../../tutorial/step_6/B_classic_vs_multigrid_controller.py
-
-Results:
-
-.. literalinclude:: ../../../step_6_B_out.txt
-
-.. image:: ../../../step_6_residuals_multigrid.png
-   :scale: 50 %
-
-Part C: Multi-step SDC
-----------------------
-
-One interesting question when playing around with the different configurations is this: what happens, if we want parallel time-steps but only a single level?
-The result is called multi-step SDC. Here, after each sweep the result is sent forward, but is picked up in the next (and not current) iteration.
-This corresponds to performing only the smoother stage in a multigrid scheme.
-Parallelization is dead-simple and no coarsening strategy is needed.
-Yet, the missing stabilization of the coarse level leads to a significant increase in iterations, when more time-steps are computed in parallel.
-
-Important things to note:
-
-- The multigrid controller cannot handle multi-step SDC. This is not a fundamental limitation but due to design decisions.
-- We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
+.. literalinclude:: ../../../tutorial/step_6/A_classic_vs_multigrid_controller.py
 
 Results:
 
-.. literalinclude:: ../../../step_6_C_out.txt
+.. literalinclude:: ../../../step_6_A_out.txt
 
-.. image:: ../../../step_6_residuals_mssdc.png
-   :scale: 50 %
 
-Part X: To be continued...
---------------------------
+Part B: MPI parallelization
+---------------------------
 
-We shall see what comes next...

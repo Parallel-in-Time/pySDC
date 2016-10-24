@@ -89,7 +89,7 @@ def main():
     # compute and print statistics
     min_iter = 99
     max_iter = 0
-    f = open('step_6_A_out.txt', 'w')
+    f = open('step_7_A_out.txt', 'w')
     for item in iter_counts:
         out = 'Number of iterations for time %4.2f: %1i' % item
         f.write(out + '\n')
@@ -98,10 +98,10 @@ def main():
         max_iter = max(max_iter,item[1])
     f.close()
 
-    show_residual_across_simulation(stats,'step_6_residuals.png')
+    show_residual_across_simulation(stats,'step_7_residuals.png')
 
     assert err < 6.155222e-05, 'ERROR: error is too large, got %s' %err
-    assert os.path.isfile('step_6_residuals.png')
+    assert os.path.isfile('step_7_residuals.png')
     assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" %(min_iter, max_iter)
 
 if __name__ == "__main__":

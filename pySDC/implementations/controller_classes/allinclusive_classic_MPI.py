@@ -84,14 +84,19 @@ class allinclusive_classic_MPI(controller):
                 self.pfasst(comm_active,num_procs)
 
             time += self.S.dt
+
+            uex = self.S.levels[0].prob.u_exact(time)
+            err_classic = abs(uex - self.S.levels[0].uend)
+            print(rank, err_classic)
+
             tend = comm_active.bcast(time, root=num_procs-1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
-            stepend = comm_active.bcast(self.S.status.slot, root=num_procs-1)
+            # stepend = comm_active.bcast(self.S.status.slot, root=num_procs-1)
 
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])
 
-            active =  time < Tend - 10 * np.finfo(float).eps
+            active = time < Tend - 10 * np.finfo(float).eps
             comm_active = comm_active.Split(active)
 
             rank = comm_active.Get_rank()
@@ -105,7 +110,7 @@ class allinclusive_classic_MPI(controller):
         self.hooks.post_run(step=self.S, level_number=0)
 
         comm_active.Free()
-        uend = self.comm.bcast(uend, root=num_procs-1)
+        # uend = self.comm.bcast(uend, root=num_procs-1)
 
         return uend, self.hooks.return_stats()
 
@@ -290,13 +295,14 @@ class allinclusive_classic_MPI(controller):
                 self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # recv status
-            if not self.S.status.first:
+            if not self.S.status.first and not self.S.status.prev_done:
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
             if not self.S.status.done:
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
+                self.hooks.pre_iteration(step=self.S, level_number=0)
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'

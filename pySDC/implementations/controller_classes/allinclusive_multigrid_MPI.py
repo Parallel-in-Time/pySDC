@@ -77,6 +77,11 @@ class allinclusive_multigrid_MPI(controller):
                 self.pfasst(comm_active, num_procs)
 
             time += self.S.dt
+
+            uex = self.S.levels[0].prob.u_exact(time)
+            err_classic = abs(uex - self.S.levels[0].uend)
+            print(rank, err_classic)
+
             tend = comm_active.bcast(time, root=num_procs - 1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
             # stepend = comm_active.bcast(self.S.status.slot, root=num_procs - 1)
@@ -268,6 +273,7 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
+                self.hooks.pre_iteration(step=self.S, level_number=0)
                 # multi-level or single-level?
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'

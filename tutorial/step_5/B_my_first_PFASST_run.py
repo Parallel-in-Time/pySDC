@@ -64,7 +64,7 @@ def main():
 
     # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend/level_params['dt'])
-    num_proc_list = [2**i for i in range(int(np.log2(16)+1))]
+    num_proc_list = [2**i for i in range(int(np.log2(nsteps)+1))]
 
     f = open('step_5_B_out.txt', 'w')
     for num_proc in num_proc_list:
