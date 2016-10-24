@@ -8,6 +8,7 @@ from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import 
 from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
 if __name__ == "__main__":
 
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     cparams = {}
     cparams['fine_comm'] = True
     cparams['predict'] = True
-    cparams['logger_level'] = 30
+    cparams['logger_level'] = 20
 
     # This comes as read-in for the problem class
     pparams = {}
@@ -59,8 +60,8 @@ if __name__ == "__main__":
     description['space_transfer_params'] = tparams
 
     # initialize controller
-    PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)
-    # PFASST = allinclusive_classic_MPI(controller_params=cparams, description=description, comm=comm)
+    # PFASST = allinclusive_multigrid_MPI(controller_params=cparams, description=description, comm=comm)
+    PFASST = allinclusive_classic_MPI(controller_params=cparams, description=description, comm=comm)
 
     # setup parameters "in time"
     t0 = 0
@@ -71,6 +72,13 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     uend, stats = PFASST.run(u0=uinit,t0=t0,Tend=Tend)
+
+    # filter statistics by type (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+    print(iter_counts)
 
     # compute exact solution and compare
     num_procs = comm.Get_size()

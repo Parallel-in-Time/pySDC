@@ -1,19 +1,25 @@
 import numpy as np
+from mpi4py import MPI
+from collections import defaultdict
+
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
 
-def main():
+if __name__ == "__main__":
     """
     A simple test program to do PFASST runs for the heat equation
     """
+
+    comm = MPI.COMM_WORLD
 
     # initialize level parameters
     level_params = {}
@@ -62,35 +68,41 @@ def main():
     t0 = 0.0
     Tend = 4.0
 
-    # set up list of parallel time-steps to run PFASST with
-    nsteps = int(Tend/level_params['dt'])
-    num_proc_list = [2**i for i in range(int(np.log2(16)+1))]
+    # instantiate controller
+    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=comm)
+    # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=comm)
 
-    f = open('step_5_B_out.txt', 'w')
-    for num_proc in num_proc_list:
-        out = 'Working with %2i processes...' %num_proc
-        f.write(out+'\n')
+    # get initial values on finest level
+    P = controller.S.levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # compute exact solution and compare
+    uex = P.u_exact(Tend)
+    err = abs(uex - uend)
+
+    # filter statistics by type (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+    print(comm.Get_rank(),iter_counts)
+
+    iter_counts_list = comm.gather(iter_counts, root=0)
+
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    if rank == 0:
+
+        f = open('step_6_D_out.txt', 'a')
+        out = 'Working with %2i processes...' % size
+        f.write(out + '\n')
         print(out)
-        # instantiate controller
-        controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
 
-        # get initial values on finest level
-        P = controller.MS[0].levels[0].prob
-        uinit = P.u_exact(t0)
-
-        # call main function to get things done...
-        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-        # compute exact solution and compare
-        uex = P.u_exact(Tend)
-        err = abs(uex - uend)
-
-        # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
-
+        iter_counts_gather = [item for sublist in iter_counts_list for item in sublist]
+        iter_counts = sorted(iter_counts_gather, key=lambda tup: tup[0])
         # compute and print statistics
         for item in iter_counts:
             out = 'Number of iterations for time %4.2f: %2i' % item
@@ -117,10 +129,13 @@ def main():
         print()
 
         assert err < 1.3505E-04, "ERROR: error is too high, got %s" % err
-        assert np.ptp(niters) <= 2, "ERROR: range of number of iterations is too high, got %s" %np.ptp(niters)
-        assert np.mean(niters) <= 5.94, "ERROR: mean number of iteratiobs is too high, got %s" %np.mean(niters)
+        assert np.ptp(niters) <= 2, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
+        assert np.mean(niters) <= 5.94, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
 
-    f.close()
 
-if __name__ == "__main__":
-    main()
+
+
+
+
+
+

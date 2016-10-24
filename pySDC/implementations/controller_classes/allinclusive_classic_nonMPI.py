@@ -83,25 +83,24 @@ class allinclusive_classic_nonMPI(controller):
         while any(active):
 
             # loop over all active steps (in the correct order)
+            while not all([self.MS[p].status.done for p in active_slots]):
+
+                for p in active_slots:
+
+                    self.MS[p] = self.pfasst(self.MS[p],len(active_slots))
+
+            # uend is uend of the last active step in the list
+            uend = self.MS[active_slots[-1]].levels[0].uend
+
             for p in active_slots:
+                time[p] += num_procs * self.MS[p].dt
 
-                self.MS[p] = self.pfasst(self.MS[p],len(active_slots))
+            # determine new set of active steps and compress slots accordingly
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active_slots = list(itertools.compress(slots, active))
 
-                # if all active steps are done
-                if all([self.MS[p].status.done for p in active_slots]):
-
-                    # uend is uend of the last active step in the list
-                    uend = self.MS[active_slots[-1]].levels[0].uend
-
-                    for p in active_slots:
-                        time[p] += num_procs * self.MS[p].dt
-
-                    # determine new set of active steps and compress slots accordingly
-                    active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-                    active_slots = list(itertools.compress(slots, active))
-
-                    # restart active steps (reset all values and pass uend to u0)
-                    self.restart_block(active_slots, time, uend)
+            # restart active steps (reset all values and pass uend to u0)
+            self.restart_block(active_slots, time, uend)
 
         # call post-run hook
         for S in self.MS:
@@ -129,13 +128,20 @@ class allinclusive_classic_nonMPI(controller):
 
             # store current slot number for diagnostics
             self.MS[p].status.slot = p
-            # store link to previous step
-            self.MS[p].prev = self.MS[active_slots[j - 1]]
+
+
             # resets step
             self.MS[p].reset_step()
             # determine whether I am the first and/or last in line
             self.MS[p].status.first = active_slots.index(p) == 0
+            if not self.MS[p].status.first:
+                # store link to previous step
+                self.MS[p].prev = self.MS[active_slots[j - 1]]
+
             self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
+            if not self.MS[p].status.last:
+                # store link to next step
+                self.MS[p].next = self.MS[active_slots[j + 1]]
             # intialize step with u0
             self.MS[p].init_step(u0)
             # reset some values
@@ -310,7 +316,7 @@ class allinclusive_classic_nonMPI(controller):
             # send forward values on finest level
 
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
-            if not S.levels[0].tag or S.status.last:
+            if not S.levels[0].tag or S.status.last or S.next.status.done:
                 if self.params.fine_comm:
                     self.send(S.levels[0], tag=True)
                 S.status.stage = 'IT_CHECK'
@@ -328,8 +334,8 @@ class allinclusive_classic_nonMPI(controller):
             S.status.done = self.check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
-            if not S.status.first and S.status.done and not S.prev.status.done:
-                S.status.done = False
+            # if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
+            #     S.status.done = False
 
             # if I am done, signal accordingly, otherwise proceed
             if S.status.done:
@@ -361,7 +367,7 @@ class allinclusive_classic_nonMPI(controller):
                 self.hooks.post_sweep(step=S, level_number=l)
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
-                if not S.levels[l].tag or S.status.last:
+                if not S.levels[l].tag or S.status.last or S.next.status.done:
                     if self.params.fine_comm:
                         self.send(S.levels[l], tag=True)
                 else:
@@ -421,7 +427,7 @@ class allinclusive_classic_nonMPI(controller):
             # send forward coarsest values
 
             # try to send new values (if old ones have not been picked up yet, retry)
-            if not S.levels[-1].tag or S.status.last:
+            if not S.levels[-1].tag or S.status.last or S.next.status.done:
                 self.send(S.levels[-1], tag=True)
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST

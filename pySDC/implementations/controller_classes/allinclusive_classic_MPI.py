@@ -182,7 +182,6 @@ class allinclusive_classic_MPI(controller):
         for l in range(1, len(self.S.levels)):
             self.S.transfer(source=self.S.levels[l-1],target=self.S.levels[l])
 
-
         for p in range(self.S.status.slot+1):
 
             if not p == 0 and not self.S.status.first:
@@ -291,11 +290,11 @@ class allinclusive_classic_MPI(controller):
                 self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # recv status
-            if not self.S.status.first and not self.S.status.prev_done:
+            if not self.S.status.first:
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
-            if not self.S.status.done or not self.S.status.prev_done:
+            if not self.S.status.done:
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
                 # multi-level or single-level?
