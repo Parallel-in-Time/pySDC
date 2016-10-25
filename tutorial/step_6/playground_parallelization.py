@@ -96,7 +96,6 @@ if __name__ == "__main__":
     iter_counts_classic_list = comm.gather(iter_counts_classic, root=0)
     iter_counts_multigrid_list = comm.gather(iter_counts_multigrid, root=0)
 
-
     rank = comm.Get_rank()
     size = comm.Get_size()
 

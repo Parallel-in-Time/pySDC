@@ -1,6 +1,7 @@
 Step-6: Advanced PFASST controllers
 ===================================
 
+We discuss controller implementations and features besides the standard classic and serial PFASST controller in this step.
 
 Part A: Classical vs. multigrid controller
 ------------------------------------------
@@ -29,6 +30,29 @@ Results:
 
 Part B: MPI parallelization
 ---------------------------
+
+Since PFASST is actually a parallel algorithm, executing it in parallel e.g. using MPI might be an interesting exercise.
+To do this, pySDC comes with the two MPI-parallelized controllers, namely ``allinclusive_classic_MPI`` and ``allinclusive_multigrid_MPI``.
+Both are supposed to yield the same results as their non-MPI counterparts and this is what we are demonstrating here (at least for one particular example).
+The actual code of this part is rather short, since the only task is to call another snippet with different number of parallel processes.
+This is realized using Python's ``subprocess`` library and we check at the end if each call returned normally.
+Now, the snippet called by the example is the basically the same code as use by Part A.
+We use the results of Part A to compare with and we expect the same number of iterations, the same accuracy and the same difference between the two flavors as in Part A (up to machine precision).
+
+Important things to note:
+
+- Both controllers need a working installation of ``mpi4py``. Since this is not always easy to achieve and since debugging a parallel program can cause a lot of headaches, the non-MPI controllers perform the same operations in serial.
+- The somewhat weird notation with the current working directory ``cwd`` is due to the corresponding test, which, run by nosetests, has a different working directory than the tutorial.
+
+Full code: `tutorial/step_6/B_MPI_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/B_MPI_parallelization.py>`_ and
+`tutorial/step_6/playground_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/playground_parallelization.py>`_
+
+.. literalinclude:: ../../../tutorial/step_6/B_MPI_parallelization.py
+.. literalinclude:: ../../../tutorial/step_6/playground_parallelization.py
+
+Results:
+
+.. literalinclude:: ../../../step_6_B_out.txt
 
 
 Part C
