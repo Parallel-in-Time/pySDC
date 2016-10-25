@@ -96,7 +96,7 @@ def main():
     err_pfasst = abs(uex - uend_pfasst)
     diff = abs(uend_mssdc-uend_pfasst)
 
-    f = open('step_6_C_out.txt', 'w')
+    f = open('step_6_B_out.txt', 'w')
 
     out = 'Error PFASST: %12.8e' % (err_pfasst)
     f.write(out + '\n')
