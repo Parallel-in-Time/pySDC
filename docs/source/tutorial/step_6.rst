@@ -1,5 +1,5 @@
-Step-6: Multigrid and MPI parallelization
-=========================================
+Step-6: Advanced PFASST controllers
+===================================
 
 
 Part A: Classical vs. multigrid controller
@@ -29,4 +29,8 @@ Results:
 
 Part B: MPI parallelization
 ---------------------------
+
+
+Part C
+------
 
