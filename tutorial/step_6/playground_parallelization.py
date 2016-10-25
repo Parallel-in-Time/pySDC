@@ -1,7 +1,6 @@
-import numpy as np
 from mpi4py import MPI
 from collections import defaultdict
-
+import sys
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -101,7 +100,12 @@ if __name__ == "__main__":
 
     if rank == 0:
 
-        f = open('step_6_B_out.txt', 'a')
+        if len(sys.argv) == 2:
+            fname = sys.argv[1]
+        else:
+            fname = 'step_6_B_out.txt'
+
+        f = open(fname, 'a')
         out = 'Working with %2i processes...' % size
         f.write(out + '\n')
         print(out)

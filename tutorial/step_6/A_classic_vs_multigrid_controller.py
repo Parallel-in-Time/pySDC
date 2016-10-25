@@ -13,7 +13,7 @@ from pySDC.plugins.stats_helper import filter_stats, sort_stats
 from pySDC.plugins.visualization_tools import show_residual_across_simulation
 
 
-def main():
+def main(num_proc_list= None, fname= None):
     """
     A simple test program to do PFASST runs for the heat equation
     """
@@ -64,13 +64,7 @@ def main():
     t0 = 0.0
     Tend = 1.0
 
-    # set up list of parallel time-steps to run PFASST with
-
-    # set up list of parallel time-steps to run PFASST with
-    nsteps = int(Tend / level_params['dt'])
-    num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
-
-    f = open('step_6_A_out.txt', 'w')
+    f = open(fname, 'w')
     for num_proc in num_proc_list:
         out = 'Working with %2i processes...' % num_proc
         f.write(out + '\n')
@@ -126,8 +120,6 @@ def main():
 
     f.close()
 
-    # assert all([item[1] == 7 for item in iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" %iter_counts_multigrid
-    # assert diff < 2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" %diff
 
 if __name__ == "__main__":
-    main()
+    main(num_proc_list=[1,2,4,8], fname='step_6_A_out.txt')
