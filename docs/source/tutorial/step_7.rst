@@ -42,7 +42,7 @@ Important things to note:
 
 Results:
 
-.. literalinclude:: ../../../step_7_C_out.txt
+.. literalinclude:: ../../../step_7_B_out.txt
 
 .. image:: ../../../step_7_residuals_mssdc.png
    :scale: 50 %
