@@ -6,13 +6,18 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.plugins.stats_helper import filter_stats, sort_stats, get_list_of_types
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-def main():
 
+def main():
+    """
+    A simple test program to describe how to get statistics of a run
+    """
+
+    # run simulation
     stats = run_simulation()
 
     f = open('step_3_A_out.txt', 'w')
-    out = 'List of registered statistic types: %s' %get_list_of_types(stats)
-    f.write(out+'\n')
+    out = 'List of registered statistic types: %s' % get_list_of_types(stats)
+    f.write(out + '\n')
     print(out)
 
     # filter statistics by first time intervall and type (residual)
@@ -22,8 +27,8 @@ def main():
     residuals = sort_stats(filtered_stats, sortby='iter')
 
     for item in residuals:
-        out = 'Residual in iteration %2i: %8.4e' %item
-        f.write(out+'\n')
+        out = 'Residual in iteration %2i: %8.4e' % item
+        f.write(out + '\n')
         print(out)
 
     # filter statistics by type (number of iterations)
@@ -33,13 +38,14 @@ def main():
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
     for item in iter_counts:
-        out = 'Number of iterations at time %4.2f: %2i' %item
+        out = 'Number of iterations at time %4.2f: %2i' % item
         f.write(out + '\n')
         print(out)
 
     f.close()
 
-    assert all([item[1] == 12 for item in iter_counts]), 'ERROR: number of iterations are not as expected, got %s' %iter_counts
+    assert all([item[1] == 12 for item in
+                iter_counts]), 'ERROR: number of iterations are not as expected, got %s' % iter_counts
 
 
 def run_simulation():
@@ -47,31 +53,31 @@ def run_simulation():
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = {}
+    level_params = dict()
     level_params['restol'] = 1E-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
-    sweeper_params = {}
+    sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
 
     # initialize step parameters
-    step_params = {}
+    step_params = dict()
     step_params['maxiter'] = 20
 
     # initialize controller parameters (<-- this is new!)
-    controller_params = {}
-    controller_params['logger_level'] = 30  # reduce verbosity of each run, see https://docs.python.org/2/library/logging.html#logging-levels
+    controller_params = dict()
+    controller_params['logger_level'] = 30  # reduce verbosity of each run
 
     # Fill description dictionary for easy hierarchy creation
-    description = {}
+    description = dict()
     description['problem_class'] = heat1d_forced
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh

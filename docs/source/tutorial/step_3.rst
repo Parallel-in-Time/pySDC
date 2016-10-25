@@ -29,7 +29,7 @@ iterations.
 
 Important things to note:
 
--  Here, we use the ``controller_params`` to control the logging verbosity.
+-  Here, we use the ``controller_params`` to control the logging verbosity, see `here <https://docs.python.org/2/library/logging.html#logging-levels>`_ for more details.
 -  Admittedly, the ``stats`` dictionary is a complex thing, but it
    allows users to add other details to it without changing its
    definition (see next part).

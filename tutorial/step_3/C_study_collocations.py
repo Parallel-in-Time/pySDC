@@ -12,10 +12,12 @@ from tutorial.step_3.HookClass_Particles import particle_hook
 
 
 def main():
-
+    """
+    A simple test program to show th eenergy deviation for different quadrature nodes
+    """
     stats_dict = run_simulation()
 
-    ediff = {}
+    ediff = dict()
     f = open('step_3_C_out.txt', 'w')
     for cclass, stats in stats_dict.items():
         # filter and convert/sort statistics by etot and iterations
@@ -24,19 +26,19 @@ def main():
         # compare base and final energy
         base_energy = energy[0][1]
         final_energy = energy[-1][1]
-        ediff[cclass] = abs(base_energy-final_energy)
-        out = "Energy deviation for %s: %12.8e" %(cclass,ediff[cclass])
+        ediff[cclass] = abs(base_energy - final_energy)
+        out = "Energy deviation for %s: %12.8e" % (cclass, ediff[cclass])
         f.write(out + '\n')
         print(out)
     f.close()
 
     # set expected differences and check
-    ediff_expect = {}
+    ediff_expect = dict()
     ediff_expect['CollGaussRadau_Right'] = 15
     ediff_expect['CollGaussLobatto'] = 1E-05
     ediff_expect['CollGaussLegendre'] = 3E-05
-    for k,v in ediff.items():
-        assert v < ediff_expect[k], "ERROR: energy deviated too much, got %s" %ediff[k]
+    for k, v in ediff.items():
+        assert v < ediff_expect[k], "ERROR: energy deviated too much, got %s" % ediff[k]
 
 
 def run_simulation():
@@ -44,16 +46,16 @@ def run_simulation():
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = {}
+    level_params = dict()
     level_params['restol'] = 1E-06
-    level_params['dt'] = 1.0/16
+    level_params['dt'] = 1.0 / 16
 
     # initialize sweeper parameters
-    sweeper_params = {}
+    sweeper_params = dict()
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['omega_E'] = 4.9
     problem_params['omega_B'] = 25.0
     problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])
@@ -61,16 +63,16 @@ def run_simulation():
     problem_params['sig'] = 0.1
 
     # initialize step parameters
-    step_params = {}
+    step_params = dict()
     step_params['maxiter'] = 20
 
     # initialize controller parameters
-    controller_params = {}
+    controller_params = dict()
     controller_params['hook_class'] = particle_hook  # specialized hook class for more statistics and output
-    controller_params['logger_level'] = 30           # reduce verbosity of each run, see https://docs.python.org/2/library/logging.html#logging-levels
+    controller_params['logger_level'] = 30  # reduce verbosity of each run
 
     # Fill description dictionary for easy hierarchy creation
-    description = {}
+    description = dict()
     description['problem_class'] = penningtrap
     description['problem_params'] = problem_params
     description['dtype_u'] = particles
@@ -81,14 +83,14 @@ def run_simulation():
 
     # assemble and loop over list of collocation classes
     coll_list = [CollGaussRadau_Right, CollGaussLegendre, CollGaussLobatto]
-    stats_dict = {}
+    stats_dict = dict()
     for cclass in coll_list:
-
         sweeper_params['collocation_class'] = cclass
         description['sweeper_params'] = sweeper_params
 
         # instantiate the controller (no controller parameters used here)
-        controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+        controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
+                                                 description=description)
 
         # set time parameters
         t0 = 0.0
