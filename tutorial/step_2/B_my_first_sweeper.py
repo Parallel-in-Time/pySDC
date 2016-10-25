@@ -11,27 +11,27 @@ def main():
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = {}
+    level_params = dict()
     level_params['restol'] = 1E-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
-    sweeper_params = {}
+    sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
 
     # initialize step parameters
-    step_params = {}
+    step_params = dict()
     step_params['maxiter'] = 20
 
     # Fill description dictionary for easy hierarchy creation
-    description = {}
+    description = dict()
     description['problem_class'] = heat1d_forced
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh
@@ -46,11 +46,11 @@ def main():
 
     # run IMEX SDC test and check error, residual and number of iterations
     err, res, niter = run_imex_sdc(S)
-    print('Error and residual: %12.8e -- %12.8e' %(err, res))
+    print('Error and residual: %12.8e -- %12.8e' % (err, res))
 
-    assert err <= 1E-5,"ERROR: IMEX SDC iteration did not reduce the error enough, got %s" %err
-    assert res <= level_params['restol'], "ERROR: IMEX SDC iteration did not reduce the residual enough, got %s" %res
-    assert niter <= 12, "ERROR: IMEX SDC took too many iterations, got %s" %niter
+    assert err <= 1E-5, "ERROR: IMEX SDC iteration did not reduce the error enough, got %s" % err
+    assert res <= level_params['restol'], "ERROR: IMEX SDC iteration did not reduce the residual enough, got %s" % res
+    assert niter <= 12, "ERROR: IMEX SDC took too many iterations, got %s" % niter
 
 
 def run_imex_sdc(S):
@@ -91,8 +91,9 @@ def run_imex_sdc(S):
         L.sweep.compute_residual()
         # increment the iteration counter
         S.status.iter += 1
-        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (L.time, L.level_index, S.status.iter, L.status.residual)
-        f.write(out+'\n')
+        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' \
+              % (L.time, L.level_index, S.status.iter, L.status.residual)
+        f.write(out + '\n')
         print(out)
     f.close()
 
@@ -106,7 +107,6 @@ def run_imex_sdc(S):
     err = abs(uex - L.uend)
 
     return err, L.status.residual, S.status.iter
-
 
 
 if __name__ == "__main__":

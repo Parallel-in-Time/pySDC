@@ -11,33 +11,33 @@ def main():
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = {}
+    level_params = dict()
     level_params['restol'] = 1E-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
-    sweeper_params = {}
+    sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
     # sweeper_params['do_LU'] = True      # for this sweeper we can use the LU trick for the implicit part!
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
 
     # initialize step parameters
-    step_params = {}
+    step_params = dict()
     step_params['maxiter'] = 20
 
     # initialize controller parameters
-    controller_params = {}
+    controller_params = dict()
     controller_params['log_to_file'] = True
     controller_params['fname'] = 'step_2_C_out.txt'
 
     # Fill description dictionary for easy hierarchy creation
-    description = {}
+    description = dict()
     description['problem_class'] = heat1d_forced
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh
@@ -52,7 +52,7 @@ def main():
 
     # set time parameters
     t0 = 0.1
-    Tend = 0.3   # note that we are requesting 2 time steps here (dt is 0.1)
+    Tend = 0.3  # note that we are requesting 2 time steps here (dt is 0.1)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -71,7 +71,7 @@ def main():
     print(out)
     f.close()
 
-    assert err <= 2E-5,"ERROR: controller doing IMEX SDC iteration did not reduce the error enough, got %s" %err
+    assert err <= 2E-5, "ERROR: controller doing IMEX SDC iteration did not reduce the error enough, got %s" % err
 
 
 if __name__ == "__main__":
