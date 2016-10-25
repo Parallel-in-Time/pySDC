@@ -85,13 +85,8 @@ class allinclusive_classic_MPI(controller):
 
             time += self.S.dt
 
-            uex = self.S.levels[0].prob.u_exact(time)
-            err_classic = abs(uex - self.S.levels[0].uend)
-            print(rank, err_classic)
-
             tend = comm_active.bcast(time, root=num_procs-1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs-1)
-            # stepend = comm_active.bcast(self.S.status.slot, root=num_procs-1)
 
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])
@@ -146,6 +141,7 @@ class allinclusive_classic_MPI(controller):
             l.tag = None
         self.req_status = None
         self.req_send = []
+        self.S.status.prev_done = False
 
         for lvl in self.S.levels:
             lvl.status.time = time
@@ -190,6 +186,8 @@ class allinclusive_classic_MPI(controller):
         for p in range(self.S.status.slot+1):
 
             if not p == 0 and not self.S.status.first:
+                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' % (
+                    self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev, self.S.status.iter, p))
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep with new values
@@ -197,6 +195,8 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[-1].sweep.compute_end_point()
 
             if not self.S.status.last:
+                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' % (
+                    self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, self.S.status.iter, p))
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
 
         # interpolate back to finest level
@@ -272,6 +272,7 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].sweep.compute_end_point()
 
             if not self.S.status.last and self.params.fine_comm:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %(self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, 0, self.S.status.iter))
                 self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
 
             # update stage
@@ -292,11 +293,14 @@ class allinclusive_classic_MPI(controller):
 
             # send status forward
             if not self.S.status.last:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %(self.S.status.done, self.S.status.slot, self.S.time, self.S.next, 99, self.S.status.iter))
                 self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
                 self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
+                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' % (
+                    self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next, 99, self.S.status.iter))
 
             # if I'm not done or the guy left of me is not done, keep doing stuff
             if not self.S.status.done:
@@ -336,6 +340,8 @@ class allinclusive_classic_MPI(controller):
                 self.S.levels[l].sweep.compute_end_point()
 
                 if not self.S.status.last and self.params.fine_comm:
+                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' % (
+                    self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, l, self.S.status.iter))
                     self.req_send.append(comm.isend(self.S.levels[l].uend,dest=self.S.next,tag=l))
 
                 # transfer further up the hierarchy
@@ -348,6 +354,9 @@ class allinclusive_classic_MPI(controller):
 
             # receive from previous step (if not first)
             if not self.S.status.first and not self.S.status.prev_done:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' % (
+                    self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev, len(self.S.levels) - 1,
+                    self.S.status.iter))
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=len(self.S.levels) - 1, comm=comm)
 
             # update stage
@@ -367,6 +376,8 @@ class allinclusive_classic_MPI(controller):
 
             # send to next step
             if not self.S.status.last:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' % (
+                self.S.status.slot, self.S.status.stage, self.S.time, self.S.next, len(self.S.levels)-1, self.S.status.iter))
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=len(self.S.levels)-1, comm=comm)
 
             # update stage
@@ -383,6 +394,9 @@ class allinclusive_classic_MPI(controller):
             for l in range(len(self.S.levels)-1,0,-1):
 
                 if not self.S.status.first and self.params.fine_comm and not self.S.status.prev_done:
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' % (
+                        self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev, l - 1,
+                        self.S.status.iter))
                     self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=l-1, comm=comm)
 
                 # prolong values

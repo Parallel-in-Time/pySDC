@@ -345,7 +345,7 @@ class allinclusive_classic_nonMPI(controller):
             else:
                 # increment iteration count here (and only here)
                 S.status.iter += 1
-                self.hooks.pre_iteration(step=self.S, level_number=0)
+                self.hooks.pre_iteration(step=S, level_number=0)
                 if len(S.levels) > 1:
                     S.status.stage = 'IT_UP'
                 elif num_procs > 1:  # MSSDC

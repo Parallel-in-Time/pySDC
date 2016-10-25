@@ -78,13 +78,8 @@ class allinclusive_multigrid_MPI(controller):
 
             time += self.S.dt
 
-            uex = self.S.levels[0].prob.u_exact(time)
-            err_classic = abs(uex - self.S.levels[0].uend)
-            print(rank, err_classic)
-
             tend = comm_active.bcast(time, root=num_procs - 1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
-            # stepend = comm_active.bcast(self.S.status.slot, root=num_procs - 1)
 
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])

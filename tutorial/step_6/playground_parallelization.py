@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # initialize controller parameters
     controller_params = {}
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.5
+    Tend = 1.0
 
     # instantiate controller
     controller_classic = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=comm)
@@ -117,7 +117,6 @@ if __name__ == "__main__":
         out = 'Error multigrid: %12.8e' % (err_multigrid)
         f.write(out + '\n')
         print(out)
-        exit()
         out = 'Diff: %12.8e' % diff
         f.write(out + '\n')
         print(out)
@@ -139,7 +138,7 @@ if __name__ == "__main__":
 
         assert all([item[1] <= 7 for item in
                     iter_counts_multigrid]), "ERROR: weird iteration counts for multigrid, got %s" % iter_counts_multigrid
-        assert diff < 1E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
+        assert diff < 1.308E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
 
 
 
