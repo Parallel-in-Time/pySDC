@@ -100,7 +100,7 @@ def main():
         out = 'Error multigrid: %12.8e' % (err_multigrid)
         f.write(out + '\n')
         print(out)
-        out = 'Diff: %12.8e' % diff
+        out = 'Diff: %6.4e' % diff
         f.write(out + '\n')
         print(out)
 

@@ -49,7 +49,6 @@ if __name__ == "__main__":
     # initialize controller parameters
     controller_params = {}
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = {}
@@ -104,6 +103,9 @@ if __name__ == "__main__":
     if rank == 0:
 
         f = open('step_6_B_out.txt', 'a')
+        out = 'Working with %2i processes...' % size
+        f.write(out + '\n')
+        print(out)
 
         # compute exact solution and compare
         uex = P.u_exact(Tend)
@@ -117,7 +119,7 @@ if __name__ == "__main__":
         out = 'Error multigrid: %12.8e' % (err_multigrid)
         f.write(out + '\n')
         print(out)
-        out = 'Diff: %12.8e' % diff
+        out = 'Diff: %6.4e' % diff
         f.write(out + '\n')
         print(out)
 
