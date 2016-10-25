@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 from collections import namedtuple
@@ -13,6 +14,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by dt)
 ID = namedtuple('ID', 'dt')
+
 
 def main():
     """
@@ -52,7 +54,9 @@ def main():
 
     assert os.path.isfile('step_1_accuracy_test_coll.png')
 
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" %order
+    assert all(np.isclose(order, 2 * coll.num_nodes - 1,
+                          rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" % order
+
 
 def run_accuracy_check(prob, coll, dt_list):
     """
@@ -61,7 +65,7 @@ def run_accuracy_check(prob, coll, dt_list):
     Args:
         prob: a problem instance
         coll: a collocation instance
-        dt: time-step size
+        dt_list: list of time-step sizes
 
     Return:
         the analytic error of the solved collocation problem
@@ -114,14 +118,13 @@ def get_accuracy_order(results):
 
     order = []
     # loop over two consecutive errors/dt pairs
-    for i in range(1,len(dt_list)):
-
+    for i in range(1, len(dt_list)):
         # get ids
         id = ID(dt=dt_list[i])
-        id_prev = ID(dt=dt_list[i-1])
+        id_prev = ID(dt=dt_list[i - 1])
 
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
-        tmp = np.log(results[id]/results[id_prev])/np.log(dt_list[i]/dt_list[i-1])
+        tmp = np.log(results[id] / results[id_prev]) / np.log(dt_list[i] / dt_list[i - 1])
         order.append(tmp)
 
     return order
@@ -166,7 +169,6 @@ def plot_accuracy(results):
     order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
     plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
 
-
     min_err = 1E99
     max_err = 0E00
     err_list = []
@@ -192,5 +194,3 @@ def plot_accuracy(results):
 
 if __name__ == "__main__":
     main()
-
-

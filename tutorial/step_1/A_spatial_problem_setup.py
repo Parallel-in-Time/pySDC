@@ -3,13 +3,14 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
+
 def main():
     """
-    A simple test program to set up a spatial problem and play with it.
+    A simple test program to set up a spatial problem and play with it
     """
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
@@ -26,7 +27,7 @@ def main():
     print(out)
     f.close()
 
-    assert err <= 2E-04, "ERROR: the spatial accuracy is higher than expected, got %s" %err
+    assert err <= 2E-04, "ERROR: the spatial accuracy is higher than expected, got %s" % err
 
 
 def run_accuracy_check(prob):

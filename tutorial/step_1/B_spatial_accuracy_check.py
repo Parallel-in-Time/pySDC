@@ -19,7 +19,7 @@ def main():
     """
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
 
@@ -27,15 +27,15 @@ def main():
     nvars_list = [2 ** p - 1 for p in range(4, 15)]
 
     # run accuracy test for all nvars
-    results = run_accuracy_check(nvars_list=nvars_list,problem_params=problem_params)
+    results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params)
 
     # compute order of accuracy
     order = get_accuracy_order(results)
 
     f = open('step_1_B_out.txt', 'w')
     for l in range(len(order)):
-        out = 'Expected order: %2i -- Computed order %4.3f' %(2,order[l])
-        f.write(out+'\n')
+        out = 'Expected order: %2i -- Computed order %4.3f' % (2, order[l])
+        f.write(out + '\n')
         print(out)
     f.close()
 
@@ -44,10 +44,10 @@ def main():
 
     assert os.path.isfile('step_1_accuracy_test_space.png')
 
-    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
+    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" % order
 
 
-def run_accuracy_check(nvars_list,problem_params):
+def run_accuracy_check(nvars_list, problem_params):
     """
     Routine to check the error of the Laplacian vs. its FD discretization
 
@@ -62,7 +62,6 @@ def run_accuracy_check(nvars_list,problem_params):
     results = {}
     # loop over all nvars
     for nvars in nvars_list:
-
         # setup problem
         problem_params['nvars'] = nvars
         prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
@@ -107,14 +106,13 @@ def get_accuracy_order(results):
 
     order = []
     # loop over two consecutive errors/nvars pairs
-    for i in range(1,len(nvars_list)):
-
+    for i in range(1, len(nvars_list)):
         # get ids
         id = ID(nvars=nvars_list[i])
-        id_prev = ID(nvars=nvars_list[i-1])
+        id_prev = ID(nvars=nvars_list[i - 1])
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
-        tmp = np.log(results[id_prev]/results[id])/np.log(nvars_list[i]/nvars_list[i-1])
+        tmp = np.log(results[id_prev] / results[id]) / np.log(nvars_list[i] / nvars_list[i - 1])
         order.append(tmp)
 
     return order
@@ -159,7 +157,6 @@ def plot_accuracy(results):
     order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(nvars_list))]
     plt.loglog(nvars_list, order_guide_space, color='k', ls='--', label='2nd order')
 
-
     min_err = 1E99
     max_err = 0E00
     err_list = []
@@ -185,4 +182,3 @@ def plot_accuracy(results):
 
 if __name__ == "__main__":
     main()
-

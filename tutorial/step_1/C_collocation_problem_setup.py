@@ -5,13 +5,14 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
+
 def main():
     """
     A simple test program to create and solve a collocation problem directly
     """
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
@@ -29,12 +30,12 @@ def main():
     err = solve_collocation_problem(prob=prob, coll=coll, dt=dt)
 
     f = open('step_1_C_out.txt', 'w')
-    out = 'Error of the collocation problem: %8.6e' %err
-    f.write(out+'\n')
+    out = 'Error of the collocation problem: %8.6e' % err
+    f.write(out + '\n')
     print(out)
     f.close()
 
-    assert err <= 4E-04, "ERROR: did not get collocation error as expected, got %s" %err
+    assert err <= 4E-04, "ERROR: did not get collocation error as expected, got %s" % err
 
 
 def solve_collocation_problem(prob, coll, dt):
@@ -74,4 +75,3 @@ def solve_collocation_problem(prob, coll, dt):
 
 if __name__ == "__main__":
     main()
-
