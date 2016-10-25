@@ -96,7 +96,7 @@ def main():
     err_pfasst = abs(uex - uend_pfasst)
     diff = abs(uend_mssdc-uend_pfasst)
 
-    f = open('step_6_B_out.txt', 'w')
+    f = open('step_7_B_out.txt', 'w')
 
     out = 'Error PFASST: %12.8e' % (err_pfasst)
     f.write(out + '\n')
@@ -124,9 +124,9 @@ def main():
 
     f.close()
 
-    show_residual_across_simulation(stats_mssdc, 'step_6_residuals_mssdc.png')
+    show_residual_across_simulation(stats_mssdc, 'step_7_residuals_mssdc.png')
 
-    assert os.path.isfile('step_6_residuals_mssdc.png')
+    assert os.path.isfile('step_7_residuals_mssdc.png')
     assert diff < 2.66E-09, "ERROR: difference between PFASST and MSSDC controller is too large, got %s" %diff
 
 if __name__ == "__main__":
