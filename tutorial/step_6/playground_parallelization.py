@@ -12,8 +12,10 @@ if __name__ == "__main__":
     A simple test program to do MPI-parallel PFASST runs
     """
 
+    # set MPI communicator
     comm = MPI.COMM_WORLD
 
+    # get parameters from Part A
     description, controller_params, t0, Tend = set_parameters()
 
     # instantiate controllers

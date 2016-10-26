@@ -1,12 +1,8 @@
-import numpy as np
 import os
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+
+from tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 from pySDC.plugins.visualization_tools import show_residual_across_simulation
@@ -14,60 +10,18 @@ from pySDC.plugins.visualization_tools import show_residual_across_simulation
 
 def main():
     """
-    A simple test program to do PFASST runs for the heat equation
+    A simple test program to demonstrate residual visualization
     """
 
-    # initialize level parameters
-    level_params = {}
-    level_params['restol'] = 5E-10
-    level_params['dt'] = 0.125
+    # get parameters from Step 6, Part A
+    description, controller_params, t0, Tend = set_parameters()
 
-    # initialize sweeper parameters
-    sweeper_params = {}
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
-
-    # initialize problem parameters
-    problem_params = {}
-    problem_params['nu'] = 0.1           # diffusion coefficient
-    problem_params['freq'] = 2           # frequency for the test value
-    problem_params['nvars'] = [63,31]  # number of degrees of freedom for each level
-
-    # initialize step parameters
-    step_params = {}
-    step_params['maxiter'] = 50
-
-    # initialize space transfer parameters
-    space_transfer_params = {}
-    space_transfer_params['rorder'] = 2
-    space_transfer_params['iorder'] = 6
-
-    # initialize controller parameters
-    controller_params = {}
-    controller_params['logger_level'] = 30
-
-    # fill description dictionary for easy step instantiation
-    description = {}
-    description['problem_class'] = heat1d                           # pass problem class
-    description['problem_params'] = problem_params                  # pass problem parameters
-    description['dtype_u'] = mesh                                   # pass data type for u
-    description['dtype_f'] = mesh                                   # pass data type for f
-    description['sweeper_class'] = generic_LU                       # pass sweeper
-    description['sweeper_params'] = sweeper_params                  # pass sweeper parameters
-    description['level_params'] = level_params                      # pass level parameters
-    description['step_params'] = step_params                        # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh              # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params    # pass paramters for spatial transfer
-
-    # set time parameters
-    t0 = 0.0
-    Tend = 1.0
-
-    # set up list of parallel time-steps to run PFASST with
+    # use 8 processes here
     num_proc = 8
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                             description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -76,7 +30,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # compute exact solution and compare
+    # compute exact solution and compare (for testing purposes only)
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
@@ -94,15 +48,18 @@ def main():
         out = 'Number of iterations for time %4.2f: %1i' % item
         f.write(out + '\n')
         print(out)
-        min_iter = min(min_iter,item[1])
-        max_iter = max(max_iter,item[1])
+        min_iter = min(min_iter, item[1])
+        max_iter = max(max_iter, item[1])
     f.close()
 
-    show_residual_across_simulation(stats,'step_7_residuals.png')
+    # call helper routine to produce residual plot
+    show_residual_across_simulation(stats=stats, fname='step_7_residuals.png')
 
-    assert err < 6.155222e-05, 'ERROR: error is too large, got %s' %err
+    assert err < 6.155222e-05, 'ERROR: error is too large, got %s' % err
     assert os.path.isfile('step_7_residuals.png')
-    assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" %(min_iter, max_iter)
+    assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" % \
+                                            (min_iter, max_iter)
+
 
 if __name__ == "__main__":
     main()
