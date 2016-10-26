@@ -17,24 +17,23 @@ def main():
     """
 
     # initialize problem parameters
-    problem_params = {}
+    problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 3  # frequency for the test value
 
     # initialize transfer parameters
-    space_transfer_params = {}
+    space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 4
 
-    nvars_fine_list = [2**p-1 for p in range(5,10)]
+    nvars_fine_list = [2 ** p - 1 for p in range(5, 10)]
 
     # set up dictionary to store results (plus lists)
-    results = {}
+    results = dict()
     results['nvars_list'] = nvars_fine_list
 
     for nvars_fine in nvars_fine_list:
-
-        print('Working on nvars_fine = %4i...' %(nvars_fine))
+        print('Working on nvars_fine = %4i...' % nvars_fine)
 
         # instantiate fine problem
         problem_params['nvars'] = nvars_fine  # number of degrees of freedom
@@ -62,18 +61,20 @@ def main():
 
         # compute error and store
         id = ID(nvars_fine=nvars_fine)
-        results[id] = abs(uinter-uexact_fine)
+        results[id] = abs(uinter - uexact_fine)
 
+    # print out and check
     print('Running order checks...')
     orders = get_accuracy_order(results)
     f = open('step_4_A_out.txt', 'w')
     for p in range(len(orders)):
-        out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%'\
-              %(space_transfer_params['iorder'], orders[p], 100*abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'])
+        out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%' \
+              % (space_transfer_params['iorder'], orders[p],
+                 100 * abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'])
         f.write(out + '\n')
         print(out)
-        assert abs(space_transfer_params['iorder']-orders[p])/space_transfer_params['iorder'] < 0.05, \
-            'ERROR: did not get expected orders for interpolation, got %s' %str(orders[p])
+        assert abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'] < 0.05, \
+            'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
     f.close()
     print('...got what we expected!')
 

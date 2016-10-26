@@ -2,12 +2,13 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 
+
 class penningtrap_coarse(penningtrap):
     """
     Coarse level problem description class, will only overwrite what is needed
     """
 
-    def eval_f(self,part,t):
+    def eval_f(self, part, t):
         """
         Routine to compute the E and B fields (named f for consistency with the original PEPC version)
 
@@ -20,12 +21,13 @@ class penningtrap_coarse(penningtrap):
 
         N = self.params.nparts
 
-        Emat = np.diag([1,1,-2])
-        f = self.dtype_f(self.init,vals=(0,0))
+        Emat = np.diag([1, 1, -2])
+        f = self.dtype_f(self.init, vals=(0, 0))
 
+        # only compute external forces here: O(N) instead of O(N*N)
         for n in range(N):
-            f.elec.values[3*n:3*n+3] = self.params.omega_E**2 / (part.q[n]/part.m[n]) * np.dot(Emat,part.pos.values[
-                                                                                              3*n:3*n+3])
-            f.magn.values[3*n:3*n+3] = self.params.omega_B * np.array([0,0,1])
+            f.elec.values[3 * n:3 * n + 3] = self.params.omega_E ** 2 / \
+                                             (part.q[n] / part.m[n]) * np.dot(Emat, part.pos.values[3 * n:3 * n + 3])
+            f.magn.values[3 * n:3 * n + 3] = self.params.omega_B * np.array([0, 0, 1])
 
         return f

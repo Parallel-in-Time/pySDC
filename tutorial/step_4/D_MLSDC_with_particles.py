@@ -24,8 +24,9 @@ def main():
     stats_mlsdc_finter, time_mlsdc_finter = run_penning_trap_simulation(mlsdc=True, finter=True)
 
     f = open('step_4_D_out.txt', 'w')
-    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' %(time_sdc, time_mlsdc, time_mlsdc_finter)
-    f.write(out+'\n')
+    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % \
+          (time_sdc, time_mlsdc, time_mlsdc_finter)
+    f.write(out + '\n')
     print(out)
 
     # filter statistics type (etot)
@@ -41,23 +42,28 @@ def main():
     # get base energy and show differences
     base_energy = energy_sdc[0][1]
     for item in energy_sdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
+              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' %(item[0], item[1], abs(base_energy-item[1])/base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
+              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc_finter:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
+              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
         f.write(out + '\n')
         print(out)
     f.close()
 
-    assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1])/base_energy < 6E-10 , \
-        'ERROR: energy deviated too much between SDC and MLSDC, got %s' %(abs(energy_sdc[-1][1] - energy_mlsdc[-1][1])/base_energy)
-    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1])/base_energy < 3E-10, \
-        'ERROR: energy deviated too much after using finter, got %s' % (abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1])/base_energy)
+    assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6E-10, \
+        'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
+        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy)
+    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 3E-10, \
+        'ERROR: energy deviated too much after using finter, got %s' % (
+        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy)
 
 
 def run_penning_trap_simulation(mlsdc, finter=False):
@@ -65,41 +71,43 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     A simple test program to run IMEX SDC for a single time step
     """
     # initialize level parameters
-    level_params = {}
+    level_params = dict()
     level_params['restol'] = 1E-07
-    level_params['dt'] = 1.0/8
+    level_params['dt'] = 1.0 / 8
 
     # initialize sweeper parameters
-    sweeper_params = {}
+    sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 5
 
     # initialize problem parameters for the Penning trap
-    problem_params = {}
-    problem_params['omega_E'] = 4.9    # E-field frequency
-    problem_params['omega_B'] = 25.0   # B-field frequency
-    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]]) # initial coordinates for the center of positions
-    problem_params['nparts'] = 50    # number of particles in the trap
-    problem_params['sig'] = 0.1    # smoothing parameter for the forces
+    problem_params = dict()
+    problem_params['omega_E'] = 4.9  # E-field frequency
+    problem_params['omega_B'] = 25.0  # B-field frequency
+    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])  # initial center of positions
+    problem_params['nparts'] = 50  # number of particles in the trap
+    problem_params['sig'] = 0.1  # smoothing parameter for the forces
 
     # initialize step parameters
-    step_params = {}
+    step_params = dict()
     step_params['maxiter'] = 20
 
     # initialize controller parameters
-    controller_params = {}
-    controller_params['hook_class'] = particle_hook # specialized hook class for more statistics and output
+    controller_params = dict()
+    controller_params['hook_class'] = particle_hook  # specialized hook class for more statistics and output
     controller_params['predict'] = False
     controller_params['logger_level'] = 30
 
-    transfer_params = {}
+    transfer_params = dict()
     transfer_params['finter'] = finter
 
     # Fill description dictionary for easy hierarchy creation
-    description = {}
+    description = dict()
     if mlsdc:
-        description['problem_class'] = [penningtrap,penningtrap_coarse]
+        # MLSDC: provide list of two problem classes: one for the fine, one for the coarse level
+        description['problem_class'] = [penningtrap, penningtrap_coarse]
     else:
+        # SDC: provide only one problem class
         description['problem_class'] = penningtrap
     description['problem_params'] = problem_params
     description['dtype_u'] = particles
@@ -128,6 +136,7 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     end_time = time.time() - start_time
 
     return stats, end_time
+
 
 if __name__ == "__main__":
     main()
