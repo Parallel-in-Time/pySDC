@@ -54,13 +54,15 @@ Part C: MPI parallelization
 Since PFASST is actually a parallel algorithm, executing it in parallel e.g. using MPI might be an interesting exercise.
 To do this, pySDC comes with the two MPI-parallelized controllers, namely ``allinclusive_classic_MPI`` and ``allinclusive_multigrid_MPI``.
 Both are supposed to yield the same results as their non-MPI counterparts and this is what we are demonstrating here (at least for one particular example).
-The actual code of this part is rather short, since the only task is to call another snippet with different number of parallel processes.
+The actual code of this part is rather short, since the only task is to call another snippet (``playground_parallelization.py``) with different number of parallel processes.
 This is realized using Python's ``subprocess`` library and we check at the end if each call returned normally.
 Now, the snippet called by the example is the basically the same code as use by Parts A and B.
 We can use the results of Parts A and B to compare with and we expect the same number of iterations, the same accuracy and the same difference between the two flavors as in Part A (up to machine precision).
 
 Important things to note:
 
+- The additional Python script ``playground_parallelization.py`` contains the code to run the MPI-parallel controllers. To this end, we import the routine ``set_parameters`` from Part A to ensure that we use teh same set of parameters for all runs.
+- This example also shows how the statistics of multiple MPI processes can be gathered and processed by rank 0, see ``playground_parallelization.py``.
 - Both controllers need a working installation of ``mpi4py``. Since this is not always easy to achieve and since debugging a parallel program can cause a lot of headaches, the non-MPI controllers perform the same operations in serial.
 - The somewhat weird notation with the current working directory ``cwd`` is due to the corresponding test, which, run by nosetests, has a different working directory than the tutorial.
 
