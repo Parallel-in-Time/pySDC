@@ -13,6 +13,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
@@ -23,7 +24,7 @@ def main():
 
     # initialize level parameters (part I)
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-08
 
     # initialize sweeper parameters (part I)
     sweeper_params = dict()
@@ -42,7 +43,9 @@ def main():
     qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'PIC']
     setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
                   ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
-                  ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)])]
+                  ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
+                  ('fisher', 63, [2*i for i in range(1,6)])]
+    # setup_list = [('fisher', 63, [2 * i for i in range(1, 6)])]
 
     # pre-fill results with lists of  setups
     results = dict()
@@ -101,14 +104,28 @@ def main():
 
                 elif setup == 'vanderpol':
 
-                    problem_params['newton_tol'] = 1E-11
-                    problem_params['maxiter'] = 50
+                    problem_params['newton_tol'] = 1E-09
+                    problem_params['maxiter'] = 20
                     problem_params['mu'] = param
                     problem_params['u0'] = np.array([2.0, 0])
 
                     level_params['dt'] = 0.1
 
                     description['problem_class'] = vanderpol
+                    description['problem_params'] = problem_params
+                    description['level_params'] = level_params
+
+                elif setup == 'fisher':
+
+                    problem_params['nu'] = 1
+                    problem_params['lambda0'] = param
+                    problem_params['maxiter'] = 20
+                    problem_params['newton_tol'] = 1E-09
+                    problem_params['interval'] = (-5, 5)
+
+                    level_params['dt'] = 0.01
+
+                    description['problem_class'] = generalized_fisher
                     description['problem_params'] = problem_params
                     description['level_params'] = level_params
 
@@ -125,7 +142,7 @@ def main():
                 uinit = P.u_exact(0)
 
                 # call main function to get things done...
-                uend, stats = controller.run(u0=uinit, t0=0, Tend=0.1)
+                uend, stats = controller.run(u0=uinit, t0=0, Tend=level_params['dt'])
 
                 # filter statistics by type (number of iterations)
                 filtered_stats = filter_stats(stats, type='niter')
@@ -138,7 +155,7 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10) * 5 + 3, 'ERROR: did not get all results, got %s' % len(results)
+    assert len(results) == (6 + 6 + 10 + 5) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
     file = open('parallelSDC_iterations_precond.pkl', 'wb')
@@ -168,7 +185,7 @@ def plot_iterations():
     print('Found these setups:', setup_list)
 
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
-    assert len(setup_list) == 3, 'ERROR: did not find three setup, got %s' % setup_list
+    assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
