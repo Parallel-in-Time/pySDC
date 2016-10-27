@@ -10,7 +10,7 @@ from pySDC.Stats import grep_stats, sort_stats
 from examples.vanderpol.HookClass import vanderpol_output
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.implementations.problem_classes.Van_der_Pol_oscillator import vanderpol
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.plugins.sweeper_helper import get_Qd
 
 if __name__ == "__main__":

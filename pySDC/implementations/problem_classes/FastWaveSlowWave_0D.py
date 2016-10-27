@@ -33,8 +33,6 @@ class swfw_scalar(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(swfw_scalar,self).__init__(init,dtype_u,dtype_f,cparams)
 
-
-
     def solve_system(self,rhs,factor,u0,t):
         """
         Simple linear solver for (I-dtA)u = rhs

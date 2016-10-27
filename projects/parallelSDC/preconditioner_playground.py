@@ -8,7 +8,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.problem_classes.Van_der_Pol_oscillator import vanderpol
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 

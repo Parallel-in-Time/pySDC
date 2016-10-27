@@ -28,9 +28,6 @@ class vanderpol(ptype):
         assert 'maxiter' in cparams
         assert 'newton_tol' in cparams
 
-        # add parameters as attributes for further reference
-        for k, v in cparams.items():
-            setattr(self, k, v)
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super(vanderpol, self).__init__(2, dtype_u, dtype_f, cparams)
 
@@ -47,7 +44,7 @@ class vanderpol(ptype):
         # thou shall not call this at time > 0
         assert t is 0
         me = self.dtype_u(2)
-        me.values = self.u0
+        me.values = self.params.u0
         return me
 
     def eval_f(self, u, t):
@@ -65,7 +62,7 @@ class vanderpol(ptype):
         x2 = u.values[1]
         f = self.dtype_f(2)
         f.values[0] = x2
-        f.values[1] = self.mu * (1 - x1 ** 2) * x2 - x1
+        f.values[1] = self.params.mu * (1 - x1 ** 2) * x2 - x1
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -82,7 +79,7 @@ class vanderpol(ptype):
             solution u
         """
 
-        mu = self.mu
+        mu = self.params.mu
 
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
@@ -91,14 +88,14 @@ class vanderpol(ptype):
 
         # start newton iteration
         n = 0
-        while n < self.maxiter:
+        while n < self.params.maxiter:
 
             # form the function g with g(u) = 0
             g = np.array([x1 - dt * x2 - rhs.values[0], x2 - dt * (mu * (1 - x1 ** 2) * x2 - x1) - rhs.values[1]])
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
-            if res < self.newton_tol:
+            if res < self.params.newton_tol:
                 break
 
             # prefactor for dg/du
@@ -121,7 +118,7 @@ class vanderpol(ptype):
         #     x1 = u.values[0]
         #     x2 = u.values[1]
         #
-        #     dfdu = np.array( [ [0, 1], [-2*self.mu*x1*x2 -1, self.mu*(1-x1**2)] ] )
+        #     dfdu = np.array( [ [0, 1], [-2*self.params.mu*x1*x2 -1, self.params.mu*(1-x1**2)] ] )
         #
         #     return dfdu
         #
