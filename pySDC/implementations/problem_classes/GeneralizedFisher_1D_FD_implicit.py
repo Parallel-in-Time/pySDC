@@ -4,11 +4,8 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from implementations.datatype_classes import mesh
 from pySDC.Problem import ptype
 
-
-# from pySDC.datatype_classes.complex_mesh import mesh
 
 class generalized_fisher(ptype):
     """
@@ -36,21 +33,16 @@ class generalized_fisher(ptype):
         assert 'maxiter' in cparams
         assert 'newton_tol' in cparams
 
-        assert (cparams['nvars'])%2 == 0
-
-        # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        assert (cparams['nvars'] + 1) % 2 == 0
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(generalized_fisher,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(generalized_fisher, self).__init__(self.nvars, dtype_u, dtype_f)
 
         # compute dx and get discretization matrix A
-        self.dx = 20/(self.nvars)
-        self.A = self.__get_A(self.nvars,self.dx)
+        self.dx = 2.0 / (self.nvars + 1)
+        self.A = self.__get_A(self.nvars, self.dx)
 
-
-    def __get_A(self,N,dx):
+    def __get_A(self, N, dx):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -64,13 +56,12 @@ class generalized_fisher(ptype):
         """
 
         stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N+1,N+1)).tolil()
-        A *= 1.0 / (dx**2)
+        A = sp.diags(stencil, [-1, 0, 1], shape=(N+2, N+2), format='lil')
+        A *= 1.0 / (dx ** 2)
 
-        return A.tocsc()
+        return A
 
-
-    def solve_system(self,rhs,factor,u0,t):
+    def solve_system(self, rhs, factor, u0, t):
         """
         Simple Newton solver
 
@@ -84,15 +75,24 @@ class generalized_fisher(ptype):
             solution as mesh
         """
 
-        u = mesh(u0)
+        u = self.dtype_u(u0)
+
+        nu = self.params.nu
+        lambda0 = self.params.lambda0
+
+        lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
+        sig1 = lam1 - np.sqrt(lam1 ** 2 - lambda0 ** 2)
+        ul = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (-1 + 2 * lam1 * t))) ** (-2.0 / nu)
+        ur = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (1 + 2 * lam1 * t))) ** (-2.0 / nu)
 
         # start newton iteration
         n = 0
-        while n < self.maxiter:
+        while n < self.params.maxiter:
 
             # form the function g with g(u) = 0
-            uext = np.concatenate((u.values, [1]))
-            g = u.values - factor * ( self.A.dot(uext)[0:-1] + self.lambda0**2*u.values*(1-u.values**self.nu) ) - rhs.values
+            uext = np.concatenate(([ul], u.values, [ur]))
+            g = u.values - \
+                factor * (self.A.dot(uext)[1:-1] + lambda0 ** 2 * u.values * (1 - u.values ** nu)) - rhs.values
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -101,18 +101,18 @@ class generalized_fisher(ptype):
                 break
 
             # assemble dg
-            dg = sp.eye(self.nvars) - factor*(self.A[:-1,:-1] + sp.diags(self.lambda0**2 - self.lambda0**2*(self.nu+1)*u.values**self.nu))
+            dg = sp.eye(self.nvars) - \
+                 factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu))
 
             # newton update: u1 = u0 - g/dg
-            u.values -= LA.spsolve(dg,g)
+            u.values -= LA.spsolve(dg, g)
 
             # increase iteration count
             n += 1
 
         return u
 
-
-    def eval_f(self,u,t):
+    def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
 
@@ -124,14 +124,20 @@ class generalized_fisher(ptype):
             the RHS
         """
 
-        uext = np.concatenate((u.values,[1]))
+        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
+        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+                     np.exp(-self.params.nu / 2.0 * sig1 * (-1 + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+        ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+                     np.exp(-self.params.nu / 2.0 * sig1 * (1 + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
 
-        f = mesh(self.nvars)
-        f.values = self.A.dot(uext)[0:-1] + self.lambda0**2 * u.values * (1 - u.values**self.nu)
+        uext = np.concatenate(([ul], u.values, [ur]))
+
+        f = self.dtype_f(self.nvars)
+        f.values = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
         return f
 
-
-    def u_exact(self,t):
+    def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
 
@@ -142,21 +148,21 @@ class generalized_fisher(ptype):
             exact solution
         """
 
-        me = mesh(self.nvars)
-        xvalues = np.array([(i+1-self.nvars/2)*self.dx for i in range(self.nvars)])
+        me = self.dtype_u(self.nvars)
+        xvalues = np.array([(i + 1 - (self.nvars+1) / 2) * self.dx for i in range(self.nvars)])
 
-        lam1 = self.lambda0/2.0*((self.nu/2.0 + 1)**0.5 + (self.nu/2.0 + 1)**(-0.5))
-        sig1 = lam1 - np.sqrt(lam1**2 - self.lambda0**2)
-        me.values = (1 + (2**(self.nu/2.0) - 1) * np.exp(-self.nu/2.0*sig1*(xvalues + 2*lam1*t)))**(-2.0/self.nu)
+        lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
+        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+                     np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
         return me
-
 
     def eval_jacobian(self, u):
 
-        dfdu = self.A[:-1,:-1] + sp.diags(self.lambda0**2-self.lambda0**2*(self.nu+1)*u.values**self.nu)
+        dfdu = self.A[1:-1, 1:-1] + sp.diags(self.params.lambda0 ** 2 - self.params.lambda0 ** 2 * (self.params.nu + 1) *
+                                           u.values ** self.params.nu)
 
         return dfdu
-
 
     def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
         """
@@ -173,6 +179,6 @@ class generalized_fisher(ptype):
             solution as mesh
         """
 
-        me = mesh(self.nvars)
+        me = self.dtype_u(self.nvars)
         me.values = LA.spsolve(sp.eye(self.nvars) - factor * dfdu, rhs.values)
         return me
