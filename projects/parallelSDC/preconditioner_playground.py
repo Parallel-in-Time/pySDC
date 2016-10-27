@@ -1,6 +1,6 @@
 import pickle
 from collections import namedtuple
-
+import os
 import numpy as np
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -134,9 +134,13 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
+    assert len(results) == (6 + 6 + 10) * 5 + 3, 'ERROR: did not get all results, got %s' % len(results)
+
     # write out for later visualization, see preconditioner_plot.py
     file = open('results_iterations_precond.pkl', 'wb')
     pickle.dump(results, file)
+
+    assert os.path.isfile('results_iterations_precond.pkl'), 'ERROR: pickle did not create file'
 
 
 if __name__ == "__main__":
