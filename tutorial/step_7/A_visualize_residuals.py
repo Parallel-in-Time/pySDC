@@ -53,10 +53,12 @@ def main():
     f.close()
 
     # call helper routine to produce residual plot
-    show_residual_across_simulation(stats=stats, fname='step_7_residuals.png')
+
+    fname = os.path.dirname(os.path.abspath(__file__)) + '/step_7_residuals.png'
+    show_residual_across_simulation(stats=stats, fname=fname)
 
     assert err < 6.155222e-05, 'ERROR: error is too large, got %s' % err
-    assert os.path.isfile('step_7_residuals.png')
+    assert os.path.isfile(fname), 'ERROR: residual plot has not been created'
     assert min_iter == 5 and max_iter == 7, "ERROR: number of iterations not as expected, got %s and %s" % \
                                             (min_iter, max_iter)
 

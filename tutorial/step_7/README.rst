@@ -23,7 +23,7 @@ Results:
 
 .. literalinclude:: ../../../step_7_A_out.txt
 
-.. image:: ../../../step_7_residuals.png
+.. image:: ../../../tutorial/step_7/step_7_residuals.png
    :scale: 50 %
 
 Part B: Multi-step SDC
@@ -39,6 +39,8 @@ Important things to note:
 
 - The multigrid controller cannot handle multi-step SDC. This is not a fundamental limitation but due to design decisions.
 - We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
+
+Full code: `tutorial/step_7/B_multistep_SDC.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_7/B_multistep_SDC.py>`_
 
 Results:
 
