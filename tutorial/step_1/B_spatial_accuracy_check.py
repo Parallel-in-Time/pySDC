@@ -42,7 +42,7 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('step_1_accuracy_test_space.png')
+    assert os.path.isfile('step_1_accuracy_test_space.png'), 'ERROR: plotting did not create file'
 
     assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" % order
 

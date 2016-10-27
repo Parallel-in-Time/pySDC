@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -118,6 +119,8 @@ def main():
     f.close()
 
     plot_graphs(uinit, uend, uex, P)
+
+    assert os.path.isfile('parallelSDC_fisher.png'), 'ERROR: plotting did not create file'
 
 
 def plot_graphs(uinit, uend, uex, P):
