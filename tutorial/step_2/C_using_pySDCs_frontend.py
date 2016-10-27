@@ -47,7 +47,7 @@ def main():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
-    # instantiate the controller (no controller parameters used here)
+    # instantiate the controller
     controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
