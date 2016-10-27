@@ -15,16 +15,7 @@ Important things to note:
 - The function visualizes simply the residuals over all processes and all iterations, but only for a single block.
 - The function itself is pretty straightforward and does not require passing the number of processes or iterations.
 
-Full code: `tutorial/step_7/A_visualize_residuals.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_7/A_visualize_residuals.py>`_
-
-.. literalinclude:: ../../../tutorial/step_7/A_visualize_residuals.py
-
-Results:
-
-.. literalinclude:: ../../../step_7_A_out.txt
-
-.. image:: ../../../tutorial/step_7/step_7_residuals.png
-   :scale: 50 %
+.. include:: doc_step_7.rst
 
 Part B: Multi-step SDC
 ----------------------
