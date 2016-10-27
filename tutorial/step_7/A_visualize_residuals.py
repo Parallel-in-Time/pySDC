@@ -54,7 +54,7 @@ def main():
 
     # call helper routine to produce residual plot
 
-    fname = os.path.dirname(os.path.abspath(__file__)) + '/step_7_residuals.png'
+    fname = 'step_7_residuals.png'
     show_residual_across_simulation(stats=stats, fname=fname)
 
     assert err < 6.155222e-05, 'ERROR: error is too large, got %s' % err

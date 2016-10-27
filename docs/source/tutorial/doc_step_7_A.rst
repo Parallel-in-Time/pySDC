@@ -6,5 +6,5 @@ Results:
 
 .. literalinclude:: ../../../step_7_A_out.txt
 
-.. image:: ../../../tutorial/step_7/step_7_residuals.png
+.. image:: ../../../step_7_residuals.png
    :scale: 50 %

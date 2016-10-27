@@ -15,7 +15,7 @@ Important things to note:
 - The function visualizes simply the residuals over all processes and all iterations, but only for a single block.
 - The function itself is pretty straightforward and does not require passing the number of processes or iterations.
 
-.. include:: doc_step_7.rst
+.. include:: doc_step_7_A.rst
 
 Part B: Multi-step SDC
 ----------------------
@@ -31,14 +31,7 @@ Important things to note:
 - The multigrid controller cannot handle multi-step SDC. This is not a fundamental limitation but due to design decisions.
 - We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
 
-Full code: `tutorial/step_7/B_multistep_SDC.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_7/B_multistep_SDC.py>`_
-
-Results:
-
-.. literalinclude:: ../../../step_7_B_out.txt
-
-.. image:: ../../../step_7_residuals_mssdc.png
-   :scale: 50 %
+.. include:: doc_step_7_B.rst
 
 Part X: To be continued...
 --------------------------
