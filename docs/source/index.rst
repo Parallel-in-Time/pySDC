@@ -28,6 +28,15 @@ Tutorial
    tutorial/step_6.rst
    tutorial/step_7.rst
 
+Projects
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   projects/parallelSDC.rst
+
+
 
 API documentation
 -----------------

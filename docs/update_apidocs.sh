@@ -16,7 +16,7 @@ SPHINX_APIDOC="`which sphinx-apidoc`"
 
 echo "removing existing .rst files ..."
 rm ${PWD}/docs/source/pySDC/*.rst
-rm -r ${PWD}/docs/build
+rm -r ${PWD}/target/doc/build
 
 echo ""
 echo "generating new .rst files ..."

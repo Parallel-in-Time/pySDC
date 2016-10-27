@@ -1,0 +1,1 @@
+.. include:: /../../projects/parallelSDC/README.rst
