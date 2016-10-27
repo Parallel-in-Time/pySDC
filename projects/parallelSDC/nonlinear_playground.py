@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 
+import pickle
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -121,21 +122,33 @@ def main():
 
     f.close()
 
-    plot_graphs(uinit, uend, uex, P)
+    results = dict()
+    results['interval'] = problem_params['interval']
+    results['xvalues'] = np.array([(i + 1 - (P.params.nvars + 1) / 2) * P.dx for i in range(P.params.nvars)])
+    results['uinit'] = uinit.values
+    results['uend'] = uend.values
+    results['uex'] = uex.values
 
-    assert os.path.isfile('parallelSDC_fisher.png'), 'ERROR: plotting did not create file'
+    # write out for later visualization
+    file = open('parallelSDC_results_graphs.pkl', 'wb')
+    pickle.dump(results, file)
+
+    assert os.path.isfile('parallelSDC_results_graphs.pkl'), 'ERROR: pickle did not create file'
 
 
-def plot_graphs(uinit, uend, uex, P):
+def plot_graphs():
     """
     Helper function to plot graphs of initial and final values
-
-    Args:
-        uinit: initial values
-        uend: computed values
-        uex: final values
-        P: problem class
     """
+
+    file = open('parallelSDC_results_graphs.pkl', 'rb')
+    results = pickle.load(file)
+
+    interval = results['interval']
+    xvalues = results['xvalues']
+    uinit = results['uinit']
+    uend = results['uend']
+    uex = results['uex']
 
     # Set up plotting parameters
     params = {'legend.fontsize': 20,
@@ -152,15 +165,15 @@ def plot_graphs(uinit, uend, uex, P):
     plt.figure()
     plt.xlabel('x')
     plt.ylabel('f(x)')
-    plt.xlim((P.params.interval[0] - P.dx, P.params.interval[1] + P.dx))
+    plt.xlim((interval[0] - 0.01, interval[1] + 0.01))
     plt.ylim((-0.1, 1.1))
     plt.grid()
 
     # compute values for x-axis and plot
-    xvalues = np.array([(i + 1 - (P.params.nvars + 1) / 2) * P.dx for i in range(P.params.nvars)])
-    plt.plot(xvalues, uinit.values, 'r--', lw=2, label='initial')
-    plt.plot(xvalues, uend.values, 'bs', lw=2, label='computed')
-    plt.plot(xvalues, uex.values, 'gd', lw=2, label='exact')
+
+    plt.plot(xvalues, uinit, 'r--', lw=2, label='initial')
+    plt.plot(xvalues, uend, 'bs', lw=2, label='computed')
+    plt.plot(xvalues, uex, 'gd', lw=2, label='exact')
 
     plt.legend(loc=2, ncol=1, numpoints=1)
 
@@ -168,6 +181,9 @@ def plot_graphs(uinit, uend, uex, P):
     fname = 'parallelSDC_fisher.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
+    assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+
 
 if __name__ == "__main__":
     main()
+    plot_graphs()

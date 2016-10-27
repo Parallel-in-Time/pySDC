@@ -1,5 +1,9 @@
+import matplotlib
+matplotlib.use('Agg')
+
 import pickle
 from collections import namedtuple
+import matplotlib.pylab as plt
 import os
 import numpy as np
 
@@ -136,12 +140,63 @@ def main():
 
     assert len(results) == (6 + 6 + 10) * 5 + 3, 'ERROR: did not get all results, got %s' % len(results)
 
-    # write out for later visualization, see preconditioner_plot.py
-    file = open('results_iterations_precond.pkl', 'wb')
+    # write out for later visualization
+    file = open('parallelSDC_iterations_precond.pkl', 'wb')
     pickle.dump(results, file)
 
-    assert os.path.isfile('results_iterations_precond.pkl'), 'ERROR: pickle did not create file'
+    assert os.path.isfile('parallelSDC_iterations_precond.pkl'), 'ERROR: pickle did not create file'
+
+
+def plot_iterations():
+    """
+    Helper routine to plot iteration counts
+    """
+
+    file = open('parallelSDC_iterations_precond.pkl', 'rb')
+    results = pickle.load(file)
+
+    # find the lists/header required for plotting
+    qd_type_list = []
+    setup_list = []
+    for key in results.keys():
+        if isinstance(key, ID):
+            if key.qd_type not in qd_type_list:
+                qd_type_list.append(key.qd_type)
+        elif isinstance(key, str):
+            setup_list.append(key)
+    print('Found these type of preconditioners:', qd_type_list)
+    print('Found these setups:', setup_list)
+
+    assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
+    assert len(setup_list) == 3, 'ERROR: did not find three setup, got %s' % setup_list
+
+    # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
+    for setup in setup_list:
+
+        plt.figure()
+        for qd_type in qd_type_list:
+            niter_heat = np.zeros(len(results[setup][1]))
+            for key in results.keys():
+                if isinstance(key, ID):
+                    if key.setup == setup and key.qd_type == qd_type:
+                        xvalue = results[setup][1].index(key.param)
+                        niter_heat[xvalue] = results[key]
+            plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=2)
+
+        plt.ylim([0, 100])
+        plt.legend(loc=2, ncol=1)
+        plt.title(setup)
+        plt.ylabel('number of iterations')
+        plt.xlabel('parameter')
+        plt.grid()
+
+        # save plot as PDF, beautify
+        fname = 'parallelSDC_preconditioner_'+setup+'.png'
+        plt.savefig(fname, rasterized=True, bbox_inches='tight')
+
+        assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 
 
 if __name__ == "__main__":
     main()
+    plot_iterations()
