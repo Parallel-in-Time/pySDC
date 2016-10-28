@@ -1,6 +1,14 @@
 Attempts to parallelize SDC
 ===========================
 
-blabla
+
+Different preconditioners for SDC
+---------------------------------
+
+.. include:: doc_parallelSDC_preconditioner.rst
+
+Simplified Newton for nonlinear problems
+----------------------------------------
 
 .. include:: doc_parallelSDC_nonlinear.rst
+
