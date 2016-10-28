@@ -27,7 +27,7 @@ def main(cwd):
         cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../' + fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % p.returncode
+        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode,num_procs)
 
     # set list of number of parallel steps (odd)
     num_procs_list = [3, 5, 7, 9]
@@ -43,7 +43,7 @@ def main(cwd):
         cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../' + fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s' % p.returncode
+        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
 
 
 if __name__ == "__main__":

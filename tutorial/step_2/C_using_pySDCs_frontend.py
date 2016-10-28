@@ -19,7 +19,6 @@ def main():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    # sweeper_params['do_LU'] = True      # for this sweeper we can use the LU trick for the implicit part!
 
     # initialize problem parameters
     problem_params = dict()

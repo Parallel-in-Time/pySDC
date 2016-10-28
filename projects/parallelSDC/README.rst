@@ -11,7 +11,7 @@ The easiest approach for a parallel SDC run is to parallelize the preconditioner
 So far, this matrix is a lower triangular matrix, containing e.g. the Euler scheme or parts of the LU-decomposition of Q.
 Here, we study different ideas to work with a diagonal matrix and compare them to the standard schemes:
 
-- ``QI`` and ``LU``: the standard scheme using implicit Euler or the LU trick
+- ``IE`` and ``LU``: the standard scheme using implicit Euler or the LU trick
 - ``PIC``: the most simple diagonal matrix, i.e. no preconditioner (which is the Picard iteration)
 - ``IEpar``: one Euler step from t0 to the current node
 - ``Qpar``: Jacobi-like diagonal part of Q

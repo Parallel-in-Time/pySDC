@@ -1,37 +1,32 @@
-
 import numpy as np
 
 from pySDC.Sweeper import sweeper
-from pySDC.plugins.sweeper_helper import get_Qd
-
 
 
 class generic_implicit(sweeper):
     """
-    Custom sweeper class, implements Sweeper.py
-
-    Generic implicit sweeper, expecting lower triangular matrix QI as input
+    Generic implicit sweeper, expecting lower triangular matrix type as input
 
     Attributes:
         QI: lower triangular matrix
     """
 
-    def __init__(self,params):
+    def __init__(self, params):
         """
         Initialization routine for the custom sweeper
 
         Args:
-            coll: collocation object
+            params: parameters for the sweeper
         """
 
-        # call parent's initialization routine
-        super(generic_implicit,self).__init__(params)
+        if 'QI' not in params:
+            params['QI'] = 'IE'
 
-        assert 'QI' in params
-        self.QI = get_Qd(self.coll, qd_type=params['QI'])
-        assert isinstance(self.QI,np.ndarray)
-        np.testing.assert_array_equal(np.triu(self.QI,k=1),np.zeros(self.QI.shape),err_msg='Lower triangular matrix expected!')
-        pass
+        # call parent's initialization routine
+        super(generic_implicit, self).__init__(params)
+
+        # get QI matrix
+        self.QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
 
     def integrate(self):
         """
@@ -48,14 +43,13 @@ class generic_implicit(sweeper):
         me = []
 
         # integrate RHS over all collocation nodes
-        for m in range(1,self.coll.num_nodes+1):
+        for m in range(1, self.coll.num_nodes + 1):
             # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init,val=0))
-            for j in range(1,self.coll.num_nodes+1):
-                me[-1] += L.dt*self.coll.Qmat[m,j]*L.f[j]
+            me.append(P.dtype_u(P.init, val=0))
+            for j in range(1, self.coll.num_nodes + 1):
+                me[-1] += L.dt * self.coll.Qmat[m, j] * L.f[j]
 
         return me
-
 
     def update_nodes(self):
         """
@@ -83,8 +77,8 @@ class generic_implicit(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(M+1):
-                integral[m] -= L.dt*self.QI[m+1,j]*L.f[j]
+            for j in range(M + 1):
+                integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
 
             # add initial value
             integral[m] += L.u[0]
@@ -93,45 +87,48 @@ class generic_implicit(sweeper):
                 integral[m] += L.tau[m]
 
         # do the sweep
-        for m in range(0,M):
+        for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m+1):
-                rhs += L.dt*self.QI[m+1,j]*L.f[j]
+            for j in range(m + 1):
+                rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            L.u[m+1] = P.solve_system(rhs,L.dt*self.QI[m+1,m+1],L.u[m+1],L.time+L.dt*self.coll.nodes[m])
+            L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
+                                        L.time + L.dt * self.coll.nodes[m])
             # update function values
-            L.f[m+1] = P.eval_f(L.u[m+1],L.time+L.dt*self.coll.nodes[m])
+            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
 
         return None
 
-
     def compute_end_point(self):
         """
         Compute u at the right point of the interval
 
-        The value uend computed here is a full evaluation of the Picard formulation (always!)
+        The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False
+
+        Returns:
+            None
         """
 
         # get current level and problem description
         L = self.level
         P = L.prob
 
-         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
+        # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
         if (self.coll.right_is_node and not self.params.do_coll_update):
-          # a copy is sufficient
-          L.uend = P.dtype_u(L.u[-1])
+            # a copy is sufficient
+            L.uend = P.dtype_u(L.u[-1])
         else:
-          # start with u0 and add integral over the full interval (using coll.weights)
-          L.uend = P.dtype_u(L.u[0])
-          for m in range(self.coll.num_nodes):
-              L.uend += L.dt*self.coll.weights[m]*L.f[m+1]
-          # add up tau correction of the full interval (last entry)
-          if L.tau is not None:
-              L.uend += L.tau[-1]
+            # start with u0 and add integral over the full interval (using coll.weights)
+            L.uend = P.dtype_u(L.u[0])
+            for m in range(self.coll.num_nodes):
+                L.uend += L.dt * self.coll.weights[m] * L.f[m + 1]
+            # add up tau correction of the full interval (last entry)
+            if L.tau is not None:
+                L.uend += L.tau[-1]
 
         return None

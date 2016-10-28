@@ -1,6 +1,8 @@
 import abc
 from future.utils import with_metaclass
 import logging
+import numpy as np
+import scipy.linalg
 
 from pySDC.Level import level
 from pySDC.plugins.pysdc_helper import FrozenClass
@@ -63,26 +65,48 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         # collocation object
         self.coll = coll
 
-    @property
-    def level(self):
-        """
-        Returns the current level
+    def get_Qdelta_implicit(self, coll, qd_type):
+        QDmat = np.zeros(coll.Qmat.shape)
+        if qd_type == 'LU':
+            QT = coll.Qmat[1:, 1:].T
+            [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
+            QDmat[1:, 1:] = U.T
+        elif qd_type == 'IE':
+            for m in range(coll.num_nodes + 1):
+                QDmat[m, 1:m + 1] = coll.delta_m[0:m]
+        elif qd_type == 'IEpar':
+            for m in range(coll.num_nodes + 1):
+                QDmat[m, m] = np.sum(coll.delta_m[0:m])
+        elif qd_type == 'Qpar':
+            QDmat = np.diag(np.diag(coll.Qmat))
+        elif qd_type == 'GS':
+            QDmat = np.tril(coll.Qmat)
+        elif qd_type == 'PIC':
+            QDmat = np.zeros(coll.Qmat.shape)
+        else:
+            raise NotImplementedError('qd_type implicit not implemented')
 
-        Returns:
-            pySDC.Level.level: the current level
-        """
-        return self.__level
+        # check if we got not more than a lower triangular matrix
+        np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape),
+                                      err_msg='Lower triangular matrix expected!')
 
-    @level.setter
-    def level(self, L):
-        """
-        Sets a reference to the current level (done in the initialization of the level)
+        return QDmat
 
-        Args:
-            L (pySDC.Level.level): current level
-        """
-        assert isinstance(L, level)
-        self.__level = L
+    def get_Qdelta_explicit(self, coll, qd_type):
+        QDmat = np.zeros(coll.Qmat.shape)
+        if qd_type == 'EE':
+            for m in range(self.coll.num_nodes + 1):
+                QDmat[m, 0:m] = self.coll.delta_m[0:m]
+        elif qd_type == 'GS':
+            QDmat = np.tril(self.coll.Qmat, k=-1)
+        else:
+            raise NotImplementedError('qd_type explicit not implemented')
+
+        # check if we got not more than a lower triangular matrix
+        np.testing.assert_array_equal(np.triu(QDmat, k=0), np.zeros(QDmat.shape),
+                                      err_msg='Strictly lower triangular matrix expected!')
+
+        return QDmat
 
     def predict(self):
         """
@@ -161,3 +185,24 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         Abstract interface to node update
         """
         return None
+
+    @property
+    def level(self):
+        """
+        Returns the current level
+
+        Returns:
+            pySDC.Level.level: the current level
+        """
+        return self.__level
+
+    @level.setter
+    def level(self, L):
+        """
+        Sets a reference to the current level (done in the initialization of the level)
+
+        Args:
+            L (pySDC.Level.level): current level
+        """
+        assert isinstance(L, level)
+        self.__level = L

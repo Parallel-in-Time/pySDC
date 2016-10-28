@@ -32,7 +32,7 @@ We see that PFASST performs very well in this case, the iteration counts do not 
 
 Important things to note:
 
-- In the IMEX sweeper, we can activate the LU-trick for the implicit part by specifying ``do_LU`` as ``True``. For stiff parabolic problems with Gauss-Radau nodes, this is usually a very good idea!
+- In the IMEX sweeper, we can activate the LU-trick for the implicit part by specifying ``QI`` as ``LU``. For stiff parabolic problems with Gauss-Radau nodes, this is usually a very good idea!
 - As usual for MLSDC and PFASST, the success depends heavily on the choice of parameters.
   Making the problem more complicated, less/more stiff, changing the order of the spatial interpolation etc. can give completely different results.
 
@@ -50,7 +50,8 @@ Again, this heavily depends on the actual problem under consideration, but it is
 Important things to note:
 
 - The setup is actually periodic in time as well! At ``Tend = 1`` the exact solution looks exactly like the initial condition.
-- The ``generic_implicit`` sweeper allows the user to change the preconditioner, named ``QI``. To get the standard implicit Euler scheme, choose ``IE``, while for the LU-trick, choose ``LU``.
+- Like the standard IME sweeper, the ``generic_implicit`` sweeper allows the user to change the preconditioner, named ``QI``.
+  To get the standard implicit Euler scheme, choose ``IE``, while for the LU-trick, choose ``LU``.
   More choices have been implemented in ``pySDC.plugins.sweeper_helper.get_Qd``.
 
 .. include:: doc_step_5_C.rst
