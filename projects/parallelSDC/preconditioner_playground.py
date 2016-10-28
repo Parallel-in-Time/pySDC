@@ -200,7 +200,7 @@ def plot_iterations():
                         niter_heat[xvalue] = results[key]
             plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=2)
 
-        plt.ylim([0, 100])
+        plt.ylim([0, 60])
         plt.legend(loc=2, ncol=1)
         plt.title(setup)
         plt.ylabel('number of iterations')
@@ -215,5 +215,5 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     plot_iterations()
