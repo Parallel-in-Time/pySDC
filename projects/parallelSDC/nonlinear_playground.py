@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.sweeper_classes.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-from pySDC.implementations.sweeper_classes.linearized_implicit_parallel import linearized_implicit_parallel
+from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
+from projects.parallelSDC.linearized_implicit_parallel import linearized_implicit_parallel
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher

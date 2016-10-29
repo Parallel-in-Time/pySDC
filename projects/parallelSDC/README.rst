@@ -26,6 +26,7 @@ While this works well for non-equidistant and non-symmetri nodes like Gauss-Rada
 In order to apply this also for nonlinear problems, we apply an outer Newton iteration to the nonlinear collocation problem and use the diagonalized SDC approach for the linear problem.
 Yet, the naive implementation still does not decouple space and time, so that we need to fix the Jacobian at e.g. node 0.
 This example compares the iteration counts and errors for this idea (incl. a modified Newton where the Jacobian is not fixed but the appraoch is applied nonetheless).
+Two new sweepers are used here: ``linearized_implicit_parallel`` and ``linearized_implicit_fixed_parallel``.
 
 .. include:: doc_parallelSDC_nonlinear.rst
 
