@@ -28,6 +28,7 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self.predict = True
                 self.logger_level = 20
                 self.log_to_file = False
+                self.dump_setup = True
                 self.fname = 'run_pid' + str(os.getpid()) + '.log'
 
                 for k, v in params.items():
@@ -40,13 +41,13 @@ class controller(with_metaclass(abc.ABCMeta)):
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger = logging.getLogger('controller')
 
-        # check if we have a hook on this list. if not, use default class.
-        if 'hook_class' in controller_params:
-            hook = controller_params['hook_class']
-        else:
-            hook = hookclass.hooks
+        if self.params.dump_setup and self.params.logger_level > 20:
+            self.logger.warning('Will not dump setup, logging level is too high, need at most 20')
 
-        self.__hooks = hook()
+        # check if we have a hook on this list. if not, use default class.
+        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
+
+        self.__hooks = controller_params['hook_class']()
 
         pass
 
@@ -92,6 +93,48 @@ class controller(with_metaclass(abc.ABCMeta)):
             logger.addHandler(file_handler)
         else:
             pass
+
+    def dump_setup(self):
+        """
+        Helper function to dump the setup used for this controller
+        """
+
+        out = 'Controller parameters\n'
+        for k, v in vars(self.params).items():
+            if not k.startswith('_'):
+                out += '        %s = %s\n' % (k, v)
+        self.logger.info(out)
+
+        out = 'Step parameters\n'
+        for k, v in vars(self.MS[0].params).items():
+            if not k.startswith('_'):
+                out += '        %s = %s\n' % (k, v)
+        for L in self.MS[0].levels:
+            out += '        Level parameters: Level %2i\n' % L.level_index
+            for k, v in vars(L.params).items():
+                if not k.startswith('_'):
+                    out += '                %s = %s\n' % (k, v)
+            out += '                Problem class: %s\n' % L.prob.__class__.__name__
+            for k, v in vars(L.prob.params).items():
+                if not k.startswith('_'):
+                    out += '                        %s = %s\n' % (k, v)
+            out += '                        Data type u: %s\n' % L.prob.dtype_u.__name__
+            out += '                        Data type f: %s\n' % L.prob.dtype_f.__name__
+            out += '                Sweeper class: %s\n' % L.sweep.__class__.__name__
+            for k, v in vars(L.sweep.params).items():
+                if not k.startswith('_'):
+                    out += '                        %s = %s\n' % (k, v)
+            out += '                        Collocation class: %s\n' % L.sweep.coll.__class__.__name__
+        if self.MS[0].base_transfer is not None:
+            out += '        Base Transfer parameters\n'
+            for k, v in vars(self.MS[0].base_transfer.params).items():
+                if not k.startswith('_'):
+                    out += '                %s = %s\n' % (k, v)
+            out += '        Space Transfer class: %s\n' % self.MS[0].base_transfer.space_transfer.__class__.__name__
+            for k, v in vars(self.MS[0].base_transfer.space_transfer.params).items():
+                if not k.startswith('_'):
+                    out += '                %s = %s\n' % (k, v)
+        self.logger.info(out)
 
     @staticmethod
     def check_convergence(S):

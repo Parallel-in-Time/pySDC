@@ -60,6 +60,7 @@ class step(FrozenClass):
 
         # empty attributes
         self.__transfer_dict = {}
+        self.base_transfer = None
         self.levels = []
         self.__prev = None
         self.__next = None
@@ -186,15 +187,15 @@ class step(FrozenClass):
         """
 
         # create new instance of the specific base_transfer class
-        T = base_transfer_class(fine_level, coarse_level, base_transfer_params, space_transfer_class,
-                                space_transfer_params)
+        self.base_transfer = base_transfer_class(fine_level, coarse_level, base_transfer_params,
+                                                 space_transfer_class, space_transfer_params)
         # use base_transfer dictionary twice to set restrict and prolong operator
-        self.__transfer_dict[tuple([fine_level, coarse_level])] = T.restrict
+        self.__transfer_dict[tuple([fine_level, coarse_level])] = self.base_transfer.restrict
 
-        if T.params.finter:
-            self.__transfer_dict[tuple([coarse_level, fine_level])] = T.prolong_f
+        if self.base_transfer.params.finter:
+            self.__transfer_dict[tuple([coarse_level, fine_level])] = self.base_transfer.prolong_f
         else:
-            self.__transfer_dict[tuple([coarse_level, fine_level])] = T.prolong
+            self.__transfer_dict[tuple([coarse_level, fine_level])] = self.base_transfer.prolong
 
     def transfer(self, source, target):
         """

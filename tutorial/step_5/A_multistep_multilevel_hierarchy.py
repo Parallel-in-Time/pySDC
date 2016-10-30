@@ -36,6 +36,10 @@ def main():
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
 
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['dump_setup'] = False
+
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heat1d_forced  # pass problem class
@@ -50,7 +54,7 @@ def main():
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=10, controller_params={}, description=description)
+    controller = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params, description=description)
 
     # check number of levels
     f = open('step_5_A_out.txt', 'w')

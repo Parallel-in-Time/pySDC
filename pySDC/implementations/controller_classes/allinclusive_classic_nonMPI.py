@@ -15,13 +15,13 @@ class allinclusive_classic_nonMPI(controller):
 
     def __init__(self, num_procs, controller_params, description):
         """
-       Initialization routine for PFASST controller
+        Initialization routine for PFASST controller
 
-       Args:
-           num_procs: number of parallel time steps (still serial, though), can be 1
-           controller_params: parameter set for the controller and the step class
-           description: all the parameters to set up the rest (levels, problems, transfer, ...)
-       """
+        Args:
+            num_procs: number of parallel time steps (still serial, though), can be 1
+            controller_params: parameter set for the controller and the step class
+            description: all the parameters to set up the rest (levels, problems, transfer, ...)
+        """
 
         # call parent's initialization routine
         super(allinclusive_classic_nonMPI, self).__init__(controller_params)
@@ -31,6 +31,9 @@ class allinclusive_classic_nonMPI(controller):
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
 
+        if self.params.dump_setup:
+            self.dump_setup()
+
         num_levels = len(self.MS[0].levels)
 
         if num_procs > 1 and num_levels > 1:
@@ -38,7 +41,6 @@ class allinclusive_classic_nonMPI(controller):
                 for L in S.levels:
                     assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
                         "For PFASST to work, we assume uend^k = u_M^k"
-
 
     def run(self, u0, t0, Tend):
         """
@@ -73,7 +75,7 @@ class allinclusive_classic_nonMPI(controller):
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
-        self.restart_block(active_slots,time,u0)
+        self.restart_block(active_slots, time, u0)
 
         # call pre-run hook
         for S in self.MS:
@@ -86,8 +88,7 @@ class allinclusive_classic_nonMPI(controller):
             while not all([self.MS[p].status.done for p in active_slots]):
 
                 for p in active_slots:
-
-                    self.MS[p] = self.pfasst(self.MS[p],len(active_slots))
+                    self.MS[p] = self.pfasst(self.MS[p], len(active_slots))
 
             # uend is uend of the last active step in the list
             uend = self.MS[active_slots[-1]].levels[0].uend
@@ -108,8 +109,7 @@ class allinclusive_classic_nonMPI(controller):
 
         return uend, self.hooks.return_stats()
 
-
-    def restart_block(self,active_slots,time,u0):
+    def restart_block(self, active_slots, time, u0):
         """
         Helper routine to reset/restart block of (active) steps
 
@@ -129,7 +129,6 @@ class allinclusive_classic_nonMPI(controller):
             # store current slot number for diagnostics
             self.MS[p].status.slot = p
 
-
             # resets step
             self.MS[p].reset_step()
             # determine whether I am the first and/or last in line
@@ -146,7 +145,8 @@ class allinclusive_classic_nonMPI(controller):
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
-            self.MS[p].status.pred_cnt = active_slots.index(p) + 1  # fixme: does this also work for ring-parallelization?
+            self.MS[p].status.pred_cnt = active_slots.index(
+                p) + 1  # fixme: does this also work for ring-parallelization?
             self.MS[p].status.iter = 1
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
@@ -156,9 +156,8 @@ class allinclusive_classic_nonMPI(controller):
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
 
-
     @staticmethod
-    def recv(target,source,tag=None):
+    def recv(target, source, tag=None):
         """
         Receive function
 
@@ -169,15 +168,15 @@ class allinclusive_classic_nonMPI(controller):
         """
 
         if tag is not None and source.tag != tag:
-            print('RECV ERROR',tag,source.tag)
+            print('RECV ERROR', tag, source.tag)
             exit()
         # simply do a deepcopy of the values uend to become the new u0 at the target
         target.u[0] = target.prob.dtype_u(source.uend)
         # re-evaluate f on left interval boundary
-        target.f[0] = target.prob.eval_f(target.u[0],target.time)
+        target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
     @staticmethod
-    def send(source,tag):
+    def send(source, tag):
         """
         Send function
 
@@ -189,7 +188,7 @@ class allinclusive_classic_nonMPI(controller):
         source.sweep.compute_end_point()
         source.tag = cp.deepcopy(tag)
 
-    def pfasst(self,S,num_procs):
+    def pfasst(self, S, num_procs):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -209,7 +208,7 @@ class allinclusive_classic_nonMPI(controller):
 
         stage = S.status.stage
 
-        self.logger.debug("Process %2i at stage %s" %(S.status.slot,stage))
+        self.logger.debug("Process %2i at stage %s" % (S.status.slot, stage))
 
         if stage == 'SPREAD':
             # first stage: spread values
@@ -221,10 +220,10 @@ class allinclusive_classic_nonMPI(controller):
             # update stage
             if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT_RESTRICT'
-            elif len(S.levels) > 1: # MLSDC or PFASST without predict
+            elif len(S.levels) > 1:  # MLSDC or PFASST without predict
                 self.hooks.pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'
-            elif num_procs > 1: # MSSDC
+            elif num_procs > 1:  # MSSDC
                 self.hooks.pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_COARSE_SWEEP'
             elif num_procs == 1:  # SDC
@@ -471,6 +470,6 @@ class allinclusive_classic_nonMPI(controller):
 
         else:
 
-            #fixme: use meaningful error object here
+            # fixme: use meaningful error object here
             print('Something is wrong here, you should have hit one case statement!')
             exit()
