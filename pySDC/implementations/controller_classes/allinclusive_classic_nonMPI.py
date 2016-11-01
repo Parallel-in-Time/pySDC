@@ -32,7 +32,7 @@ class allinclusive_classic_nonMPI(controller):
             self.MS.append(stepclass.step(description))
 
         if self.params.dump_setup:
-            self.dump_setup()
+            self.dump_setup(controller_params, description)
 
         num_levels = len(self.MS[0].levels)
 

@@ -1,10 +1,13 @@
 import abc
 import os
+import sys
 from future.utils import with_metaclass
 import logging
+import coloredlogs
 
 from pySDC.plugins.pysdc_helper import FrozenClass
 from pySDC import Hooks as hookclass
+from pySDC.BaseTransfer import base_transfer
 
 
 class controller(with_metaclass(abc.ABCMeta)):
@@ -27,7 +30,7 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self.fine_comm = True
                 self.predict = True
                 self.logger_level = 20
-                self.log_to_file = False
+                self.log_to_file = True
                 self.dump_setup = True
                 self.fname = 'run_pid' + str(os.getpid()) + '.log'
 
@@ -76,8 +79,8 @@ class controller(with_metaclass(abc.ABCMeta)):
         else:
             file_handler = None
 
-        std_formatter = logging.Formatter(fmt='%(name)s - %(levelname)s: %(message)s')
-        std_handler = logging.StreamHandler()
+        std_formatter = coloredlogs.ColoredFormatter(fmt='%(name)s - %(levelname)s: %(message)s')
+        std_handler = logging.StreamHandler(sys.stdout)
         std_handler.setFormatter(std_formatter)
 
         # instantiate logger
@@ -94,46 +97,74 @@ class controller(with_metaclass(abc.ABCMeta)):
         else:
             pass
 
-    def dump_setup(self):
+    def dump_setup(self, controller_params, description):
         """
         Helper function to dump the setup used for this controller
         """
 
-        out = 'Controller parameters\n'
+        out = 'Setup overview (user-defined)\n\n'
+        out += 'Controller: %s\n' % self.__class__
         for k, v in vars(self.params).items():
             if not k.startswith('_'):
-                out += '        %s = %s\n' % (k, v)
-        self.logger.info(out)
+                if k in controller_params:
+                    out += '--> %s = %s\n' % (k, v)
+                else:
+                    out += '    %s = %s\n' % (k, v)
 
-        out = 'Step parameters\n'
+        out += '\nStep: %s\n' % self.MS[0].__class__
         for k, v in vars(self.MS[0].params).items():
             if not k.startswith('_'):
-                out += '        %s = %s\n' % (k, v)
+                if k in description['step_params']:
+                    out += '--> %s = %s\n' % (k, v)
+                else:
+                    out += '    %s = %s\n' % (k, v)
+
+        out += '    Level: %s\n' % self.MS[0].levels[0].__class__
         for L in self.MS[0].levels:
-            out += '        Level parameters: Level %2i\n' % L.level_index
+            out += '        Level %2i\n' % L.level_index
             for k, v in vars(L.params).items():
                 if not k.startswith('_'):
-                    out += '                %s = %s\n' % (k, v)
-            out += '                Problem class: %s\n' % L.prob.__class__.__name__
+                    if k in description['level_params']:
+                        out += '-->         %s = %s\n' % (k, v)
+                    else:
+                        out += '            %s = %s\n' % (k, v)
+            out += '-->         Problem: %s\n' % L.prob.__class__
             for k, v in vars(L.prob.params).items():
                 if not k.startswith('_'):
-                    out += '                        %s = %s\n' % (k, v)
-            out += '                        Data type u: %s\n' % L.prob.dtype_u.__name__
-            out += '                        Data type f: %s\n' % L.prob.dtype_f.__name__
-            out += '                Sweeper class: %s\n' % L.sweep.__class__.__name__
+                    if k in description['problem_params']:
+                        out += '-->             %s = %s\n' % (k, v)
+                    else:
+                        out += '                %s = %s\n' % (k, v)
+            out += '-->             Data type u: %s\n' % L.prob.dtype_u
+            out += '-->             Data type f: %s\n' % L.prob.dtype_f
+            out += '-->             Sweeper: %s\n' % L.sweep.__class__
             for k, v in vars(L.sweep.params).items():
                 if not k.startswith('_'):
-                    out += '                        %s = %s\n' % (k, v)
-            out += '                        Collocation class: %s\n' % L.sweep.coll.__class__.__name__
-        if self.MS[0].base_transfer is not None:
-            out += '        Base Transfer parameters\n'
+                    if k in description['sweeper_params']:
+                        out += '-->                 %s = %s\n' % (k, v)
+                    else:
+                        out += '                    %s = %s\n' % (k, v)
+            out += '-->                 Collocation: %s\n' % L.sweep.coll.__class__
+
+        if len(self.MS[0].levels) > 1:
+            if description['base_transfer_class'] is not base_transfer:
+                out += '-->     Base Transfer: %s\n' % self.MS[0].base_transfer.__class__
+            else:
+                out += '        Base Transfer: %s\n' % self.MS[0].base_transfer.__class__
             for k, v in vars(self.MS[0].base_transfer.params).items():
                 if not k.startswith('_'):
-                    out += '                %s = %s\n' % (k, v)
-            out += '        Space Transfer class: %s\n' % self.MS[0].base_transfer.space_transfer.__class__.__name__
+                    if k in description['base_transfer_params']:
+                        out += '-->         %s = %s\n' % (k, v)
+                    else:
+                        out += '            %s = %s\n' % (k, v)
+            out += '-->     Space Transfer: %s\n' % self.MS[0].base_transfer.space_transfer.__class__
             for k, v in vars(self.MS[0].base_transfer.space_transfer.params).items():
                 if not k.startswith('_'):
-                    out += '                %s = %s\n' % (k, v)
+                    if k in description['space_transfer_params']:
+                        out += '-->         %s = %s\n' % (k, v)
+                    else:
+                        out += '            %s = %s\n' % (k, v)
+        out += '\n'
         self.logger.info(out)
 
     @staticmethod

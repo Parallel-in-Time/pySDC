@@ -33,8 +33,6 @@ class mesh_to_mesh(space_transfer):
 
         assert 'rorder' in params
         assert 'iorder' in params
-        if 'periodic' not in params:
-            params['periodic'] = False
 
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)

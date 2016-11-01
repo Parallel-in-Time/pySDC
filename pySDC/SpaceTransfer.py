@@ -30,6 +30,7 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
         class __Pars(FrozenClass):
             def __init__(self, pars):
                 self.finter = False
+                self.periodic = False
                 for k, v in pars.items():
                     setattr(self, k, v)
                 # freeze class, no further attributes allowed from this point

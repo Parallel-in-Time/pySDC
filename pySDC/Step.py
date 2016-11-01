@@ -91,6 +91,14 @@ class step(FrozenClass):
                 raise ParameterError(msg)
 
         descr['problem_params'] = descr.get('problem_params', {})
+        # check if base_transfer class is specified
+        descr['base_transfer_class'] = descr.get('base_transfer_class', base_transfer)
+        # check if base_transfer parameters are needed
+        descr['base_transfer_params'] = descr.get('base_transfer_params', {})
+        # check if space_transfer class is specified
+        descr['space_transfer_class'] = descr.get('space_transfer_class', {})
+        # check if space_transfer parameters are needed
+        descr['space_transfer_params'] = descr.get('space_transfer_params', {})
 
         # convert problem-dependent parameters consisting of dictionary of lists to a list of dictionaries with only a
         # single entry per key, one dict per level
@@ -106,25 +114,17 @@ class step(FrozenClass):
         descr_list = self.__dict_to_list(descr_new)
 
         # sanity check: is there a base_transfer class? is there one even if only a single level is specified?
-        if len(descr_list) > 1:
-            descr_new['base_transfer_class'] = descr_new.get('base_transfer_class', base_transfer)
-            if 'space_transfer_class' not in descr:
-                msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr.keys()))
-                self.logger.error(msg)
-                raise ParameterError(msg)
-        elif 'space_transfer_class' in descr_new:
-            descr_new['base_transfer_class'] = None
-            self.logger.warning('you have specified space_base_transfer classes, but only a single level')
-        else:
-            descr_new['base_transfer_class'] = None
+        if len(descr_list) > 1 and not descr_new['space_transfer_class']:
+            msg = 'need %s to instantiate step, only got %s' % ('space_transfer_class', str(descr_new.keys()))
+            self.logger.error(msg)
+            raise ParameterError(msg)
+
+        if len(descr_list) == 1 and \
+                (descr_new['space_transfer_class'] or descr_new['base_transfer_class'] is not base_transfer):
+            self.logger.warning('you have specified transfer classes, but only a single level')
 
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
-
-            # check if base_transfer parameters are needed
-            descr_list[l]['base_transfer_params'] = descr_list[l].get('base_transfer_params', {})
-            # check if space_transfer parameters are needed
-            descr_list[l]['space_transfer_params'] = descr_list[l].get('space_transfer_params', {})
 
             L = levclass.level(problem_class=descr_list[l]['problem_class'],
                                problem_params=descr_list[l]['problem_params'],
