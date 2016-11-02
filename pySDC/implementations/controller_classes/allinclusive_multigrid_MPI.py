@@ -29,9 +29,14 @@ class allinclusive_multigrid_MPI(controller):
 
         # pass communicator for future use
         self.comm = comm
-        num_procs = comm.Get_size()
-        num_levels = len(self.S.levels)
 
+        num_procs = self.comm.Get_size()
+        rank = self.comm.Get_rank()
+
+        if self.params.dump_setup and rank == 0:
+            self.dump_setup(step=self.S, controller_params=controller_params, description=description)
+
+        num_levels = len(self.S.levels)
         assert not (num_procs > 1 and num_levels == 1), "ERROR: multigrid cannot do MSSDC"
 
         if num_procs > 1 and num_levels > 1:

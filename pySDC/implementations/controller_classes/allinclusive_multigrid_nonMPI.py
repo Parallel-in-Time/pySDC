@@ -31,6 +31,9 @@ class allinclusive_multigrid_nonMPI(controller):
         for p in range(num_procs):
             self.MS.append(stepclass.step(description))
 
+        if self.params.dump_setup:
+            self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
+
         assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: multigrid cannot do MSSDC"
 
         if num_procs > 1 and len(self.MS[0].levels) > 1:

@@ -97,12 +97,19 @@ class controller(with_metaclass(abc.ABCMeta)):
         else:
             pass
 
-    def dump_setup(self, controller_params, description):
+    def dump_setup(self, step, controller_params, description):
         """
         Helper function to dump the setup used for this controller
+
+        Args:
+            step (pySDC.Step.step): the step instance (will/should be the first one only)
+            controller_params (dict): controller parameters
+            description (dict): description of the problem
         """
 
-        out = 'Setup overview (user-defined)\n\n'
+        out = 'Setup overview (--> user-defined) -- BEGIN'
+        self.logger.info(out)
+        out = '----------------------------------------------------------------------------------------------------\n\n'
         out += 'Controller: %s\n' % self.__class__
         for k, v in vars(self.params).items():
             if not k.startswith('_'):
@@ -111,16 +118,16 @@ class controller(with_metaclass(abc.ABCMeta)):
                 else:
                     out += '    %s = %s\n' % (k, v)
 
-        out += '\nStep: %s\n' % self.MS[0].__class__
-        for k, v in vars(self.MS[0].params).items():
+        out += '\nStep: %s\n' % step.__class__
+        for k, v in vars(step.params).items():
             if not k.startswith('_'):
                 if k in description['step_params']:
                     out += '--> %s = %s\n' % (k, v)
                 else:
                     out += '    %s = %s\n' % (k, v)
 
-        out += '    Level: %s\n' % self.MS[0].levels[0].__class__
-        for L in self.MS[0].levels:
+        out += '    Level: %s\n' % step.levels[0].__class__
+        for L in step.levels:
             out += '        Level %2i\n' % L.level_index
             for k, v in vars(L.params).items():
                 if not k.startswith('_'):
@@ -146,25 +153,28 @@ class controller(with_metaclass(abc.ABCMeta)):
                         out += '                    %s = %s\n' % (k, v)
             out += '-->                 Collocation: %s\n' % L.sweep.coll.__class__
 
-        if len(self.MS[0].levels) > 1:
+        if len(step.levels) > 1:
             if description['base_transfer_class'] is not base_transfer:
-                out += '-->     Base Transfer: %s\n' % self.MS[0].base_transfer.__class__
+                out += '-->     Base Transfer: %s\n' % step.base_transfer.__class__
             else:
-                out += '        Base Transfer: %s\n' % self.MS[0].base_transfer.__class__
-            for k, v in vars(self.MS[0].base_transfer.params).items():
+                out += '        Base Transfer: %s\n' % step.base_transfer.__class__
+            for k, v in vars(step.base_transfer.params).items():
                 if not k.startswith('_'):
                     if k in description['base_transfer_params']:
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
-            out += '-->     Space Transfer: %s\n' % self.MS[0].base_transfer.space_transfer.__class__
-            for k, v in vars(self.MS[0].base_transfer.space_transfer.params).items():
+            out += '-->     Space Transfer: %s\n' % step.base_transfer.space_transfer.__class__
+            for k, v in vars(step.base_transfer.space_transfer.params).items():
                 if not k.startswith('_'):
                     if k in description['space_transfer_params']:
                         out += '-->         %s = %s\n' % (k, v)
                     else:
                         out += '            %s = %s\n' % (k, v)
-        out += '\n'
+        self.logger.info(out)
+        out = '----------------------------------------------------------------------------------------------------'
+        self.logger.info(out)
+        out = 'Setup overview (--> user-defined) -- END\n'
         self.logger.info(out)
 
     @staticmethod

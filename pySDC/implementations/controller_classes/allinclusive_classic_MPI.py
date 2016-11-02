@@ -34,7 +34,12 @@ class allinclusive_classic_MPI(controller):
         # add request handler for status send
         self.req_status = None
 
-        num_procs = comm.Get_size()
+        num_procs = self.comm.Get_size()
+        rank = self.comm.Get_rank()
+
+        if self.params.dump_setup and rank == 0:
+            self.dump_setup(step=self.S, controller_params=controller_params, description=description)
+
         num_levels = len(self.S.levels)
 
         if num_procs > 1 and num_levels > 1:
