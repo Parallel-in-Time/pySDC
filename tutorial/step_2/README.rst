@@ -79,6 +79,7 @@ Important things to note:
 -  By using one of the controllers, the whole code relevant for the user
    is reduced to setting up the ``description`` dictionary, some pre-
    and some post-processing.
+-  During initializtion, the parameters used for the run are printed out. Also, user-defined/-changed parameters are indicated. This can be surpressed by setting the controller parameter ``dump_setup`` to False.
 -  We make use of ``controller_parameters`` in order to provide logging to file capabilities.
 -  In contrast to Part B, we do not have direct access to residuals or
    iteration counts for now. We will deal with these later.
