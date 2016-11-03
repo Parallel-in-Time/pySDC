@@ -30,7 +30,7 @@ class controller(with_metaclass(abc.ABCMeta)):
                 self.fine_comm = True
                 self.predict = True
                 self.logger_level = 20
-                self.log_to_file = True
+                self.log_to_file = False
                 self.dump_setup = True
                 self.fname = 'run_pid' + str(os.getpid()) + '.log'
 
@@ -44,8 +44,8 @@ class controller(with_metaclass(abc.ABCMeta)):
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger = logging.getLogger('controller')
 
-        if self.params.dump_setup and self.params.logger_level > 20:
-            self.logger.warning('Will not dump setup, logging level is too high, need at most 20')
+        # if self.params.dump_setup and self.params.logger_level > 20:
+        #     self.logger.warning('Will not dump setup, logging level is too high, need at most 20')
 
         # check if we have a hook on this list. if not, use default class.
         controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)

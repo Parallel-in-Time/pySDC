@@ -1,6 +1,6 @@
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from projects.node_failure.hard_faults import hard_fault_injection
+from projects.node_failure.emulate_hard_faults import hard_fault_injection
 
 class allinclusive_classic_nonMPI_hard_faults(allinclusive_classic_nonMPI):
     """
@@ -156,8 +156,8 @@ class allinclusive_classic_nonMPI_hard_faults(allinclusive_classic_nonMPI):
             S.status.done = self.check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
-            # if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
-            #     S.status.done = False
+            if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
+                S.status.done = False
 
             # if I am done, signal accordingly, otherwise proceed
             if S.status.done:

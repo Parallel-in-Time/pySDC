@@ -25,38 +25,43 @@ def hard_fault_injection(S):
     # name global variables for this routine
     global hard_iter, hard_step, strategy, hard_stats, hard_random, refdata
 
-    # set the seed in the first iteration, using the step number for reproducibility
+    # set the seed in the first iteration, using the process number for reproducibility
     if S.status.iter == 1:
-        rd.seed(S.status.step)
+        rd.seed(S.status.slot)
 
     # draw random number and check if we are below our threshold (hard_random gives percentage)
     if strategy is 'NOFAULT':
         doit = rd.random() < hard_random
         if doit:
-            hard_stats.append((S.status.step, S.status.iter, S.status.time))
+            hard_stats.append((S.status.slot, S.status.iter, S.time))
     else:
         if refdata is not None:
             # noinspection PyTypeChecker
-            doit = np.any(np.all([S.status.step, S.status.iter, S.status.time] == refdata, axis=1))
+            doit = np.any(np.all([S.status.slot, S.status.iter, S.time] == refdata, axis=1))
         else:
             doit = False
 
     # if we set step and iter, inject and recover (if faults are supposed to occur)
-    if ((hard_step == S.status.step and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
+    if ((hard_step == S.status.slot and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %
-              (S.status.step, S.status.iter, S.status.time))
+              (S.status.slot, S.status.iter, S.time))
 
         # add incident to statistics data type
-        hard_stats.append((S.status.step, S.status.iter, S.status.time))
+        hard_stats.append((S.status.slot, S.status.iter, S.time))
 
         # ok, that's a little bit of cheating... we would need to retrieve the current residual and iteration count
         # from the previous process, but this does not matter here
         res = cp.deepcopy(S.levels[-1].status.residual)
         niter = cp.deepcopy(S.status.iter) - 1
+        time = cp.deepcopy(S.time)
 
         # fault injection, set everything to zero or null or whatever
         S.reset_step()
+
+        for lvl in S.levels:
+            lvl.status.time = time
+
 
         # recovery
         if strategy is 'SPREAD':
@@ -90,7 +95,7 @@ def hard_fault_correction_spread(S):
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
-        ufirst = S.levels[0].prob.u_exact(S.status.time)
+        ufirst = S.levels[0].prob.u_exact(S.time)
 
     L = S.levels[0]
 
@@ -122,7 +127,7 @@ def hard_fault_correction_interp(S):
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
-        ufirst = S.levels[0].prob.u_exact(S.status.time)
+        ufirst = S.levels[0].prob.u_exact(S.time)
 
     # if I'm not the last one, get uend from following process
     # otherwise set uend = u0, so that interpolation is a copy
@@ -169,7 +174,7 @@ def hard_fault_correction_spread_predict(S, res, niter):
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
-        ufirst = S.levels[0].prob.u_exact(S.status.time)
+        ufirst = S.levels[0].prob.u_exact(S.time)
 
     L = S.levels[0]
 
@@ -182,6 +187,7 @@ def hard_fault_correction_spread_predict(S, res, niter):
         S.transfer(source=S.levels[l - 1], target=S.levels[l])
 
     # compute preliminary residual (just to set it)
+    S.levels[-1].status.updated = True
     S.levels[-1].sweep.compute_residual()
     # keep sweeping until either k < niter or the current residual is lower than res (niter, res was stored before
     # fault injection (lazy, should get this from the previous process)
@@ -223,7 +229,7 @@ def hard_fault_correction_interp_predict(S, res, niter):
     if not S.status.first:
         ufirst = S.prev.levels[0].prob.dtype_u(S.prev.levels[0].uend)
     else:
-        ufirst = S.levels[0].prob.u_exact(S.status.time)
+        ufirst = S.levels[0].prob.u_exact(S.time)
 
     # if I'm not the last one, get uend from following process
     # otherwise set uend = u0, so that interpolation is a copy
@@ -250,6 +256,7 @@ def hard_fault_correction_interp_predict(S, res, niter):
         S.transfer(source=S.levels[l - 1], target=S.levels[l])
 
     # compute preliminary residual (just to set it)
+    S.levels[-1].status.updated = True
     S.levels[-1].sweep.compute_residual()
     # keep sweeping until either k < niter or the current residual is lower than res (niter, res was stored before
     # fault injection (lazy, should get this from the previous process)

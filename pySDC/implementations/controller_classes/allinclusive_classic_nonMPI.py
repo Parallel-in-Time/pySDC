@@ -333,8 +333,8 @@ class allinclusive_classic_nonMPI(controller):
             S.status.done = self.check_convergence(S)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
-            # if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
-            #     S.status.done = False
+            if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
+                S.status.done = False
 
             # if I am done, signal accordingly, otherwise proceed
             if S.status.done:

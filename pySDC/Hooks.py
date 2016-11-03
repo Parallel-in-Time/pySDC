@@ -138,7 +138,7 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           type='residual', value=L.status.residual)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           type='timing_iteration', value=self.__t1_iteration - self.__t0_iteration)
@@ -158,7 +158,7 @@ class hooks(object):
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           type='timing_step', value=self.__t1_step - self.__t0_step)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           type='niter', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
                           type='residual', value=L.status.residual)
