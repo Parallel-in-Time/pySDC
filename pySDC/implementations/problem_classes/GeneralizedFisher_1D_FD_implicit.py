@@ -2,11 +2,12 @@ from __future__ import division
 
 import numpy as np
 import scipy.sparse as sp
-import scipy.sparse.linalg as LA
+from scipy.sparse.linalg import spsolve
 
 from pySDC.Problem import ptype
 
 
+# noinspection PyUnusedLocal
 class generalized_fisher(ptype):
     """
     Example implementing the unforced 1D heat equation with Dirichlet-0 BC in [0,1]
@@ -50,7 +51,6 @@ class generalized_fisher(ptype):
 
         Args:
             N: number of dofs
-            nu: diffusion coefficient
             dx: distance between two spatial nodes
 
         Returns:
@@ -63,6 +63,7 @@ class generalized_fisher(ptype):
 
         return A
 
+    # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple Newton solver
@@ -105,11 +106,11 @@ class generalized_fisher(ptype):
                 break
 
             # assemble dg
-            dg = sp.eye(self.params.nvars) - \
-                 factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu))
+            dg = sp.eye(self.params.nvars) - factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 *
+                                                                                     (nu + 1) * u.values ** nu))
 
             # newton update: u1 = u0 - g/dg
-            u.values -= LA.spsolve(dg, g)
+            u.values -= spsolve(dg, g)
 
             # increase iteration count
             n += 1
@@ -131,9 +132,9 @@ class generalized_fisher(ptype):
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
         ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
         ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
         uext = np.concatenate(([ul], u.values, [ur]))
 
@@ -159,31 +160,4 @@ class generalized_fisher(ptype):
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
         me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
                      np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
-        return me
-
-    def eval_jacobian(self, u):
-
-        dfdu = self.A[1:-1, 1:-1] + \
-               sp.diags(self.params.lambda0 ** 2 - self.params.lambda0 ** 2 * (self.params.nu + 1) *
-                        u.values ** self.params.nu)
-
-        return dfdu
-
-    def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
-        """
-        Simple linear solver for (I-dtA)u = rhs
-
-        Args:
-            dfdu: the Jacobian of the RHS of the ODE
-            rhs: right-hand side for the linear system
-            factor: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver (not used here so far)
-            t: current time (e.g. for time-dependent BCs)
-
-        Returns:
-            solution as mesh
-        """
-
-        me = self.dtype_u(self.init)
-        me.values = LA.spsolve(sp.eye(self.params.nvars) - factor * dfdu, rhs.values)
         return me

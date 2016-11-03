@@ -11,8 +11,9 @@ from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_i
 from projects.parallelSDC.linearized_implicit_parallel import linearized_implicit_parallel
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+
+from projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 
@@ -49,7 +50,7 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = generalized_fisher
+    description['problem_class'] = generalized_fisher_jac
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh
     description['dtype_f'] = mesh
