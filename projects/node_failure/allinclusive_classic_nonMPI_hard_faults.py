@@ -1,192 +1,13 @@
-import itertools
-import copy as cp
-import numpy as np
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from pySDC.Controller import controller
-from pySDC import Step as stepclass
+from projects.node_failure.hard_faults import hard_fault_injection
 
-
-class allinclusive_classic_nonMPI(controller):
+class allinclusive_classic_nonMPI_hard_faults(allinclusive_classic_nonMPI):
     """
 
-    PFASST controller, running serialized version of PFASST in classical style
+    PFASST controller, running serialized version of PFASST in classical style, allows node failure before fine sweep
 
     """
-
-    def __init__(self, num_procs, controller_params, description):
-        """
-        Initialization routine for PFASST controller
-
-        Args:
-            num_procs: number of parallel time steps (still serial, though), can be 1
-            controller_params: parameter set for the controller and the step class
-            description: all the parameters to set up the rest (levels, problems, transfer, ...)
-        """
-
-        # call parent's initialization routine
-        super(allinclusive_classic_nonMPI, self).__init__(controller_params)
-
-        self.MS = []
-        # simply append step after step and generate the hierarchies
-        for p in range(num_procs):
-            self.MS.append(stepclass.step(description))
-
-        if self.params.dump_setup:
-            self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
-
-        num_levels = len(self.MS[0].levels)
-
-        if num_procs > 1 and num_levels > 1:
-            for S in self.MS:
-                for L in S.levels:
-                    assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
-                        "For PFASST to work, we assume uend^k = u_M^k"
-
-    def run(self, u0, t0, Tend):
-        """
-        Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
-
-        Args:
-           u0: initial values
-           t0: starting time
-           Tend: ending time
-
-        Returns:
-            end values on the finest level
-            stats object containing statistics for each step, each level and each iteration
-        """
-
-        # fixme: use error classes for send/recv and stage errors
-
-        # some initializations
-        uend = None
-        num_procs = len(self.MS)
-
-        # initial ordering of the steps: 0,1,...,Np-1
-        slots = [p for p in range(num_procs)]
-
-        # initialize time variables of each step
-        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
-
-        # determine which steps are still active (time < Tend)
-        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-
-        # compress slots according to active steps, i.e. remove all steps which have times above Tend
-        active_slots = list(itertools.compress(slots, active))
-
-        # initialize block of steps with u0
-        self.restart_block(active_slots, time, u0)
-
-        # call pre-run hook
-        for S in self.MS:
-            self.hooks.pre_run(step=S, level_number=0)
-
-        # main loop: as long as at least one step is still active (time < Tend), do something
-        while any(active):
-
-            # loop over all active steps (in the correct order)
-            while not all([self.MS[p].status.done for p in active_slots]):
-
-                for p in active_slots:
-                    self.MS[p] = self.pfasst(self.MS[p], len(active_slots))
-
-            # uend is uend of the last active step in the list
-            uend = self.MS[active_slots[-1]].levels[0].uend
-
-            for p in active_slots:
-                time[p] += num_procs * self.MS[p].dt
-
-            # determine new set of active steps and compress slots accordingly
-            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-            active_slots = list(itertools.compress(slots, active))
-
-            # restart active steps (reset all values and pass uend to u0)
-            self.restart_block(active_slots, time, uend)
-
-        # call post-run hook
-        for S in self.MS:
-            self.hooks.post_run(step=S, level_number=0)
-
-        return uend, self.hooks.return_stats()
-
-    def restart_block(self, active_slots, time, u0):
-        """
-        Helper routine to reset/restart block of (active) steps
-
-        Args:
-            active_slots: list of active steps
-            time: new times for the steps
-            u0: initial value to distribute across the steps
-
-        """
-
-        # loop over active slots (not directly, since we need the previous entry as well)
-        for j in range(len(active_slots)):
-
-            # get slot number
-            p = active_slots[j]
-
-            # store current slot number for diagnostics
-            self.MS[p].status.slot = p
-
-            # resets step
-            self.MS[p].reset_step()
-            # determine whether I am the first and/or last in line
-            self.MS[p].status.first = active_slots.index(p) == 0
-            if not self.MS[p].status.first:
-                # store link to previous step
-                self.MS[p].prev = self.MS[active_slots[j - 1]]
-
-            self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
-            if not self.MS[p].status.last:
-                # store link to next step
-                self.MS[p].next = self.MS[active_slots[j + 1]]
-            # intialize step with u0
-            self.MS[p].init_step(u0)
-            # reset some values
-            self.MS[p].status.done = False
-            self.MS[p].status.pred_cnt = active_slots.index(
-                p) + 1  # fixme: does this also work for ring-parallelization?
-            self.MS[p].status.iter = 1
-            self.MS[p].status.stage = 'SPREAD'
-            for l in self.MS[p].levels:
-                l.tag = False
-
-        for p in active_slots:
-            for lvl in self.MS[p].levels:
-                lvl.status.time = time[p]
-
-    @staticmethod
-    def recv(target, source, tag=None):
-        """
-        Receive function
-
-        Args:
-            target: level which will receive the values
-            source: level which initiated the send
-            tag: identifier to check if this message is really for me
-        """
-
-        if tag is not None and source.tag != tag:
-            print('RECV ERROR', tag, source.tag)
-            exit()
-        # simply do a deepcopy of the values uend to become the new u0 at the target
-        target.u[0] = target.prob.dtype_u(source.uend)
-        # re-evaluate f on left interval boundary
-        target.f[0] = target.prob.eval_f(target.u[0], target.time)
-
-    @staticmethod
-    def send(source, tag):
-        """
-        Send function
-
-        Args:
-            source: level which has the new values
-            tag: identifier for this message
-        """
-        # sending here means computing uend ("one-sided communication")
-        source.sweep.compute_end_point()
-        source.tag = cp.deepcopy(tag)
 
     def pfasst(self, S, num_procs):
         """
@@ -299,6 +120,8 @@ class allinclusive_classic_nonMPI(controller):
 
         elif stage == 'IT_FINE_SWEEP':
             # do sweep on finest level
+
+            S = hard_fault_injection(S)
 
             # standard sweep workflow: update nodes, compute residual, log progress
             self.hooks.pre_sweep(step=S, level_number=0)

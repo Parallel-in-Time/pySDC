@@ -7,7 +7,7 @@ from pySDC.Step import step
 class allinclusive_classic_MPI(controller):
     """
 
-    PFASST controller, running parallel version of PFASST in blocks (MG-style)
+    PFASST controller, running parallel version of PFASST in classical style
 
     """
 
