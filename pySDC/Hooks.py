@@ -2,6 +2,7 @@ import logging
 import time
 from collections import namedtuple
 
+
 # noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
 class hooks(object):
     """
