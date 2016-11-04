@@ -60,6 +60,7 @@ class allinclusive_multigrid_nonMPI(controller):
         # some initializations
         uend = None
         num_procs = len(self.MS)
+        self.hooks.reset_stats()
 
         # initial ordering of the steps: 0,1,...,Np-1
         slots = [p for p in range(num_procs)]

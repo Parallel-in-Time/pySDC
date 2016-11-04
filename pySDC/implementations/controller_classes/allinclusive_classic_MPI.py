@@ -66,6 +66,8 @@ class allinclusive_classic_MPI(controller):
 
         # fixme: use error classes for send/recv and stage errors
 
+        self.hooks.reset_stats()
+
         rank = self.comm.Get_rank()
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[0:rank])

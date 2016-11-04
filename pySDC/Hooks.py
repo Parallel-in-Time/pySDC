@@ -65,6 +65,12 @@ class hooks(object):
         """
         return self.__stats
 
+    def reset_stats(self):
+        """
+        Funciton to reset the stats for multiple runs
+        """
+        self.__stats = {}
+
     def pre_run(self, step, level_number):
         """
         Default routine called before time-loop starts
