@@ -2,7 +2,7 @@ import logging
 import time
 from collections import namedtuple
 
-
+# noinspection PyUnusedLocal,PyShadowingBuiltins,PyShadowingNames
 class hooks(object):
     """
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
@@ -121,7 +121,7 @@ class hooks(object):
                          L.status.residual)
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          type='residual', value=L.status.residual)
+                          type='residual_post_sweep', value=L.status.residual)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           type='timing_sweep', value=self.__t1_sweep-self.__t0_sweep)
 
@@ -139,7 +139,7 @@ class hooks(object):
         L = step.levels[level_number]
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          type='residual', value=L.status.residual)
+                          type='residual_post_iteration', value=L.status.residual)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           type='timing_iteration', value=self.__t1_iteration - self.__t0_iteration)
 
@@ -161,7 +161,7 @@ class hooks(object):
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           type='niter', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
-                          type='residual', value=L.status.residual)
+                          type='residual_post_step', value=L.status.residual)
 
     def post_run(self, step, level_number):
         """

@@ -21,7 +21,7 @@ def main():
     print(out)
 
     # filter statistics by first time intervall and type (residual)
-    filtered_stats = filter_stats(stats, time=0.1, type='residual')
+    filtered_stats = filter_stats(stats, time=0.1, type='residual_post_iteration')
 
     # sort and convert stats to list, sorted by iteration numbers
     residuals = sort_stats(filtered_stats, sortby='iter')

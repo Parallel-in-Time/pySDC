@@ -6,6 +6,7 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 
 
+# noinspection PyShadowingBuiltins
 def show_residual_across_simulation(stats, fname='residuals.png'):
     """
     Helper routine to visualize the residuals across the simulation (one block of PFASST)
@@ -16,27 +17,27 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     """
 
     # get residuals of the run
-    extract_stats = filter_stats(stats,type='residual')
+    extract_stats = filter_stats(stats, type='residual_post_iteration')
 
     # find boundaries for x-,y- and c-axis as well as arrays
     maxprocs = 0
     maxiter = 0
     minres = 0
     maxres = -99
-    for k,v in extract_stats.items():
-        maxprocs = max(maxprocs,getattr(k,'process'))
-        maxiter = max(maxiter,getattr(k,'iter'))
-        minres = min(minres,np.log10(v))
-        maxres = max(maxres,np.log10(v))
+    for k, v in extract_stats.items():
+        maxprocs = max(maxprocs, getattr(k, 'process'))
+        maxiter = max(maxiter, getattr(k, 'iter'))
+        minres = min(minres, np.log10(v))
+        maxres = max(maxres, np.log10(v))
 
     # grep residuals and put into array
-    residual = np.zeros((maxiter,maxprocs+1))
+    residual = np.zeros((maxiter, maxprocs + 1))
     residual[:] = -99
-    for k,v in extract_stats.items():
-        step = getattr(k,'process')
-        iter = getattr(k,'iter')
+    for k, v in extract_stats.items():
+        step = getattr(k, 'process')
+        iter = getattr(k, 'iter')
         if iter is not -1:
-            residual[iter-1,step] = np.log10(v)
+            residual[iter - 1, step] = np.log10(v)
 
     # Set up latex stuff and fonts
     rc('font', **{"sans-serif": ["Arial"], "size": 30})
@@ -45,7 +46,7 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     rc('ytick', labelsize='small')
 
     # create plot and save
-    fig, ax = plt.subplots(figsize=(15,10))
+    fig, ax = plt.subplots(figsize=(15, 10))
 
     cmap = plt.get_cmap('Reds')
     plt.pcolor(residual.T, cmap=cmap, vmin=minres, vmax=maxres)
@@ -56,9 +57,9 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     ax.set_xlabel('iteration')
     ax.set_ylabel('process')
 
-    ax.set_xticks(np.arange(maxiter)+0.5, minor=False)
-    ax.set_yticks(np.arange(maxprocs+1)+0.5, minor=False)
-    ax.set_xticklabels(np.arange(maxiter)+1, minor=False)
-    ax.set_yticklabels(np.arange(maxprocs+1), minor=False)
+    ax.set_xticks(np.arange(maxiter) + 0.5, minor=False)
+    ax.set_yticks(np.arange(maxprocs + 1) + 0.5, minor=False)
+    ax.set_xticklabels(np.arange(maxiter) + 1, minor=False)
+    ax.set_yticklabels(np.arange(maxprocs + 1), minor=False)
 
     plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')

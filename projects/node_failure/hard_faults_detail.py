@@ -14,6 +14,7 @@ from projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinc
 import projects.node_failure.emulate_hard_faults as ft
 
 
+# noinspection PyShadowingNames,PyShadowingBuiltins
 def main(ft_setups, ft_strategies):
     """
     This routine generates the heatmaps showing the residual for a node failures at step n and iteration k
@@ -122,7 +123,8 @@ def main(ft_setups, ft_strategies):
             ft.hard_step = ft_step
             ft.hard_iter = ft_iter
 
-            controller = allinclusive_classic_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
+            controller = allinclusive_classic_nonMPI_hard_faults(num_procs=num_procs,
+                                                                 controller_params=controller_params,
                                                                  description=description)
 
             # get initial values on finest level
@@ -142,7 +144,7 @@ def main(ft_setups, ft_strategies):
             residual[:] = -99
 
             # stats magic: extract all residuals (steps vs. iterations)
-            extract_stats = filter_stats(stats, level=-1, type='residual')
+            extract_stats = filter_stats(stats, type='residual_post_iteration')
             for k, v in extract_stats.items():
                 step = getattr(k, 'process')
                 iter = getattr(k, 'iter')
@@ -156,10 +158,9 @@ def main(ft_setups, ft_strategies):
 if __name__ == "__main__":
 
     ft_strategies = ['NOFAULT', 'SPREAD', 'SPREAD_PREDICT', 'INTERP', 'INTERP_PREDICT']
-    ft_setups = ['ADVECTION', 'HEAT']
+    # ft_setups = ['ADVECTION', 'HEAT']
 
     # ft_strategies = ['NOFAULT']
-    # ft_setups = ['HEAT']
-
+    ft_setups = ['HEAT']
 
     main(ft_setups=ft_setups, ft_strategies=ft_strategies)
