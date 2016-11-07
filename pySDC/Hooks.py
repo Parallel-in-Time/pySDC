@@ -67,7 +67,7 @@ class hooks(object):
 
     def reset_stats(self):
         """
-        Funciton to reset the stats for multiple runs
+        Function to reset the stats for multiple runs
         """
         self.__stats = {}
 

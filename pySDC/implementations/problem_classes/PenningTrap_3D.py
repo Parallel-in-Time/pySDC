@@ -9,9 +9,6 @@ from pySDC.implementations.datatype_classes.particles import particles, fields, 
 class penningtrap(ptype):
     """
     Example implementing a single particle in a penning trap
-
-    Attributes:
-        nparts: number of particles (needs to be 1 here)
     """
 
     def __init__(self, cparams, dtype_u, dtype_f):
