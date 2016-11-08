@@ -1,19 +1,14 @@
 from pySDC.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.particles import particles, fields
+from pySDC.Errors import TransferError
 
 
 class particles_to_particles(space_transfer):
     """
     Custon transfer class, implements SpaceTransfer.py
 
-    This implementation is just a dummy for particles with no functionality. It can be used to check if in the particle
-    setups the number of iterations is halved once two levels are used.
-
-    Attributes:
-        fine: reference to the fine level
-        coarse: reference to the coarse level
-        init_f: number of variables on the fine level (whatever init represents there)
-        init_c: number of variables on the coarse level (whatever init represents there)
+    This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not
+    reduced on the coarse problem
     """
 
     def __init__(self, fine_prob, coarse_prob, params):
@@ -21,44 +16,41 @@ class particles_to_particles(space_transfer):
         Initialization routine
 
         Args:
-            ine_level: fine level connected with the base_transfer operations (passed to parent)
-            coarse_level: coarse level connected with the base_transfer operations (passed to parent)
-            params: parameters for the base_transfer operators
+            fine_prob: fine problem
+            coarse_prob: coarse problem
+            params: parameters for the transfer operators
         """
-        super(particles_to_particles,self).__init__(fine_prob, coarse_prob, params)
+        super(particles_to_particles, self).__init__(fine_prob, coarse_prob, params)
         pass
 
-    def restrict(self,F):
+    def restrict(self, F):
         """
         Dummy restriction routine
 
         Args:
-            F: the fine level data (easier to access than via the fine attribute)
-
+            F: the fine level data
         """
 
-        if isinstance(F,particles):
+        if isinstance(F, particles):
             G = particles(F)
-        elif isinstance(F,fields):
+        elif isinstance(F, fields):
             G = fields(F)
         else:
-            print('Transfer error')
-            exit()
+            raise TransferError("Unknown type of fine data, got %s" % type(F))
         return G
 
-    def prolong(self,G):
+    def prolong(self, G):
         """
         Dummy prolongation routine
 
         Args:
-            G: the coarse level data (easier to access than via the coarse attribute)
+            G: the coarse level data
         """
 
-        if isinstance(G,particles):
+        if isinstance(G, particles):
             F = particles(G)
-        elif isinstance(G,fields):
+        elif isinstance(G, fields):
             F = fields(G)
         else:
-            print('Transfer error')
-            exit()
+            raise TransferError("Unknown type of coarse data, got %s" % type(G))
         return F

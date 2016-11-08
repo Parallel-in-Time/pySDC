@@ -25,3 +25,10 @@ class CollocationError(Exception):
     Error class handling/indicating problems with the collocation
     """
     pass
+
+
+class TransferError(Exception):
+    """
+    Error class handling/indicating problems with the transfer processes
+    """
+    pass
