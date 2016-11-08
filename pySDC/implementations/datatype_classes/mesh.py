@@ -3,17 +3,18 @@ import copy as cp
 
 from pySDC.Errors import DataError
 
-class mesh():
+
+class mesh(object):
     """
     Mesh data type with arbitrary dimensions
 
     This data type can be used whenever structured data with a single unknown per point in space is required
 
     Attributes:
-        values: contains the ndarray of the values
+        values (np.ndarray): contains the ndarray of the values
     """
 
-    def __init__(self,init=None,val=None):
+    def __init__(self, init=None, val=None):
         """
         Initialization routine
 
@@ -26,27 +27,26 @@ class mesh():
         """
 
         # if init is another mesh, do a deepcopy (init by copy)
-        if isinstance(init,mesh):
+        if isinstance(init, mesh):
             self.values = cp.deepcopy(init.values)
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
-        elif isinstance(init,tuple) or isinstance(init,int):
-            self.values = np.empty(init,dtype=np.float64)
+        elif isinstance(init, tuple) or isinstance(init, int):
+            self.values = np.empty(init, dtype=np.float64)
             self.values[:] = val
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
-
 
     def __add__(self, other):
         """
         Overloading the addition operator for mesh types
 
         Args:
-            other: mesh object to be added
+            other (mesh.mesh): mesh object to be added
         Raises:
             DataError: if other is not a mesh object
         Returns:
-            sum of caller and other values (self+other)
+            mesh.mesh: sum of caller and other values (self+other)
         """
 
         if isinstance(other, mesh):
@@ -55,19 +55,18 @@ class mesh():
             me.values = self.values + other.values
             return me
         else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
-
+            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
     def __sub__(self, other):
         """
         Overloading the subtraction operator for mesh types
 
         Args:
-            other: mesh object to be subtracted
+            other (mesh.mesh): mesh object to be subtracted
         Raises:
             DataError: if other is not a mesh object
         Returns:
-            differences between caller and other values (self-other)
+            mesh.mesh: differences between caller and other values (self-other)
         """
 
         if isinstance(other, mesh):
@@ -76,36 +75,34 @@ class mesh():
             me.values = self.values - other.values
             return me
         else:
-            raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
-
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
         """
         Overloading the right multiply by factor operator for mesh types
 
         Args:
-            other: float factor
+            other (float): factor
         Raises:
             DataError: is other is not a float
         Returns:
-            mesh object, copy of original values scaled by factor
+            mesh.mesh: copy of original values scaled by factor
         """
 
         if isinstance(other, float) or isinstance(other, complex):
             # always create new mesh, since otherwise c = f*a changes a as well!
             me = mesh(np.shape(self.values))
-            me.values = self.values*other
+            me.values = self.values * other
             return me
         else:
-            raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
-
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
     def __abs__(self):
         """
         Overloading the abs operator for mesh types
 
         Returns:
-            absolute maximum of all mesh values
+            float: absolute maximum of all mesh values
         """
 
         # take absolute values of the mesh values
@@ -113,7 +110,7 @@ class mesh():
         # return maximum
         return np.amax(absval)
 
-    def apply_mat(self,A):
+    def apply_mat(self, A):
         """
         Matrix multiplication operator
 
@@ -121,9 +118,10 @@ class mesh():
             A: a matrix
 
         Returns:
-            mesh object, component multiplied by the matrix A
+            mesh.mesh: component multiplied by the matrix A
         """
-        assert A.shape[1] == self.values.shape[0], "ERROR: cannot apply operator %s to %s" %(A,self)
+        if not A.shape[1] == self.values.shape[0]:
+            raise DataError("ERROR: cannot apply operator %s to %s" % (A, self))
 
         me = mesh(A.shape[0])
         me.values = A.dot(self.values)
@@ -131,19 +129,18 @@ class mesh():
         return me
 
 
-class rhs_imex_mesh():
-
+class rhs_imex_mesh(object):
     """
     RHS data type for meshes with implicit and explicit components
 
     This data type can be used to have RHS with 2 components (here implicit and explicit)
 
     Attributes:
-        impl: implicit part
-        expl: explicit part
+        impl (mesh.mesh): implicit part
+        expl (mesh.mesh): explicit part
     """
 
-    def __init__(self,init):
+    def __init__(self, init):
         """
         Initialization routine
 
@@ -155,28 +152,27 @@ class rhs_imex_mesh():
         """
 
         # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
-        if isinstance(init,type(self)):
+        if isinstance(init, type(self)):
             self.impl = mesh(init.impl)
             self.expl = mesh(init.expl)
         # if init is a number or a tuple of numbers, create mesh object with None as initial value
-        elif isinstance(init,tuple) or isinstance(init,int):
+        elif isinstance(init, tuple) or isinstance(init, int):
             self.impl = mesh(init)
             self.expl = mesh(init)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
 
-
     def __sub__(self, other):
         """
         Overloading the subtraction operator for rhs types
 
         Args:
-            other: rhs object to be subtracted
+            other (mesh.rhs_imex_mesh): rhs object to be subtracted
         Raises:
             DataError: if other is not a rhs object
         Returns:
-            differences between caller and other values (self-other)
+            mesh.rhs_imex_mesh: differences between caller and other values (self-other)
         """
 
         if isinstance(other, rhs_imex_mesh):
@@ -186,19 +182,18 @@ class rhs_imex_mesh():
             me.expl.values = self.expl.values - other.expl.values
             return me
         else:
-            raise DataError("Type error: cannot subtract %s from %s" % (type(other),type(self)))
-
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
 
     def __add__(self, other):
         """
          Overloading the addition operator for rhs types
 
         Args:
-            other: rhs object to be added
+            other (mesh.rhs_imex_mesh): rhs object to be added
         Raises:
             DataError: if other is not a rhs object
         Returns:
-            sum of caller and other values (self-other)
+            mesh.rhs_imex_mesh: sum of caller and other values (self-other)
         """
 
         if isinstance(other, rhs_imex_mesh):
@@ -208,30 +203,30 @@ class rhs_imex_mesh():
             me.expl.values = self.expl.values + other.expl.values
             return me
         else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other),type(self)))
+            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
     def __rmul__(self, other):
         """
         Overloading the right multiply by factor operator for mesh types
 
         Args:
-            other: float factor
+            other (float): factor
         Raises:
             DataError: is other is not a float
         Returns:
-            mesh object, copy of original values scaled by factor
+             mesh.rhs_imex_mesh: copy of original values scaled by factor
         """
 
         if isinstance(other, float):
             # always create new rhs_imex_mesh
             me = rhs_imex_mesh(np.shape(self.impl.values))
-            me.impl.values = other*self.impl.values
-            me.expl.values = other*self.expl.values
+            me.impl.values = other * self.impl.values
+            me.expl.values = other * self.expl.values
             return me
         else:
-            raise DataError("Type error: cannot multiply %s to %s" % (type(other),type(self)))
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
-    def apply_mat(self,A):
+    def apply_mat(self, A):
         """
         Matrix multiplication operator
 
@@ -239,11 +234,13 @@ class rhs_imex_mesh():
             A: a matrix
 
         Returns:
-            rhs_imex_mesh object, each component multiplied by the matrix A
+            mesh.rhs_imex_mesh: each component multiplied by the matrix A
         """
 
-        assert A.shape[1] == self.impl.values.shape[0], "ERROR: cannot apply operator %s to %s" % (A, self.impl)
-        assert A.shape[1] == self.expl.values.shape[0], "ERROR: cannot apply operator %s to %s" % (A, self.expl)
+        if not A.shape[1] == self.impl.values.shape[0]:
+            raise DataError("ERROR: cannot apply operator %s to %s" % (A, self.impl))
+        if not A.shape[1] == self.expl.values.shape[0]:
+            raise DataError("ERROR: cannot apply operator %s to %s" % (A, self.expl))
 
         me = rhs_imex_mesh(A.shape[1])
         me.impl.values = A.dot(self.impl.values)
