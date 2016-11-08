@@ -4,6 +4,7 @@ from future.utils import with_metaclass
 from scipy.interpolate import BarycentricInterpolator
 from scipy.integrate import quad
 import numpy as np
+import logging
 
 from pySDC.Errors import CollocationError
 
@@ -42,6 +43,8 @@ class CollBase(with_metaclass(abc.ABCMeta)):
             raise CollocationError('At least one quadrature node required, got %s' % num_nodes)
         if not tleft < tright:
             raise CollocationError('Interval boundaries are corrupt, got %s and %s' % (tleft, tright))
+
+        self.logger = logging.getLogger('collocation')
 
         # Set number of nodes, left and right interval boundaries
         self.num_nodes = num_nodes

@@ -2,18 +2,42 @@ from __future__ import division
 import numpy as np
 
 from pySDC.Collocation import CollBase
+from pySDC.Errors import CollocationError
+
 
 class CollGaussLegendre(CollBase):
     """
-    Implements Gauss-Legendre Quadrature by deriving from CollBase and implementing Gauss-Legendre nodes
-    -> actually already part of CollBase, this is just for consistency
+    Implements Gauss-Legendre Quadrature
+
+    Attributes:
+        order (int): order of the quadrature
+        num_nodes (int): number of collocation nodes
+        tleft (float): left interval point
+        tright (float): right interval point
+        nodes (numpy.ndarray): array of quadrature nodes
+        weights (numpy.ndarray): array of quadrature weights for the full interval
+        Qmat (numpy.ndarray): matrix containing the weights for tleft to node
+        Smat (numpy.ndarray): matrix containing the weights for node to node
+        delta_m (numpy.ndarray): array of distances between nodes
+        right_is_node (bool): flag to indicate whether right point is collocation node
+        left_is_node (bool): flag to indicate whether left point is collocation node
     """
+
     def __init__(self, num_nodes, tleft, tright):
+        """
+        Initialization
+
+        Args:
+            num_nodes (int): number of nodes
+            tleft (float): left interval boundary (usually 0)
+            tright (float): right interval boundary (usually 1)
+        """
         super(CollGaussLegendre, self).__init__(num_nodes, tleft, tright)
-        assert num_nodes >= 1, "Number of nodes should be at least 1 for Gauss-Legendre, but is %d" % num_nodes
+        if num_nodes < 1:
+            raise CollocationError("Number of nodes should be at least 1 for Gauss-Legendre, but is %d" % num_nodes)
         self.order = 2 * self.num_nodes
         self.nodes = self._getNodes
-        self.weights = self._getWeights(tleft,tright)
+        self.weights = self._getWeights(tleft, tright)
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
@@ -23,24 +47,12 @@ class CollGaussLegendre(CollBase):
     @property
     def _getNodes(self):
         """
-        Computes nodes for the Gauss-Legendre quadrature of order :math:`n>1` on :math:`[-1,+1]`.
+        Computes nodes for the Gauss-Legendre quadrature
 
-        (ported from MATLAB code, reference see below, original commend from MATLAB code:)
-
-        .. epigraph::
-
-            Unlike many publicly available functions, this function is valid for :math:`n>=46`.
-            This is due to the fact that it does not rely on MATLAB's build-in 'root' routines to determine the roots
-            of the Legendre polynomial, but finds the roots by looking for the eigenvalues of an alternative version of
-            the companion matrix of the n'th degree Legendre polynomial.
-            The companion matrix is constructed as a symmetrical matrix, guaranteeing that all the eigenvalues (roots)
-            will be real.
-            On the contrary, MATLAB's 'roots' function uses a general form for the companion matrix, which becomes
-            unstable at higher orders :math:`n`, leading to complex roots.
-
-            -- original MATLAB function by: Geert Van Damme <geert@vandamme-iliano.be> (February 21, 2010)
         Python version by Dieter Moser, 2014
-        :return: Gauss-Legendre nodes
+
+        Returns:
+            np.ndarray: array of Gauss-Legendre nodes
         """
         M = self.num_nodes
         a = self.tleft
