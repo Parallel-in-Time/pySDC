@@ -4,13 +4,12 @@ import numpy as np
 
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
+from pySDC.Errors import CommunicationError, ControllerError
 
 
 class allinclusive_classic_nonMPI(controller):
     """
-
     PFASST controller, running serialized version of PFASST in classical style
-
     """
 
     def __init__(self, num_procs, controller_params, description):
@@ -39,8 +38,8 @@ class allinclusive_classic_nonMPI(controller):
         if num_procs > 1 and num_levels > 1:
             for S in self.MS:
                 for L in S.levels:
-                    assert L.sweep.coll.right_is_node and not L.sweep.params.do_coll_update, \
-                        "For PFASST to work, we assume uend^k = u_M^k"
+                    if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
+                        raise ControllerError("For PFASST to work, we assume uend^k = u_M^k in this controller")
 
     def run(self, u0, t0, Tend):
         """
@@ -55,8 +54,6 @@ class allinclusive_classic_nonMPI(controller):
             end values on the finest level
             stats object containing statistics for each step, each level and each iteration
         """
-
-        # fixme: use error classes for send/recv and stage errors
 
         # some initializations
         uend = None
@@ -146,8 +143,7 @@ class allinclusive_classic_nonMPI(controller):
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
-            self.MS[p].status.pred_cnt = active_slots.index(
-                p) + 1  # fixme: does this also work for ring-parallelization?
+            self.MS[p].status.pred_cnt = active_slots.index(p) + 1
             self.MS[p].status.iter = 1
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
@@ -169,9 +165,8 @@ class allinclusive_classic_nonMPI(controller):
         """
 
         if tag is not None and source.tag != tag:
-            print('RECV ERROR', tag, source.tag)
-            exit()
-        # simply do a deepcopy of the values uend to become the new u0 at the target
+            raise CommunicationError('source and target tag are not the same, got %s and %s' % (source.tag, tag))
+        # uend becomes the new u0 at the target
         target.u[0] = target.prob.dtype_u(source.uend)
         # re-evaluate f on left interval boundary
         target.f[0] = target.prob.eval_f(target.u[0], target.time)
@@ -231,8 +226,7 @@ class allinclusive_classic_nonMPI(controller):
                 self.hooks.pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_FINE_SWEEP'
             else:
-                print("Don't know what to do after spread, aborting")
-                exit()
+                raise ControllerError("Don't know what to do after spread, aborting")
 
             return S
 
@@ -255,6 +249,8 @@ class allinclusive_classic_nonMPI(controller):
             # receive new values from previous step (if not first step)
             if not S.status.first:
                 if S.prev.levels[-1].tag:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                      (S.status.slot, S.prev.status.slot, len(S.levels)-1, True))
                     self.recv(S.levels[-1], S.prev.levels[-1])
                     # reset tag to signal successful receive
                     S.prev.levels[-1].tag = False
@@ -272,6 +268,8 @@ class allinclusive_classic_nonMPI(controller):
             # send new values forward, if previous send was successful (otherwise: try again)
             if not S.status.last:
                 if not S.levels[-1].tag:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                      % (S.status.slot, len(S.levels)-1, True))
                     self.send(S.levels[-1], tag=True)
                 else:
                     S.status.stage = 'PREDICT_SEND'
@@ -318,6 +316,8 @@ class allinclusive_classic_nonMPI(controller):
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
             if not S.levels[0].tag or S.status.last or S.next.status.done:
                 if self.params.fine_comm:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                      % (S.status.slot, 0, True))
                     self.send(S.levels[0], tag=True)
                 S.status.stage = 'IT_CHECK'
             else:
@@ -367,13 +367,14 @@ class allinclusive_classic_nonMPI(controller):
                 S.levels[l].sweep.compute_residual()
                 self.hooks.post_sweep(step=S, level_number=l)
 
-                # send if last send succeeded on this level (otherwise: abort with error (FIXME))
+                # send if last send succeeded on this level (otherwise: abort with error)
                 if not S.levels[l].tag or S.status.last or S.next.status.done:
                     if self.params.fine_comm:
+                        self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                          % (S.status.slot, l, True))
                         self.send(S.levels[l], tag=True)
                 else:
-                    print('SEND ERROR', l, S.levels[l].tag)
-                    exit()
+                    raise CommunicationError('Sending failed on process %2i, level %2i' % (S.status.slot, l))
 
                 # transfer further up the hierarchy
                 S.transfer(source=S.levels[l], target=S.levels[l + 1])
@@ -392,21 +393,21 @@ class allinclusive_classic_nonMPI(controller):
             if not S.status.first and not S.prev.status.done:
                 # try to receive and the progress (otherwise: try again)
                 if S.prev.levels[-1].tag:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, True))
                     self.recv(S.levels[-1], S.prev.levels[-1])
                     S.prev.levels[-1].tag = False
                     if len(S.levels) > 1 or num_procs > 1:
                         S.status.stage = 'IT_COARSE_SWEEP'
                     else:
-                        print('you should not be here')
-                        exit()
+                        raise ControllerError('Stage unclear after coarse send')
                 else:
                     S.status.stage = 'IT_COARSE_RECV'
             else:
                 if len(S.levels) > 1 or num_procs > 1:
                     S.status.stage = 'IT_COARSE_SWEEP'
                 else:
-                    print('you should not be here')
-                    exit()
+                    raise ControllerError('Stage unclear after coarse send')
             # return
             return S
 
@@ -429,6 +430,8 @@ class allinclusive_classic_nonMPI(controller):
 
             # try to send new values (if old ones have not been picked up yet, retry)
             if not S.levels[-1].tag or S.status.last or S.next.status.done:
+                self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                  % (S.status.slot, len(S.levels) - 1, True))
                 self.send(S.levels[-1], tag=True)
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST
@@ -446,14 +449,15 @@ class allinclusive_classic_nonMPI(controller):
             # receive and sweep on middle levels (except for coarsest level)
             for l in range(len(S.levels) - 1, 0, -1):
 
-                # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
+                # if applicable, try to receive values from IT_UP, otherwise abort
                 if self.params.fine_comm and not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l - 1].tag:
+                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                          (S.status.slot, S.prev.status.slot, l - 1, True))
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1])
                         S.prev.levels[l - 1].tag = False
                     else:
-                        print('RECV ERROR DOWN')
-                        exit()
+                        raise CommunicationError('Sending failed during IT_DOWN')
 
                 # prolong values
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
@@ -471,6 +475,4 @@ class allinclusive_classic_nonMPI(controller):
 
         else:
 
-            # fixme: use meaningful error object here
-            print('Something is wrong here, you should have hit one case statement!')
-            exit()
+            raise ControllerError('Unknown stage, got %s' % S.status.stage)

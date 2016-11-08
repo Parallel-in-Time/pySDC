@@ -32,3 +32,17 @@ class TransferError(Exception):
     Error class handling/indicating problems with the transfer processes
     """
     pass
+
+
+class CommunicationError(Exception):
+    """
+    Error class handling/indicating problems with the communication
+    """
+    pass
+
+
+class ControllerError(Exception):
+    """
+    Error class handling/indicating problems with the controller
+    """
+    pass
