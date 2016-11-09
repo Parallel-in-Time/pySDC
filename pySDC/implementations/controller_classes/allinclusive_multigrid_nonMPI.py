@@ -4,6 +4,7 @@ import numpy as np
 
 from pySDC.Controller import controller
 from pySDC import Step as stepclass
+from pySDC.Errors import ControllerError, CommunicationError
 
 
 class allinclusive_multigrid_nonMPI(controller):
@@ -55,9 +56,7 @@ class allinclusive_multigrid_nonMPI(controller):
             stats object containing statistics for each step, each level and each iteration
         """
 
-        # fixme: use error classes for send/recv and stage errors
-
-        # some initializations
+        # some initializations and reset of statistics
         uend = None
         num_procs = len(self.MS)
         self.hooks.reset_stats()
@@ -69,7 +68,7 @@ class allinclusive_multigrid_nonMPI(controller):
         time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
         # determine which steps are still active (time < Tend)
-        active = [time[p] < Tend - 10*np.finfo(float).eps for p in slots]
+        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
         # compress slots according to active steps, i.e. remove all steps which have times above Tend
         active_slots = list(itertools.compress(slots, active))
@@ -98,14 +97,14 @@ class allinclusive_multigrid_nonMPI(controller):
             uend = self.MS[active_slots[-1]].levels[0].uend
 
             for p in active_slots:
-                time[p] += num_procs*self.MS[p].dt
+                time[p] += num_procs * self.MS[p].dt
 
             # determine new set of active steps and compress slots accordingly
-            active = [time[p] < Tend - 10*np.finfo(float).eps for p in slots]
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
-            self.restart_block(active_slots,time,uend)
+            self.restart_block(active_slots, time, uend)
 
         # call post-run hook
         for S in self.MS:
@@ -113,8 +112,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
         return uend, self.hooks.return_stats()
 
-
-    def restart_block(self,active_slots,time,u0):
+    def restart_block(self, active_slots, time, u0):
         """
         Helper routine to reset/restart block of (active) steps
 
@@ -128,33 +126,33 @@ class allinclusive_multigrid_nonMPI(controller):
         # loop over active slots (not directly, since we need the previous entry as well)
         for j in range(len(active_slots)):
 
-                # get slot number
-                p = active_slots[j]
+            # get slot number
+            p = active_slots[j]
 
-                # store current slot number for diagnostics
-                self.MS[p].status.slot = p
-                # store link to previous step
-                self.MS[p].prev = self.MS[active_slots[j-1]]
-                # resets step
-                self.MS[p].reset_step()
-                # determine whether I am the first and/or last in line
-                self.MS[p].status.first = active_slots.index(p) == 0
-                self.MS[p].status.last = active_slots.index(p) == len(active_slots)-1
-                # intialize step with u0
-                self.MS[p].init_step(u0)
-                # reset some values
-                self.MS[p].status.done = False
-                self.MS[p].status.iter = 1
-                self.MS[p].status.stage = 'SPREAD'
-                for l in self.MS[p].levels:
-                    l.tag = None
+            # store current slot number for diagnostics
+            self.MS[p].status.slot = p
+            # store link to previous step
+            self.MS[p].prev = self.MS[active_slots[j - 1]]
+            # resets step
+            self.MS[p].reset_step()
+            # determine whether I am the first and/or last in line
+            self.MS[p].status.first = active_slots.index(p) == 0
+            self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
+            # intialize step with u0
+            self.MS[p].init_step(u0)
+            # reset some values
+            self.MS[p].status.done = False
+            self.MS[p].status.iter = 1
+            self.MS[p].status.stage = 'SPREAD'
+            for l in self.MS[p].levels:
+                l.tag = None
 
         for p in active_slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
 
     @staticmethod
-    def recv(target,source,tag=None):
+    def recv(target, source, tag=None):
         """
         Receive function
 
@@ -165,15 +163,14 @@ class allinclusive_multigrid_nonMPI(controller):
         """
 
         if tag is not None and source.tag != tag:
-            print('RECV ERROR',tag,source.tag)
-            exit()
+            raise CommunicationError('source and target tag are not the same, got %s and %s' % (source.tag, tag))
         # simply do a deepcopy of the values uend to become the new u0 at the target
         target.u[0] = target.prob.dtype_u(source.uend)
         # re-evaluate f on left interval boundary
-        target.f[0] = target.prob.eval_f(target.u[0],target.time)
+        target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
     @staticmethod
-    def send(source,tag):
+    def send(source, tag):
         """
         Send function
 
@@ -184,7 +181,6 @@ class allinclusive_multigrid_nonMPI(controller):
         # sending here means computing uend ("one-sided communication")
         source.sweep.compute_end_point()
         source.tag = cp.deepcopy(tag)
-
 
     def predictor(self, MS):
         """
@@ -201,40 +197,42 @@ class allinclusive_multigrid_nonMPI(controller):
         for S in MS:
 
             # restrict to coarsest level
-            for l in range(1,len(S.levels)):
-                S.transfer(source=S.levels[l-1],target=S.levels[l])
+            for l in range(1, len(S.levels)):
+                S.transfer(source=S.levels[l - 1], target=S.levels[l])
 
         # loop over all steps
         for q in range(len(MS)):
 
             # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
-            for p in range(q,len(MS)):
-
+            for p in range(q, len(MS)):
                 S = MS[p]
 
                 # do the sweep with new values
                 S.levels[-1].sweep.update_nodes()
 
                 # send updated values on coarsest level
-                self.send(S.levels[-1],tag=(len(S.levels),0,S.status.slot))
+                self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                  % (S.status.slot, len(S.levels) - 1, 0))
+                self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
 
             # loop over last steps: [2,3,4], [3,4], [4]
-            for p in range(q+1,len(MS)):
-
+            for p in range(q + 1, len(MS)):
                 S = MS[p]
                 # receive values sent during previous sweep
-                self.recv(S.levels[-1],S.prev.levels[-1],tag=(len(S.levels),0,S.prev.status.slot))
+                self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                  (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
+                self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
 
         # loop over all steps
         for S in MS:
 
             # interpolate back to finest level
-            for l in range(len(S.levels)-1,0,-1):
-                S.transfer(source=S.levels[l],target=S.levels[l-1])
+            for l in range(len(S.levels) - 1, 0, -1):
+                S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
         return MS
 
-    def pfasst(self,MS):
+    def pfasst(self, MS):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -247,13 +245,11 @@ class allinclusive_multigrid_nonMPI(controller):
             all active steps
         """
 
-        stage = None
         # if all stages are the same, continue, otherwise abort
         if all(S.status.stage for S in MS):
             stage = MS[0].status.stage
         else:
-            print('not all stages are equal, aborting..')
-            exit()
+            raise ControllerError('not all stages are equal')
 
         self.logger.debug(stage)
 
@@ -268,7 +264,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if len(S.levels) > 1 and self.params.predict: # MLSDC or PFASST with predict
+                if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
                     self.hooks.pre_iteration(step=S, level_number=0)
@@ -292,7 +288,6 @@ class allinclusive_multigrid_nonMPI(controller):
             # do fine sweep for all steps (virtually parallel)
 
             for S in MS:
-
                 # standard sweep workflow: update nodes, compute residual, log progress
                 self.hooks.pre_sweep(step=S, level_number=0)
                 S.levels[0].sweep.update_nodes()
@@ -321,9 +316,9 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
                     # multi-level or single-level?
-                    if len(S.levels) > 1: # MLSDC or PFASST
+                    if len(S.levels) > 1:  # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
-                    else: # SDC
+                    else:  # SDC
                         S.status.stage = 'IT_FINE'
 
             else:
@@ -364,6 +359,8 @@ class allinclusive_multigrid_nonMPI(controller):
 
                 # receive from previous step (if not first)
                 if not S.status.first:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, S.status.iter))
                     self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), S.status.iter, S.prev.status.slot))
 
                 # do the sweep
@@ -374,14 +371,15 @@ class allinclusive_multigrid_nonMPI(controller):
 
                 # send to succ step
                 if not S.status.last:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                      % (S.status.slot, len(S.levels) - 1, S.status.iter))
                     self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
 
                 # update stage
-                if len(S.levels) > 1: # MLSDC or PFASST
+                if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_DOWN'
-                else: # MSSDC
+                else:  # MSSDC
                     S.status.stage = 'IT_CHECK'
-
 
             return MS
 
@@ -398,10 +396,14 @@ class allinclusive_multigrid_nonMPI(controller):
 
                     # send updated values forward
                     if self.params.fine_comm and not S.status.last:
+                        self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                          % (S.status.slot, l - 1, S.status.iter))
                         self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                     # # receive values
                     if self.params.fine_comm and not S.status.first:
+                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                          (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter, S.prev.status.slot))
 
                     # on middle levels: do sweep as usual
@@ -418,6 +420,4 @@ class allinclusive_multigrid_nonMPI(controller):
 
         else:
 
-            #fixme: use meaningful error object here
-            print('Something is wrong here, you should have hit one case statement!')
-            exit()
+            raise ControllerError('Unknown stage, got %s' % stage)

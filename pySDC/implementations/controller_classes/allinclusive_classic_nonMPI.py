@@ -55,7 +55,7 @@ class allinclusive_classic_nonMPI(controller):
             stats object containing statistics for each step, each level and each iteration
         """
 
-        # some initializations
+        # some initializations and reset of statistics
         uend = None
         num_procs = len(self.MS)
         self.hooks.reset_stats()

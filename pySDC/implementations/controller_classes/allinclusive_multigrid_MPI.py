@@ -2,6 +2,7 @@ import numpy as np
 
 from pySDC.Controller import controller
 from pySDC.Step import step
+from pySDC.Errors import ControllerError
 
 
 class allinclusive_multigrid_MPI(controller):
@@ -29,6 +30,10 @@ class allinclusive_multigrid_MPI(controller):
 
         # pass communicator for future use
         self.comm = comm
+        # add request handle container for isend
+        self.req_send = []
+        # add request handler for status send
+        self.req_status = None
 
         num_procs = self.comm.Get_size()
         rank = self.comm.Get_rank()
@@ -37,11 +42,13 @@ class allinclusive_multigrid_MPI(controller):
             self.dump_setup(step=self.S, controller_params=controller_params, description=description)
 
         num_levels = len(self.S.levels)
-        assert not (num_procs > 1 and num_levels == 1), "ERROR: multigrid cannot do MSSDC"
+        if num_procs > 1 and num_levels == 1:
+            raise ControllerError("multigrid cannot do MSSDC, sorry!")
 
         if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
-                assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
+                if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
+                    raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
     def run(self, u0, t0, Tend):
         """
@@ -57,15 +64,14 @@ class allinclusive_multigrid_MPI(controller):
             stats object containing statistics for each step, each level and each iteration
         """
 
-        # fixme: use error classes for send/recv and stage errors
-
+        # reset stats to prevent double entries from old runs
         self.hooks.reset_stats()
 
+        # find active processes and put into new communicator
         rank = self.comm.Get_rank()
         all_dt = self.comm.allgather(self.S.dt)
         time = t0 + sum(all_dt[0:rank])
         active = time < Tend - 10 * np.finfo(float).eps
-
         comm_active = self.comm.Split(active)
         rank = comm_active.Get_rank()
         num_procs = comm_active.Get_size()
@@ -78,6 +84,7 @@ class allinclusive_multigrid_MPI(controller):
         # call pre-run hook
         self.hooks.pre_run(step=self.S, level_number=0)
 
+        # while any process still active...
         while active:
 
             while not self.S.status.done:
@@ -85,15 +92,13 @@ class allinclusive_multigrid_MPI(controller):
 
             time += self.S.dt
 
+            # broadcast uend, set new times and fine active processes
             tend = comm_active.bcast(time, root=num_procs - 1)
             uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
-
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])
-
             active = time < Tend - 10 * np.finfo(float).eps
             comm_active = comm_active.Split(active)
-
             rank = comm_active.Get_rank()
             num_procs = comm_active.Get_size()
             self.S.status.slot = rank
@@ -105,12 +110,10 @@ class allinclusive_multigrid_MPI(controller):
         self.hooks.post_run(step=self.S, level_number=0)
 
         comm_active.Free()
-        uend = self.comm.bcast(uend, root=num_procs-1)
 
         return uend, self.hooks.return_stats()
 
-
-    def restart_block(self,size,time,u0):
+    def restart_block(self, size, time, u0):
         """
         Helper routine to reset/restart block of (active) steps
 
@@ -147,67 +150,77 @@ class allinclusive_multigrid_MPI(controller):
             lvl.status.time = time
 
     @staticmethod
-    def recv(target,source,tag,comm):
+    def recv(target, source, tag, comm):
         """
         Receive function
 
         Args:
-            target: level which will receive the values
-            source: level which initiated the send
+            target: process/level which will receive the values
+            source: process/level which initiated the send
             tag: identifier to check if this message is really for me
+            comm: communicator
         """
+        # do a blocking receive and re-compute f(u0)
         target.u[0] = comm.recv(source=source, tag=tag)
         target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
     @staticmethod
-    def send(source,target,tag,comm):
+    def send(source, target, tag, comm):
         """
         Send function
 
         Args:
-            source: level which has the new values
+            source: process/level which has the new values
+            target: process/level which will receive the values
             tag: identifier for this message
+            comm: communicator
         """
         # sending here means computing uend ("one-sided communication")
         source.sweep.compute_end_point()
-        comm.send(source.uend, dest = target, tag = tag)
+        comm.send(source.uend, dest=target, tag=tag)
 
-    def predictor(self,comm):
+    def predictor(self, comm):
         """
         Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
 
+        Args:
+            comm: communicator
         """
 
         # restrict to coarsest level
         for l in range(1, len(self.S.levels)):
-            self.S.transfer(source=self.S.levels[l-1],target=self.S.levels[l])
+            self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
 
-        for p in range(self.S.status.slot+1):
+        for p in range(self.S.status.slot + 1):
 
             if not p == 0 and not self.S.status.first:
+                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   self.S.status.iter, p))
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep with new values
             self.S.levels[-1].sweep.update_nodes()
 
             if not self.S.status.last:
+                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   self.S.status.iter, p))
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
 
         # interpolate back to finest level
-        for l in range(len(self.S.levels)-1,0,-1):
-            self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
+        for l in range(len(self.S.levels) - 1, 0, -1):
+            self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
 
-    def pfasst(self,comm,num_procs):
+    def pfasst(self, comm, num_procs):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
         For the workflow of this controller, check out one of our PFASST talks
 
         Args:
-            MS: all active steps
-
-        Returns:
-            all active steps
+            comm: communicator
+            num_procs: number of active processors
         """
 
         stage = self.S.status.stage
@@ -236,8 +249,7 @@ class allinclusive_multigrid_MPI(controller):
                 self.hooks.pre_iteration(step=self.S, level_number=0)
                 self.S.status.stage = 'IT_FINE'
             else:
-                print("Don't know what to do after spread, aborting")
-                exit()
+                raise ControllerError("Don't know what to do after spread, aborting")
 
         elif stage == 'PREDICT':
 
@@ -283,6 +295,8 @@ class allinclusive_multigrid_MPI(controller):
                     self.S.status.stage = 'IT_COARSE_RECV'
                 elif num_procs == 1:  # SDC
                     self.S.status.stage = 'IT_FINE'
+                else:
+                    raise ControllerError("Weird stage in IT_CHECK")
 
             else:
                 self.S.levels[0].sweep.compute_end_point()
@@ -293,18 +307,17 @@ class allinclusive_multigrid_MPI(controller):
 
             # go up the hierarchy from finest to coarsest level (parallel)
 
-
-            self.S.transfer(source=self.S.levels[0],target=self.S.levels[1])
+            self.S.transfer(source=self.S.levels[0], target=self.S.levels[1])
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
-            for l in range(1,len(self.S.levels)-1):
+            for l in range(1, len(self.S.levels) - 1):
                 self.hooks.pre_sweep(step=self.S, level_number=l)
                 self.S.levels[l].sweep.update_nodes()
                 self.S.levels[l].sweep.compute_residual()
                 self.hooks.post_sweep(step=self.S, level_number=l)
 
                 # transfer further up the hierarchy
-                self.S.transfer(source=self.S.levels[l],target=self.S.levels[l+1])
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
 
             # update stage
             self.S.status.stage = 'IT_COARSE_RECV'
@@ -314,6 +327,9 @@ class allinclusive_multigrid_MPI(controller):
             # receive from previous step (if not first)
 
             if not self.S.status.first:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   len(self.S.levels) - 1, self.S.status.iter))
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # update stage
@@ -332,6 +348,9 @@ class allinclusive_multigrid_MPI(controller):
 
             # send to next step
             if not self.S.status.last:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   len(self.S.levels) - 1, self.S.status.iter))
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
 
             # update stage
@@ -345,36 +364,38 @@ class allinclusive_multigrid_MPI(controller):
             # prolong corrections down to finest level (parallel)
 
             # receive and sweep on middle levels (except for coarsest level)
-            for l in range(len(self.S.levels)-1,0,-1):
+            for l in range(len(self.S.levels) - 1, 0, -1):
 
                 # prolong values
-                self.S.transfer(source=self.S.levels[l],target=self.S.levels[l-1])
-                self.S.levels[l-1].sweep.compute_end_point()
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+                self.S.levels[l - 1].sweep.compute_end_point()
 
+                req_send = None
                 if not self.S.status.last and self.params.fine_comm:
-                    req_send = comm.isend(self.S.levels[l-1].uend,dest=self.S.next,tag=self.S.status.iter)
+                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       l - 1, self.S.status.iter))
+                    req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
 
                 if not self.S.status.first and self.params.fine_comm:
-                    self.recv(target=self.S.levels[l-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       l - 1, self.S.status.iter))
+                    self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.last and self.params.fine_comm:
                     req_send.wait()
 
                 # on middle levels: do sweep as usual
-                if l-1 > 0:
+                if l - 1 > 0:
                     self.hooks.pre_sweep(step=self.S, level_number=l - 1)
-                    self.S.levels[l-1].sweep.update_nodes()
-                    self.S.levels[l-1].sweep.compute_residual()
+                    self.S.levels[l - 1].sweep.update_nodes()
+                    self.S.levels[l - 1].sweep.compute_residual()
                     self.hooks.post_sweep(step=self.S, level_number=l - 1)
 
             # update stage
             self.S.status.stage = 'IT_FINE'
 
         else:
-            #fixme: use meaningful error object here
-            print('Something is wrong here, you should have hit one case statement!')
-            exit()
 
-
-
-
+            raise ControllerError('Weird stage, got %s' % self.S.status.stage)
