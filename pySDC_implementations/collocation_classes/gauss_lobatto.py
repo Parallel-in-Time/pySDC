@@ -5,6 +5,7 @@ import numpy.polynomial.legendre as leg
 from pySDC_core.Collocation import CollBase
 from pySDC_core.Errors import CollocationError
 
+
 class CollGaussLobatto(CollBase):
     """
     Implements Gauss-Lobatto Quadrature

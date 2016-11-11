@@ -5,6 +5,7 @@ import scipy.interpolate as intpl
 from pySDC_core.Collocation import CollBase
 from pySDC_core.Errors import CollocationError
 
+
 class EquidistantSpline_Right(CollBase):
     """
     Implements equidistant nodes with right end point included and spline interpolation
