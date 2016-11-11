@@ -6,7 +6,7 @@ from examples.fenics_advection_diffusion_1d.TransferClass import mesh_to_mesh_fe
 from examples.fenics_vortex_2d.ProblemClass import fenics_vortex_2d
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.implementations.datatype_classes import fenics_mesh
+from implementations.datatype_classes import fenics_mesh
 
 if __name__ == "__main__":
 

@@ -1,12 +1,12 @@
 import numpy as np
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from implementations.sweeper_classes.generic_implicit import generic_implicit
+from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 

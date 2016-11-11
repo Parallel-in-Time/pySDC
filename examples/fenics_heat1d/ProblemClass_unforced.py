@@ -3,7 +3,7 @@ from __future__ import division
 import dolfin as df
 import numpy as np
 
-from pySDC.implementations.datatype_classes import fenics_mesh
+from implementations.datatype_classes import fenics_mesh
 from pySDC.Problem import ptype
 
 

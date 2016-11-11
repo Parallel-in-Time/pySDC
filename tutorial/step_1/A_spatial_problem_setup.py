@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from implementations.datatype_classes.mesh import mesh
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 
 def main():

@@ -2,11 +2,11 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.implementations.datatype_classes.particles import particles, fields
-from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
+from implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
+from implementations.datatype_classes.particles import particles, fields
+from implementations.problem_classes.PenningTrap_3D import penningtrap
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
 from playgrounds.Boris.penningtrap_HookClass import particles_output

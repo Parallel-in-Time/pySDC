@@ -29,7 +29,7 @@ def test_datatypes_mesh():
 
 
 def check_datatypes_mesh(init):
-    import pySDC.implementations.datatype_classes.mesh as m
+    import implementations.datatype_classes.mesh as m
 
 
     m1 = m.mesh(init)
@@ -80,8 +80,8 @@ def test_datatypes_particles():
 
 
 def check_datatypes_particles(init):
-    from pySDC.implementations.datatype_classes.particles import particles
-    from pySDC.implementations.datatype_classes.particles import acceleration
+    from implementations.datatype_classes.particles import particles
+    from implementations.datatype_classes.particles import acceleration
 
 
     p1 = particles(init)

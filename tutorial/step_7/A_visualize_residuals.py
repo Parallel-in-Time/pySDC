@@ -1,6 +1,6 @@
 import os
 
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
 

@@ -1,9 +1,9 @@
 from collections import namedtuple
 
 import numpy as np
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from implementations.datatype_classes.mesh import mesh
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 from tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
 

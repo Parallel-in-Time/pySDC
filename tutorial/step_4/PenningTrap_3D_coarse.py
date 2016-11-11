@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
+from implementations.problem_classes.PenningTrap_3D import penningtrap
 
 
 class penningtrap_coarse(penningtrap):

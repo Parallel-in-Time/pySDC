@@ -1,10 +1,10 @@
 from pySDC.Step import step
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from implementations.datatype_classes.mesh import mesh
+from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.sweeper_classes.generic_LU import generic_LU
+from implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 
 def main():

@@ -6,7 +6,7 @@ import dolfin as df
 import numpy as np
 
 from pySDC.Problem import ptype
-from pySDC.implementations.datatype_classes import fenics_mesh
+from implementations.datatype_classes import fenics_mesh
 
 
 class fenics_grayscott(ptype):

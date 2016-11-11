@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from implementations.datatype_classes.mesh import mesh
+from implementations.problem_classes.Auzinger_implicit import auzinger
+from implementations.sweeper_classes.generic_implicit import generic_implicit
+from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from playgrounds.ODEs.trajectory_HookClass import trajectories
 

@@ -5,7 +5,7 @@ from examples.fenics_heat1d_weak.ProblemClass import fenics_heat
 from examples.fenics_heat1d_weak.TransferClass import mesh_to_mesh_fenics
 from pySDC import CollocationClasses as collclass
 from pySDC import Log
-from pySDC.implementations.datatype_classes import fenics_mesh
+from implementations.datatype_classes import fenics_mesh
 
 if __name__ == "__main__":
 
