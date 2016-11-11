@@ -6,8 +6,8 @@ import matplotlib.pylab as plt
 import numpy as np
 import os.path
 
-from implementations.datatype_classes.mesh import mesh
-from implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC_implementations.datatype_classes.mesh import mesh
+from pySDC_implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')

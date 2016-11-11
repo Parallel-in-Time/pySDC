@@ -1,9 +1,9 @@
 import logging
 
-from pySDC import Level as levclass
-from pySDC.plugins.pysdc_helper import FrozenClass
-from pySDC.BaseTransfer import base_transfer
-from pySDC.Errors import ParameterError
+from pySDC_core import Level as levclass
+from pySDC_core.plugins.pysdc_helper import FrozenClass
+from pySDC_core.BaseTransfer import base_transfer
+from pySDC_core.Errors import ParameterError
 
 
 class step(FrozenClass):

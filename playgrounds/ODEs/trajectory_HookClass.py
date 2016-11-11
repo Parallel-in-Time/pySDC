@@ -2,7 +2,7 @@ from __future__ import division
 import matplotlib.pyplot as plt
 import progressbar
 
-from pySDC.Hooks import hooks
+from pySDC_core.Hooks import hooks
 
 
 class trajectories(hooks):

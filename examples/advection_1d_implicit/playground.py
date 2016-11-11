@@ -1,12 +1,12 @@
 import numpy as np
-import pySDC.deprecated.PFASST_stepwise as mp
+import pySDC_core.deprecated.PFASST_stepwise as mp
 
 from examples.advection_1d_implicit.ProblemClass import advection
 from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
-from implementations.datatype_classes import mesh
-from implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC import CollocationClasses as collclass
-from pySDC import Log
+from pySDC_implementations.datatype_classes import mesh
+from pySDC_implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC_core import CollocationClasses as collclass
+from pySDC_core import Log
 
 if __name__ == "__main__":
 

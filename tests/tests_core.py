@@ -8,9 +8,9 @@ def test_errors():
         yield check_error, subclass
 
 def check_error(subclass):
-    import pySDC.Errors
+    import pySDC_core.Errors
 
-    err = getattr(pySDC.Errors, subclass)
+    err = getattr(pySDC_core.Errors, subclass)
 
     try:
         raise err('bla')
@@ -29,7 +29,7 @@ def test_datatypes_mesh():
 
 
 def check_datatypes_mesh(init):
-    import implementations.datatype_classes.mesh as m
+    import pySDC_implementations.datatype_classes.mesh as m
 
 
     m1 = m.mesh(init)
@@ -80,8 +80,8 @@ def test_datatypes_particles():
 
 
 def check_datatypes_particles(init):
-    from implementations.datatype_classes.particles import particles
-    from implementations.datatype_classes.particles import acceleration
+    from pySDC_implementations.datatype_classes.particles import particles
+    from pySDC_implementations.datatype_classes.particles import acceleration
 
 
     p1 = particles(init)

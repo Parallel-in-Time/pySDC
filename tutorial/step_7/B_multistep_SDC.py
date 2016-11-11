@@ -1,14 +1,14 @@
 import os
 
-from implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from implementations.datatype_classes.mesh import mesh
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.sweeper_classes.generic_LU import generic_LU
-from implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC_implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC_implementations.datatype_classes.mesh import mesh
+from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC_implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC_implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from pySDC.plugins.stats_helper import filter_stats, sort_stats
-from pySDC.plugins.visualization_tools import show_residual_across_simulation
+from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
+from pySDC_core.plugins.visualization_tools import show_residual_across_simulation
 
 
 def main():

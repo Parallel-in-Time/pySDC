@@ -3,9 +3,9 @@ from __future__ import division
 import dolfin as df
 import numpy as np
 
-from implementations.datatype_classes import rhs_fenics_mesh
-from implementations.datatype_classes import fenics_mesh
-from pySDC.Problem import ptype
+from pySDC_implementations.datatype_classes import rhs_fenics_mesh
+from pySDC_implementations.datatype_classes import fenics_mesh
+from pySDC_core.Problem import ptype
 
 
 class fenics_adv_diff_1d(ptype):

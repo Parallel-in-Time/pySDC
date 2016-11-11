@@ -2,7 +2,7 @@ import abc
 from future.utils import with_metaclass
 import logging
 
-from pySDC.plugins.pysdc_helper import FrozenClass
+from pySDC_core.plugins.pysdc_helper import FrozenClass
 
 
 class ptype(with_metaclass(abc.ABCMeta)):

@@ -1,14 +1,14 @@
 import numpy as np
 from mpi4py import MPI
 
-from implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
-from implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.plugins.stats_helper import filter_stats, sort_stats
+from pySDC_implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC_implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC_implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC_implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from pySDC_implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
 
 if __name__ == "__main__":
 

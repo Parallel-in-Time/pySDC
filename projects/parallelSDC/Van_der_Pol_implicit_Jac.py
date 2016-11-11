@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+from pySDC_implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 
 
 # noinspection PyUnusedLocal

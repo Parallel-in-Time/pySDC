@@ -2,7 +2,7 @@ import numpy as np
 import nose
 
 from tests.test_helpers import get_derived_from_in_package
-from pySDC.Collocation import CollBase
+from pySDC_core.Collocation import CollBase
 
 classes = []
 t_start = None
@@ -14,7 +14,7 @@ def setup():
     # generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
     t_start = np.random.rand(1) * 0.2
     t_end = 0.8 + np.random.rand(1) * 0.2
-    classes = get_derived_from_in_package(CollBase, 'implementations/collocation_classes')
+    classes = get_derived_from_in_package(CollBase, 'pySDC_implementations/collocation_classes')
 
 
 # TEST 1:

@@ -1,4 +1,4 @@
-from pySDC.plugins.stats_helper import filter_stats
+from pySDC_core.plugins.stats_helper import filter_stats
 
 import numpy as np
 

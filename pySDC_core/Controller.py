@@ -5,9 +5,9 @@ from future.utils import with_metaclass
 import logging
 import coloredlogs
 
-from pySDC.plugins.pysdc_helper import FrozenClass
-from pySDC import Hooks as hookclass
-from pySDC.BaseTransfer import base_transfer
+from pySDC_core.plugins.pysdc_helper import FrozenClass
+from pySDC_core import Hooks as hookclass
+from pySDC_core.BaseTransfer import base_transfer
 
 
 class controller(with_metaclass(abc.ABCMeta)):

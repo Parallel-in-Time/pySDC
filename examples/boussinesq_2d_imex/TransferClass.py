@@ -1,5 +1,5 @@
-from implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC.Transfer import transfer
+from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC_core.Transfer import transfer
 
 
 class mesh_to_mesh_2d(transfer):

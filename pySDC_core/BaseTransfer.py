@@ -1,9 +1,9 @@
 import numpy as np
 import logging
 
-from pySDC.plugins.pysdc_helper import FrozenClass
-import pySDC.plugins.transfer_helper as th
-from pySDC.Errors import UnlockError
+from pySDC_core.plugins.pysdc_helper import FrozenClass
+import pySDC_core.plugins.transfer_helper as th
+from pySDC_core.Errors import UnlockError
 
 
 class base_transfer(object):

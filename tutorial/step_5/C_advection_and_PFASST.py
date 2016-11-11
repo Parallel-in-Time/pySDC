@@ -1,13 +1,13 @@
 import numpy as np
 
-from implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from implementations.datatype_classes.mesh import mesh
-from implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from implementations.sweeper_classes.generic_implicit import generic_implicit
-from implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC_implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC_implementations.datatype_classes.mesh import mesh
+from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC_implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC_implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from pySDC.plugins.stats_helper import filter_stats, sort_stats
+from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
 
 
 def main():

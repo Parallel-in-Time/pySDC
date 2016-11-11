@@ -46,8 +46,8 @@ API documentation
 .. toctree::
    :maxdepth: 3
 
-   pySDC/pySDC.rst
-   implementations/implementations.rst
+   pySDC_core/pySDC_core.rst
+   pySDC_implementations/pySDC_implementations.rst
 
 
 Indices and tables

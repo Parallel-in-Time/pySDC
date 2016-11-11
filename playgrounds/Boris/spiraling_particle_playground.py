@@ -2,12 +2,12 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-from implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-from implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from implementations.datatype_classes.particles import particles, fields
+from pySDC_implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC_implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
+from pySDC_implementations.datatype_classes.particles import particles, fields
 
-from pySDC.plugins.stats_helper import filter_stats, sort_stats
+from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
 from playgrounds.Boris.spiraling_particle_ProblemClass import planewave_single
 from playgrounds.Boris.spiraling_particle_HookClass import particles_output
 

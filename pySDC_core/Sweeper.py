@@ -4,9 +4,9 @@ import logging
 import numpy as np
 import scipy.linalg
 
-from pySDC.Level import level
-from pySDC.plugins.pysdc_helper import FrozenClass
-from pySDC.Errors import ParameterError
+from pySDC_core.Level import level
+from pySDC_core.plugins.pysdc_helper import FrozenClass
+from pySDC_core.Errors import ParameterError
 
 
 class sweeper(with_metaclass(abc.ABCMeta)):

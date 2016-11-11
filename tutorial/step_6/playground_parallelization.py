@@ -1,10 +1,10 @@
 from mpi4py import MPI
 import sys
 
-from implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
-from implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC_implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from pySDC_implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 
-from pySDC.plugins.stats_helper import filter_stats, sort_stats
+from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
 from tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
 
 if __name__ == "__main__":

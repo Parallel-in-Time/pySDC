@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import progressbar
 
-from pySDC.Hooks import hooks
+from pySDC_core.Hooks import hooks
 
 
 class particles_output(hooks):

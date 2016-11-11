@@ -6,7 +6,7 @@ from scipy.integrate import quad
 import numpy as np
 import logging
 
-from pySDC.Errors import CollocationError
+from pySDC_core.Errors import CollocationError
 
 
 class CollBase(with_metaclass(abc.ABCMeta)):

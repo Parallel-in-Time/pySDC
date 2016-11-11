@@ -4,8 +4,8 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from implementations.datatype_classes import mesh
-from pySDC.Problem import ptype
+from pySDC_implementations.datatype_classes import mesh
+from pySDC_core.Problem import ptype
 
 
 # from pySDC.datatype_classes.complex_mesh import mesh

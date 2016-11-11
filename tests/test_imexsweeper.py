@@ -2,14 +2,14 @@ import unittest
 
 import numpy as np
 
-from implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
-from implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
-from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from pySDC import Step as stepclass
-from pySDC.Collocation import CollBase
+from pySDC_implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
+from pySDC_implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
+from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+from pySDC_core import Step as stepclass
+from pySDC_core.Collocation import CollBase
 from tests.test_helpers import get_derived_from_in_package
 
-classes = get_derived_from_in_package(CollBase,'implementations/collocation_classes')
+classes = get_derived_from_in_package(CollBase,'pySDC_implementations/collocation_classes')
 
 class TestImexSweeper(unittest.TestCase):
 

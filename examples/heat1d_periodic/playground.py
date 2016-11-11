@@ -1,14 +1,14 @@
 import numpy as np
-import pySDC.deprecated.PFASST_blockwise_old as mp
+import pySDC_core.deprecated.PFASST_blockwise_old as mp
 
 from examples.heat1d_periodic.HookClass import error_output
 from examples.heat1d_periodic.ProblemClass import heat1d
 from examples.heat1d_periodic.TransferClass import mesh_to_mesh_1d_periodic
-from implementations.datatype_classes import mesh, rhs_imex_mesh
-from implementations.sweeper_classes import imex_1st_order
-from pySDC import CollocationClasses as collclass
-from pySDC import Log
-from pySDC.Stats import grep_stats, sort_stats
+from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC_implementations.sweeper_classes import imex_1st_order
+from pySDC_core import CollocationClasses as collclass
+from pySDC_core import Log
+from pySDC_core.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":
 

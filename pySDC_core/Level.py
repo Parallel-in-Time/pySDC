@@ -1,4 +1,4 @@
-from pySDC.plugins.pysdc_helper import FrozenClass
+from pySDC_core.plugins.pysdc_helper import FrozenClass
 
 
 class level(FrozenClass):

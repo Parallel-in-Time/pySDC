@@ -5,12 +5,12 @@ from examples.SWFW.ProblemClass import swfw_scalar
 from matplotlib import pyplot as plt
 from pylab import rcParams
 
-from implementations.datatype_classes import mesh, rhs_imex_mesh
-from implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from pySDC import CollocationClasses as collclass
-from pySDC import Hooks as hookclass
-from pySDC import Level as lvl
-from pySDC import Step as stepclass
+from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+from pySDC_core import CollocationClasses as collclass
+from pySDC_core import Hooks as hookclass
+from pySDC_core import Level as lvl
+from pySDC_core import Step as stepclass
 
 if __name__ == "__main__":
 

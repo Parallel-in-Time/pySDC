@@ -1,12 +1,12 @@
-import pySDC.deprecated.PFASST_blockwise_old as mp
+import pySDC_core.deprecated.PFASST_blockwise_old as mp
 
 from examples.fenics_grayscott.HookClass import fenics_output
 from examples.fenics_grayscott.ProblemClass import fenics_grayscott
 from examples.fenics_grayscott.TransferClass import mesh_to_mesh_fenics
-from implementations.datatype_classes.fenics_mesh import fenics_mesh
-from implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC import CollocationClasses as collclass
-from pySDC import Log
+from pySDC_implementations.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC_implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC_core import CollocationClasses as collclass
+from pySDC_core import Log
 
 if __name__ == "__main__":
 

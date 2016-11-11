@@ -1,11 +1,11 @@
-import pySDC.deprecated.PFASST_blockwise_old as mp
-from implementations.sweeper_classes.generic_LU import generic_LU
+import pySDC_core.deprecated.PFASST_blockwise_old as mp
+from pySDC_implementations.sweeper_classes.generic_LU import generic_LU
 
 from examples.fenics_heat1d_weak.ProblemClass import fenics_heat
 from examples.fenics_heat1d_weak.TransferClass import mesh_to_mesh_fenics
-from pySDC import CollocationClasses as collclass
-from pySDC import Log
-from implementations.datatype_classes import fenics_mesh
+from pySDC_core import CollocationClasses as collclass
+from pySDC_core import Log
+from pySDC_implementations.datatype_classes import fenics_mesh
 
 if __name__ == "__main__":
 
