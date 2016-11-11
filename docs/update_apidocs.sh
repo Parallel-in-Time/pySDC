@@ -22,5 +22,5 @@ rm -r ${PWD}/target/doc/build
 
 echo ""
 echo "generating new .rst files ..."
-${SPHINX_APIDOC} -o docs/source/pySDC_core pySDC_core --force
-${SPHINX_APIDOC} -o docs/source/pySDC_implementations pySDC_implementations --force
+${SPHINX_APIDOC} -o docs/source/pySDC_core pySDC_core --force -M
+${SPHINX_APIDOC} -o docs/source/pySDC_implementations pySDC_implementations --force -M
