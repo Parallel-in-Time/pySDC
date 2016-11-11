@@ -11,25 +11,27 @@ class particles_output(hooks):
         Initialization of particles output
         """
         super(particles_output, self).__init__()
+        self.bar_run = None
 
     def pre_run(self, step, level_number):
+        """
+        Overwrite standard pre run hook
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
         super(particles_output, self).pre_run(step, level_number)
         L = step.levels[0]
-        self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
-    # def pre_step(self, step, level_number):
-    #     super(particles_output, self).pre_step(step, level_number)
-    #     L = step.levels[0]
-    #     self.bar_step = progressbar.ProgressBar(max_value=-np.log10(L.params.restol))
-    #
-    # def post_iteration(self, step, level_number):
-    #     super(particles_output, self).post_iteration(step, level_number)
-    #     L = step.levels[0]
-    #     self.bar_step.update(-np.log10(max(L.status.residual,L.params.restol)))
+        if hasattr(L.prob.params, 'Tend'):
+            self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
+        else:
+            self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
     def post_step(self, step, level_number):
         """
-        Overwrite standard dump per step
+        Overwrite standard post step hook
 
         Args:
             step (pySDC.Step.step): the current step

@@ -2,23 +2,25 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.implementations.datatype_classes.particles import particles, fields
+from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 
 from pySDC.plugins.stats_helper import filter_stats, sort_stats
-from projects.Boris.spiraling_particle_ProblemClass import planewave_single
-from projects.Boris.spiraling_particle_HookClass import particles_output
+from playgrounds.Boris.penningtrap_HookClass import particles_output
 
 
-def main(dt, Tend):
+def main():
+    """
+    Particle cloud in a penning trap, incl. live visualization
 
+    """
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = dt
+    level_params['dt'] = 0.015625
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -27,9 +29,12 @@ def main(dt, Tend):
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
-    problem_params['delta'] = 1
-    problem_params['a0'] = 0.07
-    problem_params['u0'] = np.array([[0, -1, 0], [0.05, 0.01, 0], [1], [1]])
+    problem_params['omega_E'] = 4.9
+    problem_params['omega_B'] = 25.0
+    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])
+    problem_params['nparts'] = 10
+    problem_params['sig'] = 0.1
+    problem_params['Tend'] = 16.0
 
     # initialize step parameters
     step_params = dict()
@@ -39,12 +44,10 @@ def main(dt, Tend):
     controller_params = dict()
     controller_params['hook_class'] = particles_output  # specialized hook class for more statistics and output
     controller_params['logger_level'] = 30
-    # controller_params['log_to_file'] = True
-    # controller_params['fname'] = 'step_3_B_out.txt'
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = planewave_single
+    description['problem_class'] = penningtrap
     description['problem_params'] = problem_params
     description['dtype_u'] = particles
     description['dtype_f'] = fields
@@ -59,7 +62,7 @@ def main(dt, Tend):
 
     # set time parameters
     t0 = 0.0
-    Tend = Tend
+    Tend = 1024*0.015625
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -68,45 +71,19 @@ def main(dt, Tend):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    return uinit, stats, problem_params['a0']
-
-
-def plot_error_and_positions(uinit, stats, a0):
-
-    extract_stats = filter_stats(stats, type='energy')
+    extract_stats = filter_stats(stats, type='etot')
     sortedlist_stats = sort_stats(extract_stats, sortby='time')
 
-    R0 = np.linalg.norm(uinit.pos.values[:])
-    H0 = 1 / 2 * np.dot(uinit.vel.values[:], uinit.vel.values[:]) + a0 / R0
-
-    energy_err = [abs(entry[1] - H0) / H0 for entry in sortedlist_stats]
+    energy = [entry[1] for entry in sortedlist_stats]
 
     plt.figure()
-    plt.plot(energy_err, 'bo--')
+    plt.plot(energy, 'bo--')
 
     plt.xlabel('Time')
-    plt.ylabel('Error in hamiltonian')
+    plt.ylabel('Energy')
 
-    plt.savefig('spiraling_particle_error_ham.png', rasterized=True, transparent=True, bbox_inches='tight')
-
-    extract_stats = filter_stats(stats, type='position')
-    sortedlist_stats = sort_stats(extract_stats, sortby='time')
-
-    xpositions = [item[1][0] for item in sortedlist_stats]
-    ypositions = [item[1][1] for item in sortedlist_stats]
-
-    plt.figure()
-    plt.xlim([-1.5, 1.5])
-    plt.ylim([-1.5, 1.5])
-    plt.xlabel('x')
-    plt.ylabel('y')
-
-    plt.scatter(xpositions, ypositions)
-    plt.savefig('spiraling_particle_positons.png', rasterized=True, transparent=True, bbox_inches='tight')
-
-    plt.show()
+    plt.savefig('penningtrap_energy.png', rasterized=True, transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":
-    uinit, stats, a0 = main(dt=1.0, Tend=5000)
-    plot_error_and_positions(uinit, stats, a0)
+    main()
