@@ -105,7 +105,7 @@ def main():
                 elif setup == 'vanderpol':
 
                     problem_params['newton_tol'] = 1E-09
-                    problem_params['maxiter'] = 20
+                    problem_params['newton_maxiter'] = 20
                     problem_params['mu'] = param
                     problem_params['u0'] = np.array([2.0, 0])
 

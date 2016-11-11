@@ -23,7 +23,7 @@ class vanderpol(ptype):
         # these parameters will be used later, so assert their existence
         assert 'u0' in cparams
         assert 'mu' in cparams
-        assert 'maxiter' in cparams
+        assert 'newton_maxiter' in cparams
         assert 'newton_tol' in cparams
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
@@ -40,7 +40,7 @@ class vanderpol(ptype):
         """
 
         # thou shall not call this at time > 0
-        assert t is 0
+
         me = self.dtype_u(2)
         me.values = self.params.u0
         return me
@@ -86,7 +86,7 @@ class vanderpol(ptype):
 
         # start newton iteration
         n = 0
-        while n < self.params.maxiter:
+        while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
             g = np.array([x1 - dt * x2 - rhs.values[0], x2 - dt * (mu * (1 - x1 ** 2) * x2 - x1) - rhs.values[1]])

@@ -18,7 +18,7 @@ Tutorial
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tutorial/step_1.rst
    tutorial/step_2.rst
@@ -36,13 +36,15 @@ Projects
 
    projects/parallelSDC.rst
 
-
+Playgrounds
+-----------
+.. include:: ../../playgrounds/README.rst
 
 API documentation
 -----------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    pySDC/modules.rst
 
