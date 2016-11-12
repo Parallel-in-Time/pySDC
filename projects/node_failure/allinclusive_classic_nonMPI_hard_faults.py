@@ -2,6 +2,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 
 from projects.node_failure.emulate_hard_faults import hard_fault_injection
 
+
 class allinclusive_classic_nonMPI_hard_faults(allinclusive_classic_nonMPI):
     """
 
