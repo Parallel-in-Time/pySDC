@@ -1,15 +1,15 @@
 import dolfin as df
 import numpy as np
-from pySDC_implementations.controller_classes import allinclusive_multigrid_nonMPI
-from pySDC_implementations.datatype_classes import rhs_fenics_mesh
-from pySDC_implementations.sweeper_classes import imex_1st_order
-from pySDC_core.Stats import grep_stats, sort_stats
+from pySDC.implementations.controller_classes import allinclusive_multigrid_nonMPI
+from pySDC.implementations.datatype_classes import rhs_fenics_mesh
+from pySDC.implementations.sweeper_classes import imex_1st_order
+from pySDC.core.Stats import grep_stats, sort_stats
 
 from examples.fenics_heat1d.ProblemClass import fenics_heat
 from examples.fenics_heat1d.TransferClass import mesh_to_mesh_fenics
-from pySDC_core import CollocationClasses as collclass
-from pySDC_core import Log
-from pySDC_implementations.datatype_classes import fenics_mesh
+from pySDC.core import CollocationClasses as collclass
+from pySDC.core import Log
+from pySDC.implementations.datatype_classes import fenics_mesh
 
 if __name__ == "__main__":
 

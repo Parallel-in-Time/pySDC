@@ -5,8 +5,8 @@ import random
 import dolfin as df
 import numpy as np
 
-from pySDC_core.Problem import ptype
-from pySDC_implementations.datatype_classes import fenics_mesh
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes import fenics_mesh
 
 
 class fenics_grayscott(ptype):

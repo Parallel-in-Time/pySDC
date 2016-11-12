@@ -1,13 +1,13 @@
 import numpy as np
-from pySDC_implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from pySDC_implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-from pySDC_implementations.problem_classes.PenningTrap_3D import penningtrap
-from pySDC_implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
+from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
+from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
-from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
-from pySDC_implementations.datatype_classes.particles import particles, fields
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.datatype_classes.particles import particles, fields
 from tutorial.step_3.HookClass_Particles import particle_hook
 
 

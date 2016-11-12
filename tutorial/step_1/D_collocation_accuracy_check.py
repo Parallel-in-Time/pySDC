@@ -8,9 +8,9 @@ import numpy as np
 import os.path
 import scipy.sparse as sp
 
-from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC_implementations.datatype_classes.mesh import mesh
-from pySDC_implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by dt)
 ID = namedtuple('ID', 'dt')

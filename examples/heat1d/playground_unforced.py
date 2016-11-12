@@ -1,14 +1,14 @@
 import pickle
 from collections import namedtuple
 
-import pySDC_core.deprecated.PFASST_blockwise_old as mp
+import pySDC.core.deprecated.PFASST_blockwise_old as mp
 
-from pySDC_implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from examples.heat1d.TransferClass import mesh_to_mesh_1d
-from pySDC_implementations.datatype_classes import mesh
-from pySDC_implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC_core import CollocationClasses as collclass
-from pySDC_core.Stats import grep_stats, sort_stats
+from pySDC.implementations.datatype_classes import mesh
+from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.core import CollocationClasses as collclass
+from pySDC.core.Stats import grep_stats, sort_stats
 
 if __name__ == "__main__":
 

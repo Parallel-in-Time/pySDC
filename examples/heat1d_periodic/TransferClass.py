@@ -2,9 +2,9 @@ from __future__ import division
 
 import numpy as np
 
-import pySDC_core.plugins.transfer_helper as th
-from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC_core.Transfer import transfer
+import pySDC.helpers.transfer_helper as th
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.core.Transfer import transfer
 
 
 # FIXME: extend this to ndarrays

@@ -12,7 +12,7 @@ def check_files(dir):
     style.options.max_line_length = 120
     python_files = []
     for root, _, files in os.walk(dir):
-        if root != 'pySDC_implementations/problem_classes':
+        if root != 'pySDC/implementations/problem_classes':
             python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
     # python_files = [os.path.join(dir, f) for f in os.listdir(dir) if f.endswith('.py') and f != '__init__.py']
     print(python_files)
@@ -25,5 +25,5 @@ def check_files(dir):
 
 
 def test_pep8():
-    for dir in ['pySDC_core', 'pySDC_implementations']:
+    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers']:
         yield check_files, dir

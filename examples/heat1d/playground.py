@@ -1,11 +1,11 @@
 import numpy as np
-from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC_implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-from pySDC_implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC_implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC_implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 # from pySDC.Stats import grep_stats, sort_stats
 

@@ -1,5 +1,5 @@
 from __future__ import division
-from pySDC_core.Hooks import hooks
+from pySDC.core.Hooks import hooks
 import progressbar
 import numpy as np
 

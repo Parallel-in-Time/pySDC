@@ -5,13 +5,13 @@ import numpy as np
 from matplotlib.patches import Polygon
 from pylab import rcParams
 
-from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC_implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_scalar
-from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
-from pySDC_core import CollocationClasses as collclass
-from pySDC_core import Hooks as hookclass
-from pySDC_core import Level as lvl
-from pySDC_core import Step as stepclass
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_scalar
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+from pySDC.core import CollocationClasses as collclass
+from pySDC.core import Hooks as hookclass
+from pySDC.core import Level as lvl
+from pySDC.core import Step as stepclass
 
 if __name__ == "__main__":
 

@@ -1,6 +1,6 @@
 from __future__ import division
-from pySDC_core.Hooks import hooks
-from pySDC_core.Stats import stats
+from pySDC.core.Hooks import hooks
+from pySDC.core.Stats import stats
 
 import numpy as np
 

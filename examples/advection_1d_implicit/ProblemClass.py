@@ -5,8 +5,8 @@ import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
 from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
-from pySDC_implementations.datatype_classes import mesh
-from pySDC_core.Problem import ptype
+from pySDC.implementations.datatype_classes import mesh
+from pySDC.core.Problem import ptype
 
 
 class advection(ptype):

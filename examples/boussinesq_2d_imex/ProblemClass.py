@@ -3,8 +3,8 @@ import scipy.sparse.linalg as LA
 
 from build2DFDMatrix import get2DMesh
 from buildBoussinesq2DMatrix import getBoussinesq2DMatrix, getBoussinesq2DUpwindMatrix
-from pySDC_implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC_core.Problem import ptype
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
+from pySDC.core.Problem import ptype
 from unflatten import unflatten
 
 

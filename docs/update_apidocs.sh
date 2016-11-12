@@ -15,12 +15,13 @@ SPHINX_APIDOC="`which sphinx-apidoc`"
     }
 
 echo "removing existing .rst files ..."
-rm ${PWD}/docs/source/pySDC_core/*.rst
-rm ${PWD}/docs/source/pySDC_implementations/*.rst
+rm ${PWD}/docs/source/pySDC/*/*.rst
 rm -r ${PWD}/target/doc/build
 #rm -r ${PWD}/*_out.txt ${PWD}/*.png run_*.log
 
 echo ""
 echo "generating new .rst files ..."
-${SPHINX_APIDOC} -o docs/source/pySDC_core pySDC_core --force -M -T
-${SPHINX_APIDOC} -o docs/source/pySDC_implementations pySDC_implementations --force -M -T
+#${SPHINX_APIDOC} -o docs/source/pySDC/core pySDC/core --force -M -T
+#${SPHINX_APIDOC} -o docs/source/pySDC/implementations pySDC/implementations --force -M -T
+#${SPHINX_APIDOC} -o docs/source/pySDC/helpers pySDC/helpers --force -M -T
+${SPHINX_APIDOC} -o docs/source/pySDC pySDC --force -M -T

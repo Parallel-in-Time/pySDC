@@ -6,16 +6,16 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC_implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from projects.parallelSDC.linearized_implicit_parallel import linearized_implicit_parallel
-from pySDC_implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
 
-from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
 def main():

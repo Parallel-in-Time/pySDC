@@ -3,8 +3,8 @@ from __future__ import division
 import dolfin as df
 import numpy as np
 
-from pySDC_implementations.datatype_classes import fenics_mesh
-from pySDC_core.Problem import ptype
+from pySDC.implementations.datatype_classes import fenics_mesh
+from pySDC.core.Problem import ptype
 
 
 class fenics_heat_unforced(ptype):

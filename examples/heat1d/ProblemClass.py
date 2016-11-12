@@ -4,7 +4,7 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC_core.Problem import ptype
+from pySDC.core.Problem import ptype
 
 
 class heat1d(ptype):

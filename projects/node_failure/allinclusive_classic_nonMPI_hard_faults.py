@@ -1,4 +1,4 @@
-from pySDC_implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from projects.node_failure.emulate_hard_faults import hard_fault_injection
 

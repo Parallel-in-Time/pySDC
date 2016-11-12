@@ -1,14 +1,14 @@
 import numpy as np
 
-from pySDC_implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
-from pySDC_implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC_implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC_implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC_implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC_implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC_implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
-from pySDC_core.plugins.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 from projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
 import projects.node_failure.emulate_hard_faults as ft

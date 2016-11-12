@@ -2,8 +2,8 @@ from __future__ import division
 
 import numpy as np
 
-from pySDC_core.Problem import ptype
-from pySDC_implementations.datatype_classes.particles import particles, fields, acceleration
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
 class planewave_single(ptype):

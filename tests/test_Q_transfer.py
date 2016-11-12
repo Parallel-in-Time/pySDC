@@ -2,10 +2,10 @@ import numpy as np
 import nose
 from numpy.polynomial.polynomial import polyval
 
-import pySDC_core.plugins.transfer_helper as th
+import pySDC.helpers.transfer_helper as th
 
 from tests.test_helpers import get_derived_from_in_package
-from pySDC_core.Collocation import CollBase
+from pySDC.core.Collocation import CollBase
 
 classes = []
 
@@ -15,7 +15,7 @@ def setup():
     # generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
     t_start = np.random.rand(1) * 0.2
     t_end = 0.8 + np.random.rand(1) * 0.2
-    classes = get_derived_from_in_package(CollBase, 'pySDC_implementations/collocation_classes')
+    classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 
 @nose.tools.with_setup(setup)
 def test_Q_transfer():

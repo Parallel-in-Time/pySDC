@@ -14,8 +14,8 @@ import numpy as np
 import scipy.sparse.linalg as LA
 
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
-from pySDC_implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC_core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.core.Problem import ptype
 
 
 def u_initial(x):

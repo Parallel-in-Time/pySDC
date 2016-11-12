@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
 
-from pySDC_core.Hooks import hooks
+from pySDC.core.Hooks import hooks
 
 
 class particle_hook(hooks):

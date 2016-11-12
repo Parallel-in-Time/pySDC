@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC_implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
 class linearized_implicit_parallel(generic_implicit):
