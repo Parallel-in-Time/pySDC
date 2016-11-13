@@ -8,5 +8,5 @@ Results:
 
 Results:
 
-.. image:: ../../../parallelSDC_fisher.png
+.. image:: ../../../data/parallelSDC_fisher.png
    :scale: 50 %

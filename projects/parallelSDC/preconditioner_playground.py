@@ -158,10 +158,10 @@ def main():
     assert len(results) == (6 + 6 + 10 + 6) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
-    file = open('parallelSDC_iterations_precond.pkl', 'wb')
+    file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
     pickle.dump(results, file)
 
-    assert os.path.isfile('parallelSDC_iterations_precond.pkl'), 'ERROR: pickle did not create file'
+    assert os.path.isfile('data/parallelSDC_iterations_precond.pkl'), 'ERROR: pickle did not create file'
 
 
 def plot_iterations():
@@ -169,7 +169,7 @@ def plot_iterations():
     Helper routine to plot iteration counts
     """
 
-    file = open('parallelSDC_iterations_precond.pkl', 'rb')
+    file = open('data/parallelSDC_iterations_precond.pkl', 'rb')
     results = pickle.load(file)
 
     # find the lists/header required for plotting
@@ -208,7 +208,7 @@ def plot_iterations():
         plt.grid()
 
         # save plot as PDF, beautify
-        fname = 'parallelSDC_preconditioner_'+setup+'.png'
+        fname = 'data/parallelSDC_preconditioner_'+setup+'.png'
         plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
         assert os.path.isfile(fname), 'ERROR: plotting did not create file'

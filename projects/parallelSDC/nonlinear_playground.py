@@ -131,10 +131,10 @@ def main():
     results['uex'] = uex.values
 
     # write out for later visualization
-    file = open('parallelSDC_results_graphs.pkl', 'wb')
+    file = open('data/parallelSDC_results_graphs.pkl', 'wb')
     pickle.dump(results, file)
 
-    assert os.path.isfile('parallelSDC_results_graphs.pkl'), 'ERROR: pickle did not create file'
+    assert os.path.isfile('data/parallelSDC_results_graphs.pkl'), 'ERROR: pickle did not create file'
 
 
 def plot_graphs():
@@ -142,7 +142,7 @@ def plot_graphs():
     Helper function to plot graphs of initial and final values
     """
 
-    file = open('parallelSDC_results_graphs.pkl', 'rb')
+    file = open('data/parallelSDC_results_graphs.pkl', 'rb')
     results = pickle.load(file)
 
     interval = results['interval']
@@ -179,7 +179,7 @@ def plot_graphs():
     plt.legend(loc=2, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'parallelSDC_fisher.png'
+    fname = 'data/parallelSDC_fisher.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plotting did not create file'
