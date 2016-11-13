@@ -2,8 +2,6 @@
 /doc/latex
 /doc/html
 
-*.npz
-*.npy
 *.pdf
 
 # Created by https://www.gitignore.io
