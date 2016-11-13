@@ -151,7 +151,7 @@ def main(ft_setups, ft_strategies):
                 if iter is not -1:
                     residual[iter - 1, step] = np.log10(v)
             print('')
-            np.savez(setup + '_steps_vs_iteration_hf_' + strategy, residual=residual, ft_step=ft.hard_step,
+            np.savez('data/' + setup + '_steps_vs_iteration_hf_' + strategy, residual=residual, ft_step=ft.hard_step,
                      ft_iter=ft.hard_iter)
 
 

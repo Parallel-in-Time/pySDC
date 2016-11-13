@@ -167,8 +167,8 @@ def main(ft_setups, ft_strategies):
 
             print(iter_count)
 
-            np.savez(setup + '_results_hf_' + strategy, iter_count=iter_count, description=description, ft_step=ft_step,
-                     ft_iter=ft_iter)
+            np.savez('data/' + setup + '_results_hf_' + strategy, iter_count=iter_count, description=description,
+                     ft_step=ft_step, ft_iter=ft_iter)
 
 
 if __name__ == "__main__":

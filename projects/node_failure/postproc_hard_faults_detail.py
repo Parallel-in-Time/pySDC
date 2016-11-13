@@ -85,7 +85,7 @@ def create_plots(setup):
         if strategy is not 'NOFAULT':
             plt.text(step - 1 + 0.5, iter + 0.5, 'x', horizontalalignment='center', verticalalignment='center')
 
-        fname = setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.pdf'
+        fname = 'data/' + setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.pdf'
         plt.savefig(fname, bbox_inches='tight')
         os.system('pdfcrop ' + fname + ' ' + fname)
 
@@ -145,7 +145,7 @@ def create_plots(setup):
 
     plt.tight_layout()
 
-    fname = setup + '_residuals_allstrategies.pdf'
+    fname = 'data/' + setup + '_residuals_allstrategies.pdf'
     plt.savefig(fname, bbox_inches='tight')
     os.system('pdfcrop ' + fname + ' ' + fname)
 

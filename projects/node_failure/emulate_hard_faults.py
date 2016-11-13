@@ -62,7 +62,6 @@ def hard_fault_injection(S):
         for lvl in S.levels:
             lvl.status.time = time
 
-
         # recovery
         if strategy is 'SPREAD':
             S = hard_fault_correction_spread(S)

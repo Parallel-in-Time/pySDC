@@ -52,27 +52,26 @@ class mesh_to_mesh(space_transfer):
         # we have a 1d problem
         if type(self.fine_prob.params.nvars) is int:
 
-            if not self.params.periodic:
-                fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
-                coarse_grid = np.array([(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
-            else:
-                fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
-                coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
-
             # if number of variables is the same on both levels, Rspace and Pspace are identity
             if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
                 self.Rspace = sp.eye(self.coarse_prob.params.nvars)
+                self.Pspace = sp.eye(self.fine_prob.params.nvars)
             # assemble restriction as transpose of interpolation
             else:
+
+                if not self.params.periodic:
+                    fine_grid = np.array([(i + 1) * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+                    coarse_grid = np.array(
+                        [(i + 1) * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+                else:
+                    fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
+                    coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
+
                 self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
                                                                periodic=self.params.periodic).T
-
-            # if number of variables is the same on both levels, Rspace and Pspace are identity
-            if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-                self.Pspace = sp.eye(self.fine_prob.params.nvars)
-            else:
                 self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                          periodic=self.params.periodic)
+
         # we have an n-d problem
         else:
 
@@ -80,28 +79,28 @@ class mesh_to_mesh(space_transfer):
             Pspace = []
             for i in range(len(self.fine_prob.params.nvars)):
 
-                if not self.params.periodic:
-                    fine_grid = np.array([(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])])
-                    coarse_grid = np.array(
-                        [(j + 1) * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
-                else:
-                    fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])])
-                    coarse_grid = np.array([j * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
-
                 # if number of variables is the same on both levels, Rspace and Pspace are identity
                 if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
                     Rspace.append(sp.eye(self.coarse_prob.params.nvars[i]))
+                    Pspace.append(sp.eye(self.fine_prob.params.nvars[i]))
                 # assemble restriction as transpose of interpolation
                 else:
+
+                    if not self.params.periodic:
+                        fine_grid = np.array(
+                            [(j + 1) * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])])
+                        coarse_grid = np.array(
+                            [(j + 1) * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
+                    else:
+                        fine_grid = np.array([j * self.fine_prob.dx for j in range(self.fine_prob.params.nvars[i])])
+                        coarse_grid = np.array(
+                            [j * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
+
                     Rspace.append(0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                                    periodic=self.params.periodic).T)
-
-                # if number of variables is the same on both levels, Rspace and Pspace are identity
-                if self.coarse_prob.params.nvars == self.fine_prob.params.nvars:
-                    Pspace.append(sp.eye(self.fine_prob.params.nvars[i]))
-                else:
                     Pspace.append(th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                              periodic=self.params.periodic))
+
             # kronecker 1-d operators for n-d
             self.Pspace = Pspace[0]
             for i in range(1, len(Pspace)):

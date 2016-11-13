@@ -78,7 +78,7 @@ def create_plots(setup):
         plt.tight_layout()
 
         # fname = setup+'_iteration_counts_hf_'+strategy+'.png'
-        fname = setup + '_iteration_counts_hf_' + strategy + '.pdf'
+        fname = 'data/' + setup + '_iteration_counts_hf_' + strategy + '.pdf'
 
         # plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
         plt.savefig(fname, bbox_inches='tight')

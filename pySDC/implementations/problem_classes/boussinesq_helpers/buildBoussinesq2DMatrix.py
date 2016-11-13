@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
-from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
+from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMatrix, getBCHorizontal, \
+  getBCVertical, get2DUpwindMatrix
 
 def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
 

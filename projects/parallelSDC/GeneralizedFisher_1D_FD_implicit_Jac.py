@@ -3,6 +3,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 
+
 # noinspection PyUnusedLocal
 class generalized_fisher_jac(generalized_fisher):
 
