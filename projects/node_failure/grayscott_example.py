@@ -1,137 +1,148 @@
 import numpy as np
-import pySDC.core.PFASST_stepwise as mp
-import pySDC.helpers.fault_tolerance as ft
-from pySDC.core.Stats import grep_stats
-from pySDC.core.datatype_classes.fenics_mesh import fenics_mesh
-from pySDC.core.sweeper_classes.generic_LU import generic_LU
 
-from examples.fenics_grayscott.TransferClass import mesh_to_mesh_fenics
-from pySDC.core import CollocationClasses as collclass
-from pySDC.core import Log
-from pySDC.implementations.problem_classes.ProblemClass import fenics_grayscott
+import projects.node_failure.emulate_hard_faults as ft
+from projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott
 
 
-if __name__ == "__main__":
-
-    # set global logger (remove this if you do not want the output at all)
-    logger = Log.setup_custom_logger('root')
+# noinspection PyShadowingNames,PyShadowingBuiltins
+def main(ft_strategies):
+    """
+    This routine generates the heatmaps showing the residual for node failures at different steps and iterations
+    """
 
     num_procs = 32
 
-    # assert num_procs == 1,'turn on predictor!'
+    # setup parameters "in time"
+    t0 = 0
+    dt = 2.0
+    Tend = 1280.0
+    Nsteps = int((Tend-t0)/dt)
 
-    # This comes as read-in for the level class
-    lparams = {}
-    lparams['restol'] = 1E-07
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1E-07
+    level_params['dt'] = dt
 
-    sparams = {}
-    sparams['maxiter'] = 50
-    sparams['fine_comm'] = True
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
 
-    # This comes as read-in for the problem class
-    pparams = {}
-    # pparams['Du'] = 1.0
-    # pparams['Dv'] = 0.01
-    # pparams['A'] = 0.01
-    # pparams['B'] = 0.10
+    # initialize space transfer parameters
+    space_transfer_params = dict()
+    space_transfer_params['finter'] = True
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['num_nodes'] = [3]
+    sweeper_params['QI'] = 'LU'
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 20
+
+    # initialize problem parameters
+    problem_params = dict()
+    # problem_params['Du'] = 1.0
+    # problem_params['Dv'] = 0.01
+    # problem_params['A'] = 0.01
+    # problem_params['B'] = 0.10
     # splitting pulses until steady state
-    # pparams['Du'] = 1.0
-    # pparams['Dv'] = 0.01
-    # pparams['A'] = 0.02
-    # pparams['B'] = 0.079
+    # problem_params['Du'] = 1.0
+    # problem_params['Dv'] = 0.01
+    # problem_params['A'] = 0.02
+    # problem_params['B'] = 0.079
     # splitting pulses until steady state
-    pparams['Du'] = 1.0
-    pparams['Dv'] = 0.01
-    pparams['A'] = 0.09
-    pparams['B'] = 0.086
+    problem_params['Du'] = 1.0
+    problem_params['Dv'] = 0.01
+    problem_params['A'] = 0.09
+    problem_params['B'] = 0.086
 
-    pparams['t0'] = 0.0 # ugly, but necessary to set up ProblemClass
-    # pparams['c_nvars'] = [(16,16)]
-    pparams['c_nvars'] = [512]
-    pparams['family'] = 'CG'
-    pparams['order'] = [4]
-    pparams['refinements'] = [1,0]
+    problem_params['t0'] = t0  # ugly, but necessary to set up ProblemClass
+    problem_params['c_nvars'] = [256]
+    problem_params['family'] = 'CG'
+    problem_params['order'] = [4]
+    problem_params['refinements'] = [1, 0]
 
-
-    # This comes as read-in for the transfer operations
-    tparams = {}
-    tparams['finter'] = True
-
-    # Fill description dictionary for easy hierarchy creation
-    description = {}
-    description['problem_class'] = fenics_grayscott
-    description['problem_params'] = pparams
-    description['dtype_u'] = fenics_mesh
-    description['dtype_f'] = fenics_mesh
-    description['collocation_class'] = collclass.CollGaussRadau_Right
-    description['num_nodes'] = 3
-    description['sweeper_class'] = generic_LU
-    description['level_params'] = lparams
-    description['transfer_class'] = mesh_to_mesh_fenics
-    description['transfer_params'] = tparams
-    # description['hook_class'] = fenics_output
+    # fill description dictionary for easy step instantiation
+    description = dict()
+    description['problem_class'] = fenics_grayscott  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['dtype_u'] = fenics_mesh  # pass data type for u
+    description['dtype_f'] = fenics_mesh  # pass data type for f
+    description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh_fenics  # pass spatial transfer class
+    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     ft.hard_random = 0.03
 
-    # strategies = ['NOFAULT']
-    # strategies = ['SPREAD','INTERP','INTERP_PREDICT','SPREAD_PREDICT']
-    strategies = ['INTERP', 'INTERP_PREDICT']
+    controller = allinclusive_classic_nonMPI_hard_faults(num_procs=num_procs,
+                                                         controller_params=controller_params,
+                                                         description=description)
 
-    for strategy in strategies:
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-        print('------------------------------------------ working on strategy ',strategy)
+    for strategy in ft_strategies:
+
+        print('------------------------------------------ working on strategy ', strategy)
         ft.strategy = strategy
 
         # read in reference data from clean run, will provide reproducable locations for faults
-        if not strategy is 'NOFAULT':
-            reffile = np.load('PFASST_GRAYSCOTT_stats_hf_NOFAULT_P32.npz')
+        if strategy is not 'NOFAULT':
+            reffile = np.load('data/PFASST_GRAYSCOTT_stats_hf_NOFAULT_P16.npz')
             ft.refdata = reffile['hard_stats']
 
-        # quickly generate block of steps
-        MS = mp.generate_steps(num_procs,sparams,description)
-
-        # setup parameters "in time"
-        t0 = MS[0].levels[0].prob.t0
-        dt = 2.0
-        Tend = 1280.0
-
-        # get initial values on finest level
-        P = MS[0].levels[0].prob
-        uinit = P.u_exact(t0)
-
         # call main function to get things done...
-        uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-        # stats magic: get all residuals
-        extract_stats = grep_stats(stats,level=-1,type='residual')
+        # get residuals of the run
+        extract_stats = filter_stats(stats, type='residual_post_iteration')
 
-        # find boundaries
-        maxsteps = 0
+        # find boundaries for x-,y- and c-axis as well as arrays
+        maxprocs = 0
         maxiter = 0
         minres = 0
         maxres = -99
-        for k,v in extract_stats.items():
-            maxsteps = max(maxsteps,getattr(k,'step'))
-            maxiter = max(maxiter,getattr(k,'iter'))
-            minres = min(minres,np.log10(v))
-            maxres = max(maxres,np.log10(v))
+        for k, v in extract_stats.items():
+            maxprocs = max(maxprocs, getattr(k, 'process'))
+            maxiter = max(maxiter, getattr(k, 'iter'))
+            minres = min(minres, np.log10(v))
+            maxres = max(maxres, np.log10(v))
 
-        # fill residual array
-        residual = np.zeros((maxiter,maxsteps+1))
-        residual[:] = 0
-        for k,v in extract_stats.items():
-            step = getattr(k,'step')
-            iter = getattr(k,'iter')
+        # grep residuals and put into array
+        residual = np.zeros((maxiter, maxprocs + 1))
+        residual[:] = -99
+        for k, v in extract_stats.items():
+            step = getattr(k, 'process')
+            iter = getattr(k, 'iter')
             if iter is not -1:
-                residual[iter-1,step] = v
+                residual[iter - 1, step] = np.log10(v)
 
         # stats magic: get niter (probably redundant with maxiter)
-        extract_stats = grep_stats(stats,iter=-1,type='niter')
-        iter_count = np.zeros(maxsteps+1)
-        for k,v in extract_stats.items():
-            step = getattr(k,'step')
-            iter_count[step] = v
+        extract_stats = filter_stats(stats, level=-1, type='niter')
+        sortedlist_stats = sort_stats(extract_stats, sortby='process')
+        iter_count = np.zeros(Nsteps)
+        for item in sortedlist_stats:
+            iter_count[item[0]] = item[1]
         print(iter_count)
 
-        np.savez('PFASST_GRAYSCOTT_stats_hf_'+ft.strategy+'_P'+str(num_procs)+'_cN512',residual=residual,iter_count=iter_count,hard_stats=ft.hard_stats)
+        np.savez('data/PFASST_GRAYSCOTT_stats_hf_' + ft.strategy + '_P' + str(num_procs), residual=residual,
+                 iter_count=iter_count, hard_stats=ft.hard_stats)
 
+
+if __name__ == "__main__":
+    # ft_strategies = ['SPREAD', 'SPREAD_PREDICT', 'INTERP', 'INTERP_PREDICT']
+    ft_strategies = ['NOFAULT']
+
+    main(ft_strategies=ft_strategies)

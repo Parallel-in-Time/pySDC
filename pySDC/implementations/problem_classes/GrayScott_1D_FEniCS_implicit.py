@@ -2,6 +2,7 @@ from __future__ import division
 import dolfin as df
 import numpy as np
 import random
+import logging
 
 from pySDC.core.Problem import ptype
 
@@ -44,6 +45,8 @@ class fenics_grayscott(ptype):
             setattr(self, k, v)
 
         df.set_log_level(df.WARNING)
+
+        logging.getLogger('FFC').setLevel(logging.WARNING)
 
         df.parameters["form_compiler"]["optimize"] = True
         df.parameters["form_compiler"]["cpp_optimize"] = True
