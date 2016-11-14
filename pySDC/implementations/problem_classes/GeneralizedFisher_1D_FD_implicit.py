@@ -106,8 +106,7 @@ class generalized_fisher(ptype):
                 break
 
             # assemble dg
-            dg = sp.eye(self.params.nvars) - factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 *
-                                                                                     (nu + 1) * u.values ** nu))
+            dg = sp.eye(self.params.nvars) - factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
 
             # newton update: u1 = u0 - g/dg
             u.values -= spsolve(dg, g)
