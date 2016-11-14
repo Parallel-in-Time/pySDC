@@ -51,6 +51,6 @@ The Gray-Scott test case
 Another test case is the 1D Gray-Scott reaction diffusion model, see ``grayscott_example``.
 With spatial coarsening enabled, this application plays well with PFASST and the goal of this part is to see how fault injections and recovery impact the convergence.
 We again inject faults randomly, but in a pre-defined way with a rate of 3%.
-The ``postproc_grayscott`` script visualizes the results.
+The ``postproc_grayscott`` script visualizes the results. Also, the script ``animate_convergence`` can be used to create an animated convergence plot (and can be easily adapted for other examples, too).
 
 .. include:: doc_node_failure_grayscott.rst
