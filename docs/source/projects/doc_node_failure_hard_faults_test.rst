@@ -2,7 +2,7 @@ Full code: `projects/node_failure/hard_faults_test.py <https://github.com/Parall
 
 .. literalinclude:: ../../../projects/node_failure/hard_faults_test.py
 
-Results:
+Results (visualized by ``postproc_hard_faults_test``):
 
 Heat equation:
 

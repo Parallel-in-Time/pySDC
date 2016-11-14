@@ -2,7 +2,7 @@ Full code: `projects/node_failure/boussinesq_example.py <https://github.com/Para
 
 .. literalinclude:: ../../../projects/node_failure/boussinesq_example.py
 
-Results:
+Results (visualized by ``postproc_boussines``):
 
 .. image:: ../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png
    :width: 19%

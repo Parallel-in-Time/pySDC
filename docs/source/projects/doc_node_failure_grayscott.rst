@@ -2,7 +2,7 @@ Full code: `projects/node_failure/grayscott_example.py <https://github.com/Paral
 
 .. literalinclude:: ../../../projects/node_failure/grayscott_example.py
 
-Results:
+Results (visualized by ``postproc_grayscott``):
 
 .. image:: ../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png
    :width: 19%

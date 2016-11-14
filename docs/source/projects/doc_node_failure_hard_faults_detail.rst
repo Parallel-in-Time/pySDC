@@ -2,7 +2,7 @@ Full code: `projects/node_failure/hard_faults_detail.py <https://github.com/Para
 
 .. literalinclude:: ../../../projects/node_failure/hard_faults_detail.py
 
-Results:
+Results (visualized by ``postproc_hard_faults_detail``):
 
 Heat equation:
 
