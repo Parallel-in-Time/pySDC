@@ -1,29 +1,30 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pylab import rcParams
-import os
+# import os
 
 
-def create_plots(setup):
+def create_plots(setup, cwd=''):
     """
         Function to create heatmaps for faults at different steps and iterations
 
         Args:
             setup (str): name of the setup (heat or advection)
+            cwd: current working directory
         """
 
     axis_font = {'fontname': 'Arial', 'size': '8', 'family': 'serif'}
     fs = 8
 
     fields = [(setup + '_results_hf_SPREAD.npz', 'SPREAD'),
-              (setup + '_results_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT')]
-    # (setup+'_results_hf_INTERP.npz','INTERP'),
-    # (setup+'_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT'),
+              (setup + '_results_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT'),
+              (setup + '_results_hf_INTERP.npz','INTERP'),
+              (setup + '_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT')]
 
     vmin = 99
     vmax = 0
     for file, strategy in fields:
-        infile = np.load(file)
+        infile = np.load(cwd + 'data/' + file)
 
         data = infile['iter_count'].T
 
@@ -34,7 +35,7 @@ def create_plots(setup):
 
     for file, strategy in fields:
 
-        infile = np.load(file)
+        infile = np.load(cwd + 'data/' + file)
 
         data = infile['iter_count'].T
 
@@ -75,14 +76,16 @@ def create_plots(setup):
             label.set_visible(False)
 
         ax.tick_params(pad=2)
-        plt.tight_layout()
+        # plt.tight_layout()
 
         # fname = setup+'_iteration_counts_hf_'+strategy+'.png'
-        fname = 'data/' + setup + '_iteration_counts_hf_' + strategy + '.pdf'
+        fname = 'data/' + setup + '_iteration_counts_hf_' + strategy + '.png'
 
-        # plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
-        plt.savefig(fname, bbox_inches='tight')
-        os.system('pdfcrop ' + fname + ' ' + fname)
+        plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+        # plt.savefig(fname, bbox_inches='tight')
+        # os.system('pdfcrop ' + fname + ' ' + fname)
+
+        plt.close('all')
 
 
 if __name__ == "__main__":

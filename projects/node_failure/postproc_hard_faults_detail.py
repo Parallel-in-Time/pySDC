@@ -1,15 +1,19 @@
+import matplotlib
+matplotlib.use('Agg')
+
 import numpy as np
 import matplotlib.pyplot as plt
 from pylab import rcParams
-import os
+# import os
 
 
-def create_plots(setup):
+def create_plots(setup, cwd=''):
     """
     Function to create detailed heatmaps and the iteration plot for a single fault
 
     Args:
         setup (str): name of the setup (heat or advection)
+        cwd: current working directory (for testing)
     """
 
     # basic plotting setup
@@ -32,7 +36,7 @@ def create_plots(setup):
 
     # find axis limits
     for file, strategy, label, color, marker in setup_list:
-        infile = np.load(file)
+        infile = np.load(cwd + 'data/' + file)
         residual = infile['residual']
         maxiter = max(maxiter, len(residual[:, 0]))
         maxsteps = max(maxsteps, len(residual[0, :]))
@@ -43,7 +47,7 @@ def create_plots(setup):
         residual = np.zeros((maxiter, maxsteps))
         residual[:] = -99
 
-        infile = np.load(file)
+        infile = np.load(cwd + 'data/' + file)
         input = infile['residual']
         step = infile['ft_step']
         iter = infile['ft_iter']
@@ -80,14 +84,16 @@ def create_plots(setup):
             labely.set_visible(False)
 
         ax.tick_params(pad=2)
-        plt.tight_layout()
+        # plt.tight_layout()
 
         if strategy is not 'NOFAULT':
             plt.text(step - 1 + 0.5, iter + 0.5, 'x', horizontalalignment='center', verticalalignment='center')
 
-        fname = 'data/' + setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.pdf'
-        plt.savefig(fname, bbox_inches='tight')
-        os.system('pdfcrop ' + fname + ' ' + fname)
+        plt.title(strategy, **axis_font)
+
+        fname = 'data/' + setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.png'
+        plt.savefig(fname, bbox_inches='tight', rasterize=True)
+        # os.system('pdfcrop ' + fname + ' ' + fname)
 
     rcParams['figure.figsize'] = 6.0, 3.0
     fig, ax = plt.subplots()
@@ -97,7 +103,7 @@ def create_plots(setup):
 
     # create iteration vs. residual plot
     for file, strategy, label, color, marker in setup_list:
-        infile = np.load(file)
+        infile = np.load(cwd + 'data/' + file)
         residual = infile['residual']
         step = infile['ft_step']
         iter = infile['ft_iter'] - 1
@@ -132,6 +138,7 @@ def create_plots(setup):
 
     plt.xlabel('iteration', **axis_font)
     plt.ylabel('log10(residual)', **axis_font)
+    plt.title('ALL', **axis_font)
     ax.xaxis.labelpad = 0
     ax.yaxis.labelpad = 0
     plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -143,11 +150,13 @@ def create_plots(setup):
 
     ax.tick_params(pad=2)
 
-    plt.tight_layout()
+    # plt.tight_layout()
 
-    fname = 'data/' + setup + '_residuals_allstrategies.pdf'
-    plt.savefig(fname, bbox_inches='tight')
-    os.system('pdfcrop ' + fname + ' ' + fname)
+    fname = 'data/' + setup + '_residuals_allstrategies.png'
+    plt.savefig(fname, bbox_inches='tight', rasterize=True)
+    # os.system('pdfcrop ' + fname + ' ' + fname)
+
+    plt.close('all')
 
 
 if __name__ == "__main__":

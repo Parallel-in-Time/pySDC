@@ -35,6 +35,7 @@ Projects
    :maxdepth: 2
 
    projects/parallelSDC.rst
+   projects/node_failure.rst
 
 Playgrounds
 -----------

@@ -1,0 +1,1 @@
+.. include:: /../../projects/node_failure/README.rst

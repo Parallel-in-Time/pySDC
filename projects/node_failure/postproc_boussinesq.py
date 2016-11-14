@@ -1,5 +1,8 @@
+import matplotlib
+matplotlib.use('Agg')
+
 import numpy as np
-import os
+# import os
 import matplotlib.pyplot as plt
 from pylab import rcParams
 
@@ -8,7 +11,14 @@ fs = 8
 ms = 8
 lw = 2
 
-if __name__ == "__main__":
+
+def create_plots(cwd=''):
+    """
+    Function to plot the results of the fault-tolerant Boussinesq system
+
+    Args:
+        cwd: current workign directory
+    """
 
     ref = 'PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz'
 
@@ -36,7 +46,7 @@ if __name__ == "__main__":
     vmax = -99
     vmin = -8
     for file, strategy, label, color, marker in list:
-        data = np.load('data/' + file)
+        data = np.load(cwd + 'data/' + file)
 
         iter_count = data['iter_count'][minstep:maxstep]
         residual = data['residual'][:, minstep:maxstep]
@@ -49,7 +59,7 @@ if __name__ == "__main__":
         nsteps = max(nsteps, len(iter_count))
 
     print(vmin, vmax)
-    data = np.load('data/' + ref)
+    data = np.load(cwd + 'data/' + ref)
     ref_iter_count = data['iter_count'][nprocs - 1::nprocs]
 
     rcParams['figure.figsize'] = 6.0, 2.5
@@ -62,7 +72,7 @@ if __name__ == "__main__":
     for file, strategy, label, color, marker in list:
 
         if file is not ref:
-            data = np.load('data/' + file)
+            data = np.load(cwd + 'data/' + file)
             iter_count = data['iter_count'][nprocs - 1::nprocs]
 
             ymin = min(ymin, min(iter_count - ref_iter_count))
@@ -73,24 +83,23 @@ if __name__ == "__main__":
 
     plt.xlabel('block', **axis_font)
     plt.ylabel('$K_\\mathrm{add}$', **axis_font)
+    plt.title('ALL', **axis_font)
     plt.xlim(-1, nblocks)
     plt.ylim(-1 + ymin, ymax + 1)
     plt.legend(loc=2, numpoints=1, fontsize=fs)
     plt.tick_params(axis='both', which='major', labelsize=fs)
     ax.xaxis.labelpad = -0.5
     ax.yaxis.labelpad = -1
-    plt.tight_layout()
+    # plt.tight_layout()
 
-    fname = 'data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.pdf'
-    plt.savefig(fname, bbox_inches='tight')
-    os.system('pdfcrop ' + fname + ' ' + fname)
-    # exit()
+    fname = 'data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png'
+    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    # os.system('pdfcrop ' + fname + ' ' + fname)
 
     for file, strategy, label, color, marker in list:
 
-        data = np.load('data/' + file)
+        data = np.load(cwd + 'data/' + file)
 
-        iter_count = data['iter_count'][minstep:maxstep]
         residual = data['residual'][:, minstep:maxstep]
         stats = data['hard_stats']
 
@@ -131,10 +140,16 @@ if __name__ == "__main__":
         ax.set_yticklabels(np.arange(1, maxiter, 2) + 1, minor=False)
         ax.set_xticklabels(np.arange(minstep, maxstep, xtick_dist), minor=False)
 
-        plt.tight_layout()
+        plt.title(strategy)
 
-        fname = 'data/BOUSSINESQ_steps_vs_iteration_hf_' + strategy + '.pdf'
-        plt.savefig(fname, bbox_inches='tight')
-        os.system('pdfcrop ' + fname + ' ' + fname)
+        # plt.tight_layout()
 
-    exit()
+        fname = 'data/BOUSSINESQ_steps_vs_iteration_hf_' + strategy + '.png'
+        plt.savefig(fname, rasterized=True, bbox_inches='tight')
+        # os.system('pdfcrop ' + fname + ' ' + fname)
+
+        plt.close('all')
+
+if __name__ == "__main__":
+
+    create_plots()
