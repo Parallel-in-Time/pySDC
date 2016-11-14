@@ -1,12 +1,9 @@
 from __future__ import division
-
-import random
-
 import dolfin as df
 import numpy as np
+import random
 
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes import fenics_mesh
 
 
 class fenics_grayscott(ptype):
@@ -43,51 +40,49 @@ class fenics_grayscott(ptype):
         assert 'refinements' in cparams
 
         # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        for k, v in cparams.items():
+            setattr(self, k, v)
 
         df.set_log_level(df.WARNING)
 
-        df.parameters["form_compiler"]["optimize"]     = True
+        df.parameters["form_compiler"]["optimize"] = True
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        # mesh = df.UnitIntervalMesh(self.c_nvars)
-        # mesh = df.UnitSquareMesh(self.c_nvars[0],self.c_nvars[1])
-        mesh = df.IntervalMesh(self.c_nvars,0,100)
-        # mesh = df.RectangleMesh(0.0,0.0,2.0,2.0,self.c_nvars[0],self.c_nvars[1])
+        mesh = df.IntervalMesh(self.c_nvars, 0, 100)
         for i in range(self.refinements):
             mesh = df.refine(mesh)
 
-        # self.mesh = mesh
         # define function space for future reference
         V = df.FunctionSpace(mesh, self.family, self.order)
-        self.V = V*V
+        self.V = V * V
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_grayscott,self).__init__(self.V,dtype_u,dtype_f)
+        super(fenics_grayscott, self).__init__(self.V, dtype_u, dtype_f, cparams)
 
         # rhs in weak form
         self.w = df.Function(self.V)
-        q1,q2 = df.TestFunctions(self.V)
+        q1, q2 = df.TestFunctions(self.V)
 
-        self.w1,self.w2 = df.split(self.w)
+        self.w1, self.w2 = df.split(self.w)
 
-        self.F1 = (-self.Du*df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1)) - self.w1*(self.w2**2)*q1 + self.A*(1-self.w1)*q1)*df.dx
-        self.F2 = (-self.Dv*df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2)) + self.w1*(self.w2**2)*q2 - self.B*    self.w2*q2)*df.dx
-        self.F = self.F1+self.F2
+        self.F1 = (-self.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1)) - self.w1 * (
+        self.w2 ** 2) * q1 + self.A * (1 - self.w1) * q1) * df.dx
+        self.F2 = (-self.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2)) + self.w1 * (
+        self.w2 ** 2) * q2 - self.B * self.w2 * q2) * df.dx
+        self.F = self.F1 + self.F2
 
         # mass matrix
-        u1,u2 = df.TrialFunctions(self.V)
-        a_M = u1*q1*df.dx
+        u1, u2 = df.TrialFunctions(self.V)
+        a_M = u1 * q1 * df.dx
         M1 = df.assemble(a_M)
-        a_M = u2*q2*df.dx
+        a_M = u2 * q2 * df.dx
         M2 = df.assemble(a_M)
-        self.M = M1+M2
+        self.M = M1 + M2
 
         # self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
-    def __invert_mass_matrix(self,u):
+    def __invert_mass_matrix(self, u):
         """
         Helper routine to invert mass matrix
 
@@ -98,19 +93,18 @@ class fenics_grayscott(ptype):
             inv(M)*u
         """
 
-        me = fenics_mesh(self.V)
+        me = self.dtype_u(self.V)
 
-        A = 1.0*self.M
-        b = fenics_mesh(u)
+        A = 1.0 * self.M
+        b = self.dtype_u(u)
 
         # self.bc.apply(A,b.values.vector())
 
-        df.solve(A,me.values.vector(),b.values.vector())
+        df.solve(A, me.values.vector(), b.values.vector())
 
         return me
 
-
-    def solve_system(self,rhs,factor,u0,t):
+    def solve_system(self, rhs, factor, u0, t):
         """
         Dolfin's linear solver for (M-dtA)u = rhs
 
@@ -123,22 +117,22 @@ class fenics_grayscott(ptype):
             solution as mesh
         """
 
-        sol = fenics_mesh(self.V)
+        sol = self.dtype_u(self.V)
 
         # self.g.t = t
         self.w.assign(sol.values)
 
-        q1,q2 = df.TestFunctions(self.V)
-        w1,w2 = df.split(self.w)
-        r1,r2 = df.split(rhs.values)
-        F1 = w1*q1*df.dx - factor*self.F1 - r1*q1*df.dx
-        F2 = w2*q2*df.dx - factor*self.F2 - r2*q2*df.dx
-        F = F1+F2
+        q1, q2 = df.TestFunctions(self.V)
+        w1, w2 = df.split(self.w)
+        r1, r2 = df.split(rhs.values)
+        F1 = w1 * q1 * df.dx - factor * self.F1 - r1 * q1 * df.dx
+        F2 = w2 * q2 * df.dx - factor * self.F2 - r2 * q2 * df.dx
+        F = F1 + F2
         du = df.TrialFunction(self.V)
-        J  = df.derivative(F, self.w, du)
+        J = df.derivative(F, self.w, du)
 
         problem = df.NonlinearVariationalProblem(F, self.w, [], J)
-        solver  = df.NonlinearVariationalSolver(problem)
+        solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
         prm['newton_solver']['absolute_tolerance'] = 1E-09
@@ -154,9 +148,7 @@ class fenics_grayscott(ptype):
 
         return sol
 
-
-
-    def eval_f(self,u,t):
+    def eval_f(self, u, t):
         """
         Routine to evaluate both parts of the RHS
 
@@ -168,18 +160,16 @@ class fenics_grayscott(ptype):
             the RHS divided into two parts
         """
 
-        f = fenics_mesh(self.V)
+        f = self.dtype_f(self.V)
 
         self.w.assign(u.values)
-        f.values = df.Function(self.V,df.assemble(self.F))
+        f.values = df.Function(self.V, df.assemble(self.F))
 
         f = self.__invert_mass_matrix(f)
 
         return f
 
-
-
-    def u_exact(self,t):
+    def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
 
@@ -194,54 +184,17 @@ class fenics_grayscott(ptype):
             def __init__(self):
                 random.seed(2)
                 pass
+
             def eval(self, values, x):
-                # if df.between(x[0],(0.375,0.625)):
-                #   # values[1] = 0.25*np.power(np.sin(8*np.pi*x[0]),2)
-                #   # values[0] = 1 - 2*values[1]
-                #   values[0] = 0.5 + random.random()
-                #   values[1] = 0.25
-                # else:
-                #   values[1] = 0
-                #   values[0] = 1
-                values[0] = 1 - 0.5*np.power(np.sin(np.pi*x[0]/100),100)
-                values[1] = 0.25*np.power(np.sin(np.pi*x[0]/100),100)
+                values[0] = 1 - 0.5 * np.power(np.sin(np.pi * x[0] / 100), 100)
+                values[1] = 0.25 * np.power(np.sin(np.pi * x[0] / 100), 100)
+
             def value_shape(self):
                 return (2,)
 
-        # class InitialConditions(df.Expression):
-        #   def eval(self, values, x):
-        #     if df.between(x[0],(0.75,1.25)) and df.between(x[1],(0.75,1.25)):
-        #       values[1] = 0.25*np.power(np.sin(4*np.pi*x[0]),2)*np.power(np.sin(4*np.pi*x[1]),2)
-        #       values[0] = 1 - 2*values[1]
-        #     else:
-        #       values[1] = 0
-        #       values[0] = 1
-        #   def value_shape(self):
-        #     return (2,)
-
-
-        # class InitialConditions(df.Expression):
-        #    def __init(self):
-        #        random.seed(2)
-        #
-        #    def eval(self, values, x):
-        #      if df.between(x[0],(0.475,0.525)) and df.between(x[1],(0.475,0.525)):
-        #          # values[1] = 0.25 + random.uniform(-0.01,0.01)
-        #          # values[0] = 0.5 + random.uniform(-0.01,0.01)
-        #          values[1] = 1
-        #          values[0] = 0
-        #      else:
-        #          values[1] = 0
-        #          values[0] = 1
-        #    def value_shape(self):
-        #      return (2,)
-
         uinit = InitialConditions()
 
+        me = self.dtype_u(self.V)
+        me.values = df.interpolate(uinit, self.V)
 
-        me = fenics_mesh(self.V)
-        me.values = df.interpolate(uinit,self.V)
-        # u1,u2 = df.split(me.values)
-        # df.plot(u1,interactive = True)
-        # exit()
         return me

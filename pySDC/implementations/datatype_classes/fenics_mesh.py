@@ -30,12 +30,16 @@ class fenics_mesh(object):
             self.values = df.Function(init.V, init.values)
             self.V = init.V
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
-        elif isinstance(init, df.FunctionSpace):
+        else:
             self.values = df.Function(init)
             self.V = init
+        # (FIXME: cannot define type of functionspace)
+        # elif isinstance(init, type(df.FunctionSpace)):
+        #     self.values = df.Function(init)
+        #     self.V = init
         # something is wrong, if none of the ones above hit
-        else:
-            raise DataError('something went wrong during %s initialization' % type(self))
+        # else:
+        #     raise DataError('something went wrong during %s initialization' % type(init))
 
     def __add__(self, other):
         """

@@ -34,10 +34,10 @@ class mesh_to_mesh_fenics(space_transfer):
             F: the fine level data
         """
         if isinstance(F, fenics_mesh):
-            u_coarse = fenics_mesh(self.init_c)
+            u_coarse = fenics_mesh(self.coarse_prob.init)
             u_coarse.values = df.interpolate(F.values, u_coarse.V)
         elif isinstance(F, rhs_fenics_mesh):
-            u_coarse = rhs_fenics_mesh(self.init_c)
+            u_coarse = rhs_fenics_mesh(self.coarse_prob.init)
             u_coarse.impl.values = df.interpolate(F.impl.values, u_coarse.impl.V)
             u_coarse.expl.values = df.interpolate(F.expl.values, u_coarse.expl.V)
         else:
@@ -53,10 +53,10 @@ class mesh_to_mesh_fenics(space_transfer):
             G: the coarse level data
         """
         if isinstance(G, fenics_mesh):
-            u_fine = fenics_mesh(self.init_f)
+            u_fine = fenics_mesh(self.fine_prob.init)
             u_fine.values = df.interpolate(G.values, u_fine.V)
         elif isinstance(G, rhs_fenics_mesh):
-            u_fine = rhs_fenics_mesh(self.init_f)
+            u_fine = rhs_fenics_mesh(self.fine_prob.init)
             u_fine.impl.values = df.interpolate(G.impl.values, u_fine.impl.V)
             u_fine.expl.values = df.interpolate(G.expl.values, u_fine.expl.V)
         else:
