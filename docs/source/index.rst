@@ -17,6 +17,8 @@ See `test coverage results <test_coverage/index.html>`_
 Tutorial
 --------
 
+.. include:: ../../tutorial/README.rst
+
 .. toctree::
    :maxdepth: 1
 
