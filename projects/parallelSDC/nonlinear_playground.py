@@ -33,7 +33,7 @@ def main():
     problem_params['nu'] = 1
     problem_params['nvars'] = 255
     problem_params['lambda0'] = 5.0
-    problem_params['maxiter'] = 50
+    problem_params['newton_maxiter'] = 50
     problem_params['newton_tol'] = 1E-12
     problem_params['interval'] = (-5, 5)
 

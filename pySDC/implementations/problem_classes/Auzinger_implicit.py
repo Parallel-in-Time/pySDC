@@ -3,41 +3,43 @@ from __future__ import division
 import numpy as np
 
 from pySDC.core.Problem import ptype
+from pySDC.core.Errors import ParameterError
 
 
+# noinspection PyUnusedLocal
 class auzinger(ptype):
     """
     Example implementing the Auzinger initial value problem
     """
 
-    def __init__(self, cparams, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u, dtype_f):
         """
         Initialization routine
 
         Args:
-            cparams: custom parameters for the example
+            problem_params (dict): custom parameters for the example
             dtype_u: mesh data type (will be passed parent class)
             dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
-        assert 'newton_maxiter' in cparams
-        assert 'newton_tol' in cparams
+        essential_keys = ['newton_maxiter', 'newton_tol']
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
 
-        # add parameters as attributes for further reference
-        for k, v in cparams.items():
-            setattr(self, k, v)
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(auzinger, self).__init__(2, dtype_u, dtype_f, cparams)
+        super(auzinger, self).__init__(2, dtype_u, dtype_f, problem_params)
 
     def u_exact(self, t):
         """
         Routine for the exact solution
 
         Args:
-            t: current time
+            t (float): current time
         Returns:
-            mesh type containing the exact solution
+            dtype_u: mesh type containing the exact solution
         """
 
         me = self.dtype_u(self.init)
@@ -50,8 +52,8 @@ class auzinger(ptype):
         Routine to compute the RHS for both components simultaneously
 
         Args:
-            t: current time (not used here)
-            u: the current values
+            u (dtype_u): the current values
+            t (float): current time (not used here)
         Returns:
             RHS, 2 components
         """
@@ -68,13 +70,13 @@ class auzinger(ptype):
         Simple Newton solver for the nonlinear system
 
         Args:
-            rhs: right-hand side for the nonlinear system
-            dt: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver
-            t: current time (e.g. for time-dependent BCs)
+            rhs (dtype_f): right-hand side for the nonlinear system
+            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
 
         Returns:
-            solution u
+            dtype_u: solution u
         """
 
         # create new mesh object from u0 and set initial values for iteration
@@ -123,19 +125,6 @@ class auzinger(ptype):
         #
         #
         # def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
-        #     """
-        #     Simple linear solver for (I-dtA)u = rhs
-        #
-        #     Args:
-        #         dfdu: the Jacobian of the RHS of the ODE
-        #         rhs: right-hand side for the linear system
-        #         factor: abbrev. for the node-to-node stepsize (or any other factor required)
-        #         u0: initial guess for the iterative solver (not used here so far)
-        #         t: current time (e.g. for time-dependent BCs)
-        #
-        #     Returns:
-        #         solution as mesh
-        #     """
         #
         #     me = mesh(2)
         #     me.values = LA.spsolve(sp.eye(2) - factor * dfdu, rhs.values)

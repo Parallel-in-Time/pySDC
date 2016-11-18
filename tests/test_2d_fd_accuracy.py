@@ -16,6 +16,7 @@ def test_spatial_accuracy():
     # initialize problem parameters
     problem_params = {}
     problem_params['freq'] = 2
+    problem_params['nu'] = 1.0
 
     # create list of nvars to do the accuracy test with
     nvars_list = [(2 ** p, 2 ** p) for p in range(4, 12)]

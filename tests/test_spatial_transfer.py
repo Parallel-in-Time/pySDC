@@ -183,6 +183,7 @@ def test_mesh_to_mesh_2d_periodic():
     problem_params = {}
     problem_params['c'] = 0.1  # advection coefficient
     problem_params['freq'] = 4  # frequency for the test value
+    problem_params['nu'] = 1.0
 
     # initialize transfer parameters
     space_transfer_params = {}

@@ -119,7 +119,7 @@ def main():
 
                     problem_params['nu'] = 1
                     problem_params['lambda0'] = param
-                    problem_params['maxiter'] = 20
+                    problem_params['newton_maxiter'] = 20
                     problem_params['newton_tol'] = 1E-09
                     problem_params['interval'] = (-5, 5)
 
@@ -215,5 +215,5 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     plot_iterations()

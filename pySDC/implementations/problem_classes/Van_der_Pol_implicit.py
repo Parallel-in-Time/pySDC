@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 
 from pySDC.core.Problem import ptype
+from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal
@@ -10,33 +11,34 @@ class vanderpol(ptype):
     Example implementing the van der pol oscillator
     """
 
-    def __init__(self, cparams, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u, dtype_f):
         """
         Initialization routine
 
         Args:
-            cparams: custom parameters for the example
+            problem_params (dict): custom parameters for the example
             dtype_u: mesh data type (will be passed parent class)
             dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
-        assert 'u0' in cparams
-        assert 'mu' in cparams
-        assert 'newton_maxiter' in cparams
-        assert 'newton_tol' in cparams
+        essential_keys = ['u0', 'mu', 'newton_maxiter', 'newton_tol']
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(vanderpol, self).__init__(2, dtype_u, dtype_f, cparams)
+        super(vanderpol, self).__init__(2, dtype_u, dtype_f, problem_params)
 
     def u_exact(self, t):
         """
         Dummy routine for the exact solution, currently only passes the initial values
 
         Args:
-            t: current time
+            t (float): current time
         Returns:
-            mesh type containing the initial values
+            dtype_u: mesh type containing the initial values
         """
 
         # thou shall not call this at time > 0
@@ -50,10 +52,10 @@ class vanderpol(ptype):
         Routine to compute the RHS for both components simultaneously
 
         Args:
-            t: current time (not used here)
-            u: the current values
+            u (dtype_u): the current values
+            t (float): current time (not used here)
         Returns:
-            RHS, 2 components
+            dtype_f: RHS, 2 components
         """
 
         x1 = u.values[0]
@@ -68,13 +70,13 @@ class vanderpol(ptype):
         Simple Newton solver for the nonlinear system
 
         Args:
-            rhs: right-hand side for the nonlinear system
-            dt: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver
-            t: current time (e.g. for time-dependent BCs)
+            rhs (dtype_f): right-hand side for the nonlinear system
+            dt (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
 
         Returns:
-            solution u
+            dtype_u: solution u
         """
 
         mu = self.params.mu

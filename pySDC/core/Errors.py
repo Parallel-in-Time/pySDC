@@ -46,3 +46,10 @@ class ControllerError(Exception):
     Error class handling/indicating problems with the controller
     """
     pass
+
+
+class ProblemError(Exception):
+    """
+    Error class handling/indicating problems with the problem classes
+    """
+    pass

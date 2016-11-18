@@ -4,71 +4,39 @@ from scipy.sparse.linalg import gmres
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DMatrix
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DUpwindMatrix
-from pySDC.core.Problem import ptype
 from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
+from pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes import Callback, logging
 
-
-class logging(object):
-    def __init__(self):
-        self.solver_calls = 0
-        self.iterations = 0
-
-    def add(self, iterations):
-        self.solver_calls += 1
-        self.iterations += iterations
-
-
-class Callback(object):
-    def getresidual(self):
-        return self.residual
-
-    def getcounter(self):
-        return self.counter
-
-    def __init__(self):
-        self.counter = 0
-        self.residual = 0.0
-
-    def __call__(self, residuals):
-        self.counter += 1
-        self.residual = residuals
+from pySDC.core.Problem import ptype
+from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal
 class boussinesq_2d_imex(ptype):
     """
-
+    Example implementing the 2D Boussinesq equation for different boundary conditions
     """
 
-    def __init__(self, cparams, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u, dtype_f):
         """
         Initialization routine
 
         Args:
-            cparams: custom parameters for the example
+            problem_params (dict): custom parameters for the example
             dtype_u: particle data type (will be passed parent class)
             dtype_f: acceleration data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
-        assert 'nvars' in cparams
-        assert 'c_s' in cparams
-        assert 'u_adv' in cparams
-        assert 'Nfreq' in cparams
-        assert 'x_bounds' in cparams
-        assert 'z_bounds' in cparams
-        assert 'order_upw' in cparams
-        assert 'order' in cparams
-        assert 'gmres_maxiter' in cparams
-        assert 'gmres_restart' in cparams
-        assert 'gmres_tol_limit' in cparams
-
-        # add parameters as attributes for further reference
-        for k, v in cparams.items():
-            setattr(self, k, v)
+        essential_keys = ['nvars', 'c_s', 'u_adv', 'Nfreq', 'x_bounds', 'z_bounds', 'order_upw', 'order',
+                          'gmres_maxiter', 'gmres_restart', 'gmres_tol_limit']
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(boussinesq_2d_imex, self).__init__(self.nvars, dtype_u, dtype_f, cparams)
+        super(boussinesq_2d_imex, self).__init__(self.nvars, dtype_u, dtype_f, problem_params)
 
         self.N = [self.nvars[1], self.nvars[2]]
 
@@ -83,21 +51,21 @@ class boussinesq_2d_imex(ptype):
                                                 self.order)
         self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.u_adv, self.order_upw)
 
-        self.logger = logging()
+        self.gmres_logger = logging()
         self.gmres_tol = None
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-dtA)u = rhs
+        Simple linear solver for (I-dtA)u = rhs using GMRES
 
         Args:
-            rhs: right-hand side for the nonlinear system
-            factor: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver (not used here so far)
-            t: current time (e.g. for time-dependent BCs)
+            rhs (dtype_f): right-hand side for the nonlinear system
+            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
+            t (float): current time (e.g. for time-dependent BCs)
 
         Returns:
-            solution as mesh
+            dtype_u: solution as mesh
         """
 
         b = rhs.values.flatten()
@@ -107,7 +75,7 @@ class boussinesq_2d_imex(ptype):
                           restart=self.params.gmres_restart, maxiter=self.params.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor != 0.0:
-            self.logger.add(cb.getcounter())
+            self.gmres_logger.add(cb.getcounter())
         me = self.dtype_u(self.init)
         me.values = unflatten(sol, 4, self.N[0], self.N[1])
 
@@ -118,8 +86,8 @@ class boussinesq_2d_imex(ptype):
         Helper routine to evaluate the explicit part of the RHS
 
         Args:
-            u: current values (not used here)
-            t: current time
+            u (dtype_u): current values (not used here)
+            t (float): current time
 
         Returns:
             explicit part of RHS
@@ -138,8 +106,8 @@ class boussinesq_2d_imex(ptype):
         Helper routine to evaluate the implicit part of the RHS
 
         Args:
-            u: current values
-            t: current time (not used here)
+            u (dtype_u): current values
+            t (float): current time (not used here)
 
         Returns:
             implicit part of RHS
@@ -157,11 +125,11 @@ class boussinesq_2d_imex(ptype):
         Routine to evaluate both parts of the RHS
 
         Args:
-            u: current values
-            t: current time
+            u (dtype_u): current values
+            t (float): current time
 
         Returns:
-            the RHS divided into two parts
+            dtype_f: the RHS divided into two parts
         """
 
         f = self.dtype_f(self.init)
@@ -174,10 +142,10 @@ class boussinesq_2d_imex(ptype):
         Routine to compute the exact solution at time t
 
         Args:
-            t: current time
+            t (float): current time
 
         Returns:
-            exact solution
+            dtype_u: exact solution
         """
 
         dtheta = 0.01

@@ -5,40 +5,42 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Problem import ptype
+from pySDC.core.Errors import ParameterError, ProblemError
 
 
 # noinspection PyUnusedLocal
 class generalized_fisher(ptype):
     """
-    Example implementing the unforced 1D heat equation with Dirichlet-0 BC in [0,1]
+    Example implementing the generalized Fisher's equation in 1D with finite differences
 
     Attributes:
         A: second-order FD discretization of the 1D laplace operator
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, cparams, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u, dtype_f):
         """
         Initialization routine
 
         Args:
-            cparams: custom parameters for the example
+            problem_params (dict): custom parameters for the example
             dtype_u: mesh data type (will be passed parent class)
             dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
-        assert 'nvars' in cparams
-        assert 'nu' in cparams
-        assert 'lambda0' in cparams
-        assert 'maxiter' in cparams
-        assert 'newton_tol' in cparams
-        assert 'interval' in cparams
+        essential_keys = ['nvars', 'nu', 'lambda0', 'newton_maxiter', 'newton_tol', 'interval']
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
 
-        assert (cparams['nvars'] + 1) % 2 == 0
+        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
+        if (problem_params['nvars'] + 1) % 2 != 0:
+            raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(generalized_fisher, self).__init__(cparams['nvars'], dtype_u, dtype_f, cparams)
+        super(generalized_fisher, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1]-self.params.interval[0]) / (self.params.nvars + 1)
@@ -50,11 +52,11 @@ class generalized_fisher(ptype):
         Helper function to assemble FD matrix A in sparse format
 
         Args:
-            N: number of dofs
-            dx: distance between two spatial nodes
+            N (int): number of dofs
+            dx (float): distance between two spatial nodes
 
         Returns:
-         matrix A in CSC format
+            scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
         stencil = [1, -2, 1]
@@ -69,13 +71,13 @@ class generalized_fisher(ptype):
         Simple Newton solver
 
         Args:
-            rhs: right-hand side for the linear system
-            factor: abbrev. for the node-to-node stepsize (or any other factor required)
-            u0: initial guess for the iterative solver (not used here so far)
-            t: current time (e.g. for time-dependent BCs)
+            rhs (dtype_f): right-hand side for the nonlinear system
+            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (required here for the BC)
 
         Returns:
-            solution as mesh
+            dtype_u: solution u
         """
 
         u = self.dtype_u(u0)
@@ -83,6 +85,7 @@ class generalized_fisher(ptype):
         nu = self.params.nu
         lambda0 = self.params.lambda0
 
+        # set up boundary values to embed inner points
         lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - lambda0 ** 2)
         ul = (1 + (2 ** (nu / 2.0) - 1) *
@@ -92,7 +95,7 @@ class generalized_fisher(ptype):
 
         # start newton iteration
         n = 0
-        while n < self.params.maxiter:
+        while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
             uext = np.concatenate(([ul], u.values, [ur]))
@@ -106,7 +109,8 @@ class generalized_fisher(ptype):
                 break
 
             # assemble dg
-            dg = sp.eye(self.params.nvars) - factor * (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
+            dg = sp.eye(self.params.nvars) - factor * \
+                (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
 
             # newton update: u1 = u0 - g/dg
             u.values -= spsolve(dg, g)
@@ -121,13 +125,13 @@ class generalized_fisher(ptype):
         Routine to evaluate the RHS
 
         Args:
-            u: current values
-            t: current time
+            u (dtype_u): current values
+            t (float): current time
 
         Returns:
-            the RHS
+            dtype_f: the RHS
         """
-
+        # set up boundary values to embed inner points
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
         ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
@@ -146,10 +150,10 @@ class generalized_fisher(ptype):
         Routine to compute the exact solution at time t
 
         Args:
-            t: current time
+            t (float): current time
 
         Returns:
-            exact solution
+            dtype_u: exact solution
         """
 
         me = self.dtype_u(self.init)
