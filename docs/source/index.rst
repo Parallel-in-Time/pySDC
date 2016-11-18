@@ -44,6 +44,8 @@ Playgrounds
 API documentation
 -----------------
 
+.. include:: ../../pySDC/README.rst
+
 .. toctree::
    :maxdepth: 3
 

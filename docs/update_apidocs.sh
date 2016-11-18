@@ -25,3 +25,4 @@ echo "generating new .rst files ..."
 #${SPHINX_APIDOC} -o docs/source/pySDC/implementations pySDC/implementations --force -M -T
 #${SPHINX_APIDOC} -o docs/source/pySDC/helpers pySDC/helpers --force -M -T
 ${SPHINX_APIDOC} -o docs/source/pySDC pySDC --force -M -T
+rm docs/source/pySDC/pySDC.rst
