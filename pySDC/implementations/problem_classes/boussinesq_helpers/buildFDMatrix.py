@@ -124,7 +124,8 @@ def getMatrix(N, dx, bc_left, bc_right, order):
             A[N - 1, :] = np.zeros(N)
             A[N - 1, N - 2] = -6.0
 
-    A = coeff * (1.0 / dx) * A
+    A *= coeff * (1.0 / dx)
+
     return sp.csc_matrix(A)
 
 
@@ -138,11 +139,13 @@ def getBCLeft(value, N, dx, type, order):
         coeff = 1.0 / 2.0
     elif order == 4:
         coeff = 1.0 / 12.0
+    else:
+        raise NotImplementedError('wrong order, got %s' % order)
 
     b = np.zeros(N)
     if type in ['dirichlet']:
         if order == 2:
-            b[0] = -value;
+            b[0] = -value
         elif order == 4:
             b[0] = -6.0 * value
             b[1] = 1.0 * value
@@ -167,6 +170,8 @@ def getBCRight(value, N, dx, type, order):
         coeff = 1.0 / 2.0
     elif order == 4:
         coeff = 1.0 / 12.0
+    else:
+        raise NotImplementedError('wrong order, got %s' % order)
 
     b = np.zeros(N)
     if type in ['dirichlet']:

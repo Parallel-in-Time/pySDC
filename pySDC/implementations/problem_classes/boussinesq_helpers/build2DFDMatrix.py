@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append('../')
 import numpy as np
 import scipy.sparse as sp
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix import getMatrix, getUpwindMatrix, \
@@ -19,6 +16,7 @@ def get2DUpwindMatrix(N, dx, order):
 #
 #
 def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
+
     assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
     assert np.size(
         x_b) == 2, 'x_b needs to be an array with two entries: x_b[0] = left boundary, x_b[1] = right boundary'
@@ -26,6 +24,8 @@ def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
         z_b) == 2, 'z_b needs to be an array with two entries: z_b[0] = lower boundary, z_b[1] = upper boundary'
 
     h = np.zeros(2)
+    x = None
+    z = None
 
     if bc_hor[0] in ['periodic']:
         assert bc_hor[1] in ['periodic'], 'Periodic boundary conditions must be prescribed at both boundaries'

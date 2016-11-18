@@ -12,9 +12,8 @@ def check_files(dir):
     style.options.max_line_length = 120
     python_files = []
     for root, _, files in os.walk(dir):
-        if root != 'pySDC/implementations/problem_classes/boussinesq_helpers':
-            python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
-    # python_files = [os.path.join(dir, f) for f in os.listdir(dir) if f.endswith('.py') and f != '__init__.py']
+        # if root != 'pySDC/implementations/problem_classes/boussinesq_helpers':
+        python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
     print(python_files)
 
     for file in python_files:
