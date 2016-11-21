@@ -1,7 +1,7 @@
 from __future__ import division
+
 import dolfin as df
 import numpy as np
-import random
 import logging
 
 from pySDC.core.Problem import ptype
@@ -9,19 +9,17 @@ from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal
-class fenics_grayscott(ptype):
+class fenics_heat(ptype):
     """
-    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]
+    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation
 
     Attributes:
         V: function space
-        w: function for the RHS
-        w1: split of w, part 1
-        w2: split of w, part 2
-        F1: weak form of RHS, first part
-        F2: weak form of RHS, second part
-        F: weak form of RHS, full
-        M: full mass matrix for both parts
+        w: function for weak form
+        a_K: weak form of RHS (incl. BC)
+        M: mass matrix for FEM
+        g: forcing term
+        bc: boundary conditions
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -29,7 +27,7 @@ class fenics_grayscott(ptype):
         Initialization routine
 
         Args:
-            problem_params: custom parameters for the example
+            problem_params (dict): custom parameters for the example
             dtype_u: particle data type (will be passed parent class)
             dtype_f: acceleration data type (will be passed parent class)
         """
@@ -39,7 +37,7 @@ class fenics_grayscott(ptype):
             return on_boundary
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'Du', 'Dv', 'A', 'B']
+        essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'nu']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -54,36 +52,32 @@ class fenics_grayscott(ptype):
         df.parameters["form_compiler"]["cpp_optimize"] = True
 
         # set mesh and refinement (for multilevel)
-        mesh = df.IntervalMesh(problem_params['c_nvars'], 0, 100)
+        mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
         for i in range(problem_params['refinements']):
             mesh = df.refine(mesh)
 
         # define function space for future reference
-        V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
-        self.V = V * V
+        self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
+        tmp = df.Function(self.V)
+        print('DoFs on this level:', len(tmp.vector().array()))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(fenics_grayscott, self).__init__(self.V, dtype_u, dtype_f, problem_params)
+        super(fenics_heat, self).__init__(self.V, dtype_u, dtype_f, problem_params)
+
+        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
+                               degree=self.params.order)
 
         # rhs in weak form
         self.w = df.Function(self.V)
-        q1, q2 = df.TestFunctions(self.V)
-
-        self.w1, self.w2 = df.split(self.w)
-
-        self.F1 = (-self.params.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1)) -
-                   self.w1 * (self.w2 ** 2) * q1 + self.params.A * (1 - self.w1) * q1) * df.dx
-        self.F2 = (-self.params.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2)) +
-                   self.w1 * (self.w2 ** 2) * q2 - self.params.B * self.w2 * q2) * df.dx
-        self.F = self.F1 + self.F2
+        v = df.TestFunction(self.V)
+        self.a_K = -self.params.nu * df.inner(df.nabla_grad(self.w), df.nabla_grad(v)) * df.dx + self.g * v * df.dx
 
         # mass matrix
-        u1, u2 = df.TrialFunctions(self.V)
-        a_M = u1 * q1 * df.dx
-        M1 = df.assemble(a_M)
-        a_M = u2 * q2 * df.dx
-        M2 = df.assemble(a_M)
-        self.M = M1 + M2
+        u = df.TrialFunction(self.V)
+        a_M = u * v * df.dx
+        self.M = df.assemble(a_M)
+
+        self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
     def __invert_mass_matrix(self, u):
         """
@@ -101,18 +95,20 @@ class fenics_grayscott(ptype):
         A = 1.0 * self.M
         b = self.dtype_u(u)
 
+        self.bc.apply(A, b.values.vector())
+
         df.solve(A, me.values.vector(), b.values.vector())
 
         return me
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Dolfin's linear solver for (M-factor*A)u = rhs
+        Dolfin's weak solver for (M-dtA)u = rhs
 
         Args:
             rhs (dtype_f): right-hand side for the nonlinear system
             factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
+            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
             t (float): current time
 
         Returns:
@@ -121,26 +117,25 @@ class fenics_grayscott(ptype):
 
         sol = self.dtype_u(self.V)
 
+        self.g.t = t
         self.w.assign(sol.values)
 
-        # fixme: is this really necessary to do each time?
-        q1, q2 = df.TestFunctions(self.V)
-        w1, w2 = df.split(self.w)
-        r1, r2 = df.split(rhs.values)
-        F1 = w1 * q1 * df.dx - factor * self.F1 - r1 * q1 * df.dx
-        F2 = w2 * q2 * df.dx - factor * self.F2 - r2 * q2 * df.dx
-        F = F1 + F2
+        v = df.TestFunction(self.V)
+        F = self.w * v * df.dx - factor * self.a_K - rhs.values * v * df.dx
+
         du = df.TrialFunction(self.V)
         J = df.derivative(F, self.w, du)
 
-        problem = df.NonlinearVariationalProblem(F, self.w, [], J)
+        problem = df.NonlinearVariationalProblem(F, self.w, self.bc, J)
         solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
-        prm['newton_solver']['absolute_tolerance'] = 1E-09
-        prm['newton_solver']['relative_tolerance'] = 1E-08
-        prm['newton_solver']['maximum_iterations'] = 100
+        prm['newton_solver']['absolute_tolerance'] = 1E-8
+        prm['newton_solver']['relative_tolerance'] = 1E-7
+        prm['newton_solver']['maximum_iterations'] = 25
         prm['newton_solver']['relaxation_parameter'] = 1.0
+
+        # df.set_log_level(df.PROGRESS)
 
         solver.solve()
 
@@ -160,10 +155,12 @@ class fenics_grayscott(ptype):
             dtype_f: the RHS divided into two parts
         """
 
+        self.g.t = t
+
         f = self.dtype_f(self.V)
 
         self.w.assign(u.values)
-        f.values = df.Function(self.V, df.assemble(self.F))
+        f.values = df.Function(self.V, df.assemble(self.a_K))
 
         f = self.__invert_mass_matrix(f)
 
@@ -180,22 +177,8 @@ class fenics_grayscott(ptype):
             dtype_u: exact solution
         """
 
-        class InitialConditions(df.Expression):
-            def __init__(self):
-                # fixme: why do we need this?
-                random.seed(2)
-                pass
-
-            def eval(self, values, x):
-                values[0] = 1 - 0.5 * np.power(np.sin(np.pi * x[0] / 100), 100)
-                values[1] = 0.25 * np.power(np.sin(np.pi * x[0] / 100), 100)
-
-            def value_shape(self):
-                return 2,
-
-        uinit = InitialConditions()
-
+        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
         me = self.dtype_u(self.V)
-        me.values = df.interpolate(uinit, self.V)
+        me.values = df.interpolate(u0, self.V)
 
         return me
