@@ -105,7 +105,7 @@ def create_animation(cwd=''):
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=sum(iter_count_blocks) + 1, interval=1,
                                    blit=False, repeat=False)
 
-    if not "NOFAULT" in ref:
+    if "NOFAULT" not in ref:
         stats = data['hard_stats']
         for item in stats:
             if item[0] in range(minstep, maxstep):

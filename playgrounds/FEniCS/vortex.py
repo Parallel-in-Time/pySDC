@@ -34,7 +34,7 @@ if __name__ == "__main__":
     problem_params['nu'] = 0.01
     problem_params['delta'] = 0.05
     problem_params['rho'] = 50
-    problem_params['c_nvars'] = [(32,32)]
+    problem_params['c_nvars'] = [(32, 32)]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
     problem_params['refinements'] = [1, 0]

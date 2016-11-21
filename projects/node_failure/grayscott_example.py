@@ -22,7 +22,7 @@ def main(ft_strategies):
     t0 = 0
     dt = 2.0
     Tend = 1280.0
-    Nsteps = int((Tend-t0)/dt)
+    Nsteps = int((Tend - t0) / dt)
 
     # initialize level parameters
     level_params = dict()

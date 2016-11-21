@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import pickle
@@ -21,7 +22,6 @@ ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
 
 def main():
-
     # initialize level parameters (part I)
     level_params = dict()
     level_params['restol'] = 1E-08
@@ -44,7 +44,7 @@ def main():
     setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
                   ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
                   ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
-                  ('fisher', 63, [2 ** i for i in range(-2,4)])]
+                  ('fisher', 63, [2 ** i for i in range(-2, 4)])]
     # setup_list = [('fisher', 63, [2 * i for i in range(1, 6)])]
 
     # pre-fill results with lists of  setups
@@ -208,7 +208,7 @@ def plot_iterations():
         plt.grid()
 
         # save plot as PDF, beautify
-        fname = 'data/parallelSDC_preconditioner_'+setup+'.png'
+        fname = 'data/parallelSDC_preconditioner_' + setup + '.png'
         plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
         assert os.path.isfile(fname), 'ERROR: plotting did not create file'

@@ -18,8 +18,8 @@ def create_plots(setup, cwd=''):
 
     fields = [(setup + '_results_hf_SPREAD.npz', 'SPREAD'),
               (setup + '_results_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT'),
-              (setup + '_results_hf_INTERP.npz','INTERP'),
-              (setup + '_results_hf_INTERP_PREDICT.npz','INTERP_PREDICT')]
+              (setup + '_results_hf_INTERP.npz', 'INTERP'),
+              (setup + '_results_hf_INTERP_PREDICT.npz', 'INTERP_PREDICT')]
 
     vmin = 99
     vmax = 0

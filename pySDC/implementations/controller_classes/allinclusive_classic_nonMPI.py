@@ -250,7 +250,7 @@ class allinclusive_classic_nonMPI(controller):
             if not S.status.first:
                 if S.prev.levels[-1].tag:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
-                                      (S.status.slot, S.prev.status.slot, len(S.levels)-1, True))
+                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, True))
                     self.recv(S.levels[-1], S.prev.levels[-1])
                     # reset tag to signal successful receive
                     S.prev.levels[-1].tag = False
@@ -269,7 +269,7 @@ class allinclusive_classic_nonMPI(controller):
             if not S.status.last:
                 if not S.levels[-1].tag:
                     self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
-                                      % (S.status.slot, len(S.levels)-1, True))
+                                      % (S.status.slot, len(S.levels) - 1, True))
                     self.send(S.levels[-1], tag=True)
                 else:
                     S.status.stage = 'PREDICT_SEND'

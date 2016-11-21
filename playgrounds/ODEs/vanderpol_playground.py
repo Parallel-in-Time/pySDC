@@ -6,6 +6,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 
 from playgrounds.ODEs.trajectory_HookClass import trajectories
 
+
 def main():
     """
     Van der Pol's oscillator inc. visualization

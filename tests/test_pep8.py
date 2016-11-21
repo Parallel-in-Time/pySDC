@@ -10,9 +10,11 @@ BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..'))
 def check_files(dir):
     style = pep8.StyleGuide()
     style.options.max_line_length = 120
+    style.options.ignore = 'E402'
     python_files = []
     for root, _, files in os.walk(dir):
-        python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
+        if 'playgrounds/deprecated' not in root:
+            python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
     # print(python_files)
 
     for file in python_files:
@@ -23,5 +25,5 @@ def check_files(dir):
 
 
 def test_pep8():
-    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers']:
+    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'tutorial', 'projects', 'playgrounds']:
         yield check_files, dir

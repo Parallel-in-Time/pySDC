@@ -130,13 +130,13 @@ class planewave_single(ptype):
 
             # pre-velocity, separated by the electric forces (and the c term)
             vm = old_parts.vel.values[3 * n:3 * n + 3] + dt / 2 * a * Emean.values[3 * n:3 * n + 3] + \
-                 c.values[3 * n:3 * n + 3] / 2
+                c.values[3 * n:3 * n + 3] / 2
             # rotation
             t = dt / 2 * a * new_fields.magn.values[3 * n:3 * n + 3]
             s = 2 * t / (1 + np.linalg.norm(t, 2) ** 2)
             vp = vm + np.cross(vm + np.cross(vm, t), s)
             # post-velocity
             vel.values[3 * n:3 * n + 3] = vp + dt / 2 * a * Emean.values[3 * n:3 * n + 3] + \
-                                          c.values[3 * n:3 * n + 3] / 2
+                c.values[3 * n:3 * n + 3] / 2
 
         return vel

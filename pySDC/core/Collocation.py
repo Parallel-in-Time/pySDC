@@ -119,11 +119,11 @@ class CollBase(with_metaclass(abc.ABCMeta)):
             numpy.ndarray: matrix containing the weights for tleft to node
         """
         M = self.num_nodes
-        Q = np.zeros([M+1, M+1])
+        Q = np.zeros([M + 1, M + 1])
 
         # for all nodes, get weights for the interval [tleft,node]
         for m in np.arange(M):
-            Q[m+1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+            Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
 
         return Q
 
@@ -137,10 +137,10 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         """
         M = self.num_nodes
         Q = self.Qmat
-        S = np.zeros([M+1, M+1])
+        S = np.zeros([M + 1, M + 1])
 
         S[1, :] = Q[1, :]
-        for m in np.arange(2, M+1):
+        for m in np.arange(2, M + 1):
             S[m, :] = Q[m, :] - Q[m - 1, :]
 
         return S
@@ -157,6 +157,6 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         delta = np.zeros(M)
         delta[0] = self.nodes[0] - self.tleft
         for m in np.arange(1, M):
-            delta[m] = self.nodes[m] - self.nodes[m-1]
+            delta[m] = self.nodes[m] - self.nodes[m - 1]
 
         return delta

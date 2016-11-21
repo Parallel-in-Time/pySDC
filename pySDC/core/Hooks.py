@@ -130,7 +130,7 @@ class hooks(object):
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           type='residual_post_sweep', value=L.status.residual)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          type='timing_sweep', value=self.__t1_sweep-self.__t0_sweep)
+                          type='timing_sweep', value=self.__t1_sweep - self.__t0_sweep)
 
     def post_iteration(self, step, level_number):
         """

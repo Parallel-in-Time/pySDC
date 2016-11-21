@@ -43,7 +43,7 @@ class generalized_fisher(ptype):
         super(generalized_fisher, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = (self.params.interval[1]-self.params.interval[0]) / (self.params.nvars + 1)
+        self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
         self.A = self.__get_A(self.params.nvars, self.dx)
 
     @staticmethod
