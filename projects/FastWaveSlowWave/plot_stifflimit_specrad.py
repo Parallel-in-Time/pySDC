@@ -106,7 +106,7 @@ def compute_specrad():
 def plot_specrad(nodes_v, lambda_f, specrad, norm):
     """
     Plotting function for spectral radii and norms
-®
+
     Args:
         nodes_v (numpy.nparray): list of number of nodes
         lambda_f (numpy.nparray): list of fast lambdas
