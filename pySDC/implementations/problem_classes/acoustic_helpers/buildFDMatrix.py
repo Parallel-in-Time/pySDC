@@ -158,7 +158,7 @@ def getBCLeft(value, N, dx, type, order):
     b = np.zeros(N)
     if type in ['dirichlet']:
         if order == 2:
-            b[0] = -value;
+            b[0] = -value
         elif order == 4:
             b[0] = -6.0 * value
             b[1] = 1.0 * value
