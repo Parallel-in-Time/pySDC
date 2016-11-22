@@ -13,12 +13,6 @@ class acoustic_1d_imex(ptype):
     """
     Example implementing the one-dimensional IMEX acoustic-advection
 
-    Integrate the linear 1D acoustic-advection problem:
-
-    .. math::
-    u_t + U u_x + c p_x & = 0 \\
-    p_t + U p_x + c u_x & = 0.
-
     Attributes:
         mesh (numpy.ndarray): 1d mesh
         dx (float): mesh size

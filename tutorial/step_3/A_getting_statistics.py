@@ -44,8 +44,8 @@ def main():
 
     f.close()
 
-    assert all([item[1] == 12 for item in
-                iter_counts]), 'ERROR: number of iterations are not as expected, got %s' % iter_counts
+    assert all([item[1] == 12 for item in iter_counts]), \
+        'ERROR: number of iterations are not as expected, got %s' % iter_counts
 
 
 def run_simulation():
