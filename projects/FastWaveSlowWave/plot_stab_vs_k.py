@@ -63,7 +63,6 @@ def compute_stab_vs_k(slow_resolved):
     description['dtype_u'] = mesh  # pass data type for u
     description['dtype_f'] = rhs_imex_mesh  # pass data type for f
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
-
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = dict()  # pass step parameters
 

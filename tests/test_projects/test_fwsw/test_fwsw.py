@@ -4,6 +4,7 @@ import os
 from projects.FastWaveSlowWave.plot_stifflimit_specrad import compute_specrad, plot_specrad
 from projects.FastWaveSlowWave.plot_stability import compute_stability, plot_stability
 from projects.FastWaveSlowWave.plot_stab_vs_k import compute_stab_vs_k, plot_stab_vs_k
+from projects.FastWaveSlowWave.plot_dispersion import compute_and_plot_dispersion
 
 
 def test_stifflimit_specrad():
@@ -37,3 +38,9 @@ def test_stab_vs_k():
 
     plot_stab_vs_k(False, mvals, kvals, stabval)
     assert os.path.isfile('stab_vs_k_unresolved.png'), 'ERROR: stability plot has not been created'
+
+
+def test_dispersion():
+    compute_and_plot_dispersion()
+    assert os.path.isfile('phase-K3-M3.png'), 'ERROR: phase plot has not been created'
+    assert os.path.isfile('ampfactor-K3-M3.png'), 'ERROR: phase plot has not been created'
