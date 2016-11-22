@@ -1,8 +1,11 @@
-import numpy as np
-from examples.advection_1d_implicit.getFDMatrix import getFDMatrix
-import numpy.linalg as LA
 import math
+
+import numpy as np
+import numpy.linalg as LA
 from matplotlib import pyplot as plt
+
+from playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
+
 
 def u_function(x):
   u = np.zeros(np.size(x))

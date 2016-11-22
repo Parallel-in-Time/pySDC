@@ -26,7 +26,7 @@ before_install:
 install:
   # this line needs to be updated to match the requirements.txt files
   # the conda installer isn't able to process PIP's requirements.txt files
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx pep8 coverage mpi4py
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx pep8 coverage mpi4py sympy
   - conda list
   - pip install --user coloredlogs
   - pip install --user travis-sphinx
