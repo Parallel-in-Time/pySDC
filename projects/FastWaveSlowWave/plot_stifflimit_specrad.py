@@ -14,7 +14,7 @@ from pySDC.core.Step import step
 
 
 # noinspection PyShadowingNames
-def main():
+def compute_specrad():
     """
     Routine to compute spectral radius and norm  of the error propagation matrix E
 
@@ -55,7 +55,6 @@ def main():
     specrad = np.zeros((3, np.size(nodes_v)))
     norm = np.zeros((3, np.size(nodes_v)))
 
-    P = None
     for i in range(0, np.size(nodes_v)):
 
         sweeper_params['num_nodes'] = nodes_v[i]
@@ -100,14 +99,14 @@ def main():
         print("Spectral radius of infinitely fast wave case > 1.0 for M=%2i" % nodes_v[np.argmax(specrad[0, :] > 1.0)])
         print("Spectral radius of > 1.0 for M=%2i" % nodes_v[np.argmax(specrad[1, :] > 1.0)])
 
-    return nodes_v, P.params.lambda_f, specrad, norm
+    return nodes_v, problem_params['lambda_f'], specrad, norm
 
 
 # noinspection PyShadowingNames
-def plot_results(nodes_v, lambda_f, specrad, norm):
+def plot_specrad(nodes_v, lambda_f, specrad, norm):
     """
     Plotting function for spectral radii and norms
-
+®
     Args:
         nodes_v (numpy.nparray): list of number of nodes
         lambda_f (numpy.nparray): list of fast lambdas
@@ -150,5 +149,5 @@ def plot_results(nodes_v, lambda_f, specrad, norm):
 
 
 if __name__ == "__main__":
-    nodes_v, lambda_f, specrad, norm = main()
-    plot_results(nodes_v, lambda_f, specrad, norm)
+    nodes_v, lambda_f, specrad, norm = compute_specrad()
+    plot_specrad(nodes_v, lambda_f, specrad, norm)

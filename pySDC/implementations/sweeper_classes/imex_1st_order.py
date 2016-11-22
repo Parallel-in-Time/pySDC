@@ -156,7 +156,7 @@ class imex_1st_order(sweeper):
         See Ruprecht & Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016 for the derivation.
 
         Args:
-            lambdas (list): the first entry in lambdas is lambda_fast, the second is lambda_slow.
+            lambdas (numpy.ndarray): the first entry in lambdas is lambda_fast, the second is lambda_slow.
         """
         QE, QI, Q = self.get_sweeper_mats()
         if lambdas is None:
@@ -178,7 +178,7 @@ class imex_1st_order(sweeper):
 
         Args:
             nsweeps (int): number of sweeps
-            lambdas (list): the first entry in lambdas is lambda_fast, the second is lambda_slow.
+            lambdas (numpy.ndarray): the first entry in lambdas is lambda_fast, the second is lambda_slow.
         """
         LHS, RHS = self.get_scalar_problems_sweeper_mats(lambdas=lambdas)
         Pinv = np.linalg.inv(LHS)
