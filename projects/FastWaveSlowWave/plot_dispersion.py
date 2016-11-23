@@ -159,7 +159,7 @@ def compute_and_plot_dispersion():
     fig.gca().tick_params(axis='both', labelsize=fs)
     plt.legend(loc='lower left', fontsize=fs, prop={'size': fs - 2})
     plt.xticks([0, 1, 2, 3], fontsize=fs)
-    filename = 'phase-K' + str(K) + '-M' + str(sweeper_params['num_nodes']) + '.png'
+    filename = 'data/phase-K' + str(K) + '-M' + str(sweeper_params['num_nodes']) + '.png'
     plt.gcf().savefig(filename, bbox_inches='tight')
 
     fig = plt.figure()
@@ -177,7 +177,7 @@ def compute_and_plot_dispersion():
     plt.legend(loc='lower left', fontsize=fs, prop={'size': fs - 2})
     plt.gca().set_ylim([0.0, 1.1])
     plt.xticks([0, 1, 2, 3], fontsize=fs)
-    filename = 'ampfactor-K' + str(K) + '-M' + str(sweeper_params['num_nodes']) + '.png'
+    filename = 'data/ampfactor-K' + str(K) + '-M' + str(sweeper_params['num_nodes']) + '.png'
     plt.gcf().savefig(filename, bbox_inches='tight')
 
 

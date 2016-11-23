@@ -15,9 +15,12 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 
-def compute_convergence_data():
+def compute_convergence_data(cwd=''):
     """
     Routine to run the 1d acoustic-advection example with different orders
+
+    Args:
+        cwd (string): current working directory
     """
 
     num_procs = 1
@@ -69,9 +72,9 @@ def compute_convergence_data():
         Tend = 1.0
 
         if order == 3:
-            file = open('conv-data.txt', 'w')
+            file = open(cwd + 'data/conv-data.txt', 'w')
         else:
-            file = open('conv-data.txt', 'a')
+            file = open(cwd + 'data/conv-data.txt', 'a')
 
         step_params['maxiter'] = order
         description['step_params'] = step_params
@@ -130,7 +133,7 @@ def plot_convergence(cwd=''):
     nsteps = np.array([])
     error = np.array([])
 
-    file = open(cwd + 'conv-data.txt', 'r')
+    file = open(cwd + 'data/conv-data.txt', 'r')
     while True:
         line = file.readline()
         if not line:
@@ -178,7 +181,7 @@ def plot_convergence(cwd=''):
     plt.xticks([20, 30, 40, 60, 80, 100], fontsize=fs)
     plt.gca().get_xaxis().get_major_formatter().labelOnlyBase = False
     plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
-    filename = 'convergence.png'
+    filename = 'data/convergence.png'
     fig.savefig(filename, bbox_inches='tight')
 
 

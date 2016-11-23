@@ -15,13 +15,11 @@ def check_files(dir):
     for root, _, files in os.walk(dir):
         if 'playgrounds/deprecated' not in root:
             python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
-    # print(python_files)
 
     for file in python_files:
         report = style.check_files([os.path.join(BASE_PATH, file)])
         report.print_statistics()
-        nose.tools.assert_equal(report.total_errors, 0,
-                                "File %s has some PEP8 errors: %d" % (file, report.total_errors))
+        nose.tools.assert_equal(report.total_errors, 0, "File %s has some PEP8 errors: %d" % (file, report.total_errors))
 
 
 def test_pep8():

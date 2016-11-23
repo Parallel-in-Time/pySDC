@@ -11,12 +11,12 @@ def plot_buoyancy(cwd=''):
         cwd (string): current working directory
     """
 
-    xx = np.load(cwd + 'xaxis.npy')
-    uend = np.load(cwd + 'sdc.npy')
-    udirk = np.load(cwd + 'dirk.npy')
-    uimex = np.load(cwd + 'rkimex.npy')
-    uref = np.load(cwd + 'uref.npy')
-    usplit = np.load(cwd + 'split.npy')
+    xx = np.load(cwd + 'data/xaxis.npy')
+    uend = np.load(cwd + 'data/sdc.npy')
+    udirk = np.load(cwd + 'data/dirk.npy')
+    uimex = np.load(cwd + 'data/rkimex.npy')
+    uref = np.load(cwd + 'data/uref.npy')
+    usplit = np.load(cwd + 'data/split.npy')
 
     err_split = np.linalg.norm(usplit.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
     err_dirk = np.linalg.norm(udirk.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
@@ -44,7 +44,7 @@ def plot_buoyancy(cwd=''):
     plt.xticks(fontsize=fs)
     plt.xlabel('x [km]', fontsize=fs, labelpad=0)
     plt.ylabel('Bouyancy', fontsize=fs, labelpad=1)
-    filename = 'boussinesq.png'
+    filename = 'data/boussinesq.png'
     plt.savefig(filename, bbox_inches='tight')
 
 

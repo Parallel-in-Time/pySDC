@@ -13,8 +13,8 @@ def test_stifflimit_specrad():
     assert np.amax(norm) < 2.210096, 'Norm is too high, got %s' % norm
 
     plot_specrad(nodes_v, lambda_f, specrad, norm)
-    assert os.path.isfile('stifflimit-specrad.png'), 'ERROR: specrad plot has not been created'
-    assert os.path.isfile('stifflimit-norm.png'), 'ERROR: norm plot has not been created'
+    assert os.path.isfile('data/stifflimit-specrad.png'), 'ERROR: specrad plot has not been created'
+    assert os.path.isfile('data/stifflimit-norm.png'), 'ERROR: norm plot has not been created'
 
 
 def test_stability():
@@ -23,7 +23,7 @@ def test_stability():
     assert np.amax(stab).imag < 0.2467791, "Imag part of max. stability too large, got %s" % stab
 
     plot_stability(lambda_s, lambda_f, num_nodes, K, stab)
-    assert os.path.isfile('stability-K3-M3.png'), 'ERROR: stability plot has not been created'
+    assert os.path.isfile('data/stability-K3-M3.png'), 'ERROR: stability plot has not been created'
 
 
 def test_stab_vs_k():
@@ -31,16 +31,16 @@ def test_stab_vs_k():
     assert np.amax(stabval) < 1.4455919, 'ERROR: stability values are too high, got %s' % stabval
 
     plot_stab_vs_k(True, mvals, kvals, stabval)
-    assert os.path.isfile('stab_vs_k_resolved.png'), 'ERROR: stability plot has not been created'
+    assert os.path.isfile('data/stab_vs_k_resolved.png'), 'ERROR: stability plot has not been created'
 
     mvals, kvals, stabval = compute_stab_vs_k(slow_resolved=False)
     assert np.amax(stabval) < 3.7252282, 'ERROR: stability values are too high, got %s' % stabval
 
     plot_stab_vs_k(False, mvals, kvals, stabval)
-    assert os.path.isfile('stab_vs_k_unresolved.png'), 'ERROR: stability plot has not been created'
+    assert os.path.isfile('data/stab_vs_k_unresolved.png'), 'ERROR: stability plot has not been created'
 
 
 def test_dispersion():
     compute_and_plot_dispersion()
-    assert os.path.isfile('phase-K3-M3.png'), 'ERROR: phase plot has not been created'
-    assert os.path.isfile('ampfactor-K3-M3.png'), 'ERROR: phase plot has not been created'
+    assert os.path.isfile('data/phase-K3-M3.png'), 'ERROR: phase plot has not been created'
+    assert os.path.isfile('data/ampfactor-K3-M3.png'), 'ERROR: phase plot has not been created'

@@ -38,6 +38,7 @@ Projects
 
    projects/parallelSDC.rst
    projects/node_failure.rst
+   projects/fwsw.rst
 
 Playgrounds
 -----------

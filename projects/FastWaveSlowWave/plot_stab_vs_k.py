@@ -123,9 +123,9 @@ def plot_stab_vs_k(slow_resolved, mvals, kvals, stabval):
     plt.gca().get_xaxis().set_major_formatter(ScalarFormatter())
     # plt.show()
     if slow_resolved:
-        filename = 'stab_vs_k_resolved.png'
+        filename = 'data/stab_vs_k_resolved.png'
     else:
-        filename = 'stab_vs_k_unresolved.png'
+        filename = 'data/stab_vs_k_unresolved.png'
 
     fig.savefig(filename, bbox_inches='tight')
 

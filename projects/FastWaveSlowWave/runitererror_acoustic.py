@@ -128,7 +128,7 @@ def compute_and_plot_itererror():
     plt.ylim([0, 1.0])
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
-    filename = 'iteration.png'
+    filename = 'data/iteration.png'
     fig.savefig(filename, bbox_inches='tight')
 
 

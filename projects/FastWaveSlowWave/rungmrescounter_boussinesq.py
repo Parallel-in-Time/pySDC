@@ -10,9 +10,12 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 
-def main():
+def main(cwd=''):
     """
+    Example running/comparing SDC and different standard integrators for the 2D Boussinesq equation
 
+    Args:
+        cwd (string): current working directory
     """
 
     num_procs = 1
@@ -131,12 +134,12 @@ def main():
     uimex = unflatten(uimex, 4, P.N[0], P.N[1])
     uref = unflatten(uref, 4, P.N[0], P.N[1])
 
-    np.save('xaxis', P.xx)
-    np.save('sdc', uend.values)
-    np.save('dirk', udirk)
-    np.save('rkimex', uimex)
-    np.save('split', usplit)
-    np.save('uref', uref)
+    np.save(cwd + 'data/xaxis', P.xx)
+    np.save(cwd + 'data/sdc', uend.values)
+    np.save(cwd + 'data/dirk', udirk)
+    np.save(cwd + 'data/rkimex', uimex)
+    np.save(cwd + 'data/split', usplit)
+    np.save(cwd + 'data/uref', uref)
 
     print("diff split  ", np.linalg.norm(uref - usplit))
     print("diff dirk   ", np.linalg.norm(uref - udirk))

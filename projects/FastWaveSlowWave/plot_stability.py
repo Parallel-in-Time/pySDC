@@ -138,7 +138,7 @@ def plot_stability(lambda_s, lambda_f, num_nodes, K, stab):
     plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
     plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
     plt.title(r'$M=%1i$, $K=%1i$' % (num_nodes, K), fontsize=fs)
-    filename = 'stability-K' + str(K) + '-M' + str(num_nodes) + '.png'
+    filename = 'data/stability-K' + str(K) + '-M' + str(num_nodes) + '.png'
     fig.savefig(filename, bbox_inches='tight')
 
 

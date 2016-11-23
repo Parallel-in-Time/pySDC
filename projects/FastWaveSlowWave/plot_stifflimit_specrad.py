@@ -128,7 +128,7 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
     plt.ylim([0, 1.0])
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
-    filename = 'stifflimit-specrad.png'
+    filename = 'data/stifflimit-specrad.png'
     fig.savefig(filename, bbox_inches='tight')
 
     fig = plt.figure()
@@ -144,7 +144,7 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
     plt.ylim([0, 2.4])
     plt.yticks(fontsize=fs)
     plt.xticks(fontsize=fs)
-    filename = 'stifflimit-norm.png'
+    filename = 'data/stifflimit-norm.png'
     fig.savefig(filename, bbox_inches='tight')
 
 

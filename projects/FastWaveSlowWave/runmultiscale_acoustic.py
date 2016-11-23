@@ -151,7 +151,7 @@ def compute_and_plot_solutions():
     fig.gca().tick_params(axis='both', labelsize=fs)
     plt.legend(loc='upper left', fontsize=fs, prop={'size': fs}, handlelength=3)
     fig.gca().grid()
-    filename = 'multiscale-K' + str(step_params['maxiter']) + '-M' + str(sweeper_params['num_nodes']) + '.png'
+    filename = 'data/multiscale-K' + str(step_params['maxiter']) + '-M' + str(sweeper_params['num_nodes']) + '.png'
     plt.gcf().savefig(filename, bbox_inches='tight')
 
 
