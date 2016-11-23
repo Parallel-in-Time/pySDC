@@ -36,7 +36,7 @@ script:
   - mkdir data
   - which nosetests
   - nosetests tests -v --with-id --with-coverage --cover-package=pySDC,tutorial --cover-inclusive --cover-html --cover-html-dir=target/doc/build/test_coverage
-  - travis-sphinx --branches=pySDC_v2,master build
+  - travis-sphinx build
 
 after_success:
     - travis-sphinx deploy
