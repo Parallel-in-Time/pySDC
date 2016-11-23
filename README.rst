@@ -1,5 +1,5 @@
-Welcome to pySDC's documentation!
-=================================
+Welcome to pySDC!
+=================
 
 The `pySDC` project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors,
 esp. the multilevel extension MLSDC and PFASST. It is intended for rapid prototyping and educational purposes.
