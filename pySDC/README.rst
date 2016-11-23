@@ -13,5 +13,5 @@ The API (as well as the tutorial pages) can also be generated manually and local
    > nosetests tests -v --with-id --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
    > travis-sphinx build
 
-in the root directory. Then, the main index can be found in `` target/doc/build/index.html``. Anyway, here is the online version:
+in the root directory. Then, the main index can be found in ``target/doc/build/index.html``. Anyway, here is the online version:
 
