@@ -35,6 +35,7 @@ On November 24, 2016, we released version 2 of `pySDC`. This release contains ma
 - **Testing and documentation** The core, implementations and plugin packages and their subpackages are fully documented using sphinx-apidoc, see below.
   This documentation as well as this website are generated automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_.
   Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.
+  Travis-CI reports: |badge|
   Test coverage results can be found `here <test_coverage/index.html>`_.
 
 - Further, minor changes:
@@ -78,6 +79,12 @@ Projects
    projects/node_failure.rst
    projects/fwsw.rst
 
+Tests
+-----
+
+.. include:: ../../tests/README.rst
+
+
 API documentation
 -----------------
 
@@ -98,5 +105,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Also, see `test coverage results <test_coverage/index.html>`_.
 
