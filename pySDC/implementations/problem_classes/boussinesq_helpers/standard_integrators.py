@@ -175,7 +175,7 @@ class rk_imex:
             rhs = np.copy(u0)
             for j in range(0, i):
                 rhs += dt * self.A_hat[i, j] * (self.f_slow(self.stages[j, :])) + \
-                       dt * self.A[i, j] * (self.f_fast(self.stages[j, :]))
+                    dt * self.A[i, j] * (self.f_fast(self.stages[j, :]))
 
             # Solve for stage i
             if self.A[i, i] == 0:
@@ -187,7 +187,7 @@ class rk_imex:
         # Update
         for i in range(0, self.nstages):
             u0 += dt * self.b_hat[i] * (self.f_slow(self.stages[i, :])) + \
-                  dt * self.b[i] * (self.f_fast(self.stages[i, :]))
+                dt * self.b[i] * (self.f_fast(self.stages[i, :]))
 
         return u0
 
