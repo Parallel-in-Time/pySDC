@@ -35,7 +35,7 @@ script:
   - ./docs/update_apidocs.sh
   - mkdir data
   - which nosetests
-  - nosetests tests -v --with-id --with-coverage --cover-package=pySDC,tutorial --cover-inclusive --cover-html --cover-html-dir=target/doc/build/test_coverage
+  - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
   - travis-sphinx build
 
 after_success:
