@@ -18,14 +18,20 @@ def plot_buoyancy(cwd=''):
     uref = np.load(cwd + 'uref.npy')
     usplit = np.load(cwd + 'split.npy')
 
-    print("Estimated discretisation error split explicit:  %5.3e" %
-          (np.linalg.norm(usplit.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)))
-    print("Estimated discretisation error of DIRK: %5.3e" %
-          (np.linalg.norm(udirk.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)))
-    print("Estimated discretisation error of RK-IMEX:  %5.3e" %
-          (np.linalg.norm(uimex.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)))
-    print("Estimated discretisation error of SDC:  %5.3e" %
-          (np.linalg.norm(uend.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)))
+    err_split = np.linalg.norm(usplit.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
+    err_dirk = np.linalg.norm(udirk.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
+    err_imex = np.linalg.norm(uimex.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
+    err_sdc = np.linalg.norm(uend.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
+
+    assert err_split < 4.821E-02, 'ERROR: split error is too high, got %s' % err_split
+    assert err_dirk < 1.495e-01, 'ERROR: dirk error is too high, got %s' % err_dirk
+    assert err_imex < 1.305e-01, 'ERROR: imex error is too high, got %s' % err_imex
+    assert err_sdc < 9.548e-02, 'ERROR: sdc error is too high, got %s' % err_sdc
+
+    print("Estimated discretisation error split explicit:  %5.3e" % err_split)
+    print("Estimated discretisation error of DIRK: %5.3e" % err_dirk)
+    print("Estimated discretisation error of RK-IMEX:  %5.3e" % err_imex)
+    print("Estimated discretisation error of SDC:  %5.3e" % err_sdc)
 
     fs = 8
     rcParams['figure.figsize'] = 5.0, 2.5
