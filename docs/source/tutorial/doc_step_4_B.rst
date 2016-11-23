@@ -1,4 +1,4 @@
-Full code: `tutorial/step_4/B_multilevel_hierarchy.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_4/B_multilevel_hierarchy.py>`_
+Full code: `tutorial/step_4/B_multilevel_hierarchy.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_4/B_multilevel_hierarchy.py>`_
 
 .. literalinclude:: ../../../tutorial/step_4/B_multilevel_hierarchy.py
 

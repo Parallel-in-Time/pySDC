@@ -1,4 +1,4 @@
-Full code: `tutorial/step_2/B_my_first_sweeper.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_2/B_my_first_sweeper.py>`_
+Full code: `tutorial/step_2/B_my_first_sweeper.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_2/B_my_first_sweeper.py>`_
 
 .. literalinclude:: ../../../tutorial/step_2/B_my_first_sweeper.py
 

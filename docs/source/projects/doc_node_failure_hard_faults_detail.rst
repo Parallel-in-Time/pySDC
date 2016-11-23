@@ -1,4 +1,4 @@
-Full code: `projects/node_failure/hard_faults_detail.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/projects/node_failure/hard_faults_detail.py>`_
+Full code: `projects/node_failure/hard_faults_detail.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/node_failure/hard_faults_detail.py>`_
 
 .. literalinclude:: ../../../projects/node_failure/hard_faults_detail.py
 

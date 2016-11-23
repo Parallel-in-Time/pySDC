@@ -1,4 +1,4 @@
-Full code: `tutorial/step_6/B_odd_temporal_distribution.py <https://github.com/Parallel-in-Time/pySDC/blob/pySDC_v2/tutorial/step_6/B_odd_temporal_distribution.py>`_
+Full code: `tutorial/step_6/B_odd_temporal_distribution.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_6/B_odd_temporal_distribution.py>`_
 
 .. literalinclude:: ../../../tutorial/step_6/B_odd_temporal_distribution.py
 
