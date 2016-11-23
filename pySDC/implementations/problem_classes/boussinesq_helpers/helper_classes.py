@@ -2,6 +2,7 @@ class logging(object):
     def __init__(self):
         self.solver_calls = 0
         self.iterations = 0
+        self.nsmall = 0
 
     def add(self, iterations):
         self.solver_calls += 1

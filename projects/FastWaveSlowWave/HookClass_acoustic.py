@@ -14,7 +14,8 @@ class dump_energy(hooks):
 
     def post_step(self, step, level_number):
         """
-        Default routine called after each iteration
+        Default routine called after each iteration, compute and dump energy
+
         Args:
             step: the current step
             level_number: the current level number

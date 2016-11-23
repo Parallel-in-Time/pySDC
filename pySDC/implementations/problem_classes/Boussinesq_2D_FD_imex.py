@@ -36,23 +36,23 @@ class boussinesq_2d_imex(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(boussinesq_2d_imex, self).__init__(self.nvars, dtype_u, dtype_f, problem_params)
+        super(boussinesq_2d_imex, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
-        self.N = [self.nvars[1], self.nvars[2]]
+        self.N = [self.params.nvars[1], self.params.nvars[2]]
 
         self.bc_hor = [['periodic', 'periodic'], ['periodic', 'periodic'], ['periodic', 'periodic'],
                        ['periodic', 'periodic']]
         self.bc_ver = [['neumann', 'neumann'], ['dirichlet', 'dirichlet'], ['dirichlet', 'dirichlet'],
                        ['neumann', 'neumann']]
 
-        self.xx, self.zz, self.h = get2DMesh(self.N, self.x_bounds, self.z_bounds, self.bc_hor[0], self.bc_ver[0])
+        self.xx, self.zz, self.h = get2DMesh(self.N, self.params.x_bounds, self.params.z_bounds,
+                                             self.bc_hor[0], self.bc_ver[0])
 
-        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.c_s, self.Nfreq,
-                                                self.order)
-        self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.u_adv, self.order_upw)
+        self.Id, self.M = getBoussinesq2DMatrix(self.N, self.h, self.bc_hor, self.bc_ver, self.params.c_s,
+                                                self.params.Nfreq, self.params.order)
+        self.D_upwind = getBoussinesq2DUpwindMatrix(self.N, self.h[0], self.params.u_adv, self.params.order_upw)
 
         self.gmres_logger = logging()
-        self.gmres_tol = None
 
     def solve_system(self, rhs, factor, u0, t):
         """
