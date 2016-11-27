@@ -96,8 +96,7 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         tcks = []
         for i in range(self.num_nodes):
             tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
-            print(tcks[-1])
-        exit()
+
         weights = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
             weights[i] = quad(tcks[i], a, b, epsabs=1e-14)[0]
