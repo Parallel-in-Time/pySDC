@@ -6,7 +6,6 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
 from playgrounds.RDC.equidistant_RDC import Equidistant_RDC
-# from playgrounds.RDC.HookClass_error import dump_error
 
 
 def main():
@@ -15,7 +14,7 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-99
+    level_params['restol'] = 0
     level_params['dt'] = 10.0/40.0
 
     # initialize sweeper parameters
@@ -33,6 +32,7 @@ def main():
 
     # initialize step parameters
     step_params = dict()
+    step_params['maxiter'] = None
 
     # initialize controller parameters
     controller_params = dict()
@@ -47,10 +47,19 @@ def main():
     description['sweeper_class'] = generic_implicit
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller_rdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
+                                                 description=description)
 
     # set time parameters
     t0 = 0.0
     Tend = 10.0
+
+    # get initial values on finest level
+    P = controller_rdc.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
     ref_sol = np.load('vdp_ref.npy')
 
@@ -58,22 +67,14 @@ def main():
 
     for maxiter in maxiter_list:
 
-        step_params['maxiter'] = maxiter
-        description['step_params'] = step_params
-
-        # instantiate the controller
-        controller_rdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                     description=description)
-
-        # get initial values on finest level
-        P = controller_rdc.MS[0].levels[0].prob
-        uinit = P.u_exact(t0)
+        # ugly, but much faster than re-initializing the controller over and over again
+        controller_rdc.MS[0].params.maxiter = maxiter
 
         # call main function to get things done...
         uend_rdc, stats_rdc = controller_rdc.run(u0=uinit, t0=t0, Tend=Tend)
 
-        err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf)/np.linalg.norm(ref_sol, np.inf)
-        print('Maxiter = %2i -- Error: %8.4e' % (maxiter, err))
+        err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+        print('Maxiter = %2i -- Error: %8.4e' % (controller_rdc.MS[0].params.maxiter, err))
 
 
 if __name__ == "__main__":

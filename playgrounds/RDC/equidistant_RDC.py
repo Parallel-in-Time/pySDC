@@ -39,7 +39,7 @@ class Equidistant_RDC(Equidistant):
         self.order = self.num_nodes
         self.nodes = self._getNodes
 
-        d = min(self.num_nodes - 1, 5)
+        d = min(self.num_nodes - 1, 15)
         self.fh_weights = self._getFHWeights(d)
         self.weights = self._getWeights(tleft, tright)
 
