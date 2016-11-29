@@ -1,12 +1,10 @@
 import numpy as np
 
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-
-from playgrounds.RDC.equidistant_RDC import Equidistant_RDC
-# from playgrounds.RDC.HookClass_error import dump_error
 
 
 def main():
@@ -15,13 +13,13 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-99
-    level_params['dt'] = 10.0/40.0
+    level_params['restol'] = 1E-12
+    level_params['dt'] = 10.0/2000.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = Equidistant_RDC
-    sweeper_params['num_nodes'] = 41
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'IE'
 
     # initialize problem parameters
@@ -33,10 +31,11 @@ def main():
 
     # initialize step parameters
     step_params = dict()
+    step_params['maxiter'] = 50
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -47,33 +46,22 @@ def main():
     description['sweeper_class'] = generic_implicit
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
+    description['step_params'] = step_params
+
+    # instantiate the controller
+    controller_ref = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
     t0 = 0.0
     Tend = 10.0
 
-    ref_sol = np.load('vdp_ref.npy')
+    # get initial values on finest level
+    P = controller_ref.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-    maxiter_list = range(1, 11)
+    uend_ref, stats_ref = controller_ref.run(u0=uinit, t0=t0, Tend=Tend)
 
-    for maxiter in maxiter_list:
-
-        step_params['maxiter'] = maxiter
-        description['step_params'] = step_params
-
-        # instantiate the controller
-        controller_rdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                     description=description)
-
-        # get initial values on finest level
-        P = controller_rdc.MS[0].levels[0].prob
-        uinit = P.u_exact(t0)
-
-        # call main function to get things done...
-        uend_rdc, stats_rdc = controller_rdc.run(u0=uinit, t0=t0, Tend=Tend)
-
-        err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf)/np.linalg.norm(ref_sol, np.inf)
-        print('Maxiter = %2i -- Error: %8.4e' % (maxiter, err))
+    np.save('vdp_ref.npy', uend_ref.values)
 
 
 if __name__ == "__main__":
