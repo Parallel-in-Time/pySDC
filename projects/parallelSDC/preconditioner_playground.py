@@ -40,7 +40,7 @@ def main():
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'PIC']
+    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
     setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
                   ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
                   ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
