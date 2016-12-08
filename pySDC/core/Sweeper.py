@@ -90,7 +90,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             QDmat = np.zeros(coll.Qmat.shape)
         elif qd_type == 'MIN':
             m = QDmat.shape[0] - 1
-            x0 = 10*np.ones(m)
+            x0 = 10 * np.ones(m)
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
         else:
