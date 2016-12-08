@@ -44,7 +44,7 @@ class vanderpol(ptype):
         # thou shall not call this at time > 0
 
         me = self.dtype_u(2)
-        me.values = self.params.u0
+        me.values[:] = self.params.u0[:]
         return me
 
     def eval_f(self, u, t):
