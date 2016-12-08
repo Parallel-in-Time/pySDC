@@ -1,12 +1,4 @@
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pylab as plt
-
 import numpy as np
-import pickle
-import os
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
@@ -20,9 +12,15 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from projects.RDC.equidistant_RDC import Equidistant_RDC
 
 
-def compute_RDC_errors():
+def run_RDC(cwd=''):
     """
-    Van der Pol's oscillator with RDC
+    Van der Pol's oscillator with RDC, MLRDC and PFASST
+
+    Args:
+        cwd (string): current working directory
+
+    Returns:
+        list: list of errors and mean number of iterations (for testing)
     """
 
     # set time parameters
@@ -37,8 +35,8 @@ def compute_RDC_errors():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = Equidistant_RDC
-    sweeper_params['num_nodes'] = 10
-    sweeper_params['QI'] = ''
+    sweeper_params['num_nodes'] = 20
+    sweeper_params['QI'] = 'IE'
 
     # initialize problem parameters
     problem_params = dict()
@@ -56,6 +54,7 @@ def compute_RDC_errors():
     controller_params['logger_level'] = 50
 
     base_transfer_params = dict()
+    # base_transfer_params['finter'] = True
     # base_transfer_params['coll_iorder'] = 2
     # base_transfer_params['coll_rorder'] = 2
 
@@ -72,7 +71,8 @@ def compute_RDC_errors():
     description['space_transfer_class'] = mesh_to_mesh
     description['base_transfer_params'] = base_transfer_params
 
-    ref_sol = np.load('data/vdp_ref.npy')
+    results = []
+    ref_sol = np.load(cwd + 'data/vdp_ref.npy')
 
     # instantiate the controller
     controller_rdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
@@ -92,11 +92,12 @@ def compute_RDC_errors():
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
-    print('RDC: Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    print('RDC      : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    results.append((err, mean_niter))
 
     sweeper_params['num_nodes'] = [sweeper_params['num_nodes'], 2]
     controller_mlrdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                 description=description)
+                                                   description=description)
 
     uend_mlrdc, stats_mlrdc = controller_mlrdc.run(u0=uinit, t0=t0, Tend=Tend)
 
@@ -107,7 +108,8 @@ def compute_RDC_errors():
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_mlrdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
-    print('MLRDC: Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    print('MLRDC     : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    results.append((err, mean_niter))
 
     controller_mlrdc = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params,
                                                    description=description)
@@ -121,8 +123,10 @@ def compute_RDC_errors():
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_pfasst.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
-    print('PFASST: Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    print('PFASST(10): Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    results.append((err, mean_niter))
 
+    return results
 
 if __name__ == "__main__":
-    compute_RDC_errors()
+    results = run_RDC()
