@@ -24,7 +24,7 @@ def compute_RDC_errors():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 0
-    level_params['dt'] = 10.0/40.0
+    level_params['dt'] = 10.0 / 40.0
 
     # initialize sweeper parameters
     sweeper_params = dict()

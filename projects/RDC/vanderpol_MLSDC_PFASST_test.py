@@ -92,7 +92,7 @@ def run_RDC(cwd=''):
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
-    print('RDC      : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
+    print('RDC       : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
     sweeper_params['num_nodes'] = [sweeper_params['num_nodes'], 2]
