@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 
 from pySDC.implementations.collocation_classes.equidistant import Equidistant
-from pySDC.core.Collocation import CollocationError
+from pySDC.core.Errors import CollocationError, ParameterError
 
 from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator
@@ -30,19 +30,35 @@ class Equidistant_RDC(Equidistant):
         Initialization
 
         Args:
-            num_nodes (int): number of nodes
+            num_nodes: number of nodes
             tleft (float): left interval boundary (usually 0)
             tright (float): right interval boundary (usually 1)
         """
-        if num_nodes < 1:
+
+        if type(num_nodes) is int:
+            max_d = 15
+            nnodes = num_nodes
+        else:
+            if type(num_nodes) is not tuple:
+                raise ParameterError('Expecting int or tuple for num_nodes parameter, got %s' %type(num_nodes))
+            if len(num_nodes) != 2:
+                raise ParameterError('Expecting 1 or 2 arguments for num_nodes, got %s' % num_nodes)
+            if type(num_nodes[0]) is not int:
+                raise ParameterError('Expecting int type for first num_nodes argument, got %s' % type(num_nodes[0]))
+            if type(num_nodes[1]) is not int:
+                raise ParameterError('Expecting int type for second num_nodes argument, got %s' % type(num_nodes[1]))
+            max_d = num_nodes[1]
+            nnodes = num_nodes[0]
+
+        if nnodes < 1:
             raise CollocationError("Number of nodes should be at least 1 for equidistant, but is %d" % num_nodes)
 
-        super(Equidistant, self).__init__(num_nodes, tleft, tright)
+        super(Equidistant, self).__init__(nnodes, tleft, tright)
 
         self.order = self.num_nodes
         self.nodes = self._getNodes
 
-        d = min(self.num_nodes - 1, 15)
+        d = min(self.num_nodes - 1, max_d)
         self.fh_weights = self._getFHWeights(d)
         self.weights = self._getWeights(tleft, tright)
 
