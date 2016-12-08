@@ -40,7 +40,7 @@ class Equidistant_RDC(Equidistant):
             nnodes = num_nodes
         else:
             if type(num_nodes) is not tuple:
-                raise ParameterError('Expecting int or tuple for num_nodes parameter, got %s' %type(num_nodes))
+                raise ParameterError('Expecting int or tuple for num_nodes parameter, got %s' % type(num_nodes))
             if len(num_nodes) != 2:
                 raise ParameterError('Expecting 1 or 2 arguments for num_nodes, got %s' % num_nodes)
             if type(num_nodes[0]) is not int:
@@ -50,8 +50,8 @@ class Equidistant_RDC(Equidistant):
             max_d = num_nodes[1]
             nnodes = num_nodes[0]
 
-        if nnodes < 1:
-            raise CollocationError("Number of nodes should be at least 1 for equidistant, but is %d" % num_nodes)
+        if nnodes < 2:
+            raise CollocationError("Number of nodes should be at least 2 for equidistant, but is %d" % num_nodes)
 
         super(Equidistant, self).__init__(nnodes, tleft, tright)
 
@@ -67,20 +67,6 @@ class Equidistant_RDC(Equidistant):
         self.delta_m = self._gen_deltas
         self.left_is_node = True
         self.right_is_node = True
-
-    @property
-    def _getNodes(self):
-        """
-        Computes integration nodes with both boundaries included
-
-        Returns:
-            np.ndarray: array of equidistant nodes
-        """
-        M = self.num_nodes
-        a = self.tleft
-        b = self.tright
-        nodes = np.linspace(a, b, M)
-        return nodes
 
     def _getFHWeights(self, d):
         """
