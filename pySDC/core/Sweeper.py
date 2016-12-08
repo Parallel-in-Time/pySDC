@@ -3,6 +3,7 @@ from future.utils import with_metaclass
 import logging
 import numpy as np
 import scipy.linalg
+import scipy.optimize as opt
 
 from pySDC.core.Level import level
 from pySDC.helpers.pysdc_helper import FrozenClass
@@ -66,6 +67,10 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         self.coll = coll
 
     def get_Qdelta_implicit(self, coll, qd_type):
+
+        def rho(x):
+            return max(abs(np.linalg.eigvals(np.eye(m) - np.diag([x[i] for i in range(m)]).dot(coll.Qmat[1:, 1:]))))
+
         QDmat = np.zeros(coll.Qmat.shape)
         if qd_type == 'LU':
             QT = coll.Qmat[1:, 1:].T
@@ -83,9 +88,13 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             QDmat = np.tril(coll.Qmat)
         elif qd_type == 'PIC':
             QDmat = np.zeros(coll.Qmat.shape)
+        elif qd_type == 'MIN':
+            m = QDmat.shape[0] - 1
+            x0 = 10*np.ones(m)
+            d = opt.minimize(rho, x0, method='Nelder-Mead')
+            QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
         else:
             raise NotImplementedError('qd_type implicit not implemented')
-
         # check if we got not more than a lower triangular matrix
         np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape),
                                       err_msg='Lower triangular matrix expected!')
