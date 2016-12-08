@@ -105,7 +105,7 @@ def plot_RDC_results(cwd=''):
     """
 
     file = open(cwd + 'data/vdp_results.pkl', 'rb')
-    results = pickle.load(file)
+    results = pickle.load(file, encoding='latin-1')
     file.close()
 
     # retrieve the list of nvars from results

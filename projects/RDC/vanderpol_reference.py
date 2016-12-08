@@ -19,7 +19,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = (Tend-t0)/2000.0
+    level_params['dt'] = (Tend - t0) / 2000.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
