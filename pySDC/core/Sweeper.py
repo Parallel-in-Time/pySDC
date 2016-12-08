@@ -67,6 +67,10 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         self.coll = coll
 
     def get_Qdelta_implicit(self, coll, qd_type):
+
+        def rho(x):
+            return max(abs(np.linalg.eigvals(np.eye(m) - np.diag([x[i] for i in range(m)]).dot(coll.Qmat[1:, 1:]))))
+
         QDmat = np.zeros(coll.Qmat.shape)
         if qd_type == 'LU':
             QT = coll.Qmat[1:, 1:].T
@@ -87,9 +91,8 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         elif qd_type == 'MIN':
             m = QDmat.shape[0] - 1
             x0 = 10*np.ones(m)
-            rho = lambda x: max(abs(np.linalg.eigvals(np.eye(m) - np.diag([x[i] for i in range(m)]).dot(coll.Qmat[1:,1:]))))
             d = opt.minimize(rho, x0, method='Nelder-Mead')
-            QDmat[1:,1:] = np.linalg.inv(np.diag(d.x))
+            QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
         else:
             raise NotImplementedError('qd_type implicit not implemented')
         # check if we got not more than a lower triangular matrix
