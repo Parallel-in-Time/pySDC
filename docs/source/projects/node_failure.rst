@@ -1,1 +1,1 @@
-.. include:: /../../projects/FastWaveSlowWave/README.rst
+.. include:: /../../projects/node_failure/README.rst
