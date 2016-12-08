@@ -9,6 +9,9 @@ from scipy.interpolate import BarycentricInterpolator
 
 
 class MyBarycentricInterpolator(BarycentricInterpolator):
+    """
+    Overwrite BarycentricInterolator to inject custom weights
+    """
     def __init__(self, xi, yi=None, weights=None, axis=0):
         super(MyBarycentricInterpolator, self).__init__(xi, yi, axis)
         self.wi = weights
@@ -99,7 +102,7 @@ class Equidistant_RDC(Equidistant):
 
     def _getWeights(self, a, b):
         """
-        Computes weights using barycentric interpolation
+        Computes weights using custom barycentric interpolation
 
         Args:
             a (float): left interval boundary
@@ -115,6 +118,7 @@ class Equidistant_RDC(Equidistant):
         circ_one[0] = 1.0
         tcks = []
         for i in range(self.num_nodes):
+            # This is where the custom BarycentricInterpolator is called
             tcks.append(MyBarycentricInterpolator(self.nodes, np.roll(circ_one, i), self.fh_weights))
 
         weights = np.zeros(self.num_nodes)

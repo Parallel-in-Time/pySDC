@@ -9,12 +9,17 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 
 def main():
     """
-    Van der Pol's oscillator inc. visualization
+    Van der Pol's oscillator reference solution
     """
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 10.0
+
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = 10.0/2000.0
+    level_params['dt'] = (Tend-t0)/2000.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -49,11 +54,8 @@ def main():
     description['step_params'] = step_params
 
     # instantiate the controller
-    controller_ref = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
-
-    # set time parameters
-    t0 = 0.0
-    Tend = 10.0
+    controller_ref = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
+                                                 description=description)
 
     # get initial values on finest level
     P = controller_ref.MS[0].levels[0].prob
@@ -61,7 +63,7 @@ def main():
 
     uend_ref, stats_ref = controller_ref.run(u0=uinit, t0=t0, Tend=Tend)
 
-    np.save('vdp_ref.npy', uend_ref.values)
+    np.save('data/vdp_ref.npy', uend_ref.values)
 
 
 if __name__ == "__main__":

@@ -1,17 +1,26 @@
+import matplotlib
+
+matplotlib.use('Agg')
+
+import matplotlib.pylab as plt
+
 import numpy as np
+import pickle
+import os
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from playgrounds.RDC.equidistant_RDC import Equidistant_RDC
+from projects.RDC.equidistant_RDC import Equidistant_RDC
 
 
-def main():
+def compute_RDC_errors():
     """
-    Van der Pol's oscillator inc. visualization
+    Van der Pol's oscillator with RDC
     """
+
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 0
@@ -61,9 +70,11 @@ def main():
     P = controller_rdc.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    ref_sol = np.load('vdp_ref.npy')
+    ref_sol = np.load('data/vdp_ref.npy')
 
     maxiter_list = range(1, 11)
+    results = dict()
+    results['maxiter_list'] = maxiter_list
 
     for maxiter in maxiter_list:
 
@@ -75,7 +86,75 @@ def main():
 
         err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
         print('Maxiter = %2i -- Error: %8.4e' % (controller_rdc.MS[0].params.maxiter, err))
+        results[maxiter] = err
+
+    fname = 'data/vdp_results.pkl'
+    file = open(fname, 'wb')
+    pickle.dump(results, file)
+    file.close()
+
+    assert os.path.isfile(fname), 'ERROR: pickle did not create file'
+
+
+def plot_RDC_results(cwd=''):
+    """
+    Routine to visualize the errors
+
+    Args:
+        cwd (string): current working directory
+    """
+
+    file = open(cwd + 'data/vdp_results.pkl', 'rb')
+    results = pickle.load(file)
+    file.close()
+
+    # retrieve the list of nvars from results
+    assert 'maxiter_list' in results, 'ERROR: expecting the list of maxiters in the results dictionary'
+    maxiter_list = sorted(results['maxiter_list'])
+
+    # Set up plotting parameters
+    params = {'legend.fontsize': 20,
+              'figure.figsize': (12, 8),
+              'axes.labelsize': 20,
+              'axes.titlesize': 20,
+              'xtick.labelsize': 16,
+              'ytick.labelsize': 16,
+              'lines.linewidth': 3
+              }
+    plt.rcParams.update(params)
+
+    # create new figure
+    plt.figure()
+    # take x-axis limits from nvars_list + some spacning left and right
+    plt.xlim([min(maxiter_list) - 1, max(maxiter_list) + 1])
+    plt.xlabel('maxiter')
+    plt.ylabel('rel. error')
+    plt.grid()
+
+    min_err = 1E99
+    max_err = 0E00
+    err_list = []
+    # loop over nvars, get errors and find min/max error for y-axis limits
+    for maxiter in maxiter_list:
+        err = results[maxiter]
+        min_err = min(err, min_err)
+        max_err = max(err, max_err)
+        err_list.append(err)
+    plt.semilogy(maxiter_list, err_list, ls='-', marker='o', markersize=10, label='RDC')
+
+    # adjust y-axis limits, add legend
+    plt.ylim([min_err / 10, max_err * 10])
+    plt.legend(loc=1, ncol=1, numpoints=1)
+
+    # plt.show()
+
+    # save plot as PNG, beautify
+    fname = 'RDC_errors_vdp.png'
+    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+
+    return None
 
 
 if __name__ == "__main__":
-    main()
+    compute_RDC_errors()
+    plot_RDC_results()
