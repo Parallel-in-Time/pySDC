@@ -67,8 +67,13 @@ class mesh_to_mesh(space_transfer):
                     fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
                     coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
 
-                self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
-                                                               periodic=self.params.periodic).T
+                if self.params.rorder <= 1:
+                    self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
+                                                           periodic=self.params.periodic)
+                else:
+                    self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
+                                                                   periodic=self.params.periodic).T
+
                 self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                          periodic=self.params.periodic)
 
@@ -96,8 +101,12 @@ class mesh_to_mesh(space_transfer):
                         coarse_grid = np.array(
                             [j * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
 
-                    Rspace.append(0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
-                                                                   periodic=self.params.periodic).T)
+                    if self.params.iorder <= 1:
+                        Rspace.append(th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
+                                                               periodic=self.params.periodic).T)
+                    else:
+                        Rspace.append(0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
+                                                                       periodic=self.params.periodic).T)
                     Pspace.append(th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
                                                              periodic=self.params.periodic))
 
