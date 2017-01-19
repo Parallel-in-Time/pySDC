@@ -65,6 +65,54 @@ def check_Q_transfer(collclass):
                     assert err_restr < 2E-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
                 else:
                     assert err_inter > 2E-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
-                    # if Mfine != 5 and Mfine != 3:
-                    #     assert err_restr > 2E-15, "ERROR: Q-restriction order is higher than expected, got %s" % polyorder
 
+
+@nose.tools.with_setup(setup)
+def test_Q_transfer_minimal():
+    for collclass in classes:
+        yield check_Q_transfer_minimal, collclass
+
+def check_Q_transfer_minimal(collclass):
+    """
+    A simple test program to check the order of the Q interpolation/restriction for only 2 coarse nodes
+    """
+
+    Mcoarse = 2
+    coll_coarse = collclass(Mcoarse, 0, 1)
+
+    for M in range(3, 9):
+
+        Mfine = M
+
+        coll_fine = collclass(Mfine, 0, 1)
+
+        assert coll_fine.left_is_node == coll_coarse.left_is_node, 'ERROR: should be using the same class for coarse and fine Q'
+
+        if not coll_fine.left_is_node:
+            fine_grid = np.concatenate(([0], coll_fine.nodes))
+            coarse_grid = np.concatenate(([0], coll_coarse.nodes))
+        else:
+            fine_grid = coll_fine.nodes
+            coarse_grid = coll_coarse.nodes
+
+        Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=2, pad=0)
+        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=2, pad=0)
+
+        for polyorder in range(1,3):
+            coeff = np.random.rand(polyorder)
+            ufine = polyval(fine_grid,coeff)
+            ucoarse = polyval(coarse_grid,coeff)
+
+            uinter = Pcoll.dot(ucoarse)
+            urestr = Rcoll.dot(ufine)
+
+            err_inter = np.linalg.norm(uinter-ufine, np.inf)
+            err_restr = np.linalg.norm(urestr-ucoarse, np.inf)
+
+            print(M, Mcoarse, 2, err_inter)
+
+            if polyorder <= 2:
+                assert err_inter < 2E-15, "ERROR: Q-interpolation order is not reached, got %s" %err_inter
+                assert err_restr < 2E-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
+            else:
+                assert err_inter > 2E-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
