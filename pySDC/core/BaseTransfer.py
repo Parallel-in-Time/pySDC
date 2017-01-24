@@ -70,7 +70,7 @@ class base_transfer(object):
         # pad transfer matrices if necessary
         if self.fine.sweep.coll.left_is_node:
             self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))
-            self.Rcoll = self.Pcoll.T
+            self.Rcoll = np.zeros((self.coarse.sweep.coll.num_nodes + 1, self.fine.sweep.coll.num_nodes + 1))
             self.Pcoll[1:, 1:] = Pcoll
             self.Rcoll[1:, 1:] = Rcoll
         else:
@@ -110,7 +110,8 @@ class base_transfer(object):
             tmp_u.append(self.space_transfer.restrict(F.u[m]))
 
         # restrict collocation values
-        for n in range(0, SG.coll.num_nodes + 1):
+        G.u[0] = tmp_u[0]
+        for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes + 1):
                 G.u[n] += self.Rcoll[n, m] * tmp_u[m]
@@ -200,7 +201,8 @@ class base_transfer(object):
             tmp_u.append(self.space_transfer.prolong(G.u[m] - G.uold[m]))
 
         # interpolate values in collocation
-        for n in range(0, SF.coll.num_nodes + 1):
+        F.u[0] += tmp_u[0]
+        for n in range(1, SF.coll.num_nodes + 1):
             for m in range(0, SG.coll.num_nodes + 1):
                 F.u[n] += self.Pcoll[n, m] * tmp_u[m]
 
@@ -245,7 +247,9 @@ class base_transfer(object):
             tmp_f.append(self.space_transfer.prolong(G.f[m] - G.fold[m]))
 
         # interpolate values in collocation
-        for n in range(0, SF.coll.num_nodes + 1):
+        F.u[0] += tmp_u[0]
+        F.f[0] += tmp_f[0]
+        for n in range(1, SF.coll.num_nodes + 1):
             for m in range(0, SG.coll.num_nodes + 1):
                 F.u[n] += self.Pcoll[n, m] * tmp_u[m]
                 F.f[n] += self.Pcoll[n, m] * tmp_f[m]

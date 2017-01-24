@@ -8,7 +8,6 @@ from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
-
 from projects.RDC.equidistant_RDC import Equidistant_RDC
 
 
@@ -95,7 +94,7 @@ def run_RDC(cwd=''):
     print('RDC       : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
-    sweeper_params['num_nodes'] = [sweeper_params['num_nodes'], 2]
+    sweeper_params['num_nodes'] = [sweeper_params['num_nodes'], 10]
     controller_mlrdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
                                                    description=description)
 
@@ -111,10 +110,10 @@ def run_RDC(cwd=''):
     print('MLRDC     : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
-    controller_mlrdc = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params,
-                                                   description=description)
+    controller_pfasst = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params,
+                                                    description=description)
 
-    uend_pfasst, stats_pfasst = controller_mlrdc.run(u0=uinit, t0=t0, Tend=Tend)
+    uend_pfasst, stats_pfasst = controller_pfasst.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats_pfasst, type='niter')
