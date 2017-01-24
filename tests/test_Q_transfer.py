@@ -109,8 +109,6 @@ def check_Q_transfer_minimal(collclass):
             err_inter = np.linalg.norm(uinter-ufine, np.inf)
             err_restr = np.linalg.norm(urestr-ucoarse, np.inf)
 
-            print(M, Mcoarse, 2, err_inter)
-
             if polyorder <= 2:
                 assert err_inter < 2E-15, "ERROR: Q-interpolation order is not reached, got %s" %err_inter
                 assert err_restr < 2E-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
