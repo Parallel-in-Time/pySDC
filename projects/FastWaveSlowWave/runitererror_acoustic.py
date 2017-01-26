@@ -50,6 +50,7 @@ def compute_and_plot_itererror():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['hook_class'] = dump_energy
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -57,7 +58,6 @@ def compute_and_plot_itererror():
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
-    description['hook_class'] = dump_energy
     description['step_params'] = step_params
     description['level_params'] = level_params
 

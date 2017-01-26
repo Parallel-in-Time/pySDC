@@ -43,6 +43,7 @@ def main(cwd=''):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
+    controller_params['hook_class'] = gmres_tolerance
 
     # initialize problem parameters
     problem_params = dict()
@@ -69,7 +70,6 @@ def main(cwd=''):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    description['hook_class'] = gmres_tolerance
 
     # ORDER OF DIRK/IMEX EQUAL TO NUMBER OF SDC ITERATIONS AND THUS SDC ORDER
     dirk_order = step_params['maxiter']

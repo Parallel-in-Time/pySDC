@@ -53,6 +53,7 @@ def compute_and_plot_solutions():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['hook_class'] = dump_energy
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -62,7 +63,6 @@ def compute_and_plot_solutions():
     description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params
-    description['hook_class'] = dump_energy
     description['step_params'] = step_params
     description['level_params'] = level_params
 
