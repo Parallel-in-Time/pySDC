@@ -48,6 +48,7 @@ def compute_convergence_data(cwd=''):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['hook_class'] = dump_energy
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -56,7 +57,6 @@ def compute_convergence_data(cwd=''):
     description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params
-    description['hook_class'] = dump_energy
 
     nsteps = np.zeros((3, 9))
     nsteps[0, :] = [20, 30, 40, 50, 60, 70, 80, 90, 100]
