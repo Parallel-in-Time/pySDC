@@ -118,7 +118,7 @@ def main():
         f.write('\n')
         print()
 
-        assert err < 3.68578e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
+        assert err < 3.686e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
         assert np.mean(niters) == 7.5, 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
 
     f.close()
