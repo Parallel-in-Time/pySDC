@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import pickle
@@ -63,25 +64,18 @@ def main():
     Tend = 0.1
 
     sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel, linearized_implicit_fixed_parallel_prec]
-    dt_list = [Tend/2**i for i in range(1,5)]
+    dt_list = [Tend / 2 ** i for i in range(1, 5)]
 
     results = dict()
     results['sweeper_list'] = [sweeper.__name__ for sweeper in sweeper_list]
     results['dt_list'] = dt_list
-
-    # f = open('parallelSDC_nonlinear_out.txt', 'w')
-    # uinit = None
-    # uex = None
-    # uend = None
-    # P = None
 
     # loop over the different sweepers and check results
     for sweeper in sweeper_list:
         description['sweeper_class'] = sweeper
         error_reduction = []
         for dt in dt_list:
-
-            print('Working with sweeper %s and dt = %s...' %(sweeper.__name__,dt))
+            print('Working with sweeper %s and dt = %s...' % (sweeper.__name__, dt))
 
             level_params['dt'] = dt
             description['level_params'] = level_params
@@ -104,7 +98,7 @@ def main():
             filtered_stats = filter_stats(stats, type='error_post_iteration')
             error_post = sort_stats(filtered_stats, sortby='iter')[0][1]
 
-            error_reduction.append(error_post/error_pre)
+            error_reduction.append(error_post / error_pre)
 
             print('error and reduction rate at time %s: %6.4e -- %6.4e' % (Tend, error_post, error_reduction[-1]))
 
@@ -155,25 +149,20 @@ def plot_graphs():
     plt.figure()
     plt.xlabel('dt')
     plt.ylabel('error reduction')
-    # plt.xlim((interval[0] - 0.01, interval[1] + 0.01))
-    # plt.ylim((-0.1, 1.1))
     plt.grid()
 
-    # compute values for x-axis and plot
-
     for sweeper, color, marker, label in setups:
-
         plt.loglog(dt_list, results[sweeper], lw=3, ls='-', color=color, marker=marker, markersize=10, label=label)
 
-    plt.loglog(dt_list, [dt*2 for dt in dt_list], lw=2, ls='--', color='k', label='linear')
-    plt.loglog(dt_list, [dt*dt/dt_list[0]*2 for dt in dt_list], lw=2, ls='-.', color='k', label='quadratic')
+    plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=2, ls='--', color='k', label='linear')
+    plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=2, ls='-.', color='k', label='quadratic')
 
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     plt.gca().invert_xaxis()
-    plt.xlim([dt_list[0]*1.1, dt_list[-1]/1.1])
-    plt.ylim([4E-03,1E0])
-    plt.xticks(dt_list,dt_list)
+    plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
+    plt.ylim([4E-03, 1E0])
+    plt.xticks(dt_list, dt_list)
 
     # plt.show()
 
