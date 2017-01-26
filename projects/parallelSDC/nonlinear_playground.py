@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.implementations.datatype_classes.mesh import mesh
+from projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
 from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 from projects.parallelSDC.linearized_implicit_parallel import linearized_implicit_parallel
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -58,7 +59,7 @@ def main():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
-    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel, linearized_implicit_parallel]
+    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel_prec, linearized_implicit_fixed_parallel, linearized_implicit_parallel]
 
     f = open('parallelSDC_nonlinear_out.txt', 'w')
     uinit = None
@@ -119,7 +120,7 @@ def main():
         print()
 
         assert err < 3.686e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
-        assert np.mean(niters) == 7.5, 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
+        assert np.mean(niters) == 7.5 or np.mean(niters) == 4.0, 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
 
     f.close()
 
