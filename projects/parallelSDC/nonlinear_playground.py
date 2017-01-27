@@ -59,7 +59,8 @@ def main():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
-    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel_prec, linearized_implicit_fixed_parallel, linearized_implicit_parallel]
+    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel_prec, linearized_implicit_fixed_parallel,
+                    linearized_implicit_parallel]
 
     f = open('parallelSDC_nonlinear_out.txt', 'w')
     uinit = None
@@ -120,7 +121,8 @@ def main():
         print()
 
         assert err < 3.686e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
-        assert np.mean(niters) == 7.5 or np.mean(niters) == 4.0, 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
+        assert np.mean(niters) == 7.5 or np.mean(niters) == 4.0, \
+            'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
 
     f.close()
 
