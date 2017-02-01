@@ -25,8 +25,8 @@ The main idea here is to work with a diagonalization of the Q matrix.
 While this works well for non-equidistant and non-symmetri nodes like Gauss-Radau, this can only be applied for linear problem, where space and time is separated via Kronecker products.
 In order to apply this also for nonlinear problems, we apply an outer Newton iteration to the nonlinear collocation problem and use the diagonalized SDC approach for the linear problem.
 Yet, the naive implementation still does not decouple space and time, so that we need to fix the Jacobian at e.g. node 0.
-This example compares the iteration counts and errors for this idea (incl. a modified Newton where the Jacobian is not fixed but the appraoch is applied nonetheless).
-Two new sweepers are used here: ``linearized_implicit_parallel`` and ``linearized_implicit_fixed_parallel``.
+This example compares the iteration counts and errors for this idea (incl. a modified Newton where the Jacobian is not fixed but the approach is applied nonetheless).
+Three new sweepers are used here: ``linearized_implicit_parallel``, ``linearized_implicit_fixed_parallel`` and ``linearized_implicit_fixed_parallel_prec``.
 
 .. include:: doc_parallelSDC_nonlinear.rst
 
