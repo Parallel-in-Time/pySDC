@@ -187,24 +187,50 @@ def plot_iterations():
     assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
+    qd_type_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
+    marker_list = [None, None, 's', 'o', '^']
+    color_list = ['k', 'k', 'r', 'g', 'b']
+
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
 
         plt.figure()
-        for qd_type in qd_type_list:
+        for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
             niter_heat = np.zeros(len(results[setup][1]))
             for key in results.keys():
                 if isinstance(key, ID):
                     if key.setup == setup and key.qd_type == qd_type:
                         xvalue = results[setup][1].index(key.param)
                         niter_heat[xvalue] = results[key]
-            plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=2)
+            if qd_type == 'LU':
+                ls = '--'
+                lw = 2
+            elif qd_type == 'IE':
+                ls = '-.'
+                lw = 2
+            else:
+                ls = '-'
+                lw = 3
+            plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=lw, linestyle=ls, color=color, marker=marker,
+                         markersize=10)
+
+        if setup == 'heat':
+            xlabel = r'$\nu$'
+        elif setup == 'advection':
+            xlabel = r'$c$'
+        elif setup == 'fisher':
+            xlabel = r'$\lambda_0$'
+        elif setup == 'vanderpol':
+            xlabel = r'$\mu$'
+        else:
+            print('Setup not implemented..', setup)
+            exit()
 
         plt.ylim([0, 60])
-        plt.legend(loc=2, ncol=1)
-        plt.title(setup)
+        plt.legend(loc=2, ncol=1, numpoints=1)
+        # plt.title(setup)
         plt.ylabel('number of iterations')
-        plt.xlabel('parameter')
+        plt.xlabel(xlabel)
         plt.grid()
 
         # save plot as PDF, beautify
@@ -215,5 +241,5 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     plot_iterations()
