@@ -15,8 +15,8 @@ def main():
 
     x0 = np.ones(M)
     d = opt.minimize(rho, x0, method='Nelder-Mead')
-
     print(d)
+
     numsteps = 800
     xdim = np.linspace(0, 8, numsteps)
     ydim = np.linspace(0, 13, numsteps)
@@ -52,9 +52,9 @@ def main():
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     plt.figure()
-    xdim_part = xdim[int(0.25*numsteps):int(0.75*numsteps)+1]
-    ydim_part = ydim[0:int(0.25*numsteps)]
-    minfield_part = minfield[int(0.25*numsteps):int(0.75*numsteps)+1, 0:int(0.25*numsteps)]
+    xdim_part = xdim[int(0.25 * numsteps):int(0.75 * numsteps) + 1]
+    ydim_part = ydim[0:int(0.25 * numsteps)]
+    minfield_part = minfield[int(0.25 * numsteps):int(0.75 * numsteps) + 1, 0:int(0.25 * numsteps)]
     plt.pcolor(xdim_part, ydim_part, minfield_part.T, cmap='Reds', vmin=0, vmax=1)
     plt.text(d.x[0], d.x[1], 'X', horizontalalignment='center', verticalalignment='center')
     plt.xlim((min(xdim_part), max(xdim_part)))
