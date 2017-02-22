@@ -24,7 +24,7 @@ class EquidistantSpline_Right(CollBase):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes, tleft, tright):
+    def __init__(self, num_nodes, tleft, tright, do_DG):
         """
         Initialization
 
@@ -32,19 +32,20 @@ class EquidistantSpline_Right(CollBase):
             num_nodes (int): number of nodes
             tleft (float): left interval boundary (usually 0)
             tright (float): right interval boundary (usually 1)
+            do_DG (bool): option to use DG-based Q matrix
         """
-        super(EquidistantSpline_Right, self).__init__(num_nodes, tleft, tright)
+        super(EquidistantSpline_Right, self).__init__(num_nodes, tleft, tright, do_DG)
         if num_nodes < 2:
             raise CollocationError("Number of nodes should be at least 2 for equidist. splines, but is %d" % num_nodes)
         # This is a fixed order since we are using splines here! No spectral accuracy!
         self.order = min(num_nodes - 1, 3)  # We need: 1<=order<=5 and order < num_nodes
+        self.left_is_node = False
+        self.right_is_node = True
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
-        self.left_is_node = False
-        self.right_is_node = True
 
     @property
     def _getNodes(self):

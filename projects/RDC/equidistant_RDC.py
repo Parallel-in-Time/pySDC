@@ -25,7 +25,7 @@ class Equidistant_RDC(Equidistant):
         fh_weights: blended FH weights for barycentric interpolation
     """
 
-    def __init__(self, num_nodes, tleft, tright):
+    def __init__(self, num_nodes, tleft, tright, do_DG=False):
         """
         Initialization
 
@@ -56,6 +56,8 @@ class Equidistant_RDC(Equidistant):
         super(Equidistant, self).__init__(nnodes, tleft, tright)
 
         self.order = self.num_nodes
+        self.left_is_node = True
+        self.right_is_node = True
         self.nodes = self._getNodes
 
         d = min(self.num_nodes - 1, max_d)
@@ -65,8 +67,6 @@ class Equidistant_RDC(Equidistant):
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
-        self.left_is_node = True
-        self.right_is_node = True
 
     def _getFHWeights(self, d):
         """

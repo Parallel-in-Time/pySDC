@@ -51,9 +51,12 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 self.logger.error(msg)
                 raise ParameterError(msg)
 
+        if 'do_DG' not in params:
+            params['do_DG'] = False
+
         self.params = __Pars(params)
 
-        coll = params['collocation_class'](params['num_nodes'], 0, 1)
+        coll = params['collocation_class'](params['num_nodes'], 0, 1, params['do_DG'])
 
         if not coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning('we need to do a collocation update here, since the right end point is not a node. '
@@ -93,6 +96,9 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             x0 = 10 * np.ones(m)
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
+        elif qd_type == 'DG':
+            for m in range(self.coll.num_nodes):
+                QDmat[m + 1, 1:m + 2] = self.coll.weights[0:m + 1]
         else:
             raise NotImplementedError('qd_type implicit not implemented')
         # check if we got not more than a lower triangular matrix

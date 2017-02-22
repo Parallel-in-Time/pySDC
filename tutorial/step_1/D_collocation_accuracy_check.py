@@ -31,7 +31,7 @@ def main():
     prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
     # instantiate collocation class, relative to the time interval [0,1]
-    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
+    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1, do_DG=False)
 
     # assemble list of dt
     dt_list = [0.1 / 2 ** p for p in range(0, 4)]

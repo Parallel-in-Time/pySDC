@@ -28,7 +28,7 @@ def test_canintegratepolynomials():
 def check_canintegratepolynomials(collclass,t_start,t_end):
 
     for M in range(2,13):
-        coll = collclass(M, t_start, t_end)
+        coll = collclass(M, t_start, t_end, False)
 
         # some basic consistency tests
         assert np.size(coll.nodes)==np.size(coll.weights), "For node type " + type[0] + ", number of entries in nodes and weights is different"
@@ -59,7 +59,7 @@ def test_relateQandSmat():
 
 def check_relateQandSmat(collclass,t_start,t_end):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = collclass(M, t_start, t_end, False)
         Q = coll.Qmat[1:,1:]
         S = coll.Smat[1:,1:]
         assert np.shape(Q) == np.shape(S), "For node type " + type[0] + ", Qmat and Smat have different shape"
@@ -80,7 +80,7 @@ def test_partialquadrature():
 
 def check_partialquadraturewithQ(collclass, t_start, t_end):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = collclass(M, t_start, t_end, False)
         Q = coll.Qmat[1:,1:]
         # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
         degree = min(coll.order,M-1)
@@ -102,7 +102,7 @@ def test_partialquadraturewithS():
 
 def check_partialquadraturewithS(collclass, t_start, t_end):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = collclass(M, t_start, t_end, False)
         S = coll.Smat[1:,1:]
         # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
         degree = min(coll.order, M - 1)

@@ -1,10 +1,9 @@
 import numpy as np
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_periodic import heat1d_periodic
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
@@ -26,7 +25,7 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['do_DG'] = False
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = 'DG'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -34,8 +33,8 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1  # diffusion coefficient
-    problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [128]  # number of degrees of freedom for each level
+    problem_params['freq'] = 1  # frequency for the test value
+    problem_params['nvars'] = [127]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = dict()
@@ -45,7 +44,7 @@ def main():
     space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 2
-    space_transfer_params['periodic'] = True
+    space_transfer_params['periodic'] = False
 
     # initialize controller parameters
     controller_params = dict()
@@ -54,7 +53,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d_periodic  # pass problem class
+    description['problem_class'] = heat1d  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['dtype_u'] = mesh  # pass data type for u
     description['dtype_f'] = mesh  # pass data type for f

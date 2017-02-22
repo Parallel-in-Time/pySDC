@@ -32,8 +32,8 @@ def check_Q_transfer(collclass):
         Mfine = M
         Mcoarse = int((Mfine+1)/2.0)
 
-        coll_fine = collclass(Mfine, 0, 1)
-        coll_coarse = collclass(Mcoarse, 0, 1)
+        coll_fine = collclass(Mfine, 0, 1, False)
+        coll_coarse = collclass(Mcoarse, 0, 1, False)
 
         assert coll_fine.left_is_node == coll_coarse.left_is_node, 'ERROR: should be using the same class for coarse and fine Q'
 
@@ -78,13 +78,13 @@ def check_Q_transfer_minimal(collclass):
     """
 
     Mcoarse = 2
-    coll_coarse = collclass(Mcoarse, 0, 1)
+    coll_coarse = collclass(Mcoarse, 0, 1, False)
 
     for M in range(3, 9):
 
         Mfine = M
 
-        coll_fine = collclass(Mfine, 0, 1)
+        coll_fine = collclass(Mfine, 0, 1, False)
 
         assert coll_fine.left_is_node == coll_coarse.left_is_node, 'ERROR: should be using the same class for coarse and fine Q'
 

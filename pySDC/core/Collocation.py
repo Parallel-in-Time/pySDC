@@ -1,6 +1,7 @@
 from __future__ import division
 import abc
 from future.utils import with_metaclass
+from scipy import interpolate
 from scipy.interpolate import BarycentricInterpolator
 from scipy.integrate import quad
 import numpy as np
@@ -27,9 +28,10 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         delta_m (numpy.ndarray): array of distances between nodes
         right_is_node (bool): flag to indicate whether right point is collocation node
         left_is_node (bool): flag to indicate whether left point is collocation node
+        do_DG (bool): option to use DG-based Q matrix
     """
 
-    def __init__(self, num_nodes, tleft=0, tright=1):
+    def __init__(self, num_nodes, tleft=0, tright=1, do_DG=False):
         """
         Initialization routine for an collocation object
 
@@ -37,6 +39,7 @@ class CollBase(with_metaclass(abc.ABCMeta)):
             num_nodes (int): number of collocation nodes
             tleft (float): left interval point
             tright (float): right interval point
+            do_DG (bool): option to use DG-based Q matrix
         """
 
         if not num_nodes > 0:
@@ -59,6 +62,7 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         self.delta_m = None
         self.right_is_node = None
         self.left_is_node = None
+        self.do_DG = do_DG
 
     @staticmethod
     def evaluate(weights, data):
@@ -76,6 +80,21 @@ class CollBase(with_metaclass(abc.ABCMeta)):
             raise CollocationError("Input size does not match number of weights, but is %s" % np.size(data))
 
         return np.dot(weights, data)
+
+    def __set_DG(self, p):
+
+        L = np.zeros([p + 1, p + 1])
+        Lagrange = [interpolate.lagrange(self.nodes, np.eye(p + 1)[i, :]) for i in range(p + 1)]
+
+        for i in range(p + 1):
+            for j in range(p + 1):
+                L_Int = np.polyint(np.polymul(np.polyder(Lagrange[i]), Lagrange[j]))
+                L[i, j] = np.polyval(L_Int, 1) - np.polyval(L_Int, 0)
+
+        L[p, p] -= 1
+        L_inv = np.linalg.inv(L)
+
+        return L_inv
 
     def _getWeights(self, a, b):
         """
@@ -121,9 +140,15 @@ class CollBase(with_metaclass(abc.ABCMeta)):
         M = self.num_nodes
         Q = np.zeros([M + 1, M + 1])
 
-        # for all nodes, get weights for the interval [tleft,node]
-        for m in np.arange(M):
-            Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+        if not self.do_DG:
+            # for all nodes, get weights for the interval [tleft,node]
+            for m in np.arange(M):
+                Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+        else:
+            if not self.right_is_node:
+                raise CollocationError('This will only work if the right point is a quadrature node!')
+            L_inv = self.__set_DG(self.num_nodes - 1)
+            Q[1:, 1:] = -L_inv.dot(np.diag(self.weights))
 
         return Q
 
