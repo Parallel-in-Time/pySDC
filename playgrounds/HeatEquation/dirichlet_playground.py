@@ -27,7 +27,7 @@ def main():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['do_DG'] = False
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [9, 5]
     sweeper_params['QI'] = 'DG'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
@@ -49,7 +49,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = error_output
+    # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
     description = dict()

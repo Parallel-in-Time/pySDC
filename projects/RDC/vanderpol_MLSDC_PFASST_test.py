@@ -52,11 +52,6 @@ def run_RDC(cwd=''):
     controller_params = dict()
     controller_params['logger_level'] = 50
 
-    base_transfer_params = dict()
-    # base_transfer_params['finter'] = True
-    # base_transfer_params['coll_iorder'] = 2
-    # base_transfer_params['coll_rorder'] = 2
-
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     description['problem_class'] = vanderpol
@@ -68,7 +63,6 @@ def run_RDC(cwd=''):
     description['level_params'] = level_params
     description['step_params'] = step_params
     description['space_transfer_class'] = mesh_to_mesh
-    description['base_transfer_params'] = base_transfer_params
 
     results = []
     ref_sol = np.load(cwd + 'data/vdp_ref.npy')

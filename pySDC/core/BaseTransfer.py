@@ -1,5 +1,6 @@
 import numpy as np
 import logging
+from scipy import interpolate
 
 from pySDC.helpers.pysdc_helper import FrozenClass
 import pySDC.helpers.transfer_helper as th
@@ -33,8 +34,6 @@ class base_transfer(object):
         class __Pars(FrozenClass):
             def __init__(self, pars):
                 self.finter = False
-                self.coll_iorder = 2
-                self.coll_rorder = 1
                 for k, v in pars.items():
                     setattr(self, k, v)
 
@@ -49,33 +48,32 @@ class base_transfer(object):
         self.fine = fine_level
         self.coarse = coarse_level
 
-        # for Q-based transfer, check if we need to add 0 to the list of nodes
-        if not self.fine.sweep.coll.left_is_node:
-            fine_grid = np.concatenate(([0], self.fine.sweep.coll.nodes))
-            coarse_grid = np.concatenate(([0], self.coarse.sweep.coll.nodes))
-        else:
-            fine_grid = self.fine.sweep.coll.nodes
-            coarse_grid = self.coarse.sweep.coll.nodes
+        fine_grid = self.fine.sweep.coll.nodes
+        coarse_grid = self.coarse.sweep.coll.nodes
 
-        if self.params.coll_iorder > len(coarse_grid):
-            self.logger.warning('requested order of Q-interpolation is not valid, resetting to %s' % len(coarse_grid))
-            self.params.coll_iorder = len(coarse_grid)
-        if self.params.coll_rorder != 1:
-            self.logger.warning('requested order of Q-restriction is != 1, can lead to weird behavior!')
+        M_fine = self.fine.sweep.coll.num_nodes
+        M_coarse = self.coarse.sweep.coll.num_nodes
 
-        # set up preliminary transfer matrices for Q-based coarsening
-        Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0).toarray()
-        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
+        weights_fine = self.fine.sweep.coll.weights
+        weights_coarse = self.coarse.sweep.coll.weights
 
-        # pad transfer matrices if necessary
-        if self.fine.sweep.coll.left_is_node:
-            self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))
-            self.Rcoll = np.zeros((self.coarse.sweep.coll.num_nodes + 1, self.fine.sweep.coll.num_nodes + 1))
-            self.Pcoll[1:, 1:] = Pcoll
-            self.Rcoll[1:, 1:] = Rcoll
-        else:
-            self.Pcoll = Pcoll
-            self.Rcoll = Rcoll
+        Lagrange = [interpolate.lagrange(coarse_grid, np.eye(M_coarse)[i, :]) for i in range(M_coarse)]
+
+        Rcoll = np.zeros((M_coarse, M_fine))
+        for i in range(M_coarse):
+            for j in range(M_fine):
+                Rcoll[i, j] = weights_fine[j] / weights_coarse[i] * np.polyval(Lagrange[i], fine_grid[j])
+
+        Pcoll = np.zeros((M_fine, M_coarse))
+        for i in range(M_fine):
+            for j in range(M_coarse):
+                Pcoll[i, j] = np.polyval(Lagrange[j], fine_grid[i])
+
+        # pad transfer matrices if necessary #TODO: make me go away
+        self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))
+        self.Rcoll = np.zeros((self.coarse.sweep.coll.num_nodes + 1, self.fine.sweep.coll.num_nodes + 1))
+        self.Pcoll[1:, 1:] = Pcoll
+        self.Rcoll[1:, 1:] = Rcoll
 
         # set up spatial transfer
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob,
