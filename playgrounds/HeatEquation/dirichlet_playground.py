@@ -4,9 +4,11 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from playgrounds.HeatEquation.HookClass_error_output import error_output
 
@@ -25,20 +27,20 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['collocation_class'] = CollGaussLegendre
     sweeper_params['do_DG'] = False
-    sweeper_params['num_nodes'] = [9, 5]
-    sweeper_params['QI'] = 'DG'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['num_nodes'] = [5,3]
+    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1  # diffusion coefficient
+    problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 1  # frequency for the test value
     problem_params['nvars'] = [127]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 20
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -48,7 +50,8 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
+    controller_params['predict'] = False
     # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -66,13 +69,13 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.25
+    Tend = 0.5
 
     # set up number of parallel time-steps to run PFASST with
-    num_proc = 1
+    num_proc = 2
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
+    controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
                                              description=description)
 
     # get initial values on finest level
