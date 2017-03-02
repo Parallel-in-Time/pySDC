@@ -73,16 +73,10 @@ class base_transfer(object):
 
         # set up preliminary transfer matrices for Q-based coarsening
         # Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=2, pad=0).toarray()
-        Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=len(fine_grid), pad=0).toarray()
+        # Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=len(fine_grid), pad=0).toarray()
         #
         # print(Rcoll)
         # exit()
-
-        # pad transfer matrices if necessary #TODO: make me go away
-        # self.Pcoll = np.zeros((self.fine.sweep.coll.num_nodes + 1, self.coarse.sweep.coll.num_nodes + 1))
-        # self.Rcoll = np.zeros((self.coarse.sweep.coll.num_nodes + 1, self.fine.sweep.coll.num_nodes + 1))
-        # self.Pcoll[1:, 1:] = Pcoll
-        # self.Rcoll[1:, 1:] = Rcoll
 
         self.Rcoll = Rcoll
         self.Pcoll = Pcoll
@@ -150,8 +144,14 @@ class base_transfer(object):
                 tauFG[-1] += self.Rcoll[n, m] * tmp_tau[m]
 
         # build tau correction
+        tmp_utau = self.Rcoll[-1,0]*tmp_u[0]
+        for m in range(1,SF.coll.num_nodes):
+            tmp_utau += self.Rcoll[-1,m]*tmp_u[m]
+
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
+            if F.time > 0.0:
+                G.tau[m] += tmp_utau - tmp_u[-1]
 
         if F.tau is not None:
             # restrict possible tau correction from fine in space

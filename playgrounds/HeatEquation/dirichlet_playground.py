@@ -27,14 +27,14 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLegendre
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['do_DG'] = False
     sweeper_params['num_nodes'] = [5,3]
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['nu'] = 1  # diffusion coefficient
     problem_params['freq'] = 1  # frequency for the test value
     problem_params['nvars'] = [127]  # number of degrees of freedom for each level
 
