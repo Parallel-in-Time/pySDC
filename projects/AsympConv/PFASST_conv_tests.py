@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 import os
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -17,20 +17,28 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
 def main():
-    run_diffusion()
-    run_advection()
-
-
-def run_diffusion():
     """
-    A simple test program to test PFASST convergence for the periodic heat equation with random initial data
+    Main driver running diffusion and advection tests
+    """
+    nsweeps = 3
+    run_diffusion(nsweeps=nsweeps)
+    run_advection(nsweeps=nsweeps)
+    plot_results(nsweeps=nsweeps)
+
+
+def run_diffusion(nsweeps):
+    """
+    A simple test program to test PFASST convergence for the heat equation with random initial data
+
+    Args:
+        nsweeps: number of fine sweeps to perform
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [3, 1]
+    level_params['nsweeps'] = [nsweeps, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -114,6 +122,9 @@ def run_diffusion():
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
 
+        assert np.mean(niters) <= 6, "ERROR: number of iterations for diffusion tesst too high, got %s" \
+                                     % np.mean(niters)
+
         results[cfl] = np.mean(niters)
 
     file = open('data/results_conv_diffusion.pkl', 'wb')
@@ -123,16 +134,19 @@ def run_diffusion():
     assert os.path.isfile('data/results_conv_diffusion.pkl'), 'ERROR: pickle did not create file'
 
 
-def run_advection():
+def run_advection(nsweeps):
     """
-    A simple test program to test PFASST convergence for the periodic heat equation with random initial data
+    A simple test program to test PFASST convergence for the periodic advection equation
+
+    Args:
+        nsweeps: number of fine sweeps to perform
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [3, 1]
+    level_params['nsweeps'] = [nsweeps, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -218,6 +232,9 @@ def run_advection():
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
 
+        assert np.mean(niters) <= 10, "ERROR: number of iterations for advection tesst too high, got %s" \
+            % np.mean(niters)
+
         results[cfl] = np.mean(niters)
 
     file = open('data/results_conv_advection.pkl', 'wb')
@@ -227,7 +244,13 @@ def run_advection():
     assert os.path.isfile('data/results_conv_advection.pkl'), 'ERROR: pickle did not create file'
 
 
-def plot_results():
+def plot_results(nsweeps):
+    """
+    Plotting routine for iteration counts
+
+    Args:
+        nsweeps: number of fine sweeps used
+    """
 
     file = open('data/results_conv_diffusion.pkl', 'rb')
     results_diff = pickle.load(file)
@@ -269,13 +292,12 @@ def plot_results():
     # plot
     plt.semilogx(xvalues_diff, niter_diff, 'r-', marker='s', markersize=10, label='diffusion')
     plt.semilogx(xvalues_adv, niter_adv, 'b-', marker='o', markersize=10, label='advection')
-    # plt.plot()
 
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     # plt.show()
     # save plot, beautify
-    fname = 'data/conv_test_niter.png'
+    fname = 'data/conv_test_niter_NS' + str(nsweeps) + '.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plotting did not create file'
@@ -283,4 +305,3 @@ def plot_results():
 
 if __name__ == "__main__":
     main()
-    plot_results()
