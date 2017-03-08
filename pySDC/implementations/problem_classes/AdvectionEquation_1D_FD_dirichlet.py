@@ -8,13 +8,13 @@ from pySDC.core.Errors import ParameterError, ProblemError
 
 
 # noinspection PyUnusedLocal
-class heat1d(ptype):
+class advection1d_dirichlet(ptype):
     """
-    Example implementing the unforced 1D heat equation with Dirichlet-0 BC in [0,1],
-    discretized using central finite differences
+    Example implementing the unforced 1D advection equation with periodic BC in [0,1],
+    discretized using upwinding finite differences
 
     Attributes:
-        A: second-order FD discretization of the 1D laplace operator
+        A: FD discretization of the gradient operator using upwinding
         dx: distance between two spatial nodes
     """
 
@@ -24,12 +24,12 @@ class heat1d(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type for solution
-            dtype_f: mesh data type for RHS
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'freq']
+        essential_keys = ['nvars', 'c', 'freq']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -37,33 +37,64 @@ class heat1d(ptype):
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (problem_params['nvars'] + 1) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p - 1')
+            raise ProblemError('setup requires nvars = 2^p-1')
+
+        if 'order' not in problem_params:
+            problem_params['order'] = 1
+        if 'type' not in problem_params:
+            problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                     params=problem_params)
+        super(advection1d_dirichlet, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
+                                                    params=problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / (self.params.nvars + 1)
-        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
+        self.A = self.__get_A(self.params.nvars, self.params.c, self.dx, self.params.order, self.params.type)
 
     @staticmethod
-    def __get_A(N, nu, dx):
+    def __get_A(N, c, dx, order, type):
         """
         Helper function to assemble FD matrix A in sparse format
 
         Args:
             N (int): number of dofs
-            nu (float): diffusion coefficient
+            c (float): diffusion coefficient
             dx (float): distance between two spatial nodes
+            order (int): specifies order of discretization
+            type (string): upwind or centered differences
 
         Returns:
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N, N), format='csc')
-        A *= nu / (dx ** 2)
+        coeff = None
+        stencil = None
+        zero_pos = None
+
+        if type == 'center':
+
+            if order == 2:
+                stencil = [-1.0, 0.0, 1.0]
+                zero_pos = 2
+                coeff = 1.0 / 2.0
+            else:
+                raise ProblemError("Order " + str(order) + " not implemented.")
+
+        else:
+
+            if order == 1:
+                stencil = [-1.0, 1.0]
+                coeff = 1.0
+                zero_pos = 2
+            else:
+                raise ProblemError("Order " + str(order) + " not implemented.")
+
+        offsets = [pos - zero_pos + 1 for pos in range(len(stencil))]
+
+        A = sp.diags(stencil, offsets, shape=(N, N), format='csc')
+        A *= c * coeff * (1.0 / dx)
+
         return A
 
     def eval_f(self, u, t):
@@ -79,17 +110,17 @@ class heat1d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values)
+        f.values = -1.0 * self.A.dot(u.values)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-factor*A)u = rhs
+        Simple linear solver for (I+factor*A)u = rhs
 
         Args:
             rhs (dtype_f): right-hand side for the linear system
-            factor (float): abbrev. for the local stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver
+            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
             t (float): current time (e.g. for time-dependent BCs)
 
         Returns:
@@ -97,7 +128,7 @@ class heat1d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.params.nvars, format='csc') - factor * self.A)
+        L = splu(sp.eye(self.params.nvars, format='csc') + factor * self.A)
         me.values = L.solve(rhs.values)
         return me
 
@@ -115,8 +146,7 @@ class heat1d(ptype):
         me = self.dtype_u(self.init)
         if self.params.freq >= 0:
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-            me.values = np.sin(np.pi * self.params.freq * xvalues) * \
-                np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+            me.values = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
         else:
             np.random.seed(1)
             me.values = np.random.rand(self.params.nvars)

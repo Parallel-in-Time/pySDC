@@ -38,6 +38,8 @@ class advection1d(ptype):
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if (problem_params['nvars']) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p')
+        if problem_params['freq'] >= 0 and problem_params['freq'] % 2 != 0:
+            raise ProblemError('need even number of frequencies due to periodic BCs')
 
         if 'order' not in problem_params:
             problem_params['order'] = 1
@@ -175,6 +177,10 @@ class advection1d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-        me.values = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
+        if self.params.freq >= 0:
+            xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
+            me.values = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
+        else:
+            np.random.seed(1)
+            me.values = np.random.rand(self.params.nvars)
         return me
