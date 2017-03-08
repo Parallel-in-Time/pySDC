@@ -290,7 +290,8 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
                 # standard sweep workflow: update nodes, compute residual, log progress
                 self.hooks.pre_sweep(step=S, level_number=0)
-                S.levels[0].sweep.update_nodes()
+                for k in range(S.levels[0].params.nsweeps):
+                    S.levels[0].sweep.update_nodes()
                 S.levels[0].sweep.compute_residual()
                 self.hooks.post_sweep(step=S, level_number=0)
 
@@ -340,7 +341,8 @@ class allinclusive_multigrid_nonMPI(controller):
                 # sweep and send on middle levels (not on finest, not on coarsest, though)
                 for l in range(1, len(S.levels) - 1):
                     self.hooks.pre_sweep(step=S, level_number=l)
-                    S.levels[l].sweep.update_nodes()
+                    for k in range(S.levels[l].params.nsweeps):
+                        S.levels[l].sweep.update_nodes()
                     S.levels[l].sweep.compute_residual()
                     self.hooks.post_sweep(step=S, level_number=l)
 
@@ -409,7 +411,8 @@ class allinclusive_multigrid_nonMPI(controller):
                     # on middle levels: do sweep as usual
                     if l - 1 > 0:
                         self.hooks.pre_sweep(step=S, level_number=l - 1)
-                        S.levels[l - 1].sweep.update_nodes()
+                        for k in range(S.levels[l - 1].params.nsweeps):
+                            S.levels[l - 1].sweep.update_nodes()
                         S.levels[l - 1].sweep.compute_residual()
                         self.hooks.post_sweep(step=S, level_number=l - 1)
 

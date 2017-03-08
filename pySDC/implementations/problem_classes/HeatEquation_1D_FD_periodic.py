@@ -36,7 +36,7 @@ class heat1d_periodic(ptype):
                 raise ParameterError(msg)
 
         # make sure parameters have the correct form
-        if problem_params['freq'] % 2 != 0:
+        if problem_params['freq'] >= 0 and problem_params['freq'] % 2 != 0:
             raise ProblemError('need even number of frequencies due to periodic BCs')
         if problem_params['nvars'] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
@@ -122,8 +122,13 @@ class heat1d_periodic(ptype):
         """
 
         me = self.dtype_u(self.init)
-        xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-        me.values = np.sin(np.pi * self.params.freq * xvalues) * \
-            np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+
+        if self.params.freq >= 0:
+            xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
+            me.values = np.sin(np.pi * self.params.freq * xvalues) * \
+                np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+        else:
+            np.random.seed(1)
+            me.values = np.random.rand(self.params.nvars)
         me.values = me.values.flatten()
         return me

@@ -265,7 +265,8 @@ class allinclusive_classic_MPI(controller):
 
             # standard sweep workflow: update nodes, compute residual, log progress
             self.hooks.pre_sweep(step=self.S, level_number=0)
-            self.S.levels[0].sweep.update_nodes()
+            for k in range(self.S.levels[0].params.nsweeps):
+                self.S.levels[0].sweep.update_nodes()
             self.S.levels[0].sweep.compute_residual()
             self.hooks.post_sweep(step=self.S, level_number=0)
 
@@ -341,7 +342,8 @@ class allinclusive_classic_MPI(controller):
             # sweep and send on middle levels (not on finest, not on coarsest, though)
             for l in range(1, len(self.S.levels) - 1):
                 self.hooks.pre_sweep(step=self.S, level_number=l)
-                self.S.levels[l].sweep.update_nodes()
+                for k in range(self.S.levels[l].params.nsweeps):
+                    self.S.levels[l].sweep.update_nodes()
                 self.S.levels[l].sweep.compute_residual()
                 self.hooks.post_sweep(step=self.S, level_number=l)
 
@@ -381,7 +383,8 @@ class allinclusive_classic_MPI(controller):
 
             # do the sweep
             self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-            self.S.levels[-1].sweep.update_nodes()
+            for k in range(self.S.levels[-1].params.nsweeps):
+                self.S.levels[-1].sweep.update_nodes()
             self.S.levels[-1].sweep.compute_residual()
             self.hooks.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
             self.S.levels[-1].sweep.compute_end_point()
@@ -418,7 +421,8 @@ class allinclusive_classic_MPI(controller):
                 # on middle levels: do sweep as usual
                 if l - 1 > 0:
                     self.hooks.pre_sweep(step=self.S, level_number=l - 1)
-                    self.S.levels[l - 1].sweep.update_nodes()
+                    for k in range(self.S.levels[l - 1].params.nsweeps):
+                        self.S.levels[l - 1].sweep.update_nodes()
                     self.S.levels[l - 1].sweep.compute_residual()
                     self.hooks.post_sweep(step=self.S, level_number=l - 1)
 

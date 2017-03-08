@@ -22,6 +22,7 @@ def main():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
+    level_params['nsweeps'] = [2, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -31,8 +32,8 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1E+05  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
+    problem_params['nu'] = 1E-06  # diffusion coefficient
+    problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
 
     # initialize step parameters
@@ -71,8 +72,8 @@ def main():
     num_proc = 4
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                             description=description)
+    controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                               description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
