@@ -6,8 +6,11 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+
+from playgrounds.HeatEquation.HookClass_error_output import error_output
 
 
 def main():
@@ -17,19 +20,19 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1  # diffusion coefficient
-    problem_params['freq'] = 8  # frequency for the test value
+    problem_params['nu'] = 1E+05  # diffusion coefficient
+    problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
 
     # initialize step parameters
@@ -45,6 +48,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -61,7 +65,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 4 * level_params['dt']
 
     # set up number of parallel time-steps to run PFASST with
     num_proc = 4

@@ -76,6 +76,10 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             QT = coll.Qmat[1:, 1:].T
             [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
             QDmat[1:, 1:] = U.T
+        elif qd_type == 'LU2':
+            QT = coll.Qmat[1:, 1:].T
+            [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
+            QDmat[1:, 1:] = 2 * U.T
         elif qd_type == 'IE':
             for m in range(coll.num_nodes + 1):
                 QDmat[m, 1:m + 1] = coll.delta_m[0:m]
@@ -150,7 +154,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         L = self.level
 
         # check if there are new values (e.g. from a sweep)
-        assert L.status.updated
+        # assert L.status.updated
 
         # compute the residual for each node
 

@@ -51,6 +51,7 @@ class level(FrozenClass):
             def __init__(self, params):
                 self.dt = None
                 self.restol = 0.0
+                self.nsweeps = 1
                 for k, v in params.items():
                     setattr(self, k, v)
                 # freeze class, no further attributes allowed from this point
