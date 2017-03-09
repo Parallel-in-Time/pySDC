@@ -1,5 +1,5 @@
 import numpy as np
-import pickle
+import csv
 import os
 import matplotlib
 matplotlib.use('Agg')
@@ -20,46 +20,46 @@ def main():
     """
     Main driver running diffusion and advection tests
     """
-    nsweeps = 3
-    run_diffusion(nsweeps=nsweeps)
-    run_advection(nsweeps=nsweeps)
-    plot_results(nsweeps=nsweeps)
+    QI = 'LU'
+    # run_diffusion(QI=QI)
+    run_advection(QI=QI)
 
-    nsweeps = 2
-    run_diffusion(nsweeps=nsweeps)
-    run_advection(nsweeps=nsweeps)
-    plot_results(nsweeps=nsweeps)
+    QI = 'LU2'
+    # run_diffusion(QI=QI)
+    run_advection(QI=QI)
+
+    plot_results()
 
 
-def run_diffusion(nsweeps):
+def run_diffusion(QI):
     """
     A simple test program to test PFASST convergence for the heat equation with random initial data
 
     Args:
-        nsweeps: number of fine sweeps to perform
+        QI: preconditioner
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.25
-    level_params['nsweeps'] = [nsweeps, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = ['LU']
+    sweeper_params['QI'] = [QI, 'LU']
     sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
+    problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 200
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -75,33 +75,36 @@ def run_diffusion(nsweeps):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heat1d  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
     description['dtype_u'] = mesh  # pass data type for u
     description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # set time parameters
     t0 = 0.0
-    Tend = 4 * level_params['dt']
+    Tend = 1.0
 
     # set up number of parallel time-steps to run PFASST with
-    num_proc = 4
 
-    results = dict()
+    fname = 'data/results_conv_diffusion_Linf_QI' + str(QI) + '.txt'
+    file = open(fname, 'w')
+    writer = csv.writer(file)
+    writer.writerow(('num_proc', 'niter'))
+    file.close()
 
-    for i in range(-3, 12):
-        ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
+    for i in range(0, 13):
 
-        problem_params['nu'] = 10.0 ** i / ratio  # diffusion coefficient
-        description['problem_params'] = problem_params  # pass problem parameters
+        num_proc = 2 ** i
+        level_params['dt'] = (Tend - t0) / num_proc
+        description['level_params'] = level_params  # pass level parameters
 
-        out = 'Working on c = %6.4e' % problem_params['nu']
+        out = 'Working on num_proc = %5i' % num_proc
         print(out)
-        cfl = ratio * problem_params['nu']
+        cfl = problem_params['nu'] * level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
         out = '  CFL number: %4.2e' % cfl
         print(out)
 
@@ -127,35 +130,32 @@ def run_diffusion(nsweeps):
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
 
-        results[cfl] = np.mean(niters)
-
-    fname = 'data/results_conv_diffusion_NS' + str(nsweeps) + '.pkl'
-    file = open(fname, 'wb')
-    pickle.dump(results, file)
-    file.close()
+        file = open(fname, 'a')
+        writer = csv.writer(file)
+        writer.writerow((num_proc, np.mean(niters)))
+        file.close()
 
     assert os.path.isfile(fname), 'ERROR: pickle did not create file'
 
 
-def run_advection(nsweeps):
+def run_advection(QI):
     """
     A simple test program to test PFASST convergence for the periodic advection equation
 
     Args:
-        nsweeps: number of fine sweeps to perform
+        QI: preconditioner
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.25
-    level_params['nsweeps'] = [nsweeps, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = [QI, 'LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['spread'] = False
 
     # initialize problem parameters
@@ -164,10 +164,11 @@ def run_advection(nsweeps):
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 2
     problem_params['type'] = 'center'
+    problem_params['c'] = 0.1
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 200
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -183,33 +184,36 @@ def run_advection(nsweeps):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = advection1d  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
     description['dtype_u'] = mesh  # pass data type for u
     description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # set time parameters
     t0 = 0.0
-    Tend = 4 * level_params['dt']
+    Tend = 1.0
 
     # set up number of parallel time-steps to run PFASST with
-    num_proc = 4
 
-    results = dict()
+    fname = 'data/results_conv_advection_Linf_QI' + str(QI) + '.txt'
+    file = open(fname, 'w')
+    writer = csv.writer(file)
+    writer.writerow(('num_proc', 'niter'))
+    file.close()
 
-    for i in range(-3, 12):
-        ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1))
+    for i in range(0, 7):
 
-        problem_params['c'] = 10.0 ** i / ratio  # diffusion coefficient
-        description['problem_params'] = problem_params  # pass problem parameters
+        num_proc = 2 ** i
+        level_params['dt'] = (Tend - t0) / num_proc
+        description['level_params'] = level_params  # pass level parameters
 
-        out = 'Working on nu = %6.4e' % problem_params['c']
+        out = 'Working on num_proc = %5i' % num_proc
         print(out)
-        cfl = ratio * problem_params['c']
+        cfl = problem_params['c'] * level_params['dt'] / (1.0 / problem_params['nvars'][0])
         out = '  CFL number: %4.2e' % cfl
         print(out)
 
@@ -235,75 +239,76 @@ def run_advection(nsweeps):
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
 
-        results[cfl] = np.mean(niters)
-
-    fname = 'data/results_conv_advection_NS' + str(nsweeps) + '.pkl'
-    file = open(fname, 'wb')
-    pickle.dump(results, file)
-    file.close()
+        file = open(fname, 'a')
+        writer = csv.writer(file)
+        writer.writerow((num_proc, np.mean(niters)))
+        file.close()
 
     assert os.path.isfile(fname), 'ERROR: pickle did not create file'
 
 
-def plot_results(nsweeps):
+def plot_results(cwd=''):
     """
     Plotting routine for iteration counts
 
     Args:
-        nsweeps: number of fine sweeps used
+        cwd: current working directory
     """
 
-    fname = 'data/results_conv_diffusion_NS' + str(nsweeps) + '.pkl'
-    file = open(fname, 'rb')
-    results_diff = pickle.load(file)
-    file.close()
+    setups = [('diffusion', 'LU', 'LU2'), ('advection', 'LU', 'LU2')]
 
-    fname = 'data/results_conv_advection_NS' + str(nsweeps) + '.pkl'
-    file = open(fname, 'rb')
-    results_adv = pickle.load(file)
-    file.close()
+    for type, QI1, QI2 in setups:
 
-    xvalues_diff = sorted(list(results_diff.keys()))
-    niter_diff = []
-    for x in xvalues_diff:
-        niter_diff.append(results_diff[x])
+        fname = cwd + 'data/results_conv_' + type + '_Linf_QI' + QI1 + '.txt'
+        file = open(fname, 'r')
+        reader = csv.DictReader(file, delimiter=',')
+        xvalues_1 = []
+        niter_1 = []
+        for row in reader:
+            xvalues_1.append(int(row['num_proc']))
+            niter_1.append(float(row['niter']))
+        file.close()
 
-    xvalues_adv = sorted(list(results_adv.keys()))
-    niter_adv = []
-    for x in xvalues_adv:
-        niter_adv.append(results_adv[x])
+        fname = cwd + 'data/results_conv_' + type + '_Linf_QI' + QI2 + '.txt'
+        file = open(fname, 'r')
+        reader = csv.DictReader(file, delimiter=',')
+        xvalues_2 = []
+        niter_2 = []
+        for row in reader:
+            xvalues_2.append(int(row['num_proc']))
+            niter_2.append(float(row['niter']))
+        file.close()
 
-    # set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
-    plt.rcParams.update(params)
+        # set up plotting parameters
+        params = {'legend.fontsize': 20,
+                  'figure.figsize': (12, 8),
+                  'axes.labelsize': 20,
+                  'axes.titlesize': 20,
+                  'xtick.labelsize': 16,
+                  'ytick.labelsize': 16,
+                  'lines.linewidth': 3
+                  }
+        plt.rcParams.update(params)
 
-    # set up figure
-    plt.figure()
-    plt.xlabel(r'$\mu$')
-    plt.ylabel('#iterations')
-    plt.xlim(min(xvalues_diff + xvalues_adv) / 10, max(xvalues_diff + xvalues_adv) * 10)
-    plt.ylim(min(niter_diff + niter_adv) - 1, max(niter_diff + niter_adv) + 1)
-    plt.grid()
+        # set up figure
+        plt.figure()
+        plt.xlabel('number of time-steps (L)')
+        plt.ylabel('#iterations')
+        plt.xlim(min(xvalues_1 + xvalues_2) / 2, max(xvalues_1 + xvalues_2) * 2)
+        plt.ylim(min(niter_1 + niter_2) - 1, max(niter_1 + niter_2) + 1)
+        plt.grid()
 
-    # plot
-    plt.semilogx(xvalues_diff, niter_diff, 'r-', marker='s', markersize=10, label='diffusion')
-    plt.semilogx(xvalues_adv, niter_adv, 'b-', marker='o', markersize=10, label='advection')
+        # plot
+        plt.semilogx(xvalues_1, niter_1, 'r-', marker='s', markersize=10, label=QI1)
+        plt.semilogx(xvalues_2, niter_2, 'b-', marker='o', markersize=10, label=QI2)
 
-    plt.legend(loc=1, ncol=1, numpoints=1)
+        plt.legend(loc=2, ncol=1, numpoints=1)
 
-    # plt.show()
-    # save plot, beautify
-    fname = 'data/conv_test_niter_NS' + str(nsweeps) + '.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+        # save plot, beautify
+        fname = 'data/conv_test_niter_Linf_' + type + '.png'
+        plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
-    assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+        assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 
 
 if __name__ == "__main__":

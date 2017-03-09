@@ -18,21 +18,24 @@ def main():
     A simple test program to do PFASST runs for the heat equation
     """
 
+    # set up number of parallel time-steps to run PFASST with
+    num_proc = 16
+
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.25
-    level_params['nsweeps'] = [2, 1]
+    level_params['dt'] = 1.0 / num_proc
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = ['LU2', 'LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1E-06  # diffusion coefficient
+    problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
 
@@ -66,10 +69,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 4 * level_params['dt']
-
-    # set up number of parallel time-steps to run PFASST with
-    num_proc = 4
+    Tend = 1.0
 
     # instantiate controller
     controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,

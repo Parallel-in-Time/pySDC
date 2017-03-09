@@ -19,7 +19,18 @@ def compute_and_plot_specrad():
     # setup_list = [('LU', 'to0'), ('LU', 'toinf')]
     # setup_list = [('IE', 'to0'), ('IE', 'toinf')]
     # setup_list = [('LU', 'toinf'), ('IE', 'toinf')]
-    setup_list = [('LU', 'full'), ('IE', 'full')]
+    setup_list = [('IE', 'full'), ('LU', 'full')]
+
+    # set up plotting parameters
+    params = {'legend.fontsize': 20,
+              'figure.figsize': (12, 8),
+              'axes.labelsize': 20,
+              'axes.titlesize': 20,
+              'xtick.labelsize': 16,
+              'ytick.labelsize': 16,
+              'lines.linewidth': 3
+              }
+    plt.rcParams.update(params)
 
     Nnodes = 3
     Nsteps = 4
@@ -101,11 +112,6 @@ def compute_and_plot_specrad():
         print(np.amax(Prho))
 
         fig, ax = plt.subplots(figsize=(15, 10))
-        rc('font', **{"sans-serif": ["Arial"], "size": 24})
-        rc('legend', fontsize='small')
-        rc('xtick', labelsize='small')
-        rc('ytick', labelsize='small')
-        rc('mathtext', default='regular')
 
         ax.set_xticks([i + 0.5 for i in range(0, len(rlam_list), int(len(rlam_list) / 5))])
         ax.set_xticklabels([r'-$10^{%d}$' % i for i in range(rlim_left, rlim_right,
@@ -115,17 +121,15 @@ def compute_and_plot_specrad():
                                                              int((ilim_right - ilim_left - 1) / 5))])
 
         cmap = plt.get_cmap('Reds')
-        pcol = plt.pcolor(Prho.T, cmap=cmap, norm=LogNorm(vmin=1E-10, vmax=1E00))
+        pcol = plt.pcolor(Prho.T, cmap=cmap, norm=LogNorm(vmin=1E-10, vmax=1E-00))
 
         plt.colorbar(pcol)
 
         plt.xlabel(r'$Re(\Delta t\lambda)$')
         plt.ylabel(r'$Im(\Delta t\lambda)$')
 
-        plt.show()
-
-        fname = 'data/heatmap_smoother_' + conv_type + '_Nsteps' + str(Nsteps) + '_M' + str(
-            Nnodes) + '_' + qd_type + '.png'
+        fname = 'data/heatmap_smoother_' + conv_type + '_Nsteps' + str(Nsteps) + '_M' + \
+                str(Nnodes) + '_' + qd_type + '.png'
         plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
 
 
