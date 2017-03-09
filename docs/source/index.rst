@@ -78,6 +78,7 @@ Projects
    projects/parallelSDC.rst
    projects/node_failure.rst
    projects/fwsw.rst
+   projects/asymp_conv.rst
    projects/RDC.rst
 
 Tests
