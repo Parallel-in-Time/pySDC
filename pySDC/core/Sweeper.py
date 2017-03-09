@@ -34,6 +34,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
             def __init__(self, pars):
 
                 self.do_coll_update = False
+                self.spread = True
 
                 for k, v in pars.items():
                     if k is not 'collocation_class':
@@ -138,8 +139,12 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         # copy u[0] to all collocation nodes, evaluate RHS
         for m in range(1, self.coll.num_nodes + 1):
-            L.u[m] = P.dtype_u(L.u[0])
-            L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+            if self.params.spread:
+                L.u[m] = P.dtype_u(L.u[0])
+                L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+            else:
+                L.u[m] = P.dtype_u(init=P.init, val=0)
+                L.f[m] = P.dtype_f(init=P.init, val=0)
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True

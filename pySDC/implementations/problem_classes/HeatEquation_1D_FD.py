@@ -113,7 +113,11 @@ class heat1d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
-        me.values = np.sin(np.pi * self.params.freq * xvalues) * \
-            np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+        if self.params.freq >= 0:
+            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
+            me.values = np.sin(np.pi * self.params.freq * xvalues) * \
+                np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+        else:
+            np.random.seed(1)
+            me.values = np.random.rand(self.params.nvars)
         return me

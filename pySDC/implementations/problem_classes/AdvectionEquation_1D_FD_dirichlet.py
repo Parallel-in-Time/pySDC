@@ -8,7 +8,7 @@ from pySDC.core.Errors import ParameterError, ProblemError
 
 
 # noinspection PyUnusedLocal
-class advection1d(ptype):
+class advection1d_dirichlet(ptype):
     """
     Example implementing the unforced 1D advection equation with periodic BC in [0,1],
     discretized using upwinding finite differences
@@ -36,10 +36,8 @@ class advection1d(ptype):
                 raise ParameterError(msg)
 
         # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
-        if (problem_params['nvars']) % 2 != 0:
-            raise ProblemError('setup requires nvars = 2^p')
-        if problem_params['freq'] >= 0 and problem_params['freq'] % 2 != 0:
-            raise ProblemError('need even number of frequencies due to periodic BCs')
+        if (problem_params['nvars'] + 1) % 2 != 0:
+            raise ProblemError('setup requires nvars = 2^p-1')
 
         if 'order' not in problem_params:
             problem_params['order'] = 1
@@ -47,11 +45,11 @@ class advection1d(ptype):
             problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection1d, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                          params=problem_params)
+        super(advection1d_dirichlet, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
+                                                    params=problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 1.0 / self.params.nvars
+        self.dx = 1.0 / (self.params.nvars + 1)
         self.A = self.__get_A(self.params.nvars, self.params.c, self.dx, self.params.order, self.params.type)
 
     @staticmethod
@@ -80,14 +78,6 @@ class advection1d(ptype):
                 stencil = [-1.0, 0.0, 1.0]
                 zero_pos = 2
                 coeff = 1.0 / 2.0
-            elif order == 4:
-                stencil = [1.0, -8.0, 0.0, 8.0, -1.0]
-                zero_pos = 3
-                coeff = 1.0 / 12.0
-            elif order == 6:
-                stencil = [-1.0, 9.0, -45.0, 0.0, 45.0, -9.0, 1.0]
-                zero_pos = 4
-                coeff = 1.0 / 60.0
             else:
                 raise ProblemError("Order " + str(order) + " not implemented.")
 
@@ -97,35 +87,12 @@ class advection1d(ptype):
                 stencil = [-1.0, 1.0]
                 coeff = 1.0
                 zero_pos = 2
-
-            elif order == 2:
-                stencil = [1.0, -4.0, 3.0]
-                coeff = 1.0 / 2.0
-                zero_pos = 3
-
-            elif order == 3:
-                stencil = [1.0, -6.0, 3.0, 2.0]
-                coeff = 1.0 / 6.0
-                zero_pos = 3
-
-            elif order == 4:
-                stencil = [-5.0, 30.0, -90.0, 50.0, 15.0]
-                coeff = 1.0 / 60.0
-                zero_pos = 4
-
-            elif order == 5:
-                stencil = [3.0, -20.0, 60.0, -120.0, 65.0, 12.0]
-                coeff = 1.0 / 60.0
-                zero_pos = 5
             else:
                 raise ProblemError("Order " + str(order) + " not implemented.")
 
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
+        offsets = [pos - zero_pos + 1 for pos in range(len(stencil))]
 
-        A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
+        A = sp.diags(stencil, offsets, shape=(N, N), format='csc')
         A *= c * coeff * (1.0 / dx)
 
         return A
