@@ -22,11 +22,11 @@ def main():
     """
     QI = 'LU'
     # run_diffusion(QI=QI)
-    run_advection(QI=QI)
+    # run_advection(QI=QI)
 
     QI = 'LU2'
     # run_diffusion(QI=QI)
-    run_advection(QI=QI)
+    # run_advection(QI=QI)
 
     plot_results()
 
@@ -294,7 +294,7 @@ def plot_results(cwd=''):
         plt.figure()
         plt.xlabel('number of time-steps (L)')
         plt.ylabel('#iterations')
-        plt.xlim(min(xvalues_1 + xvalues_2) / 2, max(xvalues_1 + xvalues_2) * 2)
+        plt.xlim(min(xvalues_1 + xvalues_2) / 2.0, max(xvalues_1 + xvalues_2) * 2.0)
         plt.ylim(min(niter_1 + niter_2) - 1, max(niter_1 + niter_2) + 1)
         plt.grid()
 
