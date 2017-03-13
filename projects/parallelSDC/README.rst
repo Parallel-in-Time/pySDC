@@ -17,6 +17,8 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 - ``IEpar``: one Euler step from t0 to the current node
 - ``Qpar``: Jacobi-like diagonal part of Q
 
+This part also contains ``minimization.py``, producing the heat maps for the spectral radius of the stiff limit matrix.
+
 .. include:: doc_parallelSDC_preconditioner.rst
 
 Simplified Newton for nonlinear problems
@@ -28,6 +30,7 @@ In order to apply this also for nonlinear problems, we apply an outer Newton ite
 Yet, the naive implementation still does not decouple space and time, so that we need to fix the Jacobian at e.g. node 0.
 This example compares the iteration counts and errors for this idea (incl. a modified Newton where the Jacobian is not fixed but the approach is applied nonetheless).
 Three new sweepers are used here: ``linearized_implicit_parallel``, ``linearized_implicit_fixed_parallel`` and ``linearized_implicit_fixed_parallel_prec``.
+This part also contains the code ``newton_vs_sdc.py`` where simplified and inexact Newton are compared to standard SDC for the generalized Fisher's equation.
 
 .. include:: doc_parallelSDC_nonlinear.rst
 
