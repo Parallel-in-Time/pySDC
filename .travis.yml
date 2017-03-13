@@ -37,11 +37,10 @@ script:
   - which nosetests
 #  - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
   - if [[ $PYTHON_VERSION == 3.5 ]]; then
-      travis-sphinx build
+      travis-sphinx build;
     fi
 
 after_success:
   - if [[ $PYTHON_VERSION == 3.5 ]]; then
-      travis-sphinx deploy
+      travis-sphinx deploy;
     fi
-
