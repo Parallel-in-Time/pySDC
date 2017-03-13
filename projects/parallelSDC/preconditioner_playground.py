@@ -196,8 +196,8 @@ def plot_iterations():
               'figure.figsize': (12, 8),
               'axes.labelsize': 20,
               'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
+              'xtick.labelsize': 20,
+              'ytick.labelsize': 20,
               'lines.linewidth': 3
               }
     plt.rcParams.update(params)
@@ -246,7 +246,7 @@ def plot_iterations():
         plt.grid()
 
         # save plot as PDF, beautify
-        fname = 'data/parallelSDC_preconditioner_' + setup + '.eps'
+        fname = 'data/parallelSDC_preconditioner_' + setup + '.png'
         plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
         assert os.path.isfile(fname), 'ERROR: plotting did not create file'

@@ -173,12 +173,12 @@ def plot_graphs(cwd=''):
     plt.ylim([4E-03, 1E0])
 
     # save plot, beautify
-    fname = 'data/parallelSDC_fisher_newton.eps'
+    fname = 'data/parallelSDC_fisher_newton.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     plot_graphs()

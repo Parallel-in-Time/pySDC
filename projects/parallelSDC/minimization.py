@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.optimize as opt
 import matplotlib.pylab as plt
+import matplotlib
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
@@ -37,6 +38,7 @@ def main():
               'lines.linewidth': 3
               }
     plt.rcParams.update(params)
+    matplotlib.style.use('classic')
 
     plt.figure()
     plt.pcolor(xdim, ydim, minfield.T, cmap='Reds', vmin=0, vmax=1)
