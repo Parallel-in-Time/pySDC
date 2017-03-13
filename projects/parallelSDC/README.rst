@@ -3,6 +3,7 @@ Attempts to parallelize SDC
 
 In this project, we test different strategies to parallelize SDC beyond PFASST.
 More precisely, the goal is to find a robust parallelization strategy *within* each iteration, i.e. parallelization across the collocation nodes.
+This code is used for the publication "Parallelizing SDC across the method".
 
 Different preconditioners for SDC
 ---------------------------------

@@ -110,12 +110,15 @@ def main():
     file.close()
 
 
-def plot_graphs():
+def plot_graphs(cwd=''):
     """
     Helper function to plot graphs of initial and final values
+
+    Args:
+        cwd (str): current working directory
     """
 
-    file = open('data/error_reduction_data.pkl', 'rb')
+    file = open(cwd + 'data/error_reduction_data.pkl', 'rb')
     results = pickle.load(file)
 
     sweeper_list = results['sweeper_list']
@@ -164,15 +167,13 @@ def plot_graphs():
     plt.ylim([4E-03, 1E0])
     plt.xticks(dt_list, dt_list)
 
-    # plt.show()
-
     # save plot as PDF, beautify
     fname = 'data/parallelSDC_fisher_newton.png'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
-    # assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+    assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     plot_graphs()
