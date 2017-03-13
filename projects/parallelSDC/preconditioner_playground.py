@@ -196,24 +196,23 @@ def plot_iterations():
               'figure.figsize': (12, 8),
               'axes.labelsize': 20,
               'axes.titlesize': 20,
-              'xtick.labelsize': 20,
-              'ytick.labelsize': 20,
+              'xtick.labelsize': 16,
+              'ytick.labelsize': 16,
               'lines.linewidth': 3
               }
     plt.rcParams.update(params)
-    matplotlib.style.use('classic')
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
 
         plt.figure()
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
-            niter_heat = np.zeros(len(results[setup][1]))
+            niter = np.zeros(len(results[setup][1]))
             for key in results.keys():
                 if isinstance(key, ID):
                     if key.setup == setup and key.qd_type == qd_type:
                         xvalue = results[setup][1].index(key.param)
-                        niter_heat[xvalue] = results[key]
+                        niter[xvalue] = results[key]
             if qd_type == 'LU':
                 ls = '--'
                 lw = 2
@@ -223,7 +222,7 @@ def plot_iterations():
             else:
                 ls = '-'
                 lw = 3
-            plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=lw, linestyle=ls, color=color, marker=marker,
+            plt.semilogx(results[setup][1], niter, label=qd_type, lw=lw, linestyle=ls, color=color, marker=marker,
                          markersize=10, markeredgecolor='k')
 
         if setup == 'heat':
