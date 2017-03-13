@@ -191,6 +191,18 @@ def plot_iterations():
     marker_list = [None, None, 's', 'o', '^']
     color_list = ['k', 'k', 'r', 'g', 'b']
 
+    # Set up plotting parameters
+    params = {'legend.fontsize': 20,
+              'figure.figsize': (12, 8),
+              'axes.labelsize': 20,
+              'axes.titlesize': 20,
+              'xtick.labelsize': 16,
+              'ytick.labelsize': 16,
+              'lines.linewidth': 3
+              }
+    plt.rcParams.update(params)
+    matplotlib.style.use('classic')
+
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
 
@@ -212,7 +224,7 @@ def plot_iterations():
                 ls = '-'
                 lw = 3
             plt.semilogx(results[setup][1], niter_heat, label=qd_type, lw=lw, linestyle=ls, color=color, marker=marker,
-                         markersize=10)
+                         markersize=10, markeredgecolor='k')
 
         if setup == 'heat':
             xlabel = r'$\nu$'
@@ -234,7 +246,7 @@ def plot_iterations():
         plt.grid()
 
         # save plot as PDF, beautify
-        fname = 'data/parallelSDC_preconditioner_' + setup + '.png'
+        fname = 'data/parallelSDC_preconditioner_' + setup + '.eps'
         plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
         assert os.path.isfile(fname), 'ERROR: plotting did not create file'

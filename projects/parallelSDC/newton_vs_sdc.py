@@ -147,33 +147,38 @@ def plot_graphs(cwd=''):
               'lines.linewidth': 3
               }
     plt.rcParams.update(params)
+    matplotlib.style.use('classic')
 
     # set up figure
-    plt.figure()
+    fig, ax = plt.subplots()
+
+    for sweeper, color, marker, label in setups:
+        plt.loglog(dt_list, results[sweeper], lw=3, ls='-', color=color, marker=marker, markersize=10,
+                   markeredgecolor='k', label=label)
+
+    plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=2, ls='--', color='k', label='linear')
+    plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=2, ls='-.', color='k', label='quadratic')
+
     plt.xlabel('dt')
     plt.ylabel('error reduction')
     plt.grid()
 
-    for sweeper, color, marker, label in setups:
-        plt.loglog(dt_list, results[sweeper], lw=3, ls='-', color=color, marker=marker, markersize=10, label=label)
-
-    plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=2, ls='--', color='k', label='linear')
-    plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=2, ls='-.', color='k', label='quadratic')
+    # ax.set_xticks(dt_list, dt_list)
+    plt.xticks(dt_list, dt_list)
 
     plt.legend(loc=1, ncol=1, numpoints=1)
 
     plt.gca().invert_xaxis()
     plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
     plt.ylim([4E-03, 1E0])
-    plt.xticks(dt_list, dt_list)
 
-    # save plot as PDF, beautify
-    fname = 'data/parallelSDC_fisher_newton.png'
+    # save plot, beautify
+    fname = 'data/parallelSDC_fisher_newton.eps'
     plt.savefig(fname, rasterized=True, bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     plot_graphs()
