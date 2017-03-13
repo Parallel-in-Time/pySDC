@@ -35,9 +35,9 @@ script:
   - ./docs/update_apidocs.sh
   - mkdir data
   - which nosetests
-  - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]] travis-sphinx build
+#  - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
+  - if [[ $PYTHON_VERSION == 3.5 ]] travis-sphinx build
 
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]] travis-sphinx deploy
+  - if [[ $PYTHON_VERSION == 3.5 ]] travis-sphinx deploy
 
