@@ -36,8 +36,8 @@ script:
   - mkdir data
   - which nosetests
   - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
-  - travis-sphinx build
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]] travis-sphinx build
 
 after_success:
-    - travis-sphinx deploy
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]] travis-sphinx deploy
 
