@@ -1,10 +1,7 @@
-import matplotlib
-
-matplotlib.use('Agg')
+import pySDC.helpers.plot_helper as plt_helper
 
 import pickle
 from collections import namedtuple
-import matplotlib.pylab as plt
 import os
 import numpy as np
 
@@ -191,21 +188,13 @@ def plot_iterations():
     marker_list = [None, None, 's', 'o', '^']
     color_list = ['k', 'k', 'r', 'g', 'b']
 
-    # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
-    plt.rcParams.update(params)
+    plt_helper.setup_mpl()
 
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
 
-        plt.figure()
+        plt_helper.newfig(textwidth=338.0, scale=0.475)
+
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
             niter = np.zeros(len(results[setup][1]))
             for key in results.keys():
@@ -215,15 +204,15 @@ def plot_iterations():
                         niter[xvalue] = results[key]
             if qd_type == 'LU':
                 ls = '--'
-                lw = 2
+                lw = 0.5
             elif qd_type == 'IE':
                 ls = '-.'
-                lw = 2
+                lw = 0.5
             else:
                 ls = '-'
-                lw = 3
-            plt.semilogx(results[setup][1], niter, label=qd_type, lw=lw, linestyle=ls, color=color, marker=marker,
-                         markersize=10, markeredgecolor='k')
+                lw = 1
+            plt_helper.plt.semilogx(results[setup][1], niter, label=qd_type, lw=lw, linestyle=ls, color=color,
+                                    marker=marker, markeredgecolor='k')
 
         if setup == 'heat':
             xlabel = r'$\nu$'
@@ -237,18 +226,18 @@ def plot_iterations():
             print('Setup not implemented..', setup)
             exit()
 
-        plt.ylim([0, 60])
-        plt.legend(loc=2, ncol=1, numpoints=1)
-        # plt.title(setup)
-        plt.ylabel('number of iterations')
-        plt.xlabel(xlabel)
-        plt.grid()
+        plt_helper.plt.ylim([0, 60])
+        plt_helper.plt.legend(loc=2, ncol=1)
+        plt_helper.plt.ylabel('number of iterations')
+        plt_helper.plt.xlabel(xlabel)
+        plt_helper.plt.grid()
 
-        # save plot as PDF, beautify
-        fname = 'data/parallelSDC_preconditioner_' + setup + '.png'
-        plt.savefig(fname, rasterized=True, bbox_inches='tight')
+        # save plot as PDF and PGF
+        fname = 'data/parallelSDC_preconditioner_' + setup
+        plt_helper.savefig(fname)
 
-        assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+        assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
+        assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
 
 
 if __name__ == "__main__":

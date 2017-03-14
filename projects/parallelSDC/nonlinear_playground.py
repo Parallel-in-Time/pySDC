@@ -1,9 +1,7 @@
-import matplotlib
-matplotlib.use('Agg')
+import pySDC.helpers.plot_helper as plt_helper
 
 import pickle
 import os
-import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -154,40 +152,32 @@ def plot_graphs():
     uend = results['uend']
     uex = results['uex']
 
-    # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
-    plt.rcParams.update(params)
+    plt_helper.setup_mpl()
 
     # set up figure
-    plt.figure()
-    plt.xlabel('x')
-    plt.ylabel('f(x)')
-    plt.xlim((interval[0] - 0.01, interval[1] + 0.01))
-    plt.ylim((-0.1, 1.1))
-    plt.grid()
+    plt_helper.newfig(textwidth=338.0, scale=1.0)
 
-    # compute values for x-axis and plot
+    plt_helper.plt.xlabel('x')
+    plt_helper.plt.ylabel('f(x)')
+    plt_helper.plt.xlim((interval[0] - 0.01, interval[1] + 0.01))
+    plt_helper.plt.ylim((-0.1, 1.1))
+    plt_helper.plt.grid()
 
-    plt.plot(xvalues, uinit, 'r--', lw=2, label='initial')
-    plt.plot(xvalues, uend, 'bs', lw=2, label='computed')
-    plt.plot(xvalues, uex, 'gd', lw=2, label='exact')
+    #plot
+    plt_helper.plt.plot(xvalues, uinit, 'r--', lw=1, label='initial')
+    plt_helper.plt.plot(xvalues, uend, 'bs', lw=1, markeredgecolor='k', label='computed')
+    plt_helper.plt.plot(xvalues, uex, 'g-', lw=1, label='exact')
 
-    plt.legend(loc=2, ncol=1, numpoints=1)
+    plt_helper.plt.legend(loc=2, ncol=1)
 
     # save plot as PDF, beautify
-    fname = 'data/parallelSDC_fisher.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    fname = 'data/parallelSDC_fisher'
+    plt_helper.savefig(fname)
 
-    assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+    assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
+    assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     plot_graphs()

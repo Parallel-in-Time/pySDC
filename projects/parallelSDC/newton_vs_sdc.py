@@ -1,11 +1,7 @@
-import matplotlib
-
-matplotlib.use('Agg')
+import pySDC.helpers.plot_helper as plt_helper
 
 import pickle
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
@@ -117,6 +113,7 @@ def plot_graphs(cwd=''):
     Args:
         cwd (str): current working directory
     """
+    # plt_helper.mpl.style.use('classic')
 
     file = open(cwd + 'data/error_reduction_data.pkl', 'rb')
     results = pickle.load(file)
@@ -137,48 +134,39 @@ def plot_graphs(cwd=''):
 
     setups = zip(sweeper_list, color_list, marker_list, label_list)
 
-    # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
-    plt.rcParams.update(params)
-    matplotlib.style.use('classic')
+    plt_helper.setup_mpl()
 
-    # set up figure
-    fig, ax = plt.subplots()
+    plt_helper.newfig(textwidth=338.0, scale=1.0)
 
     for sweeper, color, marker, label in setups:
-        plt.loglog(dt_list, results[sweeper], lw=3, ls='-', color=color, marker=marker, markersize=10,
-                   markeredgecolor='k', label=label)
+        plt_helper.plt.loglog(dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker,
+                              markeredgecolor='k', label=label)
 
-    plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=2, ls='--', color='k', label='linear')
-    plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=2, ls='-.', color='k', label='quadratic')
+    plt_helper.plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=0.5, ls='--', color='k', label='linear')
+    plt_helper.plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=0.5, ls='-.', color='k',
+                          label='quadratic')
 
-    plt.xlabel('dt')
-    plt.ylabel('error reduction')
-    plt.grid()
+    plt_helper.plt.xlabel('dt')
+    plt_helper.plt.ylabel('error reduction')
+    plt_helper.plt.grid()
 
     # ax.set_xticks(dt_list, dt_list)
-    plt.xticks(dt_list, dt_list)
+    plt_helper.plt.xticks(dt_list, dt_list)
 
-    plt.legend(loc=1, ncol=1, numpoints=1)
+    plt_helper.plt.legend(loc=1, ncol=1)
 
-    plt.gca().invert_xaxis()
-    plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
-    plt.ylim([4E-03, 1E0])
+    plt_helper.plt.gca().invert_xaxis()
+    plt_helper.plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
+    plt_helper.plt.ylim([4E-03, 1E0])
 
     # save plot, beautify
-    fname = 'data/parallelSDC_fisher_newton.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    fname = 'data/parallelSDC_fisher_newton'
+    plt_helper.savefig(fname)
 
-    assert os.path.isfile(fname), 'ERROR: plotting did not create file'
+    assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
+    assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     plot_graphs()
