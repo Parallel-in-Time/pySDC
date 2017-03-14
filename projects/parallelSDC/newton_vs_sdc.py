@@ -113,7 +113,7 @@ def plot_graphs(cwd=''):
     Args:
         cwd (str): current working directory
     """
-    # plt_helper.mpl.style.use('classic')
+    plt_helper.mpl.style.use('classic')
 
     file = open(cwd + 'data/error_reduction_data.pkl', 'rb')
     results = pickle.load(file)

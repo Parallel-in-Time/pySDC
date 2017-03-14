@@ -9,7 +9,7 @@ Results:
 Results:
 
 .. image:: ../../../data/parallelSDC_fisher.png
-   :scale: 50 %
+   :scale: 100 %
 
 Full code: `projects/parallelSDC/newton_vs_sdc.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/parallelSDC/newton_vs_sdc.py>`_
 
@@ -18,4 +18,4 @@ Full code: `projects/parallelSDC/newton_vs_sdc.py <https://github.com/Parallel-i
 Results:
 
 .. image:: ../../../data/parallelSDC_fisher_newton.png
-   :scale: 50 %
+   :scale: 100 %

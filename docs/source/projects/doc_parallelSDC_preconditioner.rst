@@ -5,14 +5,14 @@ Full code: `projects/parallelSDC/preconditioner_playground.py <https://github.co
 Results:
 
 .. image:: ../../../data/parallelSDC_preconditioner_heat.png
-   :scale: 50 %
+   :scale: 100 %
 
 .. image:: ../../../data/parallelSDC_preconditioner_advection.png
-   :scale: 50 %
+   :scale: 100 %
 
 .. image:: ../../../data/parallelSDC_preconditioner_vanderpol.png
-   :scale: 50 %
+   :scale: 100 %
 
 .. image:: ../../../data/parallelSDC_preconditioner_fisher.png
-   :scale: 50 %
+   :scale: 100 %
 
