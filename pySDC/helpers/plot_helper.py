@@ -60,3 +60,4 @@ def newfig(textwidth, scale):
 def savefig(filename):
     plt.savefig('{}.pgf'.format(filename), rasterized=True, bbox_inches='tight')
     plt.savefig('{}.pdf'.format(filename), rasterized=True, bbox_inches='tight')
+    plt.savefig('{}.png'.format(filename), rasterized=True, bbox_inches='tight')
