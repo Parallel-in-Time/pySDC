@@ -1,5 +1,5 @@
 # use 'new'ish container-based infrastructure
-sudo: false
+sudo: required
 dist: trusty
 
 language: python
