@@ -163,7 +163,7 @@ def plot_graphs():
     plt_helper.plt.ylim((-0.1, 1.1))
     plt_helper.plt.grid()
 
-    #plot
+    # plot
     plt_helper.plt.plot(xvalues, uinit, 'r--', lw=1, label='initial')
     plt_helper.plt.plot(xvalues, uend, 'bs', lw=1, markeredgecolor='k', label='computed')
     plt_helper.plt.plot(xvalues, uex, 'g-', lw=1, label='exact')

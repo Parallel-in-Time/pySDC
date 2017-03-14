@@ -30,6 +30,7 @@ install:
   - conda list
   - pip install --user coloredlogs
   - pip install --user travis-sphinx
+  - sudo apt-get install -y texlive-latex-recommended
 
 script:
   - ./docs/update_apidocs.sh
