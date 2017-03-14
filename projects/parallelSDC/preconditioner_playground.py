@@ -193,7 +193,7 @@ def plot_iterations():
     # loop over setups and Q-delta types: one figure per setup, all Qds in one plot
     for setup in setup_list:
 
-        plt_helper.newfig(textwidth=338.0, scale=0.475)
+        plt_helper.newfig(textwidth=238.96, scale=0.89)
 
         for qd_type, marker, color in zip(qd_type_list, marker_list, color_list):
             niter = np.zeros(len(results[setup][1]))

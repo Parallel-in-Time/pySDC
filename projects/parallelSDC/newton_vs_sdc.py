@@ -136,7 +136,7 @@ def plot_graphs(cwd=''):
 
     plt_helper.setup_mpl()
 
-    plt_helper.newfig(textwidth=338.0, scale=1.0)
+    plt_helper.newfig(textwidth=238.96, scale=0.89)
 
     for sweeper, color, marker, label in setups:
         plt_helper.plt.loglog(dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker,
