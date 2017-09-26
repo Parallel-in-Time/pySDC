@@ -255,16 +255,16 @@ class allinclusive_classic_MPI(controller):
 
             # check whether to stop iterating (parallel)
 
-            # check if an open request of the status send is pending
-            if self.req_status is not None:
-                self.req_status.wait()
-
             # check for convergence or abort
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
 
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
+
+            # check if an open request of the status send is pending
+            if self.req_status is not None:
+                self.req_status.wait()
 
             # send status forward
             if not self.S.status.last:
