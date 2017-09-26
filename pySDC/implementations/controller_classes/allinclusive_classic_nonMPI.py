@@ -218,17 +218,9 @@ class allinclusive_classic_nonMPI(controller):
             # update stage
             if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT_RESTRICT'
-            elif len(S.levels) > 1:  # MLSDC or PFASST without predict
+            else:  # SDC
                 self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_FINE_SWEEP'
-            elif num_procs > 1:  # MSSDC
-                self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_COARSE_SWEEP'
-            elif num_procs == 1:  # SDC
-                self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_FINE_SWEEP'
-            else:
-                raise ControllerError("Don't know what to do after spread, aborting")
+                S.status.stage = 'IT_CHECK'
 
             return S
 

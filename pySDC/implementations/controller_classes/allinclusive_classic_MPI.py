@@ -43,6 +43,8 @@ class allinclusive_classic_MPI(controller):
 
         num_levels = len(self.S.levels)
 
+        assert not (num_procs > 1 and num_levels == 1), "ERROR: classic cannot do MSSDC"
+
         if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
@@ -136,7 +138,7 @@ class allinclusive_classic_MPI(controller):
         self.S.init_step(u0)
         # reset some values
         self.S.status.done = False
-        self.S.status.iter = 1
+        self.S.status.iter = 0
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
@@ -257,7 +259,7 @@ class allinclusive_classic_MPI(controller):
 
             # update stage
             self.hooks.pre_iteration(step=self.S, level_number=0)
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_FINE':
 
@@ -283,20 +285,26 @@ class allinclusive_classic_MPI(controller):
                 self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
 
             # update stage
-            self.S.status.stage = 'IT_CHECK'
+            # multi-level or single-level?
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_UP'
+            else:  # SDC
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
 
             # check whether to stop iterating (parallel)
-
-            self.hooks.post_iteration(step=self.S, level_number=0)
 
             # check if an open request of the status send is pending
             if self.req_status is not None:
                 self.req_status.wait()
 
             # check for convergence or abort
+            self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
+
+            if self.S.status.iter > 0:
+                self.hooks.post_iteration(step=self.S, level_number=0)
 
             # send status forward
             if not self.S.status.last:
@@ -318,15 +326,7 @@ class allinclusive_classic_MPI(controller):
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
                 self.hooks.pre_iteration(step=self.S, level_number=0)
-                # multi-level or single-level?
-                if len(self.S.levels) > 1:  # MLSDC or PFASST
-                    self.S.status.stage = 'IT_UP'
-                elif num_procs > 1:  # MSSDC
-                    self.S.status.stage = 'IT_COARSE_RECV'
-                elif num_procs == 1:  # SDC
-                    self.S.status.stage = 'IT_FINE'
-                else:
-                    raise ControllerError("Weird stage in IT_CHECK")
+                self.S.status.stage = 'IT_FINE'
 
             else:
                 self.S.levels[0].sweep.compute_end_point()
@@ -397,10 +397,7 @@ class allinclusive_classic_MPI(controller):
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=len(self.S.levels) - 1, comm=comm)
 
             # update stage
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_DOWN'
-            else:  # MSSDC
-                self.S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_DOWN'
 
         elif stage == 'IT_DOWN':
 
@@ -427,7 +424,7 @@ class allinclusive_classic_MPI(controller):
                     self.hooks.post_sweep(step=self.S, level_number=l - 1)
 
             # update stage
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         else:
 
