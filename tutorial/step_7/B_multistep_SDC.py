@@ -76,9 +76,9 @@ def main():
 
     # instantiate controllers
     controller_mssdc = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                   description=description_mssdc)
+                                                     description=description_mssdc)
     controller_pfasst = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                    description=description_pfasst)
+                                                      description=description_pfasst)
 
     # get initial values on finest level
     P = controller_mssdc.MS[0].levels[0].prob

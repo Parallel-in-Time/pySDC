@@ -242,7 +242,6 @@ class allinclusive_multigrid_MPI(controller):
             else:
                 self.S.status.stage = 'IT_CHECK'
 
-
         elif stage == 'PREDICT':
 
             # call predictor (serial)

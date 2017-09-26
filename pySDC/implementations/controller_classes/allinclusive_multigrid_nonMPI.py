@@ -420,8 +420,8 @@ class allinclusive_multigrid_nonMPI(controller):
                         if self.params.fine_comm and not S.status.first:
                             self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                               (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
-                            self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter, S.prev.status.slot))
-
+                            self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
+                                                                                  S.prev.status.slot))
 
                         self.hooks.pre_sweep(step=S, level_number=l - 1)
                         for k in range(S.levels[l - 1].params.nsweeps):
