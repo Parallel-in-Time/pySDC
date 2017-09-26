@@ -139,7 +139,7 @@ class allinclusive_multigrid_MPI(controller):
         self.S.init_step(u0)
         # reset some values
         self.S.status.done = False
-        self.S.status.iter = 1
+        self.S.status.iter = 0
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
@@ -239,17 +239,9 @@ class allinclusive_multigrid_MPI(controller):
             # update stage
             if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
-            elif len(self.S.levels) > 1:  # MLSDC or PFASST without predict
-                self.hooks.pre_iteration(step=self.S, level_number=0)
-                self.S.status.stage = 'IT_FINE'
-            elif num_procs > 1 and len(self.S.levels) == 1:  # MSSDC
-                self.hooks.pre_iteration(step=self.S, level_number=0)
-                self.S.status.stage = 'IT_COARSE'
-            elif num_procs == 1:  # SDC
-                self.hooks.pre_iteration(step=self.S, level_number=0)
-                self.S.status.stage = 'IT_FINE'
             else:
-                raise ControllerError("Don't know what to do after spread, aborting")
+                self.S.status.stage = 'IT_CHECK'
+
 
         elif stage == 'PREDICT':
 
@@ -259,7 +251,48 @@ class allinclusive_multigrid_MPI(controller):
 
             # update stage
             self.hooks.pre_iteration(step=self.S, level_number=0)
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
+
+        elif stage == 'IT_CHECK':
+
+            # check whether to stop iterating (parallel)
+
+            req_send = None
+            self.S.levels[0].sweep.compute_end_point()
+            if not self.S.status.last and self.params.fine_comm:
+                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   0, self.S.status.iter))
+                req_send = comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=self.S.status.iter)
+
+            if not self.S.status.first and self.params.fine_comm:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   0, self.S.status.iter))
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+            if not self.S.status.last and self.params.fine_comm:
+                req_send.wait()
+
+            self.S.levels[0].sweep.compute_residual()
+            self.S.status.done = self.check_convergence(self.S)
+            all_done = comm.allgather(self.S.status.done)
+
+            if self.S.status.iter > 0:
+                self.hooks.post_iteration(step=self.S, level_number=0)
+
+            # if not everyone is ready yet, keep doing stuff
+            if not all(all_done):
+                self.S.status.done = False
+                # increment iteration count here (and only here)
+                self.S.status.iter += 1
+                self.hooks.pre_iteration(step=self.S, level_number=0)
+                self.S.status.stage = 'IT_FINE'
+
+            else:
+                self.S.levels[0].sweep.compute_end_point()
+                self.hooks.post_step(step=self.S, level_number=0)
+                self.S.status.stage = 'DONE'
 
         elif stage == 'IT_FINE':
 
@@ -273,36 +306,10 @@ class allinclusive_multigrid_MPI(controller):
             self.hooks.post_sweep(step=self.S, level_number=0)
 
             # update stage
-            self.S.status.stage = 'IT_CHECK'
-
-        elif stage == 'IT_CHECK':
-
-            # check whether to stop iterating (parallel)
-
-            self.hooks.post_iteration(step=self.S, level_number=0)
-            self.S.status.done = self.check_convergence(self.S)
-            all_done = comm.allgather(self.S.status.done)
-
-            # if not everyone is ready yet, keep doing stuff
-            if not all(all_done):
-                self.S.status.done = False
-                # increment iteration count here (and only here)
-                self.S.status.iter += 1
-                self.hooks.pre_iteration(step=self.S, level_number=0)
-                # multi-level or single-level?
-                if len(self.S.levels) > 1:  # MLSDC or PFASST
-                    self.S.status.stage = 'IT_UP'
-                elif num_procs > 1:  # MSSDC
-                    self.S.status.stage = 'IT_COARSE_RECV'
-                elif num_procs == 1:  # SDC
-                    self.S.status.stage = 'IT_FINE'
-                else:
-                    raise ControllerError("Weird stage in IT_CHECK")
-
-            else:
-                self.S.levels[0].sweep.compute_end_point()
-                self.hooks.post_step(step=self.S, level_number=0)
-                self.S.status.stage = 'DONE'
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_UP'
+            else:  # SDC
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_UP':
 
@@ -322,24 +329,18 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
 
             # update stage
-            self.S.status.stage = 'IT_COARSE_RECV'
-
-        elif stage == 'IT_COARSE_RECV':
-
-            # receive from previous step (if not first)
-
-            if not self.S.status.first:
-                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   len(self.S.levels) - 1, self.S.status.iter))
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-
-            # update stage
             self.S.status.stage = 'IT_COARSE'
 
         elif stage == 'IT_COARSE':
 
             # sweeps on coarsest level (serial/blocking)
+
+            # receive from previous step (if not first)
+            if not self.S.status.first:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   len(self.S.levels) - 1, self.S.status.iter))
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep
             self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
@@ -357,10 +358,7 @@ class allinclusive_multigrid_MPI(controller):
                 self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
 
             # update stage
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_DOWN'
-            else:  # MSSDC
-                self.S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_DOWN'
 
         elif stage == 'IT_DOWN':
 
@@ -373,24 +371,24 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
                 self.S.levels[l - 1].sweep.compute_end_point()
 
-                req_send = None
-                if not self.S.status.last and self.params.fine_comm:
-                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                       l - 1, self.S.status.iter))
-                    req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
-
-                if not self.S.status.first and self.params.fine_comm:
-                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                       l - 1, self.S.status.iter))
-                    self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-
-                if not self.S.status.last and self.params.fine_comm:
-                    req_send.wait()
-
                 # on middle levels: do sweep as usual
                 if l - 1 > 0:
+                    req_send = None
+                    if not self.S.status.last and self.params.fine_comm:
+                        self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                           l - 1, self.S.status.iter))
+                        req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
+
+                    if not self.S.status.first and self.params.fine_comm:
+                        self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                           l - 1, self.S.status.iter))
+                        self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                    if not self.S.status.last and self.params.fine_comm:
+                        req_send.wait()
+
                     self.hooks.pre_sweep(step=self.S, level_number=l - 1)
                     for k in range(self.S.levels[l - 1].params.nsweeps):
                         self.S.levels[l - 1].sweep.update_nodes()
@@ -398,7 +396,7 @@ class allinclusive_multigrid_MPI(controller):
                     self.hooks.post_sweep(step=self.S, level_number=l - 1)
 
             # update stage
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         else:
 
