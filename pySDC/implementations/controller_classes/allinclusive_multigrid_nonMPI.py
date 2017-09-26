@@ -35,8 +35,6 @@ class allinclusive_multigrid_nonMPI(controller):
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
 
-        assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: multigrid cannot do MSSDC"
-
         if num_procs > 1 and len(self.MS[0].levels) > 1:
             for S in self.MS:
                 for L in S.levels:
@@ -142,7 +140,7 @@ class allinclusive_multigrid_nonMPI(controller):
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
-            self.MS[p].status.iter = 1
+            self.MS[p].status.iter = 0
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
                 l.tag = None
@@ -267,8 +265,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
-                    self.hooks.pre_iteration(step=S, level_number=0)
-                    S.status.stage = 'IT_FINE'
+                    S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -279,8 +276,50 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_CHECK'
+
+            return MS
+
+        elif stage == 'IT_CHECK':
+
+            # check whether to stop iterating (parallel)
+
+            for S in MS:
+
+                # send updated values forward
+                if self.params.fine_comm and not S.status.last:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                      % (S.status.slot, 0, S.status.iter))
+                    self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
+
+                # # receive values
+                if self.params.fine_comm and not S.status.first:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                      (S.status.slot, S.prev.status.slot, 0, S.status.iter))
+                    self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
+
+                S.levels[0].sweep.compute_residual()
+                S.status.done = self.check_convergence(S)
+
+                if S.status.iter > 0:
+                    self.hooks.post_iteration(step=S, level_number=0)
+
+            # if not everyone is ready yet, keep doing stuff
+            if not all(S.status.done for S in MS):
+
+                for S in MS:
+                    S.status.done = False
+                    # increment iteration count here (and only here)
+                    S.status.iter += 1
+                    self.hooks.pre_iteration(step=S, level_number=0)
+                    S.status.stage = 'IT_FINE'
+
+            else:
+                # if everyone is ready, end
+                for S in MS:
+                    S.levels[0].sweep.compute_end_point()
+                    self.hooks.post_step(step=S, level_number=0)
+                    S.status.stage = 'DONE'
 
             return MS
 
@@ -296,38 +335,10 @@ class allinclusive_multigrid_nonMPI(controller):
                 self.hooks.post_sweep(step=S, level_number=0)
 
                 # update stage
-                S.status.stage = 'IT_CHECK'
-
-            return MS
-
-        elif stage == 'IT_CHECK':
-
-            # check whether to stop iterating (parallel)
-
-            for S in MS:
-                self.hooks.post_iteration(step=S, level_number=0)
-                S.status.done = self.check_convergence(S)
-
-            # if not everyone is ready yet, keep doing stuff
-            if not all(S.status.done for S in MS):
-
-                for S in MS:
-                    S.status.done = False
-                    # increment iteration count here (and only here)
-                    S.status.iter += 1
-                    self.hooks.pre_iteration(step=S, level_number=0)
-                    # multi-level or single-level?
-                    if len(S.levels) > 1:  # MLSDC or PFASST
-                        S.status.stage = 'IT_UP'
-                    else:  # SDC
-                        S.status.stage = 'IT_FINE'
-
-            else:
-                # if everyone is ready, end
-                for S in MS:
-                    S.levels[0].sweep.compute_end_point()
-                    self.hooks.post_step(step=S, level_number=0)
-                    S.status.stage = 'DONE'
+                if len(S.levels) > 1:  # MLSDC or PFASST
+                    S.status.stage = 'IT_UP'
+                else:  # SDC
+                    S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -396,28 +407,31 @@ class allinclusive_multigrid_nonMPI(controller):
                     # prolong values
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
-                    # send updated values forward
-                    if self.params.fine_comm and not S.status.last:
-                        self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                          % (S.status.slot, l - 1, S.status.iter))
-                        self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
-
-                    # # receive values
-                    if self.params.fine_comm and not S.status.first:
-                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                          (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
-                        self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter, S.prev.status.slot))
-
-                    # on middle levels: do sweep as usual
+                    # on middle levels: do communication and sweep as usual
                     if l - 1 > 0:
+
+                        # send updated values forward
+                        if self.params.fine_comm and not S.status.last:
+                            self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                              % (S.status.slot, l - 1, S.status.iter))
+                            self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
+
+                        # # receive values
+                        if self.params.fine_comm and not S.status.first:
+                            self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                              (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
+                            self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
+                                                                                  S.prev.status.slot))
+
                         self.hooks.pre_sweep(step=S, level_number=l - 1)
                         for k in range(S.levels[l - 1].params.nsweeps):
                             S.levels[l - 1].sweep.update_nodes()
                         S.levels[l - 1].sweep.compute_residual()
                         self.hooks.post_sweep(step=S, level_number=l - 1)
+                    # on finest level, first check for convergence (where we will communication, too)
 
                 # update stage
-                S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_CHECK'
 
             return MS
 

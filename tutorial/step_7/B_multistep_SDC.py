@@ -5,7 +5,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
@@ -75,10 +75,10 @@ def main():
     num_proc = 8
 
     # instantiate controllers
-    controller_mssdc = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                   description=description_mssdc)
-    controller_pfasst = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                    description=description_pfasst)
+    controller_mssdc = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                     description=description_mssdc)
+    controller_pfasst = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                      description=description_pfasst)
 
     # get initial values on finest level
     P = controller_mssdc.MS[0].levels[0].prob
@@ -127,7 +127,7 @@ def main():
     show_residual_across_simulation(stats_mssdc, 'step_7_residuals_mssdc.png')
 
     assert os.path.isfile('step_7_residuals_mssdc.png')
-    assert diff < 2.66E-09, "ERROR: difference between PFASST and MSSDC controller is too large, got %s" % diff
+    assert diff < 1E-10, "ERROR: difference between PFASST and MSSDC controller is too large, got %s" % diff
 
 
 if __name__ == "__main__":

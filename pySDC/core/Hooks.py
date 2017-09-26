@@ -123,7 +123,8 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Residual: %12.8e',
+        self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- '
+                         'lagged residual: %12.8e',
                          step.status.slot, L.time, step.status.stage, L.level_index, step.status.iter,
                          L.status.residual)
 
