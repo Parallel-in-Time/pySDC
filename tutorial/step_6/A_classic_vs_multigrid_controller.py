@@ -78,7 +78,7 @@ def main(num_proc_list=None, fname=None):
 
         assert all([item[1] <= 7 for item in iter_counts_multigrid]), \
             "ERROR: weird iteration counts for multigrid, got %s" % iter_counts_multigrid
-        assert diff < 1E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
+        assert diff < 1.281E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
 
     f.close()
 
