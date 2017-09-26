@@ -219,7 +219,6 @@ class allinclusive_classic_nonMPI(controller):
             if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT_RESTRICT'
             else:  # SDC
-                self.hooks.pre_iteration(step=S, level_number=0)
                 S.status.stage = 'IT_CHECK'
 
             return S
@@ -286,8 +285,34 @@ class allinclusive_classic_nonMPI(controller):
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
             # update stage and return
-            self.hooks.pre_iteration(step=S, level_number=0)
             S.status.stage = 'IT_CHECK'
+            return S
+
+        elif stage == 'IT_CHECK':
+
+            # check whether to stop iterating
+
+            S.levels[0].sweep.compute_residual()
+            S.status.done = self.check_convergence(S)
+
+            if S.status.iter > 0:
+                self.hooks.post_iteration(step=S, level_number=0)
+
+            # if the previous step is still iterating but I am done, un-do me to still forward values
+            if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
+                S.status.done = False
+
+            # if I am done, signal accordingly, otherwise proceed
+            if S.status.done:
+                S.levels[0].sweep.compute_end_point()
+                self.hooks.post_step(step=S, level_number=0)
+                S.status.stage = 'DONE'
+            else:
+                # increment iteration count here (and only here)
+                S.status.iter += 1
+                self.hooks.pre_iteration(step=S, level_number=0)
+                S.status.stage = 'IT_FINE_SWEEP'
+            # return
             return S
 
         elif stage == 'IT_FINE_SWEEP':
@@ -321,33 +346,6 @@ class allinclusive_classic_nonMPI(controller):
                     S.status.stage = 'IT_CHECK'
             else:
                 S.status.stage = 'IT_FINE_SEND'
-            # return
-            return S
-
-        elif stage == 'IT_CHECK':
-
-            # check whether to stop iterating
-
-            S.levels[0].sweep.compute_residual()
-            S.status.done = self.check_convergence(S)
-
-            if S.status.iter > 0:
-                self.hooks.post_iteration(step=S, level_number=0)
-
-            # if the previous step is still iterating but I am done, un-do me to still forward values
-            if not S.status.first and S.status.done and (S.prev.status.done is not None and not S.prev.status.done):
-                S.status.done = False
-
-            # if I am done, signal accordingly, otherwise proceed
-            if S.status.done:
-                S.levels[0].sweep.compute_end_point()
-                self.hooks.post_step(step=S, level_number=0)
-                S.status.stage = 'DONE'
-            else:
-                # increment iteration count here (and only here)
-                S.status.iter += 1
-                self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_FINE_SWEEP'
             # return
             return S
 
@@ -416,7 +414,6 @@ class allinclusive_classic_nonMPI(controller):
             for k in range(S.levels[-1].params.nsweeps):
                 S.levels[-1].sweep.update_nodes()
             S.levels[-1].sweep.compute_residual()
-
             self.hooks.post_sweep(step=S, level_number=len(S.levels) - 1)
 
             # update stage and return
@@ -432,10 +429,7 @@ class allinclusive_classic_nonMPI(controller):
                                   % (S.status.slot, len(S.levels) - 1, True))
                 self.send(S.levels[-1], tag=True)
                 # update stage
-                if len(S.levels) > 1:  # MLSDC or PFASST
-                    S.status.stage = 'IT_DOWN'
-                else:  # MSSDC
-                    S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_DOWN'
             else:
                 S.status.stage = 'IT_COARSE_SEND'
             # return

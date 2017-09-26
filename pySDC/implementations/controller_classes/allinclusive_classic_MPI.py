@@ -249,38 +249,7 @@ class allinclusive_classic_MPI(controller):
             self.predictor(comm)
 
             # update stage
-            self.hooks.pre_iteration(step=self.S, level_number=0)
             self.S.status.stage = 'IT_CHECK'
-
-        elif stage == 'IT_FINE':
-
-            # do fine sweep
-
-            # standard sweep workflow: update nodes, compute residual, log progress
-            self.hooks.pre_sweep(step=self.S, level_number=0)
-            for k in range(self.S.levels[0].params.nsweeps):
-                self.S.levels[0].sweep.update_nodes()
-            self.S.levels[0].sweep.compute_residual()
-            self.hooks.post_sweep(step=self.S, level_number=0)
-
-            # wait for pending sends before computing uend, if any
-            if len(self.req_send) > 0 and not self.S.status.last and self.params.fine_comm:
-                self.req_send[0].wait()
-
-            self.S.levels[0].sweep.compute_end_point()
-
-            if not self.S.status.last and self.params.fine_comm:
-                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   0, self.S.status.iter))
-                self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
-
-            # update stage
-            # multi-level or single-level?
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_UP'
-            else:  # SDC
-                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
 
@@ -323,6 +292,36 @@ class allinclusive_classic_MPI(controller):
                 self.S.levels[0].sweep.compute_end_point()
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
+
+        elif stage == 'IT_FINE':
+
+            # do fine sweep
+
+            # standard sweep workflow: update nodes, compute residual, log progress
+            self.hooks.pre_sweep(step=self.S, level_number=0)
+            for k in range(self.S.levels[0].params.nsweeps):
+                self.S.levels[0].sweep.update_nodes()
+            self.S.levels[0].sweep.compute_residual()
+            self.hooks.post_sweep(step=self.S, level_number=0)
+
+            # wait for pending sends before computing uend, if any
+            if len(self.req_send) > 0 and not self.S.status.last and self.params.fine_comm:
+                self.req_send[0].wait()
+
+            self.S.levels[0].sweep.compute_end_point()
+
+            if not self.S.status.last and self.params.fine_comm:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   0, self.S.status.iter))
+                self.req_send.append(comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=0))
+
+            # update stage
+            # multi-level or single-level?
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_UP'
+            else:  # SDC
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_UP':
 

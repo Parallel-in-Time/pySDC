@@ -61,7 +61,7 @@ def main():
     assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6E-10, \
         'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
         abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy)
-    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 3E-10, \
+    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 8E-10, \
         'ERROR: energy deviated too much after using finter, got %s' % (
         abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy)
 
