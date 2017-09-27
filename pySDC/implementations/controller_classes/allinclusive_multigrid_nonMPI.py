@@ -136,7 +136,7 @@ class allinclusive_multigrid_nonMPI(controller):
             # determine whether I am the first and/or last in line
             self.MS[p].status.first = active_slots.index(p) == 0
             self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
-            # intialize step with u0
+            # initialize step with u0
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False

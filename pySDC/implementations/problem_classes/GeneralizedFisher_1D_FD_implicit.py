@@ -95,6 +95,7 @@ class generalized_fisher(ptype):
 
         # start newton iteration
         n = 0
+        res = 99
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
@@ -117,6 +118,9 @@ class generalized_fisher(ptype):
 
             # increase iteration count
             n += 1
+
+        if n == self.params.newton_maxiter:
+            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u
 
