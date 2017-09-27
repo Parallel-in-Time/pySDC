@@ -6,15 +6,15 @@ from tutorial.step_6.B_odd_temporal_distribution import main as main_B
 from tutorial.step_6.C_MPI_parallelization import main as main_C
 
 
-# def test_A():
-#     main_A(num_proc_list=[1,2,4,8], fname='step_6_A_out.txt')
-#
-# def test_B():
-#     main_B()
+def test_A():
+    main_A(num_proc_list=[1,2,4,8], fname='step_6_A_out.txt')
+
+def test_B():
+    main_B()
 
 def test_C():
-    # cwd = 'tutorial/step_6'
-    # main_C(cwd)
+    cwd = 'tutorial/step_6'
+    main_C(cwd)
 
     with open('step_6_C1_out.txt', 'r') as file1:
         with open('step_6_A_out.txt', 'r') as file2:
