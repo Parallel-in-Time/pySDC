@@ -41,7 +41,7 @@ def main():
     setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
                   ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
                   ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
-                  ('fisher', 63, [2 ** i for i in range(-2, 4)])]
+                  ('fisher', 63, [2 ** i for i in range(-2, 3)])]
     # setup_list = [('fisher', 63, [2 * i for i in range(1, 6)])]
 
     # pre-fill results with lists of  setups
@@ -117,7 +117,7 @@ def main():
                     problem_params['nu'] = 1
                     problem_params['lambda0'] = param
                     problem_params['newton_maxiter'] = 20
-                    problem_params['newton_tol'] = 1E-09
+                    problem_params['newton_tol'] = 1E-10
                     problem_params['interval'] = (-5, 5)
 
                     level_params['dt'] = 0.01
@@ -152,7 +152,7 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10 + 6) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    assert len(results) == (6 + 6 + 10 + 5) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
     # write out for later visualization
     file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
