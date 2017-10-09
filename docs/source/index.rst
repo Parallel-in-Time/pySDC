@@ -90,7 +90,7 @@ Tests
 API documentation
 -----------------
 
-.. include:: ../../pySDC/README.rst
+.. include:: ../../pySDC/README_API.rst
 
 .. toctree::
    :maxdepth: 1
