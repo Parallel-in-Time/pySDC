@@ -95,9 +95,9 @@ if __name__ == "__main__":
         y0 = np.concatenate( (uinit.values[0,:], uinit.values[1,:]) )
         y0 = y0.astype('complex')
         if ii==0:
-          print "Time step: %4.2f" % dt
-          print "Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx) 
-          print "Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx) 
+          print("Time step: %4.2f" % dt)
+          print("Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx))
+          print("Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx))
 
         # call main function to get things done...
         for n in range(int(ns)):
