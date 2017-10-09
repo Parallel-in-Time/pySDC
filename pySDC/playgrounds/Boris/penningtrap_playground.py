@@ -9,7 +9,7 @@ from pySDC.implementations.datatype_classes.particles import particles, fields
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from playgrounds.Boris.penningtrap_HookClass import particles_output
+from pySDC.playgrounds.Boris.penningtrap_HookClass import particles_output
 
 
 def main():

@@ -10,7 +10,7 @@ from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI impo
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
-from playgrounds.HeatEquation.HookClass_error_output import error_output
+from pySDC.playgrounds.HeatEquation.HookClass_error_output import error_output
 
 
 def main():

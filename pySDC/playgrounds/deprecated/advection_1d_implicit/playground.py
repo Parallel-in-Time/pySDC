@@ -2,7 +2,7 @@ import numpy as np
 import pySDC.core.deprecated.PFASST_stepwise as mp
 from examples.advection_1d_implicit.TransferClass import mesh_to_mesh_1d_periodic
 
-from playgrounds.deprecated.advection_1d_implicit.ProblemClass import advection
+from pySDC.playgrounds.deprecated.advection_1d_implicit.ProblemClass import advection
 from pySDC.core import CollocationClasses as collclass
 from pySDC.core import Log
 from pySDC.implementations.datatype_classes import mesh

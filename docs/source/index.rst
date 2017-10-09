@@ -65,7 +65,7 @@ Tutorial
 
 Playgrounds
 -----------
-.. include:: ../../playgrounds/README.rst
+.. include:: ../../pySDC/playgrounds/README.rst
 
 Projects
 --------

@@ -4,7 +4,7 @@ import numpy as np
 import numpy.linalg as LA
 from matplotlib import pyplot as plt
 
-from playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
+from pySDC.playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
 
 
 def u_function(x):

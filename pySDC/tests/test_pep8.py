@@ -13,7 +13,7 @@ def check_files(dir):
     style.options.ignore = 'E402'
     python_files = []
     for root, _, files in os.walk(dir):
-        if 'playgrounds/deprecated' not in root:
+        if 'pySDC/playgrounds/deprecated' not in root:
             python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
 
     for file in python_files:

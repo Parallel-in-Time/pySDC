@@ -6,7 +6,7 @@ from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from playgrounds.ODEs.trajectory_HookClass import trajectories
+from pySDC.playgrounds.ODEs.trajectory_HookClass import trajectories
 
 
 def main():

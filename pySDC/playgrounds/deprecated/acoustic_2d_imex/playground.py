@@ -1,8 +1,9 @@
-import pySDC.core.Methods as mp
-from ProblemClass import advection_2d_explicit
+import numpy as np
+import pySDC.core.deprecated.PFASST_stepwise as mp
+from ProblemClass import acoustic_2d_imex
 from matplotlib import pyplot as plt
 
-from playgrounds.deprecated.advection_2d_explicit import plot_solution
+from pySDC.playgrounds.deprecated.acoustic_2d_imex import plot_solution
 from pySDC.core import CollocationClasses as collclass
 from pySDC.core import Log
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
@@ -17,32 +18,37 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-10
+    lparams['restol'] = 3E-11
 
     sparams = {}
-    sparams['maxiter'] = 0
+    sparams['maxiter'] = 8
 
     # setup parameters "in time"
-    t0 = 0
-    dt = 0.001
-    Tend = 100*dt
+    t0     = 0
+    Tend   = 50.0
+    Nsteps = 2000
+    dt = Tend/float(Nsteps)
 
     # This comes as read-in for the problem class
     pparams = {}
-    pparams['nvars'] = [(1,100,50)]
+    pparams['nvars'] = [(3, 50,25)]
+    pparams['u_adv'] = 1.0
+    pparams['c_s']   = 0.0
+    pparams['x_bounds'] = [(-1.0, 1.0)]
+    pparams['z_bounds'] = [( 0.0, 1.0)]
 
     # This comes as read-in for the transfer operations
-    tparams = {}
-    tparams['finter'] = True
+    #tparams = {}
+    #tparams['finter'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = {}
-    description['problem_class']     = advection_2d_explicit
+    description['problem_class']     = acoustic_2d_imex
     description['problem_params']    = pparams
     description['dtype_u']           = mesh
     description['dtype_f']           = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLobatto
-    description['num_nodes']         = 2
+    description['num_nodes']         = 4
     description['sweeper_class']     = imex_1st_order
     description['level_params']      = lparams
     description['hook_class']        = plot_solution
@@ -57,20 +63,16 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst_serial(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    # print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-    #     uex.values,np.inf)))
+    print('error at time %s: %9.5e' %(Tend,np.linalg.norm(uex.values[2,:,:].flatten()-uend.values[2,:,:].flatten(),np.inf)/np.linalg.norm(
+        uex.values.flatten(),np.inf)))
 
-    #fig = plt.figure(figsize=(8,8))
-
-    #plt.imshow(uend.values[0,:,:])
-    # plt.plot(P.state.grid.x.centers,uend.values, color='b', label='SDC')
-    # plt.plot(P.state.grid.x.centers,uex.values, color='r', label='Exact')
-    # plt.legend()
-    # plt.xlim([0, 1])
-    # plt.ylim([-1, 1])
     plt.show()
+
+    # extract_stats = grep_stats(stats,iter=-1,type='residual')
+    # sortedlist_stats = sort_stats(extract_stats,sortby='step')
+    # print(extract_stats,sortedlist_stats)

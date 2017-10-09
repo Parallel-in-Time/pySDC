@@ -8,8 +8,8 @@ from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_orde
 from pySDC.implementations.datatype_classes.particles import particles, fields
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from playgrounds.Boris.spiraling_particle_ProblemClass import planewave_single
-from playgrounds.Boris.spiraling_particle_HookClass import particles_output
+from pySDC.playgrounds.Boris.spiraling_particle_ProblemClass import planewave_single
+from pySDC.playgrounds.Boris.spiraling_particle_HookClass import particles_output
 
 
 def main(dt, Tend):
