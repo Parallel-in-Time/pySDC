@@ -14,7 +14,7 @@ setup(
     url="http://www.parallelintime.org/pySDC/",
     download_url = "https://github.com/Parallel-in-Time/pySDC/",
 
-    packages=find_packages(),
+    packages=find_packages(exclude=['data', 'cover', 'docs', 'tests*']),
 
     package_data={
          '': ['*.txt', '*.rst'],
