@@ -12,7 +12,7 @@ setup(
     author='Robert Speck',
     author_email='r.speck@fz-juelich.de',
     url="http://www.parallelintime.org/pySDC/",
-    # download_url = "https://github.com/Parallel-in-Time/pySDC/archive/v2.0.tar.gz",
+    download_url = "https://github.com/Parallel-in-Time/pySDC/",
 
     packages=find_packages(),
 
