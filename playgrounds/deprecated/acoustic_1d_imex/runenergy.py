@@ -83,9 +83,9 @@ if __name__ == "__main__":
       file.write('%30.20f' % float(nsteps))
       file.close()
       
-      print "Time step: %4.2f" % dt
-      print "Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx)
-      print "Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx)
+      print("Time step: %4.2f" % dt)
+      print("Fast CFL number: %4.2f" % (pparams['cs']*dt/P.dx))
+      print("Slow CFL number: %4.2f" % (pparams['cadv']*dt/P.dx))
       
       ### Run standard integrators first
       _dirk = dirk( (P.A+P.Dx).astype('complex'), sparams['maxiter'])
