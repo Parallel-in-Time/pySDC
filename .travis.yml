@@ -1,38 +1,50 @@
 sudo: required
 dist: trusty
+
 language: python
+
 python:
-- '2.7'
-- '3.5'
+  - '2.7'
+  - '3.6'
+
 before_install:
-- if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then export PYTHON_VERSION=2; wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
-  -O $HOME/miniconda2.sh; fi
-- if [[ "$TRAVIS_PYTHON_VERSION" == "3.5" ]]; then export PYTHON_VERSION=3; wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-  -O $HOME/miniconda3.sh; fi
-- chmod +x $HOME/miniconda${PYTHON_VERSION}.sh
-- "$HOME/miniconda${PYTHON_VERSION}.sh -b;"
-- export PATH=/home/travis/miniconda${PYTHON_VERSION}/bin:$PATH
-- conda update --yes conda
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then export PYTHON_VERSION=2; wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O $HOME/miniconda2.sh; fi
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then export PYTHON_VERSION=3; wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda3.sh; fi
+  - chmod +x $HOME/miniconda${PYTHON_VERSION}.sh
+  - "$HOME/miniconda${PYTHON_VERSION}.sh -b;"
+  - export PATH=/home/travis/miniconda${PYTHON_VERSION}/bin:$PATH
+  - conda update --yes conda
+
 install:
-- conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib
-  nose sphinx pep8 coverage mpi4py sympy
-- conda list
-- pip install --user coloredlogs
-- pip install --user travis-sphinx
-- sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
-  dvipng
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose sphinx pep8 coverage mpi4py sympy
+  - conda list
+  - pip install --user coloredlogs
+  - pip install --user travis-sphinx
+  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
+
 script:
-- "./docs/update_apidocs.sh"
-- mkdir data
-- which nosetests
-#- nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
-- if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
+  - "./docs/update_apidocs.sh"
+  - mkdir data
+  - which nosetests
+  - nosetests tests --with-coverage --cover-inclusive --cover-package=pySDC,tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage
+  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
+
 after_success:
-- if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
+  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
+
 deploy:
-  provider: pypi
-  user: pancetta
-  password:
-    secure: id5Pg/GL/YdXFmbi5h4xLmmyv/0L8lj9Rlr7lFJBrHrmkHIlu78NgO+LnQsGvhSrZqdDvZwRzFFCKRLiDugp07rzfwM41ROPrcgwnSRuqnzG2sUecNulNGHHoqej/z8nG5Ss8k2+viMqpOjhhZoY3LR0D1nFxRzu3HtHs0MKpRc=
-  on:
-    tags: true
+  - provider: pypi
+    user: pancetta
+    password:
+      secure: id5Pg/GL/YdXFmbi5h4xLmmyv/0L8lj9Rlr7lFJBrHrmkHIlu78NgO+LnQsGvhSrZqdDvZwRzFFCKRLiDugp07rzfwM41ROPrcgwnSRuqnzG2sUecNulNGHHoqej/z8nG5Ss8k2+viMqpOjhhZoY3LR0D1nFxRzu3HtHs0MKpRc=
+    on:
+      tags: true
+      condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - provider: pypi
+    user: pancetta
+    password:
+      secure: id5Pg/GL/YdXFmbi5h4xLmmyv/0L8lj9Rlr7lFJBrHrmkHIlu78NgO+LnQsGvhSrZqdDvZwRzFFCKRLiDugp07rzfwM41ROPrcgwnSRuqnzG2sUecNulNGHHoqej/z8nG5Ss8k2+viMqpOjhhZoY3LR0D1nFxRzu3HtHs0MKpRc=
+    server: https://test.pypi.org/legacy/
+    on:
+      tags: false
+      condition: $TRAVIS_PYTHON_VERSION = "2.7"
