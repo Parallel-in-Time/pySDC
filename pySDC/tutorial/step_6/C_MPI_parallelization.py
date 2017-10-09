@@ -11,14 +11,14 @@ def main(cwd):
 
     # Set python path once
     my_env = os.environ.copy()
-    my_env['PYTHONPATH'] = '../..:.'
+    my_env['PYTHONPATH'] = '../../..:.'
 
     # set list of number of parallel steps (even)
     num_procs_list = [1, 2, 4, 8]
 
     # set up new/empty file for output
     fname = 'step_6_C1_out.txt'
-    f = open(cwd + '/../../' + fname, 'w')
+    f = open(cwd + '/../../../' + fname, 'w')
     f.close()
 
     # run code with different number of MPI processes
@@ -35,7 +35,7 @@ def main(cwd):
 
     # set up new/empty file for output
     fname = 'step_6_C2_out.txt'
-    f = open(cwd + '/../../' + fname, 'w')
+    f = open(cwd + '/../../../' + fname, 'w')
     f.close()
 
     # run code with different number of MPI processes
