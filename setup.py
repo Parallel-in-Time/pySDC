@@ -12,7 +12,7 @@ setup(
     author='Robert Speck',
     author_email='r.speck@fz-juelich.de',
     url="http://www.parallelintime.org/pySDC/",
-    download_url = "https://github.com/Parallel-in-Time/pySDC/archive/v2.0.tar.gz",
+    # download_url = "https://github.com/Parallel-in-Time/pySDC/archive/v2.0.tar.gz",
 
     packages=find_packages(),
 
@@ -25,8 +25,9 @@ setup(
         'numpy>=1.9.3',
         'scipy>=0.17.1',
         'future>=0.15.2',
-        'matplotlib>=1.5.0',
+        'matplotlib>=1.5.3',
         'coloredlogs',
-        'pep8'
+        'pep8',
+        'sympy>=1.0'
     ],
 )
