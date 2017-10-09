@@ -55,13 +55,13 @@ Tutorial
 .. toctree::
    :maxdepth: 1
 
-   pySDC/tutorial/step_1.rst
-   pySDC/tutorial/step_2.rst
-   pySDC/tutorial/step_3.rst
-   pySDC/tutorial/step_4.rst
-   pySDC/tutorial/step_5.rst
-   pySDC/tutorial/step_6.rst
-   pySDC/tutorial/step_7.rst
+   tutorial/step_1.rst
+   tutorial/step_2.rst
+   tutorial/step_3.rst
+   tutorial/step_4.rst
+   tutorial/step_5.rst
+   tutorial/step_6.rst
+   tutorial/step_7.rst
 
 Playgrounds
 -----------
@@ -75,11 +75,11 @@ Projects
 .. toctree::
    :maxdepth: 2
 
-   pySDC/projects/parallelSDC.rst
-   pySDC/projects/node_failure.rst
-   pySDC/projects/fwsw.rst
-   pySDC/projects/asymp_conv.rst
-   pySDC/projects/RDC.rst
+   projects/parallelSDC.rst
+   projects/node_failure.rst
+   projects/fwsw.rst
+   projects/asymp_conv.rst
+   projects/RDC.rst
 
 Tests
 -----
@@ -95,9 +95,9 @@ API documentation
 .. toctree::
    :maxdepth: 1
 
-   pySDC/pySDC.core.rst
-   pySDC/pySDC.implementations.rst
-   pySDC/pySDC.helpers.rst
+   pySDC/core.rst
+   pySDC/implementations.rst
+   pySDC/helpers.rst
 
 
 Indices and tables
