@@ -5,7 +5,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_MPI import al
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
 
 if __name__ == "__main__":
     """

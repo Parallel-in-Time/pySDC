@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from tutorial.step_4.PenningTrap_3D_coarse import penningtrap_coarse
+from pySDC.tutorial.step_4.PenningTrap_3D_coarse import penningtrap_coarse
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
@@ -10,7 +10,7 @@ from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import pa
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.datatype_classes.particles import particles, fields
-from tutorial.step_3.HookClass_Particles import particle_hook
+from pySDC.tutorial.step_3.HookClass_Particles import particle_hook
 
 
 def main():

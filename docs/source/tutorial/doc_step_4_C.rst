@@ -1,6 +1,6 @@
-Full code: `tutorial/step_4/C_SDC_vs_MLSDC.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_4/C_SDC_vs_MLSDC.py>`_
+Full code: `pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py>`_
 
-.. literalinclude:: ../../../tutorial/step_4/C_SDC_vs_MLSDC.py
+.. literalinclude:: ../../../pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py
 
 Results:
 

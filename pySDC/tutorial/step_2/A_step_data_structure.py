@@ -4,7 +4,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 
 from pySDC.core.Step import step
-from tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
+from pySDC.tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
 
 
 def main():

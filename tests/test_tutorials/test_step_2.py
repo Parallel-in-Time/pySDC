@@ -1,6 +1,6 @@
-from tutorial.step_2.A_step_data_structure import main as main_A
-from tutorial.step_2.B_my_first_sweeper import main as main_B
-from tutorial.step_2.C_using_pySDCs_frontend import main as main_C
+from pySDC.tutorial.step_2.A_step_data_structure import main as main_A
+from pySDC.tutorial.step_2.B_my_first_sweeper import main as main_B
+from pySDC.tutorial.step_2.C_using_pySDCs_frontend import main as main_C
 
 
 def test_A():

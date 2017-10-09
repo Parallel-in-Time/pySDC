@@ -1,6 +1,6 @@
-Full code: `tutorial/step_3/C_study_collocations.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_3/C_study_collocations.py>`_
+Full code: `pySDC/tutorial/step_3/C_study_collocations.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/C_study_collocations.py>`_
 
-.. literalinclude:: ../../../tutorial/step_3/C_study_collocations.py
+.. literalinclude:: ../../../pySDC/tutorial/step_3/C_study_collocations.py
 
 Results:
 

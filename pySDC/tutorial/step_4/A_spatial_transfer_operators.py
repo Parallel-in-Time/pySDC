@@ -5,7 +5,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
-from tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
+from pySDC.tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars_fine')

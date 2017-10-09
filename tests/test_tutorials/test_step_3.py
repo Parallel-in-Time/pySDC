@@ -1,7 +1,7 @@
-from tutorial.step_3.A_getting_statistics import main as main_A
-from tutorial.step_3.B_adding_statistics import main as main_B
+from pySDC.tutorial.step_3.A_getting_statistics import main as main_A
+from pySDC.tutorial.step_3.B_adding_statistics import main as main_B
 
-from tutorial.step_3.C_study_collocations import main as main_C
+from pySDC.tutorial.step_3.C_study_collocations import main as main_C
 
 
 def test_A():

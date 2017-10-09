@@ -1,8 +1,8 @@
-Full code: `tutorial/step_6/C_MPI_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_6/C_MPI_parallelization.py>`_ and
-`tutorial/step_6/playground_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_6/playground_parallelization.py>`_
+Full code: `pySDC/tutorial/step_6/C_MPI_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/C_MPI_parallelization.py>`_ and
+`pySDC/tutorial/step_6/playground_parallelization.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/playground_parallelization.py>`_
 
-.. literalinclude:: ../../../tutorial/step_6/C_MPI_parallelization.py
-.. literalinclude:: ../../../tutorial/step_6/playground_parallelization.py
+.. literalinclude:: ../../../pySDC/tutorial/step_6/C_MPI_parallelization.py
+.. literalinclude:: ../../../pySDC/tutorial/step_6/playground_parallelization.py
 
 Results:
 

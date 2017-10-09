@@ -1,8 +1,8 @@
 import pip
 
-from tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
-from tutorial.step_6.B_odd_temporal_distribution import main as main_B
-from tutorial.step_6.C_MPI_parallelization import main as main_C
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
+from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
+from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
 
 
 def test_A():
@@ -17,7 +17,7 @@ def test_C():
 
     if "mpi4py" in flat_installed_packages:
 
-        cwd = 'tutorial/step_6'
+        cwd = 'pySDC/tutorial/step_6'
         main_C(cwd)
 
         with open('step_6_C1_out.txt', 'r') as file1:

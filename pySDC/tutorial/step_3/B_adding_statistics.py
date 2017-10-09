@@ -6,7 +6,7 @@ from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_orde
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.datatype_classes.particles import particles, fields
-from tutorial.step_3.HookClass_Particles import particle_hook
+from pySDC.tutorial.step_3.HookClass_Particles import particle_hook
 
 
 def main():

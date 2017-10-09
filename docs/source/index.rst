@@ -50,18 +50,18 @@ On November 24, 2016, we released version 2 of `pySDC`. This release contains ma
 Tutorial
 --------
 
-.. include:: ../../tutorial/README.rst
+.. include:: ../../pySDC/tutorial/README.rst
 
 .. toctree::
    :maxdepth: 1
 
-   tutorial/step_1.rst
-   tutorial/step_2.rst
-   tutorial/step_3.rst
-   tutorial/step_4.rst
-   tutorial/step_5.rst
-   tutorial/step_6.rst
-   tutorial/step_7.rst
+   pySDC/tutorial/step_1.rst
+   pySDC/tutorial/step_2.rst
+   pySDC/tutorial/step_3.rst
+   pySDC/tutorial/step_4.rst
+   pySDC/tutorial/step_5.rst
+   pySDC/tutorial/step_6.rst
+   pySDC/tutorial/step_7.rst
 
 Playgrounds
 -----------

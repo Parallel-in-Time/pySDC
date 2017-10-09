@@ -2,7 +2,7 @@ import os
 
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation

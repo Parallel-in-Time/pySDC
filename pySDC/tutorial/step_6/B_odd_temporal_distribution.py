@@ -1,4 +1,4 @@
-from tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
 
 
 def main():

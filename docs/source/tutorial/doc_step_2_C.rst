@@ -1,6 +1,6 @@
-Full code: `tutorial/step_2/C_using_pySDCs_frontend.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_2/C_using_pySDCs_frontend.py>`_
+Full code: `pySDC/tutorial/step_2/C_using_pySDCs_frontend.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/C_using_pySDCs_frontend.py>`_
 
-.. literalinclude:: ../../../tutorial/step_2/C_using_pySDCs_frontend.py
+.. literalinclude:: ../../../pySDC/tutorial/step_2/C_using_pySDCs_frontend.py
 
 Results:
 
