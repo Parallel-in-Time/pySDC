@@ -6,14 +6,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from pylab import rcParams
 
-from projects.FastWaveSlowWave.HookClass_acoustic import dump_energy
+from pySDC.projects.FastWaveSlowWave.HookClass_acoustic import dump_energy
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from pySDC.implementations.problem_classes.acoustic_helpers.standard_integrators import bdf2, dirk, trapezoidal, rk_imex
 
-from projects.FastWaveSlowWave.AcousticAdvection_1D_FD_imex_multiscale import acoustic_1d_imex_multiscale
+from pySDC.projects.FastWaveSlowWave.AcousticAdvection_1D_FD_imex_multiscale import acoustic_1d_imex_multiscale
 
 
 def compute_and_plot_solutions():

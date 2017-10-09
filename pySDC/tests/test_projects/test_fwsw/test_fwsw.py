@@ -1,10 +1,10 @@
 import numpy as np
 import os
 
-from projects.FastWaveSlowWave.plot_stifflimit_specrad import compute_specrad, plot_specrad
-from projects.FastWaveSlowWave.plot_stability import compute_stability, plot_stability
-from projects.FastWaveSlowWave.plot_stab_vs_k import compute_stab_vs_k, plot_stab_vs_k
-from projects.FastWaveSlowWave.plot_dispersion import compute_and_plot_dispersion
+from pySDC.projects.FastWaveSlowWave.plot_stifflimit_specrad import compute_specrad, plot_specrad
+from pySDC.projects.FastWaveSlowWave.plot_stability import compute_stability, plot_stability
+from pySDC.projects.FastWaveSlowWave.plot_stab_vs_k import compute_stab_vs_k, plot_stab_vs_k
+from pySDC.projects.FastWaveSlowWave.plot_dispersion import compute_and_plot_dispersion
 
 
 def test_stifflimit_specrad():

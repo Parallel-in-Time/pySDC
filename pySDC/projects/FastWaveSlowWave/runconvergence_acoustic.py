@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from pylab import rcParams
 from matplotlib.ticker import ScalarFormatter
 
-from projects.FastWaveSlowWave.HookClass_acoustic import dump_energy
+from pySDC.projects.FastWaveSlowWave.HookClass_acoustic import dump_energy
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import acoustic_1d_imex

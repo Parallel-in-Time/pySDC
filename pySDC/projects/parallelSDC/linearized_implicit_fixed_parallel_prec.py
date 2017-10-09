@@ -1,6 +1,6 @@
 import numpy as np
 
-from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
+from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
 
 
 class linearized_implicit_fixed_parallel_prec(linearized_implicit_fixed_parallel):

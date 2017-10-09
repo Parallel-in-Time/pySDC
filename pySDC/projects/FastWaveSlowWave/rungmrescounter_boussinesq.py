@@ -1,6 +1,6 @@
 import numpy as np
 
-from projects.FastWaveSlowWave.HookClass_boussinesq import gmres_tolerance
+from pySDC.projects.FastWaveSlowWave.HookClass_boussinesq import gmres_tolerance
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex

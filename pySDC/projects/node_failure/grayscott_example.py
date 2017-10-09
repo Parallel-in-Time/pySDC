@@ -1,13 +1,13 @@
 import numpy as np
 
-import projects.node_failure.emulate_hard_faults as ft
-from projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
+import pySDC.projects.node_failure.emulate_hard_faults as ft
+from pySDC.projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh
+from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
+from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott
 
 
 # noinspection PyShadowingNames,PyShadowingBuiltins
@@ -16,17 +16,17 @@ def main(ft_strategies):
     This routine generates the heatmaps showing the residual for node failures at different steps and iterations
     """
 
-    num_procs = 16
+    num_procs = 32
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 960
-    Nsteps = 320
-    dt = Tend / float(Nsteps)
+    dt = 2.0
+    Tend = 1280.0
+    Nsteps = int((Tend - t0) / dt)
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-06
+    level_params['restol'] = 1E-07
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -36,8 +36,6 @@ def main(ft_strategies):
     # initialize space transfer parameters
     space_transfer_params = dict()
     space_transfer_params['finter'] = True
-    space_transfer_params['rorder'] = 2
-    space_transfer_params['iorder'] = 6
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -51,30 +49,38 @@ def main(ft_strategies):
 
     # initialize problem parameters
     problem_params = dict()
-    # problem_params['nvars'] = [(4, 450, 30), (4, 450, 30)]
-    problem_params['nvars'] = [(4, 100, 10), (4, 100, 10)]
-    problem_params['u_adv'] = 0.02
-    problem_params['c_s'] = 0.3
-    problem_params['Nfreq'] = 0.01
-    problem_params['x_bounds'] = [(-150.0, 150.0)]
-    problem_params['z_bounds'] = [(0.0, 10.0)]
-    problem_params['order'] = [4, 2]
-    problem_params['order_upw'] = [5, 1]
-    problem_params['gmres_maxiter'] = [50, 50]
-    problem_params['gmres_restart'] = [10, 10]
-    problem_params['gmres_tol_limit'] = [1e-10, 1e-10]
+    # problem_params['Du'] = 1.0
+    # problem_params['Dv'] = 0.01
+    # problem_params['A'] = 0.01
+    # problem_params['B'] = 0.10
+    # splitting pulses until steady state
+    # problem_params['Du'] = 1.0
+    # problem_params['Dv'] = 0.01
+    # problem_params['A'] = 0.02
+    # problem_params['B'] = 0.079
+    # splitting pulses until steady state
+    problem_params['Du'] = 1.0
+    problem_params['Dv'] = 0.01
+    problem_params['A'] = 0.09
+    problem_params['B'] = 0.086
+
+    problem_params['t0'] = t0  # ugly, but necessary to set up ProblemClass
+    problem_params['c_nvars'] = [256]
+    problem_params['family'] = 'CG'
+    problem_params['order'] = [4]
+    problem_params['refinements'] = [1, 0]
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = boussinesq_2d_imex  # pass problem class
+    description['problem_class'] = fenics_grayscott  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = rhs_imex_mesh  # pass data type for f
-    description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
+    description['dtype_u'] = fenics_mesh  # pass data type for u
+    description['dtype_f'] = fenics_mesh  # pass data type for f
+    description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+    description['space_transfer_class'] = mesh_to_mesh_fenics  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     ft.hard_random = 0.03
@@ -87,13 +93,6 @@ def main(ft_strategies):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    cfl_advection = P.params.u_adv * dt / P.h[0]
-    cfl_acoustic_hor = P.params.c_s * dt / P.h[0]
-    cfl_acoustic_ver = P.params.c_s * dt / P.h[1]
-    print("CFL number of advection: %4.2f" % cfl_advection)
-    print("CFL number of acoustics (horizontal): %4.2f" % cfl_acoustic_hor)
-    print("CFL number of acoustics (vertical):   %4.2f" % cfl_acoustic_ver)
-
     for strategy in ft_strategies:
 
         print('------------------------------------------ working on strategy ', strategy)
@@ -101,13 +100,11 @@ def main(ft_strategies):
 
         # read in reference data from clean run, will provide reproducable locations for faults
         if strategy is not 'NOFAULT':
-            reffile = np.load('data/PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz')
+            reffile = np.load('data/PFASST_GRAYSCOTT_stats_hf_NOFAULT_P16.npz')
             ft.refdata = reffile['hard_stats']
 
         # call main function to get things done...
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-        P.report_log()
 
         # get residuals of the run
         extract_stats = filter_stats(stats, type='residual_post_iteration')
@@ -140,7 +137,7 @@ def main(ft_strategies):
             iter_count[item[0]] = item[1]
         print(iter_count)
 
-        np.savez('data/PFASST_BOUSSINESQ_stats_hf_' + ft.strategy + '_P' + str(num_procs), residual=residual,
+        np.savez('data/PFASST_GRAYSCOTT_stats_hf_' + ft.strategy + '_P' + str(num_procs), residual=residual,
                  iter_count=iter_count, hard_stats=ft.hard_stats)
 
 

@@ -1,6 +1,6 @@
-Full code: `projects/parallelSDC/nonlinear_playground.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/parallelSDC/nonlinear_playground.py>`_
+Full code: `pySDC/projects/parallelSDC/nonlinear_playground.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/nonlinear_playground.py>`_
 
-.. literalinclude:: ../../../projects/parallelSDC/nonlinear_playground.py
+.. literalinclude:: ../../../pySDC/projects/parallelSDC/nonlinear_playground.py
 
 Results:
 
@@ -11,9 +11,9 @@ Results:
 .. image:: ../../../data/parallelSDC_fisher.png
    :scale: 100 %
 
-Full code: `projects/parallelSDC/newton_vs_sdc.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/parallelSDC/newton_vs_sdc.py>`_
+Full code: `pySDC/projects/parallelSDC/newton_vs_sdc.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py>`_
 
-.. literalinclude:: ../../../projects/parallelSDC/newton_vs_sdc.py
+.. literalinclude:: ../../../pySDC/projects/parallelSDC/newton_vs_sdc.py
 
 Results:
 

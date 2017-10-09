@@ -1,6 +1,6 @@
-Full code: `projects/node_failure/boussinesq_example.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/node_failure/boussinesq_example.py>`_
+Full code: `pySDC/projects/node_failure/boussinesq_example.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/node_failure/boussinesq_example.py>`_
 
-.. literalinclude:: ../../../projects/node_failure/boussinesq_example.py
+.. literalinclude:: ../../../pySDC/projects/node_failure/boussinesq_example.py
 
 Results (visualized by ``postproc_boussines``):
 

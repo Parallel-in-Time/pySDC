@@ -4,14 +4,14 @@ import pickle
 import os
 
 from pySDC.implementations.datatype_classes.mesh import mesh
-from projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
-from projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
+from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linearized_implicit_fixed_parallel
+from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
-from projects.parallelSDC.ErrReductionHook import err_reduction_hook
+from pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
+from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 

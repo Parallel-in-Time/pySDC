@@ -1,11 +1,11 @@
 import os
-from projects.FastWaveSlowWave.runconvergence_acoustic import plot_convergence
-from projects.FastWaveSlowWave.runitererror_acoustic import compute_and_plot_itererror
-from projects.FastWaveSlowWave.runmultiscale_acoustic import compute_and_plot_solutions
+from pySDC.projects.FastWaveSlowWave.runconvergence_acoustic import plot_convergence
+from pySDC.projects.FastWaveSlowWave.runitererror_acoustic import compute_and_plot_itererror
+from pySDC.projects.FastWaveSlowWave.runmultiscale_acoustic import compute_and_plot_solutions
 
 def test_plot_convergence():
-    assert os.path.isfile('projects/FastWaveSlowWave/data/conv-data.txt'), 'ERROR: conv-data.txt does not exist'
-    plot_convergence(cwd='projects/FastWaveSlowWave/')
+    assert os.path.isfile('pySDC/projects/FastWaveSlowWave/data/conv-data.txt'), 'ERROR: conv-data.txt does not exist'
+    plot_convergence(cwd='pySDC/projects/FastWaveSlowWave/')
     assert os.path.isfile('data/convergence.png'), 'ERROR: convergence plot has not been created'
 
 

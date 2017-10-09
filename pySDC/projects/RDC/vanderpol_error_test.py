@@ -13,7 +13,7 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from projects.RDC.equidistant_RDC import Equidistant_RDC
+from pySDC.projects.RDC.equidistant_RDC import Equidistant_RDC
 
 
 def compute_RDC_errors():

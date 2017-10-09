@@ -8,7 +8,7 @@ from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
-from projects.RDC.equidistant_RDC import Equidistant_RDC
+from pySDC.projects.RDC.equidistant_RDC import Equidistant_RDC
 
 
 def run_RDC(cwd=''):

@@ -1,1 +1,1 @@
-.. include:: /../../projects/FastWaveSlowWave/README.rst
+.. include:: /../../pySDC/projects/FastWaveSlowWave/README.rst

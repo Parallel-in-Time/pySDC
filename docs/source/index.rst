@@ -70,21 +70,21 @@ Playgrounds
 Projects
 --------
 
-.. include:: ../../projects/README.rst
+.. include:: ../../pySDC/projects/README.rst
 
 .. toctree::
    :maxdepth: 2
 
-   projects/parallelSDC.rst
-   projects/node_failure.rst
-   projects/fwsw.rst
-   projects/asymp_conv.rst
-   projects/RDC.rst
+   pySDC/projects/parallelSDC.rst
+   pySDC/projects/node_failure.rst
+   pySDC/projects/fwsw.rst
+   pySDC/projects/asymp_conv.rst
+   pySDC/projects/RDC.rst
 
 Tests
 -----
 
-.. include:: ../../tests/README.rst
+.. include:: ../../pySDC/tests/README.rst
 
 
 API documentation

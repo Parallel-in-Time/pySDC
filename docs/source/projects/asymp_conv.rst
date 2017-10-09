@@ -1,1 +1,1 @@
-.. include:: /../../projects/AsympConv/README.rst
+.. include:: /../../pySDC/projects/AsympConv/README.rst
