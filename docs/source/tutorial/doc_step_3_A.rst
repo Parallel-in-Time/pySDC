@@ -1,6 +1,6 @@
-Full code: `tutorial/step_3/A_getting_statistics.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_3/A_getting_statistics.py>`_
+Full code: `pySDC/tutorial/step_3/A_getting_statistics.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py>`_
 
-.. literalinclude:: ../../../tutorial/step_3/A_getting_statistics.py
+.. literalinclude:: ../../../pySDC/tutorial/step_3/A_getting_statistics.py
 
 Results:
 

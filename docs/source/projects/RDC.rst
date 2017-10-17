@@ -1,1 +1,1 @@
-.. include:: /../../projects/RDC/README.rst
+.. include:: /../../pySDC/projects/RDC/README.rst

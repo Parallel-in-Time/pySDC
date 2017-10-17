@@ -1,1 +1,1 @@
-.. include:: /../../projects/parallelSDC/README.rst
+.. include:: /../../pySDC/projects/parallelSDC/README.rst

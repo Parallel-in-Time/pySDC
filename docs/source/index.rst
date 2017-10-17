@@ -50,7 +50,7 @@ On November 24, 2016, we released version 2 of `pySDC`. This release contains ma
 Tutorial
 --------
 
-.. include:: ../../tutorial/README.rst
+.. include:: ../../pySDC/tutorial/README.rst
 
 .. toctree::
    :maxdepth: 1
@@ -65,12 +65,12 @@ Tutorial
 
 Playgrounds
 -----------
-.. include:: ../../playgrounds/README.rst
+.. include:: ../../pySDC/playgrounds/README.rst
 
 Projects
 --------
 
-.. include:: ../../projects/README.rst
+.. include:: ../../pySDC/projects/README.rst
 
 .. toctree::
    :maxdepth: 2
@@ -84,20 +84,20 @@ Projects
 Tests
 -----
 
-.. include:: ../../tests/README.rst
+.. include:: ../../pySDC/tests/README.rst
 
 
 API documentation
 -----------------
 
-.. include:: ../../pySDC/README.rst
+.. include:: ../../pySDC/README_API.rst
 
 .. toctree::
    :maxdepth: 1
 
-   pySDC/pySDC.core.rst
-   pySDC/pySDC.implementations.rst
-   pySDC/pySDC.helpers.rst
+   pySDC/core.rst
+   pySDC/implementations.rst
+   pySDC/helpers.rst
 
 
 Indices and tables

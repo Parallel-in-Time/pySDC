@@ -1,6 +1,6 @@
-Full code: `tutorial/step_1/D_collocation_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_1/D_collocation_accuracy_check.py>`_
+Full code: `pySDC/tutorial/step_1/D_collocation_accuracy_check.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/D_collocation_accuracy_check.py>`_
 
-.. literalinclude:: ../../../tutorial/step_1/D_collocation_accuracy_check.py
+.. literalinclude:: ../../../pySDC/tutorial/step_1/D_collocation_accuracy_check.py
 
 Results:
 

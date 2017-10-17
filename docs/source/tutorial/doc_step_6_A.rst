@@ -1,6 +1,6 @@
-Full code: `tutorial/step_6/A_classic_vs_multigrid_controller.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_6/A_classic_vs_multigrid_controller.py>`_
+Full code: `pySDC/tutorial/step_6/A_classic_vs_multigrid_controller.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/A_classic_vs_multigrid_controller.py>`_
 
-.. literalinclude:: ../../../tutorial/step_6/A_classic_vs_multigrid_controller.py
+.. literalinclude:: ../../../pySDC/tutorial/step_6/A_classic_vs_multigrid_controller.py
 
 Results:
 

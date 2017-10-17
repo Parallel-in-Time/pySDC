@@ -1,6 +1,6 @@
-Full code: `tutorial/step_7/A_visualize_residuals.py <https://github.com/Parallel-in-Time/pySDC/blob/master/tutorial/step_7/A_visualize_residuals.py>`_
+Full code: `pySDC/tutorial/step_7/A_visualize_residuals.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/A_visualize_residuals.py>`_
 
-.. literalinclude:: ../../../tutorial/step_7/A_visualize_residuals.py
+.. literalinclude:: ../../../pySDC/tutorial/step_7/A_visualize_residuals.py
 
 Results:
 

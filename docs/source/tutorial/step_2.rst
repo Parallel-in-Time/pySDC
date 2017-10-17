@@ -1,1 +1,1 @@
-.. include:: /../../tutorial/step_2/README.rst
+.. include:: /../../pySDC/tutorial/step_2/README.rst

@@ -1,6 +1,6 @@
-Full code: `projects/parallelSDC/preconditioner_playground.py <https://github.com/Parallel-in-Time/pySDC/blob/master/projects/parallelSDC/preconditioner_playground.py>`_
+Full code: `pySDC/projects/parallelSDC/preconditioner_playground.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground.py>`_
 
-.. literalinclude:: ../../../projects/parallelSDC/preconditioner_playground.py
+.. literalinclude:: ../../../pySDC/projects/parallelSDC/preconditioner_playground.py
 
 Results:
 
