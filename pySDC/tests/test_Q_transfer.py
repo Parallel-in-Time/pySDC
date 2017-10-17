@@ -4,7 +4,7 @@ from numpy.polynomial.polynomial import polyval
 
 import pySDC.helpers.transfer_helper as th
 
-from tests.test_helpers import get_derived_from_in_package
+from pySDC.tests.test_helpers import get_derived_from_in_package
 from pySDC.core.Collocation import CollBase
 
 classes = []

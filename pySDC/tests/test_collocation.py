@@ -1,7 +1,7 @@
 import numpy as np
 import nose
 
-from tests.test_helpers import get_derived_from_in_package
+from pySDC.tests.test_helpers import get_derived_from_in_package
 from pySDC.core.Collocation import CollBase
 
 classes = []
