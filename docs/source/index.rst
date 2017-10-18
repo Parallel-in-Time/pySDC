@@ -14,7 +14,7 @@ News
 - For the `6th Workshop on Parallel-in-Time Integration <https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods>`_
   `pySDC` has been updated to version 2.1. It is now available on PyPI - the Python Package Index, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_
   and can be installed simply by using ``pip install pySDC``. Naturally, this release contains a lot of bugfixes and minor improvements.
-  Most notably, the file structure has been changes again to meet the standards for Python packaging (at least a bit).
+  Most notably, the file structure has been changed again to meet the standards for Python packaging (at least a bit).
 
 - On November 24, 2016, we released version 2 of `pySDC`. This release contains major changes to the code and its structure:
 
