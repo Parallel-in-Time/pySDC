@@ -1,4 +1,3 @@
-
 # added by check_manifest.py
 include *.md
 include *.txt
