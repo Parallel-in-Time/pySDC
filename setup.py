@@ -5,7 +5,7 @@ with open("README.rst", 'r') as f:
 
 setup(
     name='pySDC',
-    version='2.1.2',
+    version='2.1.3',
     description='A Python implementation of spectral deferred correction methods and the likes',
     license="BSD-2",
     long_description=long_description,
@@ -15,6 +15,8 @@ setup(
     download_url = "https://github.com/Parallel-in-Time/pySDC/",
 
     packages=find_packages(),
+
+    include_package_data=True,
 
     install_requires=[
         'nose>=1.3.7',
