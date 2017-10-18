@@ -25,11 +25,11 @@ install:
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
-#  - nosetests --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage pySDC/tests
-#  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx -n build; fi
+  - nosetests --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage pySDC/tests
+  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx -n build; fi
 
 after_success:
-#  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
+  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
 
 deploy:
   - provider: pypi
