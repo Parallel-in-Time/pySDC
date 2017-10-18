@@ -1,0 +1,17 @@
+
+# added by check_manifest.py
+include *.md
+include *.txt
+include .coveragerc
+include Doxyfile
+include LICENSE
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs *.sh
+recursive-include docs Makefile
+recursive-include pySDC *.npy
+recursive-include pySDC *.npz
+recursive-include pySDC *.pkl
+recursive-include pySDC *.rst
+recursive-include pySDC *.txt
