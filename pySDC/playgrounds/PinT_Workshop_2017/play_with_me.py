@@ -63,7 +63,7 @@ def main():
     Tend = 4.0
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params,
+    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
                                                description=description)
 
     # get initial values on finest level
@@ -72,6 +72,8 @@ def main():
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # The following is used only for statistics and output, the main show is over now..
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)

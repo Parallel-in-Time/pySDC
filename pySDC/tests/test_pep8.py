@@ -4,7 +4,7 @@ import os.path
 import nose.tools
 import pep8
 
-BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..'))
+BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', '..'))
 
 
 def check_files(dir):
@@ -23,5 +23,5 @@ def check_files(dir):
 
 
 def test_pep8():
-    for dir in ['core', 'implementations', 'helpers', 'tutorial', '../projects', '../playgrounds']:
+    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'pySDC/tutorial', 'pySDC/projects', 'pySDC/playgrounds']:
         yield check_files, dir
