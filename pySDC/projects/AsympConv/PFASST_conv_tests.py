@@ -50,7 +50,7 @@ def run_diffusion(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # initialize problem parameters
     problem_params = dict()
@@ -156,7 +156,7 @@ def run_advection(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # initialize problem parameters
     problem_params = dict()
