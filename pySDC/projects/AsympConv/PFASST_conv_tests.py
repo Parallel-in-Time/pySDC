@@ -11,7 +11,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_matrix_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -93,7 +93,7 @@ def run_diffusion(nsweeps):
 
     results = dict()
 
-    for i in range(-3, 12):
+    for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
 
         problem_params['nu'] = 10.0 ** i / ratio  # diffusion coefficient
@@ -106,8 +106,8 @@ def run_diffusion(nsweeps):
         print(out)
 
         # instantiate controller
-        controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                   description=description)
+        controller = allinclusive_matrix_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                description=description)
 
         # get initial values on finest level
         P = controller.MS[0].levels[0].prob
@@ -201,7 +201,7 @@ def run_advection(nsweeps):
 
     results = dict()
 
-    for i in range(-3, 12):
+    for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1))
 
         problem_params['c'] = 10.0 ** i / ratio  # diffusion coefficient
@@ -214,8 +214,8 @@ def run_advection(nsweeps):
         print(out)
 
         # instantiate controller
-        controller = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                   description=description)
+        controller = allinclusive_matrix_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                description=description)
 
         # get initial values on finest level
         P = controller.MS[0].levels[0].prob

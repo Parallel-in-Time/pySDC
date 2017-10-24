@@ -62,7 +62,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         assert [type(level.prob) for step in self.MS for level in step.levels].count(type(prob)) == \
             self.nlevels * self.nsteps, 'ERROR: all probem classes have to be the same'
 
-        assert self.params.predict is False, 'ERROR: no predictor for matrix controller yet' # TODO: fixme
+        assert self.params.predict is False, 'ERROR: no predictor for matrix controller yet'  # TODO: fixme
 
         A = prob.A
         Q = self.MS[0].levels[0].sweep.coll.Qmat[1:, 1:]
@@ -180,7 +180,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                     lvl.u[m] = P.dtype_u(init=P.init, val=0)
                     lvl.f[m] = P.dtype_f(init=P.init, val=0)
 
-        self.u0 = np.kron(np.concatenate([[1],[0]*(self.nsteps-1)]), np.kron(np.ones(self.nnodes), u0.values))
+        self.u0 = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values))
 
         if self.MS[0].levels[0].sweep.params.spread:
             self.u = np.kron(np.ones(self.nsteps * self.nnodes), u0.values)
