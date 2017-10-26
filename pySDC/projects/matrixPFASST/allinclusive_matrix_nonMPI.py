@@ -64,6 +64,8 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         assert self.params.predict is False, 'ERROR: no predictor for matrix controller yet'  # TODO: fixme
 
+        assert hasattr(prob, 'A'), 'ERROR: need system matrix A for this (and linear problems!)'
+
         A = prob.A
         Q = self.MS[0].levels[0].sweep.coll.Qmat[1:, 1:]
         Qd = self.MS[0].levels[0].sweep.QI[1:, 1:]
