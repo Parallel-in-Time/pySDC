@@ -5,7 +5,7 @@ with open("README.rst", 'r') as f:
 
 setup(
     name='pySDC',
-    version='2.1.5.1',
+    version='2.1.6',
     description='A Python implementation of spectral deferred correction methods and the likes',
     license="BSD-2",
     long_description=long_description,
