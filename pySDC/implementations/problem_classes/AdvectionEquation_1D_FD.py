@@ -126,7 +126,7 @@ class advection1d(ptype):
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= c * coeff * (1.0 / dx)
+        A *= -c * coeff * (1.0 / dx)
 
         return A
 
@@ -143,7 +143,7 @@ class advection1d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = -1.0 * self.A.dot(u.values)
+        f.values = self.A.dot(u.values)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -161,7 +161,7 @@ class advection1d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.params.nvars, format='csc') + factor * self.A)
+        L = splu(sp.eye(self.params.nvars, format='csc') - factor * self.A)
         me.values = L.solve(rhs.values)
         return me
 
