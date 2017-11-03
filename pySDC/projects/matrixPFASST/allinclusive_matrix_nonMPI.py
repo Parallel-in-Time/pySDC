@@ -138,7 +138,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
 
-        nblocks = int((Tend - t0) / self.dt) / num_procs
+        nblocks = int((Tend - t0) / self.dt / num_procs)
 
         for i in range(nblocks):
 
