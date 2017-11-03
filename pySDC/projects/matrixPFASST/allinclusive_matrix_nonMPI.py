@@ -1,11 +1,8 @@
-import itertools
-import copy as cp
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as spla
 
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from pySDC.core.Errors import ControllerError, CommunicationError
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -35,6 +32,9 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             'ERROR: matrix version will only work with mesh data type for f, got %s' % description['dtype_f']
         assert description['sweeper_class'] is generic_implicit, \
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
+
+        if 'build_propagator' not in controller_params:
+            controller_params['build_propagator'] = False
 
         # call parent's initialization routine
         super(allinclusive_matrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
@@ -140,6 +140,9 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         nblocks = int((Tend - t0) / self.dt / num_procs)
 
+        if self.params.build_propagator:
+            assert nblocks == 1, 'ERROR: propagation matrix can only be created for one PFASST block, got %s' % nblocks
+
         for i in range(nblocks):
 
             self.MS = self.pfasst(self.MS)
@@ -155,7 +158,49 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         for S in self.MS:
             self.hooks.post_run(step=S, level_number=0)
 
-        return uend, self.hooks.return_stats()
+        if self.params.build_propagator:
+            return uend, self.hooks.return_stats(), self.build_propagation_matrix()
+        else:
+            return uend, self.hooks.return_stats(), None
+
+    def build_propagation_matrix(self):
+        """
+        Helper routine to create propagation matrix if requested
+
+        Returns:
+            mat: propagation matrix
+        """
+
+        precond_smoother = np.linalg.inv(self.P.todense())
+        iter_mat_smoother = (np.eye(self.nsteps * self.nnodes * self.nspace) - precond_smoother.dot(self.C.todense()))
+        iter_mat = iter_mat_smoother
+        precond = precond_smoother
+
+        if self.nlevels > 1:
+            precond_cgc = self.Tcf.todense().dot(np.linalg.inv(self.Pc.todense())).dot(self.Tfc.todense())
+            iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C.todense())
+            iter_mat = iter_mat.dot(iter_mat_cgc)
+            precond += precond_cgc - precond_smoother.dot(self.C.todense()).dot(precond_cgc)
+
+        niter = self.MS[0].status.iter
+
+        Tspread = np.kron(np.concatenate([[1] * (self.nsteps * self.nnodes)]), np.eye(self.nspace)).T
+        Tnospread = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), np.eye(self.nspace))).T
+        Treduce = np.kron(np.concatenate([[0] * (self.nsteps * self.nnodes - 1), [1]]), np.eye(self.nspace))
+
+        if self.MS[0].levels[0].sweep.params.spread:
+            mat = iter_mat_smoother.dot(Tspread) + precond_smoother.dot(Tnospread)
+        else:
+            mat = iter_mat_smoother.dot(Tnospread) + precond_smoother.dot(Tnospread)  # No, the latter is not a typo!
+
+        mat = np.linalg.matrix_power(iter_mat, niter).dot(mat)
+
+        for k in range(niter):
+            mat += np.linalg.matrix_power(iter_mat, k).dot(precond).dot(Tnospread)
+
+        mat = Treduce.dot(mat)
+
+        return mat
 
     def restart_block(self, slots, time, u0):
         """
