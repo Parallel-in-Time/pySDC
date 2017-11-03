@@ -10,12 +10,18 @@ from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
-def diffusion_setup():
+def diffusion_setup(mu=0.0):
+    """
+    Setup routine for advection test
+
+    Args:
+        mu (float): parameter for controlling stiffness
+    """
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -26,7 +32,7 @@ def diffusion_setup():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 2.5E-01  # diffusion coefficient
+    problem_params['nu'] = mu  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
 
@@ -60,12 +66,18 @@ def diffusion_setup():
     return description, controller_params
 
 
-def advection_setup():
+def advection_setup(mu=0.0):
+    """
+    Setup routine for advection test
+
+    Args:
+        mu (float): parameter for controlling stiffness
+    """
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -76,7 +88,7 @@ def advection_setup():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['c'] = 3.2E-02
+    problem_params['c'] = mu
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 2
@@ -113,12 +125,13 @@ def advection_setup():
     return description, controller_params
 
 
-def compare_controllers(type=None, f=None):
+def compare_controllers(type=None, mu=0.0, f=None):
     """
     A simple test program to compare PFASST runs with matrix-based and matrix-free controllers
 
     Args:
         type (str): setup type
+        mu (float) parameter for controlling stiffness
         f: file handler
     """
 
@@ -127,13 +140,13 @@ def compare_controllers(type=None, f=None):
     Tend = 1.0
 
     if type == 'diffusion':
-        description, controller_params = diffusion_setup()
+        description, controller_params = diffusion_setup(mu)
     elif type == 'advection':
-        description, controller_params = advection_setup()
+        description, controller_params = advection_setup(mu)
     else:
         raise ValueError('No valis setup type provided, aborting..')
 
-    out = '\nWorking with ' + type + ' setup..'
+    out = '\nWorking with %s setup and parameter %3.1e..' % (type, mu)
     f.write(out + '\n')
     print(out)
 
@@ -165,7 +178,7 @@ def compare_controllers(type=None, f=None):
     f.write(out + '\n')
     print(out)
 
-    assert diff < 1E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
+    assert diff < 2.0E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
 
     # filter statistics by type (number of iterations)
     filtered_stats_mat = filter_stats(stats_mat, type='niter')
@@ -188,9 +201,12 @@ def compare_controllers(type=None, f=None):
 
 def main():
 
+    mu_list = [1E-02, 1.0, 1E+02]
+
     f = open('comparison_matrix_vs_nomat_detail.txt', 'a')
-    compare_controllers('diffusion', f)
-    compare_controllers('advection', f)
+    for mu in mu_list:
+        compare_controllers(type='diffusion', mu=mu, f=f)
+        compare_controllers(type='advection', mu=mu, f=f)
     f.close()
 
 
