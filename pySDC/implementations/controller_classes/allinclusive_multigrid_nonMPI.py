@@ -41,8 +41,9 @@ class allinclusive_multigrid_nonMPI(controller):
                     assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
 
         for S in self.MS:
-            assert S.levels[-1].params.nsweeps == 1, 'ERROR: this controller cannot do multiple sweeps on ' \
-                                                     'coarsest level'
+            if len(S.levels) > 1:
+                assert S.levels[-1].params.nsweeps == 1, 'ERROR: this controller cannot do multiple sweeps on ' \
+                                                         'coarsest level'
 
     def run(self, u0, t0, Tend):
         """
@@ -269,7 +270,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
-                    S.status.stage = 'IT_CHECK'
+                    S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -280,7 +281,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -316,7 +317,10 @@ class allinclusive_multigrid_nonMPI(controller):
                     # increment iteration count here (and only here)
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
-                    S.status.stage = 'IT_FINE'
+                    if len(S.levels) > 1:  # MLSDC or PFASST
+                        S.status.stage = 'IT_UP'
+                    else:  # SDC
+                        S.status.stage = 'IT_FINE'
 
             else:
                 # if everyone is ready, end
@@ -356,10 +360,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                if len(S.levels) > 1:  # MLSDC or PFASST
-                    S.status.stage = 'IT_UP'
-                else:  # SDC
-                    S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -486,7 +487,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_FINE'
 
             return MS
 

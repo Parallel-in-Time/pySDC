@@ -237,6 +237,19 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         for S in MS:
             self.hooks.pre_step(step=S, level_number=0)
 
+        for _ in range(MS[0].levels[0].params.nsweeps):
+
+            MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_PRE_SWEEP')
+            for S in MS:
+                self.hooks.pre_sweep(step=S, level_number=0)
+
+            self.u += spla.spsolve(self.P, self.res)
+            self.res = self.u0 - self.C.dot(self.u)
+
+            MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_PRE_SWEEP')
+            for S in MS:
+                self.hooks.post_sweep(step=S, level_number=0)
+
         while np.linalg.norm(self.res, np.inf) > self.tol and niter < self.maxiter:
 
             niter += 1
@@ -244,19 +257,6 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_ITERATION')
             for S in MS:
                 self.hooks.pre_iteration(step=S, level_number=0)
-
-            for _ in range(MS[0].levels[0].params.nsweeps):
-
-                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
-                for S in MS:
-                    self.hooks.pre_sweep(step=S, level_number=0)
-
-                self.u += spla.spsolve(self.P, self.res)
-                self.res = self.u0 - self.C.dot(self.u)
-
-                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')
-                for S in MS:
-                    self.hooks.post_sweep(step=S, level_number=0)
 
             if self.nlevels > 1:
                 for _ in range(MS[0].levels[1].params.nsweeps):
@@ -272,6 +272,19 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                                           stage='POST_COARSE_SWEEP')
                     for S in MS:
                         self.hooks.post_sweep(step=S, level_number=1)
+
+            for _ in range(MS[0].levels[0].params.nsweeps):
+
+                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
+                for S in MS:
+                    self.hooks.pre_sweep(step=S, level_number=0)
+
+                self.u += spla.spsolve(self.P, self.res)
+                self.res = self.u0 - self.C.dot(self.u)
+
+                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')
+                for S in MS:
+                    self.hooks.post_sweep(step=S, level_number=0)
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_ITERATION')
             for S in MS:
