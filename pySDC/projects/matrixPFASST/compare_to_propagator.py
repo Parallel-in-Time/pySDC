@@ -268,7 +268,7 @@ def compare_controllers(type=None, par=0.0, f=None):
 
 def main():
 
-    f = open('comparison_matrix_vs_propagator_detail.txt', 'a')
+    f = open('comparison_matrix_vs_propagator_detail.txt', 'w')
     # compare_controllers(type='diffusion', par=1E-00, f=f)
     # compare_controllers(type='advection', par=1E-00, f=f)
     compare_controllers(type='testequation', par=0.0, f=f)

@@ -455,6 +455,21 @@ class allinclusive_multigrid_nonMPI(controller):
                     # prolong values
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
+                    # send updated values forward
+                    if self.params.fine_comm and not S.status.last:
+                        self.logger.debug('Process %2i provides data on level %2i with tag %s'
+                                          % (S.status.slot, l - 1, S.status.iter))
+                        self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
+
+                    # # receive values
+                    if self.params.fine_comm and not S.status.first:
+                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
+                                          (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
+                        self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
+                                                                              S.prev.status.slot))
+
+                    S.levels[l - 1].sweep.compute_residual()
+
                 # on middle levels: do communication and sweep as usual
                 if l - 1 > 0:
 
