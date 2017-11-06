@@ -62,7 +62,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1024 * 0.015625
+    Tend = 128 * 0.015625
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

@@ -43,7 +43,7 @@ class particles_output(hooks):
             self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
         part = L.u[0]
-        N = L.prob.nparts
+        N = L.prob.params.nparts
         w = np.array([1, 1, -2])
 
         # compute (slowly..) the potential at u0
@@ -52,13 +52,13 @@ class particles_output(hooks):
             # inner loop, omit ith particle
             for j in range(0, i):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
-                                       2) ** 2 + L.prob.sig ** 2
+                                       2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
-                                       2) ** 2 + L.prob.sig ** 2
+                                       2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
+            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
                                                                                   part.pos.values[3 * i:3 * i + 3])
 
         # add up kinetic and potntial contributions to total energy
@@ -88,7 +88,7 @@ class particles_output(hooks):
 
         L.sweep.compute_end_point()
         part = L.uend
-        N = L.prob.nparts
+        N = L.prob.params.nparts
         w = np.array([1, 1, -2])
 
         # compute (slowly..) the potential at uend
@@ -97,13 +97,13 @@ class particles_output(hooks):
             # inner loop, omit ith particle
             for j in range(0, i):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
-                                       2) ** 2 + L.prob.sig ** 2
+                                       2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
-                                       2) ** 2 + L.prob.sig ** 2
+                                       2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
+            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
                                                                                   part.pos.values[3 * i:3 * i + 3])
 
         # add up kinetic and potntial contributions to total energy
