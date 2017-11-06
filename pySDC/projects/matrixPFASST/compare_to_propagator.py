@@ -2,10 +2,13 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh as mesh_to_mesh_nocoarse
 from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_matrix_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -28,7 +31,7 @@ def diffusion_setup(par=0.0):
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = 'LU'
     sweeper_params['spread'] = True
 
     # initialize problem parameters
@@ -84,7 +87,7 @@ def advection_setup(par=0.0):
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = ['LU']
     sweeper_params['spread'] = True
 
     # initialize problem parameters
@@ -126,6 +129,73 @@ def advection_setup(par=0.0):
     return description, controller_params
 
 
+def testequation_setup():
+    """
+    Setup routine for the test equation
+
+    Args:
+        par (float): parameter for controlling stiffness
+    """
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1E-08
+    level_params['dt'] = 0.25
+    level_params['nsweeps'] = [3]
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['num_nodes'] = [3]
+    sweeper_params['QI'] = 'LU'
+    sweeper_params['spread'] = True
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['u0'] = 1.0  # initial value (for all instances)
+    # use single values like this...
+    problem_params['lambdas'] = [[-1.0]]
+    # .. or a list of values like this ...
+    problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]
+    # .. or a whole block of values like this
+    ilim_left = -11
+    ilim_right = 0
+    rlim_left = 0
+    rlim_right = 11
+    ilam = 1j * np.logspace(ilim_left, ilim_right, 11)
+    rlam = -1 * np.logspace(rlim_left, rlim_right, 11)
+    lambdas = []
+    for rl in rlam:
+        for il in ilam:
+            lambdas.append(rl + il)
+    problem_params['lambdas'] = [lambdas]
+    # note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).
+    # The propagation matrix will be diagonal too, corresponding to the respective lambda value.
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+    controller_params['predict'] = False
+
+    # fill description dictionary for easy step instantiation
+    description = dict()
+    description['problem_class'] = testequation0d  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['dtype_u'] = cmesh  # pass data type for u
+    description['dtype_f'] = cmesh  # pass data type for f
+    description['sweeper_class'] = generic_implicit  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh_nocoarse  # pass spatial transfer class
+    description['space_transfer_params'] = dict()  # pass paramters for spatial transfer
+
+    return description, controller_params
+
+
 def compare_controllers(type=None, par=0.0, f=None):
     """
     A simple test program to compare PFASST runs with matrix-based and matrix-free controllers
@@ -144,6 +214,8 @@ def compare_controllers(type=None, par=0.0, f=None):
         description, controller_params = diffusion_setup(par)
     elif type == 'advection':
         description, controller_params = advection_setup(par)
+    elif type == 'testequation':
+        description, controller_params = testequation_setup()
     else:
         raise ValueError('No valis setup type provided, aborting..')
 
@@ -196,12 +268,10 @@ def compare_controllers(type=None, par=0.0, f=None):
 
 def main():
 
-    par_list = [1E-02, 1.0, 1E+02]
-
     f = open('comparison_matrix_vs_propagator_detail.txt', 'a')
-    for par in par_list:
-        compare_controllers(type='diffusion', par=par, f=f)
-        compare_controllers(type='advection', par=par, f=f)
+    # compare_controllers(type='diffusion', par=1E-00, f=f)
+    # compare_controllers(type='advection', par=1E-00, f=f)
+    compare_controllers(type='testequation', par=0.0, f=f)
     f.close()
 
 

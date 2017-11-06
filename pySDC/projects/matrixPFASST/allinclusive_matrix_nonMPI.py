@@ -5,6 +5,7 @@ import scipy.sparse.linalg as spla
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
@@ -26,9 +27,9 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
-        assert description['dtype_u'] is mesh, \
+        assert description['dtype_u'] is mesh or cmesh, \
             'ERROR: matrix version will only work with mesh data type for u, got %s' % description['dtype_u']
-        assert description['dtype_f'] is mesh, \
+        assert description['dtype_f'] is mesh or cmesh, \
             'ERROR: matrix version will only work with mesh data type for f, got %s' % description['dtype_f']
         assert description['sweeper_class'] is generic_implicit, \
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
