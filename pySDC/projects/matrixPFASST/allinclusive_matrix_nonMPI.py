@@ -72,10 +72,12 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         N = np.zeros((self.nnodes, self.nnodes))
         N[:, -1] = 1
 
-        self.C = np.array(np.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, A)) - np.kron(E, np.kron(N, np.eye(self.nspace))))
-        self.P = np.array(np.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, A)))
+        self.C = np.eye(self.nsteps * self.nnodes * self.nspace) - \
+            self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, A)) - np.kron(E, np.kron(N, np.eye(self.nspace)))
+        self.C = np.array(self.C)
+        self.P = np.eye(self.nsteps * self.nnodes * self.nspace) - \
+            self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, A))
+        self.P = np.array(self.P)
 
         if self.nlevels > 1:
             prob_c = self.MS[0].levels[1].prob
@@ -96,9 +98,10 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             self.Tcf = np.array(np.kron(np.eye(self.nsteps), np.kron(TcfQ, TcfA)))
             self.Tfc = np.array(np.kron(np.eye(self.nsteps), np.kron(TfcQ, TfcA)))
 
-            self.Pc = np.array(np.eye(self.nsteps * nnodesc * self.nspace_c) - \
+            self.Pc = np.eye(self.nsteps * nnodesc * self.nspace_c) - \
                 self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, Ac)) - \
-                np.kron(E, np.kron(Nc, np.eye(self.nspace_c))))
+                np.kron(E, np.kron(Nc, np.eye(self.nspace_c)))
+            self.Pc = np.array(self.Pc)
 
         self.u = np.zeros(self.nsteps * self.nnodes * self.nspace)
         self.res = np.zeros(self.nsteps * self.nnodes * self.nspace)
