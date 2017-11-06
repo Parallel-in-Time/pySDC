@@ -58,8 +58,8 @@ class particles_output(hooks):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
                                        2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
-                                                                                  part.pos.values[3 * i:3 * i + 3])
+            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
+                np.dot(w, part.pos.values[3 * i:3 * i + 3] * part.pos.values[3 * i:3 * i + 3])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -103,8 +103,8 @@ class particles_output(hooks):
                 dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3],
                                        2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos.values[3 * i:3 * i + 3] *
-                                                                                  part.pos.values[3 * i:3 * i + 3])
+            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
+                np.dot(w, part.pos.values[3 * i:3 * i + 3] * part.pos.values[3 * i:3 * i + 3])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
