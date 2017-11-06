@@ -140,12 +140,12 @@ def testequation_setup():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [3]
+    level_params['nsweeps'] = [1, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
+    sweeper_params['num_nodes'] = [3, 3]
     sweeper_params['QI'] = 'LU'
     sweeper_params['spread'] = True
 
@@ -155,19 +155,19 @@ def testequation_setup():
     # use single values like this...
     problem_params['lambdas'] = [[-1.0]]
     # .. or a list of values like this ...
-    problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]
+    # problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]
     # .. or a whole block of values like this
-    ilim_left = -11
-    ilim_right = 0
-    rlim_left = 0
-    rlim_right = 11
-    ilam = 1j * np.logspace(ilim_left, ilim_right, 11)
-    rlam = -1 * np.logspace(rlim_left, rlim_right, 11)
-    lambdas = []
-    for rl in rlam:
-        for il in ilam:
-            lambdas.append(rl + il)
-    problem_params['lambdas'] = [lambdas]
+    # ilim_left = -11
+    # ilim_right = 0
+    # rlim_left = 0
+    # rlim_right = 11
+    # ilam = 1j * np.logspace(ilim_left, ilim_right, 11)
+    # rlam = -1 * np.logspace(rlim_left, rlim_right, 11)
+    # lambdas = []
+    # for rl in rlam:
+    #     for il in ilam:
+    #         lambdas.append(rl + il)
+    # problem_params['lambdas'] = [lambdas]
     # note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).
     # The propagation matrix will be diagonal too, corresponding to the respective lambda value.
 

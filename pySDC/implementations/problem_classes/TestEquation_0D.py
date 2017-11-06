@@ -35,11 +35,11 @@ class testequation0d(ptype):
 
         assert not any(isinstance(i, list) for i in problem_params['lambdas']), \
             'ERROR: expect flat list here, got %s' % problem_params['lambdas']
-        nvars = len(problem_params['lambdas'])
-        assert nvars > 0, 'ERROR: expect at least one lambda parameter here'
+        problem_params['nvars'] = len(problem_params['lambdas'])
+        assert problem_params['nvars'] > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(testequation0d, self).__init__(init=nvars, dtype_u=dtype_u, dtype_f=dtype_f,
+        super(testequation0d, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
                                              params=problem_params)
 
         self.A = self.__get_A(self.params.lambdas)

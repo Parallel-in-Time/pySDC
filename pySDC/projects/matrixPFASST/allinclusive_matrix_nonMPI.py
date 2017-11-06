@@ -1,6 +1,4 @@
 import numpy as np
-import scipy.sparse as sp
-import scipy.sparse.linalg as spla
 
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
@@ -55,8 +53,8 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         assert self.nlevels <= 2, 'ERROR: cannot use matrix-PFASST with more than 2 levels'  # TODO: fixme
         assert [level.dt for step in self.MS for level in step.levels].count(self.dt) == self.nlevels * self.nsteps, \
             'ERROR: dt must be equal for all steps and all levels'
-        assert [level.sweep.coll.num_nodes for step in self.MS for level in step.levels].count(self.nnodes) == \
-            self.nlevels * self.nsteps, 'ERROR: nnodes must be equal for all steps and all levels'
+        # assert [level.sweep.coll.num_nodes for step in self.MS for level in step.levels].count(self.nnodes) == \
+        #     self.nlevels * self.nsteps, 'ERROR: nnodes must be equal for all steps and all levels'
         assert [type(level.prob) for step in self.MS for level in step.levels].count(type(prob)) == \
             self.nlevels * self.nsteps, 'ERROR: all probem classes have to be the same'
 
@@ -64,7 +62,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         assert hasattr(prob, 'A'), 'ERROR: need system matrix A for this (and linear problems!)'
 
-        A = prob.A
+        A = prob.A.todense()
         Q = self.MS[0].levels[0].sweep.coll.Qmat[1:, 1:]
         Qd = self.MS[0].levels[0].sweep.QI[1:, 1:]
 
@@ -74,26 +72,33 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         N = np.zeros((self.nnodes, self.nnodes))
         N[:, -1] = 1
 
-        self.C = sp.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * sp.kron(sp.eye(self.nsteps), sp.kron(Q, A)) - sp.kron(E, sp.kron(N, sp.eye(self.nspace)))
-        self.P = sp.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * sp.kron(sp.eye(self.nsteps), sp.kron(Qd, A))
+        self.C = np.array(np.eye(self.nsteps * self.nnodes * self.nspace) - \
+            self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, A)) - np.kron(E, np.kron(N, np.eye(self.nspace))))
+        self.P = np.array(np.eye(self.nsteps * self.nnodes * self.nspace) - \
+            self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, A)))
 
         if self.nlevels > 1:
             prob_c = self.MS[0].levels[1].prob
             self.nspace_c = prob_c.init
 
-            Ac = prob_c.A
+            Ac = prob_c.A.todense()
             Qdc = self.MS[0].levels[1].sweep.QI[1:, 1:]
 
-            TcfA = self.MS[0].base_transfer.space_transfer.Pspace
-            TfcA = self.MS[0].base_transfer.space_transfer.Rspace
+            nnodesc = self.MS[0].levels[1].sweep.coll.num_nodes
+            Nc = np.zeros((nnodesc, nnodesc))
+            Nc[:, -1] = 1
 
-            self.Tcf = sp.kron(sp.eye(self.nsteps * self.nnodes), TcfA)
-            self.Tfc = sp.kron(sp.eye(self.nsteps * self.nnodes), TfcA)
+            TcfA = self.MS[0].base_transfer.space_transfer.Pspace.todense()
+            TfcA = self.MS[0].base_transfer.space_transfer.Rspace.todense()
+            TcfQ = self.MS[0].base_transfer.Pcoll
+            TfcQ = self.MS[0].base_transfer.Rcoll
 
-            self.Pc = sp.eye(self.nsteps * self.nnodes * self.nspace_c) - \
-                self.dt * sp.kron(sp.eye(self.nsteps), sp.kron(Qdc, Ac)) - sp.kron(E, sp.kron(N, sp.eye(self.nspace_c)))
+            self.Tcf = np.array(np.kron(np.eye(self.nsteps), np.kron(TcfQ, TcfA)))
+            self.Tfc = np.array(np.kron(np.eye(self.nsteps), np.kron(TfcQ, TfcA)))
+
+            self.Pc = np.array(np.eye(self.nsteps * nnodesc * self.nspace_c) - \
+                self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, Ac)) - \
+                np.kron(E, np.kron(Nc, np.eye(self.nspace_c))))
 
         self.u = np.zeros(self.nsteps * self.nnodes * self.nspace)
         self.res = np.zeros(self.nsteps * self.nnodes * self.nspace)
@@ -167,9 +172,9 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         """
 
         # build smoother iteration matrix and preconditioner using nsweeps
-        Pinv = np.linalg.inv(self.P.todense())
+        Pinv = np.linalg.inv(self.P)
         precond_smoother = Pinv.copy()
-        iter_mat_smoother = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_smoother.dot(self.C.todense())
+        iter_mat_smoother = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_smoother.dot(self.C)
         for k in range(1, self.MS[0].levels[0].params.nsweeps):
             precond_smoother += np.linalg.matrix_power(iter_mat_smoother, k).dot(Pinv)
         iter_mat_smoother = np.linalg.matrix_power(iter_mat_smoother, self.MS[0].levels[0].params.nsweeps)
@@ -178,10 +183,10 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         # add coarse-grid correction (single sweep, though!)
         if self.nlevels > 1:
-            precond_cgc = self.Tcf.todense().dot(np.linalg.inv(self.Pc.todense())).dot(self.Tfc.todense())
-            iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C.todense())
+            precond_cgc = self.Tcf.dot(np.linalg.inv(self.Pc)).dot(self.Tfc)
+            iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C)
             iter_mat = iter_mat.dot(iter_mat_cgc)
-            precond += precond_cgc - precond_smoother.dot(self.C.todense()).dot(precond_cgc)
+            precond += precond_cgc - precond_smoother.dot(self.C).dot(precond_cgc)
 
         # form span and reduce matrices and add to operator
         Tspread = np.kron(np.concatenate([[1] * (self.nsteps * self.nnodes)]), np.eye(self.nspace)).T
@@ -223,7 +228,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
                 P = lvl.prob
-                for m in range(1, self.nnodes + 1):
+                for m in range(1, lvl.sweep.coll.num_nodes + 1):
                     lvl.u[m] = P.dtype_u(init=P.init, val=0)
                     lvl.f[m] = P.dtype_f(init=P.init, val=0)
 
@@ -288,7 +293,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             for S in MS:
                 self.hooks.pre_sweep(step=S, level_number=0)
 
-            self.u += spla.spsolve(self.P, self.res)
+            self.u += np.linalg.solve(self.P, self.res)
             self.res = self.u0 - self.C.dot(self.u)
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_PRE_SWEEP')
@@ -310,7 +315,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                     for S in MS:
                         self.hooks.pre_sweep(step=S, level_number=1)
 
-                    self.u += self.Tcf.dot(spla.spsolve(self.Pc, self.Tfc.dot(self.res)))
+                    self.u += self.Tcf.dot(np.linalg.solve(self.Pc, self.Tfc.dot(self.res)))
                     self.res = self.u0 - self.C.dot(self.u)
 
                     MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1,
@@ -324,7 +329,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                 for S in MS:
                     self.hooks.pre_sweep(step=S, level_number=0)
 
-                self.u += spla.spsolve(self.P, self.res)
+                self.u += np.linalg.solve(self.P, self.res)
                 self.res = self.u0 - self.C.dot(self.u)
 
                 MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')

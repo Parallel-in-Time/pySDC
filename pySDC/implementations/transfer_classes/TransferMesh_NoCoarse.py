@@ -1,5 +1,7 @@
 from __future__ import division
 
+import scipy.sparse as sp
+
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
@@ -28,6 +30,9 @@ class mesh_to_mesh(space_transfer):
         """
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
+
+        self.Rspace = sp.eye(self.coarse_prob.params.nvars)
+        self.Pspace = sp.eye(self.fine_prob.params.nvars)
 
     def restrict(self, F):
         """
