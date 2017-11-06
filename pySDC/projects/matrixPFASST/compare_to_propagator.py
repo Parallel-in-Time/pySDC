@@ -11,12 +11,12 @@ from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
-def diffusion_setup(mu=0.0):
+def diffusion_setup(par=0.0):
     """
     Setup routine for advection test
 
     Args:
-        mu (float): parameter for controlling stiffness
+        par (float): parameter for controlling stiffness
     """
     # initialize level parameters
     level_params = dict()
@@ -33,7 +33,7 @@ def diffusion_setup(mu=0.0):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = mu  # diffusion coefficient
+    problem_params['nu'] = par  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
 
@@ -67,12 +67,12 @@ def diffusion_setup(mu=0.0):
     return description, controller_params
 
 
-def advection_setup(mu=0.0):
+def advection_setup(par=0.0):
     """
     Setup routine for advection test
 
     Args:
-        mu (float): parameter for controlling stiffness
+        par (float): parameter for controlling stiffness
     """
     # initialize level parameters
     level_params = dict()
@@ -89,7 +89,7 @@ def advection_setup(mu=0.0):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['c'] = mu
+    problem_params['c'] = par
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 2
@@ -126,13 +126,13 @@ def advection_setup(mu=0.0):
     return description, controller_params
 
 
-def compare_controllers(type=None, mu=0.0, f=None):
+def compare_controllers(type=None, par=0.0, f=None):
     """
     A simple test program to compare PFASST runs with matrix-based and matrix-free controllers
 
     Args:
         type (str): setup type
-        mu (float) parameter for controlling stiffness
+        par (float): parameter for controlling stiffness
         f: file handler
     """
 
@@ -141,13 +141,13 @@ def compare_controllers(type=None, mu=0.0, f=None):
     Tend = 1.0
 
     if type == 'diffusion':
-        description, controller_params = diffusion_setup(mu)
+        description, controller_params = diffusion_setup(par)
     elif type == 'advection':
-        description, controller_params = advection_setup(mu)
+        description, controller_params = advection_setup(par)
     else:
         raise ValueError('No valis setup type provided, aborting..')
 
-    out = '\nWorking with %s setup and parameter %3.1e..' % (type, mu)
+    out = '\nWorking with %s setup and parameter %3.1e..' % (type, par)
     f.write(out + '\n')
     print(out)
 
@@ -196,12 +196,12 @@ def compare_controllers(type=None, mu=0.0, f=None):
 
 def main():
 
-    mu_list = [1E-02, 1.0, 1E+02]
+    par_list = [1E-02, 1.0, 1E+02]
 
     f = open('comparison_matrix_vs_propagator_detail.txt', 'a')
-    for mu in mu_list:
-        compare_controllers(type='diffusion', mu=mu, f=f)
-        compare_controllers(type='advection', mu=mu, f=f)
+    for par in par_list:
+        compare_controllers(type='diffusion', par=par, f=f)
+        compare_controllers(type='advection', par=par, f=f)
     f.close()
 
 
