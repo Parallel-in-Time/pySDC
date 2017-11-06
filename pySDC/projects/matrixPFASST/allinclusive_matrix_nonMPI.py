@@ -165,17 +165,24 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             mat: propagation matrix
         """
 
-        precond_smoother = np.linalg.inv(self.P.todense())
-        iter_mat_smoother = (np.eye(self.nsteps * self.nnodes * self.nspace) - precond_smoother.dot(self.C.todense()))
+        # build smoother iteration matrix and preconditioner using nsweeps
+        Pinv = np.linalg.inv(self.P.todense())
+        precond_smoother = Pinv.copy()
+        iter_mat_smoother = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_smoother.dot(self.C.todense())
+        for k in range(1, self.MS[0].levels[0].params.nsweeps):
+            precond_smoother += np.linalg.matrix_power(iter_mat_smoother, k).dot(Pinv)
+        iter_mat_smoother = np.linalg.matrix_power(iter_mat_smoother, self.MS[0].levels[0].params.nsweeps)
         iter_mat = iter_mat_smoother
         precond = precond_smoother
 
+        # add coarse-grid correction (single sweep, though!)
         if self.nlevels > 1:
             precond_cgc = self.Tcf.todense().dot(np.linalg.inv(self.Pc.todense())).dot(self.Tfc.todense())
             iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C.todense())
             iter_mat = iter_mat.dot(iter_mat_cgc)
             precond += precond_cgc - precond_smoother.dot(self.C.todense()).dot(precond_cgc)
 
+        # form span and reduce matrices and add to operator
         Tspread = np.kron(np.concatenate([[1] * (self.nsteps * self.nnodes)]), np.eye(self.nspace)).T
         Tnospread = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]),
                             np.kron(np.ones(self.nnodes), np.eye(self.nspace))).T
@@ -186,11 +193,10 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         else:
             mat = iter_mat_smoother.dot(Tnospread) + precond_smoother.dot(Tnospread)  # No, the latter is not a typo!
 
+        # build propagation matrix
         mat = np.linalg.matrix_power(iter_mat, niter).dot(mat)
-
         for k in range(niter):
             mat += np.linalg.matrix_power(iter_mat, k).dot(precond).dot(Tnospread)
-
         mat = Treduce.dot(mat)
 
         return mat

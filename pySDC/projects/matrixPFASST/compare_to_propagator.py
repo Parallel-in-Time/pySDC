@@ -22,7 +22,7 @@ def diffusion_setup(mu=0.0):
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -78,7 +78,7 @@ def advection_setup(mu=0.0):
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -177,30 +177,31 @@ def compare_controllers(type=None, mu=0.0, f=None):
     assert niters.count(niters[0]) == len(niters), 'ERROR: not all time-steps have the same number of iterations'
     niter = niters[0]
 
+    # build propagation matrix using the prescribed number of iterations (or any other, if needed)
     prop = controller.build_propagation_matrix(niter=niter)
 
     err_prop_ex = np.linalg.norm(prop.dot(uinit.values) - uex.values)
     out = '  Difference between propagation and exact solution: %6.4e' % err_prop_ex
     f.write(out + '\n')
     print(out)
-    err_stand_ex = np.linalg.norm(uend_mat.values - uex.values)
-    out = '  Difference between standard PFASST and exact solution: %6.4e' % err_stand_ex
+    err_mat_ex = np.linalg.norm(uend_mat.values - uex.values)
+    out = '  Difference between matrix-PFASST and exact solution: %6.4e' % err_mat_ex
     f.write(out + '\n')
     print(out)
-    err_stand_prop = np.linalg.norm(prop.dot(uinit.values) - uend_mat.values)
-    out = '  Difference between standard PFASST and propagator: %6.4e' % err_stand_prop
+    err_mat_prop = np.linalg.norm(prop.dot(uinit.values) - uend_mat.values)
+    out = '  Difference between matrix-PFASST and propagator: %6.4e' % err_mat_prop
     f.write(out + '\n')
     print(out)
 
 
 def main():
 
-    mu_list = [1.0]#[1E-02, 1.0, 1E+02]
+    mu_list = [1E-02, 1.0, 1E+02]
 
     f = open('comparison_matrix_vs_propagator_detail.txt', 'a')
     for mu in mu_list:
         compare_controllers(type='diffusion', mu=mu, f=f)
-        # compare_controllers(type='advection', mu=mu, f=f)
+        compare_controllers(type='advection', mu=mu, f=f)
     f.close()
 
 
