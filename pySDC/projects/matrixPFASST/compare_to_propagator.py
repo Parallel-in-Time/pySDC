@@ -50,7 +50,6 @@ def diffusion_setup(mu=0.0):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['predict'] = False
-    controller_params['build_propagator'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -110,7 +109,6 @@ def advection_setup(mu=0.0):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['predict'] = False
-    controller_params['build_propagator'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -162,27 +160,8 @@ def compare_controllers(type=None, mu=0.0, f=None):
     uex = P.u_exact(Tend)
 
     # this is where the iteration is happening
-    uend_mat, stats_mat, prop = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    uend_mat, stats_mat = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    print(np.linalg.norm(prop.dot(uinit.values) - uex.values))
-    print(np.linalg.norm(uex.values - uend_mat.values))
-    print(np.linalg.norm(prop.dot(uinit.values) - uend_mat.values))
-
-
-    # diff = abs(uend_mat - uend_nomat)
-    #
-    # err_mat = abs(uend_mat - uex)
-    # err_nomat = abs(uend_nomat - uex)
-    #
-    # out = '  Error (mat/nomat) vs. exact solution: %6.4e -- %6.4e' % (err_mat, err_nomat)
-    # f.write(out + '\n')
-    # print(out)
-    # out = '  Difference between both results: %6.4e' % diff
-    # f.write(out + '\n')
-    # print(out)
-    #
-    # assert diff < 2.0E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
-    #
     # filter statistics by type (number of iterations)
     filtered_stats_mat = filter_stats(stats_mat, type='niter')
 
@@ -193,12 +172,32 @@ def compare_controllers(type=None, mu=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
+    # filter only iteration counts and check for equality
+    niters = [item[1] for item in iter_counts_mat]
+    assert niters.count(niters[0]) == len(niters), 'ERROR: not all time-steps have the same number of iterations'
+    niter = niters[0]
+
+    prop = controller.build_propagation_matrix(niter=niter)
+
+    err_prop_ex = np.linalg.norm(prop.dot(uinit.values) - uex.values)
+    out = '  Difference between propagation and exact solution: %6.4e' % err_prop_ex
+    f.write(out + '\n')
+    print(out)
+    err_stand_ex = np.linalg.norm(uend_mat.values - uex.values)
+    out = '  Difference between standard PFASST and exact solution: %6.4e' % err_stand_ex
+    f.write(out + '\n')
+    print(out)
+    err_stand_prop = np.linalg.norm(prop.dot(uinit.values) - uend_mat.values)
+    out = '  Difference between standard PFASST and propagator: %6.4e' % err_stand_prop
+    f.write(out + '\n')
+    print(out)
+
 
 def main():
 
     mu_list = [1.0]#[1E-02, 1.0, 1E+02]
 
-    f = open('comparison_matrix_vs_nomat_detail.txt', 'a')
+    f = open('comparison_matrix_vs_propagator_detail.txt', 'a')
     for mu in mu_list:
         compare_controllers(type='diffusion', mu=mu, f=f)
         # compare_controllers(type='advection', mu=mu, f=f)
