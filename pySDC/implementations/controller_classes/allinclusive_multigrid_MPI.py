@@ -291,7 +291,6 @@ class allinclusive_multigrid_MPI(controller):
                 else:  # SDC
                     self.S.status.stage = 'IT_FINE'
 
-
             else:
                 self.S.levels[0].sweep.compute_end_point()
                 self.hooks.post_step(step=self.S, level_number=0)
@@ -333,8 +332,6 @@ class allinclusive_multigrid_MPI(controller):
         elif stage == 'IT_UP':
 
             # go up the hierarchy from finest to coarsest level (parallel)
-
-
 
             self.S.transfer(source=self.S.levels[0], target=self.S.levels[1])
 
@@ -451,7 +448,8 @@ class allinclusive_multigrid_MPI(controller):
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                                l - 1, self.S.status.iter))
-                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
+                                      comm=comm)
 
                         if not self.S.status.last and self.params.fine_comm:
                             req_send.wait()
