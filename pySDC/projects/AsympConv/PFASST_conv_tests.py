@@ -50,7 +50,7 @@ def run_diffusion(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # initialize problem parameters
     problem_params = dict()
@@ -93,7 +93,7 @@ def run_diffusion(nsweeps):
 
     results = dict()
 
-    for i in range(-3, 12):
+    for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
 
         problem_params['nu'] = 10.0 ** i / ratio  # diffusion coefficient
@@ -156,7 +156,7 @@ def run_advection(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # initialize problem parameters
     problem_params = dict()
@@ -201,7 +201,7 @@ def run_advection(nsweeps):
 
     results = dict()
 
-    for i in range(-3, 12):
+    for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1))
 
         problem_params['c'] = 10.0 ** i / ratio  # diffusion coefficient

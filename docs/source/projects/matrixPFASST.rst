@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/matrixPFASST/README.rst

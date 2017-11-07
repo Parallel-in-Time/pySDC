@@ -37,12 +37,8 @@ def check_Q_transfer(collclass):
 
         assert coll_fine.left_is_node == coll_coarse.left_is_node, 'ERROR: should be using the same class for coarse and fine Q'
 
-        if not coll_fine.left_is_node:
-            fine_grid = np.concatenate(([0], coll_fine.nodes))
-            coarse_grid = np.concatenate(([0], coll_coarse.nodes))
-        else:
-            fine_grid = coll_fine.nodes
-            coarse_grid = coll_coarse.nodes
+        fine_grid = coll_fine.nodes
+        coarse_grid = coll_coarse.nodes
 
         for order in range(2,coll_coarse.num_nodes+1):
 
@@ -88,12 +84,8 @@ def check_Q_transfer_minimal(collclass):
 
         assert coll_fine.left_is_node == coll_coarse.left_is_node, 'ERROR: should be using the same class for coarse and fine Q'
 
-        if not coll_fine.left_is_node:
-            fine_grid = np.concatenate(([0], coll_fine.nodes))
-            coarse_grid = np.concatenate(([0], coll_coarse.nodes))
-        else:
-            fine_grid = coll_fine.nodes
-            coarse_grid = coll_coarse.nodes
+        fine_grid = coll_fine.nodes
+        coarse_grid = coll_coarse.nodes
 
         Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=2, pad=0)
         Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=2, pad=0)

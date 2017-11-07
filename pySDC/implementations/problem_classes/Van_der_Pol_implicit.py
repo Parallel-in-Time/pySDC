@@ -27,9 +27,9 @@ class vanderpol(ptype):
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
-
+        problem_params['nvars'] = 2
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(vanderpol, self).__init__(2, dtype_u, dtype_f, problem_params)
+        super(vanderpol, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
     def u_exact(self, t):
         """

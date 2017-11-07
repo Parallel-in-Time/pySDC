@@ -240,7 +240,7 @@ class allinclusive_multigrid_MPI(controller):
             if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
             else:
-                self.S.status.stage = 'IT_CHECK'
+                self.S.status.stage = 'IT_FINE'
 
         elif stage == 'PREDICT':
 
@@ -250,7 +250,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # update stage
             self.hooks.pre_iteration(step=self.S, level_number=0)
-            self.S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_FINE'
 
         elif stage == 'IT_CHECK':
 
@@ -286,7 +286,10 @@ class allinclusive_multigrid_MPI(controller):
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
                 self.hooks.pre_iteration(step=self.S, level_number=0)
-                self.S.status.stage = 'IT_FINE'
+                if len(self.S.levels) > 1:  # MLSDC or PFASST
+                    self.S.status.stage = 'IT_UP'
+                else:  # SDC
+                    self.S.status.stage = 'IT_FINE'
 
             else:
                 self.S.levels[0].sweep.compute_end_point()
@@ -295,20 +298,36 @@ class allinclusive_multigrid_MPI(controller):
 
         elif stage == 'IT_FINE':
 
-            # do fine sweep
+            nsweeps = self.S.levels[0].params.nsweeps
 
-            # standard sweep workflow: update nodes, compute residual, log progress
-            self.hooks.pre_sweep(step=self.S, level_number=0)
-            for k in range(self.S.levels[0].params.nsweeps):
+            # do fine sweep
+            for k in range(nsweeps):
+
+                self.hooks.pre_sweep(step=self.S, level_number=0)
                 self.S.levels[0].sweep.update_nodes()
-            self.S.levels[0].sweep.compute_residual()
-            self.hooks.post_sweep(step=self.S, level_number=0)
+
+                req_send = None
+                self.S.levels[0].sweep.compute_end_point()
+                if not self.S.status.last and self.params.fine_comm:
+                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       0, self.S.status.iter))
+                    req_send = comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=self.S.status.iter)
+
+                if not self.S.status.first and self.params.fine_comm:
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       0, self.S.status.iter))
+                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                if not self.S.status.last and self.params.fine_comm:
+                    req_send.wait()
+
+                self.S.levels[0].sweep.compute_residual()
+                self.hooks.post_sweep(step=self.S, level_number=0)
 
             # update stage
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_UP'
-            else:  # SDC
-                self.S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_UP':
 
@@ -318,11 +337,33 @@ class allinclusive_multigrid_MPI(controller):
 
             # sweep and send on middle levels (not on finest, not on coarsest, though)
             for l in range(1, len(self.S.levels) - 1):
-                self.hooks.pre_sweep(step=self.S, level_number=l)
-                for k in range(self.S.levels[l].params.nsweeps):
+
+                nsweeps = self.S.levels[l].params.nsweeps
+
+                for k in range(nsweeps):
+
+                    self.hooks.pre_sweep(step=self.S, level_number=l)
                     self.S.levels[l].sweep.update_nodes()
-                self.S.levels[l].sweep.compute_residual()
-                self.hooks.post_sweep(step=self.S, level_number=l)
+
+                    req_send = None
+                    self.S.levels[l].sweep.compute_end_point()
+                    if not self.S.status.last and self.params.fine_comm:
+                        self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                           l, self.S.status.iter))
+                        req_send = comm.isend(self.S.levels[l].uend, dest=self.S.next, tag=self.S.status.iter)
+
+                    if not self.S.status.first and self.params.fine_comm:
+                        self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                           l, self.S.status.iter))
+                        self.recv(target=self.S.levels[l], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                    if not self.S.status.last and self.params.fine_comm:
+                        req_send.wait()
+
+                    self.S.levels[l].sweep.compute_residual()
+                    self.hooks.post_sweep(step=self.S, level_number=l)
 
                 # transfer further up the hierarchy
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
@@ -343,8 +384,10 @@ class allinclusive_multigrid_MPI(controller):
 
             # do the sweep
             self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-            for k in range(self.S.levels[-1].params.nsweeps):
-                self.S.levels[-1].sweep.update_nodes()
+            assert self.S.levels[-1].params.nsweeps == 1, \
+                'ERROR: this controller can only work with one sweep on the coarse level, got %s' % \
+                self.S.levels[-1].params.nsweeps
+            self.S.levels[-1].sweep.update_nodes()
             self.S.levels[-1].sweep.compute_residual()
             self.hooks.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
             self.S.levels[-1].sweep.compute_end_point()
@@ -370,32 +413,52 @@ class allinclusive_multigrid_MPI(controller):
                 self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
                 self.S.levels[l - 1].sweep.compute_end_point()
 
+                req_send = None
+                if not self.S.status.last and self.params.fine_comm:
+                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       l - 1, self.S.status.iter))
+                    req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
+
+                if not self.S.status.first and self.params.fine_comm:
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       l - 1, self.S.status.iter))
+                    self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                if not self.S.status.last and self.params.fine_comm:
+                    req_send.wait()
+
                 # on middle levels: do sweep as usual
                 if l - 1 > 0:
-                    req_send = None
-                    if not self.S.status.last and self.params.fine_comm:
-                        self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                           l - 1, self.S.status.iter))
-                        req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
 
-                    if not self.S.status.first and self.params.fine_comm:
-                        self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                           l - 1, self.S.status.iter))
-                        self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-
-                    if not self.S.status.last and self.params.fine_comm:
-                        req_send.wait()
-
-                    self.hooks.pre_sweep(step=self.S, level_number=l - 1)
                     for k in range(self.S.levels[l - 1].params.nsweeps):
+
+                        self.hooks.pre_sweep(step=self.S, level_number=l - 1)
                         self.S.levels[l - 1].sweep.update_nodes()
-                    self.S.levels[l - 1].sweep.compute_residual()
-                    self.hooks.post_sweep(step=self.S, level_number=l - 1)
+
+                        req_send = None
+                        if not self.S.status.last and self.params.fine_comm:
+                            self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                               l - 1, self.S.status.iter))
+                            req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
+
+                        if not self.S.status.first and self.params.fine_comm:
+                            self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                               l - 1, self.S.status.iter))
+                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
+                                      comm=comm)
+
+                        if not self.S.status.last and self.params.fine_comm:
+                            req_send.wait()
+
+                        self.S.levels[l - 1].sweep.compute_residual()
+                        self.hooks.post_sweep(step=self.S, level_number=l - 1)
 
             # update stage
-            self.S.status.stage = 'IT_CHECK'
+            self.S.status.stage = 'IT_FINE'
 
         else:
 
