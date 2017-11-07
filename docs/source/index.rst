@@ -11,12 +11,16 @@ The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <ht
 News
 ----
 
-- For the `6th Workshop on Parallel-in-Time Integration <https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods>`_
+- November 7, 2017: Version 2.2 contains matrix-based versions of PFASST within the project ``matrixPFASST``. This involved quite a few
+  changes in more or less unexpected places, e.g. in the multigrid controller and the transfer base class. The impact
+  of these changes on other projects should be negligible, though.
+
+- October 25, 2017: For the `6th Workshop on Parallel-in-Time Integration <https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods>`_
   `pySDC` has been updated to version 2.1. It is now available on PyPI - the Python Package Index, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_
   and can be installed simply by using ``pip install pySDC``. Naturally, this release contains a lot of bugfixes and minor improvements.
   Most notably, the file structure has been changed again to meet the standards for Python packaging (at least a bit).
 
-- On November 24, 2016, we released version 2 of `pySDC`. This release contains major changes to the code and its structure:
+- November 24, 2016: Released version 2 of `pySDC`. This release contains major changes to the code and its structure:
 
   - **Complete redesign of code structure**: The ``core`` part of `pySDC` only contains the core modules and classes,
     while ``implementations`` contains the actual implementations necessary to run something.
@@ -85,6 +89,7 @@ Projects
    projects/fwsw.rst
    projects/RDC.rst
    projects/asymp_conv.rst
+   projects/matrixPFASST.rst
 
 
 Tests
