@@ -38,7 +38,7 @@ def diffusion_setup(par=0.0):
     problem_params = dict()
     problem_params['nu'] = par  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
-    problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [127]  # number of degrees of freedom for each level
 
     # initialize step parameters
     step_params = dict()
@@ -140,12 +140,12 @@ def testequation_setup():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.25
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3, 3]
+    sweeper_params['num_nodes'] = [3, 2]
     sweeper_params['QI'] = 'LU'
     sweeper_params['spread'] = True
 
@@ -153,21 +153,21 @@ def testequation_setup():
     problem_params = dict()
     problem_params['u0'] = 1.0  # initial value (for all instances)
     # use single values like this...
-    problem_params['lambdas'] = [[-1.0]]
+    # problem_params['lambdas'] = [[-1.0]]
     # .. or a list of values like this ...
     # problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]
     # .. or a whole block of values like this
-    # ilim_left = -11
-    # ilim_right = 0
-    # rlim_left = 0
-    # rlim_right = 11
-    # ilam = 1j * np.logspace(ilim_left, ilim_right, 11)
-    # rlam = -1 * np.logspace(rlim_left, rlim_right, 11)
-    # lambdas = []
-    # for rl in rlam:
-    #     for il in ilam:
-    #         lambdas.append(rl + il)
-    # problem_params['lambdas'] = [lambdas]
+    ilim_left = -11
+    ilim_right = 0
+    rlim_left = 0
+    rlim_right = 11
+    ilam = 1j * np.logspace(ilim_left, ilim_right, 11)
+    rlam = -1 * np.logspace(rlim_left, rlim_right, 11)
+    lambdas = []
+    for rl in rlam:
+        for il in ilam:
+            lambdas.append(rl + il)
+    problem_params['lambdas'] = [lambdas]
     # note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).
     # The propagation matrix will be diagonal too, corresponding to the respective lambda value.
 
@@ -253,11 +253,8 @@ def compare_controllers(type=None, par=0.0, f=None):
     prop = controller.build_propagation_matrix(niter=niter)
 
     err_prop_ex = np.linalg.norm(prop.dot(uinit.values) - uex.values)
-    out = '  Difference between propagation and exact solution: %6.4e' % err_prop_ex
-    f.write(out + '\n')
-    print(out)
     err_mat_ex = np.linalg.norm(uend_mat.values - uex.values)
-    out = '  Difference between matrix-PFASST and exact solution: %6.4e' % err_mat_ex
+    out = '  Error (mat/prop) vs. exact solution: %6.4e -- %6.4e' % (err_mat_ex, err_prop_ex)
     f.write(out + '\n')
     print(out)
     err_mat_prop = np.linalg.norm(prop.dot(uinit.values) - uend_mat.values)
@@ -265,12 +262,18 @@ def compare_controllers(type=None, par=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
+    assert err_mat_prop < 2.0E-14, \
+        'ERROR: difference between matrix-based and propagator result is too large, got %s' % err_mat_prop
+
 
 def main():
 
+    par_list = [1E-02, 1.0, 1E+02]
+
     f = open('comparison_matrix_vs_propagator_detail.txt', 'w')
-    # compare_controllers(type='diffusion', par=1E-00, f=f)
-    # compare_controllers(type='advection', par=1E-00, f=f)
+    for par in par_list:
+        compare_controllers(type='diffusion', par=par, f=f)
+        compare_controllers(type='advection', par=par, f=f)
     compare_controllers(type='testequation', par=0.0, f=f)
     f.close()
 

@@ -85,7 +85,6 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
 
             Ac = prob_c.A.todense()
             Qdc = self.MS[0].levels[1].sweep.QI[1:, 1:]
-
             nnodesc = self.MS[0].levels[1].sweep.coll.num_nodes
             Nc = np.zeros((nnodesc, nnodesc))
             Nc[:, -1] = 1
@@ -181,15 +180,16 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         for k in range(1, self.MS[0].levels[0].params.nsweeps):
             precond_smoother += np.linalg.matrix_power(iter_mat_smoother, k).dot(Pinv)
         iter_mat_smoother = np.linalg.matrix_power(iter_mat_smoother, self.MS[0].levels[0].params.nsweeps)
-        iter_mat = iter_mat_smoother
-        precond = precond_smoother
 
         # add coarse-grid correction (single sweep, though!)
         if self.nlevels > 1:
             precond_cgc = self.Tcf.dot(np.linalg.inv(self.Pc)).dot(self.Tfc)
             iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C)
-            iter_mat = iter_mat.dot(iter_mat_cgc)
-            precond += precond_cgc - precond_smoother.dot(self.C).dot(precond_cgc)
+            iter_mat = iter_mat_smoother.dot(iter_mat_cgc)
+            precond = precond_smoother + precond_cgc - precond_smoother.dot(self.C).dot(precond_cgc)
+        else:
+            iter_mat = iter_mat_smoother
+            precond = precond_smoother
 
         # form span and reduce matrices and add to operator
         Tspread = np.kron(np.concatenate([[1] * (self.nsteps * self.nnodes)]), np.eye(self.nspace)).T

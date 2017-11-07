@@ -3,6 +3,7 @@ from __future__ import division
 import scipy.sparse as sp
 
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
 
@@ -43,6 +44,8 @@ class mesh_to_mesh(space_transfer):
         """
         if isinstance(F, mesh):
             G = mesh(F)
+        elif isinstance(F, cmesh):
+            G = cmesh(F)
         elif isinstance(F, rhs_imex_mesh):
             G = rhs_imex_mesh(F)
         else:
@@ -58,6 +61,8 @@ class mesh_to_mesh(space_transfer):
         """
         if isinstance(G, mesh):
             F = mesh(G)
+        elif isinstance(G, cmesh):
+            F = cmesh(G)
         elif isinstance(G, rhs_imex_mesh):
             F = rhs_imex_mesh(G)
         else:
