@@ -20,6 +20,7 @@ def compute_and_plot_specrad():
     # setup_list = [('IE', 'to0'), ('IE', 'toinf')]
     # setup_list = [('LU', 'toinf'), ('IE', 'toinf')]
     setup_list = [('IE', 'full'), ('LU', 'full')]
+    setup_list = [('EX', 'to0'), ('PIC', 'to0')]
 
     # set up plotting parameters
     params = {'legend.fontsize': 20,
@@ -32,8 +33,8 @@ def compute_and_plot_specrad():
               }
     plt.rcParams.update(params)
 
-    Nnodes = 3
-    Nsteps = 4
+    Nnodes = 5
+    Nsteps = 1
 
     coll = CollGaussRadau_Right(Nnodes, 0, 1)
     Qmat = coll.Qmat[1:, 1:]
@@ -59,18 +60,36 @@ def compute_and_plot_specrad():
                 QI[m, 1:m + 1] = coll.delta_m[0:m]
             QDmat = QI[1:, 1:]
 
+        elif qd_type == 'EE':
+
+            QE = np.zeros(np.shape(coll.Qmat))
+            for m in range(coll.num_nodes + 1):
+                QE[m, 0:m] = coll.delta_m[0:m]
+            QDmat = QE[1:, 1:]
+
+        elif qd_type == 'PIC':
+
+            QDmat = np.zeros(np.shape(coll.Qmat[1:, 1:]))
+
+        elif qd_type == 'EX':
+
+            QT = coll.Qmat[1:, 1:].T
+            [_, _, U] = LA.lu(QT, overwrite_a=True)
+            QDmat = np.tril(U.T, k=-1)
+            print(QDmat)
+
         else:
             raise NotImplementedError('qd_type %s is not implemented' % qd_type)
 
-        lim_specrad = max(abs(np.linalg.eigvals(np.eye(Nnodes) - np.linalg.inv(QDmat).dot(Qmat))))
-        print('qd_type: %s -- lim_specrad: %6.4e -- conv_type: %s' % (qd_type, lim_specrad, conv_type))
+        # lim_specrad = max(abs(np.linalg.eigvals(np.eye(Nnodes) - np.linalg.inv(QDmat).dot(Qmat))))
+        # print('qd_type: %s -- lim_specrad: %6.4e -- conv_type: %s' % (qd_type, lim_specrad, conv_type))
 
         if conv_type == 'to0':
 
-            ilim_left = -11
-            ilim_right = 0
-            rlim_left = 0
-            rlim_right = 11
+            ilim_left = -4
+            ilim_right = 2
+            rlim_left = 2
+            rlim_right = -4
 
         elif conv_type == 'toinf':
 
@@ -121,7 +140,7 @@ def compute_and_plot_specrad():
                                                              int((ilim_right - ilim_left - 1) / 5))])
 
         cmap = plt.get_cmap('Reds')
-        pcol = plt.pcolor(Prho.T, cmap=cmap, norm=LogNorm(vmin=1E-10, vmax=1E-00))
+        pcol = plt.pcolor(Prho.T, cmap=cmap, norm=LogNorm(vmin=1E-09, vmax=1E-00))
 
         plt.colorbar(pcol)
 
