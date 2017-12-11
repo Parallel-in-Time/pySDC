@@ -252,7 +252,7 @@ def compare_controllers(type=None, par=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
-    assert diff < 2.3E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
+    assert diff < 3E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
 
     # filter statistics by type (number of iterations)
     filtered_stats_mat = filter_stats(stats_mat, type='niter')
