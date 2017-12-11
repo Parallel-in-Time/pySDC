@@ -9,16 +9,22 @@ from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI impo
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
-def main(num_proc_list=None, fname=None):
+def main(num_proc_list=None, fname=None, multi_level=True):
     """
     A simple test program to compare classical and multigrid PFASST runs
 
     Args:
         num_proc_list: list of number of processes to test with
         fname: filename/path for output
+        multi_level (bool): do multi-level run or single-level
     """
 
-    description, controller_params, t0, Tend = set_parameters()
+    if multi_level:
+        description, controller_params, t0, Tend = set_parameters_ml()
+    else:
+        assert all(num_proc == 1 for num_proc in num_proc_list), \
+            'ERROR: single-elevel run can only use 1 processor, got %s' % num_proc_list
+        description, controller_params, t0, Tend = set_parameters_sl()
 
     f = open(fname, 'w')
     # loop over different numbers of processes
@@ -71,21 +77,26 @@ def main(num_proc_list=None, fname=None):
             out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % \
                   (item_classic[0], item_classic[1], item_multigrid[1])
             f.write(out + '\n')
+
+            if num_proc == 1:
+                assert item_classic[1] == item_multigrid[1], \
+                    'ERROR: number of iterations differ between classic and multigrid controller by %s' \
+                    % item_classic[1] - item_multigrid[1]
             print(out)
 
         f.write('\n')
         print()
 
-        assert all([item[1] <= 7 for item in iter_counts_multigrid]), \
+        assert all([item[1] <= 8 for item in iter_counts_multigrid]), \
             "ERROR: weird iteration counts for multigrid, got %s" % iter_counts_multigrid
         assert diff < 2.2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
 
     f.close()
 
 
-def set_parameters():
+def set_parameters_ml():
     """
-    Helper routine to set parameters for the following runs
+    Helper routine to set parameters for the following multi-level runs
 
     Returns:
         dict: dictionary containing the simulation parameters
@@ -142,5 +153,58 @@ def set_parameters():
     return description, controller_params, t0, Tend
 
 
+def set_parameters_sl():
+    """
+    Helper routine to set parameters for the following multi-level runs
+
+    Returns:
+        dict: dictionary containing the simulation parameters
+        dict: dictionary containing the controller parameters
+        float: starting time
+        float: end time
+    """
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 5E-10
+    level_params['dt'] = 0.125
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['num_nodes'] = 3
+
+    # initialize problem parameters
+    problem_params = dict()
+    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['freq'] = 2  # frequency for the test value
+    problem_params['nvars'] = 63  # number of degrees of freedom for each level
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['logger_level'] = 30
+
+    # fill description dictionary for easy step instantiation
+    description = dict()
+    description['problem_class'] = heat1d  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['dtype_u'] = mesh  # pass data type for u
+    description['dtype_f'] = mesh  # pass data type for f
+    description['sweeper_class'] = generic_LU  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 1.0
+
+    return description, controller_params, t0, Tend
+
+
 if __name__ == "__main__":
-    main(num_proc_list=[1, 2, 4, 8], fname='step_6_A_out.txt')
+    main(num_proc_list=[1], fname='step_6_A_sl_out.txt', multi_level=False)
+    main(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)

@@ -6,7 +6,8 @@ from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
 
 
 def test_A():
-    main_A(num_proc_list=[1,2,4,8], fname='step_6_A_out.txt')
+    main_A(num_proc_list=[1], fname='step_6_A_sl_out.txt', multi_level=False)
+    main_A(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)
 
 def test_B():
     main_B()
@@ -21,7 +22,7 @@ def test_C():
         main_C(cwd)
 
         with open('step_6_C1_out.txt', 'r') as file1:
-            with open('step_6_A_out.txt', 'r') as file2:
+            with open('step_6_A_ml_out.txt', 'r') as file2:
                 diff = set(file1).difference(file2)
         diff.discard('\n')
         for line in diff:
@@ -43,7 +44,7 @@ def test_C():
                     diff_MPI.append(float(line.split()[1]))
 
         diff_nonMPI = []
-        with open("step_6_A_out.txt") as f:
+        with open("step_6_A_ml_out.txt") as f:
             for line in f:
                 if "Diff" in line:
                     diff_nonMPI.append(float(line.split()[1]))

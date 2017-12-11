@@ -5,7 +5,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_MPI import al
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters_ml
 
 if __name__ == "__main__":
     """
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
 
     # get parameters from Part A
-    description, controller_params, t0, Tend = set_parameters()
+    description, controller_params, t0, Tend = set_parameters_ml()
 
     # instantiate controllers
     controller_classic = allinclusive_classic_MPI(controller_params=controller_params, description=description,

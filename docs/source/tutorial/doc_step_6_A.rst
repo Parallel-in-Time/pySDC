@@ -4,4 +4,5 @@ Full code: `pySDC/tutorial/step_6/A_classic_vs_multigrid_controller.py <https://
 
 Results:
 
-.. literalinclude:: ../../../step_6_A_out.txt
+.. literalinclude:: ../../../step_6_A_sl_out.txt
+.. literalinclude:: ../../../step_6_A_ml_out.txt
