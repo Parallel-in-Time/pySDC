@@ -286,10 +286,7 @@ class allinclusive_multigrid_MPI(controller):
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
                 self.hooks.pre_iteration(step=self.S, level_number=0)
-                if len(self.S.levels) > 1:  # MLSDC or PFASST
-                    self.S.status.stage = 'IT_UP'
-                else:  # SDC
-                    self.S.status.stage = 'IT_FINE'
+                self.S.status.stage = 'IT_FINE'
 
             else:
                 self.S.levels[0].sweep.compute_end_point()
@@ -327,7 +324,10 @@ class allinclusive_multigrid_MPI(controller):
                 self.hooks.post_sweep(step=self.S, level_number=0)
 
             # update stage
-            self.S.status.stage = 'IT_CHECK'
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_UP'
+            else:  # SDC
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_UP':
 
@@ -458,7 +458,7 @@ class allinclusive_multigrid_MPI(controller):
                         self.hooks.post_sweep(step=self.S, level_number=l - 1)
 
             # update stage
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         else:
 
