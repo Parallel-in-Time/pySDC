@@ -185,8 +185,8 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         if self.nlevels > 1:
             precond_cgc = self.Tcf.dot(np.linalg.inv(self.Pc)).dot(self.Tfc)
             iter_mat_cgc = np.eye(self.nsteps * self.nnodes * self.nspace) - precond_cgc.dot(self.C)
-            iter_mat = iter_mat_smoother.dot(iter_mat_cgc)
-            precond = precond_smoother + precond_cgc - precond_smoother.dot(self.C).dot(precond_cgc)
+            iter_mat = iter_mat_cgc.dot(iter_mat_smoother)
+            precond = precond_smoother + precond_cgc - precond_cgc.dot(self.C).dot(precond_smoother)
         else:
             iter_mat = iter_mat_smoother
             precond = precond_smoother
@@ -197,13 +197,13 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                             np.kron(np.ones(self.nnodes), np.eye(self.nspace))).T
         Treduce = np.kron(np.concatenate([[0] * (self.nsteps * self.nnodes - 1), [1]]), np.eye(self.nspace))
 
-        if self.MS[0].levels[0].sweep.params.spread:
-            mat = iter_mat_smoother.dot(Tspread) + precond_smoother.dot(Tnospread)
-        else:
-            mat = iter_mat_smoother.dot(Tnospread) + precond_smoother.dot(Tnospread)  # No, the latter is not a typo!
-
         # build propagation matrix
-        mat = np.linalg.matrix_power(iter_mat, niter).dot(mat)
+        if self.MS[0].levels[0].sweep.params.spread:
+            mat = np.linalg.matrix_power(iter_mat, niter).dot(Tspread)
+        else:
+            mat = np.linalg.matrix_power(iter_mat, niter).dot(Tnospread)
+
+        # TODO: does this have to go into the if/else block, too?
         for k in range(niter):
             mat += np.linalg.matrix_power(iter_mat, k).dot(precond).dot(Tnospread)
         mat = Treduce.dot(mat)
@@ -290,19 +290,6 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         for S in MS:
             self.hooks.pre_step(step=S, level_number=0)
 
-        for _ in range(MS[0].levels[0].params.nsweeps):
-
-            MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_PRE_SWEEP')
-            for S in MS:
-                self.hooks.pre_sweep(step=S, level_number=0)
-
-            self.u += np.linalg.solve(self.P, self.res)
-            self.res = self.u0 - self.C.dot(self.u)
-
-            MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_PRE_SWEEP')
-            for S in MS:
-                self.hooks.post_sweep(step=S, level_number=0)
-
         while np.linalg.norm(self.res, np.inf) > self.tol and niter < self.maxiter:
 
             niter += 1
@@ -310,6 +297,19 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_ITERATION')
             for S in MS:
                 self.hooks.pre_iteration(step=S, level_number=0)
+
+            for _ in range(MS[0].levels[0].params.nsweeps):
+
+                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
+                for S in MS:
+                    self.hooks.pre_sweep(step=S, level_number=0)
+
+                self.u += np.linalg.solve(self.P, self.res)
+                self.res = self.u0 - self.C.dot(self.u)
+
+                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')
+                for S in MS:
+                    self.hooks.post_sweep(step=S, level_number=0)
 
             if self.nlevels > 1:
                 for _ in range(MS[0].levels[1].params.nsweeps):
@@ -325,19 +325,6 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
                                           stage='POST_COARSE_SWEEP')
                     for S in MS:
                         self.hooks.post_sweep(step=S, level_number=1)
-
-            for _ in range(MS[0].levels[0].params.nsweeps):
-
-                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_FINE_SWEEP')
-                for S in MS:
-                    self.hooks.pre_sweep(step=S, level_number=0)
-
-                self.u += np.linalg.solve(self.P, self.res)
-                self.res = self.u0 - self.C.dot(self.u)
-
-                MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')
-                for S in MS:
-                    self.hooks.post_sweep(step=S, level_number=0)
 
             MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_ITERATION')
             for S in MS:

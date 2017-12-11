@@ -317,10 +317,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     # increment iteration count here (and only here)
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
-                    if len(S.levels) > 1:  # MLSDC or PFASST
-                        S.status.stage = 'IT_UP'
-                    else:  # SDC
-                        S.status.stage = 'IT_FINE'
+                    S.status.stage = 'IT_FINE'
 
             else:
                 # if everyone is ready, end
@@ -360,7 +357,10 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_CHECK'
+                if len(S.levels) > 1:
+                    S.status.stage = 'IT_UP'
+                else:  # SDC
+                    S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -502,7 +502,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_CHECK'
 
             return MS
 
