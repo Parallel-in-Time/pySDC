@@ -240,7 +240,7 @@ class allinclusive_multigrid_MPI(controller):
             if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
             else:
-                self.S.status.stage = 'IT_FINE'
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'PREDICT':
 
@@ -250,7 +250,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # update stage
             self.hooks.pre_iteration(step=self.S, level_number=0)
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
 
