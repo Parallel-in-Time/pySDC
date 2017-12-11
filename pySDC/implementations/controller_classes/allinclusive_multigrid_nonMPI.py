@@ -270,7 +270,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
-                    S.status.stage = 'IT_FINE'
+                    S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -281,7 +281,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_CHECK'
 
             return MS
 
