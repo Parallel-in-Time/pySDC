@@ -203,8 +203,8 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             mat = iter_mat_smoother.dot(Tnospread) + precond_smoother.dot(Tnospread)  # No, the latter is not a typo!
 
         # build propagation matrix
-        mat = np.linalg.matrix_power(iter_mat, niter).dot(mat)
-        for k in range(niter):
+        mat = np.linalg.matrix_power(iter_mat, niter - 1).dot(mat)
+        for k in range(niter - 1):
             mat += np.linalg.matrix_power(iter_mat, k).dot(precond).dot(Tnospread)
         mat = Treduce.dot(mat)
 
