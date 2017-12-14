@@ -2,7 +2,7 @@ import os
 
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 
-from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters
+from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters_ml
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
@@ -14,7 +14,7 @@ def main():
     """
 
     # get parameters from Step 6, Part A
-    description, controller_params, t0, Tend = set_parameters()
+    description, controller_params, t0, Tend = set_parameters_ml()
 
     # use 8 processes here
     num_proc = 8

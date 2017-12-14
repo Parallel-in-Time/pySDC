@@ -146,7 +146,7 @@ class allinclusive_classic_nonMPI(controller):
             # reset some values
             self.MS[p].status.done = False
             self.MS[p].status.pred_cnt = active_slots.index(p) + 1
-            self.MS[p].status.iter = 0
+            self.MS[p].status.iter = 1
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
                 l.tag = False
@@ -219,7 +219,7 @@ class allinclusive_classic_nonMPI(controller):
             if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT_RESTRICT'
             else:  # SDC
-                S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_FINE_SWEEP'
 
             return S
 
@@ -285,7 +285,7 @@ class allinclusive_classic_nonMPI(controller):
                 S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
             # update stage and return
-            S.status.stage = 'IT_CHECK'
+            S.status.stage = 'IT_FINE_SWEEP'
             return S
 
         elif stage == 'IT_CHECK':
@@ -295,7 +295,7 @@ class allinclusive_classic_nonMPI(controller):
             S.levels[0].sweep.compute_residual()
             S.status.done = self.check_convergence(S)
 
-            if S.status.iter > 0:
+            if S.status.iter > 1:
                 self.hooks.post_iteration(step=S, level_number=0)
 
             # if the previous step is still iterating but I am done, un-do me to still forward values
@@ -311,7 +311,10 @@ class allinclusive_classic_nonMPI(controller):
                 # increment iteration count here (and only here)
                 S.status.iter += 1
                 self.hooks.pre_iteration(step=S, level_number=0)
-                S.status.stage = 'IT_FINE_SWEEP'
+                if len(S.levels) > 1:
+                    S.status.stage = 'IT_UP'
+                else:  # SDC
+                    S.status.stage = 'IT_FINE_SWEEP'
             # return
             return S
 
@@ -340,10 +343,7 @@ class allinclusive_classic_nonMPI(controller):
                     self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                       % (S.status.slot, 0, True))
                     self.send(S.levels[0], tag=True)
-                if len(S.levels) > 1:
-                    S.status.stage = 'IT_UP'
-                else:  # SDC
-                    S.status.stage = 'IT_CHECK'
+                S.status.stage = 'IT_CHECK'
             else:
                 S.status.stage = 'IT_FINE_SEND'
             # return
@@ -463,7 +463,7 @@ class allinclusive_classic_nonMPI(controller):
                     self.hooks.post_sweep(step=S, level_number=l - 1)
 
             # update stage and return
-            S.status.stage = 'IT_CHECK'
+            S.status.stage = 'IT_FINE_SWEEP'
             return S
 
         else:

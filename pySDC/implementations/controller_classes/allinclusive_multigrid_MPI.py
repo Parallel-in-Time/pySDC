@@ -139,7 +139,7 @@ class allinclusive_multigrid_MPI(controller):
         self.S.init_step(u0)
         # reset some values
         self.S.status.done = False
-        self.S.status.iter = 0
+        self.S.status.iter = 1
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
@@ -277,7 +277,7 @@ class allinclusive_multigrid_MPI(controller):
             self.S.status.done = self.check_convergence(self.S)
             all_done = comm.allgather(self.S.status.done)
 
-            if self.S.status.iter > 0:
+            if self.S.status.iter > 1:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
             # if not everyone is ready yet, keep doing stuff

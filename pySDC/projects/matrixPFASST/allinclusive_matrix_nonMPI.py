@@ -282,7 +282,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
             all active steps
         """
 
-        niter = 0
+        niter = 1
 
         self.res = self.u0 - self.C.dot(self.u)
 

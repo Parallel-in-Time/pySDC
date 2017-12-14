@@ -77,19 +77,19 @@ def main(num_proc_list=None, fname=None, multi_level=True):
             out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % \
                   (item_classic[0], item_classic[1], item_multigrid[1])
             f.write(out + '\n')
+            print(out)
 
             if num_proc == 1:
                 assert item_classic[1] == item_multigrid[1], \
-                    'ERROR: number of iterations differ between classic and multigrid controller by %s' \
-                    % item_classic[1] - item_multigrid[1]
-            print(out)
+                    'ERROR: number of iterations differ between classic and multigrid controller by %2i' \
+                    % (item_classic[1] - item_multigrid[1])
 
         f.write('\n')
         print()
 
         assert all([item[1] <= 8 for item in iter_counts_multigrid]), \
             "ERROR: weird iteration counts for multigrid, got %s" % iter_counts_multigrid
-        assert diff < 2.2E-10, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
+        assert diff < 1.5E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
 
     f.close()
 
