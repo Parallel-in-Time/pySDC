@@ -12,6 +12,8 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI_new import allinclusive_multigrid_nonMPI_new
+
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -50,7 +52,7 @@ def run_diffusion(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = True
+    sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
@@ -127,6 +129,10 @@ def run_diffusion(nsweeps):
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
 
+        if nsweeps == 3 and (i == -3 or i == 9):
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for diffusive asymptotics, got %s' \
+                                         % np.mean(niters)
+
         results[cfl] = np.mean(niters)
 
     fname = 'data/results_conv_diffusion_NS' + str(nsweeps) + '.pkl'
@@ -156,7 +162,7 @@ def run_advection(nsweeps):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = True
+    sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
@@ -234,6 +240,10 @@ def run_advection(nsweeps):
 
         out = '  Mean number of iterations: %4.2f' % np.mean(niters)
         print(out)
+
+        if nsweeps == 3 and (i == -3 or i == 9):
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for advective asymptotics, got %s' \
+                                         % np.mean(niters)
 
         results[cfl] = np.mean(niters)
 
