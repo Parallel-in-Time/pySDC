@@ -32,11 +32,12 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    # sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = -1  # frequency for the test value
+    problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128]  # number of degrees of freedom for each level
 
     # initialize step parameters
@@ -52,6 +53,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    # controller_params['predict'] = False
     # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation

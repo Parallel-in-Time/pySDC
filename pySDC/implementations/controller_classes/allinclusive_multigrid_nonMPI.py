@@ -38,12 +38,25 @@ class allinclusive_multigrid_nonMPI(controller):
         if num_procs > 1 and len(self.MS[0].levels) > 1:
             for S in self.MS:
                 for L in S.levels:
-                    assert L.sweep.coll.right_is_node, "For PFASST to work, we assume uend^k = u_M^k"
+                    if not L.sweep.coll.right_is_node:
+                        raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
-        for S in self.MS:
-            if len(S.levels) > 1:
-                assert S.levels[-1].params.nsweeps == 1, 'ERROR: this controller cannot do multiple sweeps on ' \
-                                                         'coarsest level'
+        if all(len(S.levels) == len(self.MS[0].levels) for S in self.MS):
+            self.nlevels = len(self.MS[0].levels)
+        else:
+            raise ControllerError('all steps need to have the same number of levels')
+
+        if self.nlevels == 0:
+            raise ControllerError('need at least one level')
+
+        self.nsweeps = []
+        for nl in range(self.nlevels):
+
+            if all(S.levels[nl].params.nsweeps == self.MS[0].levels[nl].params.nsweeps for S in self.MS):
+                self.nsweeps.append(self.MS[0].levels[nl].params.nsweeps)
+
+        if self.nlevels > 1 and self.nsweeps[-1] > 1:
+            raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
     def run(self, u0, t0, Tend):
         """
@@ -145,10 +158,11 @@ class allinclusive_multigrid_nonMPI(controller):
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
-            self.MS[p].status.iter = 1
+            self.MS[p].status.iter = 0
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
                 l.tag = None
+                l.status.sweep = 1
 
         for p in active_slots:
             for lvl in self.MS[p].levels:
@@ -270,7 +284,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
-                    S.status.stage = 'IT_FINE'
+                    S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -281,7 +295,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 # update stage
-                S.status.stage = 'IT_FINE'
+                S.status.stage = 'IT_CHECK'
 
             return MS
 
@@ -306,7 +320,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.compute_residual()
                 S.status.done = self.check_convergence(S)
 
-                if S.status.iter > 1:
+                if S.status.iter > 0:
                     self.hooks.post_iteration(step=S, level_number=0)
 
             # if not everyone is ready yet, keep doing stuff
@@ -334,15 +348,20 @@ class allinclusive_multigrid_nonMPI(controller):
         elif stage == 'IT_FINE':
             # do fine sweep for all steps (virtually parallel)
 
-            nsweeps = MS[0].levels[0].params.nsweeps  # TODO: this is ugly!
+            for S in MS:
+                S.levels[0].status.sweep = 0
 
-            for k in range(nsweeps):
+            for k in range(self.nsweeps[0]):
+
+                for S in MS:
+                    S.levels[0].status.sweep += 1
 
                 for S in MS:
                     # standard sweep workflow: update nodes, compute residual, log progress
                     self.hooks.pre_sweep(step=S, level_number=0)
                     S.levels[0].sweep.update_nodes()
 
+                for S in MS:
                     # send updated values forward
                     if self.params.fine_comm and not S.status.last:
                         self.logger.debug('Process %2i provides data on level %2i with tag %s'
@@ -371,15 +390,11 @@ class allinclusive_multigrid_nonMPI(controller):
 
                 S.transfer(source=S.levels[0], target=S.levels[1])
 
-            nlevels = len(MS[0].levels)  # TODO: this is ugly!
-
-            for l in range(1, nlevels - 1):
-
-                nsweeps = MS[0].levels[l].params.nsweeps  # TODO: this is ugly!
+            for l in range(1, self.nlevels - 1):
 
                 # sweep on middle levels (not on finest, not on coarsest, though)
 
-                for k in range(nsweeps):
+                for k in range(self.nsweeps[l]):
 
                     for S in MS:
 
@@ -447,9 +462,7 @@ class allinclusive_multigrid_nonMPI(controller):
         elif stage == 'IT_DOWN':
             # prolong corrections down to finest level (parallel)
 
-            nlevels = len(MS[0].levels)  # TODO: this is ugly!
-
-            for l in range(nlevels - 1, 0, -1):
+            for l in range(self.nlevels - 1, 0, -1):
 
                 for S in MS:
                     # prolong values
@@ -473,9 +486,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 # on middle levels: do communication and sweep as usual
                 if l - 1 > 0:
 
-                    nsweeps = MS[0].levels[l - 1].params.nsweeps  # TODO: this is ugly!
-
-                    for k in range(nsweeps):
+                    for k in range(self.nsweeps[l - 1]):
 
                         for S in MS:
 

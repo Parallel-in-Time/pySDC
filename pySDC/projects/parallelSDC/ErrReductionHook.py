@@ -26,7 +26,7 @@ class err_reduction_hook(hooks):
                 err.append(abs(uex - L.u[m + 1]))
             err_full = max(err)
             self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                              type='error_pre_iteration', value=err_full)
+                              sweep=L.status.sweep, type='error_pre_iteration', value=err_full)
             # print(L.time, step.status.iter, err_full)
 
     def post_iteration(self, step, level_number):
@@ -51,5 +51,5 @@ class err_reduction_hook(hooks):
                 err.append(abs(uex - L.u[m + 1]))
             err_full = max(err)
             self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                              type='error_post_iteration', value=err_full)
+                              sweep=L.status.sweep, type='error_post_iteration', value=err_full)
             # print(L.time, step.status.iter, err_full)

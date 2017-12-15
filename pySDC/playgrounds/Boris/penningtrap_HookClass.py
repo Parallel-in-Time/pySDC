@@ -68,8 +68,8 @@ class particles_output(hooks):
             epot += part.q[n] * fpot[n]
             ekin += part.m[n] / 2.0 * np.dot(part.vel.values[3 * n:3 * n + 3], part.vel.values[3 * n:3 * n + 3])
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, type='etot',
-                          value=epot + ekin)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='etot', value=epot + ekin)
 
     def post_step(self, step, level_number):
         """
@@ -114,7 +114,7 @@ class particles_output(hooks):
             ekin += part.m[n] / 2.0 * np.dot(part.vel.values[3 * n:3 * n + 3], part.vel.values[3 * n:3 * n + 3])
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          type='etot', value=epot + ekin)
+                          sweep=L.status.sweep, type='etot', value=epot + ekin)
 
         oldcol = self.sframe
         # # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])

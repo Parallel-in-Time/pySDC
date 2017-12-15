@@ -27,6 +27,7 @@ class level(FrozenClass):
             self.unlocked = False
             self.updated = False
             self.time = None
+            self.sweep = None
             # freeze class, no further attributes allowed from this point
             self._freeze()
 

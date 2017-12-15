@@ -49,9 +49,9 @@ class particles_output(hooks):
         H = 1 / 2 * np.dot(u.vel.values, u.vel.values) + L.prob.params.a0 / R
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          type='energy', value=H)
+                          sweep=L.status.sweep, type='energy', value=H)
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          type='position', value=L.uend.pos.values)
+                          sweep=L.status.sweep, type='position', value=L.uend.pos.values)
 
         return None
