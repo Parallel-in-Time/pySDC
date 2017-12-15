@@ -198,10 +198,10 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         Treduce = np.kron(np.concatenate([[0] * (self.nsteps * self.nnodes - 1), [1]]), np.eye(self.nspace))
 
         if self.MS[0].levels[0].sweep.params.spread:
-            mat = np.linalg.matrix_power(iter_mat, niter - 1).dot(Tspread)
+            mat = np.linalg.matrix_power(iter_mat, niter).dot(Tspread)
             # mat = iter_mat_smoother.dot(Tspread) + precond_smoother.dot(Tnospread)
         else:
-            mat = np.linalg.matrix_power(iter_mat, niter - 1).dot(Tnospread)
+            mat = np.linalg.matrix_power(iter_mat, niter).dot(Tnospread)
             # mat = iter_mat_smoother.dot(Tnospread) + precond_smoother.dot(Tnospread)  # No, the latter is not a typo!
 
         # build propagation matrix

@@ -148,6 +148,7 @@ class allinclusive_multigrid_MPI(controller):
 
         for lvl in self.S.levels:
             lvl.status.time = time
+            lvl.status.sweep = 1
 
     @staticmethod
     def recv(target, source, tag, comm):
@@ -300,8 +301,12 @@ class allinclusive_multigrid_MPI(controller):
 
             nsweeps = self.S.levels[0].params.nsweeps
 
+            self.S.levels[0].status.sweep = 0
+
             # do fine sweep
             for k in range(nsweeps):
+
+                self.S.levels[0].status.sweep += 1
 
                 self.hooks.pre_sweep(step=self.S, level_number=0)
                 self.S.levels[0].sweep.update_nodes()

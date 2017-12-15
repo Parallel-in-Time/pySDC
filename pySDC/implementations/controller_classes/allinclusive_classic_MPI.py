@@ -148,6 +148,7 @@ class allinclusive_classic_MPI(controller):
 
         for lvl in self.S.levels:
             lvl.status.time = time
+            lvl.status.sweep = 1
 
     @staticmethod
     def recv(target, source, tag, comm):

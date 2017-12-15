@@ -150,6 +150,7 @@ class allinclusive_classic_nonMPI(controller):
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
                 l.tag = False
+                l.status.sweep = 1
 
         for p in active_slots:
             for lvl in self.MS[p].levels:

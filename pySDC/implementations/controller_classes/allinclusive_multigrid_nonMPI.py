@@ -348,7 +348,13 @@ class allinclusive_multigrid_nonMPI(controller):
         elif stage == 'IT_FINE':
             # do fine sweep for all steps (virtually parallel)
 
+            for S in MS:
+                S.levels[0].status.sweep = 0
+
             for k in range(self.nsweeps[0]):
+
+                for S in MS:
+                    S.levels[0].status.sweep += 1
 
                 for S in MS:
                     # standard sweep workflow: update nodes, compute residual, log progress

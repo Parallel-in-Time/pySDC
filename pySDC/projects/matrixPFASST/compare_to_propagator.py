@@ -129,7 +129,7 @@ def advection_setup(par=0.0):
     return description, controller_params
 
 
-def testequation_setup():
+def scalar_equation_setup():
     """
     Setup routine for the test equation
 
@@ -215,7 +215,7 @@ def compare_controllers(type=None, par=0.0, f=None):
     elif type == 'advection':
         description, controller_params = advection_setup(par)
     elif type == 'testequation':
-        description, controller_params = testequation_setup()
+        description, controller_params = scalar_equation_setup()
     else:
         raise ValueError('No valis setup type provided, aborting..')
 
