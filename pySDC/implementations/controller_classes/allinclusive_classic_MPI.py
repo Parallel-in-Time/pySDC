@@ -138,7 +138,7 @@ class allinclusive_classic_MPI(controller):
         self.S.init_step(u0)
         # reset some values
         self.S.status.done = False
-        self.S.status.iter = 1
+        self.S.status.iter = 0
         self.S.status.stage = 'SPREAD'
         for l in self.S.levels:
             l.tag = None
@@ -240,7 +240,7 @@ class allinclusive_classic_MPI(controller):
             if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
             else:
-                self.S.status.stage = 'IT_FINE'
+                self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'PREDICT':
 
@@ -249,7 +249,7 @@ class allinclusive_classic_MPI(controller):
             self.predictor(comm)
 
             # update stage
-            self.S.status.stage = 'IT_FINE'
+            self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
 
@@ -259,7 +259,7 @@ class allinclusive_classic_MPI(controller):
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
 
-            if self.S.status.iter > 1:
+            if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
             # check if an open request of the status send is pending
