@@ -25,6 +25,8 @@ class allinclusive_classic_MPI(controller):
         # call parent's initialization routine
         super(allinclusive_classic_MPI, self).__init__(controller_params)
 
+        self.logger.warning('classic controller is about to become deprecated, use multigrid controller instead')
+
         # create single step per processor
         self.S = step(description)
 

@@ -12,8 +12,6 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI_new import allinclusive_multigrid_nonMPI_new
-
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 

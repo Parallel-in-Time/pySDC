@@ -25,6 +25,8 @@ class allinclusive_classic_nonMPI(controller):
         # call parent's initialization routine
         super(allinclusive_classic_nonMPI, self).__init__(controller_params)
 
+        self.logger.warning('classic controller is about to become deprecated, use multigrid controller instead')
+
         self.MS = []
         # simply append step after step and generate the hierarchies
         for p in range(num_procs):
@@ -42,6 +44,10 @@ class allinclusive_classic_nonMPI(controller):
                 for L in S.levels:
                     if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                         raise ControllerError("For PFASST to work, we assume uend^k = u_M^k in this controller")
+
+        for nl in range(len(self.MS[0].levels)):
+            if self.MS[0].levels[nl].params.nsweeps > 1:
+                raise ControllerError('classic controller cannot do multiple sweeps')
 
     def run(self, u0, t0, Tend):
         """
