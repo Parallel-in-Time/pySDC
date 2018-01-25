@@ -5,6 +5,16 @@ import logging
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, pars):
+
+        for k, v in pars.items():
+            setattr(self, k, v)
+
+        self._freeze()
+
+
 class ptype(with_metaclass(abc.ABCMeta)):
     """
     Prototype class for problems, just defines the attributes essential to get started
@@ -28,16 +38,7 @@ class ptype(with_metaclass(abc.ABCMeta)):
             params (dict): set or parameters
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, pars):
-
-                for k, v in pars.items():
-                    setattr(self, k, v)
-
-                self._freeze()
-
-        self.params = __Pars(params)
+        self.params = _Pars(params)
 
         # set up logger
         self.logger = logging.getLogger('problem')

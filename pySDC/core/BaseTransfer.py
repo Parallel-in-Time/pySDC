@@ -7,6 +7,18 @@ import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import UnlockError
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, pars):
+        self.finter = False
+        self.coll_iorder = 2
+        self.coll_rorder = 1
+        for k, v in pars.items():
+            setattr(self, k, v)
+
+        self._freeze()
+
+
 class base_transfer(object):
     """
     Standard base_transfer class
@@ -30,18 +42,7 @@ class base_transfer(object):
             space_transfer_params (dict): parameters for the space_transfer operations
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, pars):
-                self.finter = False
-                self.coll_iorder = 2
-                self.coll_rorder = 1
-                for k, v in pars.items():
-                    setattr(self, k, v)
-
-                self._freeze()
-
-        self.params = __Pars(base_transfer_params)
+        self.params = _Pars(base_transfer_params)
 
         # set up logger
         self.logger = logging.getLogger('transfer')

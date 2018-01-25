@@ -10,6 +10,20 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.Errors import ParameterError
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, pars):
+
+        self.do_coll_update = False
+        self.spread = True
+
+        for k, v in pars.items():
+            if k is not 'collocation_class':
+                setattr(self, k, v)
+
+        self._freeze()
+
+
 class sweeper(with_metaclass(abc.ABCMeta)):
     """
     Base abstract sweeper class
@@ -29,19 +43,6 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, pars):
-
-                self.do_coll_update = False
-                self.spread = True
-
-                for k, v in pars.items():
-                    if k is not 'collocation_class':
-                        setattr(self, k, v)
-
-                self._freeze()
-
         # set up logger
         self.logger = logging.getLogger('sweeper')
 
@@ -52,7 +53,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 self.logger.error(msg)
                 raise ParameterError(msg)
 
-        self.params = __Pars(params)
+        self.params = _Pars(params)
 
         coll = params['collocation_class'](params['num_nodes'], 0, 1)
 

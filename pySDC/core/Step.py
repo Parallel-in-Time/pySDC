@@ -6,6 +6,31 @@ from pySDC.core.BaseTransfer import base_transfer
 from pySDC.core.Errors import ParameterError
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, params):
+        self.maxiter = None
+        for k, v in params.items():
+            setattr(self, k, v)
+        # freeze class, no further attributes allowed from this point
+        self._freeze()
+
+
+# short helper class to bundle all status variables
+class _Status(FrozenClass):
+    def __init__(self):
+        self.iter = None
+        self.stage = None
+        self.slot = None
+        self.first = None
+        self.last = None
+        self.pred_cnt = None
+        self.done = None
+        self.prev_done = None
+        # freeze class, no further attributes allowed from this point
+        self._freeze()
+
+
 class step(FrozenClass):
     """
     Step class, referencing most of the structure needed for the time-stepping
@@ -28,32 +53,9 @@ class step(FrozenClass):
             description (dict): parameters given by the user, will be added as attributes
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, params):
-                self.maxiter = None
-                for k, v in params.items():
-                    setattr(self, k, v)
-                # freeze class, no further attributes allowed from this point
-                self._freeze()
-
-        # short helper class to bundle all status variables
-        class __Status(FrozenClass):
-            def __init__(self):
-                self.iter = None
-                self.stage = None
-                self.slot = None
-                self.first = None
-                self.last = None
-                self.pred_cnt = None
-                self.done = None
-                self.prev_done = None
-                # freeze class, no further attributes allowed from this point
-                self._freeze()
-
         # set params and status
-        self.params = __Pars(description.get('step_params', {}))
-        self.status = __Status()
+        self.params = _Pars(description.get('step_params', {}))
+        self.status = _Status()
 
         # set up logger
         self.logger = logging.getLogger('step')
