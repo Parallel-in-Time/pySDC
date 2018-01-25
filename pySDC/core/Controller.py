@@ -154,7 +154,7 @@ class controller(with_metaclass(abc.ABCMeta)):
             out += '-->                 Collocation: %s\n' % L.sweep.coll.__class__
 
         if len(step.levels) > 1:
-            if description['base_transfer_class'] is not base_transfer:
+            if 'base_transfer_class' in description and description['base_transfer_class'] is not base_transfer:
                 out += '-->     Base Transfer: %s\n' % step.base_transfer.__class__
             else:
                 out += '        Base Transfer: %s\n' % step.base_transfer.__class__
