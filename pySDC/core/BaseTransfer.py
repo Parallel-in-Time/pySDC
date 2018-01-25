@@ -1,8 +1,7 @@
-import numpy as np
 import logging
+import scipy.sparse as sp
 
 from pySDC.helpers.pysdc_helper import FrozenClass
-from scipy import interpolate
 import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import UnlockError
 
@@ -12,7 +11,7 @@ class _Pars(FrozenClass):
     def __init__(self, pars):
         self.finter = False
         self.coll_iorder = 2
-        self.coll_rorder = 1
+        self.coll_rorder = 2
         for k, v in pars.items():
             setattr(self, k, v)
 
@@ -54,8 +53,13 @@ class base_transfer(object):
         fine_grid = self.fine.sweep.coll.nodes
         coarse_grid = self.coarse.sweep.coll.nodes
 
-        self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0).toarray()
-        self.Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
+        if len(fine_grid) == len(coarse_grid):
+            self.Pcoll = sp.eye(len(fine_grid))
+            self.Rcoll = sp.eye(len(fine_grid))
+        else:
+            self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0,
+                                                    equidist_nested=False).toarray()
+            self.Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
 
         # set up spatial transfer
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob,

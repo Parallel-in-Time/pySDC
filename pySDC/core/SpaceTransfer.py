@@ -10,6 +10,7 @@ class _Pars(FrozenClass):
     def __init__(self, pars):
         self.finter = False
         self.periodic = False
+        self.equidist_nested = True
         for k, v in pars.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point

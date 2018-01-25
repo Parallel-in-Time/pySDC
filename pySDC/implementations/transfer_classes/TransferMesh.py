@@ -35,6 +35,12 @@ class mesh_to_mesh(space_transfer):
         if 'rorder' not in params:
             raise TransferError('Need rorder parameter for spatial transfer')
 
+        if params['rorder'] % 2 != 0:
+            raise TransferError('Need even order for restriction')
+
+        if params['iorder'] % 2 != 0:
+            raise TransferError('Need even order for interpolation')
+
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
 
@@ -67,15 +73,24 @@ class mesh_to_mesh(space_transfer):
                     fine_grid = np.array([i * self.fine_prob.dx for i in range(self.fine_prob.params.nvars)])
                     coarse_grid = np.array([i * self.coarse_prob.dx for i in range(self.coarse_prob.params.nvars)])
 
-                if self.params.rorder <= 1:
-                    self.Rspace = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
-                                                           periodic=self.params.periodic)
-                else:
-                    self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
-                                                                   periodic=self.params.periodic).T
-
                 self.Pspace = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
-                                                         periodic=self.params.periodic)
+                                                         periodic=self.params.periodic,
+                                                         equidist_nested=self.params.equidist_nested)
+                if self.params.rorder > 0:
+                    restr_factor = 0.5
+                else:
+                    restr_factor = 1.0
+
+                if self.params.iorder == self.params.rorder:
+
+                    self.Rspace = restr_factor * self.Pspace.T
+
+                else:
+
+                    self.Rspace = restr_factor * \
+                        th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
+                                                   periodic=self.params.periodic,
+                                                   equidist_nested=self.params.equidist_nested).T
 
         # we have an n-d problem
         else:
@@ -101,14 +116,24 @@ class mesh_to_mesh(space_transfer):
                         coarse_grid = np.array(
                             [j * self.coarse_prob.dx for j in range(self.coarse_prob.params.nvars[i])])
 
-                    if self.params.iorder <= 1:
-                        Rspace.append(th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
-                                                               periodic=self.params.periodic).T)
-                    else:
-                        Rspace.append(0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
-                                                                       periodic=self.params.periodic).T)
                     Pspace.append(th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.iorder,
-                                                             periodic=self.params.periodic))
+                                                             periodic=self.params.periodic,
+                                                             equidist_nested=self.params.equidist_nested))
+                    if self.params.rorder > 0:
+                        restr_factor = 0.5
+                    else:
+                        restr_factor = 1.0
+
+                    if self.params.iorder == self.params.rorder:
+
+                        Rspace.append(restr_factor * Pspace[-1].T)
+
+                    else:
+
+                        Rspace.append(restr_factor *
+                                      th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
+                                                                 periodic=self.params.periodic,
+                                                                 equidist_nested=self.params.equidist_nested).T)
 
             # kronecker 1-d operators for n-d
             self.Pspace = Pspace[0]
