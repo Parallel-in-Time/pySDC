@@ -54,8 +54,8 @@ class base_transfer(object):
         coarse_grid = self.coarse.sweep.coll.nodes
 
         if len(fine_grid) == len(coarse_grid):
-            self.Pcoll = sp.eye(len(fine_grid))
-            self.Rcoll = sp.eye(len(fine_grid))
+            self.Pcoll = sp.eye(len(fine_grid)).toarray()
+            self.Rcoll = sp.eye(len(fine_grid)).toarray()
         else:
             self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0,
                                                     equidist_nested=False).toarray()

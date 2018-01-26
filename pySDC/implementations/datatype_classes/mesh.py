@@ -121,7 +121,7 @@ class mesh(object):
             mesh.mesh: component multiplied by the matrix A
         """
         if not A.shape[1] == self.values.shape[0]:
-            raise DataError("ERROR: cannot apply operator %s to %s" % (A, self))
+            raise DataError("ERROR: cannot apply operator %s to %s" % (A.shape[1], self))
 
         me = mesh(A.shape[0])
         me.values = A.dot(self.values)
