@@ -10,6 +10,22 @@ from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, params):
+        self.fine_comm = True
+        self.predict = True
+        self.logger_level = 20
+        self.log_to_file = False
+        self.dump_setup = True
+        self.fname = 'run_pid' + str(os.getpid()) + '.log'
+
+        for k, v in params.items():
+            setattr(self, k, v)
+
+        self._freeze()
+
+
 class controller(with_metaclass(abc.ABCMeta)):
     """
     Base abstract controller class
@@ -23,23 +39,7 @@ class controller(with_metaclass(abc.ABCMeta)):
             controller_params (dict): parameter set for the controller and the steps
         """
 
-        # short helper class to add params as attributes
-        class pars(FrozenClass):
-            def __init__(self, params):
-
-                self.fine_comm = True
-                self.predict = True
-                self.logger_level = 20
-                self.log_to_file = False
-                self.dump_setup = True
-                self.fname = 'run_pid' + str(os.getpid()) + '.log'
-
-                for k, v in params.items():
-                    setattr(self, k, v)
-
-                self._freeze()
-
-        self.params = pars(controller_params)
+        self.params = _Pars(controller_params)
 
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
         self.logger = logging.getLogger('controller')

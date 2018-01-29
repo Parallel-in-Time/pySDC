@@ -63,7 +63,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 10
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -82,7 +82,7 @@ def main():
     t0 = 0.0
     Tend = 1.0
 
-    num_steps = 1
+    num_steps = 4
 
     # startt = time.time()
     #
@@ -128,17 +128,17 @@ def main():
 
 
     startt = time.time()
-    pr = cProfile.Profile()
-    pr.enable()
+    # pr = cProfile.Profile()
+    # pr.enable()
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    pr.disable()
+    # pr.disable()
     endt = time.time()
     print(endt-startt)
 
-    pr.print_stats(sort=2)
+    # pr.print_stats(sort=2)
 
 
 if __name__ == "__main__":
