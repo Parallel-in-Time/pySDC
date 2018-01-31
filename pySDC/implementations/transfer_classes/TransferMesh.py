@@ -30,19 +30,14 @@ class mesh_to_mesh(space_transfer):
             params: parameters for the transfer operators
         """
 
-        if 'iorder' not in params:
-            raise TransferError('Need iorder parameter for spatial transfer')
-        if 'rorder' not in params:
-            raise TransferError('Need rorder parameter for spatial transfer')
-
-        if params['rorder'] % 2 != 0:
-            raise TransferError('Need even order for restriction')
-
-        if params['iorder'] % 2 != 0:
-            raise TransferError('Need even order for interpolation')
-
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
+
+        if self.params.rorder % 2 != 0:
+            raise TransferError('Need even order for restriction')
+
+        if self.params.iorder % 2 != 0:
+            raise TransferError('Need even order for interpolation')
 
         if type(self.fine_prob.params.nvars) is tuple:
             if type(self.coarse_prob.params.nvars) is not tuple:

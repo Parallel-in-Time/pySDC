@@ -11,6 +11,8 @@ class _Pars(FrozenClass):
         self.finter = False
         self.periodic = False
         self.equidist_nested = True
+        self.iorder = 2
+        self.rorder = 2
         for k, v in pars.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point
