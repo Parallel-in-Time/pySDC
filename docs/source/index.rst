@@ -11,6 +11,11 @@ The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <ht
 News
 ----
 
+- February 8, 2018: Ever got annoyed at `pySDC`'s incredibly slow setup phase when multiple time-steps are used? Version 2.3
+  changes this by copying the data structure of the first step to all other steps using the `dill Package <https://pypi.python.org/pypi/dill>`_.
+  Setup times could be reduced by 90% and more for certain problems. We also increase the speed for certain calculations,
+  in particular for the Penning trap example.
+
 - November 7, 2017: Version 2.2 contains matrix-based versions of PFASST within the project ``matrixPFASST``. This involved quite a few
   changes in more or less unexpected places, e.g. in the multigrid controller and the transfer base class. The impact
   of these changes on other projects should be negligible, though.

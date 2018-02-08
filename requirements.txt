@@ -7,3 +7,4 @@ sympy>=1.0
 pep8
 coloredlogs
 dill>=0.2.6
+numba>=0.35
