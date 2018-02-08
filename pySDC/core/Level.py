@@ -1,6 +1,30 @@
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, params):
+        self.dt = None
+        self.restol = 0.0
+        self.nsweeps = 1
+        for k, v in params.items():
+            setattr(self, k, v)
+        # freeze class, no further attributes allowed from this point
+        self._freeze()
+
+
+# short helper class to bundle all status variables
+class _Status(FrozenClass):
+    def __init__(self):
+        self.residual = None
+        self.unlocked = False
+        self.updated = False
+        self.time = None
+        self.sweep = None
+        # freeze class, no further attributes allowed from this point
+        self._freeze()
+
+
 class level(FrozenClass):
     """
     Level class containing all management functionality for a single level
@@ -20,17 +44,6 @@ class level(FrozenClass):
         tau (list of dtype_u): FAS correction, allocated via step class if necessary
     """
 
-    # short helper class to bundle all status variables
-    class __Status(FrozenClass):
-        def __init__(self):
-            self.residual = None
-            self.unlocked = False
-            self.updated = False
-            self.time = None
-            self.sweep = None
-            # freeze class, no further attributes allowed from this point
-            self._freeze()
-
     def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params,
                  level_params, level_index):
         """
@@ -47,24 +60,13 @@ class level(FrozenClass):
             level_index (int): custom name for this level
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, params):
-                self.dt = None
-                self.restol = 0.0
-                self.nsweeps = 1
-                for k, v in params.items():
-                    setattr(self, k, v)
-                # freeze class, no further attributes allowed from this point
-                self._freeze()
-
         # instantiate sweeper, problem and hooks
         self.__sweep = sweeper_class(sweeper_params)
         self.__prob = problem_class(problem_params, dtype_u, dtype_f)
 
         # set level parameters and status
-        self.params = __Pars(level_params)
-        self.status = level.__Status()
+        self.params = _Pars(level_params)
+        self.status = _Status()
 
         # set name
         self.level_index = level_index
@@ -95,7 +97,7 @@ class level(FrozenClass):
         """
 
         # reset status
-        self.status = level.__Status()
+        self.status = _Status()
 
         # all data back to None
         self.uend = None

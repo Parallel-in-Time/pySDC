@@ -1,6 +1,7 @@
 from __future__ import division
 
 import numpy as np
+from numba import jit
 
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
@@ -33,6 +34,29 @@ class penningtrap(ptype):
         # invoke super init, passing nparts, dtype_u and dtype_f
         super(penningtrap, self).__init__(problem_params['nparts'], dtype_u, dtype_f, problem_params)
 
+    @staticmethod
+    @jit(nopython=True, nogil=True)
+    def fast_interactions(N, pos, sig, q):
+
+        Efield = np.zeros(3 * N)
+        contrib = np.zeros(3)
+
+        for i in range(N):
+
+            contrib[:] = 0
+
+            for j in range(N):
+
+                dist2 = (pos[3 * i] - pos[3 * j]) ** 2 + (pos[3 * i + 1] - pos[3 * j + 1]) ** 2 + \
+                        (pos[3 * i + 2] - pos[3 * j + 2]) ** 2 + sig ** 2
+                contrib += q[j] * (pos[3 * i:3 * i + 3] - pos[3 * j:3 * j + 3]) / dist2 ** 1.5
+
+            Efield[3 * i] += contrib[0]
+            Efield[3 * i + 1] += contrib[1]
+            Efield[3 * i + 2] += contrib[2]
+
+        return Efield
+
     def get_interactions(self, part):
         """
         Routine to compute the particle-particle interaction, assuming q = 1 for all particles
@@ -46,18 +70,7 @@ class penningtrap(ptype):
 
         N = self.params.nparts
 
-        Efield = np.zeros(3 * N)
-
-        for i in range(N):
-            for j in range(N):
-                dist2 = np.linalg.norm(part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3], 2) ** 2 \
-                    + self.params.sig ** 2
-                contrib = part.q[j] * (part.pos.values[3 * i:3 * i + 3] - part.pos.values[3 * j:3 * j + 3]) / \
-                    dist2 ** (3 / 2)
-
-                Efield[3 * i] += contrib[0]
-                Efield[3 * i + 1] += contrib[1]
-                Efield[3 * i + 2] += contrib[2]
+        Efield = self.fast_interactions(N, part.pos.values, self.params.sig, part.q)
 
         return Efield
 

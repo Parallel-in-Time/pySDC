@@ -21,6 +21,9 @@ class heat1d_forced(heat1d):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heat1d_forced, self).__init__(problem_params, dtype_u, dtype_f)
+
+        self.xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
+
         pass
 
     def eval_f(self, u, t):
@@ -52,9 +55,8 @@ class heat1d_forced(heat1d):
             dtype_f: explicit part of RHS
         """
 
-        xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
         fexpl = self.dtype_u(self.init)
-        fexpl.values = -np.sin(np.pi * self.params.freq * xvalues) * \
+        fexpl.values = -np.sin(np.pi * self.params.freq * self.xvalues) * \
             (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
         return fexpl
 
@@ -86,6 +88,5 @@ class heat1d_forced(heat1d):
         """
 
         me = self.dtype_u(self.init)
-        xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
-        me.values = np.sin(np.pi * self.params.freq * xvalues) * np.cos(t)
+        me.values = np.sin(np.pi * self.params.freq * self.xvalues) * np.cos(t)
         return me

@@ -5,6 +5,20 @@ import logging
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, pars):
+        self.finter = False
+        self.periodic = False
+        self.equidist_nested = True
+        self.iorder = 2
+        self.rorder = 2
+        for k, v in pars.items():
+            setattr(self, k, v)
+        # freeze class, no further attributes allowed from this point
+        self._freeze()
+
+
 class space_transfer(with_metaclass(abc.ABCMeta)):
     """
     Abstract space_transfer class
@@ -26,17 +40,7 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
             space_transfer_params (dict): user-defined parameters
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, pars):
-                self.finter = False
-                self.periodic = False
-                for k, v in pars.items():
-                    setattr(self, k, v)
-                # freeze class, no further attributes allowed from this point
-                self._freeze()
-
-        self.params = __Pars(space_transfer_params)
+        self.params = _Pars(space_transfer_params)
 
         # set up logger
         self.logger = logging.getLogger('space-transfer')

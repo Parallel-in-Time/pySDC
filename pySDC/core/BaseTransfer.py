@@ -1,10 +1,21 @@
-import numpy as np
 import logging
+import scipy.sparse as sp
 
 from pySDC.helpers.pysdc_helper import FrozenClass
-from scipy import interpolate
 import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import UnlockError
+
+
+# short helper class to add params as attributes
+class _Pars(FrozenClass):
+    def __init__(self, pars):
+        self.finter = False
+        self.coll_iorder = 2
+        self.coll_rorder = 2
+        for k, v in pars.items():
+            setattr(self, k, v)
+
+        self._freeze()
 
 
 class base_transfer(object):
@@ -30,18 +41,7 @@ class base_transfer(object):
             space_transfer_params (dict): parameters for the space_transfer operations
         """
 
-        # short helper class to add params as attributes
-        class __Pars(FrozenClass):
-            def __init__(self, pars):
-                self.finter = False
-                self.coll_iorder = 2
-                self.coll_rorder = 1
-                for k, v in pars.items():
-                    setattr(self, k, v)
-
-                self._freeze()
-
-        self.params = __Pars(base_transfer_params)
+        self.params = _Pars(base_transfer_params)
 
         # set up logger
         self.logger = logging.getLogger('transfer')
@@ -53,8 +53,13 @@ class base_transfer(object):
         fine_grid = self.fine.sweep.coll.nodes
         coarse_grid = self.coarse.sweep.coll.nodes
 
-        self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0).toarray()
-        self.Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
+        if len(fine_grid) == len(coarse_grid):
+            self.Pcoll = sp.eye(len(fine_grid)).toarray()
+            self.Rcoll = sp.eye(len(fine_grid)).toarray()
+        else:
+            self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0,
+                                                    equidist_nested=False).toarray()
+            self.Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
 
         # set up spatial transfer
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob,

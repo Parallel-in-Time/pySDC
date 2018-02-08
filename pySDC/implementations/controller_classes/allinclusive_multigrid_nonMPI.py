@@ -1,6 +1,7 @@
 import itertools
 import copy as cp
 import numpy as np
+import dill
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
@@ -27,10 +28,9 @@ class allinclusive_multigrid_nonMPI(controller):
         # call parent's initialization routine
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
 
-        self.MS = []
-        # simply append step after step and generate the hierarchies
-        for p in range(num_procs):
-            self.MS.append(stepclass.step(description))
+        self.MS = [stepclass.step(description)]
+        for p in range(num_procs - 1):
+            self.MS.append(dill.copy(self.MS[0]))
 
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
