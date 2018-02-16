@@ -5,7 +5,7 @@ with open("README.rst", 'r') as f:
 
 setup(
     name='pySDC',
-    version='2.3',
+    version='2.3.1',
     description='A Python implementation of spectral deferred correction methods and the likes',
     license="BSD-2",
     long_description=long_description,
@@ -26,6 +26,8 @@ setup(
         'matplotlib>=1.5.3',
         'coloredlogs',
         'pep8',
-        'sympy>=1.0'
+        'sympy>=1.0',
+        'numba>=0.35',
+        'dill>=0.2.6'
     ],
 )
