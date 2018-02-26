@@ -27,7 +27,7 @@ def main():
     problem_params['newton_tol'] = 1E-12
     problem_params['newton_maxiter'] = 50
     problem_params['mu'] = 5
-    problem_params['u0'] = (2.0, 0)
+    problem_params['u0'] = (1.0, 0)
 
     # initialize step parameters
     step_params = dict()
