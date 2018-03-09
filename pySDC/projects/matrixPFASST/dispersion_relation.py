@@ -224,7 +224,7 @@ def plot_dispersion_relations(niters, kappas, phase, amp_factor, c):
 
 def main():
     c = 1e1
-    niters, kappas, phase, amp_factor = compute_dispersion_relation(npoints=32, dx=1.0/128.0, c=c)
+    niters, kappas, phase, amp_factor = compute_dispersion_relation(npoints=32, dx=1.0 / 128.0, c=c)
     plot_dispersion_relations(niters, kappas, phase, amp_factor, c)
 
 
