@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper
+from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
 class verlet(sweeper):
@@ -65,10 +66,16 @@ class verlet(sweeper):
 
         QQ = np.zeros(np.shape(self.coll.Qmat))
 
-        for m in range(self.coll.num_nodes):
-            for n in range(self.coll.num_nodes):
-                QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] / self.coll.weights[m])
-        QQ = np.dot(self.coll.Qmat, QQ)
+        if isinstance(self.coll, CollGaussLobatto):
+
+            for m in range(self.coll.num_nodes):
+                for n in range(self.coll.num_nodes):
+                    QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] / self.coll.weights[m])
+            QQ = np.dot(self.coll.Qmat, QQ)
+
+        else:
+
+            QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
         return [QT, Qx, QQ]
 
