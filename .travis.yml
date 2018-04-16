@@ -18,14 +18,12 @@ before_install:
 install:
   - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba
   - conda install --yes python=${TRAVIS_PYTHON_VERSION} sphinx=1.6.3
-  - conda list
   - pip install --user coloredlogs
-  - pip install --user travis-sphinx
-  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
+  - if [[ $PYTHON_VERSION == 3 ]]; then pip install --user travis-sphinx; fi
+  - if [[ $PYTHON_VERSION == 3 ]]; then sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng; fi
 
 script:
   - "./docs/update_apidocs.sh"
-  - which nosetests
   - nosetests --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
