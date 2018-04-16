@@ -215,13 +215,13 @@ class particles(object):
             # FIXME: is this a good idea for multiple particles?
             return np.amax(np.absolute(self.values))
 
-    def __init__(self, init=None, vals=(None, None, None, None)):
+    def __init__(self, init=None, val=None):
         """
         Initialization routine
 
         Args:
             init: can either be a number or another particle object
-            vals: initial tuple of values for position and velocity (default: (None,None))
+            val: initial tuple of values for position and velocity (default: (None,None))
         Raises:
             DataError: if init is none of the types above
         """
@@ -234,19 +234,39 @@ class particles(object):
             self.m = cp.deepcopy(init.m)
         # if init is a number, create particles object and pick the corresponding initial values
         elif isinstance(init, int):
-            self.pos = particles.position(init, val=vals[0])
-            self.vel = particles.velocity(init, val=vals[1])
-            self.q = np.zeros(init)
-            self.q[:] = vals[2]
-            self.m = np.zeros(init)
-            self.m[:] = vals[3]
+            if isinstance(val, int) or val is None:
+                self.pos = particles.position(init, val=val)
+                self.vel = particles.velocity(init, val=val)
+                self.q = np.zeros(init)
+                self.q[:] = val
+                self.m = np.zeros(init)
+                self.m[:] = val
+            elif isinstance(val, tuple) and len(val) == 4:
+                self.pos = particles.position(init, val=val[0])
+                self.vel = particles.velocity(init, val=val[1])
+                self.q = np.zeros(init)
+                self.q[:] = val[2]
+                self.m = np.zeros(init)
+                self.m[:] = val[3]
+            else:
+                raise DataError('type of val is wrong, got %s', val)
         elif isinstance(init, tuple):
-            self.pos = particles.position(init, val=vals[0])
-            self.vel = particles.velocity(init, val=vals[1])
-            self.q = np.zeros(init[-1])
-            self.q[:] = vals[2]
-            self.m = np.zeros(init[-1])
-            self.m[:] = vals[3]
+            if isinstance(val, int) or val is None:
+                self.pos = particles.position(init, val=val)
+                self.vel = particles.velocity(init, val=val)
+                self.q = np.zeros(init[-1])
+                self.q[:] = val
+                self.m = np.zeros(init[-1])
+                self.m[:] = val
+            elif isinstance(val, tuple) and len(val) == 4:
+                self.pos = particles.position(init, val=val[0])
+                self.vel = particles.velocity(init, val=val[1])
+                self.q = np.zeros(init[-1])
+                self.q[:] = val[2]
+                self.m = np.zeros(init[-1])
+                self.m[:] = val[3]
+            else:
+                raise DataError('type of val is wrong, got %s', val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -594,13 +614,13 @@ class fields(object):
             else:
                 raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
-    def __init__(self, init=None, vals=(None, None)):
+    def __init__(self, init=None, val=None):
         """
         Initialization routine
 
         Args:
             init: can either be a number or another fields object
-            vals: initial tuple of values for electric and magnetic (default: (None,None))
+            val: initial tuple of values for electric and magnetic (default: (None,None))
         Raises:
             DataError: if init is none of the types above
         """
@@ -611,8 +631,14 @@ class fields(object):
             self.magn = fields.magnetic(init.magn)
         # if init is a number, create fields object and pick the corresponding initial values
         elif isinstance(init, int) or isinstance(init, tuple):
-            self.elec = fields.electric(init, val=vals[0])
-            self.magn = fields.magnetic(init, val=vals[1])
+            if isinstance(val, int) or val is None:
+                self.elec = fields.electric(init, val=val)
+                self.magn = fields.magnetic(init, val=val)
+            elif isinstance(val, tuple) and len(val) == 2:
+                self.elec = fields.electric(init, val=val[0])
+                self.magn = fields.magnetic(init, val=val[1])
+            else:
+                raise DataError('wrong type of val, got %s' % val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

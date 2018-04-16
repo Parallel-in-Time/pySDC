@@ -94,7 +94,7 @@ class boris_2nd_order(sweeper):
         M = self.coll.num_nodes
 
         # initialize integral terms with zeros, will add stuff later
-        integral = [P.dtype_u(P.init, vals=(0, 0, 0, 0)) for l in range(M)]
+        integral = [P.dtype_u(P.init, val=0) for l in range(M)]
 
         # gather all terms which are known already (e.g. from the previous iteration)
         # this corresponds to SF(u^k) - SdF(u^k) + tau (note: have integrals in pos and vel!)
@@ -156,7 +156,7 @@ class boris_2nd_order(sweeper):
         p = []
 
         for m in range(1, self.coll.num_nodes + 1):
-            p.append(P.dtype_u(P.init, vals=(0, 0, 0, 0)))
+            p.append(P.dtype_u(P.init, val=0))
 
             # integrate RHS over all collocation nodes, RHS is here only f(x,v)!
             for j in range(1, self.coll.num_nodes + 1):

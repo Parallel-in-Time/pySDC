@@ -99,7 +99,7 @@ class planewave_single(ptype):
         assert isinstance(part, particles)
         rhs = acceleration((3, self.nparts))
         rhs.values[:, 0] = part.q[:] / part.m[:] * \
-                           (f.elec.values + np.cross(part.vel.values[:, 0], f.magn.values[:, 0]))
+            (f.elec.values + np.cross(part.vel.values[:, 0], f.magn.values[:, 0]))
 
         return rhs
 

@@ -146,7 +146,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
             else:
-                L.u[m] = P.dtype_u(init=P.init, vals=(0, 0, 0, 0))
+                L.u[m] = P.dtype_u(init=P.init, val=0)
                 L.f[m] = P.dtype_f(init=P.init, val=0)
 
         # indicate that this level is now ready for sweeps

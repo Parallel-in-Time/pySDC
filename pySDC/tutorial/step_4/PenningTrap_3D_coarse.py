@@ -22,12 +22,12 @@ class penningtrap_coarse(penningtrap):
         N = self.params.nparts
 
         Emat = np.diag([1, 1, -2])
-        f = self.dtype_f(self.init, vals=(0, 0))
+        f = self.dtype_f((3, self.init), val=0)
 
         # only compute external forces here: O(N) instead of O(N*N)
         for n in range(N):
-            f.elec.values[3 * n:3 * n + 3] = self.params.omega_E ** 2 / \
-                (part.q[n] / part.m[n]) * np.dot(Emat, part.pos.values[3 * n:3 * n + 3])
-            f.magn.values[3 * n:3 * n + 3] = self.params.omega_B * np.array([0, 0, 1])
+            f.elec.values[:, n] = self.params.omega_E ** 2 / \
+                (part.q[n] / part.m[n]) * np.dot(Emat, part.pos.values[:, n])
+            f.magn.values[:, n] = self.params.omega_B * np.array([0, 0, 1])
 
         return f
