@@ -1,5 +1,5 @@
-Attempts to parallelize SDC
-===========================
+Second-order Problems
+=====================
 
 In this project, we run several examples of the second-order Verlet-SDC integrator.
 This SDC variant is the core integrator for the Boris method, which we use e.g. in the 3rd tutorial.
