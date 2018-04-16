@@ -20,7 +20,7 @@ install:
   - conda install --yes python=${TRAVIS_PYTHON_VERSION} sphinx=1.6.3
   - pip install --user coloredlogs
   - if [[ $PYTHON_VERSION == 3 ]]; then pip install --user travis-sphinx; fi
-  - if [[ $PYTHON_VERSION == 3 ]]; then sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng; fi
+  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
   - "./docs/update_apidocs.sh"

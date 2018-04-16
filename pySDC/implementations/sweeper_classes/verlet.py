@@ -70,7 +70,8 @@ class verlet(sweeper):
 
             for m in range(self.coll.num_nodes):
                 for n in range(self.coll.num_nodes):
-                    QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] / self.coll.weights[m])
+                    QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] /
+                                                               self.coll.weights[m])
             QQ = np.dot(self.coll.Qmat, QQ)
 
         else:
