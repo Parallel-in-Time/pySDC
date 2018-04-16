@@ -142,7 +142,7 @@ class verlet(sweeper):
         p = []
 
         for m in range(1, self.coll.num_nodes + 1):
-            p.append(P.dtype_u(P.init, vals=(0, 0, 0, 0)))
+            p.append(P.dtype_u(P.init, val=0))
 
             # integrate RHS over all collocation nodes, RHS is here only f(x)!
             for j in range(1, self.coll.num_nodes + 1):
