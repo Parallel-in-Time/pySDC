@@ -95,6 +95,7 @@ Projects
    projects/RDC.rst
    projects/asymp_conv.rst
    projects/matrixPFASST.rst
+   projects/Hamiltonian.rst
 
 
 Tests
