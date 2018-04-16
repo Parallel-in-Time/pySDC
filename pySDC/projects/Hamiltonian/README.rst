@@ -1,8 +1,8 @@
 Second-order Problems
 =====================
 
-In this project, we run several examples of the second-order Verlet-SDC integrator.
-This SDC variant is the core integrator for the Boris method, which we use e.g. in the 3rd tutorial.
+In this project, we run several examples of the `second-order Verlet-SDC integrator <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/verlet.py>`_.
+This SDC variant is the core integrator for the `Boris method <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/boris_2nd_order.py>`_, which we use e.g. in the 3rd tutorial.
 
 Simple problems
 ---------------

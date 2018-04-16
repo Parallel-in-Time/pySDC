@@ -151,9 +151,12 @@ def run_simulation(prob=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    f = open('data/' + prob + '.dat', 'wb')
+    fname = 'data/' + prob + '.dat'
+    f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
+
+    assert os.path.isfile(fname), 'Run for %s did not create stats file' % prob
 
 
 def show_results(prob=None, cwd=''):
@@ -173,16 +176,21 @@ def show_results(prob=None, cwd=''):
     for k, v in extract_stats.items():
         result[k.iter].append((k.time, v))
     for k, v in result.items():
+        assert k <= 6, 'Number of iterations is too high for %s, got %s' % (prob, k)
         result[k] = sorted(result[k], key=lambda x: x[0])
 
     plt_helper.mpl.style.use('classic')
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
+    err_ham = 1
     for k, v in result.items():
         time = [item[0] for item in v]
         ham = [item[1] for item in v]
+        err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
+
+    assert err_ham < 2.3E-08, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')
@@ -196,10 +204,13 @@ def show_results(prob=None, cwd=''):
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
 
-if __name__ == "__main__":
+def main():
     prob = 'harmonic'
     run_simulation(prob)
     show_results(prob)
     prob = 'henonheiles'
     run_simulation(prob)
     show_results(prob)
+
+if __name__ == "__main__":
+    main()

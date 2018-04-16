@@ -1,4 +1,4 @@
-Full code: `pySDC/projects/Hamiltonian/simple_problems.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/pySDC/projects/Hamiltonian/simple_problems.py>`_
+Full code: `pySDC/projects/Hamiltonian/simple_problems.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Hamiltonian/simple_problems.py>`_
 
 .. literalinclude:: ../../../pySDC/projects/Hamiltonian/simple_problems.py
 
