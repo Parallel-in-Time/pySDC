@@ -114,6 +114,8 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 QDmat[m, 0:m] = self.coll.delta_m[0:m]
         elif qd_type == 'GS':
             QDmat = np.tril(self.coll.Qmat, k=-1)
+        elif qd_type == 'PIC':
+            QDmat = np.zeros(coll.Qmat.shape)
         else:
             raise NotImplementedError('qd_type explicit not implemented')
 
@@ -144,7 +146,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
             else:
-                L.u[m] = P.dtype_u(init=P.init, val=0)
+                L.u[m] = P.dtype_u(init=P.init, vals=(0, 0, 0, 0))
                 L.f[m] = P.dtype_f(init=P.init, val=0)
 
         # indicate that this level is now ready for sweeps

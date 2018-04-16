@@ -46,16 +46,16 @@ class planewave_single(ptype):
             E and B field for the particle (external only)
         """
 
-        f = fields(self.nparts)
+        f = fields((3, self.nparts))
 
-        R = np.linalg.norm(part.pos.values, 2)
-        f.elec.values[0] = self.params.a0 / (R ** 3) * part.pos.values[0]
-        f.elec.values[1] = self.params.a0 / (R ** 3) * part.pos.values[1]
-        f.elec.values[2] = 0
+        R = np.linalg.norm(part.pos.values[:, 0], 2)
+        f.elec.values[0, 0] = self.params.a0 / (R ** 3) * part.pos.values[0, 0]
+        f.elec.values[1, 0] = self.params.a0 / (R ** 3) * part.pos.values[1, 0]
+        f.elec.values[2, 0] = 0
 
-        f.magn.values[0] = 0
-        f.magn.values[1] = 0
-        f.magn.values[2] = R
+        f.magn.values[0, 0] = 0
+        f.magn.values[1, 0] = 0
+        f.magn.values[2, 0] = R
 
         return f
 
@@ -67,17 +67,17 @@ class planewave_single(ptype):
             particle type
         """
 
-        u0 = self.u0
+        u0 = self.params.u0
         # some abbreviations
-        u = particles(1)
+        u = particles((3, 1))
 
-        u.pos.values[0] = u0[0][0]
-        u.pos.values[1] = u0[0][1]
-        u.pos.values[2] = u0[0][2]
+        u.pos.values[0, 0] = u0[0][0]
+        u.pos.values[1, 0] = u0[0][1]
+        u.pos.values[2, 0] = u0[0][2]
 
-        u.vel.values[0] = u0[1][0]
-        u.vel.values[1] = u0[1][1]
-        u.vel.values[2] = u0[1][2]
+        u.vel.values[0, 0] = u0[1][0]
+        u.vel.values[1, 0] = u0[1][1]
+        u.vel.values[2, 0] = u0[1][2]
 
         u.q[:] = u0[2][0]
         u.m[:] = u0[3][0]
@@ -97,8 +97,9 @@ class planewave_single(ptype):
         """
 
         assert isinstance(part, particles)
-        rhs = acceleration(self.nparts)
-        rhs.values[:] = part.q[:] / part.m[:] * (f.elec.values + np.cross(part.vel.values, f.magn.values))
+        rhs = acceleration((3, self.nparts))
+        rhs.values[:, 0] = part.q[:] / part.m[:] * \
+                           (f.elec.values + np.cross(part.vel.values[:, 0], f.magn.values[:, 0]))
 
         return rhs
 
@@ -124,19 +125,16 @@ class planewave_single(ptype):
         for n in range(N):
             a = old_parts.q[n] / old_parts.m[n]
 
-            c.values[3 * n:3 * n + 3] += dt / 2 * a * np.cross(old_parts.vel.values[3 * n:3 * n + 3],
-                                                               old_fields.magn.values[3 * n:3 * n + 3] -
-                                                               new_fields.magn.values[3 * n:3 * n + 3])
+            c.values[:, n] += dt / 2 * a * \
+                np.cross(old_parts.vel.values[:, n], old_fields.magn.values[:, n] - new_fields.magn.values[:, n])
 
             # pre-velocity, separated by the electric forces (and the c term)
-            vm = old_parts.vel.values[3 * n:3 * n + 3] + dt / 2 * a * Emean.values[3 * n:3 * n + 3] + \
-                c.values[3 * n:3 * n + 3] / 2
+            vm = old_parts.vel.values[:, n] + dt / 2 * a * Emean.values[:, n] + c.values[:, n] / 2
             # rotation
-            t = dt / 2 * a * new_fields.magn.values[3 * n:3 * n + 3]
+            t = dt / 2 * a * new_fields.magn.values[:, n]
             s = 2 * t / (1 + np.linalg.norm(t, 2) ** 2)
             vp = vm + np.cross(vm + np.cross(vm, t), s)
             # post-velocity
-            vel.values[3 * n:3 * n + 3] = vp + dt / 2 * a * Emean.values[3 * n:3 * n + 3] + \
-                c.values[3 * n:3 * n + 3] / 2
+            vel.values[:, n] = vp + dt / 2 * a * Emean.values[:, n] + c.values[:, n] / 2
 
         return vel
