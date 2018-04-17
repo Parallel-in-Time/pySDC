@@ -1,5 +1,5 @@
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.particles import particles, fields
+from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 from pySDC.core.Errors import TransferError
 
 
@@ -35,6 +35,8 @@ class particles_to_particles(space_transfer):
             G = particles(F)
         elif isinstance(F, fields):
             G = fields(F)
+        elif isinstance(F, acceleration):
+            G = acceleration(F)
         else:
             raise TransferError("Unknown type of fine data, got %s" % type(F))
         return G
@@ -51,6 +53,8 @@ class particles_to_particles(space_transfer):
             F = particles(G)
         elif isinstance(G, fields):
             F = fields(G)
+        elif isinstance(G, acceleration):
+            F = acceleration(G)
         else:
             raise TransferError("Unknown type of coarse data, got %s" % type(G))
         return F

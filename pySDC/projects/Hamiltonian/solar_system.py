@@ -33,8 +33,8 @@ def setup_outer_solar_system():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5]
-    sweeper_params['spread'] = False
+    sweeper_params['num_nodes'] = [5, 3]
+    sweeper_params['spread'] = True
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
@@ -59,7 +59,7 @@ def setup_outer_solar_system():
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
-    # description['space_transfer_class'] = particles_to_particles
+    description['space_transfer_class'] = particles_to_particles
 
     return description, controller_params
 
@@ -77,8 +77,8 @@ def run_simulation(prob=None):
         description, controller_params = setup_outer_solar_system()
         # set time parameters
         t0 = 0.0
-        Tend = 100000.0
-        num_procs = 1
+        Tend = 10000.0
+        num_procs = 100
     else:
         raise NotImplemented('Problem type not implemented, got %s' % prob)
 
@@ -118,7 +118,7 @@ def show_results(prob=None, cwd=''):
     for k, v in extract_stats.items():
         result[k.iter].append((k.time, v))
     for k, v in result.items():
-        # assert k <= 6, 'Number of iterations is too high for %s, got %s' % (prob, k)
+        assert k <= 4, 'Number of iterations is too high for %s, got %s' % (prob, k)
         result[k] = sorted(result[k], key=lambda x: x[0])
 
     plt_helper.mpl.style.use('classic')
@@ -131,8 +131,7 @@ def show_results(prob=None, cwd=''):
         ham = [item[1] for item in v]
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
-
-    # assert err_ham < 2.3E-08, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
+    assert err_ham < 3.0E-15, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')

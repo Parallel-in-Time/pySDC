@@ -145,10 +145,8 @@ class verlet(sweeper):
         # get current level and problem description
         L = self.level
         P = L.prob
-
         # create new instance of dtype_u, initialize values with 0
         p = []
-
         for m in range(1, self.coll.num_nodes + 1):
             p.append(P.dtype_u(P.init, val=0))
 
@@ -184,6 +182,8 @@ class verlet(sweeper):
             for m in range(self.coll.num_nodes):
                 L.uend.pos += L.dt * (L.dt * self.qQ[m] * L.f[m + 1]) + L.dt * self.coll.weights[m] * L.u[0].vel
                 L.uend.vel += L.dt * self.coll.weights[m] * L.f[m + 1]
+                L.uend.m = L.u[0].m
+                L.uend.q = L.u[0].q
             # add up tau correction of the full interval (last entry)
             if L.tau is not None:
                 L.uend += L.tau[-1]
