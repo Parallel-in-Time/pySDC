@@ -11,3 +11,13 @@ We first test the integrator for some rather simple problems, namely the harmoni
 For both problems we make use of the hook ``hamiltonian_output`` to monitor the deviation from the exact Hamiltonian.
 
 .. include:: doc_hamiltonian_simple.rst
+
+Solar system problem
+--------------------
+
+In this slightly more complex setup we simulate the movement of planets in the outer solar system.
+For this, only six planets are modeled, namely the Sun (which in its mass contains the inner planets), Jupiter, Saturn, Uranus, Neptune and Pluto.
+The gravitational forces are computed using a simple N^2 solver.
+All this is implemented within the ``OuterSolarSystem`` problem class.
+
+.. include:: doc_solar_system.rst
