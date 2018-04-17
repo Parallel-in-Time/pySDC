@@ -10,7 +10,7 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # noinspection PyUnusedLocal
 class outer_solar_system(ptype):
     """
-    Example implementing the harmonic oscillator
+    Example implementing the outer solar system problem
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -23,6 +23,9 @@ class outer_solar_system(ptype):
             dtype_f: acceleration data type (will be passed parent class)
         """
 
+        if 'sun_only' not in problem_params:
+            problem_params['sun_only'] = False
+
         # these parameters will be used later, so assert their existence
         essential_keys = []
         for key in essential_keys:
@@ -32,6 +35,8 @@ class outer_solar_system(ptype):
 
         # invoke super init, passing nparts, dtype_u and dtype_f
         super(outer_solar_system, self).__init__((3, 6), dtype_u, dtype_f, problem_params)
+
+        # gravitational constant
         self.G = 2.95912208286E-4
 
     def eval_f(self, u, t):
@@ -46,24 +51,37 @@ class outer_solar_system(ptype):
         """
         me = acceleration(self.init, val=0.0)
 
-        for i in range(self.init[-1]):
-            for j in range(i):
-                dx = u.pos.values[:, i] - u.pos.values[:, j]
+        # compute the acceleration due to gravitational forces
+        # ... only with respect to the sun
+        if self.params.sun_only:
+
+            for i in range(1, self.init[-1]):
+                dx = u.pos.values[:, i] - u.pos.values[:, 0]
                 r = np.sqrt(np.dot(dx, dx))
                 df = self.G * dx / (r ** 3)
-                me.values[:, i] -= u.m[j] * df
-                me.values[:, j] += u.m[i] * df
+                me.values[:, i] -= u.m[0] * df
+
+        # ... or with all planets involved
+        else:
+
+            for i in range(self.init[-1]):
+                for j in range(i):
+                    dx = u.pos.values[:, i] - u.pos.values[:, j]
+                    r = np.sqrt(np.dot(dx, dx))
+                    df = self.G * dx / (r ** 3)
+                    me.values[:, i] -= u.m[j] * df
+                    me.values[:, j] += u.m[i] * df
 
         return me
 
     def u_exact(self, t):
         """
-        Routine to compute the exact trajectory at time t
+        Routine to compute the exact/initial trajectory at time t
 
         Args:
             t (float): current time
         Returns:
-            dtype_u: exact position and velocity
+            dtype_u: exact/initial position and velocity
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = particles(self.init)
@@ -82,12 +100,12 @@ class outer_solar_system(ptype):
         me.vel.values[:, 4] = [0.00288930, 0.00114527, 0.00039677]
         me.vel.values[:, 5] = [0.00276725, -0.0017072, -0.00136504]
 
-        me.m[0] = 1.00000597682
-        me.m[1] = 0.000954786104043
-        me.m[2] = 0.000285583733151
-        me.m[3] = 0.0000437273164546
-        me.m[4] = 0.0000517759138449
-        me.m[5] = 1.0 / 130000000.0
+        me.m[0] = 1.00000597682         # Sun
+        me.m[1] = 0.000954786104043     # Jupiter
+        me.m[2] = 0.000285583733151     # Saturn
+        me.m[3] = 0.0000437273164546    # Uranus
+        me.m[4] = 0.0000517759138449    # Neptune
+        me.m[5] = 1.0 / 130000000.0     # Pluto
 
         return me
 

@@ -2,6 +2,7 @@ from __future__ import division
 from collections import defaultdict
 import os
 import dill
+import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
 
@@ -12,7 +13,7 @@ from pySDC.implementations.datatype_classes.particles import particles, accelera
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
 from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import particles_to_particles
 
-from pySDC.helpers.stats_helper import filter_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.projects.Hamiltonian.hamiltonian_output import hamiltonian_output
 
 
@@ -38,6 +39,7 @@ def setup_outer_solar_system():
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
+    problem_params['sun_only'] = [False, True]
 
     # initialize step parameters
     step_params = dict()
@@ -93,6 +95,30 @@ def run_simulation(prob=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+    # filter statistics by type (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # compute and print statistics
+    for item in iter_counts:
+        out = 'Number of iterations for time %4.2f: %2i' % item
+        print(out)
+
+    niters = np.array([item[1] for item in iter_counts])
+    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    print(out)
+    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    print(out)
+    out = '   Position of max/min number of iterations: %2i -- %2i' % \
+          (int(np.argmax(niters)), int(np.argmin(niters)))
+    print(out)
+    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    print(out)
+
+    assert np.mean(niters) <= 4.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+
     fname = 'data/' + prob + '.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -118,7 +144,6 @@ def show_results(prob=None, cwd=''):
     for k, v in extract_stats.items():
         result[k.iter].append((k.time, v))
     for k, v in result.items():
-        assert k <= 4, 'Number of iterations is too high for %s, got %s' % (prob, k)
         result[k] = sorted(result[k], key=lambda x: x[0])
 
     plt_helper.mpl.style.use('classic')

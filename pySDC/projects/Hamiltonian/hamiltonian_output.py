@@ -27,7 +27,7 @@ class hamiltonian_output(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        super(hamiltonian_output, self).post_step(step, level_number)
+        super(hamiltonian_output, self).post_iteration(step, level_number)
 
         # some abbreviations
         L = step.levels[0]
