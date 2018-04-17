@@ -89,7 +89,7 @@ def create_plots(setup, cwd=''):
         if strategy is not 'NOFAULT':
             plt.text(step - 1 + 0.5, iter + 0.5, 'x', horizontalalignment='center', verticalalignment='center')
 
-        plt.title(strategy, **axis_font)
+        plt.title(strategy.replace('_', '-'), **axis_font)
 
         fname = 'data/' + setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.png'
         plt.savefig(fname, bbox_inches='tight', rasterize=True)
