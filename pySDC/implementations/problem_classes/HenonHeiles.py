@@ -50,12 +50,12 @@ class henon_heiles(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact trajectory at time t
+        Routine to compute the exact/initial trajectory at time t
 
         Args:
             t (float): current time
         Returns:
-            dtype_u: exact position and velocity
+            dtype_u: exact/initial position and velocity
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = particles(2)

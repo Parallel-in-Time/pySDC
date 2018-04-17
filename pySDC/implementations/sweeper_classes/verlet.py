@@ -12,10 +12,10 @@ class verlet(sweeper):
     Second-order sweeper using velocity-Verlet as base integrator
 
     Attributes:
-        S: node-to-node collocation matrix (first order)
-        SQ: node-to-node collocation matrix (second order)
-        ST: node-to-node trapezoidal matrix
-        Sx: node-to-node Euler half-step for position update
+        QQ: 0-to-node collocation matrix (second order)
+        QT: 0-to-node trapezoidal matrix
+        Qx: 0-to-node Euler half-step for position update
+        qQ: update rule for final value (if needed)
     """
 
     def __init__(self, params):
@@ -26,17 +26,15 @@ class verlet(sweeper):
             params: parameters for the sweeper
         """
 
-        # call parent's initialization routine
-
         if 'QI' not in params:
             params['QI'] = 'IE'
         if 'QE' not in params:
             params['QE'] = 'EE'
 
+        # call parent's initialization routine
         super(verlet, self).__init__(params)
 
-        # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
-        # [self.S, self.ST, self.SQ, self.Sx, self.QQ] = self.__get_Qd()
+        # Trapezoidal rule, Qx and Double-Q as in the Boris-paper
         [self.QT, self.Qx, self.QQ] = self.__get_Qd()
 
         self.qQ = np.dot(self.coll.weights, self.coll.Qmat[1:, 1:])
@@ -55,8 +53,6 @@ class verlet(sweeper):
         # set implicit and explicit Euler matrices
         QI = self.get_Qdelta_implicit(self.coll, self.params.QI)
         QE = self.get_Qdelta_explicit(self.coll, self.params.QE)
-        # QI = np.zeros(self.coll.Qmat.shape)
-        # QE = np.zeros(self.coll.Qmat.shape)
 
         # trapezoidal rule
         QT = 0.5 * (QI + QE)
@@ -66,6 +62,8 @@ class verlet(sweeper):
 
         QQ = np.zeros(np.shape(self.coll.Qmat))
 
+        # if we have Gauss-Lobatto nodes, we can do a magic trick from the Book
+        # this takes Gauss-Lobatto IIIB and create IIIA out of this
         if isinstance(self.coll, CollGaussLobatto):
 
             for m in range(self.coll.num_nodes):
@@ -74,6 +72,7 @@ class verlet(sweeper):
                                                                self.coll.weights[m])
             QQ = np.dot(self.coll.Qmat, QQ)
 
+        # if we do not have Gauss-Lobatto, just multiply Q (will not get a symplectic method, they say)
         else:
 
             QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
@@ -154,6 +153,7 @@ class verlet(sweeper):
             for j in range(1, self.coll.num_nodes + 1):
                 p[-1].pos += L.dt * (L.dt * self.QQ[m, j] * L.f[j]) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
                 p[-1].vel += L.dt * self.coll.Qmat[m, j] * L.f[j]
+                # we need to set mass and charge here, too, since the code uses the integral to create new particles
                 p[-1].m = L.u[0].m
                 p[-1].q = L.u[0].q
 
@@ -182,6 +182,7 @@ class verlet(sweeper):
             for m in range(self.coll.num_nodes):
                 L.uend.pos += L.dt * (L.dt * self.qQ[m] * L.f[m + 1]) + L.dt * self.coll.weights[m] * L.u[0].vel
                 L.uend.vel += L.dt * self.coll.weights[m] * L.f[m + 1]
+                # remember to set mass and charge here, too
                 L.uend.m = L.u[0].m
                 L.uend.q = L.u[0].q
             # add up tau correction of the full interval (last entry)

@@ -135,10 +135,13 @@ def show_results(prob=None, cwd=''):
         prob (str): name of the problem
         cwd (str): current working directory
     """
+
+    # read in the dill data
     f = open(cwd + 'data/' + prob + '.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
+    # extract error in hamiltonian and prepare for plotting
     extract_stats = filter_stats(stats, type='err_hamiltonian')
     result = defaultdict(list)
     for k, v in extract_stats.items():
@@ -150,6 +153,7 @@ def show_results(prob=None, cwd=''):
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
+    # Rearrange data for easy plotting
     err_ham = 1
     for k, v in result.items():
         time = [item[0] for item in v]

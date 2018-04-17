@@ -3,8 +3,8 @@ from __future__ import division
 import numpy as np
 
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
+from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal

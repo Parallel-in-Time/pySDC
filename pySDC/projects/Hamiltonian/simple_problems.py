@@ -2,6 +2,7 @@ from __future__ import division
 from collections import defaultdict
 import os
 import dill
+import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
 
@@ -13,7 +14,7 @@ from pySDC.implementations.problem_classes.HenonHeiles import henon_heiles
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import particles_to_particles
 
-from pySDC.helpers.stats_helper import filter_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.projects.Hamiltonian.hamiltonian_output import hamiltonian_output
 
 
@@ -125,18 +126,21 @@ def run_simulation(prob=None):
 
     """
 
+    # check what problem type we have and set up corresponding description and variables
     if prob == 'harmonic':
         description, controller_params = setup_harmonic()
         # set time parameters
         t0 = 0.0
         Tend = 50.0
         num_procs = 100
+        maxmeaniter = 5.6
     elif prob == 'henonheiles':
         description, controller_params = setup_henonheiles()
         # set time parameters
         t0 = 0.0
         Tend = 25.0
         num_procs = 100
+        maxmeaniter = 3.9
     else:
         raise NotImplemented('Problem type not implemented, got %s' % prob)
 
@@ -150,6 +154,30 @@ def run_simulation(prob=None):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # filter statistics by type (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # compute and print statistics
+    for item in iter_counts:
+        out = 'Number of iterations for time %4.2f: %2i' % item
+        print(out)
+
+    niters = np.array([item[1] for item in iter_counts])
+    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    print(out)
+    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    print(out)
+    out = '   Position of max/min number of iterations: %2i -- %2i' % \
+          (int(np.argmax(niters)), int(np.argmin(niters)))
+    print(out)
+    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    print(out)
+
+    assert np.mean(niters) <= maxmeaniter, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
     fname = 'data/' + prob + '.dat'
     f = open(fname, 'wb')
@@ -167,22 +195,25 @@ def show_results(prob=None, cwd=''):
         prob (str): name of the problem
         cwd (str): current working directory
     """
+
+    # read in the dill data
     f = open(cwd + 'data/' + prob + '.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
+    # extract error in hamiltonian and prepare for plotting
     extract_stats = filter_stats(stats, type='err_hamiltonian')
     result = defaultdict(list)
     for k, v in extract_stats.items():
         result[k.iter].append((k.time, v))
     for k, v in result.items():
-        assert k <= 6, 'Number of iterations is too high for %s, got %s' % (prob, k)
         result[k] = sorted(result[k], key=lambda x: x[0])
 
     plt_helper.mpl.style.use('classic')
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
+    # Rearrange data for easy plotting
     err_ham = 1
     for k, v in result.items():
         time = [item[0] for item in v]
