@@ -156,6 +156,8 @@ class verlet(sweeper):
             for j in range(1, self.coll.num_nodes + 1):
                 p[-1].pos += L.dt * (L.dt * self.QQ[m, j] * L.f[j]) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
                 p[-1].vel += L.dt * self.coll.Qmat[m, j] * L.f[j]
+                p[-1].m = L.u[0].m
+                p[-1].q = L.u[0].q
 
         return p
 
