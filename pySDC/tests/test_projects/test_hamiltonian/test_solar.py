@@ -1,4 +1,5 @@
-from pySDC.projects.Hamiltonian.solar_system import main
+from pySDC.projects.Hamiltonian.solar_system import show_results
 
 def test_main():
-    main()
+    prob = 'outer_solar_system'
+    show_results(prob)
