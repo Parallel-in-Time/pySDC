@@ -6,3 +6,5 @@ Results:
 
 .. image:: ../../../data/outer_solar_system_hamiltonian.png
    :scale: 50 %
+.. image:: ../../../data/outer_solar_system_positions.png
+   :scale: 50 %
