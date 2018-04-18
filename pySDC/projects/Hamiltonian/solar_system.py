@@ -80,7 +80,7 @@ def run_simulation(prob=None):
         description, controller_params = setup_outer_solar_system()
         # set time parameters
         t0 = 0.0
-        Tend = 100000.0
+        Tend = 20000.0
         num_procs = 100
     else:
         raise NotImplemented('Problem type not implemented, got %s' % prob)
