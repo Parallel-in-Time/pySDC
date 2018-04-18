@@ -140,7 +140,7 @@ def create_plots(cwd=''):
         ax.set_yticklabels(np.arange(1, maxiter, 2) + 1, minor=False)
         ax.set_xticklabels(np.arange(minstep, maxstep, xtick_dist), minor=False)
 
-        plt.title(strategy)
+        plt.title(strategy.replace('_', '-'))
 
         # plt.tight_layout()
 

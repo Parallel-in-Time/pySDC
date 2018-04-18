@@ -39,8 +39,8 @@ class particles(object):
             if isinstance(init, type(self)):
                 self.values = cp.deepcopy(init.values)
             # if init is a number, create position object with val as initial value
-            elif isinstance(init, int):
-                self.values = np.empty(3 * init)
+            elif isinstance(init, int) or isinstance(init, tuple):
+                self.values = np.empty(init)
                 self.values[:] = val
             # something is wrong, if none of the ones above hit
             else:
@@ -60,7 +60,7 @@ class particles(object):
 
             if isinstance(other, type(self)):
                 # always create new position, since otherwise c = a + b changes a as well!
-                pos = particles.position(int(np.size(self.values) / 3))
+                pos = particles.position(self.values.shape)
                 pos.values = self.values + other.values
                 return pos
             else:
@@ -80,7 +80,7 @@ class particles(object):
 
             if isinstance(other, type(self)):
                 # always create new position, since otherwise c = a - b changes a as well!
-                pos = particles.position(int(np.size(self.values) / 3))
+                pos = particles.position(self.values.shape)
                 pos.values = self.values - other.values
                 return pos
             else:
@@ -100,7 +100,7 @@ class particles(object):
 
             if isinstance(other, float):
                 # create new position
-                pos = particles.position(int(np.size(self.values) / 3))
+                pos = particles.position(self.values.shape)
                 pos.values = self.values * other
                 return pos
             else:
@@ -138,8 +138,8 @@ class particles(object):
             if isinstance(init, type(self)):
                 self.values = cp.deepcopy(init.values)
             # if init is a number, create velocity object with val as initial value
-            elif isinstance(init, int):
-                self.values = np.empty(3 * init)
+            elif isinstance(init, int) or isinstance(init, tuple):
+                self.values = np.empty(init)
                 self.values[:] = val
             # something is wrong, if none of the ones above hit
             else:
@@ -159,7 +159,7 @@ class particles(object):
 
             if isinstance(other, type(self)):
                 # always create new position, since otherwise c = a + b changes a as well!
-                vel = particles.velocity(int(np.size(self.values) / 3))
+                vel = particles.velocity(self.values.shape)
                 vel.values = self.values + other.values
                 return vel
             else:
@@ -179,7 +179,7 @@ class particles(object):
 
             if isinstance(other, type(self)):
                 # always create new position, since otherwise c = a - b changes a as well!
-                vel = particles.velocity(int(np.size(self.values) / 3))
+                vel = particles.velocity(self.values.shape)
                 vel.values = self.values - other.values
                 return vel
             else:
@@ -199,7 +199,7 @@ class particles(object):
 
             if isinstance(other, float):
                 # create new position, interpret float factor as time (time x velocity = position)
-                pos = particles.position(int(np.size(self.values) / 3))
+                pos = particles.position(self.values.shape)
                 pos.values = self.values * other
                 return pos
             else:
@@ -215,13 +215,13 @@ class particles(object):
             # FIXME: is this a good idea for multiple particles?
             return np.amax(np.absolute(self.values))
 
-    def __init__(self, init=None, vals=(None, None, None, None)):
+    def __init__(self, init=None, val=None):
         """
         Initialization routine
 
         Args:
             init: can either be a number or another particle object
-            vals: initial tuple of values for position and velocity (default: (None,None))
+            val: initial tuple of values for position and velocity (default: (None,None))
         Raises:
             DataError: if init is none of the types above
         """
@@ -234,12 +234,39 @@ class particles(object):
             self.m = cp.deepcopy(init.m)
         # if init is a number, create particles object and pick the corresponding initial values
         elif isinstance(init, int):
-            self.pos = particles.position(init, val=vals[0])
-            self.vel = particles.velocity(init, val=vals[1])
-            self.q = np.zeros(int(np.size(self.pos.values) / 3))
-            self.q[:] = vals[2]
-            self.m = np.zeros(int(np.size(self.pos.values) / 3))
-            self.m[:] = vals[3]
+            if isinstance(val, int) or val is None:
+                self.pos = particles.position(init, val=val)
+                self.vel = particles.velocity(init, val=val)
+                self.q = np.zeros(init)
+                self.q[:] = val
+                self.m = np.zeros(init)
+                self.m[:] = val
+            elif isinstance(val, tuple) and len(val) == 4:
+                self.pos = particles.position(init, val=val[0])
+                self.vel = particles.velocity(init, val=val[1])
+                self.q = np.zeros(init)
+                self.q[:] = val[2]
+                self.m = np.zeros(init)
+                self.m[:] = val[3]
+            else:
+                raise DataError('type of val is wrong, got %s', val)
+        elif isinstance(init, tuple):
+            if isinstance(val, int) or val is None:
+                self.pos = particles.position(init, val=val)
+                self.vel = particles.velocity(init, val=val)
+                self.q = np.zeros(init[-1])
+                self.q[:] = val
+                self.m = np.zeros(init[-1])
+                self.m[:] = val
+            elif isinstance(val, tuple) and len(val) == 4:
+                self.pos = particles.position(init, val=val[0])
+                self.vel = particles.velocity(init, val=val[1])
+                self.q = np.zeros(init[-1])
+                self.q[:] = val[2]
+                self.m = np.zeros(init[-1])
+                self.m[:] = val[3]
+            else:
+                raise DataError('type of val is wrong, got %s', val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -258,7 +285,7 @@ class particles(object):
 
         if isinstance(other, type(self)):
             # always create new particles, since otherwise c = a + b changes a as well!
-            p = particles(int(np.size(self.pos.values) / 3))
+            p = particles(self.pos.values.shape)
             p.pos = self.pos + other.pos
             p.vel = self.vel + other.vel
             p.m = self.m
@@ -281,7 +308,7 @@ class particles(object):
 
         if isinstance(other, type(self)):
             # always create new particles, since otherwise c = a - b changes a as well!
-            p = particles(int(np.size(self.pos.values) / 3))
+            p = particles(self.pos.values.shape)
             p.pos = self.pos - other.pos
             p.vel = self.vel - other.vel
             p.m = self.m
@@ -304,7 +331,7 @@ class particles(object):
 
         if isinstance(other, float):
             # always create new particles
-            p = particles(int(np.size(self.pos.values) / 3))
+            p = particles(self.pos.values.shape)
             p.pos = other * self.pos
             p.vel.values = other * self.vel.values
             p.m = self.m
@@ -348,8 +375,8 @@ class acceleration(object):
         if isinstance(init, acceleration):
             self.values = cp.deepcopy(init.values)
         # if init is a number, create acceleration object with val as initial value
-        elif isinstance(init, int):
-            self.values = np.empty(3 * init)
+        elif isinstance(init, int) or isinstance(init, tuple):
+            self.values = np.empty(init)
             self.values[:] = val
         # something is wrong, if none of the ones above hit
         else:
@@ -369,7 +396,7 @@ class acceleration(object):
 
         if isinstance(other, type(self)):
             # always create new acceleration, since otherwise c = a + b changes a as well!
-            acc = acceleration(int(np.size(self.values) / 3))
+            acc = acceleration(self.values.shape)
             acc.values = self.values + other.values
             return acc
         else:
@@ -389,7 +416,7 @@ class acceleration(object):
 
         if isinstance(other, float):
             # create new velocity, interpret float factor as time (time x acceleration = velocity)
-            vel = particles.velocity(int(np.size(self.values) / 3))
+            vel = particles.velocity(self.values.shape)
             vel.values = self.values * other
             return vel
         else:
@@ -430,8 +457,8 @@ class fields(object):
             if isinstance(init, type(self)):
                 self.values = cp.deepcopy(init.values)
             # if init is a number, create electric object with val as initial value
-            elif isinstance(init, int):
-                self.values = np.empty(3 * init)
+            elif isinstance(init, int) or isinstance(init, tuple):
+                self.values = np.empty(init)
                 self.values[:] = val
             # something is wrong, if none of the ones above hit
             else:
@@ -451,7 +478,7 @@ class fields(object):
 
             if isinstance(other, type(self)):
                 # always create new electric, since otherwise c = a + b changes a as well!
-                E = fields.electric(int(np.size(self.values) / 3))
+                E = fields.electric(self.values.shape)
                 E.values = self.values + other.values
                 return E
             else:
@@ -471,7 +498,7 @@ class fields(object):
 
             if isinstance(other, type(self)):
                 # always create new electric, since otherwise c = a + b changes a as well!
-                E = fields.electric(int(np.size(self.values) / 3))
+                E = fields.electric(self.values.shape)
                 E.values = self.values - other.values
                 return E
             else:
@@ -491,7 +518,7 @@ class fields(object):
 
             if isinstance(other, float):
                 # create new electric, no specific interpretation of float factor
-                E = fields.electric(int(np.size(self.values) / 3))
+                E = fields.electric(self.values.shape)
                 E.values = self.values * other
                 return E
             else:
@@ -520,8 +547,8 @@ class fields(object):
             if isinstance(init, type(self)):
                 self.values = cp.deepcopy(init.values)
             # if init is a number, create magnetic object with val as initial value
-            elif isinstance(init, int):
-                self.values = np.empty(3 * init)
+            elif isinstance(init, int) or isinstance(init, tuple):
+                self.values = np.empty(init)
                 self.values[:] = val
             # something is wrong, if none of the ones above hit
             else:
@@ -541,7 +568,7 @@ class fields(object):
 
             if isinstance(other, type(self)):
                 # always create new magnetic, since otherwise c = a + b changes a as well!
-                M = fields.magnetic(int(np.size(self.values) / 3))
+                M = fields.magnetic(self.values.shape)
                 M.values = self.values + other.values
                 return M
             else:
@@ -561,7 +588,7 @@ class fields(object):
 
             if isinstance(other, type(self)):
                 # always create new magnetic, since otherwise c = a + b changes a as well!
-                M = fields.magnetic(int(np.size(self.values) / 3))
+                M = fields.magnetic(self.values.shape)
                 M.values = self.values - other.values
                 return M
             else:
@@ -581,19 +608,19 @@ class fields(object):
 
             if isinstance(other, float):
                 # create new magnetic, no specific interpretation of float factor
-                M = fields.magnetic(int(np.size(self.values) / 3))
+                M = fields.magnetic(self.values.shape)
                 M.values = self.values * other
                 return M
             else:
                 raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
-    def __init__(self, init=None, vals=(None, None)):
+    def __init__(self, init=None, val=None):
         """
         Initialization routine
 
         Args:
             init: can either be a number or another fields object
-            vals: initial tuple of values for electric and magnetic (default: (None,None))
+            val: initial tuple of values for electric and magnetic (default: (None,None))
         Raises:
             DataError: if init is none of the types above
         """
@@ -603,9 +630,15 @@ class fields(object):
             self.elec = fields.electric(init.elec)
             self.magn = fields.magnetic(init.magn)
         # if init is a number, create fields object and pick the corresponding initial values
-        elif isinstance(init, int):
-            self.elec = fields.electric(init, val=vals[0])
-            self.magn = fields.magnetic(init, val=vals[1])
+        elif isinstance(init, int) or isinstance(init, tuple):
+            if isinstance(val, int) or val is None:
+                self.elec = fields.electric(init, val=val)
+                self.magn = fields.magnetic(init, val=val)
+            elif isinstance(val, tuple) and len(val) == 2:
+                self.elec = fields.electric(init, val=val[0])
+                self.magn = fields.magnetic(init, val=val[1])
+            else:
+                raise DataError('wrong type of val, got %s' % val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -624,7 +657,7 @@ class fields(object):
 
         if isinstance(other, type(self)):
             # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(int(np.size(self.elec.values) / 3))
+            p = fields(self.elec.values.shape)
             p.elec = self.elec + other.elec
             p.magn = self.magn + other.magn
             return p
@@ -645,7 +678,7 @@ class fields(object):
 
         if isinstance(other, type(self)):
             # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(int(np.size(self.elec.values) / 3))
+            p = fields(self.elec.values.shape)
             p.elec = self.elec - other.elec
             p.magn = self.magn - other.magn
             return p
@@ -666,7 +699,7 @@ class fields(object):
 
         if isinstance(other, float):
             # always create new fields, since otherwise c = a - b changes a as well!
-            p = fields(int(np.size(self.elec.values) / 3))
+            p = fields(self.elec.values.shape)
             p.elec = other * self.elec
             p.magn = other * self.magn
             return p

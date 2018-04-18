@@ -46,7 +46,7 @@ class particles_output(hooks):
         self.bar_run.update(L.time)
 
         R = np.linalg.norm(u.pos.values)
-        H = 1 / 2 * np.dot(u.vel.values, u.vel.values) + L.prob.params.a0 / R
+        H = 1 / 2 * np.dot(u.vel.values[:, 0], u.vel.values[:, 0]) + L.prob.params.a0 / R
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='energy', value=H)

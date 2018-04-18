@@ -114,6 +114,8 @@ class sweeper(with_metaclass(abc.ABCMeta)):
                 QDmat[m, 0:m] = self.coll.delta_m[0:m]
         elif qd_type == 'GS':
             QDmat = np.tril(self.coll.Qmat, k=-1)
+        elif qd_type == 'PIC':
+            QDmat = np.zeros(coll.Qmat.shape)
         else:
             raise NotImplementedError('qd_type explicit not implemented')
 
