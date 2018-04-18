@@ -21,7 +21,7 @@ class hamiltonian_output(hooks):
 
     def post_iteration(self, step, level_number):
         """
-        Overwrite standard post step hook
+        Overwrite standard post iteration hook
 
         Args:
             step (pySDC.Step.step): the current step
@@ -41,6 +41,21 @@ class hamiltonian_output(hooks):
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='err_hamiltonian', value=abs(self.ham_init - H))
+
+        return None
+
+    def post_step(self, step, level_number):
+        """
+        Overwrite standard post iteration hook
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        super(hamiltonian_output, self).post_step(step, level_number)
+
+        # some abbreviations
+        L = step.levels[0]
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='position', value=L.uend.pos.values)
