@@ -16,10 +16,15 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 Solar system problem
 --------------------
 
-In this slightly more complex setup we simulate the movement of planets in the outer solar system.
-For this, only six planets are modeled, namely the Sun (which in its mass contains the inner planets), Jupiter, Saturn, Uranus, Neptune and Pluto.
+In this slightly more complex setup we simulate the movement of planets in the solar system.
 The acceleration due to gravitational forces are computed using a simple N^2 solver.
-All this is implemented within the ``OuterSolarSystem`` problem class.
+We can use two different setups:
+
+-  ``OuterSolarSystem`` problem class: only the six outer planets are simulated, namely the Sun (which in its mass contains the inner planets), Jupiter, Saturn, Uranus, Neptune and Pluto.
+-  ``FullSolarSystem`` problem class: all planets are simulated, with earth and moon combined
+
 Coarsening can be done using only the sun for computing the acceleration.
+Note how PFASST works very well for the outer solar system problem, but not so well for the full solar system problem.
+Here, over 15 iterations are required in the mean, while SDC and MLSDC require only about 5 per step.
 
 .. include:: doc_solar_system.rst

@@ -40,13 +40,3 @@ deploy:
     on:
       tags: true
       condition: $TRAVIS_PYTHON_VERSION = "2.7"
-  - provider: pypi
-    edge:
-      branch: jc-pypi
-    user: pancetta
-    password:
-      secure: id5Pg/GL/YdXFmbi5h4xLmmyv/0L8lj9Rlr7lFJBrHrmkHIlu78NgO+LnQsGvhSrZqdDvZwRzFFCKRLiDugp07rzfwM41ROPrcgwnSRuqnzG2sUecNulNGHHoqej/z8nG5Ss8k2+viMqpOjhhZoY3LR0D1nFxRzu3HtHs0MKpRc=
-    server: https://test.pypi.org/legacy/
-    on:
-      tags: false
-      condition: $TRAVIS_PYTHON_VERSION = "2.7"
