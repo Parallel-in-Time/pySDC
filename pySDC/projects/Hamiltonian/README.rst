@@ -35,7 +35,7 @@ Fermi-Pasta-Ulam-Tsingou problem
 This is the famous FPUT problem, one of the first numerical simulation done in physics.
 The basis for this setup can be found `here <http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations>`_ and we implement this in the ``FermiPastaUlamTsingou`` problem class.
 Due to time limitations in the CI environment, we only run the first few steps and not until Tend=10000.
-We refer to the left-most picture below for the full run.
+We refer to the right-most picture below for the full run.
 Note that we run MLSDC here, since PFASST does not seem to converge easily.
 
 .. include:: doc_fput.rst
