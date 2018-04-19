@@ -106,10 +106,10 @@ def run_simulation():
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
     # compute and print statistics
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %2i' % item
-        f.write(out)
-        print(out)
+    # for item in iter_counts:
+    #     out = 'Number of iterations for time %4.2f: %2i' % item
+    #     f.write(out + '\n')
+    #     print(out)
 
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
@@ -140,7 +140,7 @@ def run_simulation():
     dill.dump(stats, f)
     f.close()
 
-    assert os.path.isfile(fname), 'Run for %s did not create stats file' % prob
+    assert os.path.isfile(fname), 'Run for %s did not create stats file'
 
 
 def show_results(cwd=''):
