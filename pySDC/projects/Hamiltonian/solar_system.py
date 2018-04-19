@@ -12,6 +12,7 @@ from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import
 from pySDC.implementations.sweeper_classes.verlet import verlet
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
+from pySDC.implementations.problem_classes.FullSolarSystem import full_solar_system
 from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import particles_to_particles
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -67,6 +68,55 @@ def setup_outer_solar_system():
     return description, controller_params
 
 
+def setup_full_solar_system():
+    """
+    Helper routine for setting up everything for the full solar system problem
+
+    Returns:
+        description (dict): description of the controller
+        controller_params (dict): controller parameters
+    """
+
+    # initialize level parameters
+    level_params = dict()
+    level_params['restol'] = 1E-10
+    level_params['dt'] = 10.0
+
+    # initialize sweeper parameters
+    sweeper_params = dict()
+    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['num_nodes'] = [5, 3]
+    sweeper_params['spread'] = True
+
+    # initialize problem parameters for the Penning trap
+    problem_params = dict()
+    problem_params['sun_only'] = [False, True]
+
+    # initialize step parameters
+    step_params = dict()
+    step_params['maxiter'] = 50
+
+    # initialize controller parameters
+    controller_params = dict()
+    controller_params['hook_class'] = hamiltonian_output  # specialized hook class for more statistics and output
+    controller_params['logger_level'] = 30
+    controller_params['predict'] = False
+
+    # Fill description dictionary for easy hierarchy creation
+    description = dict()
+    description['problem_class'] = full_solar_system
+    description['problem_params'] = problem_params
+    description['dtype_u'] = particles
+    description['dtype_f'] = acceleration
+    description['sweeper_class'] = verlet
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+    description['space_transfer_class'] = particles_to_particles
+
+    return description, controller_params
+
+
 def run_simulation(prob=None):
     """
     Routine to run the simulation of a second order problem
@@ -80,10 +130,23 @@ def run_simulation(prob=None):
         description, controller_params = setup_outer_solar_system()
         # set time parameters
         t0 = 0.0
-        Tend = 20000.0
+        Tend = 10000.0
         num_procs = 100
+        maxmeaniter = 4.0
+    elif prob == 'full_solar_system':
+        description, controller_params = setup_full_solar_system()
+        # set time parameters
+        t0 = 0.0
+        Tend = 1000.0
+        num_procs = 100
+        maxmeaniter = 16.0
     else:
         raise NotImplemented('Problem type not implemented, got %s' % prob)
+
+    f = open(prob + '_out.txt', 'w')
+    out = 'Running ' + prob + ' problem with %s processors...' % num_procs
+    f.write(out + '\n')
+    print(out)
 
     # instantiate the controller
     controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=controller_params,
@@ -103,22 +166,28 @@ def run_simulation(prob=None):
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
     # compute and print statistics
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %2i' % item
-        print(out)
+    # for item in iter_counts:
+    #     out = 'Number of iterations for time %4.2f: %2i' % item
+    #     f.write(out)
+    #     print(out)
 
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    f.write(out + '\n')
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    f.write(out + '\n')
     print(out)
     out = '   Position of max/min number of iterations: %2i -- %2i' % \
           (int(np.argmax(niters)), int(np.argmin(niters)))
+    f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    f.write(out + '\n')
     print(out)
+    f.close()
 
-    assert np.mean(niters) <= 4.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+    assert np.mean(niters) <= maxmeaniter, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
     fname = 'data/' + prob + '.dat'
     f = open(fname, 'wb')
@@ -211,6 +280,9 @@ def show_results(prob=None, cwd=''):
 
 def main():
     prob = 'outer_solar_system'
+    run_simulation(prob)
+    show_results(prob)
+    prob = 'full_solar_system'
     run_simulation(prob)
     show_results(prob)
 
