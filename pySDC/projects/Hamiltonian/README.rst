@@ -28,3 +28,13 @@ Note how PFASST works very well for the outer solar system problem, but not so w
 Here, over 15 iterations are required in the mean, while SDC and MLSDC require only about 5 per step.
 
 .. include:: doc_solar_system.rst
+
+Fermi-Pasta-Ulam-Tsingou problem
+--------------------------------
+
+This is the famous FPUT problem, one of the first numerical simulation done in physics.
+The basis for this setup can be found `here <http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations>`_ and we implement this in the ``FermiPastaUlamTsingou`` problem class.
+Due to time limitations in the CI environment, we only run the first few steps and not until Tend=10000.
+Note that we run MLSDC here, since PFASST does not seem to converge easily.
+
+.. include:: doc_fput.rst

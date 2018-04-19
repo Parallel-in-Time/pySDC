@@ -34,7 +34,7 @@ def setup_fput():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['spread'] = False
 
     # initialize problem parameters for the Penning trap
@@ -78,7 +78,9 @@ def run_simulation():
     description, controller_params = setup_fput()
     # set time parameters
     t0 = 0.0
-    Tend = 5000.0
+    # set this to 10000 to reproduce the picture in
+    # http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
+    Tend = 250.0
     num_procs = 1
 
     f = open('fput_out.txt', 'w')
@@ -126,12 +128,12 @@ def run_simulation():
 
     # get runtime
     timing_run = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
-    out = '... took %s seconds to run this.' % timing_run
+    out = '... took %6.4f seconds to run this.' % timing_run
     f.write(out + '\n')
     print(out)
     f.close()
 
-    # assert np.mean(niters) <= maxmeaniter, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+    assert np.mean(niters) <= 3.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
     fname = 'data/fput.dat'
     f = open(fname, 'wb')
@@ -176,7 +178,7 @@ def show_results(cwd=''):
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
     print(err_ham)
-    # assert err_ham < 7.5E-15, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
+    assert err_ham < 1E-10, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')
@@ -197,7 +199,6 @@ def show_results(cwd=''):
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
     # Rearrange data for easy plotting
-
     for mode in result[0][1].keys():
         time = [item[0] for item in result]
         energy = [item[1][mode] for item in result]
@@ -245,6 +246,7 @@ def show_results(cwd=''):
 def main():
     run_simulation()
     show_results()
+
 
 if __name__ == "__main__":
     main()
