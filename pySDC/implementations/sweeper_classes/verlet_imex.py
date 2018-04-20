@@ -60,7 +60,7 @@ class verlet_imex(sweeper):
 
         # Qx as in the paper
         QxE = np.dot(QE, QT) + 0.5 * QE * QE
-        QxI = np.dot(QE, QT) + 0.25 * QE * QE + 0.25 * QI * QI
+        QxI = np.dot(QE, QT) + 0.5 * QI * QI
 
         QQ = np.zeros(np.shape(self.coll.Qmat))
 

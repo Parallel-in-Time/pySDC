@@ -5,7 +5,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.particles import particles, acceleration
+from pySDC.implementations.datatype_classes.particles import particles
 from pySDC.core.Errors import ParameterError
 
 
@@ -65,17 +65,17 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
         """
         f = self.dtype_f(self.init, val=0)
         f.impl.values = self.A.dot(u.pos.values)
-        f.impl.values[0] = 0.0
-        f.impl.values[-1] = 0.0
         self.fast_acceleration(self.params.npart, self.params.alpha, u.pos.values,
-                               f.expl.values[1:self.params.npart - 1])
+                               f.expl.values[:])
         return f
 
     @staticmethod
     @jit
     def fast_acceleration(N, alpha, pos, accel):
+        accel[0] = alpha * ((pos[1] - pos[0]) ** 2 - pos[0] ** 2)
         for n in range(1, N - 1):
-            accel[n - 1] = alpha * ((pos[n + 1] - pos[n]) ** 2 - (pos[n] - pos[n - 1]) ** 2)
+            accel[n] = alpha * ((pos[n + 1] - pos[n]) ** 2 - (pos[n] - pos[n - 1]) ** 2)
+        accel[-1] = alpha * (pos[-1] ** 2 - (pos[-1] - pos[-2]) ** 2)
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -92,8 +92,6 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
         """
         me = self.dtype_u(rhs)
         me.pos.values = spsolve(sp.eye(self.params.npart, format='csc') - factor * self.A, rhs.pos.values)
-        me.pos.values[0] = 0.0
-        me.pos.values[-1] = 0.0
         return me
 
     def u_exact(self, t):
@@ -110,7 +108,7 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
         me = particles(self.init)
 
         for n in range(self.params.npart):
-            me.pos.values[n] = np.sin(self.params.k * np.pi * n / (self.params.npart - 1))
+            me.pos.values[n] = np.sin(self.params.k * np.pi * (n + 1) / (self.params.npart + 1))
             me.vel.values[n] = 0.0
 
         return me
@@ -118,9 +116,10 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
     @staticmethod
     @jit
     def fast_hamiltonian(N, alpha, pos, vel):
-        ham = 0.0
+        ham = 0.5 * pos[0] ** 2 + alpha / 3.0 * pos[0] ** 3
         for n in range(N - 1):
             ham += 0.5 * vel[n] ** 2 + 0.5 * (pos[n + 1] - pos[n]) ** 2 + alpha / 3.0 * (pos[n + 1] - pos[n]) ** 3
+        ham += 0.5 * vel[-1] ** 2 + 0.5 * pos[-1] ** 2 + alpha / 3.0 * (- pos[-1]) ** 3
         return ham
 
     def eval_hamiltonian(self, u):
@@ -149,14 +148,14 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
 
         for k in self.params.energy_modes:
 
-            Qk = np.sqrt(2.0 / (self.params.npart - 1)) * \
-                sum([u.pos.values[n] * np.sin(np.pi * k * n / (self.params.npart - 1))
+            Qk = np.sqrt(2.0 / (self.params.npart + 1)) * \
+                sum([u.pos.values[n] * np.sin(np.pi * k * (n + 1) / (self.params.npart + 1))
                      for n in range(1, self.params.npart)])
-            Qkdot = np.sqrt(2.0 / (self.params.npart - 1)) * \
-                sum([u.vel.values[n] * np.sin(np.pi * k * n / (self.params.npart - 1))
-                     for n in range(1, self.params.npart)])
+            Qkdot = np.sqrt(2.0 / (self.params.npart + 1)) * \
+                sum([u.vel.values[n] * np.sin(np.pi * k * (n + 1) / (self.params.npart + 1))
+                     for n in range(self.params.npart)])
 
-            omegak2 = 4.0 * np.sin(k * np.pi / (2.0 * (self.params.npart - 1))) ** 2
+            omegak2 = 4.0 * np.sin(k * np.pi / (2.0 * (self.params.npart + 1))) ** 2
             energy[k] = 0.5 * (Qkdot ** 2 + omegak2 * Qk ** 2)
 
         return energy

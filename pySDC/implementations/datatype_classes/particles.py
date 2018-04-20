@@ -7,9 +7,7 @@ from pySDC.core.Errors import DataError
 
 class particles(object):
     """
-    Particle data type for particles in 3 dimensions
-
-    This data type can be used for particles in 3 dimensions with 3 position and 3 velocity values per particle
+    Particle data type for particles in any dimensions
 
     Attributes:
         pos: contains the positions of all particles
@@ -18,10 +16,10 @@ class particles(object):
 
     class position(object):
         """
-        Position data type for particles in 3 dimensions
+        Position data type for particles in any dimensions
 
         Attributes:
-            values (np.ndarray): array with 3 position values per particle (dim. 3*nparts)
+            values (np.ndarray): array with position values
         """
 
         def __init__(self, init=None, val=None):
@@ -117,10 +115,10 @@ class particles(object):
 
     class velocity(object):
         """
-        Velocity data type for particles in 3 dimensions
+        Velocity data type for particles in any dimensions
 
         Attributes:
-            values (np.ndarray): array with 3 velocity values per particle (dim. 3*nparts)
+            values (np.ndarray): array with velocity values
         """
 
         def __init__(self, init=None, val=None):
@@ -221,7 +219,7 @@ class particles(object):
 
         Args:
             init: can either be a number or another particle object
-            val: initial tuple of values for position and velocity (default: (None,None))
+            val: initial tuple of values for position and velocity (default: None)
         Raises:
             DataError: if init is none of the types above
         """
@@ -354,10 +352,10 @@ class particles(object):
 
 class acceleration(object):
     """
-    Acceleration data type for particles in 3 dimensions
+    Acceleration data type for particles in any dimensions
 
     Attributes:
-        values (np.ndarray): array with 3 acceleration values per particle (dim. 3*nparts)
+        values (np.ndarray): array with acceleration values
     """
 
     def __init__(self, init=None, val=None):
@@ -424,14 +422,22 @@ class acceleration(object):
 
 
 class imex_acceleration(object):
+    """
+    IMEX Acceleration data type for particles in any dimensions
 
+    This acceleration data type can hold an implicit and an explicit part
+
+    Attributes:
+        impl (acceleration): acceleration values for the implicit part
+        expl (acceleration): acceleration values for the explicit part
+    """
     def __init__(self, init=None, val=None):
         """
         Initialization routine
 
         Args:
             init: can either be a number or another imex_acceleration object object
-            val: initial tuple of values for both parts of the acceleration (default: (None,None))
+            val: initial tuple of values for both parts of the acceleration
         Raises:
             DataError: if init is none of the types above
         """
@@ -457,9 +463,7 @@ class imex_acceleration(object):
 
 class fields(object):
     """
-    Field data type for 3 dimensions
-
-    This data type can be used for electric and magnetic fields in 3 dimensions
+    Field data type for any dimensions
 
     Attributes:
         elec: contains the electric field
@@ -468,10 +472,10 @@ class fields(object):
 
     class electric(object):
         """
-        Electric field data type in 3 dimensions
+        Electric field data type in any dimensions
 
         Attributes:
-            values (np.ndarray): array with 3 field values per particle (dim. 3*nparts)
+            values (np.ndarray): array with electric values
         """
 
         def __init__(self, init=None, val=None):
@@ -558,10 +562,10 @@ class fields(object):
 
     class magnetic(object):
         """
-        Magnetic field data type in 3 dimensions
+        Magnetic field data type in any dimensions
 
         Attributes:
-            values (np.ndarray): array with 3 field values per particle (dim. 3*nparts)
+            values (np.ndarray): array with magnetic values
         """
 
         def __init__(self, init=None, val=None):
@@ -652,7 +656,7 @@ class fields(object):
 
         Args:
             init: can either be a number or another fields object
-            val: initial tuple of values for electric and magnetic (default: (None,None))
+            val: initial tuple of values for electric and magnetic (default: None)
         Raises:
             DataError: if init is none of the types above
         """

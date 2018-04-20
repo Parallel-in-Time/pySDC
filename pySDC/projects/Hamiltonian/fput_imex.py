@@ -29,24 +29,25 @@ def setup_fput():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 2.5
+    level_params['dt'] = 25.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
     sweeper_params['num_nodes'] = [5]
     sweeper_params['spread'] = False
+    sweeper_params['QI'] = 'IE'
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
-    problem_params['npart'] = 34
+    problem_params['npart'] = 32
     problem_params['alpha'] = 0.25
     problem_params['k'] = 1.0
     problem_params['energy_modes'] = [[1, 2, 3, 4]]
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 10
+    step_params['maxiter'] = 50
 
     # initialize controller parameters
     controller_params = dict()
@@ -80,7 +81,7 @@ def run_simulation():
     t0 = 0.0
     # set this to 10000 to reproduce the picture in
     # http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
-    Tend = 2.5
+    Tend = 50.0
     num_procs = 1
 
     f = open('fput_out.txt', 'w')
