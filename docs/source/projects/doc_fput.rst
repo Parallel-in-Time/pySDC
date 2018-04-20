@@ -12,5 +12,5 @@ Results:
    :scale: 100 %
 .. image:: ../../../data/fput_energy.png
    :scale: 100 %
-.. image:: ../../../data/fput_energy_full.png
+.. image:: ../../../pySDC/projects/Hamiltonian/data/fput_energy_full.png
    :scale: 100 %
