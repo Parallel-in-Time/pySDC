@@ -63,7 +63,7 @@ class fermi_pasta_ulam_tsingou_imex(ptype):
         Returns:
             dtype_f: RHS
         """
-        f = self.dtype_f(self.init, val=(0.0, 0.0))
+        f = self.dtype_f(self.init, val=0)
         f.impl.values = self.A.dot(u.pos.values)
         f.impl.values[0] = 0.0
         f.impl.values[-1] = 0.0

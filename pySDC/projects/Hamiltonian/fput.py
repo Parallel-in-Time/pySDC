@@ -34,7 +34,7 @@ def setup_fput():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['spread'] = False
 
     # initialize problem parameters for the Penning trap
@@ -80,7 +80,7 @@ def run_simulation():
     t0 = 0.0
     # set this to 10000 to reproduce the picture in
     # http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
-    Tend = 2.5
+    Tend = 250.0
     num_procs = 1
 
     f = open('fput_out.txt', 'w')
