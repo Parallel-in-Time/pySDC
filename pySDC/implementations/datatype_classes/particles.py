@@ -423,6 +423,38 @@ class acceleration(object):
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
 
+class imex_acceleration(object):
+
+    def __init__(self, init=None, val=None):
+        """
+        Initialization routine
+
+        Args:
+            init: can either be a number or another imex_acceleration object object
+            val: initial tuple of values for both parts of the acceleration (default: (None,None))
+        Raises:
+            DataError: if init is none of the types above
+        """
+
+        # if init is another imex_acceleration object, do a deepcopy (init by copy)
+        if isinstance(init, type(self)):
+            self.impl = acceleration(init.impl)
+            self.expl = acceleration(init.expl)
+        # if init is a number, create imex_acceleration object and pick the corresponding initial values
+        elif isinstance(init, int) or isinstance(init, tuple):
+            if isinstance(val, int) or val is None:
+                self.impl = acceleration(init, val=val)
+                self.expl = acceleration(init, val=val)
+            elif isinstance(val, tuple) and len(val) == 2:
+                self.impl = acceleration(init, val=val[0])
+                self.expl = acceleration(init, val=val[1])
+            else:
+                raise DataError('wrong type of val, got %s' % val)
+        # something is wrong, if none of the ones above hit
+        else:
+            raise DataError('something went wrong during %s initialization' % type(self))
+
+
 class fields(object):
     """
     Field data type for 3 dimensions

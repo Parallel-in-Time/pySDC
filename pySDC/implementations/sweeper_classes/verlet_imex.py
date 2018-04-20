@@ -5,7 +5,7 @@ from pySDC.core.Sweeper import sweeper
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
-class verlet(sweeper):
+class verlet_imex(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
@@ -14,7 +14,8 @@ class verlet(sweeper):
     Attributes:
         QQ: 0-to-node collocation matrix (second order)
         QT: 0-to-node trapezoidal matrix
-        Qx: 0-to-node Euler half-step for position update
+        QxE: 0-to-node explicit Euler half-step for position update
+        QxI: 0-to-node implicit Euler half-step for position update
         qQ: update rule for final value (if needed)
     """
 
@@ -32,10 +33,10 @@ class verlet(sweeper):
             params['QE'] = 'EE'
 
         # call parent's initialization routine
-        super(verlet, self).__init__(params)
+        super(verlet_imex, self).__init__(params)
 
         # Trapezoidal rule, Qx and Double-Q as in the Boris-paper
-        [self.QT, self.Qx, self.QQ] = self.__get_Qd()
+        [self.QT, self.QxE, self.QxI, self.QQ] = self.__get_Qd()
 
         self.qQ = np.dot(self.coll.weights, self.coll.Qmat[1:, 1:])
 
@@ -45,7 +46,8 @@ class verlet(sweeper):
 
         Returns:
             QT: 0-to-node trapezoidal matrix
-            Qx: 0-to-node Euler half-step for position update
+            QxE: 0-to-node explicit Euler half-step for position update
+            QxI: 0-to-node implicit Euler half-step for position update
             QQ: 0-to-node collocation matrix (second order)
         """
 
@@ -57,7 +59,8 @@ class verlet(sweeper):
         QT = 0.5 * (QI + QE)
 
         # Qx as in the paper
-        Qx = np.dot(QE, QT) + 0.5 * QE * QE
+        QxE = np.dot(QE, QT) + 0.5 * QE * QE
+        QxI = np.dot(QE, QT) + 0.25 * QE * QE + 0.25 * QI * QI
 
         QQ = np.zeros(np.shape(self.coll.Qmat))
 
@@ -76,7 +79,7 @@ class verlet(sweeper):
 
             QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
-        return [QT, Qx, QQ]
+        return [QT, QxE, QxI, QQ]
 
     def update_nodes(self):
         """
@@ -103,8 +106,9 @@ class verlet(sweeper):
 
             # get -QdF(u^k)_m
             for j in range(M + 1):
-                integral[m].pos -= L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])
-                integral[m].vel -= L.dt * self.QT[m + 1, j] * L.f[j]
+                integral[m].pos -= L.dt * (L.dt * self.QxE[m + 1, j] * L.f[j].expl +
+                                           L.dt * self.QxI[m + 1, j] * L.f[j].impl)
+                integral[m].vel -= L.dt * self.QT[m + 1, j] * (L.f[j].expl + L.f[j].impl)
 
             # add initial value
             integral[m].pos += L.u[0].pos
@@ -116,16 +120,19 @@ class verlet(sweeper):
         # do the sweep
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
-            L.u[m + 1] = P.dtype_u(integral[m])
+            rhs = P.dtype_u(integral[m])
             for j in range(m + 1):
                 # add QxF(u^{k+1})
-                L.u[m + 1].pos += L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])
-                L.u[m + 1].vel += L.dt * self.QT[m + 1, j] * L.f[j]
+                rhs.pos += L.dt * (L.dt * self.QxE[m + 1, j] * L.f[j].expl + L.dt * self.QxI[m + 1, j] * L.f[j].impl)
+                rhs.vel += L.dt * self.QT[m + 1, j] * (L.f[j].expl + L.f[j].impl)
+
+            L.u[m + 1] = P.solve_system(rhs, L.dt * L.dt * self.QxI[m + 1, m + 1], L.u[m + 1],
+                                        L.time + L.dt * self.coll.nodes[m])
 
             # get RHS with new positions
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
-            L.u[m + 1].vel += L.dt * self.QT[m + 1, m + 1] * L.f[m + 1]
+            L.u[m + 1].vel += L.dt * self.QT[m + 1, m + 1] * (L.f[m + 1].expl + L.f[m + 1].impl)
 
         # indicate presence of new values at this level
         L.status.updated = True
@@ -150,8 +157,9 @@ class verlet(sweeper):
 
             # integrate RHS over all collocation nodes, RHS is here only f(x)!
             for j in range(1, self.coll.num_nodes + 1):
-                p[-1].pos += L.dt * (L.dt * self.QQ[m, j] * L.f[j]) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
-                p[-1].vel += L.dt * self.coll.Qmat[m, j] * L.f[j]
+                p[-1].pos += L.dt * (L.dt * self.QQ[m, j] * (L.f[j].impl + L.f[j].expl)) + \
+                    L.dt * self.coll.Qmat[m, j] * L.u[0].vel
+                p[-1].vel += L.dt * self.coll.Qmat[m, j] * (L.f[j].impl + L.f[j].expl)
                 # we need to set mass and charge here, too, since the code uses the integral to create new particles
                 p[-1].m = L.u[0].m
                 p[-1].q = L.u[0].q
@@ -179,8 +187,9 @@ class verlet(sweeper):
         else:
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):
-                L.uend.pos += L.dt * (L.dt * self.qQ[m] * L.f[m + 1]) + L.dt * self.coll.weights[m] * L.u[0].vel
-                L.uend.vel += L.dt * self.coll.weights[m] * L.f[m + 1]
+                L.uend.pos += L.dt * (L.dt * self.qQ[m] * (L.f[m + 1].impl + L.f[m + 1].expl)) + \
+                    L.dt * self.coll.weights[m] * L.u[0].vel
+                L.uend.vel += L.dt * self.coll.weights[m] * (L.f[m + 1].impl + L.f[m + 1].expl)
                 # remember to set mass and charge here, too
                 L.uend.m = L.u[0].m
                 L.uend.q = L.u[0].q
