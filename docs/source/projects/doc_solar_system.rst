@@ -4,7 +4,16 @@ Full code: `pySDC/projects/Hamiltonian/solar_system.py <https://github.com/Paral
 
 Results:
 
+.. literalinclude:: ../../../outer_solar_system_out.txt
+
 .. image:: ../../../data/outer_solar_system_hamiltonian.png
-   :scale: 50 %
+   :scale: 100 %
 .. image:: ../../../data/outer_solar_system_positions.png
-   :scale: 50 %
+   :scale: 100 %
+
+.. literalinclude:: ../../../full_solar_system_out.txt
+
+.. image:: ../../../data/full_solar_system_hamiltonian.png
+   :scale: 100 %
+.. image:: ../../../data/full_solar_system_positions.png
+   :scale: 100 %
