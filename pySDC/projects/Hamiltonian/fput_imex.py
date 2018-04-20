@@ -29,7 +29,7 @@ def setup_fput():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 25.0
+    level_params['dt'] = 10.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -81,7 +81,7 @@ def run_simulation():
     t0 = 0.0
     # set this to 10000 to reproduce the picture in
     # http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
-    Tend = 50.0
+    Tend = 100.0
     num_procs = 1
 
     f = open('fput_out.txt', 'w')
