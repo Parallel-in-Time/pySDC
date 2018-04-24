@@ -11,6 +11,7 @@
 import sys
 
 from mpi4py import MPI
+import time
 
 
 class Poisson2D(object):
@@ -53,6 +54,9 @@ class Poisson2D(object):
 
 
 def main():
+    import petsc4py
+    from petsc4py import PETSc
+
     # set MPI communicator
     comm = MPI.COMM_WORLD
 
@@ -80,33 +84,33 @@ def main():
     print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
                                                                         time_rank, time_size))
 
-    import petsc4py
-    petsc4py.init(comm=space_comm)
-    from petsc4py import PETSc
-
     OptDB = PETSc.Options()
 
     n = OptDB.getInt('n', 128)
     nx = OptDB.getInt('nx', n)
     ny = OptDB.getInt('ny', n)
 
-    da = PETSc.DMDA().create([nx, ny], stencil_width=1)
+    t0 = time.time()
+    da = PETSc.DMDA().create([nx, ny], stencil_width=1, comm=space_comm)
     pde = Poisson2D(da)
 
     x = da.createGlobalVec()
     b = da.createGlobalVec()
     # A = da.createMat('python')
     A = PETSc.Mat().createPython(
-        [x.getSizes(), b.getSizes()], comm=da.comm)
+        [x.getSizes(), b.getSizes()], comm=space_comm)
     A.setPythonContext(pde)
     A.setUp()
+    # print(da.comm, space_comm)
 
-    ksp = PETSc.KSP().create()
+    ksp = PETSc.KSP().create(comm=space_comm)
     ksp.setOperators(A)
     ksp.setType('cg')
     pc = ksp.getPC()
     pc.setType('none')
     ksp.setFromOptions()
+
+    t1 = time.time()
 
     pde.formRHS(b)
     ksp.solve(b, x)
@@ -114,7 +118,9 @@ def main():
     u = da.createNaturalVec()
     da.globalToNatural(x, u)
 
-    n = 10
+    t2 = time.time()
+
+    n = 8
 
     rank = PETSc.COMM_WORLD.Get_rank()
     size = PETSc.COMM_WORLD.Get_size()
@@ -129,6 +135,8 @@ def main():
     print('Performing various vector operations on x =', x.getArray())
 
     print('Sum of elements of x =', x.sum())
+
+    print(t1-t0, t2-t1, t2-t0)
 
 if __name__ == "__main__":
     main()
