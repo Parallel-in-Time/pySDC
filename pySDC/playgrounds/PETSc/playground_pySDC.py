@@ -76,7 +76,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     # controller_params['predict'] = False
     # controller_params['hook_class'] = error_output
 
@@ -95,7 +95,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 0.2
 
     # instantiate controller
     controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
@@ -133,6 +133,11 @@ def main():
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
+
+    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+
+    print(timing)
+
 
 if __name__ == "__main__":
     main()

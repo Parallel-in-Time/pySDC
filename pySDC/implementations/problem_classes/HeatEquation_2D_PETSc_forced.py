@@ -73,7 +73,6 @@ class heat2d_petsc_forced(ptype):
         # TODO: fill with data
         self.ksp.setTolerances(rtol=1E-10, atol=1E-10, divtol=None, max_it=None)
 
-
     def __get_A(self, N, nu, dx, dy, comm):
         """
         Helper function to assemble PETSc matrix A
@@ -218,6 +217,6 @@ class heat2d_petsc_forced(ptype):
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j] = np.sin(np.pi * self.params.freq * self.xvalues[i]) * \
-                           np.sin(np.pi * self.params.freq * self.yvalues[j]) * np.cos(t)
+                    np.sin(np.pi * self.params.freq * self.yvalues[j]) * np.cos(t)
 
         return me
