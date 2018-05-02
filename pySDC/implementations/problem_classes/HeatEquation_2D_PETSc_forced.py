@@ -66,12 +66,11 @@ class heat2d_petsc_forced(ptype):
         self.ksp.create(comm=self.params.comm)
         # use conjugate gradients
         self.ksp.setType('cg')
-        # and incomplete Cholesky
-        self.ksp.getPC().setType('icc')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         # TODO: fill with data
         self.ksp.setTolerances(rtol=1E-10, atol=1E-10, divtol=None, max_it=None)
+        # TODO get rid of communicator for nonMPI controllers (purge, then restore)
 
     def __get_A(self, N, nu, dx, dy, comm):
         """
@@ -87,11 +86,9 @@ class heat2d_petsc_forced(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        A = PETSc.Mat()
-        A.create(comm=comm)
-        A.setSizes([N[0] * N[1], N[0] * N[1]])
+        A = self.init.createMatrix()
         A.setType('aij')  # sparse
-        A.setPreallocationNNZ(5)
+        # A.setPreallocationNNZ(5)
 
         diagv = nu * (-2.0 / dx ** 2 - 2.0 / dy ** 2)
         offdx = nu * (1.0 / dx ** 2)
@@ -137,17 +134,13 @@ class heat2d_petsc_forced(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        A = PETSc.Mat()
-        A.create(comm=comm)
-        A.setSizes([N[0] * N[1], N[0] * N[1]])
+        A = self.init.createMatrix()
         A.setType('aij')  # sparse
-        A.setPreallocationNNZ(5)
-
-        diagv = 1.0
+        # A.setPreallocationNNZ(5)
 
         Istart, Iend = A.getOwnershipRange()
         for I in range(Istart, Iend):
-            A[I, I] = diagv
+            A[I, I] = 1.0
 
         # communicate off-processor values
         # and setup internal data structures
@@ -213,6 +206,8 @@ class heat2d_petsc_forced(ptype):
         """
 
         me = self.dtype_u(self.init)
+        # tmp, _ = self.A.getVecs()
+        # me = self.dtype_u(tmp)
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):

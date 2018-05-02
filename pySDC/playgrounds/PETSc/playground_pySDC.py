@@ -112,6 +112,8 @@ def main():
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
+    print(err)
+
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
 
