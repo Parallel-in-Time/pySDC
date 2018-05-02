@@ -47,8 +47,8 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1.0
-    level_params['nsweeps'] = [3]
+    level_params['dt'] = 0.1
+    level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -60,7 +60,7 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
-    problem_params['freq'] = 4  # frequency for the test value
+    problem_params['freq'] = 2  # frequency for the test value
     problem_params['nvars'] = [(101, 101)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
 

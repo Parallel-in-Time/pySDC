@@ -71,7 +71,7 @@ class heat2d_petsc_forced(ptype):
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         # TODO: fill with data
-        # self.ksp.setTolerances(self, rtol=None, atol=None, divtol=None, max_it=None)
+        self.ksp.setTolerances(rtol=1E-10, atol=1E-10, divtol=None, max_it=None)
 
 
     def __get_A(self, N, nu, dx, dy, comm):
@@ -94,9 +94,9 @@ class heat2d_petsc_forced(ptype):
         A.setType('aij')  # sparse
         A.setPreallocationNNZ(5)
 
-        diagv = nu * (2.0 / dx ** 2 + 2.0 / dy ** 2)
-        offdx = nu * (-1.0 / dx ** 2)
-        offdy = nu * (-1.0 / dy ** 2)
+        diagv = nu * (-2.0 / dx ** 2 - 2.0 / dy ** 2)
+        offdx = nu * (1.0 / dx ** 2)
+        offdy = nu * (1.0 / dy ** 2)
 
         Istart, Iend = A.getOwnershipRange()
         for I in range(Istart, Iend):
