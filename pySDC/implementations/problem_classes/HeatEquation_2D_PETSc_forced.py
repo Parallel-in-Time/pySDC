@@ -41,8 +41,6 @@ class heat2d_petsc_forced(ptype):
                 raise ParameterError(msg)
 
         # make sure parameters have the correct form
-        if problem_params['freq'] % 2 != 0:
-            raise ProblemError('need even number of frequencies due to periodic BCs')
         if len(problem_params['nvars']) != 2:
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
 
@@ -51,25 +49,23 @@ class heat2d_petsc_forced(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heat2d_petsc_forced, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
-        # compute dx (equal in both dimensions) and get discretization matrix A
-        # TODO: dx correct?
-        self.dx = 1.0 / (self.params.nvars[0] - 1)
-        self.dy = 1.0 / (self.params.nvars[1] - 1)
-        self.xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
-        self.yvalues = np.array([i * self.dy for i in range(self.params.nvars[1])])
+        # compute dx, dy and get local ranges
+        self.dx = 1.0 / (self.params.nvars[0] + 1)
+        self.dy = 1.0 / (self.params.nvars[1] + 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
+        # compute discretization matrix A and identity
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.dy, self.params.comm)
         self.Id = self.__get_Id(self.params.nvars, self.params.nu, self.dx, self.dy, self.params.comm)
 
+        # setup solver
         self.ksp = PETSc.KSP()
         self.ksp.create(comm=self.params.comm)
-        # use conjugate gradients
         self.ksp.setType('cg')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         # TODO: fill with data
-        self.ksp.setTolerances(rtol=1E-10, atol=1E-10, divtol=None, max_it=None)
+        self.ksp.setTolerances(rtol=1E-12, atol=1E-12, divtol=None, max_it=None)
         # TODO get rid of communicator for nonMPI controllers (purge, then restore)
 
     def __get_A(self, N, nu, dx, dy, comm):
@@ -88,7 +84,7 @@ class heat2d_petsc_forced(ptype):
 
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
-        # A.setPreallocationNNZ(5)
+        A.setPreallocationNNZ(5)
 
         diagv = nu * (-2.0 / dx ** 2 - 2.0 / dy ** 2)
         offdx = nu * (1.0 / dx ** 2)
@@ -168,8 +164,8 @@ class heat2d_petsc_forced(ptype):
 
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                fa[i, j] = -np.sin(np.pi * self.params.freq * self.xvalues[i]) * \
-                    np.sin(np.pi * self.params.freq * self.yvalues[j]) * \
+                fa[i, j] = -np.sin(np.pi * self.params.freq * (i+1) * self.dx) * \
+                    np.sin(np.pi * self.params.freq * (j+1) * self.dy) * \
                     (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
 
         return f
@@ -206,12 +202,10 @@ class heat2d_petsc_forced(ptype):
         """
 
         me = self.dtype_u(self.init)
-        # tmp, _ = self.A.getVecs()
-        # me = self.dtype_u(tmp)
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j] = np.sin(np.pi * self.params.freq * self.xvalues[i]) * \
-                    np.sin(np.pi * self.params.freq * self.yvalues[j]) * np.cos(t)
+                xa[i, j] = np.sin(np.pi * self.params.freq * (i+1) * self.dx) * \
+                    np.sin(np.pi * self.params.freq * (j+1) * self.dy) * np.cos(t)
 
         return me

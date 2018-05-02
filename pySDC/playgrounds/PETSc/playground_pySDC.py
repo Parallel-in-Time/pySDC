@@ -47,7 +47,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.1
+    level_params['dt'] = 0.2
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -59,9 +59,9 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(101, 101)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(128, 128)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
 
     # initialize step parameters
@@ -76,7 +76,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
     # controller_params['predict'] = False
     # controller_params['hook_class'] = error_output
 
