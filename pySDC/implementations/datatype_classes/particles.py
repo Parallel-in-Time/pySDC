@@ -324,6 +324,55 @@ class particles(object):
         absvel = abs(self.vel)
         return np.amax((abspos, absvel))
 
+    def send(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (blocking)
+
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            None
+        """
+
+        comm.send(self, dest=dest, tag=tag)
+        return None
+
+    def isend(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (non-blocking)
+
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            request handle
+        """
+        return comm.isend(self, dest=dest, tag=tag)
+
+    def recv(self, source=None, tag=None, comm=None):
+        """
+        Routine for receiving in time
+
+        Args:
+            source (int): source rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            None
+        """
+        part = comm.recv(source=source, tag=tag)
+        self.pos = cp.deepcopy(part.pos)
+        self.vel = cp.deepcopy(part.vel)
+        self.m = cp.deepcopy(part.m)
+        self.q = cp.deepcopy(part.q)
+        return None
+
 
 class acceleration(object):
     """

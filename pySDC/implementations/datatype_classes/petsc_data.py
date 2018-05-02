@@ -2,6 +2,7 @@ from pySDC.core.Errors import DataError
 
 from petsc4py import PETSc
 
+
 class petsc_data(object):
     """
     Wrapper for PETSc Vectors
@@ -158,4 +159,3 @@ class petsc_data(object):
         """
         self.values.setArray(comm.recv(source=source, tag=tag))
         return None
-
