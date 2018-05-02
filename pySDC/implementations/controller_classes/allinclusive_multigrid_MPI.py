@@ -94,7 +94,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # broadcast uend, set new times and fine active processes
             tend = comm_active.bcast(time, root=num_procs - 1)
-            uend = comm_active.bcast(self.S.levels[0].uend, root=num_procs - 1)
+            uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
             all_dt = comm_active.allgather(self.S.dt)
             time = tend + sum(all_dt[0:rank])
             active = time < Tend - 10 * np.finfo(float).eps

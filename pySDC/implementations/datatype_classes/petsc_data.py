@@ -160,6 +160,22 @@ class petsc_data(object):
         self.values.setArray(comm.recv(source=source, tag=tag))
         return None
 
+    def bcast(self, root=None, comm=None):
+        """
+        Routine for broadcasting values
+
+        Args:
+            root (int): process with value to broadcast
+            comm: communicator
+
+        Returns:
+            broadcasted values
+        """
+
+        me = petsc_data(self)
+        me.values.setArray(comm.bcast(self.values.getArray(), root=root))
+        return me
+
 
 class rhs_imex_petsc_data(object):
     """

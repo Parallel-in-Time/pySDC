@@ -173,6 +173,19 @@ class mesh(object):
         self.values = comm.recv(source=source, tag=tag)
         return None
 
+    def bcast(self, root=None, comm=None):
+        """
+        Routine for broadcasting values
+
+        Args:
+            root (int): process with value to broadcast
+            comm: communicator
+
+        Returns:
+            broadcasted values
+        """
+        return comm.bcast(self, root=root)
+
 
 class rhs_imex_mesh(object):
     """
