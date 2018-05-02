@@ -150,36 +150,6 @@ class allinclusive_multigrid_MPI(controller):
             lvl.status.time = time
             lvl.status.sweep = 1
 
-    @staticmethod
-    def recv(target, source, tag, comm):
-        """
-        Receive function
-
-        Args:
-            target: process/level which will receive the values
-            source: process/level which initiated the send
-            tag: identifier to check if this message is really for me
-            comm: communicator
-        """
-        # do a blocking receive and re-compute f(u0)
-        target.u[0] = comm.recv(source=source, tag=tag)
-        target.f[0] = target.prob.eval_f(target.u[0], target.time)
-
-    @staticmethod
-    def send(source, target, tag, comm):
-        """
-        Send function
-
-        Args:
-            source: process/level which has the new values
-            target: process/level which will receive the values
-            tag: identifier for this message
-            comm: communicator
-        """
-        # sending here means computing uend ("one-sided communication")
-        source.sweep.compute_end_point()
-        comm.send(source.uend, dest=target, tag=tag)
-
     def predictor(self, comm):
         """
         Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
@@ -198,16 +168,17 @@ class allinclusive_multigrid_MPI(controller):
                 self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    self.S.status.iter, p))
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep with new values
             self.S.levels[-1].sweep.update_nodes()
+            self.S.levels[-1].sweep.compute_end_point()
 
             if not self.S.status.last:
                 self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    self.S.status.iter, p))
-                self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
+                self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
         # interpolate back to finest level
         for l in range(len(self.S.levels) - 1, 0, -1):
@@ -263,13 +234,13 @@ class allinclusive_multigrid_MPI(controller):
                 self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    0, self.S.status.iter))
-                req_send = comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=self.S.status.iter)
+                req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.first and self.params.fine_comm:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    0, self.S.status.iter))
-                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.last and self.params.fine_comm:
                 req_send.wait()
@@ -317,13 +288,13 @@ class allinclusive_multigrid_MPI(controller):
                     self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        0, self.S.status.iter))
-                    req_send = comm.isend(self.S.levels[0].uend, dest=self.S.next, tag=self.S.status.iter)
+                    req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.first and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        0, self.S.status.iter))
-                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.last and self.params.fine_comm:
                     req_send.wait()
@@ -356,13 +327,13 @@ class allinclusive_multigrid_MPI(controller):
                         self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                            l, self.S.status.iter))
-                        req_send = comm.isend(self.S.levels[l].uend, dest=self.S.next, tag=self.S.status.iter)
+                        req_send = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
                     if not self.S.status.first and self.params.fine_comm:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                            l, self.S.status.iter))
-                        self.recv(target=self.S.levels[l], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                        self.S.levels[l].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                     if not self.S.status.last and self.params.fine_comm:
                         req_send.wait()
@@ -385,7 +356,7 @@ class allinclusive_multigrid_MPI(controller):
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    len(self.S.levels) - 1, self.S.status.iter))
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep
             self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
@@ -402,7 +373,7 @@ class allinclusive_multigrid_MPI(controller):
                 self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    len(self.S.levels) - 1, self.S.status.iter))
-                self.send(source=self.S.levels[-1], target=self.S.next, tag=self.S.status.iter, comm=comm)
+                self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
             # update stage
             self.S.status.stage = 'IT_DOWN'
@@ -423,13 +394,13 @@ class allinclusive_multigrid_MPI(controller):
                     self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        l - 1, self.S.status.iter))
-                    req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
+                    req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.first and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        l - 1, self.S.status.iter))
-                    self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    self.S.levels[l - 1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.last and self.params.fine_comm:
                     req_send.wait()
@@ -447,14 +418,14 @@ class allinclusive_multigrid_MPI(controller):
                             self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                                l - 1, self.S.status.iter))
-                            req_send = comm.isend(self.S.levels[l - 1].uend, dest=self.S.next, tag=self.S.status.iter)
+                            req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter,
+                                                                       comm=comm)
 
                         if not self.S.status.first and self.params.fine_comm:
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                                l - 1, self.S.status.iter))
-                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
-                                      comm=comm)
+                            self.S.levels[l - 1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                         if not self.S.status.last and self.params.fine_comm:
                             req_send.wait()
