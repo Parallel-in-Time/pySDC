@@ -86,7 +86,7 @@ def main():
 
     OptDB = PETSc.Options()
 
-    n = OptDB.getInt('n', 128)
+    n = OptDB.getInt('n', 16)
     nx = OptDB.getInt('nx', n)
     ny = OptDB.getInt('ny', n)
 
