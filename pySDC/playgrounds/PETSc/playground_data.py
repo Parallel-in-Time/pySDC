@@ -16,45 +16,6 @@ import numpy as np
 from matplotlib import pylab
 
 
-class Poisson2D(object):
-
-    def __init__(self, da):
-        assert da.getDim() == 2
-        self.da = da
-        self.localX = da.createLocalVec()
-
-    def formRHS(self, B):
-        b = self.da.getVecArray(B)
-        mx, my = self.da.getSizes()
-        hx, hy = [1.0 / m for m in [mx, my]]
-        (xs, xe), (ys, ye) = self.da.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                b[i, j] = 1 * hx * hy
-
-    def mult(self, mat, X, Y):
-        #
-        self.da.globalToLocal(X, self.localX)
-        x = self.da.getVecArray(self.localX)
-        y = self.da.getVecArray(Y)
-        #
-        mx, my = self.da.getSizes()
-        hx, hy = [1.0 / m for m in [mx, my]]
-        (xs, xe), (ys, ye) = self.da.getRanges()
-
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                u = x[i, j]  # center
-                u_e = u_w = u_n = u_s = 0
-                if i > 0:    u_w = x[i - 1, j]  # west
-                if i < mx - 1: u_e = x[i + 1, j]  # east
-                if j > 0:    u_s = x[i, j - 1]  # south
-                if j < my - 1: u_n = x[i, j + 1]  # north
-                u_xx = (-u_e + 2 * u - u_w) * hy / hx
-                u_yy = (-u_n + 2 * u - u_s) * hx / hy
-                y[i, j] = u_xx + u_yy
-
-
 def main():
     import petsc4py
     from petsc4py import PETSc
@@ -78,9 +39,15 @@ def main():
     for i in range(xs, xe):
         for j in range(ys, ye):
             ya[i, j] = np.sin(2 * np.pi * (i + 1) / (n + 1)) * np.sin(2 * np.pi * (j + 1) / (n + 1))
-    y = 0.1*y
+    y = 0.1*y + y
     print('y=', y.getArray())
     print((x-y).norm(PETSc.NormType.NORM_INFINITY))
+
+    z = y.copy()
+    print('z=', z.getArray())
+    ya = da.getVecArray(y)
+    ya[0,0] = 10.0
+    print(y.getArray()[0], z.getArray()[0])
 
     # y = da.createLocalVec()
     # da.globalToLocal(x, y)
