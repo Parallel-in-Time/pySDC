@@ -60,6 +60,19 @@ class heat2d_petsc_forced(ptype):
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.dy, self.params.comm)
+        self.Id = self.__get_Id(self.params.nvars, self.params.nu, self.dx, self.dy, self.params.comm)
+
+        self.ksp = PETSc.KSP()
+        self.ksp.create(comm=self.params.comm)
+        # use conjugate gradients
+        self.ksp.setType('cg')
+        # and incomplete Cholesky
+        self.ksp.getPC().setType('icc')
+        self.ksp.setInitialGuessNonzero(True)
+        self.ksp.setFromOptions()
+        # TODO: fill with data
+        # self.ksp.setTolerances(self, rtol=None, atol=None, divtol=None, max_it=None)
+
 
     def __get_A(self, N, nu, dx, dy, comm):
         """
@@ -111,6 +124,40 @@ class heat2d_petsc_forced(ptype):
 
         return A
 
+    def __get_Id(self, N, nu, dx, dy, comm):
+        """
+        Helper function to assemble PETSc matrix A
+
+        Args:
+            N (list): number of dofs
+            nu (float): diffusion coefficient
+            dx (float): distance between two spatial nodes in x direction
+            dx (float): distance between two spatial nodes in y direction
+
+        Returns:
+            scipy.sparse.csc_matrix: matrix A in CSC format
+        """
+
+        A = PETSc.Mat()
+        A.create(comm=comm)
+        A.setSizes([N[0] * N[1], N[0] * N[1]])
+        A.setType('aij')  # sparse
+        A.setPreallocationNNZ(5)
+
+        diagv = 1.0
+
+        Istart, Iend = A.getOwnershipRange()
+        for I in range(Istart, Iend):
+            A[I, I] = diagv
+
+        # communicate off-processor values
+        # and setup internal data structures
+        # for performing parallel operations
+        A.assemblyBegin()
+        A.assemblyEnd()
+
+        return A
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -148,9 +195,11 @@ class heat2d_petsc_forced(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-        me = self.dtype_u(self.init)
-        L = splu(sp.eye(self.params.nvars, format='csc') - factor * self.A)
-        me.values = L.solve(rhs.values)
+
+        me = self.dtype_u(u0)
+        self.ksp.setOperators(self.Id - factor * self.A)
+        self.ksp.solve(rhs.values, me.values)
+
         return me
 
     def u_exact(self, t):
