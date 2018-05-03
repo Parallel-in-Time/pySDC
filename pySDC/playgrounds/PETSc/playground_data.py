@@ -1,81 +1,102 @@
-# Summary
-#     Creating and using vectors and basic vector operations in PETSc.
-#
-# Description
-#     Vectors are a basic mathematical building block.
-#
-# For a complete list of vector operations, consult the PETSc user manual.
-# Also look at the petsc4py/src/PETSc/Vec.pyx file for petsc4py implementation
-# details.
 
-import sys
-
-from mpi4py import MPI
-import time
 import numpy as np
-from matplotlib import pylab
+from petsc4py import PETSc
 
 
 def main():
-    import petsc4py
-    from petsc4py import PETSc
+    # import petsc4py
 
-    n = 7
-    da = PETSc.DMDA().create([n, n], stencil_width=1)
+
+    n = 4
+    dx = 1.0/(n + 1)
+    dy = dx
+    da = PETSc.DMDA().create([n, n], stencil_width=2)
+
+    rank = PETSc.COMM_WORLD.getRank()
 
     x = da.createGlobalVec()
     xa = da.getVecArray(x)
     (xs, xe), (ys, ye) = da.getRanges()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j] = np.sin(2 * np.pi * (i + 1) / (n + 1)) * np.sin(2 * np.pi * (j + 1) / (n + 1))
-    print('x=', x.getArray())
-    print('x:', x.getSizes(), da.getRanges())
-    print()
+            xa[i, j] = np.sin(2 * np.pi * (i + 1) * dx) * np.sin(2 * np.pi * (j + 1) * dy)
+    print('x=', rank, x.getArray())
+    # print('x:', x.getSizes(), da.getRanges())
+    # print()
 
     y = da.createGlobalVec()
     ya = da.getVecArray(y)
     (xs, xe), (ys, ye) = da.getRanges()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            ya[i, j] = np.sin(2 * np.pi * (i + 1) / (n + 1)) * np.sin(2 * np.pi * (j + 1) / (n + 1))
-    y = 0.1*y + y
-    print('y=', y.getArray())
-    print((x-y).norm(PETSc.NormType.NORM_INFINITY))
+            ya[i, j] = -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i + 1) * dx) * np.sin(2 * np.pi * (j + 1) * dy)
 
-    z = y.copy()
-    print('z=', z.getArray())
-    ya = da.getVecArray(y)
-    ya[0,0] = 10.0
-    print(y.getArray()[0], z.getArray()[0])
+    z = da.createGlobalVec()
+    za = da.getVecArray(z)
+    (xs, xe), (ys, ye) = da.getRanges()
+    for i in range(xs, xe):
+        for j in range(ys, ye):
+            za[i, j] = 4 * (2.0 * np.pi) ** 4 * np.sin(2 * np.pi * (i + 1) * dx) * np.sin(2 * np.pi * (j + 1) * dy)
 
-    # y = da.createLocalVec()
-    # da.globalToLocal(x, y)
-    # print('y=', y.getArray())
-    # print('y:', y.getSizes())
 
-    # pylab.imshow(x.getArray().reshape((ye-ys,xe-xs)))
-    # pylab.show()
+    # z = y.copy()
+    # print('z=', z.getArray())
+    # ya = da.getVecArray(y)
+    # ya[0,0] = 10.0
+    # print(y.getArray()[0], z.getArray()[0])
 
-    # t2 = time.time()
-    #
-    # n = 8
-    #
-    # rank = PETSc.COMM_WORLD.Get_rank()
-    # size = PETSc.COMM_WORLD.Get_size()
-    #
-    # print('Hello World! From process {rank} out of {size} process(es).'.format(rank=rank, size=size))
-    #
-    # x = PETSc.Vec().createSeq(n)  # Faster way to create a sequential vector.
-    #
-    # x.setValues(range(n), range(n))  # x = [0 1 ... 9]
-    # x.shift(1)  # x = x + 1 (add 1 to all elements in x)
-    #
-    # print('Performing various vector operations on x =', x.getArray())
-    #
-    # print('Sum of elements of x =', x.sum())
-    #
-    # print(t1-t0, t2-t1, t2-t0)
+    A = da.createMatrix()
+    A.setType('aij')  # sparse
+    A.setFromOptions()
+    A.setPreallocationNNZ((5,5))
+
+    diagv = -2.0 / dx ** 2 - 2.0 / dy ** 2
+    offdx = (1.0 / dx ** 2)
+    offdy = (1.0 / dy ** 2)
+
+    Istart, Iend = A.getOwnershipRange()
+    for I in range(Istart, Iend):
+        A[I, I] = diagv
+        i = I // n  # map row number to
+        j = I - i * n  # grid coordinates
+        if i > 0:
+            J = I - n
+            A[I, J] = offdx
+        if i < n - 1:
+            J = I + n
+            A[I, J] = offdx
+        if j > 0:
+            J = I - 1
+            A[I, J] = offdy
+        if j < n - 1:
+            J = I + 1
+            A[I, J] = offdy
+
+    # communicate off-processor values
+    # and setup internal data structures
+    # for performing parallel operations
+    A.assemblyBegin()
+    A.assemblyEnd()
+
+    # (xs, xe), (ys, ye) = da.getRanges()
+    # print(A.getValues(range(n*n), range(n*n)))
+
+    res = da.createGlobalVec()
+    u = da.createNaturalVec()
+    da.globalToNatural(x, u)
+    A.mult(u, res)
+    print('1st turn', rank, res.getArray())
+    da.globalToNatural(res, u)
+    print((u - y).norm(PETSc.NormType.NORM_INFINITY))
+
+    res1 = da.createGlobalVec()
+    u1 = da.createNaturalVec()
+    da.globalToNatural(u, u1)
+    A.mult(u1, res1)
+    print('2nd turn', rank, res1.getArray())
+    da.globalToNatural(res1, u1)
+    print((u1 - z).norm(PETSc.NormType.NORM_INFINITY))
+
 
 if __name__ == "__main__":
     main()

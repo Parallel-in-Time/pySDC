@@ -34,23 +34,24 @@ class Poisson2D(object):
         self.da = da
         self.localX  = da.createLocalVec()
 
-    def formRHS(self, B, val):
-        b = self.da.getVecArray(B)
-        mx, my = self.da.getSizes()
-        hx, hy = [1.0 / (m + 1) for m in [mx, my]]
-        (xs, xe), (ys, ye) = self.da.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                # b[i, j] = val*1*hx*hy
-                b[i, j] = val * np.sin(2 * np.pi * (i + 1) * hx) * np.sin(2 * np.pi * (j + 1) * hy)
+    # def formRHS(self, B):
+    #     b = self.da.getVecArray(B)
+    #     mx, my = self.da.getSizes()
+    #     hx, hy = [1.0/m for m in [mx, my]]
+    #     (xs, xe), (ys, ye) = self.da.getRanges()
+    #     for j in range(ys, ye):
+    #         for i in range(xs, xe):
+    #             b[i, j] = 1*hx*hy
+    #             # b[i, j] = np.sin(2 * np.pi * (i + 1) * hx) * np.sin(2 * np.pi * (j + 1) * hy)
 
     def mult(self, mat, X, Y):
         #
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         y = self.da.getVecArray(Y)
+        #
         mx, my = self.da.getSizes()
-        hx, hy = [1.0 / (m + 1) for m in [mx, my]]
+        hx, hy = [1.0/m for m in [mx, my]]
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
@@ -59,9 +60,9 @@ class Poisson2D(object):
                 if i > 0:    u_w = x[i-1, j] # west
                 if i < mx-1: u_e = x[i+1, j] # east
                 if j > 0:    u_s = x[i, j-1] # south
-                if j < my-1: u_n = x[i, j+1] # north
-                u_xx = (u_e - 2*u + u_w) / hx ** 2
-                u_yy = (u_n - 2*u + u_s) / hy ** 2
+                if j < ny-1: u_n = x[i, j+1] # north
+                u_xx = (u_e - 2*u + u_w)*hy/hx
+                u_yy = (u_n - 2*u + u_s)*hx/hy
                 y[i, j] = u_xx + u_yy
 
 OptDB = PETSc.Options()
@@ -78,45 +79,32 @@ b = da.createGlobalVec()
 # A = da.createMat('python')
 A = PETSc.Mat().createPython(
     [x.getSizes(), b.getSizes()], comm=da.comm)
-print(A.getSize())
 A.setPythonContext(pde)
 A.setUp()
 
-y = da.createGlobalVec()
-
-pde.formRHS(x, val=1.0)
-A.mult(x, b)
-pde.formRHS(y, val=-2.0 * (2.0 * np.pi) ** 2)
-
-# u = da.createNaturalVec()
-# da.globalToNatural(b, u)
-
-# print((b - y).norm(PETSc.NormType.NORM_INFINITY))
-# exit()
-
 ksp = PETSc.KSP().create()
+ksp.setOperators(A)
 ksp.setType('cg')
 pc = ksp.getPC()
 pc.setType('none')
 ksp.setFromOptions()
 
-ksp.setOperators(A)
+ba = da.getVecArray(b)
+mx, my = da.getSizes()
+hx, hy = [1.0/m for m in [mx, my]]
+(xs, xe), (ys, ye) = da.getRanges()
+for i in range(xs, xe):
+    for j in range(ys, ye):
+        ba[i, j] = 1*hx*hy
+# pde.formRHS(b)
+# b.setUp()
+# print(PETSc.COMM_WORLD.getRank(), b.getArray())
+ksp.solve(b, x)
 
-x1 = da.createGlobalVec()
-pde.formRHS(b,val=1)
-ksp.solve(b, x1)
-
-x2 = da.createGlobalVec()
-pde.formRHS(b,val=0)
-ksp.solve(b, x2)
-
-print(x1.array)
-
+print(PETSc.COMM_WORLD.getRank(), x.getArray())
 
 u = da.createNaturalVec()
 da.globalToNatural(x, u)
 
-# if OptDB.getBool('plot', True):
-#     draw = PETSc.Viewer.DRAW(x.comm)
-#     OptDB['draw_pause'] = 1
-#     draw(x)
+print('nat', PETSc.COMM_WORLD.getRank(), u.getArray())
+
