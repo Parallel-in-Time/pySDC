@@ -119,7 +119,7 @@ class heat2d_petsc_forced(ptype):
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
-        # pc.setType('none')
+        pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         # TODO: fill with data

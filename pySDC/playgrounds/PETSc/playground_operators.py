@@ -25,7 +25,7 @@ def main():
 
     n_fine = 401
     da_fine = PETSc.DMDA().create([n_fine, n_fine], stencil_width=1)
-    da_coarse = da_fine.coarsen()
+    da_coarse = PETSc.DMDA().create([201, 201], stencil_width=1)
 
     x_fine = da_fine.createGlobalVec()
     xa = da_fine.getVecArray(x_fine)
@@ -33,9 +33,9 @@ def main():
     nx, ny = da_fine.getSizes()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j] = 1.0
-            # xa[i, j] = i / nx * j / ny
-            # xa[i, j] = np.sin(2 * np.pi * i / nx) * np.sin(2 * np.pi * j / ny)
+            # xa[i, j] = 1.0
+            # xa[i, j] = i
+            xa[i, j] = np.sin(2 * np.pi * i / (nx+1)) * np.sin(2 * np.pi * j / (ny+1))
 
     da_coarse.setInterpolationType(PETSc.DMDA.InterpolationType.Q1)
     B, vec = da_coarse.createInterpolation(da_fine)
@@ -47,9 +47,9 @@ def main():
     nx, ny = da_coarse.getSizes()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j] = 1.0
-            # xa[i, j] = i / nx * j / ny
-            # xa[i, j] = np.sin(2 * np.pi * i / nx) * np.sin(2 * np.pi * j / ny)
+            # xa[i, j] = 1.0
+            # xa[i, j] = i
+            xa[i, j] = np.sin(2 * np.pi * i / (nx+1)) * np.sin(2 * np.pi * j / (ny+1))
 
     y = da_fine.createGlobalVec()
     # x_coarse.pointwiseMult(x_coarse)
