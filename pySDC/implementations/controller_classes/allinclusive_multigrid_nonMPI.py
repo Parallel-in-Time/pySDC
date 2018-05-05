@@ -126,7 +126,9 @@ class allinclusive_multigrid_nonMPI(controller):
         for S in self.MS:
             self.hooks.post_run(step=S, level_number=0)
 
-        return uend, self.hooks.return_stats()
+        ufull = np.concatenate([S.levels[0].u[m].values for S in self.MS for m in range(1, 4)])
+
+        return uend, ufull, self.hooks.return_stats()
 
     def restart_block(self, active_slots, time, u0):
         """

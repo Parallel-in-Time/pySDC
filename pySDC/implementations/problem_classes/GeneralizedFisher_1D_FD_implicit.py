@@ -45,6 +45,7 @@ class generalized_fisher(ptype):
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
         self.A = self.__get_A(self.params.nvars, self.dx)
+        self.newton_counter = 0
 
     @staticmethod
     def __get_A(N, dx):
@@ -119,9 +120,9 @@ class generalized_fisher(ptype):
             # increase iteration count
             n += 1
 
-        if n == self.params.newton_maxiter:
-            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
-
+        # if n == self.params.newton_maxiter:
+        #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+        self.newton_counter += n
         return u
 
     def eval_f(self, u, t):
