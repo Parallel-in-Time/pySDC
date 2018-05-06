@@ -11,16 +11,18 @@ def main():
     n = 4
     dx = 1.0/(n + 1)
     dy = dx
-    da = PETSc.DMDA().create([n, n], stencil_width=1)
+    da = PETSc.DMDA().create([n, n], stencil_width=1, comm=PETSc.COMM_WORLD)
 
     rank = PETSc.COMM_WORLD.getRank()
-    comm=PETSc.COMM_WORLD
+    # comm=
 
-    x = PETSc.Vec().createMPI(n*n, comm=comm)
+    x = da.createNaturalVector()
+    # x.setSizes(n*n)
     y = x.duplicate()
     res = x.duplicate()
     xs, xe = x.getOwnershipRange()
     ldim = x.getLocalSize()
+    print(xs, xe, ldim)
     for k in range(ldim):
         iglobal = k + xs
         j = k % n
@@ -61,18 +63,18 @@ def main():
     # ya[0,0] = 10.0
     # print(y.getArray()[0], z.getArray()[0])
 
-    # A = da.createMatrix()
+    A = da.createMatrix()
+    A.setType('aij')  # sparse
+    A.setFromOptions()
+    A.setPreallocationNNZ((5,5))
+    A.setUp()
+
+    # A = PETSc.Mat().create(comm=comm)
+    # A.setSizes(n*n)
     # A.setType('aij')  # sparse
     # A.setFromOptions()
     # A.setPreallocationNNZ((5,5))
     # A.setUp()
-
-    A = PETSc.Mat().create(comm=comm)
-    A.setSizes(n*n)
-    # A.setType('aij')  # sparse
-    A.setFromOptions()
-    # A.setPreallocationNNZ((5,5))
-    A.setUp()
 
     diagv = -2.0 / dx ** 2 - 2.0 / dy ** 2
     offdx = (1.0 / dx ** 2)

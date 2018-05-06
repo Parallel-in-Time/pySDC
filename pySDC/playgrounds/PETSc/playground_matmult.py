@@ -4,8 +4,10 @@ import numpy as np
 n = 4
 dx = 1.0/(n + 1)
 
+da = PETSc.DMDA().create([n, n], stencil_width=1, comm=PETSc.COMM_WORLD)
+
 # set up vectors
-x = PETSc.Vec().createMPI(n*n)
+x = da.createNaturalVector()
 b = x.duplicate()
 y = x.duplicate()
 xs, xe = x.getOwnershipRange()
@@ -22,11 +24,12 @@ x.assemblyBegin()
 x.assemblyEnd()
 
 # set up 2nd order FD matrix, taken from https://bitbucket.org/petsc/petsc4py/src/master/demo/kspsolve/petsc-mat.py
-A = PETSc.Mat()
-A.create(PETSc.COMM_WORLD)
-A.setSizes([n*n, n*n])
-A.setType('aij')
-A.setPreallocationNNZ(5)
+A = da.createMatrix()
+A.setType('aij')  # sparse
+A.setFromOptions()
+A.setPreallocationNNZ((5,5))
+A.setUp()
+
 
 diagv = -2.0 / dx ** 2 - 2.0 / dx ** 2
 offdx = (1.0 / dx ** 2)
