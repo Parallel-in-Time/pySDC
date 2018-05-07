@@ -34,6 +34,10 @@ class heat2d_petsc_forced(ptype):
 
         if 'comm' not in problem_params:
             problem_params['comm'] = PETSc.COMM_WORLD
+        if 'sol_tol' not in problem_params:
+            problem_params['sol_tol'] = 1E-10
+        if 'sol_maxiter' not in problem_params:
+            problem_params['sol_maxiter'] = None
 
         essential_keys = ['nvars', 'nu', 'freq', 'comm']
         for key in essential_keys:
@@ -64,11 +68,10 @@ class heat2d_petsc_forced(ptype):
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
-        pc.setType('none')
+        pc.setType('mg')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
-        # TODO: fill with data
-        self.ksp.setTolerances(rtol=1E-12, atol=1E-12, divtol=None, max_it=None)
+        self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
         # TODO get rid of communicator for nonMPI controllers (purge, then restore)
 
     def __get_A(self):
@@ -117,14 +120,8 @@ class heat2d_petsc_forced(ptype):
         """
         Helper function to assemble PETSc identity matrix
 
-        Args:
-            N (list): number of dofs
-            nu (float): diffusion coefficient
-            dx (float): distance between two spatial nodes in x direction
-            dx (float): distance between two spatial nodes in y direction
-
         Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
+            PETSc matrix object
         """
 
         Id = self.init.createMatrix()

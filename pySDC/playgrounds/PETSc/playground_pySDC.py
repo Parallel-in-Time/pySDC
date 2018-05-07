@@ -61,8 +61,9 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(128, 128)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(129, 129)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
+    problem_params['sol_tol'] = 1E-10
 
     # initialize step parameters
     step_params = dict()
