@@ -100,11 +100,11 @@ def main():
     Tend = 0.4
 
     # instantiate controller
-    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
-    # controller = allinclusive_multigrid_nonMPI(num_procs=2, controller_params=controller_params, description=description)
+    # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    controller = allinclusive_multigrid_nonMPI(num_procs=2, controller_params=controller_params, description=description)
 
     # get initial values on finest level
-    P = controller.S.levels[0].prob
+    P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...

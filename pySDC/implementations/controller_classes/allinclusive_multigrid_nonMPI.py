@@ -29,8 +29,14 @@ class allinclusive_multigrid_nonMPI(controller):
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
 
         self.MS = [stepclass.step(description)]
-        for p in range(num_procs - 1):
-            self.MS.append(dill.copy(self.MS[0]))
+
+        try:
+            for p in range(num_procs - 1):
+                self.MS.append(dill.copy(self.MS[0]))
+        except dill.PicklingError and TypeError:
+            print('meeh')
+            for p in range(num_procs - 1):
+                self.MS.append(stepclass.step(description))
 
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)
