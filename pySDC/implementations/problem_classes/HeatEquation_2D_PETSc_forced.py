@@ -49,7 +49,8 @@ class heat2d_petsc_forced(ptype):
         if len(problem_params['nvars']) != 2:
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
 
-        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], stencil_width=1)
+        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], stencil_width=1,
+                                 comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heat2d_petsc_forced, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
@@ -72,7 +73,6 @@ class heat2d_petsc_forced(ptype):
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
-        # TODO get rid of communicator for nonMPI controllers (purge, then restore)
 
     def __get_A(self):
         """

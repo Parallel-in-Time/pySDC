@@ -12,6 +12,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 # from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -96,11 +97,11 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.2
+    Tend = 0.4
 
     # instantiate controller
-    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
-                                            comm=time_comm)
+    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    # controller = allinclusive_multigrid_nonMPI(num_procs=2, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob
