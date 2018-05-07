@@ -46,24 +46,46 @@ class Poisson2D(object):
 
     def mult(self, mat, X, Y):
         #
+        print('here')
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         y = self.da.getVecArray(Y)
         #
         mx, my = self.da.getSizes()
         hx, hy = [1.0/m for m in [mx, my]]
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                u = x[i, j] # center
-                u_e = u_w = u_n = u_s = 0
-                if i > 0:    u_w = x[i-1, j] # west
-                if i < mx-1: u_e = x[i+1, j] # east
-                if j > 0:    u_s = x[i, j-1] # south
-                if j < ny-1: u_n = x[i, j+1] # north
-                u_xx = (u_e - 2*u + u_w)*hy/hx
-                u_yy = (u_n - 2*u + u_s)*hx/hy
-                y[i, j] = u_xx + u_yy
+                row.index = (i,j)
+                if (i==0 or j==0 or i==mx-1 or j==my-1):
+                    mat.setValueStencil(row,col,1.0)
+                else:
+                    # u = x[i, j] # center
+                    diag = (2*(hx/hy + hy/hx))
+                    for index, value in [
+                        ((i, j - 1), -hx/hy),
+                        ((i - 1, j), -hy/hx),
+                        ((i, j), diag),
+                        ((i + 1, j), -hy/hx),
+                        ((i, j + 1), -hx/hy),
+                    ]:
+                        col.index = index
+                        col.field = 0
+                        mat.setValueStencil(row, col, value)
+                # u_e = u_w = u_n = u_s = 0
+                # if i > 0:    u_w = x[i-1, j] # west
+                # if i < mx-1: u_e = x[i+1, j] # east
+                # if j > 0:    u_s = x[i, j-1] # south
+                # if j < ny-1: u_n = x[i, j+1] # north
+                # u_xx = (u_e - 2*u + u_w)*hy/hx
+                # u_yy = (u_n - 2*u + u_s)*hx/hy
+                # y[i, j] = u_xx + u_yy
+        mat.assemble()
+        mat.mult(x, y)
+        # if J != P: J.assemble()  # matrix-free operator
+        return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 OptDB = PETSc.Options()
 

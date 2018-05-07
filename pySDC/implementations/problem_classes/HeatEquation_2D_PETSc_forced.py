@@ -20,60 +20,6 @@ class heat2d_petsc_forced(ptype):
         dx: distance between two spatial nodes (here: being the same in both dimensions)
     """
 
-    class Laplace2D(object):
-
-        def __init__(self, da, nu):
-            assert da.getDim() == 2
-            self.da = da
-            self.localX = da.createLocalVec()
-            self.nu = nu
-
-        def mult(self, mat, X, Y):
-            self.da.globalToLocal(X, self.localX)
-            x = self.da.getVecArray(self.localX)
-            y = self.da.getVecArray(Y)
-            mx, my = self.da.getSizes()
-            hx, hy = [1.0 / (m + 1) for m in [mx, my]]
-            (xs, xe), (ys, ye) = self.da.getRanges()
-            for j in range(ys, ye):
-                for i in range(xs, xe):
-                    u = x[i, j]  # center
-                    u_e = u_w = u_n = u_s = 0
-                    if i > 0:    u_w = x[i - 1, j]  # west
-                    if i < mx - 1: u_e = x[i + 1, j]  # east
-                    if j > 0:    u_s = x[i, j - 1]  # south
-                    if j < my - 1: u_n = x[i, j + 1]  # north
-                    u_xx = (u_e - 2 * u + u_w) / hx ** 2
-                    u_yy = (u_n - 2 * u + u_s) / hy ** 2
-                    y[i, j] = self.nu * (u_xx + u_yy)
-
-    class Heat2D(object):
-
-        def __init__(self, da, factor):
-            assert da.getDim() == 2
-            self.da = da
-            self.localX = da.createLocalVec()
-            self.factor = factor
-
-        def mult(self, mat, X, Y):
-            self.da.globalToLocal(X, self.localX)
-            x = self.da.getVecArray(self.localX)
-            y = self.da.getVecArray(Y)
-            mx, my = self.da.getSizes()
-            hx, hy = [1.0 / (m + 1) for m in [mx, my]]
-            (xs, xe), (ys, ye) = self.da.getRanges()
-            for j in range(ys, ye):
-                for i in range(xs, xe):
-                    u = x[i, j]  # center
-                    u_e = u_w = u_n = u_s = 0
-                    if i > 0:    u_w = x[i - 1, j]  # west
-                    if i < mx - 1: u_e = x[i + 1, j]  # east
-                    if j > 0:    u_s = x[i, j - 1]  # south
-                    if j < my - 1: u_n = x[i, j + 1]  # north
-                    u_xx = (u_e - 2 * u + u_w) / hx ** 2
-                    u_yy = (u_n - 2 * u + u_s) / hy ** 2
-                    y[i, j] = u - self.factor * (u_xx + u_yy)
-
     def __init__(self, problem_params, dtype_u, dtype_f):
         """
         Initialization routine
@@ -105,21 +51,20 @@ class heat2d_petsc_forced(ptype):
         super(heat2d_petsc_forced, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx, dy and get local ranges
-        self.dx = 1.0 / (self.params.nvars[0] + 1)
-        self.dy = 1.0 / (self.params.nvars[1] + 1)
+        self.dx = 1.0 / (self.params.nvars[0] - 1)
+        self.dy = 1.0 / (self.params.nvars[1] - 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         # compute discretization matrix A and identity
         self.A = self.__get_A()
-        self.H = self.__get_Id()
-        # self.Id = self.__get_Id(self.params.nvars, self.params.nu, self.dx, self.dy, self.params.comm)
+        self.Id = self.__get_Id()
 
         # setup solver
         self.ksp = PETSc.KSP()
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
-        pc.setType('ilu')
+        pc.setType('none')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         # TODO: fill with data
@@ -133,16 +78,44 @@ class heat2d_petsc_forced(ptype):
         Returns:
             PETSc matrix object
         """
-        N = self.params.nvars[0] * self.params.nvars[1]
-        A = PETSc.Mat().createPython([N, N], comm=self.init.comm)
-        A.setPythonContext(self.Laplace2D(da=self.init, nu=self.params.nu))
+        A = self.init.createMatrix()
+        A.setType('aij')  # sparse
+        A.setFromOptions()
+        A.setPreallocationNNZ((5, 5))
         A.setUp()
+
+        A.zeroEntries()
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
+        mx, my = self.init.getSizes()
+        (xs, xe), (ys, ye) = self.init.getRanges()
+        for j in range(ys, ye):
+            for i in range(xs, xe):
+                row.index = (i, j)
+                row.field = 0
+                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
+                    A.setValueStencil(row, row, 1.0)
+                    # pass
+                else:
+                    # u = x[i, j] # center
+                    diag = -2.0 / self.dx ** 2 - 2.0 / self.dy ** 2
+                    for index, value in [
+                        ((i, j - 1), 1.0 / self.dy ** 2),
+                        ((i - 1, j), 1.0 / self.dx ** 2),
+                        ((i, j), diag),
+                        ((i + 1, j), 1.0 / self.dx ** 2),
+                        ((i, j + 1), 1.0 / self.dy ** 2),
+                    ]:
+                        col.index = index
+                        col.field = 0
+                        A.setValueStencil(row, col, value)
+        A.assemble()
 
         return A
 
     def __get_Id(self):
         """
-        Helper function to assemble PETSc matrix A
+        Helper function to assemble PETSc identity matrix
 
         Args:
             N (list): number of dofs
@@ -154,10 +127,28 @@ class heat2d_petsc_forced(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        N = self.params.nvars[0] * self.params.nvars[1]
-        A = PETSc.Mat().createPython([N, N], comm=self.init.comm)
+        Id = self.init.createMatrix()
+        Id.setType('aij')  # sparse
+        Id.setFromOptions()
+        Id.setPreallocationNNZ((5, 5))
+        Id.setUp()
 
-        return A
+        Id.zeroEntries()
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
+        mx, my = self.init.getSizes()
+        (xs, xe), (ys, ye) = self.init.getRanges()
+        for j in range(ys, ye):
+            for i in range(xs, xe):
+                row.index = (i, j)
+                row.field = 0
+                col.index = (i, j)
+                col.field = 0
+                Id.setValueStencil(row, col, 1.0)
+
+        Id.assemble()
+
+        return Id
 
     def eval_f(self, u, t):
         """
@@ -177,8 +168,8 @@ class heat2d_petsc_forced(ptype):
         fa = self.init.getVecArray(f.expl.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                fa[i, j] = -np.sin(np.pi * self.params.freq * (i+1) * self.dx) * \
-                    np.sin(np.pi * self.params.freq * (j+1) * self.dy) * \
+                fa[i, j] = -np.sin(np.pi * self.params.freq * i * self.dx) * \
+                    np.sin(np.pi * self.params.freq * j * self.dy) * \
                     (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
 
         return f
@@ -197,11 +188,8 @@ class heat2d_petsc_forced(ptype):
             dtype_u: solution as mesh
         """
 
-        self.H.setPythonContext(self.Heat2D(da=self.init, factor=factor))
-        self.H.setUp()
-
         me = self.dtype_u(u0)
-        self.ksp.setOperators(self.H)
+        self.ksp.setOperators(self.Id - factor * self.A)
         self.ksp.solve(rhs.values, me.values)
 
         return me
@@ -221,7 +209,7 @@ class heat2d_petsc_forced(ptype):
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j] = np.sin(np.pi * self.params.freq * (i+1) * self.dx) * \
-                    np.sin(np.pi * self.params.freq * (j+1) * self.dy) * np.cos(t)
+                xa[i, j] = np.sin(np.pi * self.params.freq * i * self.dx) * \
+                    np.sin(np.pi * self.params.freq * j * self.dy) * np.cos(t)
 
         return me

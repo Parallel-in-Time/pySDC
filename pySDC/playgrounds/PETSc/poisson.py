@@ -97,7 +97,7 @@ pde.formRHS(y, val=-2.0 * (2.0 * np.pi) ** 2)
 ksp = PETSc.KSP().create()
 ksp.setType('cg')
 pc = ksp.getPC()
-pc.setType('none')
+pc.setType('ilu')
 ksp.setFromOptions()
 
 ksp.setOperators(A)
