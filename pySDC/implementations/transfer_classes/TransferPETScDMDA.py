@@ -26,9 +26,8 @@ class mesh_to_mesh_petsc_dmda(space_transfer):
         super(mesh_to_mesh_petsc_dmda, self).__init__(fine_prob, coarse_prob, params)
 
         self.coarse_prob.init.setInterpolationType(PETSc.DMDA.InterpolationType.Q1)
-        self.interp, self.scale = self.coarse_prob.init.createInterpolation(self.fine_prob.init)
-        # self.restr, _ = self.fine_prob.init.createInjection(self.coarse_prob.init)
-
+        self.interp, _ = self.coarse_prob.init.createInterpolation(self.fine_prob.init)
+        self.inject = self.coarse_prob.init.createInjection(self.fine_prob.init)
         pass
 
     def restrict(self, F):
@@ -40,14 +39,11 @@ class mesh_to_mesh_petsc_dmda(space_transfer):
         """
         if isinstance(F, petsc_data):
             u_coarse = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            self.interp.multTranspose(F.values, u_coarse.values)
-            u_coarse.values.pointwiseMult(self.scale, u_coarse.values)
+            self.inject.mult(F.values, u_coarse.values)
         elif isinstance(F, rhs_imex_petsc_data):
             u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            self.interp.multTranspose(F.impl.values, u_coarse.impl.values)
-            self.interp.multTranspose(F.expl.values, u_coarse.expl.values)
-            u_coarse.impl.values.pointwiseMult(self.scale, u_coarse.impl.values)
-            u_coarse.expl.values.pointwiseMult(self.scale, u_coarse.expl.values)
+            self.inject.mult(F.impl.values, u_coarse.impl.values)
+            self.inject.mult(F.expl.values, u_coarse.expl.values)
         else:
             raise TransferError('Unknown type of fine data, got %s' % type(F))
 

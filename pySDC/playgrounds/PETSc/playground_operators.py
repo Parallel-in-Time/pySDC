@@ -23,7 +23,7 @@ def main():
     import petsc4py
     from petsc4py import PETSc
 
-    n_fine = 1025
+    n_fine = 5
     n_coarse = int((n_fine-1) / 2) + 1
     da_fine = PETSc.DMDA().create([n_fine, n_fine], stencil_width=1)
     da_coarse = PETSc.DMDA().create([n_coarse, n_coarse], stencil_width=1)
@@ -69,14 +69,6 @@ def main():
     y_coarse.pointwiseMult(vec, y_coarse)
 
     print((y_coarse - x_coarse).norm(PETSc.NormType.NORM_INFINITY))
-
-    # ksp = PETSc.KSP().create()
-    # ksp.setType('cg')
-    # pc = ksp.getPC()
-    # pc.setType('mg')
-    # pc.MGSetLevels(2)
-    # ksp.setFromOptions()
-
 
 
 if __name__ == "__main__":
