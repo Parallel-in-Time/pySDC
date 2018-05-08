@@ -23,9 +23,10 @@ def main():
     import petsc4py
     from petsc4py import PETSc
 
-    n_fine = 401
+    n_fine = 1025
+    n_coarse = int((n_fine-1) / 2) + 1
     da_fine = PETSc.DMDA().create([n_fine, n_fine], stencil_width=1)
-    da_coarse = PETSc.DMDA().create([201, 201], stencil_width=1)
+    da_coarse = PETSc.DMDA().create([n_coarse, n_coarse], stencil_width=1)
 
     x_fine = da_fine.createGlobalVec()
     xa = da_fine.getVecArray(x_fine)
@@ -34,11 +35,13 @@ def main():
     for i in range(xs, xe):
         for j in range(ys, ye):
             # xa[i, j] = 1.0
-            # xa[i, j] = i
+            # xa[i, j] = i / nx
             xa[i, j] = np.sin(2 * np.pi * i / (nx+1)) * np.sin(2 * np.pi * j / (ny+1))
 
     da_coarse.setInterpolationType(PETSc.DMDA.InterpolationType.Q1)
     B, vec = da_coarse.createInterpolation(da_fine)
+
+
     # print(B, vec.getArray())
 
     x_coarse = da_coarse.createGlobalVec()
@@ -47,8 +50,8 @@ def main():
     nx, ny = da_coarse.getSizes()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            # xa[i, j] = 1.0
-            # xa[i, j] = i
+            xa[i, j] = 1.0
+            # xa[i, j] = i / nx
             xa[i, j] = np.sin(2 * np.pi * i / (nx+1)) * np.sin(2 * np.pi * j / (ny+1))
 
     y = da_fine.createGlobalVec()
@@ -60,6 +63,12 @@ def main():
     # print(y.getArray())
     # print(x_coarse.getArray())
     print((y-x_fine).norm(PETSc.NormType.NORM_INFINITY))
+
+    y_coarse = da_coarse.createGlobalVec()
+    B.multTranspose(x_fine, y_coarse)
+    y_coarse.pointwiseMult(vec, y_coarse)
+
+    print((y_coarse - x_coarse).norm(PETSc.NormType.NORM_INFINITY))
 
     # ksp = PETSc.KSP().create()
     # ksp.setType('cg')

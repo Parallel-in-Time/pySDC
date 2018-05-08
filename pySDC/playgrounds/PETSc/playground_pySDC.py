@@ -7,10 +7,10 @@ from petsc4py import PETSc
 import numpy as np
 
 from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
-from pySDC.implementations.datatype_classes.petsc_data import petsc_data, rhs_imex_petsc_data
+from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-# from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
@@ -62,7 +62,7 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(129, 129)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(129, 129), (65, 65)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10
 
@@ -92,7 +92,7 @@ def main():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    # description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+    description['space_transfer_class'] = mesh_to_mesh_petsc_dmda  # pass spatial transfer class
     # description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # set time parameters
@@ -101,7 +101,7 @@ def main():
 
     # instantiate controller
     # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
-    controller = allinclusive_multigrid_nonMPI(num_procs=2, controller_params=controller_params, description=description)
+    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
