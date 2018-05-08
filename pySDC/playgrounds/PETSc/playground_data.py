@@ -12,33 +12,19 @@ def main():
     dx = 1.0/(n - 1)
     dy = dx
     comm= PETSc.COMM_WORLD
-    da = PETSc.DMDA().create([n, n], stencil_width=1, comm=comm)
+    da = PETSc.DMDA().create([n, n], dof=2, stencil_width=1, comm=comm)
 
     rank = PETSc.COMM_WORLD.getRank()
     # comm=
 
-    x = da.createGlobalVector()
-    # x.setSizes(n*n)
-    y = x.duplicate()
-    res = x.duplicate()
-    xs, xe = x.getOwnershipRange()
-    ldim = x.getLocalSize()
-    print(xs, xe, ldim)
-    for k in range(ldim):
-        iglobal = k + xs
-        j = k % n
-        i = k // n
-        x.setValue(iglobal, np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy))
-        y.setValue(iglobal, -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy))
-    x.assemblyBegin()
-    x.assemblyEnd()
-    #
     x = da.createGlobalVec()
     xa = da.getVecArray(x)
     (xs, xe), (ys, ye) = da.getRanges()
+    print(xs,xe,ys,ye, xa.shape)
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j] = np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            xa[i, j, 0] = np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            xa[i, j, 1] = 0.1 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
     print('x=', rank, x.getArray())
     # print('x:', x.getSizes(), da.getRanges())
     # print()
@@ -48,7 +34,8 @@ def main():
     (xs, xe), (ys, ye) = da.getRanges()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            ya[i, j] = -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            ya[i, j, 0] = -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            ya[i, j, 1] = -0.2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i) * dx) * np.sin(2 * np.pi * (j) * dy)
     #
     # z = da.createGlobalVec()
     # za = da.getVecArray(z)
@@ -77,9 +64,11 @@ def main():
     (xs, xe), (ys, ye) = da.getRanges()
     for j in range(ys, ye):
         for i in range(xs, xe):
-            row.index = (i, j)
-            row.field = 0
             if (i == 0 or j == 0 or i == mx - 1 or j == my - 1):
+                row.index = (i, j)
+                row.field = 0
+                A.setValueStencil(row, row, 1.0)
+                row.field = 1
                 A.setValueStencil(row, row, 1.0)
                 # pass
             else:
@@ -92,10 +81,18 @@ def main():
                     ((i + 1, j), 1.0 / dx ** 2),
                     ((i, j + 1), 1.0 / dy ** 2),
                 ]:
+                    row.index = (i, j)
+                    row.field = 0
                     col.index = index
                     col.field = 0
                     A.setValueStencil(row, col, value)
+                    row.field = 1
+                    col.field = 1
+                    A.setValueStencil(row, col, value)
+
     A.assemble()
+    # A.view()
+    # exit()
 
     Id = da.createMatrix()
     Id.setType('aij')  # sparse
@@ -115,30 +112,15 @@ def main():
             col.index = (i, j)
             col.field = 0
             Id.setValueStencil(row, row, 1.0)
-            # if (i == 0 or j == 0 or i == mx - 1 or j == my - 1):
-            #     Id.setValueStencil(row, row, 1.0)
-            #     pass
-            # else:
-            #
-            #     col.field = 0
-            #     Id.setValueStencil(row, col, 1.0)
-                # # u = x[i, j] # center
-                # diag = 1.0
-                # for index, value in [
-                #     # ((i, j - 1), 1.0 / dy ** 2),
-                #     # ((i - 1, j), 1.0 / dx ** 2),
-                #     ((i, j), diag),
-                #     # ((i + 1, j), 1.0 / dx ** 2),
-                #     # ((i, j + 1), 1.0 / dy ** 2),
-                # ]:
-                #     col.index = index
-                #     col.field = 0
-                #     Id.setValueStencil(row, col, value)
+            row.field = 1
+            col.field = 1
+            Id.setValueStencil(row, col, 1.0)
     Id.assemble()
 
     # (xs, xe), (ys, ye) = da.getRanges()
     # print(A.getValues(range(n*n), range(n*n)))
 
+    res = da.createGlobalVec()
     A.mult(x, res)
     print('1st turn', rank, res.getArray())
     print((res-y).norm(PETSc.NormType.NORM_INFINITY))
