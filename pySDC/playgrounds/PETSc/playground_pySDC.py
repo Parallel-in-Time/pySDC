@@ -48,7 +48,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.2
+    level_params['dt'] = 0.125
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -56,13 +56,13 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    # sweeper_params['spread'] = False
+    sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(129, 129), (65, 65)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(129, 129)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10
 
@@ -97,7 +97,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.4
+    Tend = 1.0
 
     # instantiate controller
     controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
