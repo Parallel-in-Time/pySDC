@@ -62,8 +62,8 @@ def main():
     problem_params = dict()
     problem_params['Du'] = 1.0
     problem_params['Dv'] = 0.01
-    problem_params['A'] = 0.0#0.09
-    problem_params['B'] = 0.0#0.086
+    problem_params['A'] = 0.09
+    problem_params['B'] = 0.086
     problem_params['nvars'] = [(17, 17)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10

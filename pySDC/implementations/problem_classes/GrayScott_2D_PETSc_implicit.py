@@ -8,7 +8,7 @@ from pySDC.core.Errors import ParameterError
 
 class GS(object):
 
-    def __init__(self, da, params, factor, dx, dy, L, rhs):
+    def __init__(self, da, params, factor, dx, dy, L):
         assert da.getDim() == 2
         self.da = da
         self.params = params
@@ -16,7 +16,6 @@ class GS(object):
         self.dx = dx
         self.dy = dy
         self.L = L
-        self.rhs = self.da.getVecArray(rhs.values)
         self.localX = da.createLocalVec()
 
     def formFunction(self, snes, X, F):
@@ -29,19 +28,20 @@ class GS(object):
         for j in range(ys, ye):
             for i in range(xs, xe):
                 if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    f[i, j] = x[i, j] - self.rhs[i, j]
+                    f[i, j] = x[i, j]
+                    pass
                 else:
                     u = x[i, j]  # center
                     u_e = x[i + 1, j]  # east
                     u_w = x[i - 1, j]  # west
                     u_n = x[i, j + 1]  # north
                     u_s = x[i, j - 1]  # south
-                    u_xx = (-u_e + 2 * u - u_w)
-                    u_yy = (-u_n + 2 * u - u_s)
-                    f[i, j, 0] = x[i, j, 0] - (self.factor * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
-                            x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])) - self.rhs[i, j, 0]
-                    f[i, j, 1] = x[i, j, 1] - (self.factor * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
-                            x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]) - self.rhs[i, j, 1]
+                    u_xx = (u_e - 2 * u + u_w)
+                    u_yy = (u_n - 2 * u + u_s)
+                    f[i, j, 0] = x[i, j, 0] - (self.factor * (self.params.Du * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
+                            x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
+                    f[i, j, 1] = x[i, j, 1] - (self.factor * (self.params.Dv * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
+                            x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
 
     def formJacobian(self, snes, X, J, P):
         #
@@ -55,10 +55,11 @@ class GS(object):
         for j in range(ys, ye):
             for i in range(xs, xe):
                 if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    for indx in [0, 1]:
-                        row.index = (i, j)
-                        row.field = indx
-                        P.setValueStencil(row, row, 1.0)
+                    pass
+                    # for indx in [0, 1]:
+                    #     row.index = (i, j)
+                    #     row.field = indx
+                    #     P.setValueStencil(row, row, 0.0)
                 else:
                     row.index = (i, j)
                     col.index = (i, j)
@@ -131,10 +132,10 @@ class petsc_grayscott(ptype):
         # setup solver
         self.snes = PETSc.SNES()
         self.snes.create(comm=self.params.comm)
-        self.snes.getKSP().setType('cg')
-        # self.ksp.setInitialGuessNonzero(True)
+        # self.snes.getKSP().setType('cg')
+        self.snes.setType('anderson')
         self.snes.setFromOptions()
-        self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+        self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol, max_it=self.params.sol_maxiter)
 
     def __get_A(self):
         """
@@ -260,14 +261,17 @@ class petsc_grayscott(ptype):
         """
 
         me = self.dtype_u(u0)
-        target = GS(self.init, self.params, factor, self.dx, self.dy, self.Id - factor * self.A, rhs)
+        target = GS(self.init, self.params, factor, self.dx, self.dy, self.Id - factor * self.A)
 
         F = self.init.createGlobalVec()
         self.snes.setFunction(target.formFunction, F)
         J = self.init.createMatrix()
         self.snes.setJacobian(target.formJacobian, J)
 
-        self.snes.solve(None, me.values)
+        self.snes.solve(rhs.values, me.values)
+
+        print( self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(), self.snes.getKSP().getResidualNorm() )
+        # exit()
 
         return me
 
@@ -286,6 +290,10 @@ class petsc_grayscott(ptype):
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
+            #     xa[i, j, 0] = np.sin(np.pi * 2 * i * self.dx) * \
+            #                np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
+            #     xa[i, j, 1] = np.sin(np.pi * 2 * i * self.dx) * \
+            #                   np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
                 xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * self.dx / 100) *
                                                    np.sin(np.pi * j * self.dy / 100), 100)
                 xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * i * self.dx / 100) *
