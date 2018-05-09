@@ -48,7 +48,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.1
+    level_params['dt'] = 1.0
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -99,7 +99,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.1
+    Tend = 1.0
 
     # instantiate controller
     controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)

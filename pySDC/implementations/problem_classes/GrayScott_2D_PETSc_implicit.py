@@ -27,21 +27,18 @@ class GS(object):
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    f[i, j] = x[i, j]
-                    pass
-                else:
-                    u = x[i, j]  # center
-                    u_e = x[i + 1, j]  # east
-                    u_w = x[i - 1, j]  # west
-                    u_n = x[i, j + 1]  # north
-                    u_s = x[i, j - 1]  # south
-                    u_xx = (u_e - 2 * u + u_w)
-                    u_yy = (u_n - 2 * u + u_s)
-                    f[i, j, 0] = x[i, j, 0] - (self.factor * (self.params.Du * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
-                            x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
-                    f[i, j, 1] = x[i, j, 1] - (self.factor * (self.params.Dv * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
-                            x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
+                u_e = u_w = u_n = u_s = 0.0
+                u = x[i, j]  # center
+                if i < mx - 1: u_e = x[i + 1, j]  # east
+                if i > 0: u_w = x[i - 1, j]  # west
+                if j < my - 1: u_s = x[i, j + 1]  # south
+                if j > 0: u_n = x[i, j - 1]  # north
+                u_xx = (u_e - 2 * u + u_w)
+                u_yy = (u_n - 2 * u + u_s)
+                f[i, j, 0] = x[i, j, 0] - (self.factor * (self.params.Du * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
+                        x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
+                f[i, j, 1] = x[i, j, 1] - (self.factor * (self.params.Dv * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
+                        x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
 
     def formJacobian(self, snes, X, J, P):
         #
@@ -54,27 +51,20 @@ class GS(object):
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    pass
-                    # for indx in [0, 1]:
-                    #     row.index = (i, j)
-                    #     row.field = indx
-                    #     P.setValueStencil(row, row, 0.0)
-                else:
-                    row.index = (i, j)
-                    col.index = (i, j)
-                    row.field = 0
-                    col.field = 0
-                    P.setValueStencil(row, col, -x[i, j, 1] ** 2 - self.params.A)
-                    row.field = 0
-                    col.field = 1
-                    P.setValueStencil(row, col, -2.0 * x[i, j, 0] * x[i, j, 1])
-                    row.field = 1
-                    col.field = 1
-                    P.setValueStencil(row, col, 2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B)
-                    row.field = 1
-                    col.field = 0
-                    P.setValueStencil(row, col, x[i, j, 1] ** 2)
+                row.index = (i, j)
+                col.index = (i, j)
+                row.field = 0
+                col.field = 0
+                P.setValueStencil(row, col, -x[i, j, 1] ** 2 - self.params.A)
+                row.field = 0
+                col.field = 1
+                P.setValueStencil(row, col, -2.0 * x[i, j, 0] * x[i, j, 1])
+                row.field = 1
+                col.field = 1
+                P.setValueStencil(row, col, 2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B)
+                row.field = 1
+                col.field = 0
+                P.setValueStencil(row, col, x[i, j, 1] ** 2)
         P.assemble()
         P = self.L - P
         if J != P:
@@ -120,8 +110,8 @@ class petsc_grayscott(ptype):
         super(petsc_grayscott, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx, dy and get local ranges
-        self.dx = 1.0 / (self.params.nvars[0] - 1)
-        self.dy = 1.0 / (self.params.nvars[1] - 1)
+        self.dx = 1.0 / (self.params.nvars[0] + 1)
+        self.dy = 1.0 / (self.params.nvars[1] + 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         # compute discretization matrix A and identity
@@ -147,7 +137,7 @@ class petsc_grayscott(ptype):
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
         A.setFromOptions()
-        A.setPreallocationNNZ((5, 5))
+        A.setPreallocationNNZ((10, 5))
         A.setUp()
 
         A.zeroEntries()
@@ -158,37 +148,34 @@ class petsc_grayscott(ptype):
         for j in range(ys, ye):
             for i in range(xs, xe):
                 row.index = (i, j)
-                row.field = 0
-                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    A.setValueStencil(row, row, 1.0)
-                else:
-                    diag = self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2)
-                    for index, value in [
-                        ((i, j - 1), self.params.Du / self.dy ** 2),
-                        ((i - 1, j), self.params.Du / self.dx ** 2),
-                        ((i, j), diag),
-                        ((i + 1, j), self.params.Du / self.dx ** 2),
-                        ((i, j + 1), self.params.Du / self.dy ** 2),
-                    ]:
-                        col.index = index
-                        col.field = 0
-                        A.setValueStencil(row, col, value)
-                row.index = (i, j)
                 row.field = 1
-                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    A.setValueStencil(row, row, 1.0)
-                else:
-                    diag = self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2)
-                    for index, value in [
-                        ((i, j - 1), self.params.Dv / self.dy ** 2),
-                        ((i - 1, j), self.params.Dv / self.dx ** 2),
-                        ((i, j), diag),
-                        ((i + 1, j), self.params.Dv / self.dx ** 2),
-                        ((i, j + 1), self.params.Dv / self.dy ** 2),
-                    ]:
-                        col.index = index
-                        col.field = 1
-                        A.setValueStencil(row, col, value)
+                A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
+                row.field = 0
+                A.setValueStencil(row, row, self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
+                if j > 0:
+                    col.index = (i, j - 1)
+                    col.field = 0
+                    A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                    col.field = 1
+                    A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                if j < my - 1:
+                    col.index = (i, j + 1)
+                    col.field = 0
+                    A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                    col.field = 1
+                    A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                if i > 0:
+                    col.index = (i - 1, j)
+                    col.field = 0
+                    A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                    col.field = 1
+                    A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
+                if i < mx - 1:
+                    col.index = (i + 1, j)
+                    col.field = 0
+                    A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                    col.field = 1
+                    A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
         A.assemble()
 
         return A
@@ -294,9 +281,9 @@ class petsc_grayscott(ptype):
             #                np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
             #     xa[i, j, 1] = np.sin(np.pi * 2 * i * self.dx) * \
             #                   np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
-                xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * self.dx / 100) *
-                                                   np.sin(np.pi * j * self.dy / 100), 100)
-                xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * i * self.dx / 100) *
-                                              np.sin(np.pi * j * self.dy / 100), 100)
+                xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *
+                                                   np.sin(np.pi * (j + 1) * self.dy / 100), 100)
+                xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *
+                                              np.sin(np.pi * (j + 1) * self.dy / 100), 100)
 
         return me
