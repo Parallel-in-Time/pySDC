@@ -1,11 +1,84 @@
 from __future__ import division
-import dolfin as df
 import numpy as np
-import random
 from petsc4py import PETSc
 
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+
+
+class GS(object):
+
+    def __init__(self, da, params, factor, dx, dy, L, rhs):
+        assert da.getDim() == 2
+        self.da = da
+        self.params = params
+        self.factor = factor
+        self.dx = dx
+        self.dy = dy
+        self.L = L
+        self.rhs = self.da.getVecArray(rhs.values)
+        self.localX = da.createLocalVec()
+
+    def formFunction(self, snes, X, F):
+        #
+        self.da.globalToLocal(X, self.localX)
+        x = self.da.getVecArray(self.localX)
+        f = self.da.getVecArray(F)
+        mx, my = self.da.getSizes()
+        (xs, xe), (ys, ye) = self.da.getRanges()
+        for j in range(ys, ye):
+            for i in range(xs, xe):
+                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
+                    f[i, j] = x[i, j] - self.rhs[i, j]
+                else:
+                    u = x[i, j]  # center
+                    u_e = x[i + 1, j]  # east
+                    u_w = x[i - 1, j]  # west
+                    u_n = x[i, j + 1]  # north
+                    u_s = x[i, j - 1]  # south
+                    u_xx = (-u_e + 2 * u - u_w)
+                    u_yy = (-u_n + 2 * u - u_s)
+                    f[i, j, 0] = x[i, j, 0] - (self.factor * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
+                            x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])) - self.rhs[i, j, 0]
+                    f[i, j, 1] = x[i, j, 1] - (self.factor * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
+                            x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]) - self.rhs[i, j, 1]
+
+    def formJacobian(self, snes, X, J, P):
+        #
+        self.da.globalToLocal(X, self.localX)
+        x = self.da.getVecArray(self.localX)
+        P.zeroEntries()
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
+        mx, my = self.da.getSizes()
+        (xs, xe), (ys, ye) = self.da.getRanges()
+        for j in range(ys, ye):
+            for i in range(xs, xe):
+                if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
+                    for indx in [0, 1]:
+                        row.index = (i, j)
+                        row.field = indx
+                        P.setValueStencil(row, row, 1.0)
+                else:
+                    row.index = (i, j)
+                    col.index = (i, j)
+                    row.field = 0
+                    col.field = 0
+                    P.setValueStencil(row, col, -x[i, j, 1] ** 2 - self.params.A)
+                    row.field = 0
+                    col.field = 1
+                    P.setValueStencil(row, col, -2.0 * x[i, j, 0] * x[i, j, 1])
+                    row.field = 1
+                    col.field = 1
+                    P.setValueStencil(row, col, 2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B)
+                    row.field = 1
+                    col.field = 0
+                    P.setValueStencil(row, col, x[i, j, 1] ** 2)
+        P.assemble()
+        P = self.L - P
+        if J != P:
+            J.assemble()  # matrix-free operator
+        return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 
 # noinspection PyUnusedLocal
@@ -25,8 +98,12 @@ class petsc_grayscott(ptype):
         """
 
         # define the Dirichlet boundary
-        def Boundary(x, on_boundary):
-            return on_boundary
+        if 'comm' not in problem_params:
+            problem_params['comm'] = PETSc.COMM_WORLD
+        if 'sol_tol' not in problem_params:
+            problem_params['sol_tol'] = 1E-10
+        if 'sol_maxiter' not in problem_params:
+            problem_params['sol_maxiter'] = None
 
         # these parameters will be used later, so assert their existence
         essential_keys = ['nvars', 'Du', 'Dv', 'A', 'B']
@@ -35,14 +112,13 @@ class petsc_grayscott(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], stencil_width=1,
+        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], dof=2, stencil_width=1,
                                  comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(petsc_grayscott, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
-
-       # compute dx, dy and get local ranges
+        # compute dx, dy and get local ranges
         self.dx = 1.0 / (self.params.nvars[0] - 1)
         self.dy = 1.0 / (self.params.nvars[1] - 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
@@ -53,14 +129,12 @@ class petsc_grayscott(ptype):
         self.localX = self.init.createLocalVec()
 
         # setup solver
-        self.ksp = PETSc.KSP()
-        self.ksp.create(comm=self.params.comm)
-        self.ksp.setType('cg')
-        pc = self.ksp.getPC()
-        pc.setType('none')
-        self.ksp.setInitialGuessNonzero(True)
-        self.ksp.setFromOptions()
-        self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+        self.snes = PETSc.SNES()
+        self.snes.create(comm=self.params.comm)
+        self.snes.getKSP().setType('cg')
+        # self.ksp.setInitialGuessNonzero(True)
+        self.snes.setFromOptions()
+        self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
 
     def __get_A(self):
         """
@@ -134,7 +208,6 @@ class petsc_grayscott(ptype):
 
         Id.zeroEntries()
         row = PETSc.Mat.Stencil()
-        col = PETSc.Mat.Stencil()
         mx, my = self.init.getSizes()
         (xs, xe), (ys, ye) = self.init.getRanges()
         for j in range(ys, ye):
@@ -142,46 +215,11 @@ class petsc_grayscott(ptype):
                 for indx in [0, 1]:
                     row.index = (i, j)
                     row.field = indx
-                    Id.setValueStencil(row, col, 1.0)
+                    Id.setValueStencil(row, row, 1.0)
 
         Id.assemble()
 
         return Id
-
-    def __form_Jacobian(self, sens, X, J, P):
-        self.init.globalToLocal(X, self.localX)
-        x = self.init.getVecArray(self.localX)
-        mx, my = self.init.getSizes()
-        P.zeroEntries()
-        row = PETSc.Mat.Stencil()
-        col = PETSc.Mat.Stencil()
-        (xs, xe), (ys, ye) = self.init.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                row.index = (i,j)
-                row.field = 0
-                if (i==0    or j==0    or k==0 or
-                    i==mx-1 or j==my-1 or k==mz-1):
-                    P.setValueStencil(row, row, 1.0)
-                else:
-                    u = x[i,j,k]
-                    diag = (2*(hyhzdhx+hxhzdhy+hxhydhz)
-                            - lambda_*exp(u)*hxhyhz)
-                    for index, value in [
-                        ((i,j,k-1), -hxhydhz),
-                        ((i,j-1,k), -hxhzdhy),
-                        ((i-1,j,k), -hyhzdhx),
-                        ((i, j, k), diag),
-                        ((i+1,j,k), -hyhzdhx),
-                        ((i,j+1,k), -hxhzdhy),
-                        ((i,j,k+1), -hxhydhz),
-                        ]:
-                        col.index = index
-                        col.field = 0
-                        P.setValueStencil(row, col, value)
-        P.assemble()
-        if J != P: J.assemble() # matrix-free operator
-        return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
     def eval_f(self, u, t):
         """
@@ -196,14 +234,14 @@ class petsc_grayscott(ptype):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.impl.values)
+        self.A.mult(u.values, f.values)
 
-        fa = self.init.getVecArray(f.expl.values)
+        fa = self.init.getVecArray(f.values)
+        xa = self.init.getVecArray(u.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                fa[i, j] = -np.sin(np.pi * self.params.freq * i * self.dx) * \
-                    np.sin(np.pi * self.params.freq * j * self.dy) * \
-                    (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
+                fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
+                fa[i, j, 1] += xa[i, j, 0] * xa[i, j, 1] ** 2 - self.params.B * xa[i, j, 1]
 
         return f
 
@@ -222,8 +260,14 @@ class petsc_grayscott(ptype):
         """
 
         me = self.dtype_u(u0)
-        self.ksp.setOperators(self.Id - factor * self.A)
-        self.ksp.solve(rhs.values, me.values)
+        target = GS(self.init, self.params, factor, self.dx, self.dy, self.Id - factor * self.A, rhs)
+
+        F = self.init.createGlobalVec()
+        self.snes.setFunction(target.formFunction, F)
+        J = self.init.createMatrix()
+        self.snes.setJacobian(target.formJacobian, J)
+
+        self.snes.solve(None, me.values)
 
         return me
 

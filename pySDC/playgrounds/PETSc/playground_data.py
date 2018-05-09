@@ -91,8 +91,8 @@ def main():
                     A.setValueStencil(row, col, value)
 
     A.assemble()
-    # A.view()
-    # exit()
+    A.view()
+    exit()
 
     Id = da.createMatrix()
     Id.setType('aij')  # sparse

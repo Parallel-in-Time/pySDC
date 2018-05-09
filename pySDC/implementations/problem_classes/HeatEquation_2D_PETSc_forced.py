@@ -130,16 +130,13 @@ class heat2d_petsc_forced(ptype):
 
         Id.zeroEntries()
         row = PETSc.Mat.Stencil()
-        col = PETSc.Mat.Stencil()
         mx, my = self.init.getSizes()
         (xs, xe), (ys, ye) = self.init.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
                 row.index = (i, j)
                 row.field = 0
-                col.index = (i, j)
-                col.field = 0
-                Id.setValueStencil(row, col, 1.0)
+                Id.setValueStencil(row, row, 1.0)
 
         Id.assemble()
 
