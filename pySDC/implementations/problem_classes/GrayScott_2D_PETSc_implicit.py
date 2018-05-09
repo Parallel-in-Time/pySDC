@@ -66,7 +66,7 @@ class GS(object):
                 col.field = 0
                 P.setValueStencil(row, col, x[i, j, 1] ** 2)
         P.assemble()
-        P = self.L - P
+        P = self.L - self.factor * P
         if J != P:
             J.assemble()  # matrix-free operator
         return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
@@ -137,7 +137,7 @@ class petsc_grayscott(ptype):
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
         A.setFromOptions()
-        A.setPreallocationNNZ((10, 5))
+        A.setPreallocationNNZ((5, 5))
         A.setUp()
 
         A.zeroEntries()
@@ -148,33 +148,41 @@ class petsc_grayscott(ptype):
         for j in range(ys, ye):
             for i in range(xs, xe):
                 row.index = (i, j)
-                row.field = 1
-                A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
                 row.field = 0
                 A.setValueStencil(row, row, self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
+                row.field = 1
+                A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
                 if j > 0:
                     col.index = (i, j - 1)
                     col.field = 0
+                    row.field = 0
                     A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
                     col.field = 1
+                    row.field = 1
                     A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
                 if j < my - 1:
                     col.index = (i, j + 1)
                     col.field = 0
+                    row.field = 0
                     A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
                     col.field = 1
+                    row.field = 1
                     A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
                 if i > 0:
                     col.index = (i - 1, j)
                     col.field = 0
+                    row.field = 0
                     A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
                     col.field = 1
+                    row.field = 1
                     A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
                 if i < mx - 1:
                     col.index = (i + 1, j)
                     col.field = 0
+                    row.field = 0
                     A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
                     col.field = 1
+                    row.field = 1
                     A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
         A.assemble()
 
@@ -191,7 +199,7 @@ class petsc_grayscott(ptype):
         Id = self.init.createMatrix()
         Id.setType('aij')  # sparse
         Id.setFromOptions()
-        Id.setPreallocationNNZ((5, 5))
+        Id.setPreallocationNNZ((1, 1))
         Id.setUp()
 
         Id.zeroEntries()
@@ -277,10 +285,6 @@ class petsc_grayscott(ptype):
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-            #     xa[i, j, 0] = np.sin(np.pi * 2 * i * self.dx) * \
-            #                np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
-            #     xa[i, j, 1] = np.sin(np.pi * 2 * i * self.dx) * \
-            #                   np.sin(np.pi * 2 * j * self.dy) * np.cos(t)
                 xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *
                                                    np.sin(np.pi * (j + 1) * self.dy / 100), 100)
                 xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *

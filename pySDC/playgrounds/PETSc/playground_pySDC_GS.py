@@ -48,7 +48,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1.0
+    level_params['dt'] = 0.1
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -64,9 +64,10 @@ def main():
     problem_params['Dv'] = 0.01
     problem_params['A'] = 0.09
     problem_params['B'] = 0.086
-    problem_params['nvars'] = [(17, 17)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(127, 127)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10
+    problem_params['sol_maxiter'] = 100
 
     # initialize step parameters
     step_params = dict()
