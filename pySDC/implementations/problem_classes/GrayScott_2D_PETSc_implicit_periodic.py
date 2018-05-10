@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np
+import time
 from petsc4py import PETSc
 
 from pySDC.core.Problem import ptype
@@ -46,6 +47,7 @@ class GS(object):
 
     def formJacobian(self, snes, X, J, P):
         #
+        t0 = time.time()
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         P.zeroEntries()
@@ -59,20 +61,53 @@ class GS(object):
                 col.index = (i, j)
                 row.field = 0
                 col.field = 0
-                P.setValueStencil(row, col, -x[i, j, 1] ** 2 - self.params.A)
+                P.setValueStencil(row, col, 1.0 - self.factor * (self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2) -x[i, j, 1] ** 2 - self.params.A))
                 row.field = 0
                 col.field = 1
-                P.setValueStencil(row, col, -2.0 * x[i, j, 0] * x[i, j, 1])
+                P.setValueStencil(row, col, self.factor * 2.0 * x[i, j, 0] * x[i, j, 1])
                 row.field = 1
                 col.field = 1
-                P.setValueStencil(row, col, 2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B)
+                P.setValueStencil(row, col, 1.0 - self.factor * (self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2) + 2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B))
                 row.field = 1
                 col.field = 0
-                P.setValueStencil(row, col, x[i, j, 1] ** 2)
+                P.setValueStencil(row, col, -self.factor * x[i, j, 1] ** 2)
+                col.index = (i, j - 1)
+                col.field = 0
+                row.field = 0
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dy ** 2)
+                col.field = 1
+                row.field = 1
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                # if j < my - 1:
+                col.index = (i, j + 1)
+                col.field = 0
+                row.field = 0
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dy ** 2)
+                col.field = 1
+                row.field = 1
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                # if i > 0:
+                col.index = (i - 1, j)
+                col.field = 0
+                row.field = 0
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                col.field = 1
+                row.field = 1
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dx ** 2)
+                # if i < mx - 1:
+                col.index = (i + 1, j)
+                col.field = 0
+                row.field = 0
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                col.field = 1
+                row.field = 1
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dx ** 2)
+
         P.assemble()
-        P = self.L - self.factor * P
+        # P = self.L - self.factor * P
         if J != P:
             J.assemble()  # matrix-free operator
+        print(time.time() - t0)
         return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 
@@ -128,7 +163,7 @@ class petsc_grayscott(ptype):
         self.snes = PETSc.SNES()
         self.snes.create(comm=self.params.comm)
         # self.snes.getKSP().setType('cg')
-        self.snes.setType('anderson')
+        # self.snes.setType('ngmres')
         self.snes.setFromOptions()
         self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol, max_it=self.params.sol_maxiter)
 
