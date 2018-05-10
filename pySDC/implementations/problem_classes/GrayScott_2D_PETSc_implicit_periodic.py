@@ -27,12 +27,16 @@ class GS(object):
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                u_e = u_w = u_n = u_s = [0.0, 0.0]
+                # u_e = u_w = u_n = u_s = [0.0, 0.0]
                 u = x[i, j]  # center
-                if i < mx - 1: u_e = x[i + 1, j]  # east
-                if i > 0: u_w = x[i - 1, j]  # west
-                if j < my - 1: u_s = x[i, j + 1]  # south
-                if j > 0: u_n = x[i, j - 1]  # north
+                # if i < mx - 1: u_e = x[i + 1, j]  # east
+                # if i > 0: u_w = x[i - 1, j]  # west
+                # if j < my - 1: u_s = x[i, j + 1]  # south
+                # if j > 0: u_n = x[i, j - 1]  # north
+                u_e = x[i + 1, j]  # east
+                u_w = x[i - 1, j]  # west
+                u_s = x[i, j + 1]  # south
+                u_n = x[i, j - 1]  # north
                 u_xx = (u_e - 2 * u + u_w)
                 u_yy = (u_n - 2 * u + u_s)
                 f[i, j, 0] = x[i, j, 0] - (self.factor * (self.params.Du * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
@@ -103,15 +107,16 @@ class petsc_grayscott(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], dof=2, stencil_width=1,
+        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], dof=2, boundary_type=3,
+                                 stencil_width=1,
                                  comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(petsc_grayscott, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx, dy and get local ranges
-        self.dx = 100.0 / (self.params.nvars[0] + 1)
-        self.dy = 100.0 / (self.params.nvars[1] + 1)
+        self.dx = 100.0 / (self.params.nvars[0])
+        self.dy = 100.0 / (self.params.nvars[1])
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         # compute discretization matrix A and identity
@@ -124,7 +129,7 @@ class petsc_grayscott(ptype):
         self.snes.create(comm=self.params.comm)
         # self.snes.getKSP().setType('cg')
         self.snes.setType('anderson')
-        # self.snes.setFromOptions()
+        self.snes.setFromOptions()
         self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol, max_it=self.params.sol_maxiter)
 
     def __get_A(self):
@@ -152,38 +157,38 @@ class petsc_grayscott(ptype):
                 A.setValueStencil(row, row, self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
                 row.field = 1
                 A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
-                if j > 0:
-                    col.index = (i, j - 1)
-                    col.field = 0
-                    row.field = 0
-                    A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
-                    col.field = 1
-                    row.field = 1
-                    A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
-                if j < my - 1:
-                    col.index = (i, j + 1)
-                    col.field = 0
-                    row.field = 0
-                    A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
-                    col.field = 1
-                    row.field = 1
-                    A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
-                if i > 0:
-                    col.index = (i - 1, j)
-                    col.field = 0
-                    row.field = 0
-                    A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
-                    col.field = 1
-                    row.field = 1
-                    A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
-                if i < mx - 1:
-                    col.index = (i + 1, j)
-                    col.field = 0
-                    row.field = 0
-                    A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
-                    col.field = 1
-                    row.field = 1
-                    A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
+                # if j > 0:
+                col.index = (i, j - 1)
+                col.field = 0
+                row.field = 0
+                A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                col.field = 1
+                row.field = 1
+                A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                # if j < my - 1:
+                col.index = (i, j + 1)
+                col.field = 0
+                row.field = 0
+                A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                col.field = 1
+                row.field = 1
+                A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                # if i > 0:
+                col.index = (i - 1, j)
+                col.field = 0
+                row.field = 0
+                A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                col.field = 1
+                row.field = 1
+                A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
+                # if i < mx - 1:
+                col.index = (i + 1, j)
+                col.field = 0
+                row.field = 0
+                A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                col.field = 1
+                row.field = 1
+                A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
         A.assemble()
 
         return A
@@ -285,9 +290,9 @@ class petsc_grayscott(ptype):
         xa = self.init.getVecArray(me.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *
-                                                   np.sin(np.pi * (j + 1) * self.dy / 100), 100)
-                xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * (i + 1) * self.dx / 100) *
-                                              np.sin(np.pi * (j + 1) * self.dy / 100), 100)
+                xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * self.dx / 100) *
+                                                   np.sin(np.pi * j * self.dy / 100), 100)
+                xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * i * self.dx / 100) *
+                                              np.sin(np.pi * j * self.dy / 100), 100)
 
         return me
