@@ -27,7 +27,7 @@ class GS(object):
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                u_e = u_w = u_n = u_s = 0.0
+                u_e = u_w = u_n = u_s = [0.0, 0.0]
                 u = x[i, j]  # center
                 if i < mx - 1: u_e = x[i + 1, j]  # east
                 if i > 0: u_w = x[i - 1, j]  # west
@@ -110,8 +110,8 @@ class petsc_grayscott(ptype):
         super(petsc_grayscott, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx, dy and get local ranges
-        self.dx = 1.0 / (self.params.nvars[0] + 1)
-        self.dy = 1.0 / (self.params.nvars[1] + 1)
+        self.dx = 100.0 / (self.params.nvars[0] + 1)
+        self.dy = 100.0 / (self.params.nvars[1] + 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         # compute discretization matrix A and identity
@@ -124,7 +124,7 @@ class petsc_grayscott(ptype):
         self.snes.create(comm=self.params.comm)
         # self.snes.getKSP().setType('cg')
         self.snes.setType('anderson')
-        self.snes.setFromOptions()
+        # self.snes.setFromOptions()
         self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol, max_it=self.params.sol_maxiter)
 
     def __get_A(self):
