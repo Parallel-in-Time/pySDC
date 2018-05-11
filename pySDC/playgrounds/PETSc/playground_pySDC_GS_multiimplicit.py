@@ -65,7 +65,7 @@ def main():
     problem_params['Dv'] = 0.01
     problem_params['A'] = 0.09
     problem_params['B'] = 0.086
-    problem_params['nvars'] = [(127, 127)]  # number of degrees of freedom for each level
+    problem_params['nvars'] = [(128, 128)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10
     problem_params['sol_maxiter'] = 100
