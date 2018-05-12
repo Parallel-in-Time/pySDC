@@ -6,11 +6,11 @@ class multi_implicit(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
 
-    First-order IMEX sweeper using implicit/explicit Euler as base integrator
+    First-order multi-implicit sweeper for two components
 
     Attributes:
-        QI: implicit Euler integration matrix
-        QE: explicit Euler integration matrix
+        Q1: implicit integration matrix for the first component
+        Q2: implicit integration matrix for the second component
     """
 
     def __init__(self, params):
@@ -21,6 +21,7 @@ class multi_implicit(sweeper):
             params: parameters for the sweeper
         """
 
+        # Default choice: implicit Euler
         if 'Q1' not in params:
             params['Q1'] = 'IE'
         if 'Q2' not in params:
@@ -35,7 +36,7 @@ class multi_implicit(sweeper):
 
     def integrate(self):
         """
-        Integrates the right-hand side (all three components)
+        Integrates the right-hand side (two components)
 
         Returns:
             list of dtype_u: containing the integral as values
@@ -88,6 +89,7 @@ class multi_implicit(sweeper):
             if L.tau is not None:
                 integral[m] += L.tau[m]
 
+        # store Q2F2(u^k) for later usage
         Q2int = []
         for m in range(M):
             Q2int.append(P.dtype_u(P.init, val=0))
@@ -104,8 +106,10 @@ class multi_implicit(sweeper):
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system_1(rhs, L.dt * self.Q1[m + 1, m + 1], L.u[m + 1],
                                           L.time + L.dt * self.coll.nodes[m])
+            # evaluate preliminary f for computing the second component
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])  # TODO: UGLY, remove
 
+            # substract Q2F2(u^k) and add Q2F(u^k+1)
             rhs = L.u[m + 1] - Q2int[m]
             for j in range(m + 1):
                 rhs += L.dt * self.Q2[m + 1, j] * L.f[j].comp2

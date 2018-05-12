@@ -182,7 +182,8 @@ class rhs_imex_petsc_data(object):
     Wrapper for PETSc Vectors with two components
 
     Attributes:
-        values (np.ndarray): contains the ndarray of the values
+        impl: contains the data for the implicit part
+        expl: contains the data for the explicit part
     """
 
     def __init__(self, init=None, val=None):
@@ -291,7 +292,8 @@ class rhs_2comp_petsc_data(object):
     Wrapper for PETSc Vectors with two components
 
     Attributes:
-        values (np.ndarray): contains the ndarray of the values
+        comp1: contains the data for the first component
+        comp2: contains the data for the second part
     """
 
     def __init__(self, init=None, val=None):

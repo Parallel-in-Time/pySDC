@@ -1,8 +1,5 @@
 from __future__ import division
-
 import numpy as np
-import scipy.sparse as sp
-
 from petsc4py import PETSc
 
 from pySDC.core.Problem import ptype
@@ -12,12 +9,15 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # noinspection PyUnusedLocal
 class heat2d_petsc_forced(ptype):
     """
-    Example implementing the unforced 2D heat equation with periodic BCs in [0,1]^2,
-    discretized using central finite differences
+    Example implementing the forced 2D heat equation with periodic BCs in [0,1]^2,
+    discretized using central finite differences and realized with PETSc
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (here: being the same in both dimensions)
+        Id: identity matrix
+        dx: distance between two spatial nodes in x direction
+        dy: distance between two spatial nodes in y direction
+        ksp: PETSc linear solver object
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -49,6 +49,7 @@ class heat2d_petsc_forced(ptype):
         if len(problem_params['nvars']) != 2:
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
 
+        # create DMDA object which will be used for all grid operations
         da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], stencil_width=1,
                                  comm=problem_params['comm'])
 
@@ -81,12 +82,14 @@ class heat2d_petsc_forced(ptype):
         Returns:
             PETSc matrix object
         """
+        # create matrix and set basic options
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
         A.setFromOptions()
         A.setPreallocationNNZ((5, 5))
         A.setUp()
 
+        # fill matrix
         A.zeroEntries()
         row = PETSc.Mat.Stencil()
         col = PETSc.Mat.Stencil()
@@ -122,15 +125,16 @@ class heat2d_petsc_forced(ptype):
             PETSc matrix object
         """
 
+        # create matrix and set basic options
         Id = self.init.createMatrix()
         Id.setType('aij')  # sparse
         Id.setFromOptions()
-        Id.setPreallocationNNZ((5, 5))
+        Id.setPreallocationNNZ((1, 1))
         Id.setUp()
 
+        # fill matrix
         Id.zeroEntries()
         row = PETSc.Mat.Stencil()
-        mx, my = self.init.getSizes()
         (xs, xe), (ys, ye) = self.init.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
@@ -155,8 +159,10 @@ class heat2d_petsc_forced(ptype):
         """
 
         f = self.dtype_f(self.init)
+        # evaluate Au for implicit part
         self.A.mult(u.values, f.impl.values)
 
+        # evaluate forcing term for explicit part
         fa = self.init.getVecArray(f.expl.values)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
@@ -168,7 +174,7 @@ class heat2d_petsc_forced(ptype):
 
     def solve_system(self, rhs, factor, u0, t):
         """
-        Simple linear solver for (I-factor*A)u = rhs
+        KSP linear solver for (I-factor*A)u = rhs
 
         Args:
             rhs (dtype_f): right-hand side for the linear system
@@ -177,7 +183,7 @@ class heat2d_petsc_forced(ptype):
             t (float): current time (e.g. for time-dependent BCs)
 
         Returns:
-            dtype_u: solution as mesh
+            dtype_u: solution
         """
 
         me = self.dtype_u(u0)

@@ -1,6 +1,5 @@
 from __future__ import division
 import numpy as np
-import time
 from petsc4py import PETSc
 
 from pySDC.core.Problem import ptype
@@ -8,8 +7,18 @@ from pySDC.core.Errors import ParameterError
 
 
 class GS(object):
-
+    """
+    Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
+    """
     def __init__(self, da, params, factor):
+        """
+        Initialization routine
+
+        Args:
+            da: DMDA object
+            params: problem parameters
+            factor: temporal factor (dt*Qd)
+        """
         assert da.getDim() == 2
         self.da = da
         self.params = params
@@ -17,19 +26,43 @@ class GS(object):
         self.localX = da.createLocalVec()
 
     def formFunction(self, snes, X, F):
-        #
+        """
+        Function to evaluate the residual for the Newton solver
+
+        This function should be equal to the RHS in the solution
+
+        Args:
+            snes: nonlinear solver object
+            X: input vector
+            F: output vector F(X)
+
+        Returns:
+            None (overwrites F)
+        """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         f = self.da.getVecArray(F)
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                f[i, j, 0] = x[i, j, 0] - (self.factor * (-x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
-                f[i, j, 1] = x[i, j, 1] - (self.factor * (x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
+                f[i, j, 0] = x[i, j, 0] - \
+                    (self.factor * (-x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
+                f[i, j, 1] = x[i, j, 1] - \
+                    (self.factor * (x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
 
     def formJacobian(self, snes, X, J, P):
-        #
-        t0 = time.time()
+        """
+        Function to return the Jacobian matrix
+
+        Args:
+            snes: nonlinear solver object
+            X: input vector
+            J: Jacobian matrix (current?)
+            P: Jacobian matrix (new)
+
+        Returns:
+            matrix status
+        """
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         P.zeroEntries()
@@ -54,17 +87,15 @@ class GS(object):
                 P.setValueStencil(row, col, -self.factor * x[i, j, 1] ** 2)
 
         P.assemble()
-        # P = self.L - self.factor * P
         if J != P:
             J.assemble()  # matrix-free operator
-        print(time.time() - t0)
         return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
 
 # noinspection PyUnusedLocal
 class petsc_grayscott(ptype):
     """
-
+    Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -93,8 +124,7 @@ class petsc_grayscott(ptype):
                 raise ParameterError(msg)
 
         da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], dof=2, boundary_type=3,
-                                 stencil_width=1,
-                                 comm=problem_params['comm'])
+                                 stencil_width=1, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(petsc_grayscott, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
@@ -125,7 +155,8 @@ class petsc_grayscott(ptype):
         self.snes.getKSP().setType('cg')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
-        self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+        self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol,
+                                max_it=self.params.sol_maxiter)
 
     def __get_A(self):
         """
@@ -285,9 +316,8 @@ class petsc_grayscott(ptype):
 
         self.snes.solve(rhs.values, me.values)
 
-        print( self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(), self.snes.getKSP().getResidualNorm() )
-        # exit()
-
+        # print(self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(),
+        #       self.snes.getKSP().getResidualNorm())
         return me
 
     def u_exact(self, t):
