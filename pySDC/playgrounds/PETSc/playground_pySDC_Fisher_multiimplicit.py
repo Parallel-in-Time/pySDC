@@ -6,10 +6,10 @@ from petsc4py import PETSc
 
 import numpy as np
 
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc_implicit import petsc_fisher
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data
+from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc_multiimplicit import petsc_fisher
+from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
@@ -55,13 +55,14 @@ def main():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
-    sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['Q1'] = ['LU']
+    sweeper_params['Q2'] = ['LU']
     sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1
-    problem_params['nvars'] = 2049
+    problem_params['nvars'] = 2047
     problem_params['lambda0'] = 2.0
     problem_params['interval'] = (-50, 50)
     problem_params['comm'] = space_comm
@@ -89,8 +90,8 @@ def main():
     description['problem_class'] = petsc_fisher # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['dtype_u'] = petsc_data  # pass data type for u
-    description['dtype_f'] = petsc_data  # pass data type for f
-    description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
+    description['dtype_f'] = rhs_2comp_petsc_data  # pass data type for f
+    description['sweeper_class'] = multi_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
