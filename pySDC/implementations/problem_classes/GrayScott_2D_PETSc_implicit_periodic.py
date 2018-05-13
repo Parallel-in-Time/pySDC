@@ -187,7 +187,6 @@ class petsc_grayscott(ptype):
 
         # compute discretization matrix A and identity
         self.A = self.__get_A()
-        self.Id = self.__get_Id()
         self.localX = self.init.createLocalVec()
 
         # setup nonlinear solver
@@ -206,12 +205,6 @@ class petsc_grayscott(ptype):
         Returns:
             PETSc matrix object
         """
-        """
-                Helper function to assemble PETSc matrix A
-
-                Returns:
-                    PETSc matrix object
-                """
         # create matrix and set basic options
         A = self.init.createMatrix()
         A.setType('aij')  # sparse
@@ -263,35 +256,6 @@ class petsc_grayscott(ptype):
         A.assemble()
 
         return A
-
-    def __get_Id(self):
-        """
-        Helper function to assemble PETSc identity matrix
-
-        Returns:
-            PETSc matrix object
-        """
-
-        Id = self.init.createMatrix()
-        Id.setType('aij')  # sparse
-        Id.setFromOptions()
-        Id.setPreallocationNNZ((1, 1))
-        Id.setUp()
-
-        Id.zeroEntries()
-        row = PETSc.Mat.Stencil()
-        mx, my = self.init.getSizes()
-        (xs, xe), (ys, ye) = self.init.getRanges()
-        for j in range(ys, ye):
-            for i in range(xs, xe):
-                for indx in [0, 1]:
-                    row.index = (i, j)
-                    row.field = indx
-                    Id.setValueStencil(row, row, 1.0)
-
-        Id.assemble()
-
-        return Id
 
     def eval_f(self, u, t):
         """
