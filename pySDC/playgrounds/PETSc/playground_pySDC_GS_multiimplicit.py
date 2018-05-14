@@ -6,7 +6,7 @@ from petsc4py import PETSc
 
 import numpy as np
 
-from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_multiimplicit_periodic import petsc_grayscott
+from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit

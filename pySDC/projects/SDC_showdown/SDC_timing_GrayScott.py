@@ -2,8 +2,8 @@ import pickle
 import os
 import numpy as np
 
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc import petsc_fisher_multiimplicit, \
-    petsc_fisher_fullyimplicit, petsc_fisher_semiimplicit
+from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott_multiimplicit, \
+    petsc_grayscott_fullyimplicit, petsc_grayscott_semiimplicit
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
@@ -30,7 +30,7 @@ def setup_parameters():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.25
+    level_params['dt'] = 1.0
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -44,10 +44,11 @@ def setup_parameters():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1
-    problem_params['nvars'] = 2049
-    problem_params['lambda0'] = 2.0
-    problem_params['interval'] = (-50, 50)
+    problem_params['Du'] = 1.0
+    problem_params['Dv'] = 0.01
+    problem_params['A'] = 0.09
+    problem_params['B'] = 0.086
+    problem_params['nvars'] = [(128, 128)]
     problem_params['nlsol_tol'] = 1E-10
     problem_params['nlsol_maxiter'] = 100
     problem_params['lsol_tol'] = 1E-10
@@ -63,7 +64,7 @@ def setup_parameters():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -97,21 +98,22 @@ def run_SDC_variant(variant=None, inexact=False):
     description, controller_params = setup_parameters()
 
     if variant == 'fully-implicit':
-        description['problem_class'] = petsc_fisher_fullyimplicit
+        description['problem_class'] = petsc_grayscott_fullyimplicit
         description['dtype_f'] = petsc_data
         description['sweeper_class'] = generic_implicit
     elif variant == 'semi-implicit':
-        description['problem_class'] = petsc_fisher_semiimplicit
+        description['problem_class'] = petsc_grayscott_semiimplicit
         description['dtype_f'] = rhs_imex_petsc_data
         description['sweeper_class'] = imex_1st_order
     elif variant == 'multi-implicit':
-        description['problem_class'] = petsc_fisher_multiimplicit
+        description['problem_class'] = petsc_grayscott_multiimplicit
         description['dtype_f'] = rhs_2comp_petsc_data
         description['sweeper_class'] = multi_implicit
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)
 
     if inexact:
+        description['problem_params']['lsol_maxiter'] = 2
         description['problem_params']['nlsol_maxiter'] = 1
         out = 'Working on inexact %s variant...' % variant
     else:
@@ -132,10 +134,6 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-    # compute exact solution and compare
-    uex = P.u_exact(Tend)
-    err = abs(uex - uend)
 
     # filter statistics by variant (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
@@ -162,10 +160,9 @@ def run_SDC_variant(variant=None, inexact=False):
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
-    print('Error vs. PDE solution: %6.4e' % err)
     print()
 
-    assert err < 7E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
+    # assert err < 7E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
 
     return timing[0][1], np.mean(niters)
 
@@ -207,7 +204,7 @@ def main():
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
-    fname = 'data/timings_SDC_variants_Fisher'
+    fname = 'data/timings_SDC_variants_GrayScott'
     file = open(fname + '.pkl', 'wb')
     pickle.dump(results, file)
     file.close()

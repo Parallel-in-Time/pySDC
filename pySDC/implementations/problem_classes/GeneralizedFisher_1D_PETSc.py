@@ -180,7 +180,7 @@ class Fisher_reaction(object):
 
 class petsc_fisher_multiimplicit(ptype):
     """
-    Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
+    Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
     """
     def __init__(self, problem_params, dtype_u, dtype_f):
         """
