@@ -66,7 +66,7 @@ def main():
     problem_params['interval'] = (-50, 50)
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-10
-    problem_params['sol_maxiter'] = 100
+    problem_params['sol_maxiter'] = 1
 
     # initialize step parameters
     step_params = dict()
@@ -116,8 +116,6 @@ def main():
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
-    print(err)
-
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
 
@@ -140,9 +138,14 @@ def main():
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
+    print('Iteration count (nonlinear/linear): %i / %i' % (P.snes_itercount, P.ksp_itercount))
+    print('Mean Iteration count per call: %4.2f / %4.2f' % (
+        P.snes_itercount / max(P.snes_ncalls, 1), P.ksp_itercount / max(P.ksp_ncalls, 1)))
+
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-    print(timing)
+    print('Time to solution: %6.4f sec.' % timing[0][1])
+    print('Error vs. PDE solution: %6.4e' % err)
 
 
 if __name__ == "__main__":

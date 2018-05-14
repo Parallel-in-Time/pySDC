@@ -140,6 +140,8 @@ class petsc_fisher(ptype):
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+        self.ksp_itercount = 0
+        self.ksp_ncalls = 0
 
         # setup nonlinear solver
         self.snes = PETSc.SNES()
@@ -148,7 +150,9 @@ class petsc_fisher(ptype):
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
         self.snes.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, stol=self.params.sol_tol,
-                                max_it=self.params.sol_maxiter)
+                                max_it=1)
+        self.snes_itercount = 0
+        self.snes_ncalls = 0
 
     def __get_A(self):
         """
@@ -277,6 +281,9 @@ class petsc_fisher(ptype):
         # xa = self.init.getVecArray(me.values)
         # print('x1', xa[0], xa[-1])
 
+        self.ksp_itercount += self.ksp.getIterationNumber()
+        self.ksp_ncalls += 1
+
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -312,8 +319,12 @@ class petsc_fisher(ptype):
         # xa = self.init.getVecArray(me.values)
         # print('x2', xa[0], xa[-1])
 
-        print(self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(),
-              self.snes.getKSP().getResidualNorm())
+        # print(self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(),
+        #       self.snes.getKSP().getResidualNorm())
+
+        self.snes_itercount += self.snes.getIterationNumber()
+        self.snes_ncalls += 1
+
         return me
 
     def u_exact(self, t):

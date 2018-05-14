@@ -10,7 +10,7 @@ class Fisher(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
-    def __init__(self, da, params, factor, dx):
+    def __init__(self, da, params, factor):
         """
         Initialization routine
 
@@ -24,7 +24,6 @@ class Fisher(object):
         self.da = da
         self.params = params
         self.factor = factor
-        self.dx = dx
         self.localX = da.createLocalVec()
 
     def formFunction(self, snes, X, F):
@@ -52,11 +51,7 @@ class Fisher(object):
             elif i == mx - 1:
                 f[i] = x[i]
             else:
-                u = x[i]  # center
-                u_e = x[i + 1]  # east
-                u_w = x[i - 1]  # west
-                u_xx = (u_e - 2 * u + u_w) / self.dx ** 2
-                f[i] = x[i] - self.factor * (u_xx + self.params.lambda0 ** 2 * x[i] * (1 - x[i] ** self.params.nu))
+                f[i] = x[i] - self.factor * self.params.lambda0 ** 2 * x[i] * (1 - x[i] ** self.params.nu)
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -84,15 +79,8 @@ class Fisher(object):
             if i == 0 or i == mx - 1:
                 P.setValueStencil(row, row, 1.0)
             else:
-                diag = 1.0 - self.factor * (-2.0 / self.dx ** 2 + self.params.lambda0 ** 2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu))
-                for index, value in [
-                    (i - 1, -self.factor / self.dx ** 2),
-                    (i, diag),
-                    (i + 1, -self.factor / self.dx ** 2),
-                ]:
-                    col.i = index
-                    col.field = 0
-                    P.setValueStencil(row, col, value)
+                diag = 1.0 - self.factor * self.params.lambda0 ** 2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu)
+                P.setValueStencil(row, row, diag)
         P.assemble()
         if J != P:
             J.assemble()  # matrix-free operator
@@ -143,6 +131,15 @@ class petsc_fisher(ptype):
         self.A = self.__get_A()
         self.localX = self.init.createLocalVec()
 
+        # setup linear solver
+        self.ksp = PETSc.KSP()
+        self.ksp.create(comm=self.params.comm)
+        self.ksp.setType('cg')
+        pc = self.ksp.getPC()
+        pc.setType('none')
+        self.ksp.setInitialGuessNonzero(True)
+        self.ksp.setFromOptions()
+        self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
         self.ksp_itercount = 0
         self.ksp_ncalls = 0
 
@@ -195,6 +192,45 @@ class petsc_fisher(ptype):
         A.assemble()
         return A
 
+    def __get_sys_mat(self, factor):
+        """
+        Helper function to assemble PETSc identity matrix
+
+        Returns:
+            PETSc matrix object
+        """
+
+        # create matrix and set basic options
+        A = self.init.createMatrix()
+        A.setType('aij')  # sparse
+        A.setFromOptions()
+        A.setPreallocationNNZ((3, 3))
+        A.setUp()
+
+        # fill matrix
+        A.zeroEntries()
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
+        mx = self.init.getSizes()[0]
+        (xs, xe) = self.init.getRanges()[0]
+        for i in range(xs, xe):
+            row.i = i
+            row.field = 0
+            if i == 0 or i == mx - 1:
+                A.setValueStencil(row, row, 1.0)
+            else:
+                diag = 1.0 + factor * 2.0 / self.dx ** 2
+                for index, value in [
+                    (i - 1, -factor / self.dx ** 2),
+                    (i, diag),
+                    (i + 1, -factor / self.dx ** 2),
+                ]:
+                    col.i = index
+                    col.field = 0
+                    A.setValueStencil(row, col, value)
+        A.assemble()
+        return A
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -208,19 +244,49 @@ class petsc_fisher(ptype):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.values)
+        self.A.mult(u.values, f.impl.values)
+        fa1 = self.init.getVecArray(f.impl.values)
+        fa1[0] = 0
+        fa1[-1] = 0
 
-        fa = self.init.getVecArray(f.values)
+        fa2 = self.init.getVecArray(f.expl.values)
         xa = self.init.getVecArray(u.values)
         for i in range(self.xs, self.xe):
-                fa[i] += self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
-        fa[0] = 0
-        fa[-1] = 0
+            fa2[i] = self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
+        fa2[0] = 0
+        fa2[-1] = 0
         # print('F:', fa[0], fa[-1])
         # exit()
         return f
 
     def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-factor*A)u = rhs
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float): abbrev. for the local stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        me = self.dtype_u(u0)
+
+        self.ksp.setOperators(self.__get_sys_mat(factor))
+        self.ksp.solve(rhs.values, me.values)
+
+        # xa = self.init.getVecArray(me.values)
+        # print('x1', xa[0], xa[-1])
+
+        self.ksp_itercount += self.ksp.getIterationNumber()
+        self.ksp_ncalls +=1
+
+        return me
+
+    def solve_system_2(self, rhs, factor, u0, t):
         """
         Nonlinear solver for (I-factor*F)(u) = rhs
 
@@ -235,10 +301,10 @@ class petsc_fisher(ptype):
         """
 
         me = self.dtype_u(u0)
-        target = Fisher(self.init, self.params, factor, self.dx)
+        target = Fisher(self.init, self.params, factor)
 
-        ra = self.init.getVecArray(rhs.values)
-        # print('r', ra[0], ra[-1])
+        # ra = self.init.getVecArray(rhs.values)
+        # print('r2', ra[0], ra[-1])
         # ra[0] = 0
         # ra[-1] = 1
 
@@ -251,7 +317,7 @@ class petsc_fisher(ptype):
         self.snes.solve(rhs.values, me.values)
 
         # xa = self.init.getVecArray(me.values)
-        # print('x', xa[0], xa[-1])
+        # print('x2', xa[0], xa[-1])
 
         # print(self.snes.getConvergedReason(), self.snes.getLinearSolveIterations(), self.snes.getFunctionNorm(),
         #       self.snes.getKSP().getResidualNorm())
