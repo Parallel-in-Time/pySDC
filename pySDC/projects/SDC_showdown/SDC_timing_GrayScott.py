@@ -1,6 +1,7 @@
 import pickle
 import os
 import numpy as np
+from petsc4py import PETSc
 
 from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott_multiimplicit, \
     petsc_grayscott_fullyimplicit, petsc_grayscott_semiimplicit
@@ -82,13 +83,14 @@ def setup_parameters():
     return description, controller_params
 
 
-def run_SDC_variant(variant=None, inexact=False):
+def run_SDC_variant(variant=None, inexact=False, cwd=''):
     """
     Routine to run particular SDC variant
 
     Args:
         variant (str): string describing the variant
         inexact (bool): flag to use inexact nonlinear solve (or nor)
+        cwd (str): current working directory
 
     Returns:
         timing (float)
@@ -135,6 +137,13 @@ def run_SDC_variant(variant=None, inexact=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+    fname = cwd + 'data/GS_reference.dat'
+    viewer = PETSc.Viewer().createBinary(fname, 'r')
+    uex = P.u_exact(t0)
+    uex.values = PETSc.Vec().load(viewer)
+
+    err = abs(uex - uend)
+
     # filter statistics by variant (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
 
@@ -160,14 +169,21 @@ def run_SDC_variant(variant=None, inexact=False):
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
+    print('Error vs. reference solution: %6.4e' % err)
     print()
 
-    # assert err < 7E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
+    assert err < 3E-06, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
 
     return timing[0][1], np.mean(niters)
 
 
 def show_results(fname):
+    """
+    Plotting routine
+
+    Args:
+        fname: file name to read in and name plots
+    """
 
     file = open(fname + '.pkl', 'rb')
     results = pickle.load(file)
@@ -195,6 +211,71 @@ def show_results(fname):
     assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
+    return None
+
+
+def run_reference():
+    """
+    Helper routine to create a reference soultion using very high order SDC and small time-steps
+    """
+
+    description, controller_params = setup_parameters()
+
+    description['problem_class'] = petsc_grayscott_semiimplicit
+    description['dtype_f'] = rhs_imex_petsc_data
+    description['sweeper_class'] = imex_1st_order
+    description['sweeper_params']['num_nodes'] = 9
+    description['level_params']['dt'] = 0.01
+
+    # set time parameters
+    t0 = 0.0
+    Tend = 1.0
+
+    # instantiate controller
+    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
+                                               description=description)
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # filter statistics by variant (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # compute and print statistics
+    niters = np.array([item[1] for item in iter_counts])
+    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    print(out)
+    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    print(out)
+    out = '   Position of max/min number of iterations: %2i -- %2i' % \
+          (int(np.argmax(niters)), int(np.argmin(niters)))
+    print(out)
+    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    print(out)
+
+    print('Iteration count (nonlinear/linear): %i / %i' % (P.snes_itercount, P.ksp_itercount))
+    print('Mean Iteration count per call: %4.2f / %4.2f' % (P.snes_itercount / max(P.snes_ncalls, 1),
+                                                            P.ksp_itercount / max(P.ksp_ncalls, 1)))
+
+    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+
+    print('Time to solution: %6.4f sec.' % timing[0][1])
+
+    fname = 'data/GS_reference.dat'
+    viewer = PETSc.Viewer().createBinary(fname, 'w')
+    viewer.view(uend.values)
+
+    assert os.path.isfile(fname), 'ERROR: PETSc did not create file'
+
+    return None
+
 
 def main():
 
@@ -214,4 +295,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # run_reference()
     main()
