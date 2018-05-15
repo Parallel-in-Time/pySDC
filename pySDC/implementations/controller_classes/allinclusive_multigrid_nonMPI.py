@@ -58,7 +58,12 @@ class allinclusive_multigrid_nonMPI(controller):
         if self.nlevels > 1 and self.nsweeps[-1] > 1:
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
 
+        self.u0 = None
+
     def run(self, u0, t0, Tend):
+        pass
+
+    def run_magic(self, u0, uinit, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
 
@@ -90,7 +95,7 @@ class allinclusive_multigrid_nonMPI(controller):
         active_slots = list(itertools.compress(slots, active))
 
         # initialize block of steps with u0
-        self.restart_block(active_slots, time, u0)
+        self.restart_block(active_slots, time, u0, uinit)
 
         # call pre-run hook
         for S in self.MS:
@@ -120,7 +125,7 @@ class allinclusive_multigrid_nonMPI(controller):
             active_slots = list(itertools.compress(slots, active))
 
             # restart active steps (reset all values and pass uend to u0)
-            self.restart_block(active_slots, time, uend)
+            self.restart_block(active_slots, time, uend, uend)
 
         # call post-run hook
         for S in self.MS:
@@ -130,7 +135,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
         return uend, ufull, self.hooks.return_stats()
 
-    def restart_block(self, active_slots, time, u0):
+    def restart_block(self, active_slots, time, u0, uinit):
         """
         Helper routine to reset/restart block of (active) steps
 
@@ -152,12 +157,21 @@ class allinclusive_multigrid_nonMPI(controller):
             # store link to previous step
             self.MS[p].prev = self.MS[active_slots[j - 1]]
             # resets step
-            self.MS[p].reset_step()
+            # self.MS[p].reset_step()
             # determine whether I am the first and/or last in line
             self.MS[p].status.first = active_slots.index(p) == 0
             self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
             # initialize step with u0
-            self.MS[p].init_step(u0)
+
+            if type(u0) == np.ndarray:
+                self.u0 = u0.copy()
+                P = self.MS[p].levels[0].prob
+                if True: #p == 0:
+                    self.MS[p].init_step(uinit)
+                else:
+                    self.MS[p].levels[0].u[0] = P.dtype_u(P.init, val=0)
+            else:
+                self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
             self.MS[p].status.iter = 0
@@ -280,13 +294,16 @@ class allinclusive_multigrid_nonMPI(controller):
                 self.hooks.pre_step(step=S, level_number=0)
 
                 # call predictor from sweeper
-                S.levels[0].sweep.predict()
+                if self.u0 is not None:
+                    S.levels[0].sweep.predict(u0=self.u0, slot=S.status.slot)
+                else:
+                    S.levels[0].sweep.predict()
 
                 # update stage
                 if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
-                    S.status.stage = 'IT_CHECK'
+                    S.status.stage = 'IT_FINE'
 
             return MS
 
@@ -344,6 +361,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.levels[0].sweep.compute_end_point()
                     self.hooks.post_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
+
 
             return MS
 

@@ -125,7 +125,7 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         return QDmat
 
-    def predict(self):
+    def predict(self, u0=None, slot=None):
         """
         Predictor to fill values at nodes before first sweep
 
@@ -141,14 +141,25 @@ class sweeper(with_metaclass(abc.ABCMeta)):
         L.f[0] = P.eval_f(L.u[0], L.time)
 
         # copy u[0] to all collocation nodes, evaluate RHS
-        for m in range(1, self.coll.num_nodes + 1):
-            if self.params.spread:
-                L.u[m] = P.dtype_u(L.u[0])
-                L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
-            else:
+        if u0 is None:
+            for m in range(1, self.coll.num_nodes + 1):
+                if self.params.spread:
+                    L.u[m] = P.dtype_u(L.u[0])
+                    L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+                else:
+                    L.u[m] = P.dtype_u(init=P.init, val=0)
+                    L.f[m] = P.dtype_f(init=P.init, val=0)
+        else:
+            if slot > 0:
+                first = (slot-1) * self.coll.num_nodes * P.init + (self.coll.num_nodes-1)*P.init
+                last = first + P.init
+                L.u[0].values = u0[first:last].copy()
+            for m in range(1, self.coll.num_nodes + 1):
+                first = slot * self.coll.num_nodes * P.init + (m-1)*P.init
+                last = first + P.init
                 L.u[m] = P.dtype_u(init=P.init, val=0)
-                L.f[m] = P.dtype_f(init=P.init, val=0)
-
+                L.u[m].values = u0[first:last].copy()
+                L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
         L.status.updated = True

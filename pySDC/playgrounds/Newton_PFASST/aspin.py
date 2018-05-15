@@ -66,7 +66,7 @@ def main():
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.04
+    Tend = 0.08
 
     num_procs = int((Tend - t0) / level_params['dt'])
 
@@ -75,17 +75,17 @@ def main():
     for S in controller_pfasst.MS:
         S.params.maxiter = 0
 
-    # get initial values on finest level
-    P = controller_pfasst.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    uend, ufull, stats = controller_pfasst.run(u0=uinit, t0=t0, Tend=Tend)
-
-    uex = P.u_exact(Tend)
-    print(np.linalg.norm(uex.values - ufull[-problem_params['nvars'][0]:], np.inf))
-    for S in controller_pfasst.MS:
-        print(S.levels[0].prob.newton_counter)
-    print(sum(S.levels[0].prob.newton_counter for S in controller_pfasst.MS) / num_procs)
+    # # get initial values on finest level
+    # P = controller_pfasst.MS[0].levels[0].prob
+    # uinit = P.u_exact(t0)
+    #
+    # uend, ufull, stats = controller_pfasst.run_magic(u0=uinit, uinit=uinit, t0=t0, Tend=Tend)
+    #
+    # uex = P.u_exact(Tend)
+    # print(np.linalg.norm(uex.values - ufull[-problem_params['nvars'][0]:], np.inf))
+    # for S in controller_pfasst.MS:
+    #     print(S.levels[0].prob.newton_counter)
+    # print(sum(S.levels[0].prob.newton_counter for S in controller_pfasst.MS) / num_procs)
 
     # instantiate the controller
     controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -95,18 +95,24 @@ def main():
     uinit = P.u_exact(t0)
 
     uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
-    uk = ufull.copy()
 
     controller.compute_rhs(uk, t0)
     print(np.linalg.norm(controller.rhs, np.inf))
+
     k = 0
     while np.linalg.norm(controller.rhs, np.inf) > 1E-10 or k == 0:
         k += 1
+
+        uend, uk, stats = controller_pfasst.run_magic(u0=uk, uinit=uinit, t0=t0, Tend=Tend)
+
+        # controller.compute_rhs(uk, t0)
+        # print(k, np.linalg.norm(controller.rhs, np.inf))
+
         ek, stats = controller.run(uk=uk, t0=t0, Tend=Tend)
         uk -= ek
         controller.compute_rhs(uk, t0)
 
-        print(k, np.linalg.norm(controller.rhs, np.inf), np.linalg.norm(ek, np.inf))
+        print(k, np.linalg.norm(controller.rhs, np.inf), np.linalg.norm(ek, np.inf), controller.iter_counter)
 
     uex = P.u_exact(Tend)
     print(np.linalg.norm(uex.values - uk[-controller.nspace:], np.inf))
