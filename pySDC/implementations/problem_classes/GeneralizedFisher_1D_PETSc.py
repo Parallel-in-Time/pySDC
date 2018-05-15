@@ -26,6 +26,10 @@ class Fisher_full(object):
         self.factor = factor
         self.dx = dx
         self.localX = da.createLocalVec()
+        (self.xs, self.xe) = self.da.getRanges()[0]
+        self.mx = self.da.getSizes()[0]
+        self.row = PETSc.Mat.Stencil()
+        self.col = PETSc.Mat.Stencil()
 
     def formFunction(self, snes, X, F):
         """
@@ -44,10 +48,9 @@ class Fisher_full(object):
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         f = self.da.getVecArray(F)
-        mx = self.da.getSizes()[0]
-        (xs, xe) = self.da.getRanges()[0]
-        for i in range(xs, xe):
-            if i == 0 or i == mx - 1:
+
+        for i in range(self.xs, self.xe):
+            if i == 0 or i == self.mx - 1:
                 f[i] = x[i]
             else:
                 u = x[i]  # center
@@ -72,15 +75,12 @@ class Fisher_full(object):
         self.da.globalToLocal(X, self.localX)
         x = self.da.getVecArray(self.localX)
         P.zeroEntries()
-        row = PETSc.Mat.Stencil()
-        col = PETSc.Mat.Stencil()
-        mx = self.da.getSizes()[0]
-        (xs, xe) = self.da.getRanges()[0]
-        for i in range(xs, xe):
-            row.i = i
-            row.field = 0
-            if i == 0 or i == mx - 1:
-                P.setValueStencil(row, row, 1.0)
+
+        for i in range(self.xs, self.xe):
+            self.row.i = i
+            self.row.field = 0
+            if i == 0 or i == self.mx - 1:
+                P.setValueStencil(self.row, self.row, 1.0)
             else:
                 diag = 1.0 -\
                     self.factor * (-2.0 / self.dx ** 2 +
@@ -90,9 +90,9 @@ class Fisher_full(object):
                     (i, diag),
                     (i + 1, -self.factor / self.dx ** 2),
                 ]:
-                    col.i = index
-                    col.field = 0
-                    P.setValueStencil(row, col, value)
+                    self.col.i = index
+                    self.col.field = 0
+                    P.setValueStencil(self.row, self.col, value)
         P.assemble()
         if J != P:
             J.assemble()  # matrix-free operator
@@ -230,7 +230,7 @@ class petsc_fisher_multiimplicit(ptype):
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
         pc = self.ksp.getPC()
-        pc.setType('none')
+        # pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.lsol_tol, atol=self.params.lsol_tol,
@@ -241,6 +241,7 @@ class petsc_fisher_multiimplicit(ptype):
         # setup nonlinear solver
         self.snes = PETSc.SNES()
         self.snes.create(comm=self.params.comm)
+        self.snes.setType('ksponly')
         # self.snes.getKSP().setType('cg')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
@@ -248,6 +249,8 @@ class petsc_fisher_multiimplicit(ptype):
                                 max_it=self.params.nlsol_maxiter)
         self.snes_itercount = 0
         self.snes_ncalls = 0
+        self.F = self.init.createGlobalVec()
+        self.J = self.init.createMatrix()
 
     def __get_A(self):
         """
@@ -477,10 +480,9 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         target = Fisher_full(self.init, self.params, factor, self.dx)
 
         # assign residual function and Jacobian
-        F = self.init.createGlobalVec()
-        self.snes.setFunction(target.formFunction, F)
-        J = self.init.createMatrix()
-        self.snes.setJacobian(target.formJacobian, J)
+
+        self.snes.setFunction(target.formFunction, self.F)
+        self.snes.setJacobian(target.formJacobian, self.J)
 
         self.snes.solve(rhs.values, me.values)
 

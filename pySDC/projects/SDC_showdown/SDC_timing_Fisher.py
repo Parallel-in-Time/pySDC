@@ -2,6 +2,8 @@ import pickle
 import os
 import numpy as np
 
+import cProfile, io, pstats
+
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc import petsc_fisher_multiimplicit, \
     petsc_fisher_fullyimplicit, petsc_fisher_semiimplicit
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
@@ -29,7 +31,7 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1E-06
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [1]
 
@@ -130,8 +132,17 @@ def run_SDC_variant(variant=None, inexact=False):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    # pr = cProfile.Profile()
+    # pr.enable()
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    # pr.disable()
+    # s = io.StringIO()
+    # sortby = 'cumulative'
+    # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    # ps.print_stats()
+    # print(s.getvalue())
+
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
@@ -166,8 +177,9 @@ def run_SDC_variant(variant=None, inexact=False):
     print()
 
     assert err < 7E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
-
+    # exit()
     return timing[0][1], np.mean(niters)
+
 
 
 def show_results(fname):
@@ -212,7 +224,7 @@ def main():
     results = {}
     for variant in ['fully-implicit', 'multi-implicit', 'semi-implicit']:
 
-        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+        # results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     fname = 'data/timings_SDC_variants_Fisher'
