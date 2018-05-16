@@ -8,7 +8,7 @@ class petsc_data(object):
     Wrapper for PETSc Vectors
 
     Attributes:
-        values (np.ndarray): contains the ndarray of the values
+        values: contains the actual PETSc vector
     """
 
     def __init__(self, init=None, val=None):
@@ -40,7 +40,7 @@ class petsc_data(object):
         Args:
             other: PETSc object to be added
         Raises:
-            DataError: if other is not a mesh object
+            DataError: if other is not a DMDA object
         Returns:
             sum of caller and other values (self+other)
         """
@@ -59,7 +59,7 @@ class petsc_data(object):
         Args:
             other: PETSc object to be subtracted
         Raises:
-            DataError: if other is not a mesh object
+            DataError: if other is not a DMDA object
         Returns:
             differences between caller and other values (self-other)
         """
@@ -192,7 +192,7 @@ class rhs_imex_petsc_data(object):
 
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another mesh object
+                  or another DMDA object
             val: initial value (default: None)
         Raises:
             DataError: if init is none of the types above
@@ -302,7 +302,7 @@ class rhs_2comp_petsc_data(object):
 
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another mesh object
+                  or another DMDA object
             val: initial value (default: None)
         Raises:
             DataError: if init is none of the types above
