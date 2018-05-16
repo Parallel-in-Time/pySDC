@@ -65,7 +65,7 @@ def setup_parameters():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -173,6 +173,7 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
     print()
 
     assert err < 3E-06, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
+    assert np.mean(niters) <= 10, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
     return timing[0][1], np.mean(niters)
 
@@ -277,13 +278,13 @@ def run_reference():
     return None
 
 
-def main():
+def main(cwd=''):
 
     results = {}
     for variant in ['fully-implicit', 'multi-implicit', 'semi-implicit']:
 
-        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False, cwd=cwd)
+        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True, cwd=cwd)
 
     fname = 'data/timings_SDC_variants_GrayScott'
     file = open(fname + '.pkl', 'wb')
