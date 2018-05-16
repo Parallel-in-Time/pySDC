@@ -23,7 +23,7 @@ def main():
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 1
 
     # This comes as read-in for the problem class
     problem_params = dict()
@@ -66,7 +66,7 @@ def main():
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.08
+    Tend = 0.16
 
     num_procs = int((Tend - t0) / level_params['dt'])
 
