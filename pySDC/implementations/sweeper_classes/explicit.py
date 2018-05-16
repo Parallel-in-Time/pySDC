@@ -30,7 +30,7 @@ class explicit(sweeper):
 
     def integrate(self):
         """
-        Integrates the right-hand side (here impl + expl)
+        Integrates the right-hand side
 
         Returns:
             list of dtype_u: containing the integral as values
@@ -70,12 +70,12 @@ class explicit(sweeper):
         M = self.coll.num_nodes
 
         # gather all terms which are known already (e.g. from the previous iteration)
-        # this corresponds to u0 + QF(u^k) - QIFI(u^k) - QEFE(u^k) + tau
+        # this corresponds to u0 + QF(u^k) - QEFE(u^k) + tau
 
         # get QF(u^k)
         integral = self.integrate()
         for m in range(M):
-            # subtract QIFI(u^k)_m - QEFE(u^k)_m
+            # subtract QEFE(u^k)_m
             for j in range(M + 1):
                 integral[m] -= L.dt * self.QE[m + 1, j] * L.f[j]
             # add initial value
@@ -86,7 +86,7 @@ class explicit(sweeper):
 
         # do the sweep
         for m in range(0, M):
-            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
+            # build new u, consisting of the known values from above and new values from previous nodes (at k+1)
             L.u[m + 1] = P.dtype_u(integral[m])
             for j in range(m + 1):
                 L.u[m + 1] += L.dt * self.QE[m + 1, j] * L.f[j]

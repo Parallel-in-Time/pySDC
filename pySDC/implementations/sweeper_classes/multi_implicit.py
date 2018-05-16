@@ -103,7 +103,7 @@ class multi_implicit(sweeper):
             for j in range(m + 1):
                 rhs += L.dt * self.Q1[m + 1, j] * L.f[j].comp1
 
-            # implicit solve with prefactor stemming from QI
+            # implicit solve with prefactor stemming from Q1
             L.u[m + 1] = P.solve_system_1(rhs, L.dt * self.Q1[m + 1, m + 1], L.u[m + 1],
                                           L.time + L.dt * self.coll.nodes[m])
             # evaluate preliminary f for computing the second component
