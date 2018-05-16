@@ -229,7 +229,7 @@ class petsc_fisher_multiimplicit(ptype):
         self.ksp = PETSc.KSP()
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
-        pc = self.ksp.getPC()
+        # pc = self.ksp.getPC()
         # pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
@@ -241,7 +241,8 @@ class petsc_fisher_multiimplicit(ptype):
         # setup nonlinear solver
         self.snes = PETSc.SNES()
         self.snes.create(comm=self.params.comm)
-        self.snes.setType('ksponly')
+        if self.params.nlsol_maxiter <= 1:
+            self.snes.setType('ksponly')
         # self.snes.getKSP().setType('cg')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()

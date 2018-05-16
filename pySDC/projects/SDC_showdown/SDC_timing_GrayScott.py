@@ -97,8 +97,10 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
         niter (float)
     """
 
+    # load (incomplete) default parameters
     description, controller_params = setup_parameters()
 
+    # add stuff based on variant
     if variant == 'fully-implicit':
         description['problem_class'] = petsc_grayscott_fullyimplicit
         description['dtype_f'] = petsc_data
@@ -137,11 +139,11 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+    # load reference solution to compare with
     fname = cwd + 'data/GS_reference.dat'
     viewer = PETSc.Viewer().createBinary(fname, 'r')
     uex = P.u_exact(t0)
     uex.values = PETSc.Vec().load(viewer)
-
     err = abs(uex - uend)
 
     # filter statistics by variant (number of iterations)
@@ -217,7 +219,7 @@ def show_results(fname):
 
 def run_reference():
     """
-    Helper routine to create a reference soultion using very high order SDC and small time-steps
+    Helper routine to create a reference solution using very high order SDC and small time-steps
     """
 
     description, controller_params = setup_parameters()
@@ -279,19 +281,28 @@ def run_reference():
 
 
 def main(cwd=''):
+    """
+    Main driver
 
+    Args:
+        cwd (str): current working directory (need this for testing)
+    """
+
+    # Loop over variants, exact and inexact solves
     results = {}
     for variant in ['fully-implicit', 'multi-implicit', 'semi-implicit']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False, cwd=cwd)
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True, cwd=cwd)
 
+    # dump result
     fname = 'data/timings_SDC_variants_GrayScott'
     file = open(fname + '.pkl', 'wb')
     pickle.dump(results, file)
     file.close()
     assert os.path.isfile(fname + '.pkl'), 'ERROR: pickle did not create file'
 
+    # visualize
     show_results(fname)
 
 

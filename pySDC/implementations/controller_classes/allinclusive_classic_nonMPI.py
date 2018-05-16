@@ -1,6 +1,7 @@
 import itertools
 import copy as cp
 import numpy as np
+import dill
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
@@ -27,10 +28,17 @@ class allinclusive_classic_nonMPI(controller):
 
         self.logger.warning('classic controller is about to become deprecated, use multigrid controller instead')
 
-        self.MS = []
-        # simply append step after step and generate the hierarchies
-        for p in range(num_procs):
-            self.MS.append(stepclass.step(description))
+        self.MS = [stepclass.step(description)]
+
+        # try to initialize via dill.copy (much faster for many time-steps)
+        try:
+            for p in range(num_procs - 1):
+                self.MS.append(dill.copy(self.MS[0]))
+        # if this fails (e.g. due to un-picklable data in the steps), initialize seperately
+        except dill.PicklingError and TypeError:
+            self.logger.warning('Need to initialize steps separately due to pickling error')
+            for p in range(num_procs - 1):
+                self.MS.append(stepclass.step(description))
 
         assert not (len(self.MS) > 1 and len(self.MS[0].levels) == 1), "ERROR: classic cannot do MSSDC"
 

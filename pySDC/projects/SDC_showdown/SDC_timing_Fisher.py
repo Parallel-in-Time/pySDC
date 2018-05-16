@@ -94,8 +94,10 @@ def run_SDC_variant(variant=None, inexact=False):
         niter (float)
     """
 
+    # load (incomplete) default parameters
     description, controller_params = setup_parameters()
 
+    # add stuff based on variant
     if variant == 'fully-implicit':
         description['problem_class'] = petsc_fisher_fullyimplicit
         description['dtype_f'] = petsc_data
@@ -209,19 +211,28 @@ def show_results(fname):
 
 
 def main():
+    """
+    Main driver
 
+    Args:
+        cwd (str): current working directory (need this for testing)
+    """
+
+    # Loop over variants, exact and inexact solves
     results = {}
     for variant in ['fully-implicit', 'multi-implicit', 'semi-implicit']:
 
-        # results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
+    # dump result
     fname = 'data/timings_SDC_variants_Fisher'
     file = open(fname + '.pkl', 'wb')
     pickle.dump(results, file)
     file.close()
     assert os.path.isfile(fname + '.pkl'), 'ERROR: pickle did not create file'
 
+    # visualize
     show_results(fname)
 
 
