@@ -1,8 +1,8 @@
 import numpy as np
 import csv
 import os
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -293,7 +293,7 @@ def plot_results(cwd=''):
         # set up figure
         plt.figure()
         plt.xlabel('number of time-steps (L)')
-        plt.ylabel('#iterations')
+        plt.ylabel('no. of iterations')
         plt.xlim(min(xvalues_1 + xvalues_2) / 2.0, max(xvalues_1 + xvalues_2) * 2.0)
         plt.ylim(min(niter_1 + niter_2) - 1, max(niter_1 + niter_2) + 1)
         plt.grid()

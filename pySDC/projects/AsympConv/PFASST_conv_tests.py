@@ -295,7 +295,7 @@ def plot_results(nsweeps):
     # set up figure
     plt.figure()
     plt.xlabel(r'$\mu$')
-    plt.ylabel('#iterations')
+    plt.ylabel('no. of iterations')
     plt.xlim(min(xvalues_diff + xvalues_adv) / 10.0, max(xvalues_diff + xvalues_adv) * 10.0)
     plt.ylim(min(niter_diff + niter_adv) - 1, max(niter_diff + niter_adv) + 1)
     plt.grid()

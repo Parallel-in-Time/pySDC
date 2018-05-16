@@ -64,3 +64,4 @@ def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
         plt.savefig('{}.pdf'.format(filename), rasterized=True, bbox_inches='tight')
     if save_png:
         plt.savefig('{}.png'.format(filename), rasterized=True, bbox_inches='tight')
+    plt.close()
