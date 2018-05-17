@@ -229,8 +229,8 @@ class petsc_fisher_multiimplicit(ptype):
         self.ksp = PETSc.KSP()
         self.ksp.create(comm=self.params.comm)
         self.ksp.setType('cg')
-        # pc = self.ksp.getPC()
-        # pc.setType('ilu')
+        pc = self.ksp.getPC()
+        pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.lsol_tol, atol=self.params.lsol_tol,
@@ -243,7 +243,9 @@ class petsc_fisher_multiimplicit(ptype):
         self.snes.create(comm=self.params.comm)
         if self.params.nlsol_maxiter <= 1:
             self.snes.setType('ksponly')
-        # self.snes.getKSP().setType('cg')
+        self.snes.getKSP().setType('cg')
+        pc = self.snes.getKSP().getPC()
+        pc.setType('ilu')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
         self.snes.setTolerances(rtol=self.params.nlsol_tol, atol=self.params.nlsol_tol, stol=self.params.nlsol_tol,
