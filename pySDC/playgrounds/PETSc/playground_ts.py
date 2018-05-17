@@ -208,8 +208,8 @@ x = ode.gvec.duplicate()
 f = ode.gvec.duplicate()
 
 ts = PETSc.TS().create(comm=MPI.COMM_WORLD)
-ts.setType(ts.Type.RK)        # Rosenbrock-W. ARKIMEX is a nonlinearly implicit alternative.
-ts.setRKType('3bs')
+ts.setType(ts.Type.ARKIMEXARS443)        # Rosenbrock-W. ARKIMEX is a nonlinearly implicit alternative.
+# ts.setRKType('3bs')
 
 ts.setIFunction(ode.formFunction, ode.gvec)
 ts.setIJacobian(ode.formJacobian, ode.mat)
