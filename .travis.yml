@@ -16,11 +16,12 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba sphinx=1.6.3
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba
+  - conda install --yes sphinx=1.6.3
   - conda install --yes -c conda-forge petsc4py
   - conda list
-  - pip install --user coloredlogs
-  - pip install --user travis-sphinx
+  - pip install coloredlogs
+  - pip install travis-sphinx
   - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
