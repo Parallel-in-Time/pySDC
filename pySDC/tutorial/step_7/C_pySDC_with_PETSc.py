@@ -29,6 +29,7 @@ def main():
     else:
         color = int(world_rank / 1)
     space_comm = comm.Split(color=color)
+    space_rank = space_comm.Get_rank()
 
     # split world communicator to create time-communicators
     if len(sys.argv) == 2:
@@ -70,8 +71,8 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
-    # controller_params['predict'] = False
+    controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
+    controller_params['dump_setup'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -111,39 +112,41 @@ def main():
     # convert filtered statistics to list of iterations count, sorted by process
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
-    f = open('step_7_C_out.txt', 'w')
+    niters = np.array([item[1] for item in iter_counts])
+    
+    if space_rank == 0:
+        f = open('step_7_C_out.txt', 'w')
 
-    # compute and print statistics
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %2i' % item
+        # compute and print statistics
+        for item in iter_counts:
+            out = 'Number of iterations for time %4.2f: %2i' % item
+            f.write(out + '\n')
+            print(out)
+
+        out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+        f.write(out + '\n')
+        print(out)
+        out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+        f.write(out + '\n')
+        print(out)
+        out = '   Position of max/min number of iterations: %2i -- %2i' % \
+              (int(np.argmax(niters)), int(np.argmin(niters)))
+        f.write(out + '\n')
+        print(out)
+        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         print(out)
 
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-    f.write(out + '\n')
-    print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
-    f.write(out + '\n')
-    print(out)
-    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-    f.write(out + '\n')
-    print(out)
+        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        out = 'Time to solution: %6.4f sec.' % timing[0][1]
+        f.write(out + '\n')
+        print(out)
+        out = 'Error vs. PDE solution: %6.4e' % err
+        f.write(out + '\n')
+        print(out)
 
-    out = 'Time to solution: %6.4f sec.' % timing[0][1]
-    f.write(out + '\n')
-    print(out)
-    out = 'Error vs. PDE solution: %6.4e' % err
-    f.write(out + '\n')
-    print(out)
-
-    f.close()
+        f.close()
 
     assert err < 2E-04, 'ERROR: did not match error tolerance, got %s' % err
     assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
