@@ -24,7 +24,7 @@ def main():
     world_size = comm.Get_size()
 
     # split world communicator to create space-communicators
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         color = int(world_rank / int(sys.argv[1]))
     else:
         color = int(world_rank / 1)
@@ -32,11 +32,12 @@ def main():
     space_rank = space_comm.Get_rank()
 
     # split world communicator to create time-communicators
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         color = int(world_rank % int(sys.argv[1]))
     else:
         color = int(world_rank / world_size)
     time_comm = comm.Split(color=color)
+    time_rank = time_comm.Get_rank()
 
     # initialize level parameters
     level_params = dict()
@@ -113,9 +114,18 @@ def main():
     iter_counts = sort_stats(filtered_stats, sortby='time')
 
     niters = np.array([item[1] for item in iter_counts])
-    
+
+    # limit output to space-rank 0 (as before when setting the logger level)
     if space_rank == 0:
-        f = open('step_7_C_out.txt', 'w')
+        if len(sys.argv) == 3:
+            fname = str(sys.argv[2])
+        else:
+            fname = 'step_7_C_out.txt'
+        f = open(fname, 'a+')
+
+        out = 'This is time-rank %i...' % time_rank
+        f.write(out + '\n')
+        print(out)
 
         # compute and print statistics
         for item in iter_counts:
