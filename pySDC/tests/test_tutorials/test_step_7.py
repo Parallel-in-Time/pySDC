@@ -23,8 +23,6 @@ def test_C_1x1():
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    stdout = p.communicate()[0]
-    print('STDOUT:{}'.format(stdout))
     p.wait()
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                               (p.returncode, num_procs)
@@ -42,8 +40,6 @@ def test_C_1x2():
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    stdout = p.communicate()[0]
-    print('STDOUT:{}'.format(stdout))
     p.wait()
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                               (p.returncode, num_procs)
@@ -61,8 +57,6 @@ def test_C_2x2():
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
-    stdout = p.communicate()[0]
-    print('STDOUT:{}'.format(stdout))
     p.wait()
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                               (p.returncode, num_procs)
