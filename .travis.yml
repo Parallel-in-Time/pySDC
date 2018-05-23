@@ -27,6 +27,8 @@ install:
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
+  - mpirun --version
+  - export MPICH_NO_LOCAL=1
   - export PYTHONPATH=$PYTHONPATH:../../..
   - mpirun -np 2 python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
 #  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
