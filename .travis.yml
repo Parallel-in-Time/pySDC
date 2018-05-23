@@ -16,9 +16,9 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba sphinx
+  - conda install --yes -c conda-forge petsc4py mpi4py
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy future scipy matplotlib nose pep8 coverage sympy dill numba sphinx
 #  - conda install --yes sphinx
-  - conda install --yes -c conda-forge petsc4py
   - conda list
   - pip install coloredlogs
   - pip install travis-sphinx
@@ -29,7 +29,7 @@ script:
   - which nosetests
   - export MPICH_NO_LOCAL=1
   - export PYTHONPATH=$PYTHONPATH:../../..
-  - nosetests -s -v pySDC/tests/test_tutorials/test_step_6.py
+  - nosetests -s -v pySDC/tests/test_tutorials/test_step_7.py
 #  - mpirun -np 4 python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py 2
 #  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
