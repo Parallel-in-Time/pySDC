@@ -14,10 +14,14 @@ def test_C_1x1():
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
     cwd = '.'
+    # set up new/empty file for output
+    fname = 'step_7_C_out_1x1.txt'
+    f = open(fname, 'w')
+    f.close()
     num_procs = 1
     num_procs_space = 1
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
-           + str(num_procs_space) + ' ' + 'step_7_C_out_1x1.txt').split()
+           + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     stdout = p.communicate()[0]
     print('STDOUT:{}'.format(stdout))
@@ -30,10 +34,13 @@ def test_C_1x2():
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
     cwd = '.'
+    fname = 'step_7_C_out_1x2.txt'
+    f = open(fname, 'w')
+    f.close()
     num_procs = 2
     num_procs_space = 2
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
-           + str(num_procs_space) + ' ' + 'step_7_C_out_1x2.txt').split()
+           + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     stdout = p.communicate()[0]
     print('STDOUT:{}'.format(stdout))
@@ -46,10 +53,13 @@ def test_C_2x2():
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
     cwd = '.'
+    fname = 'step_7_C_out_2x2.txt'
+    f = open(fname, 'w')
+    f.close()
     num_procs = 4
     num_procs_space = 2
     cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
-           + str(num_procs_space) + ' ' + 'step_7_C_out_2x2.txt').split()
+           + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     stdout = p.communicate()[0]
     print('STDOUT:{}'.format(stdout))
