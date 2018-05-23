@@ -27,7 +27,7 @@ install:
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
-  - nosetests -s -v pySDC/tests/test_tutorials/test_step_7.py
+  - mpirun -np 4 python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py 2
 #  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
