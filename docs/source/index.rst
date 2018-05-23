@@ -11,6 +11,11 @@ The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <ht
 News
 ----
 
+- May 23, 3018: Version 2.4 adds support for PETSc! You can now use PETSc data types (pySDC ships with DMDA for distributed structured grids) and parallel solvers right from you examples and problem classes.
+  There is also a new tutorial (7.C) showing this in a bit more detail, including communicator splitting for parallelization in space and time.
+  Warning: in order to get this to work you need to install petsc4py and mpi4py first! Make sure both use MPICH3 bindings.
+  Downloading pySDC from PyPI does not include these packages.
+
 - February 8, 2018: Ever got annoyed at `pySDC`'s incredibly slow setup phase when multiple time-steps are used? Version 2.3
   changes this by copying the data structure of the first step to all other steps using the `dill Package <https://pypi.python.org/pypi/dill>`_.
   Setup times could be reduced by 90% and more for certain problems. We also increase the speed for certain calculations,

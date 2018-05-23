@@ -178,7 +178,7 @@ def show_results(cwd=''):
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
     print(err_ham)
-    assert err_ham < 1E-10, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
+    assert err_ham < 6E-10, 'Error in the Hamiltonian is too large, got %s' % err_ham
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')
