@@ -1,5 +1,7 @@
 Full code: `pySDC/tutorial/step_7/C_pySDC_with_PETSc.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/C_pySDC_with_PETSc.py>`_
 
+.. literalinclude:: ../../../pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
+
 Results:
 
 1 processor in time, 1 processor in space
