@@ -22,13 +22,13 @@ install:
   - conda list
   - pip install coloredlogs
   - pip install travis-sphinx
-  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
+#  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
   - export PYTHONPATH=$PYTHONPATH:../../..
-  - mpirun -np 4 python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py 2
+  - mpirun -np 2 python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py
 #  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
