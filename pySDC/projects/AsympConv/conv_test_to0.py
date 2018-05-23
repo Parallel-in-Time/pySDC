@@ -56,7 +56,8 @@ def compute_and_plot_specrad(Nnodes, lam):
                 x * lam * np.kron(np.eye(Nsteps), (Qmat - QDmat)) + np.kron(Emat, Nmat))
 
             Prho_list.append(max(abs(np.linalg.eigvals(mat))))
-            predict_list.append((1 + x) ** (1.0 - 1.0 / (Nnodes * Nsteps)) * x ** (1.0 / (Nnodes * Nsteps)))
+            # predict_list.append((1 + x) ** (1.0 - 1.0 / (Nnodes * Nsteps)) * x ** (1.0 / (Nnodes * Nsteps)))
+            predict_list.append(x ** (1.0 / (Nnodes * Nsteps)))
 
             if len(predict_list) > 1:
                 print(x, predict_list[-1], Prho_list[-1], Prho_list[-2] / Prho_list[-1],

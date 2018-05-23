@@ -16,9 +16,9 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba
-  - conda install --yes sphinx
-  - conda install --yes -c conda-forge petsc=3.9.0 petsc4py=3.9.0
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba sphinx
+#  - conda install --yes sphinx
+  - conda install --yes -c conda-forge petsc4py
   - conda list
   - pip install coloredlogs
   - pip install travis-sphinx

@@ -1,5 +1,4 @@
 from __future__ import division
-from petsc4py import PETSc
 
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
@@ -26,7 +25,7 @@ class mesh_to_mesh_petsc_dmda(space_transfer):
         super(mesh_to_mesh_petsc_dmda, self).__init__(fine_prob, coarse_prob, params)
 
         # set interpolation type (no effect as far as I can tell)
-        self.coarse_prob.init.setInterpolationType(PETSc.DMDA.InterpolationType.Q1)
+        # self.coarse_prob.init.setInterpolationType(PETSc.DMDA.InterpolationType.Q1)
         # define interpolation (only accurate for constant functions)
         self.interp, _ = self.coarse_prob.init.createInterpolation(self.fine_prob.init)
         # define restriction as injection (tranpose of interpolation does not work)

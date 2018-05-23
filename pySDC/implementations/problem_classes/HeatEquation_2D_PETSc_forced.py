@@ -1,6 +1,5 @@
 from __future__ import division
 import numpy as np
-from petsc4py import PETSc
 
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
@@ -32,6 +31,8 @@ class heat2d_petsc_forced(ptype):
 
         # these parameters will be used later, so assert their existence
 
+        from petsc4py import PETSc
+
         if 'comm' not in problem_params:
             problem_params['comm'] = PETSc.COMM_WORLD
         if 'sol_tol' not in problem_params:
@@ -60,6 +61,9 @@ class heat2d_petsc_forced(ptype):
         self.dx = 1.0 / (self.params.nvars[0] - 1)
         self.dy = 1.0 / (self.params.nvars[1] - 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
+
+        self.row = PETSc.Mat.Stencil()
+        self.col = PETSc.Mat.Stencil()
 
         # compute discretization matrix A and identity
         self.A = self.__get_A()
@@ -91,16 +95,14 @@ class heat2d_petsc_forced(ptype):
 
         # fill matrix
         A.zeroEntries()
-        row = PETSc.Mat.Stencil()
-        col = PETSc.Mat.Stencil()
         mx, my = self.init.getSizes()
         (xs, xe), (ys, ye) = self.init.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                row.index = (i, j)
-                row.field = 0
+                self.row.index = (i, j)
+                self.row.field = 0
                 if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
-                    A.setValueStencil(row, row, 1.0)
+                    A.setValueStencil(self.row, self.row, 1.0)
                 else:
                     diag = self.params.nu * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2)
                     for index, value in [
@@ -110,9 +112,9 @@ class heat2d_petsc_forced(ptype):
                         ((i + 1, j), self.params.nu / self.dx ** 2),
                         ((i, j + 1), self.params.nu / self.dy ** 2),
                     ]:
-                        col.index = index
-                        col.field = 0
-                        A.setValueStencil(row, col, value)
+                        self.col.index = index
+                        self.col.field = 0
+                        A.setValueStencil(self.row, self.col, value)
         A.assemble()
 
         return A
@@ -134,13 +136,12 @@ class heat2d_petsc_forced(ptype):
 
         # fill matrix
         Id.zeroEntries()
-        row = PETSc.Mat.Stencil()
         (xs, xe), (ys, ye) = self.init.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                row.index = (i, j)
-                row.field = 0
-                Id.setValueStencil(row, row, 1.0)
+                self.row.index = (i, j)
+                self.row.field = 0
+                Id.setValueStencil(self.row, self.row, 1.0)
 
         Id.assemble()
 
