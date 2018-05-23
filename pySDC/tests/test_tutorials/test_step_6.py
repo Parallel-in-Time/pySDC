@@ -18,6 +18,8 @@ def test_C():
 
     if "mpi4py" in flat_installed_packages:
 
+        print('Doing MPI stuff now')
+
         cwd = 'pySDC/tutorial/step_6'
         main_C(cwd)
 
