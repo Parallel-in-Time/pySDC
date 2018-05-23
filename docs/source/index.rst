@@ -24,7 +24,7 @@ News
 ----
 
 - May 23, 3018: Version 2.4 adds support for `petsc4py <https://bitbucket.org/petsc/petsc4py>`_!
-  You can now use `PETSc <http://www.mcs.anl.gov/petsc/>`_ data types (pySDC ships with DMDA for distributed structured grids) and parallel solvers right from you examples and problem classes.
+  You can now use `PETSc <http://www.mcs.anl.gov/petsc/>`_ data types (pySDC ships with DMDA for distributed structured grids) and parallel solvers right from your examples and problem classes.
   There is also a new tutorial (7.C) showing this in a bit more detail, including communicator splitting for parallelization in space and time.
   Warning: in order to get this to work you need to install petsc4py and mpi4py first! Make sure both use MPICH3 bindings.
   Downloading pySDC from PyPI does not include these packages.
