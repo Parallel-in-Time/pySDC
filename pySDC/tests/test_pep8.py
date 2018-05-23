@@ -13,8 +13,8 @@ def check_files(dir):
     style.options.ignore = 'E402'
     python_files = []
     for root, _, files in os.walk(dir):
-        if 'pySDC/playgrounds/deprecated' not in root:
-            python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
+        # if 'pySDC/playgrounds' not in root:
+        python_files += [os.path.join(root, f) for f in files if f.endswith('.py')]
 
     for file in python_files:
         report = style.check_files([os.path.join(BASE_PATH, file)])
@@ -23,5 +23,5 @@ def check_files(dir):
 
 
 def test_pep8():
-    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'pySDC/tutorial', 'pySDC/projects', 'pySDC/playgrounds']:
+    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'pySDC/tutorial', 'pySDC/projects']:
         yield check_files, dir

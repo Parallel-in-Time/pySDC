@@ -1,0 +1,132 @@
+# ------------------------------------------------------------------------
+#
+#  Poisson problem. This problem is modeled by the partial
+#  differential equation
+#
+#          -Laplacian(u) = 1,  0 < x,y < 1,
+#
+#  with boundary conditions
+#
+#           u = 0  for  x = 0, x = 1, y = 0, y = 1
+#
+#  A finite difference approximation with the usual 7-point stencil
+#  is used to discretize the boundary value problem to obtain a
+#  nonlinear system of equations. The problem is solved in a 2D
+#  rectangular domain, using distributed arrays (DAs) to partition
+#  the parallel grid.
+#
+# ------------------------------------------------------------------------
+
+# try: range = xrange
+# except: pass
+
+import numpy as np
+
+import sys, petsc4py
+petsc4py.init(sys.argv)
+
+from petsc4py import PETSc
+
+class Poisson2D(object):
+
+    def __init__(self, da):
+        assert da.getDim() == 2
+        self.da = da
+        self.localX  = da.createLocalVec()
+
+    # def formRHS(self, B):
+    #     b = self.da.getVecArray(B)
+    #     mx, my = self.da.getSizes()
+    #     hx, hy = [1.0/m for m in [mx, my]]
+    #     (xs, xe), (ys, ye) = self.da.getRanges()
+    #     for j in range(ys, ye):
+    #         for i in range(xs, xe):
+    #             b[i, j] = 1*hx*hy
+    #             # b[i, j] = np.sin(2 * np.pi * (i + 1) * hx) * np.sin(2 * np.pi * (j + 1) * hy)
+
+    def mult(self, mat, X, Y):
+        #
+        print('here')
+        self.da.globalToLocal(X, self.localX)
+        x = self.da.getVecArray(self.localX)
+        y = self.da.getVecArray(Y)
+        #
+        mx, my = self.da.getSizes()
+        hx, hy = [1.0/m for m in [mx, my]]
+        row = PETSc.Mat.Stencil()
+        col = PETSc.Mat.Stencil()
+        (xs, xe), (ys, ye) = self.da.getRanges()
+        for j in range(ys, ye):
+            for i in range(xs, xe):
+                row.index = (i,j)
+                if (i==0 or j==0 or i==mx-1 or j==my-1):
+                    mat.setValueStencil(row,col,1.0)
+                else:
+                    # u = x[i, j] # center
+                    diag = (2*(hx/hy + hy/hx))
+                    for index, value in [
+                        ((i, j - 1), -hx/hy),
+                        ((i - 1, j), -hy/hx),
+                        ((i, j), diag),
+                        ((i + 1, j), -hy/hx),
+                        ((i, j + 1), -hx/hy),
+                    ]:
+                        col.index = index
+                        col.field = 0
+                        mat.setValueStencil(row, col, value)
+                # u_e = u_w = u_n = u_s = 0
+                # if i > 0:    u_w = x[i-1, j] # west
+                # if i < mx-1: u_e = x[i+1, j] # east
+                # if j > 0:    u_s = x[i, j-1] # south
+                # if j < ny-1: u_n = x[i, j+1] # north
+                # u_xx = (u_e - 2*u + u_w)*hy/hx
+                # u_yy = (u_n - 2*u + u_s)*hx/hy
+                # y[i, j] = u_xx + u_yy
+        mat.assemble()
+        mat.mult(x, y)
+        # if J != P: J.assemble()  # matrix-free operator
+        return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
+
+OptDB = PETSc.Options()
+
+n  = OptDB.getInt('n', 4)
+nx = OptDB.getInt('nx', n)
+ny = OptDB.getInt('ny', n)
+
+da = PETSc.DMDA().create([nx, ny], stencil_width=1)
+pde = Poisson2D(da)
+
+x = da.createGlobalVec()
+b = da.createGlobalVec()
+# A = da.createMat('python')
+A = PETSc.Mat().createPython(
+    [x.getSizes(), b.getSizes()], comm=da.comm)
+A.setPythonContext(pde)
+A.setUp()
+
+ksp = PETSc.KSP().create()
+ksp.setOperators(A)
+ksp.setType('cg')
+pc = ksp.getPC()
+pc.setType('none')
+ksp.setFromOptions()
+
+ba = da.getVecArray(b)
+mx, my = da.getSizes()
+hx, hy = [1.0/m for m in [mx, my]]
+(xs, xe), (ys, ye) = da.getRanges()
+for i in range(xs, xe):
+    for j in range(ys, ye):
+        ba[i, j] = 1*hx*hy
+# pde.formRHS(b)
+# b.setUp()
+# print(PETSc.COMM_WORLD.getRank(), b.getArray())
+ksp.solve(b, x)
+
+print(PETSc.COMM_WORLD.getRank(), x.getArray())
+
+u = da.createNaturalVec()
+da.globalToNatural(x, u)
+
+print('nat', PETSc.COMM_WORLD.getRank(), u.getArray())
+
