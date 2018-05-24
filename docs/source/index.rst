@@ -85,13 +85,19 @@ Getting started
 
 The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <https://github.com/Parallel-in-Time/pySDC>`_, and PyPI, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_.
 Either use ``pip install pySDC`` to get the latest stable release including the core dependencies or check out the code on Github.
-All package requirements are listed in the files `requirements.txt` (for the core dependencies) and `requirements-optional.txt` for the more advanced features.
+All package requirements are listed in the files `requirements.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements.txt>`_ (for the core dependencies) and `requirements-optional.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements-optional.txt>`_ for the more advanced features.
 
 To check your installation, run
 
 .. code-block:: bash
 
    nosetests -v pySDC/tests
+
+You may need to update your ``PYTHONPATH`` by running
+
+.. code-block:: bash
+
+   export PYTHONPATH=$PYTHONPATH:../../..
 
 Note: When installing both `mpi4py` and `petsc4py`, make sure they use the same MPI installation (e.g. MPICH3).
 You can achieve this e.g. by using the `Anaconda distribution <https://www.anaconda.com/distribution/>`_ of Python and then run
@@ -100,7 +106,7 @@ You can achieve this e.g. by using the `Anaconda distribution <https://www.anaco
 
    conda install -c conda-forge petsc4py mpi4py
 
-Most of the code is tested automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_, so a working version of the installation process can always be found in the `install`-block of the `.travis.yml` file.
+Most of the code is tested automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_, so a working version of the installation process can always be found in the `install`-block of the `.travis.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.travis.yml>`_ file.
 
 
 Tutorial
