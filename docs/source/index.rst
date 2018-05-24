@@ -99,12 +99,6 @@ You may need to update your ``PYTHONPATH`` by running
 
    export PYTHONPATH=$PYTHONPATH:../../..
 
-You may need to update your ``PYTHONPATH`` by running
-
-.. code-block:: bash
-
-   export PYTHONPATH=$PYTHONPATH:../../..
-
 in particular if you want to run any of the playgrounds, projects or tutorials.
 All ``import`` statements there assume that the `pySDC`'s base directory is part of ``PYTHONPATH``.
 
