@@ -22,7 +22,6 @@ setup(
         'nose>=1.3.7',
         'numpy>=1.9.3',
         'scipy>=0.17.1',
-        'future>=0.15.2',
         'matplotlib>=1.5.3',
         'pep8',
         'sympy>=1.0',
