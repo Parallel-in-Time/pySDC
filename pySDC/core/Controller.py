@@ -1,7 +1,5 @@
-import abc
 import os
 import sys
-from future.utils import with_metaclass
 import logging
 
 from pySDC.helpers.pysdc_helper import FrozenClass
@@ -25,7 +23,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class controller(with_metaclass(abc.ABCMeta)):
+class controller(object):
     """
     Base abstract controller class
     """
@@ -198,7 +196,6 @@ class controller(with_metaclass(abc.ABCMeta)):
 
         return converged
 
-    @abc.abstractmethod
     def run(self, u0, t0, Tend):
         """
         Abstract interface to the run() method
@@ -208,7 +205,7 @@ class controller(with_metaclass(abc.ABCMeta)):
             t0 (float): starting time
             Tend (float): ending time
         """
-        return None
+        raise NotImplementedError('ERROR: controller has to implement run(self, u0, t0, Tend)')
 
     @property
     def hooks(self):
