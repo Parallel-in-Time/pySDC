@@ -99,6 +99,15 @@ You may need to update your ``PYTHONPATH`` by running
 
    export PYTHONPATH=$PYTHONPATH:../../..
 
+You may need to update your ``PYTHONPATH`` by running
+
+.. code-block:: bash
+
+   export PYTHONPATH=$PYTHONPATH:../../..
+
+in particular if you want to run any of the playgrounds, projects or tutorials.
+All ``import`` statements there assume that the `pySDC`'s base directory is part of ``PYTHONPATH``.
+
 Note: When installing both `mpi4py` and `petsc4py`, make sure they use the same MPI installation (e.g. MPICH3).
 You can achieve this e.g. by using the `Anaconda distribution <https://www.anaconda.com/distribution/>`_ of Python and then run
 
