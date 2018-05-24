@@ -24,7 +24,6 @@ setup(
         'scipy>=0.17.1',
         'future>=0.15.2',
         'matplotlib>=1.5.3',
-        'coloredlogs',
         'pep8',
         'sympy>=1.0',
         'numba>=0.35',

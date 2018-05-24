@@ -3,7 +3,6 @@ import os
 import sys
 from future.utils import with_metaclass
 import logging
-import coloredlogs
 
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core import Hooks as hookclass
@@ -79,7 +78,7 @@ class controller(with_metaclass(abc.ABCMeta)):
         else:
             file_handler = None
 
-        std_formatter = coloredlogs.ColoredFormatter(fmt='%(name)s - %(levelname)s: %(message)s')
+        std_formatter = logging.Formatter(fmt='%(name)s - %(levelname)s: %(message)s')
         std_handler = logging.StreamHandler(sys.stdout)
         std_handler.setFormatter(std_formatter)
 
