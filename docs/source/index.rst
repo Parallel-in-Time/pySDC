@@ -28,7 +28,7 @@ Projects
 .. include:: ../../pySDC/projects/README.rst
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    projects/parallelSDC.rst
    projects/node_failure.rst
