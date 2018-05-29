@@ -142,17 +142,23 @@ class mesh_to_mesh(space_transfer):
     def restrict(self, F):
         """
         Restriction implementation
-
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        return F.apply_mat(self.Rspace)
+        F.values = F.values.flatten()
+        G = F.apply_mat(self.Rspace)
+        G.values = G.values.reshape(self.coarse_prob.params.nvars)
+        F.values = F.values.reshape(self.fine_prob.params.nvars)
+        return G
 
     def prolong(self, G):
         """
         Prolongation implementation
-
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        return G.apply_mat(self.Pspace)
+        G.values = G.values.flatten()
+        F = G.apply_mat(self.Pspace)
+        F.values = F.values.reshape(self.fine_prob.params.nvars)
+        G.values = G.values.reshape(self.coarse_prob.params.nvars)
+        return F

@@ -40,16 +40,16 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
         if problem_params['nvars'][0] != problem_params['nvars'][1]:
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
-        if (problem_params['nvars'][0] + 1) % 2 != 0:
-            raise ProblemError('the setup requires nvars = 2^p per dimension')
+        # if (problem_params['nvars'][0] + 1) % 2 != 0:
+        #     raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 1.0 / (self.params.nvars[0] + 1)
+        self.dx = 1.0 / (self.params.nvars[0] - 0)
         self.A = self.__get_A(self.params.nvars, self.dx)
-        self.xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars[0])])
+        self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
     @staticmethod
     def __get_A(N, dx):
@@ -65,14 +65,18 @@ class allencahn_fullyimplicit(ptype):
         """
 
         stencil = [1, -2, 1]
-        # zero_pos = 2
-        # dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        # offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-        #                           [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
-        # doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
-        #
-        # A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N[0], N[0]), format='csc')
+        zero_pos = 2
+        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
+        offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
+
+        A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
+        # A = sp.diags(stencil, [-1, 0, 1], shape=(N[0], N[0]), format='csc')
+        # A[0, 1] = 2
+        # A[-1, -2] = 2
+        # print(A.todense())
+        # exit()
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
 
@@ -106,7 +110,7 @@ class allencahn_fullyimplicit(ptype):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.values.flatten()
+            g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.values.flatten()
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -115,7 +119,7 @@ class allencahn_fullyimplicit(ptype):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
+            dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -145,7 +149,7 @@ class allencahn_fullyimplicit(ptype):
         """
         f = self.dtype_f(self.init)
         v = u.values.flatten()
-        f.values = self.A.dot(v) - 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
+        f.values = self.A.dot(v) + 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
         f.values = f.values.reshape(self.params.nvars)
 
         return f
@@ -165,11 +169,12 @@ class allencahn_fullyimplicit(ptype):
         me = self.dtype_u(self.init, val=0.0)
         for i in range(self.params.nvars[0]):
             for j in range(self.params.nvars[1]):
-                r2 = (0.5 - self.xvalues[i]) ** 2 + (0.5 - self.xvalues[j]) ** 2
-                if r2 <= self.params.radius ** 2:
-                    me.values[i, j] = 1.0
-                else:
-                    me.values[i, j] = 0.0
+                r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
+                me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / self.params.eps)
+                # if r2 <= self.params.radius ** 2:
+                #     me.values[i, j] = 1.0
+                # else:
+                #     me.values[i, j] = 0.0
         return me
 
 
@@ -223,4 +228,109 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.ltol)[0]
         me.values = me.values.reshape(self.params.nvars)
+        return me
+
+
+# noinspection PyUnusedLocal
+class allencahn_multiimplicit(allencahn_fullyimplicit):
+    """
+    Example implementing the Allen-Cahn equation in 2D with finite differences
+
+    Attributes:
+        A: second-order FD discretization of the 2D laplace operator
+        dx: distance between two spatial nodes (same for both directions)
+    """
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+        f = self.dtype_f(self.init)
+        v = u.values.flatten()
+        f.comp1.values = self.A.dot(v)
+        f.comp2.values = - 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
+        f.comp1.values = f.comp1.values.reshape(self.params.nvars)
+        f.comp2.values = f.comp2.values.reshape(self.params.nvars)
+
+        return f
+
+    def solve_system_1(self, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-factor*A)u = rhs
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float): abbrev. for the local stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        me = self.dtype_u(self.init)
+
+        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+
+        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.ltol)[0]
+        me.values = me.values.reshape(self.params.nvars)
+        return me
+
+    def solve_system_2(self, rhs, factor, u0, t):
+        """
+        Newton solver for the reaction term
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float): abbrev. for the local stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        u = self.dtype_u(u0).values.flatten()
+
+        nu = self.params.nu
+        eps2 = self.params.eps ** 2
+
+        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+
+        # start newton iteration
+        n = 0
+        res = 99
+        while n < self.params.newton_maxiter:
+
+            # form the function g with g(u) = 0
+            g = u - factor / eps2 * u * (1.0 - u ** nu) - rhs.values.flatten()
+
+            # if g is close to 0, then we are done
+            res = np.linalg.norm(g, np.inf)
+
+            if res < self.params.newton_tol:
+                break
+
+            # assemble dg
+            dg = Id - factor / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0)
+
+            # newton update: u1 = u0 - g/dg
+            # u -= spsolve(dg, g)
+            u -= cg(dg, g, x0=u0.values.flatten(), tol=self.params.ltol)[0]
+            # increase iteration count
+            n += 1
+            # print(n, res)
+
+        # if n == self.params.newton_maxiter:
+        #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+
+        me = self.dtype_u(self.init)
+        me.values = u.reshape(self.params.nvars)
         return me
