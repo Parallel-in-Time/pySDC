@@ -7,6 +7,7 @@ from scipy.sparse.linalg import cg, spsolve
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
+# http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):

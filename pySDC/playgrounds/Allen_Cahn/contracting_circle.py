@@ -17,6 +17,9 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.playgrounds.Allen_Cahn.monitor import monitor
 
 
+# http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
+
+
 def main():
     # initialize level parameters
     level_params = dict()
@@ -25,13 +28,13 @@ def main():
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 1
+    step_params['maxiter'] = 3
 
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(128, 128)]#, (64, 64)]
-    problem_params['eps'] = [0.0390625]#, 0.078125]
+    problem_params['nvars'] = [(128, 128), (64, 64)]
+    problem_params['eps'] = [0.0390625, 0.078125]
     problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-09
     problem_params['ltol'] = 1E-10
@@ -40,7 +43,7 @@ def main():
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = 2
+    sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
     sweeper_params['spread'] = False
     sweeper_params['do_coll_update'] = False
@@ -75,7 +78,7 @@ def main():
     Tend = 0.032
 
     # instantiate the controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
+    controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params,
                                                description=description)
 
     # get initial values on finest level

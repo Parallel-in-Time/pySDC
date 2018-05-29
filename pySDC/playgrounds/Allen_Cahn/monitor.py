@@ -41,6 +41,11 @@ class monitor(hooks):
         for r in rows:
             radius1 = max(radius1, abs(L.prob.xvalues[r]))
 
+        rows1 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] > -1 + L.prob.params.eps)
+        rows2 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] < 1 - L.prob.params.eps)
+        # print(rows1[0], rows2[0])
+        print((rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps)
+        # exit()
         print(radius, radius1)
         self.init_radius = L.prob.params.radius
         # exit()
