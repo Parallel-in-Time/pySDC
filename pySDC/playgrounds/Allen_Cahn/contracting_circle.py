@@ -28,7 +28,7 @@ def main():
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 1
 
     # This comes as read-in for the problem class
     problem_params = dict()
@@ -43,7 +43,7 @@ def main():
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = 3
+    sweeper_params['num_nodes'] = 2
     sweeper_params['QI'] = 'IE'
     sweeper_params['spread'] = False
     sweeper_params['do_coll_update'] = False
@@ -62,11 +62,11 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = allencahn_semiimplicit_v2#allencahn_fullyimplicit
+    description['problem_class'] = allencahn_fullyimplicit
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh#mesh
-    description['sweeper_class'] = imex_1st_order#generic_implicit
+    description['dtype_f'] = mesh
+    description['sweeper_class'] = generic_implicit
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
