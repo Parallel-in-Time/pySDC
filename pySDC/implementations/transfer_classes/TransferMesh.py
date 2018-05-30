@@ -7,6 +7,8 @@ import pySDC.helpers.transfer_helper as th
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+
 
 class mesh_to_mesh(space_transfer):
     """
@@ -145,10 +147,19 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        F.values = F.values.flatten()
-        G = F.apply_mat(self.Rspace)
-        G.values = G.values.reshape(self.coarse_prob.params.nvars)
-        F.values = F.values.reshape(self.fine_prob.params.nvars)
+        if isinstance(F, mesh):
+            F.values = F.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.values = G.values.reshape(self.coarse_prob.params.nvars)
+            F.values = F.values.reshape(self.fine_prob.params.nvars)
+        elif isinstance(F, rhs_imex_mesh):
+            F.impl.values = F.impl.values.flatten()
+            F.expl.values = F.expl.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
+            G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
+            F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
+            F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
         return G
 
     def prolong(self, G):
@@ -157,8 +168,17 @@ class mesh_to_mesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        G.values = G.values.flatten()
-        F = G.apply_mat(self.Pspace)
-        F.values = F.values.reshape(self.fine_prob.params.nvars)
-        G.values = G.values.reshape(self.coarse_prob.params.nvars)
+        if isinstance(G, mesh):
+            G.values = G.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.values = F.values.reshape(self.fine_prob.params.nvars)
+            G.values = G.values.reshape(self.coarse_prob.params.nvars)
+        elif isinstance(G, rhs_imex_mesh):
+            G.impl.values = G.impl.values.flatten()
+            G.expl.values = G.expl.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
+            F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
+            G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
+            G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
         return F

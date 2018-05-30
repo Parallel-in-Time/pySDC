@@ -54,11 +54,11 @@ class monitor(hooks):
                           sweep=L.status.sweep, type='radius', value=radius)
         # self.im = self.ax.imshow(L.u[0].values, vmin=-1.0, vmax=1.0)
         # self.im_cut = self.ax_cut.plot(L.prob.xvalues, L.u[0].values[int((L.prob.init[0]-1)/2), :])
-        self.im_rad = self.ax.text(0,0,'')
-        self.ax.set_xlim(0, 0.05)
-        self.ax.set_ylim(0, 0.3)
-        plt.pause(0.001)
-        plt.show()
+        # self.im_rad = self.ax.text(0,0,'')
+        # self.ax.set_xlim(0, 0.05)
+        # self.ax.set_ylim(0, 0.3)
+        # plt.pause(0.001)
+        # plt.show()
 
     def post_step(self, step, level_number):
         """
@@ -92,12 +92,12 @@ class monitor(hooks):
         # self.im.set_data(L.uend.values)
         # self.im_cut = self.ax_cut.plot(L.prob.xvalues, L.uend.values[int((L.prob.init[0]-1)/2), :])
         # self.im_cut = self.ax_cut.text(0.5-radius_exact, 0.5, 'X')
-        self.im_rad = self.ax.text(L.time + L.dt, radius, 'o', color='r')
-        self.im_rad = self.ax.text(L.time + L.dt, radius1, 'o', color='b')
-        self.im_rad = self.ax.text(L.time + L.dt, radius_exact, 'o', color='k')
+        # self.im_rad = self.ax.text(L.time + L.dt, radius, 'o', color='r')
+        # self.im_rad = self.ax.text(L.time + L.dt, radius1, 'o', color='b')
+        # self.im_rad = self.ax.text(L.time + L.dt, radius_exact, 'o', color='k')
         # self.sframe = self.ax.imshow(L.uend.values, vmin=-1.0, vmax=1.0)
-        plt.pause(0.001)
-        plt.show()
+        # plt.pause(0.001)
+        # plt.show()
 
         return None
 
