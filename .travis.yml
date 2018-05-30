@@ -1,4 +1,4 @@
-sudo: required
+sudo: false
 dist: trusty
 
 language: python
@@ -16,15 +16,17 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} numpy future scipy matplotlib nose pep8 coverage mpi4py sympy dill numba
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} sphinx=1.6.3
-  - pip install --user coloredlogs
-  - if [[ $PYTHON_VERSION == 3 ]]; then pip install --user travis-sphinx; fi
+  - conda install --yes -c conda-forge petsc4py mpi4py
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
+  - conda list
+  - pip install travis-sphinx
   - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
   - "./docs/update_apidocs.sh"
-  - nosetests --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
+  - which nosetests
+  - export PYTHONPATH=$PYTHONPATH:../../..
+  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
 after_success:

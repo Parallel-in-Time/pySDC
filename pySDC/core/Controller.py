@@ -1,9 +1,6 @@
-import abc
 import os
 import sys
-from future.utils import with_metaclass
 import logging
-import coloredlogs
 
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core import Hooks as hookclass
@@ -26,7 +23,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class controller(with_metaclass(abc.ABCMeta)):
+class controller(object):
     """
     Base abstract controller class
     """
@@ -79,7 +76,7 @@ class controller(with_metaclass(abc.ABCMeta)):
         else:
             file_handler = None
 
-        std_formatter = coloredlogs.ColoredFormatter(fmt='%(name)s - %(levelname)s: %(message)s')
+        std_formatter = logging.Formatter(fmt='%(name)s - %(levelname)s: %(message)s')
         std_handler = logging.StreamHandler(sys.stdout)
         std_handler.setFormatter(std_formatter)
 
@@ -199,7 +196,6 @@ class controller(with_metaclass(abc.ABCMeta)):
 
         return converged
 
-    @abc.abstractmethod
     def run(self, u0, t0, Tend):
         """
         Abstract interface to the run() method
@@ -209,7 +205,7 @@ class controller(with_metaclass(abc.ABCMeta)):
             t0 (float): starting time
             Tend (float): ending time
         """
-        return None
+        raise NotImplementedError('ERROR: controller has to implement run(self, u0, t0, Tend)')
 
     @property
     def hooks(self):

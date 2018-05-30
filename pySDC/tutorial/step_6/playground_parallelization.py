@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     if rank == 0:
 
-        # we'd need to deal with variable file names here (for testign purpose only)
+        # we'd need to deal with variable file names here (for testing purpose only)
         if len(sys.argv) == 2:
             fname = sys.argv[1]
         else:

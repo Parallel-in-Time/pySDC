@@ -1,4 +1,4 @@
-import pip
+import pkg_resources
 
 from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
 from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
@@ -13,7 +13,7 @@ def test_B():
     main_B()
 
 def test_C():
-    installed_packages = pip.get_installed_distributions()
+    installed_packages = [d for d in pkg_resources.working_set]
     flat_installed_packages = [package.project_name for package in installed_packages]
 
     if "mpi4py" in flat_installed_packages:

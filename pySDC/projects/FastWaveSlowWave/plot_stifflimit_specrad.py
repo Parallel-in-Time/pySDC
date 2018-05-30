@@ -115,12 +115,13 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
     """
     fs = 8
     rcParams['figure.figsize'] = 2.5, 2.5
+    rcParams['pgf.rcfonts'] = False
     fig = plt.figure()
-    plt.plot(nodes_v, specrad[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{\rm fast} = \infty$')
+    plt.plot(nodes_v, specrad[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{fast} = \infty$')
     plt.plot(nodes_v, specrad[1, :], 'bo-', markersize=fs - 2,
-             label=r'$\lambda_{\rm fast} = %2.0f $' % lambda_f[0].imag)
+             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
     plt.plot(nodes_v, specrad[2, :], 'gs-', markersize=fs - 2,
-             label=r'$\lambda_{\rm fast} = %2.0f $' % lambda_f[1].imag)
+             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Spectral radius  $\sigma\left( \mathbf{E} \right)$', fontsize=fs, labelpad=2)
     plt.legend(loc='lower right', fontsize=fs, prop={'size': fs})
@@ -132,11 +133,11 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
     fig.savefig(filename, bbox_inches='tight')
 
     fig = plt.figure()
-    plt.plot(nodes_v, norm[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{\rm fast} = \infty$')
+    plt.plot(nodes_v, norm[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{fast} = \infty$')
     plt.plot(nodes_v, norm[1, :], 'bo-', markersize=fs - 2,
-             label=r'$\lambda_{\rm fast} = %2.0f $' % lambda_f[0].imag)
+             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
     plt.plot(nodes_v, norm[2, :], 'gs-', markersize=fs - 2,
-             label=r'$\lambda_{\rm fast} = %2.0f $' % lambda_f[1].imag)
+             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Norm  $\left|| \mathbf{E} \right||_{\infty}$', fontsize=fs, labelpad=2)
     plt.legend(loc='lower right', fontsize=fs, prop={'size': fs})

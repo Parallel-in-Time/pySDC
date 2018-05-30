@@ -122,6 +122,7 @@ def compute_and_plot_solutions():
     fs = 8
 
     rcParams['figure.figsize'] = 2.5, 2.5
+    # rcParams['pgf.rcfonts'] = False
     fig = plt.figure()
 
     sigma_0 = 0.1

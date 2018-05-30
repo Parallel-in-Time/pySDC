@@ -128,6 +128,64 @@ class mesh(object):
 
         return me
 
+    def send(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (blocking)
+
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            None
+        """
+
+        comm.send(self.values, dest=dest, tag=tag)
+        return None
+
+    def isend(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (non-blocking)
+
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            request handle
+        """
+        return comm.isend(self.values, dest=dest, tag=tag)
+
+    def recv(self, source=None, tag=None, comm=None):
+        """
+        Routine for receiving in time
+
+        Args:
+            source (int): source rank
+            tag (int): communication tag
+            comm: communicator
+
+        Returns:
+            None
+        """
+        self.values = comm.recv(source=source, tag=tag)
+        return None
+
+    def bcast(self, root=None, comm=None):
+        """
+        Routine for broadcasting values
+
+        Args:
+            root (int): process with value to broadcast
+            comm: communicator
+
+        Returns:
+            broadcasted values
+        """
+        return comm.bcast(self, root=root)
+
 
 class rhs_imex_mesh(object):
     """

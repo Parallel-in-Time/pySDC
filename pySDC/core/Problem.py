@@ -1,5 +1,3 @@
-import abc
-from future.utils import with_metaclass
 import logging
 
 from pySDC.helpers.pysdc_helper import FrozenClass
@@ -15,7 +13,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class ptype(with_metaclass(abc.ABCMeta)):
+class ptype(object):
     """
     Prototype class for problems, just defines the attributes essential to get started
 
@@ -48,9 +46,8 @@ class ptype(with_metaclass(abc.ABCMeta)):
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
 
-    @abc.abstractmethod
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE
         """
-        return None
+        raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
