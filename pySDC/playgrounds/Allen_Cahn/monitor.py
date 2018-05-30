@@ -41,8 +41,8 @@ class monitor(hooks):
         for r in rows:
             radius1 = max(radius1, abs(L.prob.xvalues[r]))
 
-        rows1 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] > -1 + L.prob.params.eps)
-        rows2 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] < 1 - L.prob.params.eps)
+        rows1 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] > -0.99)
+        rows2 = np.where(L.u[0].values[int((L.prob.init[0])/2), :int((L.prob.init[0])/2)] < 0.99)
         # print(rows1[0], rows2[0])
         print((rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps)
         # exit()
@@ -81,6 +81,10 @@ class monitor(hooks):
             radius1 = max(radius, abs(L.prob.xvalues[r]))
         radius_exact = np.sqrt(max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0))
         print(radius, radius1, radius_exact)
+        rows1 = np.where(L.uend.values[int((L.prob.init[0]) / 2), :int((L.prob.init[0]) / 2)] > -0.99)
+        rows2 = np.where(L.uend.values[int((L.prob.init[0]) / 2), :int((L.prob.init[0]) / 2)] < 0.99)
+        # print(rows1[0], rows2[0])
+        print((rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps)
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='radius', value=radius)

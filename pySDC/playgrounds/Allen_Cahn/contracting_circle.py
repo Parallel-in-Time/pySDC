@@ -33,8 +33,8 @@ def main():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(128, 128), (64, 64)]
-    problem_params['eps'] = [0.0390625, 0.078125]
+    problem_params['nvars'] = [(256, 256)]#, (64, 64)]
+    problem_params['eps'] = [0.01953125]#, 0.078125]
     problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-09
     problem_params['ltol'] = 1E-10
@@ -78,7 +78,7 @@ def main():
     Tend = 0.032
 
     # instantiate the controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params,
+    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
                                                description=description)
 
     # get initial values on finest level
