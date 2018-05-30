@@ -203,7 +203,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.values.flatten()
         f.impl.values = self.A.dot(v)
-        f.expl.values = - 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
+        f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
         f.impl.values = f.impl.values.reshape(self.params.nvars)
         f.expl.values = f.expl.values.reshape(self.params.nvars)
 
@@ -233,6 +233,89 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
 
 # noinspection PyUnusedLocal
+class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
+    """
+    Example implementing the Allen-Cahn equation in 2D with finite differences
+
+    Attributes:
+        A: second-order FD discretization of the 2D laplace operator
+        dx: distance between two spatial nodes (same for both directions)
+    """
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+        f = self.dtype_f(self.init)
+        v = u.values.flatten()
+        f.impl.values = self.A.dot(v) - 1.0 / self.params.eps ** 2 * v ** (self.params.nu + 1)
+        f.expl.values = 1.0 / self.params.eps ** 2 * v
+        f.impl.values = f.impl.values.reshape(self.params.nvars)
+        f.expl.values = f.expl.values.reshape(self.params.nvars)
+
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple Newton solver
+
+        Args:
+            rhs (dtype_f): right-hand side for the nonlinear system
+            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (required here for the BC)
+
+        Returns:
+            dtype_u: solution u
+        """
+
+        u = self.dtype_u(u0).values.flatten()
+
+        nu = self.params.nu
+        eps2 = self.params.eps ** 2
+
+        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+
+        # start newton iteration
+        n = 0
+        res = 99
+        while n < self.params.newton_maxiter:
+
+            # form the function g with g(u) = 0
+            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.values.flatten()
+
+            # if g is close to 0, then we are done
+            res = np.linalg.norm(g, np.inf)
+
+            if res < self.params.newton_tol:
+                break
+
+            # assemble dg
+            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags(((nu + 1) * u ** nu), offsets=0))
+
+            # newton update: u1 = u0 - g/dg
+            # u -= spsolve(dg, g)
+            u -= cg(dg, g, x0=u0.values.flatten(), tol=self.params.ltol)[0]
+            # increase iteration count
+            n += 1
+            # print(n, res)
+
+        # if n == self.params.newton_maxiter:
+        #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+
+        me = self.dtype_u(self.init)
+        me.values = u.reshape(self.params.nvars)
+
+        return me
+
+# noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences
@@ -256,7 +339,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         f = self.dtype_f(self.init)
         v = u.values.flatten()
         f.comp1.values = self.A.dot(v)
-        f.comp2.values = - 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
+        f.comp2.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
         f.comp1.values = f.comp1.values.reshape(self.params.nvars)
         f.comp2.values = f.comp2.values.reshape(self.params.nvars)
 

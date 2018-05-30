@@ -10,7 +10,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit, allencahn_multiimplicit
+from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit, allencahn_semiimplicit_v2
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -24,17 +24,17 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-04
+    level_params['dt'] = 5E-04
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 3
+    step_params['maxiter'] = 50
 
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [(256, 256)]#, (64, 64)]
-    problem_params['eps'] = [0.01953125]#, 0.078125]
+    problem_params['nvars'] = [(128, 128)]#, (64, 64)]
+    problem_params['eps'] = [0.0390625]#, 0.078125]
     problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-09
     problem_params['ltol'] = 1E-10
@@ -62,11 +62,11 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = allencahn_fullyimplicit
+    description['problem_class'] = allencahn_semiimplicit_v2#allencahn_fullyimplicit
     description['problem_params'] = problem_params
     description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
-    description['sweeper_class'] = generic_implicit
+    description['dtype_f'] = rhs_imex_mesh#mesh
+    description['sweeper_class'] = imex_1st_order#generic_implicit
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
@@ -75,7 +75,7 @@ def main():
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.032
+    Tend = 0.031
 
     # instantiate the controller
     controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
