@@ -9,6 +9,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -30,6 +31,7 @@ def main():
     else:
         color = int(world_rank / 1)
     space_comm = comm.Split(color=color)
+    space_size = space_comm.Get_size()
     space_rank = space_comm.Get_rank()
 
     # split world communicator to create time-communicators
@@ -38,7 +40,11 @@ def main():
     else:
         color = int(world_rank / world_size)
     time_comm = comm.Split(color=color)
+    time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
+
+    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
+                                                                        time_rank, time_size))
 
     # initialize level parameters
     level_params = dict()
@@ -49,7 +55,7 @@ def main():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
+    sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['spread'] = False
 
@@ -73,9 +79,9 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
+    controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
     controller_params['dump_setup'] = False
-    controller_params['predict'] = True
+    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -92,15 +98,17 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.0
+    Tend = 3.0
 
     # instantiate controller
     # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
     #                                         comm=time_comm)
-    controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params, description=description)
+    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description,
+                                            comm=time_comm)
+    # controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params, description=description)
 
     # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
+    P = controller.S.levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
