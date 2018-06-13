@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jube>
+  <benchmark name="pySDC scaling test" outpath="bench_run_PFASST_CL">
+    <comment>Scaling test with pySDC</comment>
+
+    <parameterset name="param_set_spacetime">
+      <parameter name="i">0,1,2,3</parameter>
+      <parameter name="nnodes" mode="python" type="int">[1,1,1,1][$i]</parameter>
+      <parameter name="ntasks" mode="python" type="int">[4,8,16,24][$i]</parameter>
+      <parameter name="space_size" mode="python" type="int">${nnodes}*${ntasks}//4</parameter>
+    </parameterset>
+
+    <!-- Files -->
+    <fileset name="files">
+      <copy>run_pySDC_with_PETSc.tmpl</copy>
+      <copy>pySDC_with_PETSc.py</copy>
+    </fileset>
+
+    <!-- Substitute -->
+    <substituteset name="substitute">
+      <!-- Substitute files -->
+      <iofile in="run_pySDC_with_PETSc.tmpl" out="run_pySDC_with_PETSc.exe" />
+      <!-- Substitute commands -->
+      <sub source="#NNODES#" dest="$nnodes" />
+      <sub source="#NTASKS#" dest="$ntasks" />
+      <sub source="#SPACE_SIZE#" dest="$space_size" />
+    </substituteset>
+
+    <!-- Regex pattern -->
+    <patternset name="pattern">
+      <pattern name="timing_pat" type="float">Time to solution: $jube_pat_fp sec.</pattern>
+      <pattern name="error_pat" type="float">Error vs. PDE solution: $jube_pat_fp</pattern>
+      <pattern name="niter_pat" type="float">Mean number of iterations: $jube_pat_fp</pattern>
+    </patternset>
+    
+    <!-- Operation -->
+    <step name="sub_step">
+      <use>param_set_spacetime</use> <!-- use existing parameterset -->
+      <use>files</use>        <!-- use existing fileset -->
+      <use>substitute</use>   <!-- use existing substituteset -->
+      <do done_file="ready">sbatch run_pySDC_with_PETSc.exe</do>   <!-- shell command -->
+    </step>
+
+    <!-- Analyse -->
+    <analyser name="analyse">
+      <use>pattern</use> <!-- use existing patternset -->
+      <analyse step="sub_step">
+        <file>run.out</file> <!-- file which should be scanned -->
+      </analyse>
+    </analyser>
+
+    <!-- Create result table -->
+    <result>
+      <use>analyse</use> <!-- use existing analyser -->
+      <table name="result" style="pretty" sort="space_size">
+        <column>nnodes</column>
+        <column>ntasks</column>
+        <column>space_size</column>
+        <column>timing_pat</column>
+        <column>error_pat</column>
+        <column>niter_pat</column>
+      </table>
+    </result>
+
+  </benchmark>
+</jube>
