@@ -8,7 +8,9 @@ from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.playgrounds.order_test.HeatEquation_1D_FD_forced_time import heat1d_forced_time
+
+from pySDC.playgrounds.order_test.hook_update_problem_params import update_problem_params
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -16,34 +18,34 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-08
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 20
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 0.001
+    problem_params['nu'] = 1
     problem_params['freq'] = 2
-    problem_params['nvars'] = 16383
+    problem_params['nvars'] = 32768
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
     sweeper_params['do_coll_update'] = False
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['hook_class'] = update_problem_params
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = heat1d_forced
-
+    description['problem_class'] = heat1d_forced_time
     description['dtype_u'] = mesh
     description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
@@ -52,15 +54,15 @@ def main():
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 1.0
+    Tend = 1000.0
     dt_list = [Tend / 2 ** i for i in range(0, 4)]
 
     err = 0
     for dt in dt_list:
         print('Working with dt = %s...' % dt)
-
+        # Tend = dt
         level_params['dt'] = dt
-        problem_params['nu'] = dt * 0.1
+        problem_params['Tend'] = Tend
         description['level_params'] = level_params
         description['problem_params'] = problem_params
 
