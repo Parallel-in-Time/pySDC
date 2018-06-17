@@ -15,7 +15,7 @@ def figsize(textwidth, scale):
     return fig_size
 
 
-def setup_mpl():
+def setup_mpl(font_size=8):
     # Set up plotting parameters
     pgf_with_latex = {  # setup matplotlib to use latex for output
         "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
@@ -26,7 +26,7 @@ def setup_mpl():
         "font.monospace": [],
         "axes.labelsize": 8,  # LaTeX default is 10pt font.
         "axes.linewidth": 0.5,
-        "font.size": 8,
+        "font.size": font_size,
         "legend.fontsize": 6,  # Make the legend/label fonts a little smaller
         "legend.numpoints": 1,
         "xtick.labelsize": 6,
