@@ -309,13 +309,11 @@ class rhs_imex_mesh(object):
 
 class rhs_comp2_mesh(object):
     """
-    RHS data type for meshes with comp1icit and comp2icit components
-
-    This data type can be used to have RHS with 2 components (here comp1icit and comp2icit)
+    RHS data type for meshes with 2 components
 
     Attributes:
-        comp1 (mesh.mesh): comp1icit part
-        comp2 (mesh.mesh): comp2icit part
+        comp1 (mesh.mesh): first part
+        comp2 (mesh.mesh): second part
     """
 
     def __init__(self, init, val=0.0):
@@ -350,7 +348,7 @@ class rhs_comp2_mesh(object):
         Raises:
             DataError: if other is not a rhs object
         Returns:
-            mesh.rhs_imex_mesh: differences between caller and other values (self-other)
+            mesh.rhs_comp2_mesh: differences between caller and other values (self-other)
         """
 
         if isinstance(other, rhs_comp2_mesh):
@@ -367,11 +365,11 @@ class rhs_comp2_mesh(object):
          Overloading the addition operator for rhs types
 
         Args:
-            other (mesh.rhs_imex_mesh): rhs object to be added
+            other (mesh.rhs_comp2_mesh): rhs object to be added
         Raises:
             DataError: if other is not a rhs object
         Returns:
-            mesh.rhs_imex_mesh: sum of caller and other values (self-other)
+            mesh.rhs_comp2_mesh: sum of caller and other values (self-other)
         """
 
         if isinstance(other, rhs_comp2_mesh):
@@ -392,7 +390,7 @@ class rhs_comp2_mesh(object):
         Raises:
             DataError: is other is not a float
         Returns:
-             mesh.rhs_imex_mesh: copy of original values scaled by factor
+             mesh.rhs_comp2_mesh: copy of original values scaled by factor
         """
 
         if isinstance(other, float):
@@ -412,7 +410,7 @@ class rhs_comp2_mesh(object):
             A: a matrix
 
         Returns:
-            mesh.rhs_imex_mesh: each component multiplied by the matrix A
+            mesh.rhs_comp2_mesh: each component multiplied by the matrix A
         """
 
         if not A.shape[1] == self.comp1.values.shape[0]:

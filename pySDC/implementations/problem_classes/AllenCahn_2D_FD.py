@@ -9,6 +9,7 @@ from pySDC.core.Errors import ParameterError, ProblemError
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
+
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
     """
@@ -227,7 +228,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
-        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
+        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
+                       maxiter=self.params.lin_maxiter)[0]
         me.values = me.values.reshape(self.params.nvars)
         return me
 
@@ -364,7 +366,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
-        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
+        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
+                       maxiter=self.params.lin_maxiter)[0]
         me.values = me.values.reshape(self.params.nvars)
         return me
 

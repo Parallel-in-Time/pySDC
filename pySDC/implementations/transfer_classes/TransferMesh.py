@@ -160,6 +160,16 @@ class mesh_to_mesh(space_transfer):
             G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
             F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
             F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
+        elif isinstance(F, rhs_comp2_mesh):
+            F.comp1.values = F.comp1.values.flatten()
+            F.comp2.values = F.comp2.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.comp1.values = G.comp1.values.reshape(self.coarse_prob.params.nvars)
+            G.comp2.values = G.comp2.values.reshape(self.coarse_prob.params.nvars)
+            F.comp1.values = F.comp1.values.reshape(self.fine_prob.params.nvars)
+            F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
+        else:
+            raise TransferError('Wrong data type for restriction, got %s' % type(F))
         return G
 
     def prolong(self, G):
@@ -181,4 +191,14 @@ class mesh_to_mesh(space_transfer):
             F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
             G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
             G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
+        elif isinstance(G, rhs_comp2_mesh):
+            G.comp1.values = G.comp1.values.flatten()
+            G.comp2.values = G.comp2.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.comp1.values = F.comp1.values.reshape(self.fine_prob.params.nvars)
+            F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
+            G.comp1.values = G.comp1.values.reshape(self.coarse_prob.params.nvars)
+            G.comp2.values = G.comp2.values.reshape(self.coarse_prob.params.nvars)
+        else:
+            raise TransferError('Wrong data type for prolongation, got %s' % type(G))
         return F
