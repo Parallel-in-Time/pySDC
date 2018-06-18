@@ -7,8 +7,6 @@ from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, r
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -101,11 +99,7 @@ def main():
     Tend = 3.0
 
     # instantiate controller
-    # controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
-    #                                         comm=time_comm)
-    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description,
-                                            comm=time_comm)
-    # controller = allinclusive_multigrid_nonMPI(num_procs=16, controller_params=controller_params, description=description)
+    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob
@@ -128,49 +122,31 @@ def main():
 
     # limit output to space-rank 0 (as before when setting the logger level)
     if space_rank == 0:
-        if len(sys.argv) == 3:
-            fname = str(sys.argv[2])
-        else:
-            fname = 'step_7_C_out.txt'
-        f = open(fname, 'a+')
 
         out = 'This is time-rank %i...' % time_rank
-        f.write(out + '\n')
         print(out)
 
         # compute and print statistics
         for item in iter_counts:
             out = 'Number of iterations for time %4.2f: %2i' % item
-            f.write(out + '\n')
             print(out)
 
         out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-        f.write(out + '\n')
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-        f.write(out + '\n')
         print(out)
         out = '   Position of max/min number of iterations: %2i -- %2i' % \
               (int(np.argmax(niters)), int(np.argmin(niters)))
-        f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-        f.write(out + '\n')
         print(out)
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
         out = 'Time to solution: %6.4f sec.' % timing[0][1]
-        f.write(out + '\n')
         print(out)
         out = 'Error vs. PDE solution: %6.4e' % err
-        f.write(out + '\n')
         print(out)
-
-        f.close()
-
-    # assert err < 2E-04, 'ERROR: did not match error tolerance, got %s' % err
-    # assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
 
 if __name__ == "__main__":

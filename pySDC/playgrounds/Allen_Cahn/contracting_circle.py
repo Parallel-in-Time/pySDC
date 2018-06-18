@@ -46,7 +46,7 @@ def main():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = ['LU', 'IEpar']
+    sweeper_params['QI'] = ['LU']
     sweeper_params['spread'] = False
     sweeper_params['do_coll_update'] = False
 
