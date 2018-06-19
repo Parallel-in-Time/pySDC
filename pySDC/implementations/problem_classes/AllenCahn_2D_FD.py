@@ -13,7 +13,7 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences
+    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
@@ -42,16 +42,21 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
         if problem_params['nvars'][0] != problem_params['nvars'][1]:
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
-        # if (problem_params['nvars'][0] + 1) % 2 != 0:
-        #     raise ProblemError('the setup requires nvars = 2^p per dimension')
+        if problem_params['nvars'][0] % 2 != 0:
+            raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
-        self.dx = 1.0 / (self.params.nvars[0] - 0)
+        self.dx = 1.0 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.dx)
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
+
+        self.newton_itercount = 0
+        self.lin_itercount = 0
+        self.newton_ncalls = 0
+        self.lin_ncalls = 0
 
     @staticmethod
     def __get_A(N, dx):
@@ -74,11 +79,6 @@ class allencahn_fullyimplicit(ptype):
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
 
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        # A = sp.diags(stencil, [-1, 0, 1], shape=(N[0], N[0]), format='csc')
-        # A[0, 1] = 2
-        # A[-1, -2] = 2
-        # print(A.todense())
-        # exit()
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
 
@@ -136,6 +136,9 @@ class allencahn_fullyimplicit(ptype):
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
 
+        self.newton_ncalls += 1
+        self.newton_itercount += n
+
         return me
 
     def eval_f(self, u, t):
@@ -173,17 +176,14 @@ class allencahn_fullyimplicit(ptype):
             for j in range(self.params.nvars[1]):
                 r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
                 me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / self.params.eps)
-                # if r2 <= self.params.radius ** 2:
-                #     me.values[i, j] = 1.0
-                # else:
-                #     me.values[i, j] = 0.0
+
         return me
 
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences
+    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
@@ -224,20 +224,31 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             dtype_u: solution as mesh
         """
 
+        class context:
+            num_iter = 0
+
+        def callback(xk):
+            context.num_iter += 1
+            return context.num_iter
+
         me = self.dtype_u(self.init)
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
-                       maxiter=self.params.lin_maxiter)[0]
+                       maxiter=self.params.lin_maxiter, callback=callback)[0]
         me.values = me.values.reshape(self.params.nvars)
+
+        self.lin_ncalls += 1
+        self.lin_itercount += context.num_iter
+
         return me
 
 
 # noinspection PyUnusedLocal
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences
+    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
@@ -315,13 +326,16 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
 
+        self.newton_ncalls += 1
+        self.newton_itercount += n
+
         return me
 
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences
+    Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
@@ -362,13 +376,24 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             dtype_u: solution as mesh
         """
 
+        class context:
+            num_iter = 0
+
+        def callback(xk):
+            context.num_iter += 1
+            return context.num_iter
+
         me = self.dtype_u(self.init)
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
-                       maxiter=self.params.lin_maxiter)[0]
+                       maxiter=self.params.lin_maxiter, callback=callback)[0]
         me.values = me.values.reshape(self.params.nvars)
+
+        self.lin_ncalls += 1
+        self.lin_itercount += context.num_iter
+
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -422,13 +447,16 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
 
+        self.newton_ncalls += 1
+        self.newton_itercount += n
+
         return me
 
 
 # noinspection PyUnusedLocal
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences
+    Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
 
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
@@ -506,6 +534,9 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         me = self.dtype_u(self.init)
         me.values = u.reshape(self.params.nvars)
 
+        self.newton_ncalls += 1
+        self.newton_itercount += n
+
         return me
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -523,8 +554,6 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         """
 
         me = self.dtype_u(self.init)
-
-        # Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         me.values = 1.0 / (1.0 - factor * 1.0 / self.params.eps ** 2) * rhs.values
         me.values = me.values.reshape(self.params.nvars)
