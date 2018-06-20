@@ -219,8 +219,8 @@ def show_results(fname, cwd=''):
     for key, item in results.items():
         computed_radii = sort_stats(filter_stats(item, type='computed_radius'), sortby='time')
 
-        xcoords = [item[0] for item in computed_radii]
-        radii = [item[1] for item in computed_radii]
+        xcoords = [item0[0] for item0 in computed_radii]
+        radii = [item0[1] for item0 in computed_radii]
         plt_helper.plt.plot(xcoords, radii, label=key[0] + ' ' + key[1])
 
         exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
@@ -286,7 +286,7 @@ def main(cwd=''):
         cwd (str): current working directory (need this for testing)
     """
 
-    # # Loop over variants, exact and inexact solves
+    # Loop over variants, exact and inexact solves
     results = {}
     for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit']:
 
