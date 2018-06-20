@@ -19,7 +19,7 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1E-10
     level_params['dt'] = None
 
     # This comes as read-in for the step class (this is optional!)
@@ -30,20 +30,20 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 0.01
     problem_params['freq'] = 2
-    problem_params['nvars'] = [2 ** 7]#, 2 ** 6]
+    problem_params['nvars'] = [2 ** 7, 2 ** 6]
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'IE'
-    sweeper_params['spread'] = True
+    sweeper_params['num_nodes'] = [5]
+    sweeper_params['QI'] = ['IE', 'PIC']
+    sweeper_params['spread'] = False
     sweeper_params['do_coll_update'] = False
 
     # initialize space transfer parameters
     space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
-    space_transfer_params['iorder'] = 2
+    space_transfer_params['iorder'] = 6
     space_transfer_params['periodic'] = True
 
     # initialize controller parameters
@@ -69,8 +69,8 @@ def main():
     t0 = 0.0
     Tend = 1.0
 
-    dt_list = [Tend / 2 ** i for i in range(3, 6)]
-    niter_list = [2]#[1, 2, 3, 4]
+    dt_list = [Tend / 2 ** i for i in range(0, 6)]
+    niter_list = [100]#[1, 2, 3, 4]
 
     for niter in niter_list:
 
@@ -82,7 +82,7 @@ def main():
             description['step_params']['maxiter'] = niter
             description['level_params']['dt'] = dt
 
-            Tend = t0 + dt
+            # Tend = t0 + dt
 
             # instantiate the controller
             controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
@@ -108,15 +108,15 @@ def main():
             err = err_new
 
             # # filter statistics by type (number of iterations)
-            # filtered_stats = filter_stats(stats, type='niter')
-            #
-            # # convert filtered statistics to list of iterations count, sorted by process
-            # iter_counts = sort_stats(filtered_stats, sortby='time')
-            #
-            # # compute and print statistics
-            # niters = np.array([item[1] for item in iter_counts])
-            # out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-            # print(out)
+            filtered_stats = filter_stats(stats, type='niter')
+
+            # convert filtered statistics to list of iterations count, sorted by process
+            iter_counts = sort_stats(filtered_stats, sortby='time')
+
+            # compute and print statistics
+            niters = np.array([item[1] for item in iter_counts])
+            out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+            print(out)
             # out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
             # # f.write(out + '\n')
             # print(out)
