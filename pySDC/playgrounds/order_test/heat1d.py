@@ -28,48 +28,49 @@ def main():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 1.0
+    problem_params['nu'] = 0.01
     problem_params['freq'] = 2
-    problem_params['nvars'] = [2 ** 14 - 1]#, 2 ** 13]
+    problem_params['nvars'] = [2 ** 7]#, 2 ** 6]
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
     sweeper_params['do_coll_update'] = False
 
     # initialize space transfer parameters
     space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 2
-    space_transfer_params['periodic'] = False
+    space_transfer_params['periodic'] = True
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
+    controller_params['predict'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = heat1d_forced
+    description['problem_class'] = heat1d_periodic
     description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
-    description['sweeper_class'] = imex_1st_order
+    description['dtype_f'] = mesh#rhs_imex_mesh
+    description['sweeper_class'] = generic_implicit#imex_1st_order
     description['sweeper_params'] = sweeper_params
     description['step_params'] = step_params
     description['level_params'] = level_params
     description['problem_params'] = problem_params
-    # description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    # description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
 
     # setup parameters "in time"
-    t0 = 0
-    Tend = 2.0
+    t0 = 0.0
+    Tend = 1.0
 
-    dt_list = [Tend / 2 ** i for i in range(0, 4)]
-    niter_list = [100]#[1, 2, 3, 4]
+    dt_list = [Tend / 2 ** i for i in range(3, 6)]
+    niter_list = [2]#[1, 2, 3, 4]
 
     for niter in niter_list:
 
@@ -80,6 +81,8 @@ def main():
 
             description['step_params']['maxiter'] = niter
             description['level_params']['dt'] = dt
+
+            Tend = t0 + dt
 
             # instantiate the controller
             controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
@@ -93,6 +96,8 @@ def main():
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
             # compute exact solution and compare
+            # uex = compute_collocation_solution(controller)
+            # print(abs(uex - P.u_exact(Tend)))
             uex = P.u_exact(Tend)
             err_new = abs(uex - uend)
 
@@ -125,6 +130,26 @@ def main():
             # # f.write(out + '\n')
             # print(out)
         print()
+
+
+def compute_collocation_solution(controller):
+
+    Q = controller.MS[0].levels[0].sweep.coll.Qmat[1:, 1:]
+    A = controller.MS[0].levels[0].prob.A.todense()
+    dt = controller.MS[0].levels[0].dt
+
+    N = controller.MS[0].levels[0].prob.init
+    M = controller.MS[0].levels[0].sweep.coll.num_nodes
+
+    u0 = np.kron(np.ones(M), controller.MS[0].levels[0].u[0].values)
+
+    C = np.eye(M * N) - dt * np.kron(Q, A)
+
+    tmp = np.linalg.solve(C, u0)
+    print(np.linalg.norm(C.dot(tmp) - u0, np.inf))
+    uex = controller.MS[0].levels[0].prob.dtype_u(N)
+    uex.values[:] = tmp[(M-1) * N:]
+    return uex
 
 if __name__ == "__main__":
     main()
