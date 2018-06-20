@@ -171,15 +171,16 @@ def run_SDC_variant(variant=None, inexact=False):
     return stats
 
 
-def show_results(fname):
+def show_results(fname, cwd=''):
     """
     Plotting routine
 
     Args:
-        fname: file name to read in and name plots
+        fname (str): file name to read in and name plots
+        cwd (str): current working directory
     """
 
-    file = open(fname + '.pkl', 'rb')
+    file = open(cwd + fname + '.pkl', 'rb')
     results = dill.load(file)
     file.close()
 
@@ -293,14 +294,14 @@ def main(cwd=''):
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
-    fname = cwd + 'data/results_SDC_variants_AllenCahn_1E-03'
-    file = open(fname + '.pkl', 'wb')
+    fname = 'data/results_SDC_variants_AllenCahn_1E-03'
+    file = open(cwd + fname + '.pkl', 'wb')
     dill.dump(results, file)
     file.close()
-    assert os.path.isfile(fname + '.pkl'), 'ERROR: dill did not create file'
+    assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
-    show_results(fname)
+    show_results(fname, cwd=cwd)
 
 
 if __name__ == "__main__":
