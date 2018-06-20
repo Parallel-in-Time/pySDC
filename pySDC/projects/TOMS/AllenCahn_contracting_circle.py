@@ -44,6 +44,7 @@ def setup_parameters():
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
+    sweeper_params['QE'] = ['EE']
     sweeper_params['spread'] = False
 
     # This comes as read-in for the problem class
@@ -101,19 +102,25 @@ def run_SDC_variant(variant=None, inexact=False):
         description['problem_class'] = allencahn_fullyimplicit
         description['dtype_f'] = mesh
         description['sweeper_class'] = generic_implicit
+        if inexact:
+            description['problem_params']['newton_maxiter'] = 1
     elif variant == 'semi-implicit':
         description['problem_class'] = allencahn_semiimplicit
         description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
+        if inexact:
+            description['problem_params']['lin_maxiter'] = 10
     elif variant == 'multi-implicit':
         description['problem_class'] = allencahn_multiimplicit
         description['dtype_f'] = rhs_comp2_mesh
         description['sweeper_class'] = multi_implicit
+        if inexact:
+            description['problem_params']['newton_maxiter'] = 1
+            description['problem_params']['lin_maxiter'] = 10
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)
 
     if inexact:
-        description['problem_params']['newton_maxiter'] = 1
         out = 'Working on inexact %s variant...' % variant
     else:
         out = 'Working on exact %s variant...' % variant
@@ -121,7 +128,7 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 0.001
+    Tend = 0.032
 
     # instantiate controller
     controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
@@ -152,18 +159,16 @@ def run_SDC_variant(variant=None, inexact=False):
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    print('Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
-    print('Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
-                                                            P.lin_itercount / max(P.lin_ncalls, 1)))
+    print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
+    print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
+                                                               P.lin_itercount / max(P.lin_ncalls, 1)))
 
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
     print()
 
-    # assert np.mean(niters) <= 23, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
-
-    return timing[0][1], np.mean(niters)
+    return stats
 
 
 def show_results(fname):
@@ -181,10 +186,15 @@ def show_results(fname):
     # plt_helper.mpl.style.use('classic')
     plt_helper.setup_mpl()
 
+    # set up plot for timings
     plt_helper.newfig(textwidth=238.96, scale=1.0)
 
-    xcoords = [i for i in range(len(results))]
-    sorted_data = sorted([(key, results[key][0]) for key in results], reverse=True, key=lambda tup: tup[1])
+    timings = {}
+    for key, item in results.items():
+        timings[key] = sort_stats(filter_stats(item, type='timing_run'), sortby='time')[0][1]
+
+    xcoords = [i for i in range(len(timings))]
+    sorted_data = sorted([(key, timings[key]) for key in timings], reverse=True, key=lambda tup: tup[1])
     heights = [item[1] for item in sorted_data]
     keys = [(item[0][1] + ' ' + item[0][0]).replace('-', '\n') for item in sorted_data]
 
@@ -193,17 +203,81 @@ def show_results(fname):
     plt_helper.plt.xticks(xcoords, keys, rotation=90)
     plt_helper.plt.ylabel('time (sec)')
 
-    # save plot, beautify
-    plt_helper.savefig(fname)
+    # # save plot, beautify
+    f = fname + '_timings'
+    plt_helper.savefig(f)
 
-    assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
-    assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
+    assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
+    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
+
+    # set up plot for radii
+    plt_helper.newfig(textwidth=238.96, scale=1.0)
+
+    exact_radii = []
+    for key, item in results.items():
+        computed_radii = sort_stats(filter_stats(item, type='computed_radius'), sortby='time')
+
+        xcoords = [item[0] for item in computed_radii]
+        radii = [item[1] for item in computed_radii]
+        plt_helper.plt.plot(xcoords, radii, label=key[0] + ' ' + key[1])
+
+        exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
+
+        diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
+        max_pos = int(np.argmax(diff))
+        assert max(diff) < 0.07, 'ERROR: computed radius is too far away from exact radius, got %s' % max(diff)
+        assert 0.028 < computed_radii[max_pos][0] < 0.03, \
+            'ERROR: largest difference is at wrong time, got %s' % computed_radii[max_pos][0]
+
+    xcoords = [item[0] for item in exact_radii]
+    radii = [item[1] for item in exact_radii]
+    plt_helper.plt.plot(xcoords, radii, color='k', linestyle='--', linewidth=1, label='exact')
+
+    plt_helper.plt.ylabel('radius')
+    plt_helper.plt.xlabel('time')
+    plt_helper.plt.grid()
+    plt_helper.plt.legend()
+
+    # save plot, beautify
+    f = fname + '_radii'
+    plt_helper.savefig(f)
+
+    assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
+    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
+
+    # set up plot for interface width
+    plt_helper.newfig(textwidth=238.96, scale=1.0)
+
+    interface_width = []
+    for key, item in results.items():
+        interface_width = sort_stats(filter_stats(item, type='interface_width'), sortby='time')
+        xcoords = [item[0] for item in interface_width]
+        width = [item[1] for item in interface_width]
+        plt_helper.plt.plot(xcoords, width, label=key[0] + ' ' + key[1])
+
+    xcoords = [item[0] for item in interface_width]
+    init_width = [interface_width[0][1]] * len(xcoords)
+    plt_helper.plt.plot(xcoords, init_width, color='k', linestyle='--', linewidth=1, label='exact')
+
+    plt_helper.plt.ylabel('interface width')
+    plt_helper.plt.xlabel('time')
+    plt_helper.plt.grid()
+    plt_helper.plt.legend()
+
+    # save plot, beautify
+    f = fname + '_interface'
+    plt_helper.savefig(f)
+
+    assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
+    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     return None
 
 
-def main():
+def main(cwd=''):
     """
     Main driver
 
@@ -211,7 +285,7 @@ def main():
         cwd (str): current working directory (need this for testing)
     """
 
-    # Loop over variants, exact and inexact solves
+    # # Loop over variants, exact and inexact solves
     results = {}
     for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit']:
 
@@ -219,7 +293,7 @@ def main():
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
-    fname = 'data/timings_SDC_variants_AllenCahn'
+    fname = cwd + 'data/results_SDC_variants_AllenCahn_1E-03'
     file = open(fname + '.pkl', 'wb')
     dill.dump(results, file)
     file.close()
