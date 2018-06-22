@@ -1,4 +1,5 @@
 import pySDC.helpers.plot_helper as plt_helper
+import matplotlib.ticker as ticker
 
 import dill
 import os
@@ -51,7 +52,7 @@ def setup_parameters():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['nvars'] = [(128, 128)]
-    problem_params['eps'] = [0.0390625]
+    problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-09
     problem_params['lin_tol'] = 1E-10
@@ -110,6 +111,12 @@ def run_SDC_variant(variant=None, inexact=False):
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['lin_maxiter'] = 10
+    elif variant == 'semi-implicit_v2':
+        description['problem_class'] = allencahn_semiimplicit_v2
+        description['dtype_f'] = rhs_imex_mesh
+        description['sweeper_class'] = imex_1st_order
+        if inexact:
+            description['problem_params']['newton_maxiter'] = 1
     elif variant == 'multi-implicit':
         description['problem_class'] = allencahn_multiimplicit
         description['dtype_f'] = rhs_comp2_mesh
@@ -117,6 +124,12 @@ def run_SDC_variant(variant=None, inexact=False):
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
             description['problem_params']['lin_maxiter'] = 10
+    elif variant == 'multi-implicit_v2':
+        description['problem_class'] = allencahn_multiimplicit_v2
+        description['dtype_f'] = rhs_comp2_mesh
+        description['sweeper_class'] = multi_implicit
+        if inexact:
+            description['problem_params']['newton_maxiter'] = 1
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)
 
@@ -188,23 +201,38 @@ def show_results(fname, cwd=''):
     plt_helper.setup_mpl()
 
     # set up plot for timings
-    plt_helper.newfig(textwidth=238.96, scale=1.0)
+    fig, ax1 = plt_helper.newfig(textwidth=238.96, scale=1.5, ratio=0.4)
 
     timings = {}
+    niters = {}
     for key, item in results.items():
         timings[key] = sort_stats(filter_stats(item, type='timing_run'), sortby='time')[0][1]
+        iter_counts = sort_stats(filter_stats(item, type='niter'), sortby='time')
+        niters[key] = np.mean(np.array([item[1] for item in iter_counts]))
 
     xcoords = [i for i in range(len(timings))]
-    sorted_data = sorted([(key, timings[key]) for key in timings], reverse=True, key=lambda tup: tup[1])
-    heights = [item[1] for item in sorted_data]
-    keys = [(item[0][1] + ' ' + item[0][0]).replace('-', '\n') for item in sorted_data]
+    sorted_timings = sorted([(key, timings[key]) for key in timings], reverse=True, key=lambda tup: tup[1])
+    sorted_niters = [(k, niters[k]) for k in [key[0] for key in sorted_timings]]
+    heights_timings = [item[1] for item in sorted_timings]
+    heights_niters = [item[1] for item in sorted_niters]
+    keys = [(item[0][1] + ' ' + item[0][0]).replace('-', '\n').replace('_v2', ' mod.') for item in sorted_timings]
 
-    plt_helper.plt.bar(xcoords, heights, align='center')
+    ax1.bar(xcoords, heights_timings, align='edge', width=-0.3, label='timings (left axis)')
+    ax1.set_ylabel('time (sec)')
 
-    plt_helper.plt.xticks(xcoords, keys, rotation=90)
-    plt_helper.plt.ylabel('time (sec)')
+    ax2 = ax1.twinx()
+    ax2.bar(xcoords, heights_niters, color='r', align='edge', width=0.3, label='iterations (right axis)')
+    ax2.set_ylabel('mean number of iterations')
 
-    # # save plot, beautify
+    ax1.set_xticks(xcoords)
+    ax1.set_xticklabels(keys, rotation=90, ha='center')
+
+    # ask matplotlib for the plotted objects and their labels
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc=0)
+
+    # save plot, beautify
     f = fname + '_timings'
     plt_helper.savefig(f)
 
@@ -213,7 +241,7 @@ def show_results(fname, cwd=''):
     assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     # set up plot for radii
-    plt_helper.newfig(textwidth=238.96, scale=1.0)
+    fig, ax = plt_helper.newfig(textwidth=238.96, scale=1.0)
 
     exact_radii = []
     for key, item in results.items():
@@ -221,7 +249,8 @@ def show_results(fname, cwd=''):
 
         xcoords = [item0[0] for item0 in computed_radii]
         radii = [item0[1] for item0 in computed_radii]
-        plt_helper.plt.plot(xcoords, radii, label=key[0] + ' ' + key[1])
+        if key[0] + ' ' + key[1] == 'fully-implicit exact':
+            ax.plot(xcoords, radii, label=(key[0] + ' ' + key[1]).replace('_v2', ' mod.'))
 
         exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
 
@@ -233,12 +262,13 @@ def show_results(fname, cwd=''):
 
     xcoords = [item[0] for item in exact_radii]
     radii = [item[1] for item in exact_radii]
-    plt_helper.plt.plot(xcoords, radii, color='k', linestyle='--', linewidth=1, label='exact')
+    ax.plot(xcoords, radii, color='k', linestyle='--', linewidth=1, label='exact')
 
-    plt_helper.plt.ylabel('radius')
-    plt_helper.plt.xlabel('time')
-    plt_helper.plt.grid()
-    plt_helper.plt.legend()
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.2f'))
+    ax.set_ylabel('radius')
+    ax.set_xlabel('time')
+    ax.grid()
+    ax.legend(loc=3)
 
     # save plot, beautify
     f = fname + '_radii'
@@ -249,23 +279,25 @@ def show_results(fname, cwd=''):
     assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     # set up plot for interface width
-    plt_helper.newfig(textwidth=238.96, scale=1.0)
+    fig, ax = plt_helper.newfig(textwidth=238.96, scale=1.0)
 
     interface_width = []
     for key, item in results.items():
         interface_width = sort_stats(filter_stats(item, type='interface_width'), sortby='time')
         xcoords = [item[0] for item in interface_width]
         width = [item[1] for item in interface_width]
-        plt_helper.plt.plot(xcoords, width, label=key[0] + ' ' + key[1])
+        if key[0] + ' ' + key[1] == 'fully-implicit exact':
+            ax.plot(xcoords, width, label=key[0] + ' ' + key[1])
 
     xcoords = [item[0] for item in interface_width]
     init_width = [interface_width[0][1]] * len(xcoords)
-    plt_helper.plt.plot(xcoords, init_width, color='k', linestyle='--', linewidth=1, label='exact')
+    ax.plot(xcoords, init_width, color='k', linestyle='--', linewidth=1, label='exact')
 
-    plt_helper.plt.ylabel('interface width')
-    plt_helper.plt.xlabel('time')
-    plt_helper.plt.grid()
-    plt_helper.plt.legend()
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.2f'))
+    ax.set_ylabel('interface')
+    ax.set_xlabel('time')
+    ax.grid()
+    ax.legend(loc=3)
 
     # save plot, beautify
     f = fname + '_interface'
@@ -286,19 +318,19 @@ def main(cwd=''):
         cwd (str): current working directory (need this for testing)
     """
 
-    # Loop over variants, exact and inexact solves
-    results = {}
-    for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit']:
-
-        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
-
-    # dump result
+    # # Loop over variants, exact and inexact solves
+    # results = {}
+    # for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
+    #
+    #     results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+    #     results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+    #
+    # # dump result
     fname = 'data/results_SDC_variants_AllenCahn_1E-03'
-    file = open(cwd + fname + '.pkl', 'wb')
-    dill.dump(results, file)
-    file.close()
-    assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
+    # file = open(cwd + fname + '.pkl', 'wb')
+    # dill.dump(results, file)
+    # file.close()
+    # assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
     show_results(fname, cwd=cwd)
