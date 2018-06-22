@@ -11,7 +11,10 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_periodic import heat1d_periodic
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+
+from pySDC.playgrounds.order_test.hook_get_update import get_update
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -28,15 +31,15 @@ def main():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nu'] = 0.01
+    problem_params['nu'] = 0.1
     problem_params['freq'] = 2
-    problem_params['nvars'] = [2 ** 7, 2 ** 6]
+    problem_params['nvars'] = [2 ** 10 - 1, 2 ** 9 - 1]
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [5]
-    sweeper_params['QI'] = ['IE', 'PIC']
+    sweeper_params['QI'] = ['IE']#, 'IE']
     sweeper_params['spread'] = False
     sweeper_params['do_coll_update'] = False
 
@@ -44,16 +47,17 @@ def main():
     space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
-    space_transfer_params['periodic'] = True
+    space_transfer_params['periodic'] = False
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     controller_params['predict'] = False
+    # controller_params['hook_class'] = get_update
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = heat1d_periodic
+    description['problem_class'] = heat1d
     description['dtype_u'] = mesh
     description['dtype_f'] = mesh#rhs_imex_mesh
     description['sweeper_class'] = generic_implicit#imex_1st_order
@@ -69,8 +73,8 @@ def main():
     t0 = 0.0
     Tend = 1.0
 
-    dt_list = [Tend / 2 ** i for i in range(0, 6)]
-    niter_list = [100]#[1, 2, 3, 4]
+    dt_list = [Tend / 2 ** i for i in range(0, 8)]
+    niter_list = [2]#[1, 2, 3, 4]
 
     for niter in niter_list:
 
@@ -104,7 +108,7 @@ def main():
             print('   error at time %s: %s' % (Tend, err_new))
             if err > 0:
                 print('   order of accuracy: %6.4f' % (np.log(err / err_new) / np.log(2)))
-
+            # exit()
             err = err_new
 
             # # filter statistics by type (number of iterations)

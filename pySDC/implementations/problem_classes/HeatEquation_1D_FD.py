@@ -114,8 +114,9 @@ class heat1d(ptype):
         me = self.dtype_u(self.init)
         if self.params.freq >= 0:
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
+            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx ** 2
             me.values = np.sin(np.pi * self.params.freq * xvalues) * \
-                np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+                np.exp(-t * self.params.nu * rho)
         else:
             np.random.seed(1)
             me.values = np.random.rand(self.params.nvars)
