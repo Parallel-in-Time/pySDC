@@ -45,6 +45,7 @@ def setup_mpl(font_size=8):
             r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
             r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
             r"\usepackage{underscore}",
+            r"\usepackage{amsmath,amssymb,marvosym}"
         ]
     }
     mpl.rcParams.update(pgf_with_latex)

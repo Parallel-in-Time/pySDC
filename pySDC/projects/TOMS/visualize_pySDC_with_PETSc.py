@@ -94,15 +94,15 @@ def visualize_matrix(result=None):
         tmax = max(tmax, item)
 
     plt_helper.setup_mpl()
-    plt_helper.newfig(textwidth=238.96, scale=1.33)
-
+    plt_helper.newfig(textwidth=120, scale=1.5)
     cmap = plt_helper.plt.get_cmap('RdYlGn_r')
     new_cmap = truncate_colormap(cmap, 0.1, 0.9)
-    plt_helper.plt.imshow(mat, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap)
+    plt_helper.plt.imshow(mat, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto')
 
     for key, item in result.items():
         timing = "{:3.1f}".format(item)
-        plt_helper.plt.text(process_list.index(key[0]), process_list.index(key[1]), timing, ha='center', va='center')
+        plt_helper.plt.annotate(timing, xy=(process_list.index(key[0]), process_list.index(key[1])), size='x-small',
+                                ha='center', va='center')
 
     plt_helper.plt.xticks(range(dim), process_list)
     plt_helper.plt.yticks(range(dim), process_list)
@@ -136,7 +136,7 @@ def visualize_speedup(result=None):
             timing_PFASST[process_list_PFASST.index(key[0] * key[1])] = item
 
     plt_helper.setup_mpl()
-    plt_helper.newfig(textwidth=238.96, scale=1.33)
+    plt_helper.newfig(textwidth=120, scale=1.5)
 
     process_list_all = process_list_MLSDC + process_list_PFASST
     ideal = [timing_MLSDC[0] / nproc for nproc in process_list_all]
