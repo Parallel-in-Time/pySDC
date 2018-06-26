@@ -175,7 +175,7 @@ class allencahn_fullyimplicit(ptype):
         for i in range(self.params.nvars[0]):
             for j in range(self.params.nvars[1]):
                 r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / self.params.eps)
+                me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
 
         return me
 
