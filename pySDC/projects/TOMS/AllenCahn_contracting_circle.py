@@ -318,19 +318,19 @@ def main(cwd=''):
         cwd (str): current working directory (need this for testing)
     """
 
-    # # Loop over variants, exact and inexact solves
-    # results = {}
-    # for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
-    #
-    #     results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-    #     results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
-    #
-    # # dump result
+    # Loop over variants, exact and inexact solves
+    results = {}
+    for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
+
+        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+
+    # dump result
     fname = 'data/results_SDC_variants_AllenCahn_1E-03'
-    # file = open(cwd + fname + '.pkl', 'wb')
-    # dill.dump(results, file)
-    # file.close()
-    # assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
+    file = open(cwd + fname + '.pkl', 'wb')
+    dill.dump(results, file)
+    file.close()
+    assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
     show_results(fname, cwd=cwd)
