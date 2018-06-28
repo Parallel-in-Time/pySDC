@@ -9,7 +9,7 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # noinspection PyUnusedLocal
 class heat2d_petsc_forced(ptype):
     """
-    Example implementing the forced 2D heat equation with periodic BCs in [0,1]^2,
+    Example implementing the forced 2D heat equation with Dirichlet BCs in [0,1]^2,
     discretized using central finite differences and realized with PETSc
 
     Attributes:
