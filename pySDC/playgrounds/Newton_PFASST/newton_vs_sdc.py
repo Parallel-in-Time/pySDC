@@ -23,7 +23,7 @@ def main():
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 1
 
     # This comes as read-in for the problem class
     problem_params = dict()
@@ -33,6 +33,8 @@ def main():
     problem_params['newton_maxiter'] = 50
     problem_params['newton_tol'] = 1E-10
     problem_params['interval'] = (-5, 5)
+    problem_params['radius'] = 0.25
+    problem_params['eps'] = 0.2
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
@@ -65,8 +67,8 @@ def main():
     description['space_transfer_params'] = space_transfer_params
 
     # setup parameters "in time"
-    t0 = 0
-    Tend = 0.04
+    t0 = 0.0
+    Tend = 0.01
 
     num_procs = int((Tend - t0) / level_params['dt'])
 
@@ -78,14 +80,14 @@ def main():
     # get initial values on finest level
     P = controller_pfasst.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
-
-    uend, ufull, stats = controller_pfasst.run(u0=uinit, t0=t0, Tend=Tend)
+    uk = np.kron(np.ones(num_procs * 3), uinit.values)
+    uend, ufull, stats = controller_pfasst.run_magic(u0=uk, uinit=uinit, t0=t0, Tend=Tend)
 
     uex = P.u_exact(Tend)
     print(np.linalg.norm(uex.values - ufull[-problem_params['nvars'][0]:], np.inf))
-    for S in controller_pfasst.MS:
-        print(S.levels[0].prob.newton_counter)
-    print(sum(S.levels[0].prob.newton_counter for S in controller_pfasst.MS) / num_procs)
+    # for S in controller_pfasst.MS:
+        # print(S.levels[0].prob.newton_counter)
+    # print(sum(S.levels[0].prob.newton_counter for S in controller_pfasst.MS) / num_procs)
 
     # instantiate the controller
     controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -94,7 +96,7 @@ def main():
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
+    # uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
     uk = ufull.copy()
 
     controller.compute_rhs(uk, t0)

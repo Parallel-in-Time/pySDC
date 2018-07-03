@@ -33,6 +33,8 @@ def main():
     problem_params['newton_maxiter'] = 50
     problem_params['newton_tol'] = 1E-10
     problem_params['interval'] = (-5, 5)
+    problem_params['radius'] = 0.25
+    problem_params['eps'] = 0.2
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
