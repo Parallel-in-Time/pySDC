@@ -39,11 +39,8 @@ def compute_and_plot_specrad(Nnodes, lam):
 
     xlist = [10 ** i for i in range(11)]
 
-    plt.subplots(figsize=(15, 10))
     rc('font', **{"sans-serif": ["Arial"], "size": 24})
-    rc('legend', fontsize='small')
-    rc('xtick', labelsize='small')
-    rc('ytick', labelsize='small')
+    plt.subplots(figsize=(15, 10))
 
     for Nsweeps, color, marker in setup_list:
 
