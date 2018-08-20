@@ -5,3 +5,4 @@ matplotlib>=1.5.3
 pep8
 dill>=0.2.6
 numba>=0.35
+pyfftw
