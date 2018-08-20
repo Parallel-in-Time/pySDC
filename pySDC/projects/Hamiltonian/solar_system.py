@@ -231,7 +231,7 @@ def show_results(prob=None, cwd=''):
         ham = [item[1] for item in v]
         err_ham = ham[-1]
         plt_helper.plt.semilogy(time, ham, '-', lw=1, label='Iter ' + str(k))
-    assert err_ham < 7.5E-15, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
+    assert err_ham < 2.4E-14, 'Error in the Hamiltonian is too large for %s, got %s' % (prob, err_ham)
 
     plt_helper.plt.xlabel('Time')
     plt_helper.plt.ylabel('Error in Hamiltonian')
