@@ -57,11 +57,13 @@ def newfig(textwidth, scale, ratio=0.6180339887):
     return fig, ax
 
 
-def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
+def savefig(filename, save_pdf=True, save_pgf=True, save_png=True, save_jpg=True):
     if save_pgf:
         plt.savefig('{}.pgf'.format(filename), rasterized=True, bbox_inches='tight')
     if save_pdf:
         plt.savefig('{}.pdf'.format(filename), rasterized=True, bbox_inches='tight')
     if save_png:
         plt.savefig('{}.png'.format(filename), rasterized=True, bbox_inches='tight')
+    if save_jpg:
+        plt.savefig('{}.jpg'.format(filename), rasterized=True, bbox_inches='tight')
     plt.close()

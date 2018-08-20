@@ -1,8 +1,8 @@
 import logging
 import scipy.sparse as sp
+import numpy as np
 
 from pySDC.helpers.pysdc_helper import FrozenClass
-import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import UnlockError
 
 
@@ -10,8 +10,6 @@ from pySDC.core.Errors import UnlockError
 class _Pars(FrozenClass):
     def __init__(self, pars):
         self.finter = False
-        self.coll_iorder = 2
-        self.coll_rorder = 2
         for k, v in pars.items():
             setattr(self, k, v)
 
@@ -57,13 +55,43 @@ class base_transfer(object):
             self.Pcoll = sp.eye(len(fine_grid)).toarray()
             self.Rcoll = sp.eye(len(fine_grid)).toarray()
         else:
-            self.Pcoll = th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_iorder, pad=0,
-                                                    equidist_nested=False).toarray()
-            self.Rcoll = th.restriction_matrix_1d(fine_grid, coarse_grid, k=self.params.coll_rorder, pad=0).toarray()
+            self.Pcoll = self.get_transfer_matrix_Q(fine_grid, coarse_grid)
+            self.Rcoll = self.get_transfer_matrix_Q(coarse_grid, fine_grid)
 
         # set up spatial transfer
         self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob,
                                                    params=space_transfer_params)
+
+    @staticmethod
+    def get_transfer_matrix_Q(f_nodes, c_nodes):
+        """
+        Helper routine to quickly define transfer matrices between sets of nodes (fully Lagrangian)
+        Args:
+            f_nodes: fine nodes
+            c_nodes: coarse nodes
+
+        Returns:
+            matrix containing the interpolation weights
+        """
+        nnodes_f = len(f_nodes)
+        nnodes_c = len(c_nodes)
+
+        tmat = np.zeros((nnodes_f, nnodes_c))
+
+        for i in range(nnodes_f):
+            xi = f_nodes[i]
+            for j in range(nnodes_c):
+                den = 1.0
+                num = 1.0
+                for k in range(nnodes_c):
+                    if k == j:
+                        continue
+                    else:
+                        den *= c_nodes[j] - c_nodes[k]
+                        num *= xi - c_nodes[k]
+                tmat[i, j] = num / den
+
+        return tmat
 
     def restrict(self):
         """
