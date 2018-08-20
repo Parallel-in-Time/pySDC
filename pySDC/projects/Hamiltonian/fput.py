@@ -133,7 +133,7 @@ def run_simulation():
     print(out)
     f.close()
 
-    assert np.mean(niters) <= 3.37, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+    assert np.mean(niters) <= 3.45, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
     fname = 'data/fput.dat'
     f = open(fname, 'wb')
