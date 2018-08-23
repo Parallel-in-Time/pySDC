@@ -38,7 +38,7 @@ def setup():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3, 3]
-    sweeper_params['QI'] = ['LU', 'IEpar']
+    sweeper_params['QI'] = ['LU', 'LUinv']
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -139,7 +139,7 @@ def run_pfasst_newton(Tend=None):
 
 if __name__ == "__main__":
 
-    Tend = 16 * 0.001
+    Tend = 4 * 0.001
 
     run_newton_pfasst(Tend=Tend)
     run_pfasst_newton(Tend=Tend)

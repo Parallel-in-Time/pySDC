@@ -66,6 +66,20 @@ class sweeper(object):
         # collocation object
         self.coll = coll
 
+    def lunopiv(self, A, ptol=1E-12):
+        m, n = np.shape(A)
+        for i in np.arange(0, n):
+            pivot = A[i, i]
+            if abs(pivot) < ptol:
+                print('zero pivot encountered')
+                break
+            for k in np.arange(i + 1, n):
+                A[k, i] = A[k, i] / pivot
+                A[k, i + 1:n] = A[k, i + 1:n] - A[k, i] * A[i, i + 1:n]
+        L = np.eye(n) + np.tril(A, -1)
+        U = np.triu(A)
+        return L, U
+
     def get_Qdelta_implicit(self, coll, qd_type):
 
         def rho(x):
@@ -80,6 +94,10 @@ class sweeper(object):
             QT = coll.Qmat[1:, 1:].T
             [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
             QDmat[1:, 1:] = 2 * U.T
+        elif qd_type == 'LUinv':
+            QT = np.linalg.inv(coll.Qmat[1:, 1:]).T
+            L, U = self.lunopiv(QT)
+            QDmat[1:, 1:] = np.linalg.inv(U)
         elif qd_type == 'IE':
             for m in range(coll.num_nodes + 1):
                 QDmat[m, 1:m + 1] = coll.delta_m[0:m]
@@ -100,8 +118,8 @@ class sweeper(object):
         else:
             raise NotImplementedError('qd_type implicit not implemented')
         # check if we got not more than a lower triangular matrix
-        np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape),
-                                      err_msg='Lower triangular matrix expected!')
+        # np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape),
+        #                               err_msg='Lower triangular matrix expected!')
 
         return QDmat
 
