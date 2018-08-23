@@ -23,8 +23,8 @@ class generalized_fisher_jac(generalized_fisher):
         xvalues = np.array([self.params.interval[0] + (i + 1) * self.dx for i in range(self.params.nvars)])
 
         for i in range(self.params.nvars):
-                r2 = xvalues[i] ** 2
-                me.values[i] = 1.0/2.0 + 1.0/2.0 * np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+            r2 = xvalues[i] ** 2
+            me.values[i] = 1.0/2.0 + 1.0/2.0 * np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
         return me
 
     def eval_jacobian(self, u):

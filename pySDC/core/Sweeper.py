@@ -85,7 +85,7 @@ class sweeper(object):
                 QDmat[m, 1:m + 1] = coll.delta_m[0:m]
         elif qd_type == 'IEpar':
             for m in range(coll.num_nodes + 1):
-                QDmat[m, m] = np.sum(coll.delta_m[0:m])
+                QDmat[m, m] = 2 * np.sum(coll.delta_m[0:m])
         elif qd_type == 'Qpar':
             QDmat = np.diag(np.diag(coll.Qmat))
         elif qd_type == 'GS':

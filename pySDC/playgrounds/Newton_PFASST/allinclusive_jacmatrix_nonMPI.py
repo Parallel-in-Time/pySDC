@@ -43,8 +43,8 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.nspace = self.MS[0].levels[0].prob.init
 
         self.dt = self.MS[0].levels[0].dt
-        self.tol = self.MS[0].levels[0].params.restol
-        self.maxiter = self.MS[0].params.maxiter
+        self.tol = self.MS[0].levels[0].prob.params.inner_tol
+        self.maxiter = self.MS[0].levels[0].prob.params.inner_maxiter
 
         prob = self.MS[0].levels[0].prob
 
@@ -75,7 +75,14 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.res = np.zeros(self.nsteps * self.nnodes * self.nspace)
         self.rhs = np.zeros(self.nsteps * self.nnodes * self.nspace)
 
+        self.Tcf = None
+        self.Tfc = None
+        self.Pc = None
+        self.C = None
+        self.P = None
+
         self.iter_counter = 0
+        self.inner_solve_counter = 0
 
     def compute_rhs(self, uk, t0):
 
@@ -112,14 +119,14 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
     def compute_matrices(self):
 
         L = self.MS[0].levels[0]
-        P = L.prob
 
         jac = []
         for S in self.MS:
             L = S.levels[0]
+            L = self.MS[-1].levels[0]
             P = L.prob
             for m in range(1, self.nnodes + 1):
-                jac.append(P.eval_jacobian(L.u[m]))
+                jac.append(P.eval_jacobian(L.u[-1]))
         A = spla.block_diag(jac).todense()
         Q = L.sweep.coll.Qmat[1:, 1:]
         Qd = L.sweep.QI[1:, 1:]
@@ -129,17 +136,23 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         N = np.zeros((self.nnodes, self.nnodes))
         N[:, -1] = 1
+
         self.C = np.eye(self.nsteps * self.nnodes * self.nspace) - \
                  self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, np.eye(self.nspace))).dot(A) - np.kron(E, np.kron(N, np.eye(self.nspace)))
         self.C = np.array(self.C)
+
+        # N = np.eye(self.nnodes)
+        # E[0,-1] = self.dt
+        # Qd = Q
+
         self.P = np.eye(self.nsteps * self.nnodes * self.nspace) - \
-                 self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, np.eye(self.nspace))).dot(A)
+                 self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, np.eye(self.nspace))).dot(A) # - np.kron(E, np.kron(N, np.eye(self.nspace)))
         self.P = np.array(self.P)
 
         if self.nlevels > 1:
             L = self.MS[0].levels[1]
             P = L.prob
-            self.nspace_c = P.init
+            nspace_c = P.init
 
             Qdc = L.sweep.QI[1:, 1:]
             nnodesc = L.sweep.coll.num_nodes
@@ -155,10 +168,15 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
             self.Tfc = np.array(np.kron(np.eye(self.nsteps), np.kron(TfcQ, TfcA)))
 
             Ac = self.Tfc.dot(A.dot(self.Tcf))
+            Ec = E.copy()
 
-            self.Pc = np.eye(self.nsteps * nnodesc * self.nspace_c) - \
-                      self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, np.eye(self.nspace_c))).dot(Ac) - \
-                      np.kron(E, np.kron(Nc, np.eye(self.nspace_c)))
+            Ec[0, -1] = self.dt
+            # Qdc = L.sweep.coll.Qmat[1:, 1:]
+            # Nc = np.eye(nnodesc)
+
+            self.Pc = np.eye(self.nsteps * nnodesc * nspace_c) - \
+                      self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, np.eye(nspace_c))).dot(Ac) - \
+                      np.kron(Ec, np.kron(Nc, np.eye(nspace_c)))
             self.Pc = np.array(self.Pc)
 
     def run(self, uk, t0, Tend):
@@ -260,6 +278,8 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
 
         niter = 0
 
+        # self.u += np.linalg.solve(self.P, self.res)
+        # self.inner_solve_counter += self.nnodes * self.nsteps
         self.res = self.rhs - self.C.dot(self.u)
 
         MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='PRE_STEP')
@@ -296,6 +316,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                     self.hooks.pre_sweep(step=S, level_number=0)
 
                 self.u += np.linalg.solve(self.P, self.res)
+                self.inner_solve_counter += self.nnodes * self.nsteps
                 self.res = self.rhs - self.C.dot(self.u)
 
                 MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=0, stage='POST_FINE_SWEEP')

@@ -34,8 +34,8 @@ class CollGaussRadau_Right(CollBase):
             tright (float): right interval boundary (usually 1)
         """
         super(CollGaussRadau_Right, self).__init__(num_nodes, tleft, tright)
-        if num_nodes < 2:
-            raise CollocationError("Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes)
+        if num_nodes < 1:
+            raise CollocationError("Number of nodes should be at least 1 for Gauss-Radau, but is %d" % num_nodes)
         self.order = 2 * self.num_nodes - 1
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
@@ -59,31 +59,36 @@ class CollGaussRadau_Right(CollBase):
         a = self.tleft
         b = self.tright
 
-        alpha = 1.0
-        beta = 0.0
+        if M > 1:
 
-        diag = np.zeros(M - 1)
-        subdiag = np.zeros(M - 2)
+            alpha = 1.0
+            beta = 0.0
 
-        diag[0] = (beta - alpha) / (2 + alpha + beta)
+            diag = np.zeros(M - 1)
+            subdiag = np.zeros(M - 2)
 
-        for jj in range(1, M - 1):
-            diag[jj] = (beta - alpha) * (alpha + beta) / (2 * jj + 2 + alpha + beta) / (2 * jj + alpha + beta)
-            num = np.sqrt(4 * jj * (jj + alpha) * (jj + beta) * (jj + alpha + beta))
-            denom = np.sqrt((2 * jj - 1 + alpha + beta) * (2 * jj + alpha + beta) ** 2 * (2 * jj + 1 + alpha + beta))
-            subdiag[jj - 1] = num / denom
+            diag[0] = (beta - alpha) / (2 + alpha + beta)
 
-        subdiag1 = np.zeros(M - 1)
-        subdiag2 = np.zeros(M - 1)
-        subdiag1[0:-1] = subdiag
-        subdiag2[1:] = subdiag
+            for jj in range(1, M - 1):
+                diag[jj] = (beta - alpha) * (alpha + beta) / (2 * jj + 2 + alpha + beta) / (2 * jj + alpha + beta)
+                num = np.sqrt(4 * jj * (jj + alpha) * (jj + beta) * (jj + alpha + beta))
+                denom = np.sqrt((2 * jj - 1 + alpha + beta) * (2 * jj + alpha + beta) ** 2 * (2 * jj + 1 + alpha + beta))
+                subdiag[jj - 1] = num / denom
 
-        Mat = sp.spdiags(data=[subdiag1, diag, subdiag2], diags=[-1, 0, 1], m=M - 1, n=M - 1).todense()
+            subdiag1 = np.zeros(M - 1)
+            subdiag2 = np.zeros(M - 1)
+            subdiag1[0:-1] = subdiag
+            subdiag2[1:] = subdiag
 
-        x = np.sort(np.linalg.eigvals(Mat))
+            Mat = sp.spdiags(data=[subdiag1, diag, subdiag2], diags=[-1, 0, 1], m=M - 1, n=M - 1).todense()
 
-        nodes = np.concatenate((x, [1.0]))
+            x = np.sort(np.linalg.eigvals(Mat))
 
-        nodes = (a * (1 - nodes) + b * (1 + nodes)) / 2
+            nodes = np.concatenate((x, [1.0]))
+
+            nodes = (a * (1 - nodes) + b * (1 + nodes)) / 2
+
+        else:
+            nodes = [b]
 
         return nodes
