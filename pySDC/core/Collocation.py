@@ -1,6 +1,4 @@
 from __future__ import division
-import abc
-from future.utils import with_metaclass
 from scipy.interpolate import BarycentricInterpolator
 from scipy.integrate import quad
 import numpy as np
@@ -9,7 +7,7 @@ import logging
 from pySDC.core.Errors import CollocationError
 
 
-class CollBase(with_metaclass(abc.ABCMeta)):
+class CollBase(object):
     """
     Abstract class for collocation
 
@@ -103,12 +101,11 @@ class CollBase(with_metaclass(abc.ABCMeta)):
 
         return weights
 
-    @abc.abstractmethod
     def _getNodes(self):
         """
         Dummy method for generating the collocation nodes.
         """
-        pass
+        raise NotImplementedError('ERROR: collocation has to implement _getNodes(self)')
 
     @property
     def _gen_Qmatrix(self):

@@ -114,14 +114,15 @@ def compute_and_plot_itererror():
     # Plot the results
     fs = 8
     color = ['r', 'b', 'g', 'c']
-    shape = ['o-', 'd-', 's-', '>-']
+    shape = ['o', 'd', 's', 'v']
     rcParams['figure.figsize'] = 2.5, 2.5
+    rcParams['pgf.rcfonts'] = False
     fig = plt.figure()
     for ii in range(0, np.size(cs_v)):
-        x = np.arange(1, lastiter[ii, 0])
-        y = convrate[ii, 0, 0:int(lastiter[ii, 0]) - 1]
-        plt.plot(x, y, shape[ii], markersize=fs - 2, color=color[ii],
-                 label=r'$C_{\rm fast}$=%4.2f' % (cs_v[ii] * level_params['dt'] / P.dx))
+        x = np.arange(1, lastiter[ii, 0] - 1)
+        y = convrate[ii, 0, 0:int(lastiter[ii, 0]) - 2]
+        plt.plot(x, y, linestyle='-', marker=shape[ii], markersize=fs - 2, color=color[ii],
+                 label=r'$C_{fast}$=%4.2f' % (cs_v[ii] * level_params['dt'] / P.dx))
 
     plt.legend(loc='upper right', fontsize=fs, prop={'size': fs - 2})
     plt.xlabel('Iteration', fontsize=fs)

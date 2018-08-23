@@ -3,7 +3,6 @@ import scipy.linalg as LA
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib import rc
 from matplotlib.colors import LogNorm
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -12,29 +11,27 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 def compute_and_plot_specrad():
     """
     Compute and plot spectral radius of smoother iteration matrix for a whole range of eigenvalues
-    Returns:
-
     """
     # setup_list = [('LU', 'to0'), ('LU', 'toinf'), ('IE', 'to0'), ('IE', 'toinf')]
     # setup_list = [('LU', 'to0'), ('LU', 'toinf')]
     # setup_list = [('IE', 'to0'), ('IE', 'toinf')]
     # setup_list = [('LU', 'toinf'), ('IE', 'toinf')]
     setup_list = [('IE', 'full'), ('LU', 'full')]
-    setup_list = [('EX', 'to0'), ('PIC', 'to0')]
+    # setup_list = [('EX', 'to0'), ('PIC', 'to0')]
 
     # set up plotting parameters
-    params = {'legend.fontsize': 20,
+    params = {'legend.fontsize': 24,
               'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
+              'axes.labelsize': 24,
+              'axes.titlesize': 24,
+              'xtick.labelsize': 24,
+              'ytick.labelsize': 24,
               'lines.linewidth': 3
               }
     plt.rcParams.update(params)
 
-    Nnodes = 5
-    Nsteps = 1
+    Nnodes = 3
+    Nsteps = 4
 
     coll = CollGaussRadau_Right(Nnodes, 0, 1)
     Qmat = coll.Qmat[1:, 1:]

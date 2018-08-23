@@ -1,5 +1,3 @@
-import abc
-from future.utils import with_metaclass
 import logging
 import numpy as np
 import scipy.linalg
@@ -24,7 +22,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class sweeper(with_metaclass(abc.ABCMeta)):
+class sweeper(object):
     """
     Base abstract sweeper class
 
@@ -197,26 +195,23 @@ class sweeper(with_metaclass(abc.ABCMeta)):
 
         return None
 
-    @abc.abstractmethod
     def compute_end_point(self):
         """
         Abstract interface to end-node computation
         """
-        return None
+        raise NotImplementedError('ERROR: sweeper has to implement compute_end_point(self)')
 
-    @abc.abstractmethod
     def integrate(self):
         """
         Abstract interface to right-hand side integration
         """
-        return None
+        raise NotImplementedError('ERROR: sweeper has to implement integrate(self)')
 
-    @abc.abstractmethod
     def update_nodes(self):
         """
         Abstract interface to node update
         """
-        return None
+        raise NotImplementedError('ERROR: sweeper has to implement update_nodes(self)')
 
     @property
     def level(self):

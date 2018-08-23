@@ -166,6 +166,7 @@ def plot_convergence(cwd=''):
     color = ['r', 'b', 'g']
     shape = ['o', 'd', 's']
     rcParams['figure.figsize'] = 2.5, 2.5
+    rcParams['pgf.rcfonts'] = False
     fig = plt.figure()
     for ii in range(0, 3):
         plt.loglog(nsteps_plot[ii, :], convline[ii, :], '-', color=color[ii])

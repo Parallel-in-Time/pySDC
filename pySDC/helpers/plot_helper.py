@@ -5,17 +5,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def figsize(textwidth, scale):
+def figsize(textwidth, scale, ratio):
     fig_width_pt = textwidth                            # Get this from LaTeX using \the\textwidth
     inches_per_pt = 1.0 / 72.27                         # Convert pt to inch
-    golden_mean = (np.sqrt(5.0) - 1.0) / 2.0            # Aesthetic ratio (you could change this)
     fig_width = fig_width_pt * inches_per_pt * scale    # width in inches
-    fig_height = fig_width * golden_mean                # height in inches
+    fig_height = fig_width * ratio                # height in inches
     fig_size = [fig_width, fig_height]
     return fig_size
 
 
-def setup_mpl():
+def setup_mpl(font_size=8):
     # Set up plotting parameters
     pgf_with_latex = {  # setup matplotlib to use latex for output
         "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
@@ -26,7 +25,7 @@ def setup_mpl():
         "font.monospace": [],
         "axes.labelsize": 8,  # LaTeX default is 10pt font.
         "axes.linewidth": 0.5,
-        "font.size": 8,
+        "font.size": font_size,
         "legend.fontsize": 6,  # Make the legend/label fonts a little smaller
         "legend.numpoints": 1,
         "xtick.labelsize": 6,
@@ -46,15 +45,15 @@ def setup_mpl():
             r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
             r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
             r"\usepackage{underscore}",
+            r"\usepackage{amsmath,amssymb,marvosym}"
         ]
     }
     mpl.rcParams.update(pgf_with_latex)
 
 
-def newfig(textwidth, scale):
+def newfig(textwidth, scale, ratio=0.6180339887):
     plt.clf()
-    fig = plt.figure(figsize=figsize(textwidth, scale))
-    ax = fig.add_subplot()
+    fig, ax = plt.subplots(figsize=figsize(textwidth, scale, ratio))
     return fig, ax
 
 
@@ -65,3 +64,4 @@ def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
         plt.savefig('{}.pdf'.format(filename), rasterized=True, bbox_inches='tight')
     if save_png:
         plt.savefig('{}.png'.format(filename), rasterized=True, bbox_inches='tight')
+    plt.close()

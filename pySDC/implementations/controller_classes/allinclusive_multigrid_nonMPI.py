@@ -29,8 +29,16 @@ class allinclusive_multigrid_nonMPI(controller):
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
 
         self.MS = [stepclass.step(description)]
-        for p in range(num_procs - 1):
-            self.MS.append(dill.copy(self.MS[0]))
+
+        # try to initialize via dill.copy (much faster for many time-steps)
+        try:
+            for p in range(num_procs - 1):
+                self.MS.append(dill.copy(self.MS[0]))
+        # if this fails (e.g. due to un-picklable data in the steps), initialize seperately
+        except dill.PicklingError and TypeError:
+            self.logger.warning('Need to initialize steps separately due to pickling error')
+            for p in range(num_procs - 1):
+                self.MS.append(stepclass.step(description))
 
         if self.params.dump_setup:
             self.dump_setup(step=self.MS[0], controller_params=controller_params, description=description)

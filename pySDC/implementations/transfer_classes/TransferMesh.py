@@ -7,6 +7,8 @@ import pySDC.helpers.transfer_helper as th
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+
 
 class mesh_to_mesh(space_transfer):
     """
@@ -142,17 +144,61 @@ class mesh_to_mesh(space_transfer):
     def restrict(self, F):
         """
         Restriction implementation
-
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        return F.apply_mat(self.Rspace)
+        if isinstance(F, mesh):
+            F.values = F.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.values = G.values.reshape(self.coarse_prob.params.nvars)
+            F.values = F.values.reshape(self.fine_prob.params.nvars)
+        elif isinstance(F, rhs_imex_mesh):
+            F.impl.values = F.impl.values.flatten()
+            F.expl.values = F.expl.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
+            G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
+            F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
+            F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
+        elif isinstance(F, rhs_comp2_mesh):
+            F.comp1.values = F.comp1.values.flatten()
+            F.comp2.values = F.comp2.values.flatten()
+            G = F.apply_mat(self.Rspace)
+            G.comp1.values = G.comp1.values.reshape(self.coarse_prob.params.nvars)
+            G.comp2.values = G.comp2.values.reshape(self.coarse_prob.params.nvars)
+            F.comp1.values = F.comp1.values.reshape(self.fine_prob.params.nvars)
+            F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
+        else:
+            raise TransferError('Wrong data type for restriction, got %s' % type(F))
+        return G
 
     def prolong(self, G):
         """
         Prolongation implementation
-
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        return G.apply_mat(self.Pspace)
+        if isinstance(G, mesh):
+            G.values = G.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.values = F.values.reshape(self.fine_prob.params.nvars)
+            G.values = G.values.reshape(self.coarse_prob.params.nvars)
+        elif isinstance(G, rhs_imex_mesh):
+            G.impl.values = G.impl.values.flatten()
+            G.expl.values = G.expl.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
+            F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
+            G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
+            G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
+        elif isinstance(G, rhs_comp2_mesh):
+            G.comp1.values = G.comp1.values.flatten()
+            G.comp2.values = G.comp2.values.flatten()
+            F = G.apply_mat(self.Pspace)
+            F.comp1.values = F.comp1.values.reshape(self.fine_prob.params.nvars)
+            F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
+            G.comp1.values = G.comp1.values.reshape(self.coarse_prob.params.nvars)
+            G.comp2.values = G.comp2.values.reshape(self.coarse_prob.params.nvars)
+        else:
+            raise TransferError('Wrong data type for prolongation, got %s' % type(G))
+        return F

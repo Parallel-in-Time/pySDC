@@ -1,5 +1,3 @@
-import abc
-from future.utils import with_metaclass
 import logging
 
 from pySDC.helpers.pysdc_helper import FrozenClass
@@ -19,7 +17,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class space_transfer(with_metaclass(abc.ABCMeta)):
+class space_transfer(object):
     """
     Abstract space_transfer class
 
@@ -49,7 +47,6 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
         self.fine_prob = fine_prob
         self.coarse_prob = coarse_prob
 
-    @abc.abstractmethod
     def restrict(self, F):
         """
         Abstract interface for restriction in space
@@ -57,9 +54,8 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        pass
+        raise NotImplementedError('ERROR: space_transfer has to implement restrict(self, F)')
 
-    @abc.abstractmethod
     def prolong(self, G):
         """
         Abstract interface for prolongation in space
@@ -67,4 +63,4 @@ class space_transfer(with_metaclass(abc.ABCMeta)):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        pass
+        raise NotImplementedError('ERROR: space_transfer has to implement prolong(self, G)')
