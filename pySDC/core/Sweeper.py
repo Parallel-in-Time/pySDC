@@ -66,7 +66,7 @@ class sweeper(object):
         # collocation object
         self.coll = coll
 
-    def lunopiv(self, A, ptol=1E-12):
+    def lunopiv(self, A, ptol=1E-14):
         m, n = np.shape(A)
         for i in np.arange(0, n):
             pivot = A[i, i]
@@ -95,7 +95,7 @@ class sweeper(object):
             [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
             QDmat[1:, 1:] = 2 * U.T
         elif qd_type == 'LUinv':
-            QT = np.linalg.inv(coll.Qmat[1:, 1:]).T
+            QT = np.linalg.inv(coll.Qmat[1:, 1:])
             L, U = self.lunopiv(QT)
             QDmat[1:, 1:] = np.linalg.inv(U)
         elif qd_type == 'IE':
