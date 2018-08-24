@@ -1,6 +1,5 @@
 import numpy as np
 
-
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -73,6 +72,8 @@ def run_newton_pfasst(Tend=None):
 
     description, controller_params = setup()
 
+    controller_params['do_coarse'] = True
+
     # setup parameters "in time"
     t0 = 0.0
 
@@ -105,9 +106,10 @@ def run_newton_pfasst(Tend=None):
     nsolves_step = nsolves_all / num_procs
     nsolves_iter = nsolves_all / k
     print('  --> Number of outer iterations: %i' % k)
-    print('  --> Number of inner solves (total/per step/per iteration): %i / %f / %f' %
-          (nsolves_all, nsolves_step, nsolves_iter))
+    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
+          (nsolves_all, nsolves_iter, nsolves_step))
     print()
+
 
 def run_pfasst_newton(Tend=None):
 
@@ -115,7 +117,8 @@ def run_pfasst_newton(Tend=None):
 
     description, controller_params = setup()
 
-    # controller_params['hook_class'] = output
+    # remove this line to reduce the output of PFASST
+    controller_params['hook_class'] = output
 
     # setup parameters "in time"
     t0 = 0.0
@@ -145,15 +148,16 @@ def run_pfasst_newton(Tend=None):
     nsolves_step = nsolves_all / num_procs
     nsolves_iter = nsolves_all / niter
     print('  --> Number of outer iterations: %i' % niter)
-    print('  --> Number of inner solves (total/per step/per iteration): %i / %f / %f' %
-          (nsolves_all, nsolves_step, nsolves_iter))
+    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
+          (nsolves_all, nsolves_iter, nsolves_step))
     print()
 
 
 def main():
 
-    # Set Tend here. Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
-    Tend = 4 * 0.001
+    # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
+    num_procs = 4
+    Tend = num_procs * 0.001
 
     run_newton_pfasst(Tend=Tend)
     run_pfasst_newton(Tend=Tend)

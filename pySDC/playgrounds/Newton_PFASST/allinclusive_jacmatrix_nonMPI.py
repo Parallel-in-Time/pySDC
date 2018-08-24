@@ -33,6 +33,9 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         assert description['sweeper_class'] is generic_implicit, \
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
 
+        if 'do_coarse' not in controller_params:
+            controller_params['do_coarse'] = True
+
         # call parent's initialization routine
         super(allinclusive_jacmatrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
                                                          description=description)
@@ -294,7 +297,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
             for S in MS:
                 self.hooks.pre_iteration(step=S, level_number=0)
 
-            if self.nlevels > 1:
+            if self.nlevels > 1 and self.params.do_coarse:
                 for _ in range(MS[0].levels[1].params.nsweeps):
 
                     MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1, stage='PRE_COARSE_SWEEP')

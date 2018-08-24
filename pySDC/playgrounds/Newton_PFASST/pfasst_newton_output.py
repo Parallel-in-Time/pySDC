@@ -20,5 +20,6 @@ class output(hooks):
         L = step.levels[0]
         P = L.prob
 
-        print(step.status.iter, P.inner_solve_counter)
+        print('  Outer Iteration: %i -- process %i -- number of inner solves: %i -- PFASST residual: %8.6e' %
+              (step.status.iter, step.status.slot, P.inner_solve_counter, L.status.residual))
 
