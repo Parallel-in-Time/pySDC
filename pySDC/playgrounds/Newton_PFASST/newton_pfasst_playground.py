@@ -38,7 +38,7 @@ def setup():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3, 3]
-    sweeper_params['QI'] = ['LU', 'LUinv']
+    sweeper_params['QI'] = ['LU', 'IEpar']
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -69,6 +69,8 @@ def setup():
 
 def run_newton_pfasst(Tend=None):
 
+    print('THIS IS NEWTON-PFASST....')
+
     description, controller_params = setup()
 
     # setup parameters "in time"
@@ -80,9 +82,6 @@ def run_newton_pfasst(Tend=None):
     controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                                description=description)
 
-    # print([L.sweep.coll.nodes for L in controller.MS[0].levels])
-    # exit()
-
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
@@ -90,22 +89,29 @@ def run_newton_pfasst(Tend=None):
     uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
 
     controller.compute_rhs(uk, t0)
-    print(np.linalg.norm(controller.rhs, np.inf))
+    print('  Initial residual: %8.6e' % np.linalg.norm(controller.rhs, np.inf))
     k = 0
-    while np.linalg.norm(controller.rhs, np.inf) > 1E-08 or k == 0:
+    while np.linalg.norm(controller.rhs, np.inf) > description['level_params']['restol'] or k == 0:
         k += 1
         ek, stats = controller.run(uk=uk, t0=t0, Tend=Tend)
         uk -= ek
         controller.compute_rhs(uk, t0)
 
-        print(k, controller.inner_solve_counter, np.linalg.norm(controller.rhs, np.inf), np.linalg.norm(ek, np.inf))
+        print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e' %
+              (k, controller.inner_solve_counter, np.linalg.norm(controller.rhs, np.inf)))
 
+    # compute and print statistics
     nsolves_all = controller.inner_solve_counter
     nsolves_step = nsolves_all / num_procs
-    print(nsolves_all, nsolves_step)
-
+    nsolves_iter = nsolves_all / k
+    print('  --> Number of outer iterations: %i' % k)
+    print('  --> Number of inner solves (total/per step/per iteration): %i / %f / %f' %
+          (nsolves_all, nsolves_step, nsolves_iter))
+    print()
 
 def run_pfasst_newton(Tend=None):
+
+    print('THIS IS PFASST-NEWTON....')
 
     description, controller_params = setup()
 
@@ -125,22 +131,34 @@ def run_pfasst_newton(Tend=None):
 
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # # filter statistics by variant (number of iterations)
-    # filtered_stats = filter_stats(stats, type='niter')
-    #
-    # # convert filtered statistics to list of iterations count, sorted by process
-    # iter_counts = sort_stats(filtered_stats, sortby='time')
+    # filter statistics by variant (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # get maximum number of iterations
+    niter = max([item[1] for item in iter_counts])
 
     # compute and print statistics
-    nsolves_all = np.sum([S.levels[0].prob.inner_solve_counter for S in controller.MS])
+    nsolves_all = int(np.sum([S.levels[0].prob.inner_solve_counter for S in controller.MS]))
     nsolves_step = nsolves_all / num_procs
-    print(nsolves_all, nsolves_step)
+    nsolves_iter = nsolves_all / niter
+    print('  --> Number of outer iterations: %i' % niter)
+    print('  --> Number of inner solves (total/per step/per iteration): %i / %f / %f' %
+          (nsolves_all, nsolves_step, nsolves_iter))
+    print()
 
 
-if __name__ == "__main__":
+def main():
 
+    # Set Tend here. Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
     Tend = 4 * 0.001
 
     run_newton_pfasst(Tend=Tend)
     run_pfasst_newton(Tend=Tend)
 
+
+if __name__ == "__main__":
+
+    main()
