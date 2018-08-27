@@ -84,8 +84,8 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.C = None
         self.P = None
 
-        self.iter_counter = 0
-        self.inner_solve_counter = 0
+        self.iter_counter = None
+        self.inner_solve_counter = None
 
     def compute_rhs(self, uk, t0):
 
@@ -176,6 +176,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
             Ec[0, -1] = self.dt
             # Qdc = L.sweep.coll.Qmat[1:, 1:]
             # Nc = np.eye(nnodesc)
+            # Nc = np.zeros((nnodesc, nnodesc))
 
             self.Pc = np.eye(self.nsteps * nnodesc * nspace_c) - \
                       self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, np.eye(nspace_c))).dot(Ac) - \
@@ -199,6 +200,9 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         # some initializations and reset of statistics
         num_procs = len(self.MS)
         self.hooks.reset_stats()
+
+        self.iter_counter = 0
+        self.inner_solve_counter = 0
 
         assert ((Tend - t0) / self.dt).is_integer(), \
             'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'

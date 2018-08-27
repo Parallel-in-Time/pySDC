@@ -18,7 +18,7 @@ def setup():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = 1
+    level_params['nsweeps'] = [1, 1]
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
@@ -37,7 +37,7 @@ def setup():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3, 3]
-    sweeper_params['QI'] = ['LU', 'IEpar']
+    sweeper_params['QI'] = ['LU', 'LU']
 
     # initialize space transfer parameters
     space_transfer_params = dict()
