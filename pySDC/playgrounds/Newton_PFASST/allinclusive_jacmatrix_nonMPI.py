@@ -84,8 +84,8 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.C = None
         self.P = None
 
-        self.iter_counter = None
-        self.inner_solve_counter = None
+        self.iter_counter = 0
+        self.inner_solve_counter = 0
 
     def compute_rhs(self, uk, t0):
 
@@ -126,10 +126,10 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         jac = []
         for S in self.MS:
             L = S.levels[0]
-            L = self.MS[-1].levels[0]
+            L = self.MS[-1].levels[0]  # WARNING: this is simplified Newton to decouple space from time and nodes
             P = L.prob
             for m in range(1, self.nnodes + 1):
-                jac.append(P.eval_jacobian(L.u[-1]))
+                jac.append(P.eval_jacobian(L.u[-1])) # WARNING: this is simplified Newton
         A = spla.block_diag(jac).todense()
         Q = L.sweep.coll.Qmat[1:, 1:]
         Qd = L.sweep.QI[1:, 1:]
@@ -151,6 +151,23 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.P = np.eye(self.nsteps * self.nnodes * self.nspace) - \
                  self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, np.eye(self.nspace))).dot(A) # - np.kron(E, np.kron(N, np.eye(self.nspace)))
         self.P = np.array(self.P)
+
+        # D, V = np.linalg.eig(E)
+        # Vi = np.linalg.inv(V)
+        # D = np.diag(D)
+        #
+        # uN = np.kron(np.ones(self.nnodes), np.eye(self.nspace)).T
+        # vN = np.zeros(self.nnodes)
+        # vN[-1] = 1
+        # vN = np.kron(vN, np.eye(self.nspace)).T
+        #
+        # Pi = np.linalg.inv(self.P)
+        # W = Pi - Pi.dot(np.kron(D, uN).dot(np.linalg.inv(np.eye(self.nsteps * self.nspace) - np.kron(D, np.eye(self.nspace)))).dot(np.kron(np.eye(self.nsteps), vN.T)).dot(Pi))
+        #
+        # self.Pi = np.kron(V, np.eye(self.nnodes * self.nspace)).dot(W).dot(np.kron(Vi, np.eye(self.nnodes * self.nspace)))
+        # self.Pi = np.linalg.inv(np.eye(self.nsteps * self.nnodes * self.nspace) - \
+        #          self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, np.eye(self.nspace))).dot(A) - np.kron(E, np.kron(N, np.eye(self.nspace))))
+        # self.Pi = np.array(self.Pi)
 
         if self.nlevels > 1:
             L = self.MS[0].levels[1]
@@ -183,6 +200,24 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                       np.kron(Ec, np.kron(Nc, np.eye(nspace_c)))
             self.Pc = np.array(self.Pc)
 
+            # D, V = np.linalg.eig(Ec)
+            # Vi = np.linalg.inv(V)
+            # D = np.diag(D)
+            #
+            # uN = np.kron(np.ones(nnodesc), np.eye(nspace_c)).T
+            # vN = np.zeros(nnodesc)
+            # vN[-1] = 1
+            # vN = np.kron(vN, np.eye(nspace_c)).T
+            #
+            # Pi = np.linalg.inv(self.Pc)
+            # W = Pi - Pi.dot(np.kron(D, uN).dot(
+            #     np.linalg.inv(np.eye(self.nsteps * nspace_c) - np.kron(D, np.eye(nspace_c)))).dot(
+            #     np.kron(np.eye(self.nsteps), vN.T)).dot(Pi))
+            #
+            # self.Pi = np.kron(V, np.eye(nnodesc * nspace_c)).dot(W).dot(
+            #     np.kron(Vi, np.eye(nnodesc * nspace_c)))
+
+
     def run(self, uk, t0, Tend):
         """
         Main driver for running the serial matrix version of SDC, MSSDC, MLSDC and PFASST
@@ -200,9 +235,6 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         # some initializations and reset of statistics
         num_procs = len(self.MS)
         self.hooks.reset_stats()
-
-        self.iter_counter = 0
-        self.inner_solve_counter = 0
 
         assert ((Tend - t0) / self.dt).is_integer(), \
             'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'
@@ -309,6 +341,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                         self.hooks.pre_sweep(step=S, level_number=1)
 
                     self.u += self.Tcf.dot(np.linalg.solve(self.Pc, self.Tfc.dot(self.res)))
+                    # self.u += np.real(self.Tcf.dot(self.Pi.dot(self.Tfc.dot(self.res))))
                     self.res = self.rhs - self.C.dot(self.u)
 
                     MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1,
@@ -323,6 +356,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
                     self.hooks.pre_sweep(step=S, level_number=0)
 
                 self.u += np.linalg.solve(self.P, self.res)
+                # self.u += self.Pi.dot(self.res)
                 self.inner_solve_counter += self.nnodes * self.nsteps
                 self.res = self.rhs - self.C.dot(self.u)
 

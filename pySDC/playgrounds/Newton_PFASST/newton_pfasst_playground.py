@@ -10,6 +10,11 @@ from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI impo
 from pySDC.playgrounds.Newton_PFASST.allinclusive_jacmatrix_nonMPI import allinclusive_jacmatrix_nonMPI
 from pySDC.playgrounds.Newton_PFASST.pfasst_newton_output import output
 
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.LinearBaseTransfer import linear_base_transfer
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.allinclusive_linearmultigrid_nonMPI import allinclusive_linearmultigrid_nonMPI
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.generic_implicit_rhs import generic_implicit_rhs
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit_jac
+
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
@@ -66,9 +71,9 @@ def setup():
     return description, controller_params
 
 
-def run_newton_pfasst(Tend=None):
+def run_newton_pfasst_matrix(Tend=None):
 
-    print('THIS IS NEWTON-PFASST....')
+    print('THIS IS MATRIX-BASED NEWTON-PFASST....')
 
     description, controller_params = setup()
 
@@ -110,6 +115,56 @@ def run_newton_pfasst(Tend=None):
           (nsolves_all, nsolves_iter, nsolves_step))
     print()
 
+
+def run_newton_pfasst_matrixfree(Tend=None):
+
+    print('THIS IS MATRIX-FREE NEWTON-PFASST....')
+
+    description, controller_params = setup()
+
+    controller_params['do_coarse'] = True
+    description['problem_class'] = allencahn_fullyimplicit_jac
+    description['base_transfer_class'] = linear_base_transfer
+    description['sweeper_class'] = generic_implicit_rhs
+
+    # setup parameters "in time"
+    t0 = 0.0
+
+    num_procs = int((Tend - t0) / description['level_params']['dt'])
+
+    # instantiate the controller
+    controller = allinclusive_linearmultigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                                     description=description)
+
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
+
+    uk = [[P.dtype_u(uinit) for _ in S.levels[0].u[1:]] for S in controller.MS]
+    einit = [[P.dtype_u(P.init, val=0.0) for _ in S.levels[0].u[1:]] for S in controller.MS]
+
+    rhs, norm_rhs = controller.compute_rhs(uk=uk, u0=uinit, t0=t0)
+    controller.set_jacobian(uk=uk)
+
+    print('  Initial residual: %8.6e' % norm_rhs)
+    k = 0
+    while norm_rhs > description['level_params']['restol'] and k < 5:
+        k += 1
+        ek, stats = controller.run_linear(rhs=rhs, uk0=einit, t0=t0, Tend=Tend)
+        uk = [[uk[l][m] - ek[l][m] for m in range(len(uk[l]))] for l in range(len(uk))]
+        rhs, norm_rhs = controller.compute_rhs(uk=uk, u0=uinit, t0=t0)
+        controller.set_jacobian(uk=uk)
+
+        print('  Outer Iteration: %i --  Newton residual: %8.6e' % (k, norm_rhs))
+
+    # compute and print statistics
+    nsolves_all = controller.inner_solve_counter
+    nsolves_step = nsolves_all / num_procs
+    nsolves_iter = nsolves_all / k
+    print('  --> Number of outer iterations: %i' % k)
+    print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
+          (nsolves_all, nsolves_iter, nsolves_step))
+    print()
 
 def run_pfasst_newton(Tend=None):
 
@@ -159,8 +214,9 @@ def main():
     num_procs = 4
     Tend = num_procs * 0.001
 
-    run_newton_pfasst(Tend=Tend)
-    run_pfasst_newton(Tend=Tend)
+    run_newton_pfasst_matrixfree(Tend=Tend)
+    # run_newton_pfasst_matrix(Tend=Tend)
+    # run_pfasst_newton(Tend=Tend)
 
 
 if __name__ == "__main__":

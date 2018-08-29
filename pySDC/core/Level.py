@@ -41,6 +41,7 @@ class level(FrozenClass):
         uold (list of dtype_u): copy of dof values for saving data during restriction)
         f (list of dtype_f): RHS values at the nodes
         fold (list of dtype_f): copy of RHS values for saving data during restriction
+        rhs (list of dtype_f): placeholder for varying RHS of the collocation problem (e.g. Newton-PFASST)
         tau (list of dtype_u): FAS correction, allocated via step class if necessary
     """
 
@@ -78,6 +79,8 @@ class level(FrozenClass):
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
+        self.rhs = [None] * self.sweep.coll.num_nodes
+
         if self.level_index > 0:
             self.tau = [None] * self.sweep.coll.num_nodes
         else:
@@ -105,6 +108,8 @@ class level(FrozenClass):
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
+
+        self.rhs = [None] * self.sweep.coll.num_nodes
 
     @property
     def sweep(self):

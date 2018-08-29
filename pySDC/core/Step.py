@@ -1,6 +1,6 @@
 import logging
 
-from pySDC.core import Level as levclass
+from pySDC.core.Level import level
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.core.Errors import ParameterError
@@ -62,6 +62,7 @@ class step(FrozenClass):
 
         # empty attributes
         self.__transfer_dict = {}
+        self.__transfer_class_dict = {}
         self.base_transfer = None
         self.levels = []
         self.__prev = None
@@ -128,14 +129,14 @@ class step(FrozenClass):
         # generate levels, register and connect if needed
         for l in range(len(descr_list)):
 
-            L = levclass.level(problem_class=descr_list[l]['problem_class'],
-                               problem_params=descr_list[l]['problem_params'],
-                               dtype_u=descr_list[l]['dtype_u'],
-                               dtype_f=descr_list[l]['dtype_f'],
-                               sweeper_class=descr_list[l]['sweeper_class'],
-                               sweeper_params=descr_list[l]['sweeper_params'],
-                               level_params=descr_list[l]['level_params'],
-                               level_index=l)
+            L = level(problem_class=descr_list[l]['problem_class'],
+                      problem_params=descr_list[l]['problem_params'],
+                      dtype_u=descr_list[l]['dtype_u'],
+                      dtype_f=descr_list[l]['dtype_f'],
+                      sweeper_class=descr_list[l]['sweeper_class'],
+                      sweeper_params=descr_list[l]['sweeper_params'],
+                      level_params=descr_list[l]['level_params'],
+                      level_index=l)
 
             self.levels.append(L)
 
@@ -193,6 +194,7 @@ class step(FrozenClass):
                                                  space_transfer_class, space_transfer_params)
         # use base_transfer dictionary twice to set restrict and prolong operator
         self.__transfer_dict[tuple([fine_level, coarse_level])] = self.base_transfer.restrict
+        self.__transfer_class_dict[tuple([fine_level, coarse_level])] = self.base_transfer
 
         if self.base_transfer.params.finter:
             self.__transfer_dict[tuple([coarse_level, fine_level])] = self.base_transfer.prolong_f
@@ -213,6 +215,10 @@ class step(FrozenClass):
         """
         self.__transfer_dict[tuple([source, target])]()
 
+    def get_transfer_class(self, source, target):
+
+        return self.__transfer_class_dict[tuple([source, target])]
+
     def reset_step(self):
         """
         Routine so clean-up step structure and the corresp. levels for further uses
@@ -225,18 +231,30 @@ class step(FrozenClass):
         """
         Initialization routine for a new step.
 
-        This routine uses initial values u0 to set up the u[0] values at the finest level
+        This routine uses initial values u0 to set up the u[0] values at the finest level.
+        Alternatively, a list of initial values can be passed to initialize the full vector of u at all nodes.
 
         Args:
-            u0 (dtype_u): initial values
+            u0: initial values
         """
 
         assert len(self.levels) >= 1
         assert len(self.levels[0].u) >= 1
 
-        # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
-        self.levels[0].u[0] = P.dtype_u(u0)
+
+        if isinstance(u0, P.dtype_u):
+
+            # pass u0 to u[0] on the finest level 0
+            self.levels[0].u[0] = P.dtype_u(u0)
+
+        else:
+
+            nnodes = self.levels[0].sweep.coll.num_nodes
+            assert isinstance(u0, list) and len(u0) == nnodes
+
+            for m in range(1, nnodes + 1):
+                self.levels[0].u[m] = P.dtype_u(u0[m - 1])
 
     @property
     def prev(self):
