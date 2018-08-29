@@ -38,7 +38,6 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
         self.Jf = None
 
         self.inner_solve_counter = 0
-        self.newton_ncalls = 0
 
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):

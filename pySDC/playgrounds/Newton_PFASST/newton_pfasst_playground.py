@@ -23,7 +23,7 @@ def setup():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [1, 1]
+    level_params['nsweeps'] = [1]
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
@@ -41,8 +41,8 @@ def setup():
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3, 3]
-    sweeper_params['QI'] = ['LU', 'LU']
+    sweeper_params['num_nodes'] = [3]#, 3]
+    sweeper_params['QI'] = ['LU']#, 'LU']
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -126,6 +126,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     description['problem_class'] = allencahn_fullyimplicit_jac
     description['base_transfer_class'] = linear_base_transfer
     description['sweeper_class'] = generic_implicit_rhs
+    description['step_params']['maxiter'] = 1
 
     # setup parameters "in time"
     t0 = 0.0
@@ -148,23 +149,25 @@ def run_newton_pfasst_matrixfree(Tend=None):
 
     print('  Initial residual: %8.6e' % norm_rhs)
     k = 0
-    while norm_rhs > description['level_params']['restol'] and k < 5:
+    ninnersolve = 0
+    while norm_rhs > description['level_params']['restol']:
         k += 1
         ek, stats = controller.run_linear(rhs=rhs, uk0=einit, t0=t0, Tend=Tend)
         uk = [[uk[l][m] - ek[l][m] for m in range(len(uk[l]))] for l in range(len(uk))]
         rhs, norm_rhs = controller.compute_rhs(uk=uk, u0=uinit, t0=t0)
         controller.set_jacobian(uk=uk)
 
-        print('  Outer Iteration: %i --  Newton residual: %8.6e' % (k, norm_rhs))
+        ninnersolve = sum([S.levels[0].prob.inner_solve_counter for S in controller.MS])
+        print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e' % (k, ninnersolve, norm_rhs))
 
     # compute and print statistics
-    nsolves_all = controller.inner_solve_counter
-    nsolves_step = nsolves_all / num_procs
-    nsolves_iter = nsolves_all / k
+    nsolves_step = ninnersolve / num_procs
+    nsolves_iter = ninnersolve / k
     print('  --> Number of outer iterations: %i' % k)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
-          (nsolves_all, nsolves_iter, nsolves_step))
+          (ninnersolve, nsolves_iter, nsolves_step))
     print()
+
 
 def run_pfasst_newton(Tend=None):
 
@@ -173,7 +176,7 @@ def run_pfasst_newton(Tend=None):
     description, controller_params = setup()
 
     # remove this line to reduce the output of PFASST
-    controller_params['hook_class'] = output
+    # controller_params['hook_class'] = output
 
     # setup parameters "in time"
     t0 = 0.0
@@ -215,8 +218,8 @@ def main():
     Tend = num_procs * 0.001
 
     run_newton_pfasst_matrixfree(Tend=Tend)
-    # run_newton_pfasst_matrix(Tend=Tend)
-    # run_pfasst_newton(Tend=Tend)
+    run_newton_pfasst_matrix(Tend=Tend)
+    run_pfasst_newton(Tend=Tend)
 
 
 if __name__ == "__main__":

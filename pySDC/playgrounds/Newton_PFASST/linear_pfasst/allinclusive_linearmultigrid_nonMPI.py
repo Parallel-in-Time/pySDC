@@ -23,17 +23,6 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         # call parent's initialization routine
         super(allinclusive_linearmultigrid_nonMPI, self).__init__(num_procs, controller_params, description)
 
-    def prepare_run(self, uk):
-
-        num_procs = len(self.MS)
-
-        assert len(uk) == num_procs, \
-            'ERROR: rhs needs to be a list of %i lists of entries for the RHS of the problem, got %s' % rhs
-
-        for i, S in enumerate(self.MS):
-            for j, L in enumerate(S.levels):
-                L.prob.set_jacobian()
-
     def run(self, rhs, t0, Tend):
         raise ControllerError('This run routine does not exist, use run_linear instead')
 
@@ -49,8 +38,6 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
         assert len(rhs) == num_procs, \
             'ERROR: rhs needs to be a list of %i lists of entries for the RHS of the problem, got %s' % rhs
-        # assert len(uinit) == num_procs, \
-        #     'ERROR: uinit needs to be a list of %i lists of entries to start the iteration, got %s' % uinit
 
         # initialize time variables of each step
         time = [t0 + sum(S.dt for S in self.MS[:p]) for p in range(len(self.MS))]
@@ -68,9 +55,6 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         # main loop: as long as at least one step is still active (time < Tend), do something
         while not all([S.status.done for S in self.MS]):
             self.MS = self.pfasst(self.MS)
-
-        # t = time[-1] + self.MS[-1].dt
-        # time = [t + sum(S.dt for S in self.MS[:p]) for p in range(len(self.MS))]
 
         uend = [[S.levels[0].u[m] for m in range(1, S.levels[0].sweep.coll.num_nodes + 1)] for S in self.MS]
 
@@ -107,7 +91,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
             for k in S.levels:
                 k.tag = None
                 k.status.sweep = 1
-                k.status.time = time[l] #TODO: is this ok?
+                k.status.time = time[l]  # TODO: is this ok?
 
             for m in range(len(rhs[l])):
                 S.levels[0].rhs[m] = S.levels[0].prob.dtype_f(rhs[l][m])
@@ -148,8 +132,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         # WARNING: this is simplified Newton!
         # The problem class does not know of different nodes besides the actual time, so we cannot have different Jf!
         for S in self.MS:
-            P = S.levels[0].prob
-            P.build_jacobian(u=uk[-1][-1])
+            S.levels[0].prob.build_jacobian(u=uk[-1][-1])
 
             for l in range(len(S.levels) - 1):
 
@@ -159,7 +142,3 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                 Tfc = base_transfer.space_transfer.Rspace
 
                 S.levels[l + 1].prob.Jf = Tfc.dot(S.levels[l].prob.Jf).dot(Tcf)
-
-
-
-

@@ -40,8 +40,9 @@ class generic_implicit_rhs(generic_implicit):
 
             # add initial value
             integral[m] += L.u[0]
+
             # add rhs vector
-            integral[m] += L.rhs[m]
+            integral[m] -= L.rhs[m]
 
         # do the sweep
         for m in range(0, M):
