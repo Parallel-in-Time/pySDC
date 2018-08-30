@@ -100,13 +100,13 @@ class allencahn_fullyimplicit(ptype):
             dtype_u: solution u
         """
 
-        num_iters = 0
-
-        def callback(xk):
-            nonlocal num_iters
-            num_iters += 1
-
-        t0 = time.time()
+        # num_iters = 0
+        #
+        # def callback(xk):
+        #     nonlocal num_iters
+        #     num_iters += 1
+        #
+        # t0 = time.time()
 
         u = self.dtype_u(u0).values.flatten()
         z = self.dtype_u(self.init, val=0.0).values.flatten()
@@ -134,10 +134,9 @@ class allencahn_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, callback=callback)[0]
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
             # increase iteration count
             n += 1
-            # print(n, res)
 
         # if n == self.params.newton_maxiter:
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
@@ -148,7 +147,7 @@ class allencahn_fullyimplicit(ptype):
         self.newton_ncalls += 1
         self.newton_itercount += n
 
-        print('.......... %s -- %s' % (time.time() - t0, num_iters))
+        # print('.......... %s -- %s' % (time.time() - t0, num_iters))
 
         return me
 

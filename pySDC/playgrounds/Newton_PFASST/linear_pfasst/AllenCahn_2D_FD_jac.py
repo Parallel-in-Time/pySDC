@@ -34,11 +34,11 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
 
-        num_iters = 0
-
-        def callback(xk):
-            nonlocal num_iters
-            num_iters += 1
+        # num_iters = 0
+        #
+        # def callback(xk):
+        #     nonlocal num_iters
+        #     num_iters += 1
 
         t0 = time.time()
         me = self.dtype_u(self.init)
@@ -46,10 +46,10 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
 
         M = sp.eye(self.params.nvars[0] * self.params.nvars[1], format='csr') - factor * self.Jf
 
-        # me.values = spsolve(sp.eye(self.params.nvars[0] * self.params.nvars[1], format='csc') - factor * self.Jf, rhs.values.flatten())
-        me.values = cg(M, rhs.values.flatten(), x0=z.values.flatten(), tol=self.params.lin_tol, callback=callback)[0]
+        # me.values = spsolve(M, rhs.values.flatten())
+        me.values = cg(M, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
         me.values = me.values.reshape(self.params.nvars)
-        print('.......... %s -- %s' % (time.time() - t0, num_iters))
+        # print('.......... %s -- %s' % (time.time() - t0, num_iters))
 
         self.inner_solve_counter += 1
 
