@@ -200,7 +200,7 @@ class sweeper(object):
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 res[m] += L.tau[m]
             # use abs function from data type here
             res_norm.append(abs(res[m]))

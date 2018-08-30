@@ -83,7 +83,7 @@ class generic_implicit(sweeper):
             # add initial value
             integral[m] += L.u[0]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
         # do the sweep

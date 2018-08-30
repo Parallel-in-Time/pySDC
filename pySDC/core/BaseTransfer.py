@@ -155,7 +155,7 @@ class base_transfer(object):
         for m in range(SG.coll.num_nodes):
             G.tau[m] = tauFG[m] - tauG[m]
 
-        if F.tau is not None:
+        if all(tau is not None for tau in F.tau):
             # restrict possible tau correction from fine in space
             tmp_tau = []
             for m in range(SF.coll.num_nodes):

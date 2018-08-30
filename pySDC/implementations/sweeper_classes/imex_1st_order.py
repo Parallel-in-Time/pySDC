@@ -87,7 +87,7 @@ class imex_1st_order(sweeper):
             # add initial value
             integral[m] += L.u[0]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
 
         # do the sweep
@@ -132,7 +132,7 @@ class imex_1st_order(sweeper):
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt * self.coll.weights[m] * (L.f[m + 1].impl + L.f[m + 1].expl)
             # add up tau correction of the full interval (last entry)
-            if L.tau is not None:
+            if L.tau[-1] is not None:
                 L.uend += L.tau[-1]
 
         return None
