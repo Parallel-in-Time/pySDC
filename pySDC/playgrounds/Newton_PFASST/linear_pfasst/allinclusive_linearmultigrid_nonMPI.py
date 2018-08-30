@@ -83,6 +83,8 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
             S.status.last = l == len(self.MS) - 1
             # initialize step with
             S.init_step(uk0[l])
+            u0 = S.levels[0].prob.dtype_u(S.levels[0].prob.init, val=0.0)
+            S.init_step(u0)
             S.levels[0].sweep.compute_end_point()
             # reset some values
             S.status.done = False

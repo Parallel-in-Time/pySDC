@@ -163,8 +163,13 @@ class sweeper(object):
                     L.u[m] = P.dtype_u(L.u[0])
                     L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
                 else:
-                    L.u[m] = P.dtype_u(init=P.init, val=0)
-                    L.f[m] = P.dtype_f(init=P.init, val=0)
+                    if L.u[m] is None:
+                        L.u[m] = P.dtype_u(init=P.init, val=0)
+                        L.f[m] = P.dtype_f(init=P.init, val=0)
+                    elif L.f[m] is None:
+                        L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+                    else:
+                        pass
         else:
             if slot > 0:
                 first = (slot-1) * self.coll.num_nodes * P.init + (self.coll.num_nodes-1)*P.init
