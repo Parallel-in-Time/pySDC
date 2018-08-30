@@ -42,7 +42,7 @@ class generic_implicit_rhs(generic_implicit):
             integral[m] += L.u[0]
 
             # add rhs vector
-            integral[m] -= L.rhs[m]
+            integral[m] += L.rhs[m]
 
         # do the sweep
         for m in range(0, M):
@@ -85,9 +85,6 @@ class generic_implicit_rhs(generic_implicit):
             L.uend = P.dtype_u(L.u[0])
             for m in range(self.coll.num_nodes):
                 L.uend += L.dt * self.coll.weights[m] * L.f[m + 1]
-            # add up tau correction of the full interval (last entry)
-            if L.tau is not None:
-                L.uend += L.tau[-1]
 
         return None
 

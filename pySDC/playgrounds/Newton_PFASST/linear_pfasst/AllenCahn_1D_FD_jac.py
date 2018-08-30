@@ -108,23 +108,6 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
         """
 
         # noinspection PyTypeChecker
-        self.Jf = self.A + sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values ** self.params.nu),
-                                 offsets=0)
-
-    def u_exact(self, t):
-        """
-        Routine to compute the exact solution at time t
-
-        Args:
-            t (float): current time
-
-        Returns:
-            dtype_u: exact solution
-        """
-
-        assert t == 0, 'ERROR: u_exact only valid for t=0'
-        me = self.dtype_u(self.init, val=0.0)
-        for i in range(self.params.nvars):
-            me.values[i] = np.tanh((self.params.radius - abs(self.xvalues[i])) / (np.sqrt(2) * self.params.eps))
-
-        return me
+        self.Jf = self.A + \
+                  sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values ** self.params.nu),
+                           offsets=0)

@@ -100,7 +100,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
         time = [t0 + sum(S.dt for S in self.MS[:p]) for p in range(len(self.MS))]
 
-        rhs = [[-1.0 * u for u in ustep] for ustep in uk]
+        rhs = [[u for u in ustep] for ustep in uk]
 
         norm_rhs = 0.0
         for l, S in enumerate(self.MS):
@@ -116,12 +116,12 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                 int = P.dtype_u(P.init, val=0)
                 for j in range(len(rhs[l])):
                     int += L.dt * L.sweep.coll.Qmat[m + 1, j + 1] * f_ode[j]
-                rhs[l][m] += int
+                rhs[l][m] -= int
                 # This is where we need to communicate!
                 if l > 0:
-                    rhs[l][m] += uk[l-1][-1]
+                    rhs[l][m] -= uk[l-1][-1]
                 else:
-                    rhs[l][m] += u0
+                    rhs[l][m] -= u0
 
                 norm_rhs = max(norm_rhs, abs(rhs[l][m]))
 

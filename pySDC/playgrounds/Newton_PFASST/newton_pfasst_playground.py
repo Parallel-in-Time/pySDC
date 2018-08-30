@@ -34,14 +34,14 @@ def setup():
     problem_params['nu'] = 2
     problem_params['nvars'] = [128, 64]
     problem_params['eps'] = 0.04
-    problem_params['inner_maxiter'] = 1
+    problem_params['inner_maxiter'] = 10
     problem_params['inner_tol'] = 1E-09
     problem_params['radius'] = 0.25
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]#, 3]
+    sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']#, 'LU']
 
     # initialize space transfer parameters
@@ -126,7 +126,10 @@ def run_newton_pfasst_matrixfree(Tend=None):
     description['problem_class'] = allencahn_fullyimplicit_jac
     description['base_transfer_class'] = linear_base_transfer
     description['sweeper_class'] = generic_implicit_rhs
-    description['step_params']['maxiter'] = 1
+    outer_restol = description['level_params']['restol']
+    description['step_params']['maxiter'] = description['problem_params']['inner_maxiter']
+    description['level_params']['restol'] = description['problem_params']['inner_tol']
+
 
     # setup parameters "in time"
     t0 = 0.0
@@ -150,7 +153,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     print('  Initial residual: %8.6e' % norm_rhs)
     k = 0
     ninnersolve = 0
-    while norm_rhs > description['level_params']['restol']:
+    while norm_rhs > outer_restol:
         k += 1
         ek, stats = controller.run_linear(rhs=rhs, uk0=einit, t0=t0, Tend=Tend)
         uk = [[uk[l][m] - ek[l][m] for m in range(len(uk[l]))] for l in range(len(uk))]

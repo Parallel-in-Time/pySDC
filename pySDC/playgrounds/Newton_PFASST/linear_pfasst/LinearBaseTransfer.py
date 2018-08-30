@@ -59,7 +59,6 @@ class linear_base_transfer(base_transfer):
             G.u[n + 1] = PG.dtype_u(PG.init, val=0.0)
             G.f[n + 1] = PG.dtype_f(PG.init, val=0.0)  # This is zeros because we are in the linear case!
 
-        # TODO: do we need G.u[0]?
         G.u[0] = self.space_transfer.restrict(F.u[0])
         G.f[0] = PG.eval_f(G.u[0], F.time)
 
