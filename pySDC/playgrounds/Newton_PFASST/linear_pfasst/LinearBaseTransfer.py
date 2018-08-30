@@ -48,7 +48,7 @@ class linear_base_transfer(base_transfer):
         tmp_res = []
         for m in range(SF.coll.num_nodes):
             # TODO: how to make sure communication did happen before the following statement?
-            res = -1.0* (F.u[m + 1] - intF[m] - F.u[0])
+            res = intF[m] + F.u[0] - F.u[m + 1]
             tmp_res.append(self.space_transfer.restrict(res))
 
         # restrict collocation values

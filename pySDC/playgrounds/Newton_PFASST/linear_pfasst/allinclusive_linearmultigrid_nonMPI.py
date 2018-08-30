@@ -1,10 +1,8 @@
-import itertools
-import copy as cp
 import numpy as np
-import dill
+import scipy.sparse as sp
+import time
 
-from pySDC.core.Controller import controller
-from pySDC.core.Errors import ControllerError, CommunicationError
+from pySDC.core.Errors import ControllerError
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 
@@ -133,14 +131,12 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
         # WARNING: this is simplified Newton!
         # The problem class does not know of different nodes besides the actual time, so we cannot have different Jf!
+
         for S in self.MS:
             S.levels[0].prob.build_jacobian(u=uk[-1][-1])
 
             for l in range(len(S.levels) - 1):
 
                 base_transfer = S.get_transfer_class(S.levels[l], S.levels[l + 1])
-
-                Tcf = base_transfer.space_transfer.Pspace
-                Tfc = base_transfer.space_transfer.Rspace
-
-                S.levels[l + 1].prob.Jf = Tfc.dot(S.levels[l].prob.Jf).dot(Tcf)
+                uc = base_transfer.space_transfer.restrict(uk[-1][-1])
+                S.levels[l + 1].prob.build_jacobian(u=uc)

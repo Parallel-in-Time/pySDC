@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -13,7 +14,8 @@ from pySDC.playgrounds.Newton_PFASST.pfasst_newton_output import output
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.LinearBaseTransfer import linear_base_transfer
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.allinclusive_linearmultigrid_nonMPI import allinclusive_linearmultigrid_nonMPI
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.generic_implicit_rhs import generic_implicit_rhs
-from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit_jac
+# from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit_jac
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_2D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -32,10 +34,15 @@ def setup():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [128, 64]
+    # problem_params['nvars'] = [128, 64]
+    # problem_params['nvars'] = [(128, 128), (64, 64)]
+    problem_params['nvars'] = [(512, 512), (256, 256)]
+    # problem_params['nvars'] = [(512, 512)]
     problem_params['eps'] = 0.04
-    problem_params['inner_maxiter'] = 10
-    problem_params['inner_tol'] = 1E-09
+    problem_params['newton_maxiter'] = 1
+    problem_params['newton_tol'] = 1E-09
+    problem_params['lin_tol'] = 1E-09
+    problem_params['lin_maxiter'] = 10
     problem_params['radius'] = 0.25
 
     # This comes as read-in for the sweeper class
@@ -127,9 +134,8 @@ def run_newton_pfasst_matrixfree(Tend=None):
     description['base_transfer_class'] = linear_base_transfer
     description['sweeper_class'] = generic_implicit_rhs
     outer_restol = description['level_params']['restol']
-    description['step_params']['maxiter'] = description['problem_params']['inner_maxiter']
-    description['level_params']['restol'] = description['problem_params']['inner_tol']
-
+    description['step_params']['maxiter'] = description['problem_params']['newton_maxiter']
+    description['level_params']['restol'] = description['problem_params']['newton_tol']
 
     # setup parameters "in time"
     t0 = 0.0
@@ -147,6 +153,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     uk = [[P.dtype_u(uinit) for _ in S.levels[0].u[1:]] for S in controller.MS]
     einit = [[P.dtype_u(P.init, val=0.0) for _ in S.levels[0].u[1:]] for S in controller.MS]
 
+    time0 = time.time()
     rhs, norm_rhs = controller.compute_rhs(uk=uk, u0=uinit, t0=t0)
     controller.set_jacobian(uk=uk)
 
@@ -169,6 +176,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     print('  --> Number of outer iterations: %i' % k)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
           (ninnersolve, nsolves_iter, nsolves_step))
+    print('  ... took %s sec' % (time.time() - time0))
     print()
 
 
@@ -193,6 +201,8 @@ def run_pfasst_newton(Tend=None):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    time0 = time.time()
+
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by variant (number of iterations)
@@ -205,23 +215,26 @@ def run_pfasst_newton(Tend=None):
     niter = max([item[1] for item in iter_counts])
 
     # compute and print statistics
-    nsolves_all = int(np.sum([S.levels[0].prob.inner_solve_counter for S in controller.MS]))
+    nsolves_all = int(np.sum([S.levels[0].prob.newton_itercount for S in controller.MS]))
     nsolves_step = nsolves_all / num_procs
     nsolves_iter = nsolves_all / niter
     print('  --> Number of outer iterations: %i' % niter)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f' %
           (nsolves_all, nsolves_iter, nsolves_step))
+    print('  --> took %s sec' % (time.time() - time0))
     print()
 
 
 def main():
 
     # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
-    num_procs = 4
+    num_procs = 1
     Tend = num_procs * 0.001
 
     run_newton_pfasst_matrixfree(Tend=Tend)
-    run_newton_pfasst_matrix(Tend=Tend)
+
+    # run_newton_pfasst_matrix(Tend=Tend)
+
     run_pfasst_newton(Tend=Tend)
 
 
