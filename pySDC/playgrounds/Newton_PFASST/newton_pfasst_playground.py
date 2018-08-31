@@ -14,7 +14,7 @@ from pySDC.playgrounds.Newton_PFASST.pfasst_newton_output import output
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.LinearBaseTransfer import linear_base_transfer
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.allinclusive_linearmultigrid_nonMPI import allinclusive_linearmultigrid_nonMPI
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.generic_implicit_rhs import generic_implicit_rhs
-# from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit_jac
+# from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_2D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -41,7 +41,7 @@ def setup():
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 1
     problem_params['newton_tol'] = 1E-09
-    problem_params['lin_tol'] = 1E-09
+    problem_params['lin_tol'] = 1E-08
     problem_params['lin_maxiter'] = 1000
     problem_params['radius'] = 0.25
 
@@ -59,7 +59,7 @@ def setup():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
     controller_params['predict'] = False
 
     # Fill description dictionary for easy hierarchy creation
@@ -166,7 +166,7 @@ def run_pfasst_newton(Tend=None):
 def main():
 
     # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
-    num_procs = 4
+    num_procs = 32
     Tend = num_procs * 0.001
 
     run_newton_pfasst_matrixfree(Tend=Tend)

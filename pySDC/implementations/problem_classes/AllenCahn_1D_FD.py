@@ -49,7 +49,7 @@ class allencahn_fullyimplicit(ptype):
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars)])
 
-        self.inner_solve_counter = 0
+        self.newton_itercount = 0
         self.newton_ncalls = 0
 
     @staticmethod
@@ -129,7 +129,7 @@ class allencahn_fullyimplicit(ptype):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         self.newton_ncalls += 1
-        self.inner_solve_counter += n
+        self.newton_itercount += n
 
         return me
 

@@ -13,6 +13,11 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
     """
 
+    # TODO: fix treatment of active slots in compute_rhs and set_jacobian
+    # TODO: fix output: don't do print statement, use hooks (new ones?)
+    # TODO: allow change of norm_res tolerance via parameter (!!!!!!!!)
+    # TODO: move set_jacobian into restart_block_linear
+
     def __init__(self, num_procs, controller_params, description):
         """
         Initialization routine for PFASST controller
@@ -53,7 +58,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
 
-        rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, t0=t0)
+        rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
         self.set_jacobian(uk=uk)
 
         # initialize block of steps with u0
@@ -78,9 +83,9 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                     # uend is uend of the last active step in the list
                 ek = [[self.MS[l].levels[0].u[m] for m in range(1, self.MS[l].levels[0].sweep.coll.num_nodes + 1)]
                       for l in active_slots]
-                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(uk[l]))] for l in range(len(uk))]
+                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(ek[l]))]for l in active_slots]
 
-                rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, t0=t0)
+                rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
                 self.set_jacobian(uk=uk)
 
                 ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
@@ -143,9 +148,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
             for m in range(len(rhs[p])):
                 self.MS[p].levels[0].rhs[m] = self.MS[p].levels[0].prob.dtype_f(rhs[p][m])
 
-    def compute_rhs(self, uk=None, u0=None, t0=None):
-
-        time = [t0 + sum(S.dt for S in self.MS[:p]) for p in range(len(self.MS))]
+    def compute_rhs(self, uk=None, u0=None, time=None):
 
         rhs = [[u for u in ustep] for ustep in uk]
 
@@ -187,3 +190,8 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                 base_transfer = S.get_transfer_class(S.levels[l], S.levels[l + 1])
                 uc = base_transfer.space_transfer.restrict(uk[-1][-1])
                 S.levels[l + 1].prob.build_jacobian(u=uc)
+
+                # Tcf = base_transfer.space_transfer.Pspace
+                # Tfc = base_transfer.space_transfer.Rspace
+                #
+                # S.levels[l + 1].prob.Jf = Tfc.dot(S.levels[l].prob.Jf).dot(Tcf)
