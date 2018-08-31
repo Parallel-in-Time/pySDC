@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.sparse as sp
+import itertools
 import time
 
 from pySDC.core.Errors import ControllerError
@@ -21,40 +21,84 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         # call parent's initialization routine
         super(allinclusive_linearmultigrid_nonMPI, self).__init__(num_procs, controller_params, description)
 
-    def run(self, rhs, t0, Tend):
-        raise ControllerError('This run routine does not exist, use run_linear instead')
+        self.ninnersolve = 0
+        self.nouteriter = 0
 
-    def run_linear(self, rhs, uk0, t0, Tend):
-        """
-        Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
-        """
+    def run(self, u0, t0, Tend):
 
         # some initializations and reset of statistics
-
+        uend = None
         num_procs = len(self.MS)
         self.hooks.reset_stats()
 
-        assert len(rhs) == num_procs, \
-            'ERROR: rhs needs to be a list of %i lists of entries for the RHS of the problem, got %s' % rhs
+        # initialize time variables of each step
+
+        # initial ordering of the steps: 0,1,...,Np-1
+        slots = [p for p in range(num_procs)]
 
         # initialize time variables of each step
-        time = [t0 + sum(S.dt for S in self.MS[:p]) for p in range(len(self.MS))]
+        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
 
-        assert np.isclose(time[-1] + self.MS[-1].dt, Tend), \
-            'ERROR: this controller can only run a single but full block'
+        # determine which steps are still active (time < Tend)
+        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
-        # initialize block of steps with uk0
-        self.restart_block(time, rhs, uk0)
+        # compress slots according to active steps, i.e. remove all steps which have times above Tend
+        active_slots = list(itertools.compress(slots, active))
+
+        P = self.MS[0].levels[0].prob
+        uk = [[P.dtype_u(u0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
+        einit = [[P.dtype_u(P.init, val=0.0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
 
         # call pre-run hook
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
 
-        # main loop: as long as at least one step is still active (time < Tend), do something
-        while not all([S.status.done for S in self.MS]):
-            self.MS = self.pfasst(self.MS)
+        rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, t0=t0)
+        self.set_jacobian(uk=uk)
 
-        uend = [[S.levels[0].u[m] for m in range(1, S.levels[0].sweep.coll.num_nodes + 1)] for S in self.MS]
+        # initialize block of steps with u0
+        self.restart_block_linear(active_slots, time, rhs, einit)
+
+        # main loop: as long as at least one step is still active (time < Tend), do something
+        while any(active):
+
+            k = 0
+            ninnersolve = 0
+            while norm_rhs > 1E-08:  # TODO!!!
+                k += 1
+
+                MS_active = [self.MS[p] for p in active_slots]
+
+                while not all([S.status.done for S in MS_active]):
+                    MS_active = self.pfasst(MS_active)
+
+                for p in range(len(MS_active)):
+                    self.MS[active_slots[p]] = MS_active[p]
+
+                    # uend is uend of the last active step in the list
+                ek = [[self.MS[l].levels[0].u[m] for m in range(1, self.MS[l].levels[0].sweep.coll.num_nodes + 1)]
+                      for l in active_slots]
+                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(uk[l]))] for l in range(len(uk))]
+
+                rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, t0=t0)
+                self.set_jacobian(uk=uk)
+
+                ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
+                print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e'
+                      % (k, ninnersolve, norm_rhs))
+
+                # restart active steps (reset all values and pass uend to u0)
+                self.restart_block_linear(active_slots, time, rhs, einit)
+
+            for p in active_slots:
+                time[p] += num_procs * self.MS[p].dt
+
+            self.nouteriter += k
+            self.ninnersolve += ninnersolve
+
+            # determine new set of active steps and compress slots accordingly
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active_slots = list(itertools.compress(slots, active))
 
         # call post-run hook
         for S in self.MS:
@@ -62,39 +106,42 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
         return uend, self.hooks.return_stats()
 
-    def restart_block(self, time, rhs, uk0):
+    def restart_block_linear(self, active_slots, time, rhs, uk0):
         """
         Helper routine to reset/restart block of (active) steps
 
         """
 
-        for l, S in enumerate(self.MS):
+        for j in range(len(active_slots)):
+
+            # get slot number
+            p = active_slots[j]
 
             # store current slot number for diagnostics
-            S.status.slot = l
+            self.MS[p].status.slot = p
             # store link to previous step
-            S.prev = self.MS[l - 1]
+            self.MS[p].prev = self.MS[active_slots[j - 1]]
             # resets step
-            S.reset_step()
+            self.MS[p].reset_step()
             # determine whether I am the first and/or last in line
-            S.status.first = l == 0
-            S.status.last = l == len(self.MS) - 1
+            self.MS[p].status.first = active_slots.index(p) == 0
+            self.MS[p].status.last = active_slots.index(p) == len(active_slots) - 1
             # initialize step with
-            S.init_step(uk0[l])
-            u0 = S.levels[0].prob.dtype_u(S.levels[0].prob.init, val=0.0)
-            S.init_step(u0)
-            S.levels[0].sweep.compute_end_point()
+            self.MS[p].init_step(uk0[p])
+            u0 = self.MS[p].levels[0].prob.dtype_u(self.MS[p].levels[0].prob.init, val=0.0)
+            self.MS[p].init_step(u0)
+            self.MS[p].levels[0].sweep.compute_end_point()
             # reset some values
-            S.status.done = False
-            S.status.iter = 0
-            S.status.stage = 'SPREAD'
-            for k in S.levels:
+            self.MS[p].status.done = False
+            self.MS[p].status.iter = 0
+            self.MS[p].status.stage = 'SPREAD'
+            for k in self.MS[p].levels:
                 k.tag = None
                 k.status.sweep = 1
-                k.status.time = time[l]  # TODO: is this ok?
+                k.status.time = time[p]
 
-            for m in range(len(rhs[l])):
-                S.levels[0].rhs[m] = S.levels[0].prob.dtype_f(rhs[l][m])
+            for m in range(len(rhs[p])):
+                self.MS[p].levels[0].rhs[m] = self.MS[p].levels[0].prob.dtype_f(rhs[p][m])
 
     def compute_rhs(self, uk=None, u0=None, t0=None):
 

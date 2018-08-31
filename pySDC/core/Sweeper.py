@@ -174,11 +174,11 @@ class sweeper(object):
         # If u0 has been passed, use it to fill the whole data structure
         else:
             if slot > 0:
-                first = (slot-1) * self.coll.num_nodes * P.init + (self.coll.num_nodes-1)*P.init
+                first = (slot - 1) * self.coll.num_nodes * P.init + (self.coll.num_nodes - 1) * P.init
                 last = first + P.init
                 L.u[0].values = u0[first:last].copy()
             for m in range(1, self.coll.num_nodes + 1):
-                first = slot * self.coll.num_nodes * P.init + (m-1)*P.init
+                first = slot * self.coll.num_nodes * P.init + (m - 1) * P.init
                 last = first + P.init
                 L.u[m] = P.dtype_u(init=P.init, val=0)
                 L.u[m].values = u0[first:last].copy()

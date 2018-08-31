@@ -72,7 +72,8 @@ class CollGaussRadau_Right(CollBase):
             for jj in range(1, M - 1):
                 diag[jj] = (beta - alpha) * (alpha + beta) / (2 * jj + 2 + alpha + beta) / (2 * jj + alpha + beta)
                 num = np.sqrt(4 * jj * (jj + alpha) * (jj + beta) * (jj + alpha + beta))
-                denom = np.sqrt((2 * jj - 1 + alpha + beta) * (2 * jj + alpha + beta) ** 2 * (2 * jj + 1 + alpha + beta))
+                denom = np.sqrt((2 * jj - 1 + alpha + beta) * (2 * jj + alpha + beta) ** 2 *
+                                (2 * jj + 1 + alpha + beta))
                 subdiag[jj - 1] = num / denom
 
             subdiag1 = np.zeros(M - 1)
