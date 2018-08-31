@@ -145,8 +145,6 @@ class sweeper(object):
         """
         Predictor to fill values at nodes before first sweep
 
-        Default prediction for the sweepers, only copies the values to all collocation nodes
-        and evaluates the RHS of the ODE there
         """
 
         # get current level and problem description
@@ -163,13 +161,17 @@ class sweeper(object):
                     L.u[m] = P.dtype_u(L.u[0])
                     L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
                 else:
+                    # Has u been filled?
                     if L.u[m] is None:
                         L.u[m] = P.dtype_u(init=P.init, val=0)
                         L.f[m] = P.dtype_f(init=P.init, val=0)
+                    # If yes, has f been filled, too?
                     elif L.f[m] is None:
                         L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+                    # If yes, do not touch them
                     else:
                         pass
+        # If u0 has been passed, use it to fill the whole data structure
         else:
             if slot > 0:
                 first = (slot-1) * self.coll.num_nodes * P.init + (self.coll.num_nodes-1)*P.init

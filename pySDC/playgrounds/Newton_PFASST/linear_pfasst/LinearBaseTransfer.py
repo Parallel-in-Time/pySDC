@@ -6,21 +6,9 @@ class linear_base_transfer(base_transfer):
     """
     Standard base_transfer class
 
-    Attributes:
-        logger: custom logger for sweeper-related logging
-        params(__Pars): parameter object containing the custom parameters passed by the user
-        fine (pySDC.Level.level): reference to the fine level
-        coarse (pySDC.Level.level): reference to the coarse level
+    This variant for linear problems only restricts the residual and prolongs only the error
+
     """
-
-    def __init__(self, fine_level, coarse_level, base_transfer_params, space_transfer_class, space_transfer_params):
-        """
-        Initialization routine
-
-        """
-
-        super(linear_base_transfer, self).__init__(fine_level, coarse_level, base_transfer_params, space_transfer_class,
-                                                   space_transfer_params)
 
     def restrict(self):
         """
@@ -44,14 +32,14 @@ class linear_base_transfer(base_transfer):
         # build fine level integral
         intF = F.sweep.integrate()
 
-        # restrict fine values in space
+        # restrict fine level residual in space
         tmp_res = []
         for m in range(SF.coll.num_nodes):
             # TODO: how to make sure communication did happen before the following statement?
             res = intF[m] + F.u[0] - F.u[m + 1]
             tmp_res.append(self.space_transfer.restrict(res))
 
-        # restrict collocation values
+        # restrict fine level residual in the collocation
         for n in range(SG.coll.num_nodes):
             G.rhs[n] = PG.dtype_u(PG.init, val=0.0)
             for m in range(SF.coll.num_nodes):
@@ -85,8 +73,6 @@ class linear_base_transfer(base_transfer):
         # only of the level is unlocked at least by prediction or restriction
         if not G.status.unlocked:
             raise UnlockError('coarse level is still locked, cannot use data from there')
-
-        # build coarse correction
 
         # interpolate values in space first
         tmp_u = []

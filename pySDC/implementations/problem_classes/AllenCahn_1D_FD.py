@@ -31,7 +31,7 @@ class allencahn_fullyimplicit(ptype):
         """
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'eps', 'inner_maxiter', 'inner_tol', 'radius']
+        essential_keys = ['nvars', 'nu', 'eps', 'newton_maxiter', 'newton_tol', 'radius']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -104,7 +104,7 @@ class allencahn_fullyimplicit(ptype):
         # start newton iteration
         n = 0
         res = 99
-        while n < self.params.inner_maxiter:
+        while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
             g = me.values - factor * (self.A.dot(me.values) + 1.0 / eps2 * me.values * (1.0 - me.values ** nu))\
@@ -113,7 +113,7 @@ class allencahn_fullyimplicit(ptype):
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
 
-            if res < self.params.inner_tol:
+            if res < self.params.newton_tol:
                 break
 
             # assemble dg
@@ -160,7 +160,6 @@ class allencahn_fullyimplicit(ptype):
             Jacobian matrix
         """
 
-        # noinspection PyTypeChecker
         dfdu = self.A + sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values ** self.params.nu),
                                  offsets=0)
         return dfdu

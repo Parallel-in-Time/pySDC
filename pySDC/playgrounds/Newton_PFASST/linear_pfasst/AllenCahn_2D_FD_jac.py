@@ -1,6 +1,5 @@
 from __future__ import division
 
-import time
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg, spsolve
 
@@ -9,14 +8,13 @@ from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_full
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
-# noinspection PyUnusedLocal
 class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
     """
-    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
+    Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC (Jacobi formulation)
 
     Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
+        Jf: Jacobi matrix of the collocation problem
+        inner_solve_counter (int): counter for the number of linear solves
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -31,25 +29,28 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
 
         self.inner_solve_counter = 0
 
-    # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
+        """
+        Linear solver for the Jacobian
 
-        # num_iters = 0
-        #
-        # def callback(xk):
-        #     nonlocal num_iters
-        #     num_iters += 1
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time
 
-        t0 = time.time()
+        Returns:
+            dtype_u: solution u
+        """
+
         me = self.dtype_u(self.init)
-        z = self.dtype_u(self.init, val=0.0)
 
         M = sp.eye(self.params.nvars[0] * self.params.nvars[1], format='csr') - factor * self.Jf
 
         # me.values = spsolve(M, rhs.values.flatten())
-        me.values = cg(M, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol, maxiter=self.params.lin_maxiter)[0]
+        me.values = cg(M, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
+                       maxiter=self.params.lin_maxiter)[0]
         me.values = me.values.reshape(self.params.nvars)
-        # print('.......... %s -- %s' % (time.time() - t0, num_iters))
 
         self.inner_solve_counter += 1
 
@@ -57,14 +58,14 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
 
     def eval_f_ode(self, u, t):
         """
-        Routine to evaluate the RHS
+        Routine to evaluate the RHS of the ODE
 
         Args:
             u (dtype_u): current values
             t (float): current time
 
         Returns:
-            dtype_f: the RHS
+            dtype_f: the RHS of the ODE
         """
         f = self.dtype_f(self.init)
         v = u.values.flatten()
@@ -75,7 +76,7 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
 
     def eval_f(self, u, t):
         """
-        Routine to evaluate the RHS of the ODE
+        Routine to evaluate the RHS of the linear system (i.e. Jf times e)
 
         Args:
             u (dtype_u): current values
@@ -93,16 +94,16 @@ class allencahn_fullyimplicit_jac(allencahn_fullyimplicit):
 
     def build_jacobian(self, u):
         """
-        Evaluation of the Jacobian of the right-hand side
+        Set the Jacobian of the ODE's right-hand side
 
         Args:
-            u: space values
+            u (dtype_u): space values
 
         Returns:
             Jacobian matrix
         """
 
-        # noinspection PyTypeChecker
-        self.Jf = self.A + sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values.flatten() ** self.params.nu),
-                                    offsets=0)
+        J = sp.diags(1.0 / self.params.eps ** 2 * (1.0 - (self.params.nu + 1) * u.values.flatten() ** self.params.nu),
+                     offsets=0)
 
+        self.Jf = self.A + J

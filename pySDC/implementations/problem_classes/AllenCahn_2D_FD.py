@@ -1,6 +1,5 @@
 from __future__ import division
 
-import time
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg, spsolve
@@ -11,7 +10,6 @@ from pySDC.core.Errors import ParameterError, ProblemError
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
 
-# noinspection PyUnusedLocal
 class allencahn_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences and periodic BC
@@ -19,6 +17,11 @@ class allencahn_fullyimplicit(ptype):
     Attributes:
         A: second-order FD discretization of the 2D laplace operator
         dx: distance between two spatial nodes (same for both directions)
+        xvalues: array of grid values
+        newton_itercount (int): counts the number of Newton solves
+        lin_itercount = counts the number of inner linear solves
+        newton_ncalls = counts the number of Newton calls
+        lin_ncalls = counts the number of inner linear calls
     """
 
     def __init__(self, problem_params, dtype_u, dtype_f):
@@ -85,7 +88,6 @@ class allencahn_fullyimplicit(ptype):
 
         return A
 
-    # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple Newton solver
@@ -99,14 +101,6 @@ class allencahn_fullyimplicit(ptype):
         Returns:
             dtype_u: solution u
         """
-
-        # num_iters = 0
-        #
-        # def callback(xk):
-        #     nonlocal num_iters
-        #     num_iters += 1
-        #
-        # t0 = time.time()
 
         u = self.dtype_u(u0).values.flatten()
         z = self.dtype_u(self.init, val=0.0).values.flatten()
@@ -146,8 +140,6 @@ class allencahn_fullyimplicit(ptype):
 
         self.newton_ncalls += 1
         self.newton_itercount += n
-
-        # print('.......... %s -- %s' % (time.time() - t0, num_iters))
 
         return me
 
