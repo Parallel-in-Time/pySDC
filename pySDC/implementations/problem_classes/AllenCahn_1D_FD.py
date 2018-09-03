@@ -46,14 +46,14 @@ class allencahn_fullyimplicit(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars
-        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
+        self.A = self.__get_A(self.params.nvars, self.dx)
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars)])
 
         self.newton_itercount = 0
         self.newton_ncalls = 0
 
     @staticmethod
-    def __get_A(N, nu, dx):
+    def __get_A(N, dx):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -74,7 +74,7 @@ class allencahn_fullyimplicit(ptype):
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= nu / (dx ** 2)
+        A *= 1.0 / (dx ** 2)
 
         return A
 

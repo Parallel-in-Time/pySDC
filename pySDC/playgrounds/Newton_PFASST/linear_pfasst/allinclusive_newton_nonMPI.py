@@ -1,8 +1,6 @@
 import numpy as np
 import itertools
-import time
 
-from pySDC.core.Errors import ControllerError
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 
@@ -29,6 +27,19 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
         self.nouteriter = 0
 
     def run_with_pred(self, uk, u0, t0, Tend):
+        """
+        Main run routine for Newton-PFASST, allows to take a full initial vector from a predictor
+
+        Args:
+            uk: initial vector
+            u0: initial value at t0
+            t0 (float): initial time
+            Tend (float): final time
+
+        Returns:
+            uend: final value
+            stats: statistics object
+        """
 
         # some initializations and reset of statistics
         uend = None
@@ -108,9 +119,20 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
         return uend, self.hooks.return_stats()
 
     def run(self, u0, t0, Tend):
+        """
+        Main run routine for Newton-PFASST
+
+        Args:
+            u0: initial value at t0
+            t0 (float): initial time
+            Tend (float): final time
+
+        Returns:
+            uend: final value
+            stats: statistics object
+        """
 
         # some initializations and reset of statistics
-        uend = None
         num_procs = len(self.MS)
         self.hooks.reset_stats()
 
@@ -136,17 +158,17 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
             self.hooks.pre_run(step=S, level_number=0)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
+        nblock = 0
         while any(active):
-
+            nblock += 1
             uk = [[P.dtype_u(u0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
 
             rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
             self.set_jacobian(uk=uk)
 
-            print(norm_rhs)
+            print(' Initial residual: %8.6e' % norm_rhs)
 
             k = 0
-            ninnersolve = 0
             while norm_rhs > self.params.outer_restol:
                 k += 1
 
@@ -161,7 +183,6 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
                 for p in range(len(MS_active)):
                     self.MS[active_slots[p]] = MS_active[p]
 
-                    # uend is uend of the last active step in the list
                 ek = [[P.dtype_u(self.MS[l].levels[0].u[m + 1]) for m in range(len(uk[l]))] for l in active_slots]
                 uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(uk[l]))] for l in active_slots]
 
@@ -171,6 +192,8 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
                 ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
                 print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e'
                       % (k, ninnersolve, norm_rhs))
+
+            ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
 
             for p in active_slots:
                 time[p] += num_procs * self.MS[p].dt
@@ -182,7 +205,7 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
             active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
-            u0 = uk[-1][-1]
+            u0 = P.dtype_u(uk[-1][-1])
 
         # call post-run hook
         for S in self.MS:

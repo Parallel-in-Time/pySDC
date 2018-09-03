@@ -1,5 +1,5 @@
 import matplotlib as mpl
-mpl.use('pgf')
+# mpl.use('pgf')
 import matplotlib.pyplot as plt
 
 import numpy as np
