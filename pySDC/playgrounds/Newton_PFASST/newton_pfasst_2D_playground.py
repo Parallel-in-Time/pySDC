@@ -79,7 +79,7 @@ def setup():
     return description, controller_params
 
 
-def run_newton_pfasst_matrixfree(Tend=None):
+def run_newton_pfasst_matrixfree(num_procs, Tend=None):
 
     print('THIS IS MATRIX-FREE NEWTON-PFASST....')
 
@@ -88,14 +88,12 @@ def run_newton_pfasst_matrixfree(Tend=None):
     description['problem_class'] = allencahn_fullyimplicit_jac
     description['base_transfer_class'] = linear_base_transfer
     description['sweeper_class'] = generic_implicit_rhs
-    outer_restol = description['level_params']['restol']
+    controller_params['outer_restol'] = description['level_params']['restol']
     description['step_params']['maxiter'] = description['problem_params']['newton_maxiter']
     description['level_params']['restol'] = description['problem_params']['newton_tol']
 
     # setup parameters "in time"
     t0 = 0.0
-
-    num_procs = int((Tend - t0) / description['level_params']['dt'])
 
     # instantiate the controller
     controller = allinclusive_newton_nonMPI(num_procs=num_procs, controller_params=controller_params,
@@ -111,8 +109,9 @@ def run_newton_pfasst_matrixfree(Tend=None):
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
 
     # compute and print statistics
+    nsteps = int((Tend - t0) / description['level_params']['dt'])
     nsolves_all = controller.ninnersolve
-    nsolves_step = nsolves_all / num_procs
+    nsolves_step = nsolves_all / nsteps
     nsolves_iter = nsolves_all / controller.nouteriter
     print('  --> Number of outer iterations: %i' % controller.nouteriter)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f'
@@ -130,7 +129,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     print()
 
 
-def run_pfasst_newton(Tend=None):
+def run_pfasst_newton(num_procs, Tend=None):
 
     print('THIS IS PFASST-NEWTON....')
 
@@ -142,8 +141,6 @@ def run_pfasst_newton(Tend=None):
     # setup parameters "in time"
     t0 = 0.0
 
-    num_procs = int((Tend - t0) / description['level_params']['dt'])
-
     controller = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                                description=description)
 
@@ -154,17 +151,18 @@ def run_pfasst_newton(Tend=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # get list of iterations count, sorted by process/time
-    iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+    iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='process')
 
     # get maximum number of iterations
-    niter = max([item[1] for item in iter_counts])
+    niter = sum([item[1] for item in iter_counts if item[0] == num_procs - 1])
 
     # get duration of run
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
 
     # compute and print statistics
+    nsteps = int((Tend - t0) / description['level_params']['dt'])
     nsolves_all = int(np.sum([S.levels[0].prob.newton_itercount for S in controller.MS]))
-    nsolves_step = nsolves_all / num_procs
+    nsolves_step = nsolves_all / nsteps
     nsolves_iter = nsolves_all / niter
     print('  --> Number of outer iterations: %i' % niter)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f'
@@ -185,11 +183,11 @@ def run_pfasst_newton(Tend=None):
 def main():
 
     # Setup can run until 0.032 = 32 * 0.001, so the factor gives the number of time-steps.
-    num_procs = 32
-    Tend = num_procs * 0.001
+    num_procs = 4
+    Tend = 0.032
 
-    run_newton_pfasst_matrixfree(Tend=Tend)
-    run_pfasst_newton(Tend=Tend)
+    run_newton_pfasst_matrixfree(num_procs=num_procs, Tend=Tend)
+    run_pfasst_newton(num_procs=num_procs, Tend=Tend)
 
 
 if __name__ == "__main__":

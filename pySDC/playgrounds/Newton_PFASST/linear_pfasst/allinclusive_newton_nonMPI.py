@@ -15,7 +15,6 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
 
     # TODO: fix treatment of active slots in compute_rhs and set_jacobian
     # TODO: fix output: don't do print statement, use hooks (new ones?)
-    # TODO: allow change of norm_res tolerance via parameter (!!!!!!!!)
     # TODO: move set_jacobian into restart_block_linear
 
     def __init__(self, num_procs, controller_params, description):
@@ -130,24 +129,25 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
         active_slots = list(itertools.compress(slots, active))
 
         P = self.MS[0].levels[0].prob
-        uk = [[P.dtype_u(u0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
         einit = [[P.dtype_u(P.init, val=0.0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
 
         # call pre-run hook
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
 
-        rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
-        self.set_jacobian(uk=uk)
-
-        print(norm_rhs)
-
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
 
+            uk = [[P.dtype_u(u0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
+
+            rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
+            self.set_jacobian(uk=uk)
+
+            print(norm_rhs)
+
             k = 0
             ninnersolve = 0
-            while norm_rhs > 1E-08:  # TODO!!!
+            while norm_rhs > self.params.outer_restol:
                 k += 1
 
                 # initialize block of steps with u0
@@ -176,17 +176,19 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
                 time[p] += num_procs * self.MS[p].dt
 
             self.nouteriter += k
-            self.ninnersolve += ninnersolve
+            self.ninnersolve = ninnersolve
 
             # determine new set of active steps and compress slots accordingly
             active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
             active_slots = list(itertools.compress(slots, active))
 
+            u0 = uk[-1][-1]
+
         # call post-run hook
         for S in self.MS:
             self.hooks.post_run(step=S, level_number=0)
 
-        uend = uk[-1][-1]
+        uend = u0
 
         return uend, self.hooks.return_stats()
 
