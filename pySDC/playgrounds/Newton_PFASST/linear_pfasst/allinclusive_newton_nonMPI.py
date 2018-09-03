@@ -29,6 +29,85 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
         self.ninnersolve = 0
         self.nouteriter = 0
 
+    def run_with_pred(self, uk, u0, t0, Tend):
+
+        # some initializations and reset of statistics
+        uend = None
+        num_procs = len(self.MS)
+        self.hooks.reset_stats()
+
+        # initialize time variables of each step
+
+        # initial ordering of the steps: 0,1,...,Np-1
+        slots = [p for p in range(num_procs)]
+
+        # initialize time variables of each step
+        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
+
+        # determine which steps are still active (time < Tend)
+        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+
+        # compress slots according to active steps, i.e. remove all steps which have times above Tend
+        active_slots = list(itertools.compress(slots, active))
+
+        P = self.MS[0].levels[0].prob
+        einit = [[P.dtype_u(P.init, val=0.0) for _ in self.MS[l].levels[0].u[1:]] for l in active_slots]
+
+        # call pre-run hook
+        for S in self.MS:
+            self.hooks.pre_run(step=S, level_number=0)
+
+        rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
+        self.set_jacobian(uk=uk)
+
+        print(norm_rhs)
+
+        # main loop: as long as at least one step is still active (time < Tend), do something
+        while any(active):
+
+            k = 0
+            ninnersolve = 0
+            while norm_rhs > 1E-08:  # TODO!!!
+                k += 1
+
+                # initialize block of steps with u0
+                self.restart_block_linear(active_slots, time, rhs, einit)
+
+                MS_active = [self.MS[p] for p in active_slots]
+
+                while not all([S.status.done for S in MS_active]):
+                    MS_active = self.pfasst(MS_active)
+
+                for p in range(len(MS_active)):
+                    self.MS[active_slots[p]] = MS_active[p]
+
+                    # uend is uend of the last active step in the list
+                ek = [[P.dtype_u(self.MS[l].levels[0].u[m + 1]) for m in range(len(uk[l]))] for l in active_slots]
+                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(uk[l]))] for l in active_slots]
+
+                rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
+                self.set_jacobian(uk=uk)
+
+                ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
+                print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e'
+                      % (k, ninnersolve, norm_rhs))
+
+            for p in active_slots:
+                time[p] += num_procs * self.MS[p].dt
+
+            self.nouteriter += k
+            self.ninnersolve += ninnersolve
+
+            # determine new set of active steps and compress slots accordingly
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active_slots = list(itertools.compress(slots, active))
+
+        # call post-run hook
+        for S in self.MS:
+            self.hooks.post_run(step=S, level_number=0)
+
+        return uend, self.hooks.return_stats()
+
     def run(self, u0, t0, Tend):
 
         # some initializations and reset of statistics
@@ -106,6 +185,8 @@ class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
         # call post-run hook
         for S in self.MS:
             self.hooks.post_run(step=S, level_number=0)
+
+        uend = uk[-1][-1]
 
         return uend, self.hooks.return_stats()
 

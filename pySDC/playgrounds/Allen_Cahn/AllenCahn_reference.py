@@ -30,7 +30,7 @@ def setup_parameters():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-11
-    level_params['dt'] = 1E-05
+    level_params['dt'] = 1E-04
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -141,7 +141,8 @@ def run_reference(Tend):
     """
 
     # load (incomplete) default parameters
-    description, controller_params = setup_parameters_FFT()
+    # description, controller_params = setup_parameters_FFT()
+    description, controller_params = setup_parameters()
 
     # setup parameters "in time"
     t0 = 0
@@ -184,7 +185,7 @@ def run_reference(Tend):
     computed_radii = np.array([item0[1] for item0 in computed_radii_tmp])
     print(len(computed_radii_tmp), len(computed_radii))
 
-    fname = 'data/AC_reference_FFT_Tend{:.1e}'.format(Tend)
+    fname = 'data/AC_reference_Tend{:.1e}'.format(Tend)
     np.savez_compressed(file=fname, uend=uend.values, radius=computed_radii)
 
 
@@ -195,10 +196,10 @@ def main(cwd=''):
     Args:
         cwd (str): current working directory (need this for testing)
     """
-    Tend = 0.032
+    Tend = 0.001
     run_reference(Tend=Tend)
 
-    fname = cwd + 'data/AC_reference_FFT_Tend{:.1e}'.format(Tend) + '.npz'
+    fname = cwd + 'data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
     assert os.path.isfile(fname), 'ERROR: numpy did not create file'
 
     loaded = np.load(fname)

@@ -5,6 +5,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_fullyimplicit
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.playgrounds.Newton_PFASST.allinclusive_jacmatrix_nonMPI import allinclusive_jacmatrix_nonMPI
@@ -13,7 +14,8 @@ from pySDC.playgrounds.Newton_PFASST.pfasst_newton_output import output
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.LinearBaseTransfer import linear_base_transfer
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.allinclusive_newton_nonMPI import allinclusive_newton_nonMPI
 from pySDC.playgrounds.Newton_PFASST.linear_pfasst.generic_implicit_rhs import generic_implicit_rhs
-from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
+# from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_1D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
+from pySDC.playgrounds.Newton_PFASST.linear_pfasst.AllenCahn_2D_FD_jac import allencahn_fullyimplicit, allencahn_fullyimplicit_jac
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -32,7 +34,10 @@ def setup():
     # This comes as read-in for the problem class
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['nvars'] = [32, 16]
+    # problem_params['nvars'] = [128, 64]
+    problem_params['nvars'] = [(128, 128), (64, 64)]
+    # problem_params['nvars'] = [(512, 512), (256, 256)]
+    # problem_params['nvars'] = [(512, 512)]
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 1
     problem_params['newton_tol'] = 1E-09
@@ -74,7 +79,9 @@ def setup():
     return description, controller_params
 
 
-def run_newton_pfasst_matrix(Tend=None):
+def run_newton_pfasst_matrixfree(Tend=None):
+
+    print('THIS IS MATRIX-FREE NEWTON-PFASST....')
 
     description, controller_params = setup()
 
@@ -83,37 +90,21 @@ def run_newton_pfasst_matrix(Tend=None):
 
     num_procs = int((Tend - t0) / description['level_params']['dt'])
 
-    # instantiate the controller
-    controller = allinclusive_jacmatrix_nonMPI(num_procs=num_procs, controller_params=controller_params,
+    controller_pred = allinclusive_multigrid_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                                description=description)
-
     # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
+    P = controller_pred.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    uk = np.kron(np.ones(controller.nsteps * controller.nnodes), uinit.values)
+    controller_pred.params.predict = True
+    for S in controller_pred.MS:
+        S.params.maxiter = 2
 
-    controller.compute_rhs(uk, t0)
-    print(np.linalg.norm(controller.rhs, np.inf))
-    k = 0
-    while np.linalg.norm(controller.rhs, np.inf) > 1E-08 or k == 0:
-        k += 1
-        ek, stats = controller.run(uk=uk, t0=t0, Tend=Tend)
-        uk -= ek
-        controller.compute_rhs(uk, t0)
+    uend, stats = controller_pred.run(u0=uinit, t0=t0, Tend=Tend)
 
-        print(k, controller.inner_solve_counter, np.linalg.norm(controller.rhs, np.inf), np.linalg.norm(ek, np.inf))
-
-    nsolves_all = controller.inner_solve_counter
-    nsolves_step = nsolves_all / num_procs
-    print(nsolves_all, nsolves_step)
-
-
-def run_newton_pfasst_matrixfree(Tend=None):
-
-    print('THIS IS MATRIX-FREE NEWTON-PFASST....')
-
-    description, controller_params = setup()
+    uk = [[P.dtype_u(S.levels[0].u[m]) for m in range(1, 4)] for S in controller_pred.MS]
+    # uk = np.concatenate([[S.levels[0].u[m] for S in controller_pred.MS for m in
+    #                      range(1, description['sweeper_params']['num_nodes'] + 1)])
 
     description['problem_class'] = allencahn_fullyimplicit_jac
     description['base_transfer_class'] = linear_base_transfer
@@ -121,11 +112,6 @@ def run_newton_pfasst_matrixfree(Tend=None):
     outer_restol = description['level_params']['restol']
     description['step_params']['maxiter'] = description['problem_params']['newton_maxiter']
     description['level_params']['restol'] = description['problem_params']['newton_tol']
-
-    # setup parameters "in time"
-    t0 = 0.0
-
-    num_procs = int((Tend - t0) / description['level_params']['dt'])
 
     # instantiate the controller
     controller = allinclusive_newton_nonMPI(num_procs=num_procs, controller_params=controller_params,
@@ -135,7 +121,7 @@ def run_newton_pfasst_matrixfree(Tend=None):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    uend, stats = controller.run_with_pred(uk=uk, u0=uinit, t0=t0, Tend=Tend)
 
     # get duration of run
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
@@ -201,7 +187,6 @@ def main():
     Tend = num_procs * 0.001
 
     run_newton_pfasst_matrixfree(Tend=Tend)
-    run_newton_pfasst_matrix(Tend=Tend)
     run_pfasst_newton(Tend=Tend)
 
 

@@ -53,8 +53,8 @@ class allencahn2d_imex(ptype):
         super(allencahn2d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
-        dx = self.params.L / self.params.nvars[0]
-        self.xvalues = np.array([i * dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
+        self.dx = self.params.L / self.params.nvars[0]
+        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
 
         kx = np.zeros(self.init[0])
         ky = np.zeros(self.init[1])

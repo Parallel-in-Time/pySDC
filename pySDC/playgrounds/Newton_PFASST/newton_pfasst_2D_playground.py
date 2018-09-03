@@ -117,6 +117,15 @@ def run_newton_pfasst_matrixfree(Tend=None):
     print('  --> Number of outer iterations: %i' % controller.nouteriter)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f'
           % (nsolves_all, nsolves_iter, nsolves_step))
+
+    fname = '../Allen_Cahn/data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
+    loaded = np.load(fname)
+    uref = loaded['uend']
+
+    err = np.linalg.norm(uref - uend.values, np.inf)
+    print('Error vs. reference solution: %6.4e' % err)
+    print()
+
     print('  ... took %s sec' % timing)
     print()
 
@@ -160,6 +169,15 @@ def run_pfasst_newton(Tend=None):
     print('  --> Number of outer iterations: %i' % niter)
     print('  --> Number of inner solves (total/per iter/per step): %i / %4.2f / %4.2f'
           % (nsolves_all, nsolves_iter, nsolves_step))
+
+    fname = '../Allen_Cahn/data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
+    loaded = np.load(fname)
+    uref = loaded['uend']
+
+    err = np.linalg.norm(uref - uend.values, np.inf)
+    print('Error vs. reference solution: %6.4e' % err)
+    print()
+
     print('  --> took %s sec' % timing)
     print()
 
