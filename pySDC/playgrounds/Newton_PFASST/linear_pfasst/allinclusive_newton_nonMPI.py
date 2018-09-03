@@ -6,7 +6,7 @@ from pySDC.core.Errors import ControllerError
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 
-class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
+class allinclusive_newton_nonMPI(allinclusive_multigrid_nonMPI):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style), linear only
@@ -24,7 +24,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         """
 
         # call parent's initialization routine
-        super(allinclusive_linearmultigrid_nonMPI, self).__init__(num_procs, controller_params, description)
+        super(allinclusive_newton_nonMPI, self).__init__(num_procs, controller_params, description)
 
         self.ninnersolve = 0
         self.nouteriter = 0
@@ -61,8 +61,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
         self.set_jacobian(uk=uk)
 
-        # initialize block of steps with u0
-        self.restart_block_linear(active_slots, time, rhs, einit)
+        print(norm_rhs)
 
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
@@ -71,6 +70,9 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
             ninnersolve = 0
             while norm_rhs > 1E-08:  # TODO!!!
                 k += 1
+
+                # initialize block of steps with u0
+                self.restart_block_linear(active_slots, time, rhs, einit)
 
                 MS_active = [self.MS[p] for p in active_slots]
 
@@ -81,9 +83,8 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                     self.MS[active_slots[p]] = MS_active[p]
 
                     # uend is uend of the last active step in the list
-                ek = [[self.MS[l].levels[0].u[m] for m in range(1, self.MS[l].levels[0].sweep.coll.num_nodes + 1)]
-                      for l in active_slots]
-                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(ek[l]))]for l in active_slots]
+                ek = [[P.dtype_u(self.MS[l].levels[0].u[m + 1]) for m in range(len(uk[l]))] for l in active_slots]
+                uk = [[P.dtype_u(uk[l][m] - ek[l][m]) for m in range(len(uk[l]))] for l in active_slots]
 
                 rhs, norm_rhs = self.compute_rhs(uk=uk, u0=u0, time=time)
                 self.set_jacobian(uk=uk)
@@ -91,9 +92,6 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
                 ninnersolve = sum([self.MS[l].levels[0].prob.inner_solve_counter for l in active_slots])
                 print('  Outer Iteration: %i -- number of inner solves: %i -- Newton residual: %8.6e'
                       % (k, ninnersolve, norm_rhs))
-
-                # restart active steps (reset all values and pass uend to u0)
-                self.restart_block_linear(active_slots, time, rhs, einit)
 
             for p in active_slots:
                 time[p] += num_procs * self.MS[p].dt
@@ -150,7 +148,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
     def compute_rhs(self, uk=None, u0=None, time=None):
 
-        rhs = [[u for u in ustep] for ustep in uk]
+        rhs = [[self.MS[0].levels[0].prob.dtype_u(u) for u in ustep] for ustep in uk]
 
         norm_rhs = 0.0
         for l, S in enumerate(self.MS):
@@ -160,10 +158,10 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
 
             f_ode = []
             for m in range(len(rhs[l])):
-                f_ode.append(P.eval_f_ode(u=uk[l][m], t=time[l]+L.sweep.coll.nodes[m]))
+                f_ode.append(P.eval_f_ode(u=uk[l][m], t=time[l] + L.sweep.coll.nodes[m]))
 
             for m in range(len(rhs[l])):
-                int = P.dtype_u(P.init, val=0)
+                int = P.dtype_u(P.init, val=0.0)
                 for j in range(len(rhs[l])):
                     int += L.dt * L.sweep.coll.Qmat[m + 1, j + 1] * f_ode[j]
                 rhs[l][m] -= int
@@ -182,7 +180,7 @@ class allinclusive_linearmultigrid_nonMPI(allinclusive_multigrid_nonMPI):
         # WARNING: this is simplified Newton!
         # The problem class does not know of different nodes besides the actual time, so we cannot have different Jf!
 
-        for S in self.MS:
+        for j, S in enumerate(self.MS):
             S.levels[0].prob.build_jacobian(u=uk[-1][-1])
 
             for l in range(len(S.levels) - 1):

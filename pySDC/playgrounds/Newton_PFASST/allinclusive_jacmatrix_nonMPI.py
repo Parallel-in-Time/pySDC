@@ -46,8 +46,8 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         self.nspace = self.MS[0].levels[0].prob.init
 
         self.dt = self.MS[0].levels[0].dt
-        self.tol = self.MS[0].levels[0].prob.params.inner_tol
-        self.maxiter = self.MS[0].levels[0].prob.params.inner_maxiter
+        self.tol = self.MS[0].levels[0].prob.params.newton_tol
+        self.maxiter = self.MS[0].levels[0].prob.params.newton_maxiter
 
         prob = self.MS[0].levels[0].prob
 
@@ -190,7 +190,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
             Ac = self.Tfc.dot(A.dot(self.Tcf))
             Ec = E.copy()
 
-            Ec[0, -1] = self.dt
+            # Ec[0, -1] = self.dt
             # Qdc = L.sweep.coll.Qmat[1:, 1:]
             # Nc = np.eye(nnodesc)
             # Nc = np.zeros((nnodesc, nnodesc))
@@ -216,7 +216,6 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
             #
             # self.Pi = np.kron(V, np.eye(nnodesc * nspace_c)).dot(W).dot(
             #     np.kron(Vi, np.eye(nnodesc * nspace_c)))
-
 
     def run(self, uk, t0, Tend):
         """
@@ -246,6 +245,7 @@ class allinclusive_jacmatrix_nonMPI(allinclusive_multigrid_nonMPI):
         # initialize time variables of each step
         time = [t0 + sum(self.dt for _ in range(p)) for p in slots]
 
+        # This is a bit redundant, but we do this to fill the coarser levels, too!
         for p in slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
