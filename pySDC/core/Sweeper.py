@@ -7,6 +7,10 @@ from pySDC.core.Level import level
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.Errors import ParameterError
 
+from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
+from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
@@ -97,6 +101,92 @@ class sweeper(object):
             x0 = 10 * np.ones(m)
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
+        elif qd_type == 'MIN3':
+            m = QDmat.shape[0] - 1
+            x = None
+            # These values have been obtained using Indie Solver, a commercial solver for black-box optimization which
+            # aggregates several state-of-the-art optimization methods (free academic subscription plan)
+            # objective function: sum over 17^2 values of lamdt, real and imaginary (WORKS SURPRISINGLY WELL!)
+            if type(coll) == CollGaussLobatto:
+                if m == 9:
+                    # rho = 0.154786693955
+                    x = [0.0, 0.14748983547536937, 0.1243753767395874, 0.08797965969063823, 0.03249792877433364,
+                         0.06171633442251176, 0.08995295998705832, 0.1080641868728824, 0.11621787232558443]
+                elif m == 7:
+                    # rho = 0.0979351256833
+                    x = [0.0, 0.18827968699454273, 0.1307213945012976, 0.04545003319140543, 0.08690617895312261,
+                         0.12326429119922168, 0.13815746843252427]
+                elif m == 5:
+                    # rho = 0.0513543155235
+                    x = [0.0, 0.2994085231050721, 0.07923154575177252, 0.14338847088077, 0.17675509273708057]
+                elif m == 4:
+                    # rho = 0.0381589713397
+                    x = [0.0, 0.2865524188780046, 0.11264992497015984, 0.2583063168320655]
+                elif m == 3:
+                    # rho = 0.013592619664
+                    x = [0.0, 0.2113181799416633, 0.3943250920445912]
+                elif m == 2:
+                    # rho = 0
+                    x = [0.0, 0.5]
+                else:
+                    NotImplementedError('This combination of preconditioner, node type and node number is not '
+                                        'implemented')
+            elif type(coll) == CollGaussRadau_Right:
+                if m == 9:
+                    # rho = 0.151784861385
+                    x = [0.14208076083211416, 0.1288153963623986, 0.10608601069476883, 0.07509520272252024,
+                         0.027986167728305308, 0.05351160749903067, 0.07911315989747868, 0.09514844658836666,
+                         0.10204992319487571]
+                elif m == 7:
+                    # rho = 0.116400161888
+                    x = [0.15223871397682717, 0.12625448001038536, 0.08210714764924298, 0.03994434742760019,
+                         0.1052662547386142, 0.14075805578834127, 0.15636085758812895]
+                elif m == 5:
+                    # rho = 0.0783352996958 (iteration 5355)
+                    x = [0.2818591930905709, 0.2011358490453793, 0.06274536689514164, 0.11790265267514095,
+                         0.1571629578515223]
+                elif m == 4:
+                    # rho = 0.057498908343
+                    x = [0.3198786751412953, 0.08887606314792469, 0.1812366328324738, 0.23273925017954]
+                elif m == 3:
+                    # rho = 0.038744192979 (iteration 11188)
+                    x = [0.3203856825077055, 0.1399680686269595, 0.3716708461097372]
+                elif m == 2:
+                    # rho = 0.0208560702294 (iteration 6690)
+                    x = [0.2584092406077449, 0.6449261740461826]
+                else:
+                    NotImplementedError('This combination of preconditioner, node type and node number is not '
+                                        'implemented')
+            elif type(coll) == EquidistantNoLeft:
+                if m == 9:
+                    # rho = 0.251820022583 (iteration 32402)
+                    x = [0.04067333763109274, 0.06893408176924318, 0.0944460427779633, 0.11847528720123894,
+                         0.14153236351607695, 0.1638856774260845, 0.18569759470199648, 0.20707543960267513,
+                         0.2280946565716198]
+                elif m == 7:
+                    # rho = 0.184582997611 (iteration 44871)
+                    x = [0.0582690792096515, 0.09937620459067688, 0.13668728443669567, 0.1719458323664216,
+                         0.20585615258818232, 0.2387890485242656, 0.27096908017041393]
+                elif m == 5:
+                    # rho = 0.118441339197 (iteration 34581)
+                    x = [0.0937126798932547, 0.1619131388001843, 0.22442341539247537, 0.28385142992912565,
+                         0.3412523013467262]
+                elif m == 4:
+                    # rho = 0.0844043254542 (iteration 33099)
+                    x = [0.13194852204686872, 0.2296718892453916, 0.3197255970017318, 0.405619746972393]
+                elif m == 3:
+                    # rho = 0.0504635143866 (iteration 9783)
+                    x = [0.2046955744931575, 0.3595744268324041, 0.5032243650307717]
+                elif m == 2:
+                    # rho = 0.0214806480623 (iteration 6109)
+                    x = [0.3749891032632652, 0.6666472946796036]
+                else:
+                    NotImplementedError('This combination of preconditioner, node type and node number is not '
+                                        'implemented')
+            else:
+                NotImplementedError('This combination of preconditioner, node type and node number is not '
+                                    'implemented')
+            QDmat[1:, 1:] = np.diag(x)
         else:
             raise NotImplementedError('qd_type implicit not implemented')
         # check if we got not more than a lower triangular matrix
