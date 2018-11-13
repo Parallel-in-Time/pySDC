@@ -14,6 +14,7 @@ class allencahn2d_imex(ptype):
 
     Attributes:
         xvalues: grid points in space
+        dx: mesh width
         lap: spectral operator for Laplacian
         fft_object: planned FFT for forward transformation
         ifft_object: planned IFFT for backward transformation
@@ -53,8 +54,8 @@ class allencahn2d_imex(ptype):
         super(allencahn2d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
-        dx = self.params.L / self.params.nvars[0]
-        self.xvalues = np.array([i * dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
+        self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
+        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
 
         kx = np.zeros(self.init[0])
         ky = np.zeros(self.init[1])

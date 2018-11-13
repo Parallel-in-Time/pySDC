@@ -451,6 +451,26 @@ class acceleration(object):
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
+    def __sub__(self, other):
+        """
+        Overloading the subtraction operator for acceleration types
+
+        Args:
+            other (acceleration): acceleration object to be subtracted
+        Raises:
+            DataError: if other is not a acceleration object
+        Returns:
+            acceleration: subtraction of caller and other values (self+other)
+        """
+
+        if isinstance(other, type(self)):
+            # always create new acceleration, since otherwise c = a + b changes a as well!
+            acc = acceleration(self.values.shape)
+            acc.values = self.values - other.values
+            return acc
+        else:
+            raise DataError("Type error: cannot subtract %s to %s" % (type(other), type(self)))
+
     def __rmul__(self, other):
         """
         Overloading the right multiply by factor operator for acceleration types

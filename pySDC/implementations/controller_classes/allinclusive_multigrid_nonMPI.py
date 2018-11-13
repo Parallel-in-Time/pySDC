@@ -17,13 +17,16 @@ class allinclusive_multigrid_nonMPI(controller):
 
     def __init__(self, num_procs, controller_params, description):
         """
-       Initialization routine for PFASST controller
+        Initialization routine for PFASST controller
 
-       Args:
+        Args:
            num_procs: number of parallel time steps (still serial, though), can be 1
            controller_params: parameter set for the controller and the steps
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
-       """
+        """
+
+        if 'predict' in controller_params:
+            raise ControllerError('predict flag is ignored, use predict_type instead')
 
         # call parent's initialization routine
         super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
@@ -65,6 +68,10 @@ class allinclusive_multigrid_nonMPI(controller):
 
         if self.nlevels > 1 and self.nsweeps[-1] > 1:
             raise ControllerError('this controller cannot do multiple sweeps on coarsest level')
+
+        if self.nlevels == 1 and self.params.predict_type is not None:
+            self.logger.warning('you have specified a predictor type but only a single level.. '
+                                'predictor will be ignored')
 
     def run(self, u0, t0, Tend):
         """
@@ -218,42 +225,105 @@ class allinclusive_multigrid_nonMPI(controller):
             all active steps
         """
 
-        # loop over all steps
-        for S in MS:
+        if self.params.predict_type is None:
+            pass
 
-            # restrict to coarsest level
-            for l in range(1, len(S.levels)):
-                S.transfer(source=S.levels[l - 1], target=S.levels[l])
+        elif self.params.predict_type == 'fine_only':
 
-        # loop over all steps
-        for q in range(len(MS)):
+            # do a fine sweep only
+            for S in MS:
+                S.levels[0].sweep.update_nodes()
 
-            # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
-            for p in range(q, len(MS)):
-                S = MS[p]
+        elif self.params.predict_type == 'libpfasst_style':
 
-                # do the sweep with new values
+            # loop over all steps
+            for S in MS:
+
+                # restrict to coarsest level
+                for l in range(1, len(S.levels)):
+                    S.transfer(source=S.levels[l - 1], target=S.levels[l])
+
+            # run in serial on coarse level
+            for S in MS:
+
+                # receive from previous step (if not first)
+                if not S.status.first:
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
+                    self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+
+                # do the coarse sweep
                 S.levels[-1].sweep.update_nodes()
 
-                # send updated values on coarsest level
-                self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
-                                  % (S.status.slot, len(S.levels) - 1, 0))
-                self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+                # send to succ step
+                if not S.status.last:
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                      % (S.status.slot, len(S.levels) - 1, 0))
+                    self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
 
-            # loop over last steps: [2,3,4], [3,4], [4]
-            for p in range(q + 1, len(MS)):
-                S = MS[p]
-                # receive values sent during previous sweep
-                self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
-                                  (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
-                self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+            # go back to fine level, sweeping
+            for l in range(self.nlevels - 1, 0, -1):
 
-        # loop over all steps
-        for S in MS:
+                for S in MS:
+                    # prolong values
+                    S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
-            # interpolate back to finest level
-            for l in range(len(S.levels) - 1, 0, -1):
-                S.transfer(source=S.levels[l], target=S.levels[l - 1])
+                    if l - 1 > 0:
+                        S.levels[l - 1].sweep.update_nodes()
+
+            # end with a fine sweep
+            for S in MS:
+                S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'pfasst_burnin':
+
+            # loop over all steps
+            for S in MS:
+
+                # restrict to coarsest level
+                for l in range(1, len(S.levels)):
+                    S.transfer(source=S.levels[l - 1], target=S.levels[l])
+
+            # loop over all steps
+            for q in range(len(MS)):
+
+                # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
+                for p in range(q, len(MS)):
+                    S = MS[p]
+
+                    # do the sweep with new values
+                    S.levels[-1].sweep.update_nodes()
+
+                    # send updated values on coarsest level
+                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                      % (S.status.slot, len(S.levels) - 1, 0))
+                    self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+
+                # loop over last steps: [2,3,4], [3,4], [4]
+                for p in range(q + 1, len(MS)):
+                    S = MS[p]
+                    # receive values sent during previous sweep
+                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
+                    self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+
+            # loop over all steps
+            for S in MS:
+
+                # interpolate back to finest level
+                for l in range(len(S.levels) - 1, 0, -1):
+                    S.transfer(source=S.levels[l], target=S.levels[l - 1])
+
+            # end this with a fine sweep
+            for S in MS:
+                S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'fmg':
+            # TODO: implement FMG predictor
+            raise NotImplementedError('FMG predictor is not yet implemented')
+
+        else:
+            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
         return MS
 
@@ -289,7 +359,7 @@ class allinclusive_multigrid_nonMPI(controller):
                 S.levels[0].sweep.predict()
 
                 # update stage
-                if len(S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
+                if len(S.levels) > 1:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
                 else:
                     S.status.stage = 'IT_CHECK'
@@ -299,7 +369,13 @@ class allinclusive_multigrid_nonMPI(controller):
         elif stage == 'PREDICT':
             # call predictor (serial)
 
+            for S in MS:
+                self.hooks.pre_predict(step=S, level_number=0)
+
             MS = self.predictor(MS)
+
+            for S in MS:
+                self.hooks.post_predict(step=S, level_number=0)
 
             for S in MS:
                 # update stage

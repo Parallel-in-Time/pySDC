@@ -50,6 +50,10 @@ class allinclusive_multigrid_MPI(controller):
                 if not L.sweep.coll.right_is_node or L.sweep.params.do_coll_update:
                     raise ControllerError("For PFASST to work, we assume uend^k = u_M^k")
 
+        if num_levels == 1 and self.params.predict_type is not None:
+            self.logger.warning('you have specified a predictor type but only a single level.. '
+                                'predictor will be ignored')
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
@@ -145,6 +149,7 @@ class allinclusive_multigrid_MPI(controller):
             l.tag = None
         self.req_status = None
         self.req_send = []
+        self.S.status.prev_done = False
 
         for lvl in self.S.levels:
             lvl.status.time = time
@@ -158,16 +163,24 @@ class allinclusive_multigrid_MPI(controller):
             comm: communicator
         """
 
-        # restrict to coarsest level
-        for l in range(1, len(self.S.levels)):
-            self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+        if self.params.predict_type is None:
+            pass
 
-        for p in range(self.S.status.slot + 1):
+        elif self.params.predict_type == 'fine_only':
 
-            if not p == 0 and not self.S.status.first:
-                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+            # do a fine sweep only
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'libpfasst_style':
+
+            # restrict to coarsest level
+            for l in range(1, len(self.S.levels)):
+                self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+
+            if not self.S.status.first:
+                self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   self.S.status.iter, p))
+                                   self.S.status.iter))
                 self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             # do the sweep with new values
@@ -175,14 +188,59 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[-1].sweep.compute_end_point()
 
             if not self.S.status.last:
-                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   self.S.status.iter, p))
+                                   self.S.status.iter))
                 self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-        # interpolate back to finest level
-        for l in range(len(self.S.levels) - 1, 0, -1):
-            self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+            # go back to fine level, sweeping
+            for l in range(len(self.S.levels) - 1, 0, -1):
+                # prolong values
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+                # on middle levels: do sweep as usual
+                if l - 1 > 0:
+                    self.S.levels[l - 1].sweep.update_nodes()
+
+            # end with a fine sweep
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'pfasst_burnin':
+
+            # restrict to coarsest level
+            for l in range(1, len(self.S.levels)):
+                self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+
+            for p in range(self.S.status.slot + 1):
+
+                if not p == 0 and not self.S.status.first:
+                    self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       self.S.status.iter, p))
+                    self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+
+                # do the sweep with new values
+                self.S.levels[-1].sweep.update_nodes()
+                self.S.levels[-1].sweep.compute_end_point()
+
+                if not self.S.status.last:
+                    self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       self.S.status.iter, p))
+                    self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+
+            # interpolate back to finest level
+            for l in range(len(self.S.levels) - 1, 0, -1):
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+            # end this with a fine sweep
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'fmg':
+            # TODO: implement FMG predictor
+            raise NotImplementedError('FMG predictor is not yet implemented')
+
+        else:
+            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
     def pfasst(self, comm, num_procs):
         """
@@ -197,7 +255,7 @@ class allinclusive_multigrid_MPI(controller):
 
         stage = self.S.status.stage
 
-        self.logger.debug(stage)
+        self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
@@ -209,7 +267,7 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[0].sweep.predict()
 
             # update stage
-            if len(self.S.levels) > 1 and self.params.predict:  # MLSDC or PFASST with predict
+            if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
                 self.S.status.stage = 'PREDICT'
             else:
                 self.S.status.stage = 'IT_CHECK'
@@ -218,10 +276,14 @@ class allinclusive_multigrid_MPI(controller):
 
             # call predictor (serial)
 
+            self.hooks.pre_predict(step=self.S, level_number=0)
+
             self.predictor(comm)
 
+            self.hooks.post_predict(step=self.S, level_number=0)
+
             # update stage
-            self.hooks.pre_iteration(step=self.S, level_number=0)
+            # self.hooks.pre_iteration(step=self.S, level_number=0)
             self.S.status.stage = 'IT_CHECK'
 
         elif stage == 'IT_CHECK':
@@ -236,7 +298,7 @@ class allinclusive_multigrid_MPI(controller):
                                    0, self.S.status.iter))
                 req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-            if not self.S.status.first and self.params.fine_comm:
+            if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    0, self.S.status.iter))
@@ -247,16 +309,37 @@ class allinclusive_multigrid_MPI(controller):
 
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
-            all_done = comm.allgather(self.S.status.done)
+
+            # check if an open request of the status send is pending
+            if self.req_status is not None:
+                self.req_status.wait()
+
+            # recv status
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
+                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.S.status.done = self.S.status.done and self.S.status.prev_done
+
+            # send status forward
+            if not self.S.status.last:
+                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                   99, self.S.status.iter))
+                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
+
+            # all_done = comm.allgather(self.S.status.done)
 
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
             # if not everyone is ready yet, keep doing stuff
-            if not all(all_done):
-                self.S.status.done = False
+            if not self.S.status.done:
+                # self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
+
                 self.hooks.pre_iteration(step=self.S, level_number=0)
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
@@ -264,7 +347,8 @@ class allinclusive_multigrid_MPI(controller):
                     self.S.status.stage = 'IT_FINE'
 
             else:
-                self.S.levels[0].sweep.compute_end_point()
+
+                self.S.levels[0].sweep.compute_end_point()  # TODO: is this really necessary?
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
 
@@ -290,7 +374,7 @@ class allinclusive_multigrid_MPI(controller):
                                        0, self.S.status.iter))
                     req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                if not self.S.status.first and self.params.fine_comm:
+                if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        0, self.S.status.iter))
@@ -329,7 +413,7 @@ class allinclusive_multigrid_MPI(controller):
                                            l, self.S.status.iter))
                         req_send = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                    if not self.S.status.first and self.params.fine_comm:
+                    if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                            l, self.S.status.iter))
@@ -352,7 +436,7 @@ class allinclusive_multigrid_MPI(controller):
             # sweeps on coarsest level (serial/blocking)
 
             # receive from previous step (if not first)
-            if not self.S.status.first:
+            if not self.S.status.first and not self.S.status.prev_done:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    len(self.S.levels) - 1, self.S.status.iter))
@@ -396,7 +480,7 @@ class allinclusive_multigrid_MPI(controller):
                                        l - 1, self.S.status.iter))
                     req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
-                if not self.S.status.first and self.params.fine_comm:
+                if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        l - 1, self.S.status.iter))
@@ -421,7 +505,7 @@ class allinclusive_multigrid_MPI(controller):
                             req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter,
                                                                        comm=comm)
 
-                        if not self.S.status.first and self.params.fine_comm:
+                        if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                                l - 1, self.S.status.iter))
