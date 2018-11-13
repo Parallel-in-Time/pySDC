@@ -53,7 +53,7 @@ def diffusion_setup(par=0.0):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
+    controller_params['all_to_done'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -112,7 +112,7 @@ def advection_setup(par=0.0):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
+    controller_params['all_to_done'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -179,7 +179,7 @@ def testequation_setup():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
+    controller_params['all_to_done'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()

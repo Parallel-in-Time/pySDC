@@ -52,7 +52,6 @@ def setup_harmonic():
     controller_params = dict()
     controller_params['hook_class'] = hamiltonian_output  # specialized hook class for more statistics and output
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -100,7 +99,6 @@ def setup_henonheiles():
     controller_params = dict()
     controller_params['hook_class'] = hamiltonian_output  # specialized hook class for more statistics and output
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -133,14 +131,14 @@ def run_simulation(prob=None):
         t0 = 0.0
         Tend = 50.0
         num_procs = 100
-        maxmeaniter = 5.6
+        maxmeaniter = 6.5
     elif prob == 'henonheiles':
         description, controller_params = setup_henonheiles()
         # set time parameters
         t0 = 0.0
         Tend = 25.0
         num_procs = 100
-        maxmeaniter = 3.9
+        maxmeaniter = 5.0
     else:
         raise NotImplemented('Problem type not implemented, got %s' % prob)
 

@@ -409,11 +409,13 @@ class allinclusive_multigrid_nonMPI(controller):
                 if S.status.iter > 0:
                     self.hooks.post_iteration(step=S, level_number=0)
 
-            # need to do this in reverse order, since oherwise the status would propagate through
-            for S in reversed(MS):
+            for S in MS:
                 if not S.status.first:
                     S.status.prev_done = S.prev.status.done  # "communicate"
                     S.status.done = S.status.done and S.status.prev_done
+
+                if self.params.all_to_done:
+                    S.status.done = all([T.status.done for T in MS])
 
                 if not S.status.done:
                     # increment iteration count here (and only here)
@@ -427,27 +429,6 @@ class allinclusive_multigrid_nonMPI(controller):
                     S.levels[0].sweep.compute_end_point()
                     self.hooks.post_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
-
-
-            # if not everyone is ready yet, keep doing stuff
-            # if not all(S.status.done for S in MS):
-            #
-            #     for S in MS:
-            #         S.status.done = False
-            #         # increment iteration count here (and only here)
-            #         S.status.iter += 1
-            #         self.hooks.pre_iteration(step=S, level_number=0)
-            #         if len(S.levels) > 1:  # MLSDC or PFASST
-            #             S.status.stage = 'IT_UP'
-            #         else:  # SDC
-            #             S.status.stage = 'IT_FINE'
-            #
-            # else:
-            #     # if everyone is ready, end
-            #     for S in MS:
-            #         S.levels[0].sweep.compute_end_point()
-            #         self.hooks.post_step(step=S, level_number=0)
-            #         S.status.stage = 'DONE'
 
             return MS
 

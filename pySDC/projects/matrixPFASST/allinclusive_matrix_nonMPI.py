@@ -58,7 +58,7 @@ class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
         assert [type(level.prob) for step in self.MS for level in step.levels].count(type(prob)) == \
             self.nlevels * self.nsteps, 'ERROR: all probem classes have to be the same'
 
-        assert self.params.predict is False, 'ERROR: no predictor for matrix controller yet'  # TODO: fixme
+        assert self.params.predict_type is None, 'ERROR: no predictor for matrix controller yet'  # TODO: fixme
 
         assert hasattr(prob, 'A'), 'ERROR: need system matrix A for this (and linear problems!)'
 

@@ -1,4 +1,5 @@
 import numpy as np
+from mpi4py import MPI
 
 from pySDC.core.Controller import controller
 from pySDC.core.Step import step
@@ -310,24 +311,30 @@ class allinclusive_multigrid_MPI(controller):
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
 
-            # check if an open request of the status send is pending
-            if self.req_status is not None:
-                self.req_status.wait()
+            if self.params.all_to_done:
 
-            # recv status
-            if not self.S.status.first and not self.S.status.prev_done:
-                self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
-                self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
-                                   99, self.S.status.iter))
-                self.S.status.done = self.S.status.done and self.S.status.prev_done
+                self.S.status.done = comm.allreduce(sendobj=self.S.status.done, op=MPI.LAND)
 
-            # send status forward
-            if not self.S.status.last:
-                self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
-                                   99, self.S.status.iter))
-                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
+            else:
+
+                # check if an open request of the status send is pending
+                if self.req_status is not None:
+                    self.req_status.wait()
+
+                # recv status
+                if not self.S.status.first and not self.S.status.prev_done:
+                    self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
+                    self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
+                                       99, self.S.status.iter))
+                    self.S.status.done = self.S.status.done and self.S.status.prev_done
+
+                # send status forward
+                if not self.S.status.last:
+                    self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                       99, self.S.status.iter))
+                    self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)

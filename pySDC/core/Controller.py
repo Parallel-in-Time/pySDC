@@ -12,6 +12,7 @@ class _Pars(FrozenClass):
     def __init__(self, params):
         self.fine_comm = True
         self.predict_type = None
+        self.all_to_done = False
         self.logger_level = 20
         self.log_to_file = False
         self.dump_setup = True

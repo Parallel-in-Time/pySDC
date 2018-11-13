@@ -132,6 +132,7 @@ def set_parameters_ml():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['all_to_done'] = True  # can ask the controller to keep iterating all steps until the end
 
     # fill description dictionary for easy step instantiation
     description = dict()

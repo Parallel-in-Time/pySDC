@@ -52,7 +52,6 @@ def setup_fput():
     controller_params = dict()
     controller_params['hook_class'] = hamiltonian_and_energy_output
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -133,7 +132,7 @@ def run_simulation():
     print(out)
     f.close()
 
-    assert np.mean(niters) <= 3.45, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+    assert np.mean(niters) <= 3.46, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
     fname = 'data/fput.dat'
     f = open(fname, 'wb')
