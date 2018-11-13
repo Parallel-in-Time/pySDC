@@ -59,7 +59,7 @@ def main():
 
     assert err < 6.1555e-05, 'ERROR: error is too large, got %s' % err
     assert os.path.isfile(fname), 'ERROR: residual plot has not been created'
-    assert min_iter == 5 and max_iter == 8, "ERROR: number of iterations not as expected, got %s and %s" % \
+    assert min_iter == 8 and max_iter == 8, "ERROR: number of iterations not as expected, got %s and %s" % \
                                             (min_iter, max_iter)
 
 
