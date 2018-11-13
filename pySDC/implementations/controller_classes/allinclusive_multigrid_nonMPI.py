@@ -173,6 +173,7 @@ class allinclusive_multigrid_nonMPI(controller):
             self.MS[p].init_step(u0)
             # reset some values
             self.MS[p].status.done = False
+            self.MS[p].status.prev_done = False
             self.MS[p].status.iter = 0
             self.MS[p].status.stage = 'SPREAD'
             for l in self.MS[p].levels:
@@ -340,9 +341,10 @@ class allinclusive_multigrid_nonMPI(controller):
             all active steps
         """
 
-        # if all stages are the same, continue, otherwise abort
-        if all(S.status.stage for S in MS):
-            stage = MS[0].status.stage
+        # if all stages are the same (or DONE), continue, otherwise abort
+        stages = [S.status.stage for S in MS if S.status.stage is not 'DONE']
+        if stages[1:] == stages[:-1]:
+            stage = stages[0]
         else:
             raise ControllerError('not all stages are equal')
 
@@ -396,7 +398,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
                 # # receive values
-                if self.params.fine_comm and not S.status.first:
+                if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                     self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
@@ -407,11 +409,13 @@ class allinclusive_multigrid_nonMPI(controller):
                 if S.status.iter > 0:
                     self.hooks.post_iteration(step=S, level_number=0)
 
-            # if not everyone is ready yet, keep doing stuff
-            if not all(S.status.done for S in MS):
+            # need to do this in reverse order, since oherwise the status would propagate through
+            for S in reversed(MS):
+                if not S.status.first:
+                    S.status.prev_done = S.prev.status.done  # "communicate"
+                    S.status.done = S.status.done and S.status.prev_done
 
-                for S in MS:
-                    S.status.done = False
+                if not S.status.done:
                     # increment iteration count here (and only here)
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
@@ -419,13 +423,31 @@ class allinclusive_multigrid_nonMPI(controller):
                         S.status.stage = 'IT_UP'
                     else:  # SDC
                         S.status.stage = 'IT_FINE'
-
-            else:
-                # if everyone is ready, end
-                for S in MS:
+                else:
                     S.levels[0].sweep.compute_end_point()
                     self.hooks.post_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
+
+
+            # if not everyone is ready yet, keep doing stuff
+            # if not all(S.status.done for S in MS):
+            #
+            #     for S in MS:
+            #         S.status.done = False
+            #         # increment iteration count here (and only here)
+            #         S.status.iter += 1
+            #         self.hooks.pre_iteration(step=S, level_number=0)
+            #         if len(S.levels) > 1:  # MLSDC or PFASST
+            #             S.status.stage = 'IT_UP'
+            #         else:  # SDC
+            #             S.status.stage = 'IT_FINE'
+            #
+            # else:
+            #     # if everyone is ready, end
+            #     for S in MS:
+            #         S.levels[0].sweep.compute_end_point()
+            #         self.hooks.post_step(step=S, level_number=0)
+            #         S.status.stage = 'DONE'
 
             return MS
 
@@ -453,7 +475,7 @@ class allinclusive_multigrid_nonMPI(controller):
                         self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
                     # # receive values
-                    if self.params.fine_comm and not S.status.first:
+                    if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                         self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                           (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                         self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
@@ -493,7 +515,7 @@ class allinclusive_multigrid_nonMPI(controller):
                             self.send(S.levels[l], tag=(l, S.status.iter, S.status.slot))
 
                         # # receive values
-                        if self.params.fine_comm and not S.status.first:
+                        if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                             self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                               (S.status.slot, S.prev.status.slot, l, S.status.iter))
                             self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
@@ -518,7 +540,7 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
 
                 # receive from previous step (if not first)
-                if not S.status.first:
+                if not S.status.first and not S.status.prev_done:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, len(S.levels) - 1, S.status.iter))
                     self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), S.status.iter, S.prev.status.slot))
@@ -559,7 +581,7 @@ class allinclusive_multigrid_nonMPI(controller):
                         self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                     # # receive values
-                    if self.params.fine_comm and not S.status.first:
+                    if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                         self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                           (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
@@ -585,7 +607,7 @@ class allinclusive_multigrid_nonMPI(controller):
                                 self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                             # # receive values
-                            if self.params.fine_comm and not S.status.first:
+                            if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                                 self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                                   (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
                                 self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,

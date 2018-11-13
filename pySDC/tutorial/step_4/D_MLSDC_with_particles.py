@@ -95,7 +95,6 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     # initialize controller parameters
     controller_params = dict()
     controller_params['hook_class'] = particle_hook  # specialized hook class for more statistics and output
-    controller_params['predict'] = False
     controller_params['logger_level'] = 30
 
     transfer_params = dict()

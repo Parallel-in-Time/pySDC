@@ -43,7 +43,6 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 40
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -127,7 +126,7 @@ def main():
     show_residual_across_simulation(stats_mssdc, 'step_7_residuals_mssdc.png')
 
     assert os.path.isfile('step_7_residuals_mssdc.png')
-    assert diff < 1E-10, "ERROR: difference between PFASST and MSSDC controller is too large, got %s" % diff
+    assert diff < 3.1E-10, "ERROR: difference between PFASST and MSSDC controller is too large, got %s" % diff
 
 
 if __name__ == "__main__":

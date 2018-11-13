@@ -50,7 +50,6 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False  # can turn on/off predictor here!
 
     # fill description dictionary for SDC
     description_sdc = dict()

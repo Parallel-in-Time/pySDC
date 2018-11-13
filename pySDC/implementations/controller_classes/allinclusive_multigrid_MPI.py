@@ -329,14 +329,11 @@ class allinclusive_multigrid_MPI(controller):
                                    99, self.S.status.iter))
                 self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
 
-            # all_done = comm.allgather(self.S.status.done)
-
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
-            # if not everyone is ready yet, keep doing stuff
+            # if not readys, keep doing stuff
             if not self.S.status.done:
-                # self.S.status.done = False
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
 
