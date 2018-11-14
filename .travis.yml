@@ -20,14 +20,16 @@ install:
   - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
   - conda list
   - pip install travis-sphinx
-  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
+#  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
   - export PYTHONPATH=$PYTHONPATH:../../..
-  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
-  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
+  - cd pySDC/tutorial/step_6/
+  - mpirun -np 2 python playground_parallelization.py
+#  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
+#  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
 after_success:
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
