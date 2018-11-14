@@ -443,13 +443,15 @@ class acceleration(object):
             acceleration: sum of caller and other values (self+other)
         """
 
-        if isinstance(other, type(self)):
-            # always create new acceleration, since otherwise c = a + b changes a as well!
-            acc = acceleration(self.values.shape)
-            acc.values = self.values + other.values
-            return acc
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+        # cannot do type-checking here, because otherwise f-interpolation would not work
+        # (multiplication with a constant yields velocity, velocity + acceleration = booom!
+        # if isinstance(other, type(self)):
+        # always create new acceleration, since otherwise c = a + b changes a as well!
+        acc = acceleration(self.values.shape)
+        acc.values = self.values + other.values
+        return acc
+        # else:
+        #     raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
 
     def __sub__(self, other):
         """
