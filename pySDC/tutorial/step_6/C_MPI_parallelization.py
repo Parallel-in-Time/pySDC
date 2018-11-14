@@ -25,10 +25,7 @@ def main(cwd):
     for num_procs in num_procs_list:
         print('Running code with %2i processes...' % num_procs)
         cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../../' + fname).split()
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd, universal_newlines=True)
-        for stdout_line in iter(p.stdout.readline, ""):
-            print(stdout_line)
-        p.stdout.close()
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
         assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                                   (p.returncode, num_procs)
