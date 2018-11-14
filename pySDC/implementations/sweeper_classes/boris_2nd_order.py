@@ -107,7 +107,7 @@ class boris_2nd_order(sweeper):
                 # add SF(u^k) - STF(u^k) for the velocity
                 integral[m].vel += L.dt * (self.S[m + 1, j] - self.ST[m + 1, j]) * f
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 integral[m] += L.tau[m]
                 # tau is 0-to-node, need to change it to node-to-node here
                 if m > 0:
@@ -187,7 +187,7 @@ class boris_2nd_order(sweeper):
             L.uend.pos += L.dt * (L.dt * self.qQ[m] * f) + L.dt * self.coll.weights[m] * L.u[0].vel
             L.uend.vel += L.dt * self.coll.weights[m] * f
         # add up tau correction of the full interval (last entry)
-        if L.tau is not None:
+        if L.tau[-1] is not None:
             L.uend += L.tau[-1]
 
         return None

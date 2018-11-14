@@ -78,10 +78,7 @@ class level(FrozenClass):
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
 
-        if self.level_index > 0:
-            self.tau = [None] * self.sweep.coll.num_nodes
-        else:
-            self.tau = None
+        self.tau = [None] * self.sweep.coll.num_nodes
 
         # pass this level to the sweeper for easy access
         self.sweep.level = self
@@ -105,6 +102,7 @@ class level(FrozenClass):
         self.uold = [None] * (self.sweep.coll.num_nodes + 1)
         self.f = [None] * (self.sweep.coll.num_nodes + 1)
         self.fold = [None] * (self.sweep.coll.num_nodes + 1)
+        self.tau = [None] * self.sweep.coll.num_nodes
 
     @property
     def sweep(self):

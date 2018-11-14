@@ -70,6 +70,8 @@ class sweeper(object):
         # collocation object
         self.coll = coll
 
+        self.parallelizable = False
+
     def get_Qdelta_implicit(self, coll, qd_type):
 
         def rho(x):
@@ -90,17 +92,21 @@ class sweeper(object):
         elif qd_type == 'IEpar':
             for m in range(coll.num_nodes + 1):
                 QDmat[m, m] = np.sum(coll.delta_m[0:m])
+            self.parallelizable = True
         elif qd_type == 'Qpar':
             QDmat = np.diag(np.diag(coll.Qmat))
+            self.parallelizable = True
         elif qd_type == 'GS':
             QDmat = np.tril(coll.Qmat)
         elif qd_type == 'PIC':
             QDmat = np.zeros(coll.Qmat.shape)
+            self.parallelizable = True
         elif qd_type == 'MIN':
             m = QDmat.shape[0] - 1
             x0 = 10 * np.ones(m)
             d = opt.minimize(rho, x0, method='Nelder-Mead')
             QDmat[1:, 1:] = np.linalg.inv(np.diag(d.x))
+            self.parallelizable = True
         elif qd_type == 'MIN3':
             m = QDmat.shape[0] - 1
             x = None
@@ -187,6 +193,7 @@ class sweeper(object):
                 NotImplementedError('This combination of preconditioner, node type and node number is not '
                                     'implemented')
             QDmat[1:, 1:] = np.diag(x)
+            self.parallelizable = True
         else:
             raise NotImplementedError('qd_type implicit not implemented')
         # check if we got not more than a lower triangular matrix
@@ -261,7 +268,7 @@ class sweeper(object):
             # add u0 and subtract u at current node
             res[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
-            if L.tau is not None:
+            if L.tau[m] is not None:
                 res[m] += L.tau[m]
             # use abs function from data type here
             res_norm.append(abs(res[m]))
