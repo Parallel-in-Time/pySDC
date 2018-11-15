@@ -26,6 +26,7 @@ install:
 script:
   - "./docs/update_apidocs.sh"
   - which nosetests
+  - export OMPI_MCA_btl_vader_single_copy_mechanism=none
   - export PYTHONPATH=$PYTHONPATH:../../..
   - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
