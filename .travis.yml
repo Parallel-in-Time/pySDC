@@ -16,8 +16,9 @@ before_install:
   - conda update --yes conda
 
 install:
+  - conda install python=${TRAVIS_PYTHON_VERSION}
   - conda install --yes -c conda-forge petsc4py mpi4py pyfftw
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
+  - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
   - conda list
   - pip install travis-sphinx
 #  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
@@ -26,7 +27,6 @@ script:
   - "./docs/update_apidocs.sh"
   - which nosetests
   - export PYTHONPATH=$PYTHONPATH:../../..
-#  - nosetests --with-id -v pySDC/tests
   - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
