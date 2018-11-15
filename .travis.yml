@@ -21,7 +21,7 @@ install:
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
   - conda list
   - pip install travis-sphinx
-#  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
+  - sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra dvipng
 
 script:
   - "./docs/update_apidocs.sh"
