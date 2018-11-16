@@ -370,7 +370,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # send to next step
             if not self.S.status.last:
-                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    len(self.S.levels) - 1, self.S.status.iter))
                 self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
