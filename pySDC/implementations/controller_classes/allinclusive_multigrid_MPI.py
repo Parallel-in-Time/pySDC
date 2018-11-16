@@ -100,7 +100,7 @@ class allinclusive_multigrid_MPI(controller):
         while active:
 
             while not self.S.status.done:
-                self.pfasst(comm_active, num_procs)
+                self.pfasst(comm_active)
 
             time += self.S.dt
 
@@ -253,7 +253,7 @@ class allinclusive_multigrid_MPI(controller):
         else:
             raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
-    def pfasst(self, comm, num_procs):
+    def pfasst(self, comm):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -261,7 +261,6 @@ class allinclusive_multigrid_MPI(controller):
 
         Args:
             comm: communicator
-            num_procs: number of active processors
         """
 
         stage = self.S.status.stage
