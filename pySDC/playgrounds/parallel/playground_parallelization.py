@@ -52,7 +52,7 @@ def set_parameters_ml():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 10
+    controller_params['logger_level'] = 30
     controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
@@ -70,7 +70,7 @@ def set_parameters_ml():
 
     # set time parameters
     t0 = 0.0
-    Tend = 4 * level_params['dt']
+    Tend = 1.0
 
     return description, controller_params, t0, Tend
 
