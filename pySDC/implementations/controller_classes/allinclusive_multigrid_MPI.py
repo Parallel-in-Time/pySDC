@@ -303,7 +303,7 @@ class allinclusive_multigrid_MPI(controller):
             req_send = None
             self.S.levels[0].sweep.compute_end_point()
             if not self.S.status.last and self.params.fine_comm:
-                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    0, self.S.status.iter))
                 req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -378,11 +378,11 @@ class allinclusive_multigrid_MPI(controller):
 
                 self.hooks.pre_sweep(step=self.S, level_number=0)
                 self.S.levels[0].sweep.update_nodes()
-
+                
                 req_send = None
                 self.S.levels[0].sweep.compute_end_point()
                 if not self.S.status.last and self.params.fine_comm:
-                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        0, self.S.status.iter))
                     req_send = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -421,7 +421,7 @@ class allinclusive_multigrid_MPI(controller):
                     req_send = None
                     self.S.levels[l].sweep.compute_end_point()
                     if not self.S.status.last and self.params.fine_comm:
-                        self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                        self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                            l, self.S.status.iter))
                         req_send = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -467,7 +467,7 @@ class allinclusive_multigrid_MPI(controller):
 
             # send to next step
             if not self.S.status.last:
-                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    len(self.S.levels) - 1, self.S.status.iter))
                 self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -488,7 +488,7 @@ class allinclusive_multigrid_MPI(controller):
 
                 req_send = None
                 if not self.S.status.last and self.params.fine_comm:
-                    self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        l - 1, self.S.status.iter))
                     req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
@@ -512,7 +512,7 @@ class allinclusive_multigrid_MPI(controller):
 
                         req_send = None
                         if not self.S.status.last and self.params.fine_comm:
-                            self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                            self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                                l - 1, self.S.status.iter))
                             req_send = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter,
