@@ -24,7 +24,7 @@ def main(cwd):
     # run code with different number of MPI processes
     for num_procs in num_procs_list:
         print('Running code with %2i processes...' % num_procs)
-        cmd = ('mpirun -np ' + str(num_procs) + ' --oversubscribe python playground_parallelization.py ../../../' +
+        cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../../' +
                fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
@@ -42,7 +42,7 @@ def main(cwd):
     # run code with different number of MPI processes
     for num_procs in num_procs_list:
         print('Running code with %2i processes...' % num_procs)
-        cmd = ('mpirun -np ' + str(num_procs) + ' --oversubscribe python playground_parallelization.py ../../../' +
+        cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../../' +
                fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
         p.wait()
