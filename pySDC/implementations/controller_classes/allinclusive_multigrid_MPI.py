@@ -74,12 +74,18 @@ class allinclusive_multigrid_MPI(controller):
 
         # find active processes and put into new communicator
         rank = self.comm.Get_rank()
+        num_procs = self.comm.Get_size()
         all_dt = self.comm.allgather(self.S.dt)
-        time = t0 + sum(all_dt[0:rank])
-        active = time < Tend - 10 * np.finfo(float).eps
-        comm_active = self.comm.Split(active)
-        rank = comm_active.Get_rank()
-        num_procs = comm_active.Get_size()
+        all_time = [t0 + sum(all_dt[0:i]) for i in range(num_procs)]
+        time = all_time[rank]
+        active = all_time < Tend - 10 * np.finfo(float).eps
+        if not all(active):
+            comm_active = self.comm.Split(active[rank])
+            rank = comm_active.Get_rank()
+            num_procs = comm_active.Get_size()
+        else:
+            comm_active = self.comm
+
         self.S.status.slot = rank
 
         # initialize block of steps with u0
@@ -90,7 +96,7 @@ class allinclusive_multigrid_MPI(controller):
         self.hooks.pre_run(step=self.S, level_number=0)
 
         # while any process still active...
-        while active:
+        while active[rank]:
 
             while not self.S.status.done:
                 self.pfasst(comm_active, num_procs)
@@ -101,11 +107,13 @@ class allinclusive_multigrid_MPI(controller):
             tend = comm_active.bcast(time, root=num_procs - 1)
             uend = self.S.levels[0].uend.bcast(root=num_procs - 1, comm=comm_active)
             all_dt = comm_active.allgather(self.S.dt)
-            time = tend + sum(all_dt[0:rank])
-            active = time < Tend - 10 * np.finfo(float).eps
-            comm_active = comm_active.Split(active)
-            rank = comm_active.Get_rank()
-            num_procs = comm_active.Get_size()
+            all_time = [tend + sum(all_dt[0:i]) for i in range(num_procs)]
+            time = all_time[rank]
+            active = self.comm.allgather(time < Tend - 10 * np.finfo(float).eps)
+            if not all(active):
+                comm_active = comm_active.Split(active[rank])
+                rank = comm_active.Get_rank()
+                num_procs = comm_active.Get_size()
             self.S.status.slot = rank
 
             # initialize block of steps with u0
