@@ -11,6 +11,7 @@ from pySDC.core.BaseTransfer import base_transfer
 class _Pars(FrozenClass):
     def __init__(self, params):
         self.fine_comm = True
+        self.mssdc_jac = True
         self.predict_type = None
         self.all_to_done = False
         self.logger_level = 20

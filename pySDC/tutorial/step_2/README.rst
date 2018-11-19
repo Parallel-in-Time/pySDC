@@ -70,7 +70,7 @@ We use one of the ``controller`` implementations to do the whole
 iteration logic for us, namely ``controller_nonMPI``. It can
 do SDC, multi-level SDC, multi-step SDC and PFASST, depending on the
 input dictionary (more on this in later tutorials). This is the default
-controller and does not require ``mpi4py`` to work. 
+controller and does not require ``mpi4py`` to work.
 
 Important things to note:
 

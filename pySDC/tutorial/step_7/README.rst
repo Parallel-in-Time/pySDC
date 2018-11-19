@@ -25,10 +25,11 @@ The result is called multi-step SDC. Here, after each sweep the result is sent f
 This corresponds to performing only the smoother stage in a multigrid scheme.
 Parallelization is dead-simple and no coarsening strategy is needed.
 Yet, the missing stabilization of the coarse level leads to a significant increase in iterations, when more time-steps are computed in parallel.
+To prevent this, information can be sent forward immediately, but then this is not a parallel algorithm anymore..
 
 Important things to note:
 
-- The multigrid controller cannot handle multi-step SDC. This is not a fundamental limitation but due to design decisions.
+- Use the controller parameter ``mssdc_jac`` to controll whether the method should be "parallel" (Jacobi-like) or "serial" (Gauss-like).
 - We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
 
 .. include:: doc_step_7_B.rst

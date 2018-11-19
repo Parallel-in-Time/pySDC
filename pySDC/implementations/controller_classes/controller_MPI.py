@@ -43,8 +43,6 @@ class controller_MPI(controller):
             self.dump_setup(step=self.S, controller_params=controller_params, description=description)
 
         num_levels = len(self.S.levels)
-        if num_procs > 1 and num_levels == 1:
-            raise ControllerError("multigrid cannot do MSSDC, sorry!")
 
         if num_procs > 1 and num_levels > 1:
             for L in self.S.levels:
@@ -100,7 +98,7 @@ class controller_MPI(controller):
         while active:
 
             while not self.S.status.done:
-                self.pfasst(comm_active)
+                self.pfasst(comm_active, num_procs)
 
             time += self.S.dt
 
@@ -262,7 +260,7 @@ class controller_MPI(controller):
         else:
             raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
 
-    def pfasst(self, comm):
+    def pfasst(self, comm, num_procs):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -270,6 +268,7 @@ class controller_MPI(controller):
 
         Args:
             comm: communicator
+            num_procs (int): number of parallel processes
         """
 
         stage = self.S.status.stage
@@ -373,8 +372,11 @@ class controller_MPI(controller):
                 self.hooks.pre_iteration(step=self.S, level_number=0)
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_UP'
-                else:  # SDC
-                    self.S.status.stage = 'IT_FINE'
+                else:
+                    if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+                        self.S.status.stage = 'IT_FINE'
+                    else:
+                        self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
 
             else:
 
@@ -496,7 +498,10 @@ class controller_MPI(controller):
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
 
             # update stage
-            self.S.status.stage = 'IT_DOWN'
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_DOWN'
+            else:
+                self.S.status.stage = 'IT_CHECK'  # MSSDC
 
         elif stage == 'IT_DOWN':
 

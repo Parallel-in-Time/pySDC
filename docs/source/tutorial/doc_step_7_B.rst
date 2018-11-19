@@ -6,5 +6,8 @@ Results:
 
 .. literalinclude:: ../../../step_7_B_out.txt
 
-.. image:: ../../../step_7_residuals_mssdc.png
+.. image:: ../../../step_7_residuals_mssdc_jac.png
+   :scale: 50 %
+
+.. image:: ../../../step_7_residuals_mssdc_gs.png
    :scale: 50 %

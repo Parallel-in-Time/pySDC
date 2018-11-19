@@ -406,7 +406,7 @@ class controller_nonMPI(controller):
                                       % (S.status.slot, 0, S.status.iter))
                     self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
-                # # receive values
+                # receive values
                 if self.params.fine_comm and not S.status.prev_done and not S.status.first:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, 0, S.status.iter))
@@ -437,8 +437,11 @@ class controller_nonMPI(controller):
                     self.hooks.pre_iteration(step=S, level_number=0)
                     if len(S.levels) > 1:  # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
-                    else:  # SDC
-                        S.status.stage = 'IT_FINE'
+                    else:  # SDC or MSSDC
+                        if len(MS) == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+                            S.status.stage = 'IT_FINE'
+                        else:
+                            S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
                 else:
                     S.levels[0].sweep.compute_end_point()
                     self.hooks.post_step(step=S, level_number=0)
