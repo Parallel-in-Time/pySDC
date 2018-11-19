@@ -6,26 +6,26 @@ language: python
 python:
   - '2.7'
   - '3.6'
-
-env:
-  matrix:
-    - TEST = test_.*py
-    - TEST = test_tutorials/test_step_1.py
-    - TEST = test_tutorials/test_step_2.py
-    - TEST = test_tutorials/test_step_3.py
-    - TEST = test_tutorials/test_step_4.py
-    - TEST = test_tutorials/test_step_5.py
-    - TEST = test_tutorials/test_step_6.py
-    - TEST = test_tutorials/test_step_7.py
-    - TEST = test_projects/test_asympconv
-    - TEST = test_projects/test_fwsw
-    - TEST = test_projects/test_hamiltonian
-    - TEST = test_projects/test_matrixPFASST
-    - TEST = test_projects/test_node_failure
-    - TEST = test_projects/test_parallelSDC
-    - TEST = test_projects/test_RDC
-    - TEST = test_projects/test_SDC_showdown
-    - TEST = test_projects/test_TOMS
+#
+#env:
+#  matrix:
+#    - TEST = test*.py
+#    - TEST = test_tutorials/test_step_1.py
+#    - TEST = test_tutorials/test_step_2.py
+#    - TEST = test_tutorials/test_step_3.py
+#    - TEST = test_tutorials/test_step_4.py
+#    - TEST = test_tutorials/test_step_5.py
+#    - TEST = test_tutorials/test_step_6.py
+#    - TEST = test_tutorials/test_step_7.py
+#    - TEST = test_projects/test_asympconv
+#    - TEST = test_projects/test_fwsw
+#    - TEST = test_projects/test_hamiltonian
+#    - TEST = test_projects/test_matrixPFASST
+#    - TEST = test_projects/test_node_failure
+#    - TEST = test_projects/test_parallelSDC
+#    - TEST = test_projects/test_RDC
+#    - TEST = test_projects/test_SDC_showdown
+#    - TEST = test_projects/test_TOMS
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then export PYTHON_VERSION=2; wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O $HOME/miniconda2.sh; fi
@@ -48,7 +48,7 @@ script:
   - which nosetests
   - export OMPI_MCA_btl_vader_single_copy_mechanism=none
   - export PYTHONPATH=$PYTHONPATH:../../..
-  - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests/$TEST
+  - nosetests --processes=2 -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
 
 after_success:
