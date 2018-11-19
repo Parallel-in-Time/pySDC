@@ -17,7 +17,7 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
-class base_transfer_mpi(object):
+class base_transfer_MPI(object):
     """
     Standard base_transfer class
 

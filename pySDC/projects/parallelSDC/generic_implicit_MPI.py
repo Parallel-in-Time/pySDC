@@ -87,7 +87,7 @@ class generic_implicit_MPI(sweeper):
 
         # implicit solve with prefactor stemming from the diagonal of Qd
         L.u[self.rank + 1] = P.solve_system(rhs, L.dt * self.QI[self.rank + 1, self.rank + 1], L.u[self.rank + 1],
-                                    L.time + L.dt * self.coll.nodes[self.rank])
+                                            L.time + L.dt * self.coll.nodes[self.rank])
         # update function values
         L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
 
