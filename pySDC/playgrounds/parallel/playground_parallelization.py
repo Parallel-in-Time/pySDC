@@ -53,6 +53,7 @@ def set_parameters_ml():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     description, controller_params, t0, Tend = set_parameters_ml()
 
     # instantiate controllers
-    if len(sys.argv) >= 2 and sys.argv[1] == 1:
+    if len(sys.argv) >= 2 and sys.argv[1] == '1':
             controller = allinclusive_classic_MPI(controller_params=controller_params, description=description,
                                                   comm=comm)
     else:

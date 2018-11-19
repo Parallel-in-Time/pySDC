@@ -20,7 +20,7 @@ def test_C_1x1():
     f.close()
     num_procs = 1
     num_procs_space = 1
-    cmd = ('mpirun -np ' + str(num_procs) + '  python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
+    cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
@@ -37,7 +37,7 @@ def test_C_1x2():
     f.close()
     num_procs = 2
     num_procs_space = 2
-    cmd = ('mpirun -np ' + str(num_procs) + '  python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
+    cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
@@ -54,7 +54,7 @@ def test_C_2x2():
     f.close()
     num_procs = 4
     num_procs_space = 2
-    cmd = ('mpirun -np ' + str(num_procs) + '  python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
+    cmd = ('mpirun -np ' + str(num_procs) + ' python pySDC/tutorial/step_7/C_pySDC_with_PETSc.py '
            + str(num_procs_space) + ' ' + fname).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
