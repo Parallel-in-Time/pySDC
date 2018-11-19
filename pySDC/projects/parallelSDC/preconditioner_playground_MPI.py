@@ -17,7 +17,7 @@ from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit impo
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
-from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
+# from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
 
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
@@ -78,7 +78,7 @@ def main(comm=None):
                 description['sweeper_class'] = generic_implicit_MPI  # pass sweeper
                 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
                 description['step_params'] = step_params  # pass step parameters
-                description['base_transfer_class'] = base_transfer_mpi
+                # description['base_transfer_class'] = base_transfer_mpi
 
                 print('working on: %s - %s - %s' % (qd_type, setup, param))
 

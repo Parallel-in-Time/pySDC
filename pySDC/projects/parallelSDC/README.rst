@@ -13,13 +13,23 @@ So far, this matrix is a lower triangular matrix, containing e.g. the Euler sche
 Here, we study different ideas to work with a diagonal matrix and compare them to the standard schemes:
 
 - ``IE`` and ``LU``: the standard scheme using implicit Euler or the LU trick
-- ``PIC``: the most simple diagonal matrix, i.e. no preconditioner (which is the Picard iteration)
 - ``IEpar``: one Euler step from t0 to the current node
 - ``Qpar``: Jacobi-like diagonal part of Q
+- ``MIN``: A simple minimzation-based preconditioner
 
 This part also contains ``minimization.py``, producing the heat maps for the spectral radius of the stiff limit matrix.
 
 .. include:: doc_parallelSDC_preconditioner.rst
+
+Node-parallel SDC with MPI
+---------------------------------
+
+The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
+We test again the aforementioned ideas, but now add the ``MIN3`` approach: These values have been obtained using Indie Solver,
+a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
+The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!
+
+.. include:: doc_parallelSDC_preconditioner_MPI.rst
 
 Simplified Newton for nonlinear problems
 ----------------------------------------
@@ -33,4 +43,14 @@ Three new sweepers are used here: ``linearized_implicit_parallel``, ``linearized
 This part also contains the code ``newton_vs_sdc.py`` where simplified and inexact Newton are compared to standard SDC for the generalized Fisher's equation.
 
 .. include:: doc_parallelSDC_nonlinear.rst
+
+Node-parallel SDC with MPI
+---------------------------------
+
+The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
+We test again the aforementioned ideas, but now add the ``MIN3`` approach: These values have been obtained using Indie Solver,
+a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
+The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!
+
+.. include:: doc_parallelSDC_preconditioner_MPI.rst
 
