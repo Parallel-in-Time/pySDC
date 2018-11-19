@@ -247,20 +247,24 @@ class allinclusive_multigrid_nonMPI(controller):
             # run in serial on coarse level
             for S in MS:
 
+                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                 # receive from previous step (if not first)
                 if not S.status.first:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
                                       (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
                     self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
 
                 # do the coarse sweep
                 S.levels[-1].sweep.update_nodes()
 
+                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                 # send to succ step
                 if not S.status.last:
                     self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
                                       % (S.status.slot, len(S.levels) - 1, 0))
                     self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)
 
             # go back to fine level, sweeping
             for l in range(self.nlevels - 1, 0, -1):
@@ -295,18 +299,22 @@ class allinclusive_multigrid_nonMPI(controller):
                     # do the sweep with new values
                     S.levels[-1].sweep.update_nodes()
 
+                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                     # send updated values on coarsest level
                     self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
                                       % (S.status.slot, len(S.levels) - 1, 0))
                     self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
 
                 # loop over last steps: [2,3,4], [3,4], [4]
                 for p in range(q + 1, len(MS)):
                     S = MS[p]
                     # receive values sent during previous sweep
+                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
                                       (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
                     self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=(p == len(MS) - 1))
 
             # loop over all steps
             for S in MS:
@@ -392,6 +400,7 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
 
                 # send updated values forward
+                self.hooks.pre_comm(step=S, level_number=0)
                 if self.params.fine_comm and not S.status.last:
                     self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                       % (S.status.slot, 0, S.status.iter))
@@ -402,6 +411,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                     self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
+                self.hooks.post_comm(step=S, level_number=0)
 
                 S.levels[0].sweep.compute_residual()
                 S.status.done = self.check_convergence(S)
@@ -411,11 +421,15 @@ class allinclusive_multigrid_nonMPI(controller):
 
             for S in MS:
                 if not S.status.first:
+                    self.hooks.pre_comm(step=S, level_number=0)
                     S.status.prev_done = S.prev.status.done  # "communicate"
+                    self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
                     S.status.done = S.status.done and S.status.prev_done
 
                 if self.params.all_to_done:
+                    self.hooks.pre_comm(step=S, level_number=0)
                     S.status.done = all([T.status.done for T in MS])
+                    self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
 
                 if not S.status.done:
                     # increment iteration count here (and only here)
@@ -445,6 +459,7 @@ class allinclusive_multigrid_nonMPI(controller):
 
                 for S in MS:
                     # send updated values forward
+                    self.hooks.pre_comm(step=S, level_number=0)
                     if self.params.fine_comm and not S.status.last:
                         self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                           % (S.status.slot, 0, S.status.iter))
@@ -455,6 +470,7 @@ class allinclusive_multigrid_nonMPI(controller):
                         self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                           (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                         self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
+                    self.hooks.post_comm(step=S, level_number=0, add_to_stats=(k == self.nsweeps[0] - 1))
 
                 for S in MS:
                     # standard sweep workflow: update nodes, compute residual, log progress
@@ -485,6 +501,7 @@ class allinclusive_multigrid_nonMPI(controller):
                     for S in MS:
 
                         # send updated values forward
+                        self.hooks.pre_comm(step=S, level_number=l)
                         if self.params.fine_comm and not S.status.last:
                             self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                               % (S.status.slot, l, S.status.iter))
@@ -495,6 +512,7 @@ class allinclusive_multigrid_nonMPI(controller):
                             self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                               (S.status.slot, S.prev.status.slot, l, S.status.iter))
                             self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
+                        self.hooks.post_comm(step=S, level_number=l)
 
                     for S in MS:
 
@@ -519,10 +537,12 @@ class allinclusive_multigrid_nonMPI(controller):
             for S in MS:
 
                 # receive from previous step (if not first)
+                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                 if not S.status.first and not S.status.prev_done:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, len(S.levels) - 1, S.status.iter))
                     self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), S.status.iter, S.prev.status.slot))
+                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
 
                 # do the sweep
                 self.hooks.pre_sweep(step=S, level_number=len(S.levels) - 1)
@@ -531,10 +551,12 @@ class allinclusive_multigrid_nonMPI(controller):
                 self.hooks.post_sweep(step=S, level_number=len(S.levels) - 1)
 
                 # send to succ step
+                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
                 if not S.status.last:
                     self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                       % (S.status.slot, len(S.levels) - 1, S.status.iter))
                     self.send(S.levels[-1], tag=(len(S.levels), S.status.iter, S.status.slot))
+                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)
 
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST
@@ -561,6 +583,7 @@ class allinclusive_multigrid_nonMPI(controller):
                         for S in MS:
 
                             # send updated values forward
+                            self.hooks.pre_comm(step=S, level_number=l - 1)
                             if self.params.fine_comm and not S.status.last:
                                 self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                                   % (S.status.slot, l - 1, S.status.iter))
@@ -572,6 +595,8 @@ class allinclusive_multigrid_nonMPI(controller):
                                                   (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
                                 self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
                                                                                       S.prev.status.slot))
+                            self.hooks.post_comm(step=S, level_number=l - 1,
+                                                 add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
                         for S in MS:
 
