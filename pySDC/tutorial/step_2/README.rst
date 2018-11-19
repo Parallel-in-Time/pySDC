@@ -67,12 +67,10 @@ Part C: Using pySDC's frontend
 
 Finally, we arrive at the user-friendliest interface pySDC has to offer.
 We use one of the ``controller`` implementations to do the whole
-iteration logic for us, namely ``allinclusive_classic_nonMPI``. It can
+iteration logic for us, namely ``controller_nonMPI``. It can
 do SDC, multi-level SDC, multi-step SDC and PFASST, depending on the
 input dictionary (more on this in later tutorials). This is the default
-controller and does not require ``mpi4py`` to work. It also reflects the
-standard PFASST implementation idea, in contrast to the multigrid
-counterparts.
+controller and does not require ``mpi4py`` to work. 
 
 Important things to note:
 

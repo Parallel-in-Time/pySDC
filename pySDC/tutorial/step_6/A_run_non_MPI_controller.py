@@ -4,14 +4,13 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 
 def main(num_proc_list=None, fname=None, multi_level=True):
     """
-    A simple test program to compare classical and multigrid PFASST runs
+    A simple test program to run PFASST
 
     Args:
         num_proc_list: list of number of processes to test with
@@ -23,7 +22,7 @@ def main(num_proc_list=None, fname=None, multi_level=True):
         description, controller_params, t0, Tend = set_parameters_ml()
     else:
         assert all(num_proc == 1 for num_proc in num_proc_list), \
-            'ERROR: single-elevel run can only use 1 processor, got %s' % num_proc_list
+            'ERROR: single-level run can only use 1 processor, got %s' % num_proc_list
         description, controller_params, t0, Tend = set_parameters_sl()
 
     f = open(fname, 'w')
@@ -35,61 +34,39 @@ def main(num_proc_list=None, fname=None, multi_level=True):
         print(out)
 
         # instantiate controllers
-        controller_classic = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                               description=description)
-        controller_multigrid = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                 description=description)
+        controller = controller_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
 
         # get initial values on finest level
-        P = controller_classic.MS[0].levels[0].prob
+        P = controller.MS[0].levels[0].prob
         uinit = P.u_exact(t0)
 
         # call main functions to get things done...
-        uend_classic, stats_classic = controller_classic.run(u0=uinit, t0=t0, Tend=Tend)
-        uend_multigrid, stats_multigrid = controller_multigrid.run(u0=uinit, t0=t0, Tend=Tend)
+        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # compute exact solution and compare with both results
         uex = P.u_exact(Tend)
-        err_classic = abs(uex - uend_classic)
-        err_multigrid = abs(uex - uend_multigrid)
-        diff = abs(uend_classic - uend_multigrid)
+        err = abs(uex - uend)
 
-        out = 'Error classic: %12.8e' % err_classic
-        f.write(out + '\n')
-        print(out)
-        out = 'Error multigrid: %12.8e' % err_multigrid
-        f.write(out + '\n')
-        print(out)
-        out = 'Diff: %6.4e' % diff
+        out = 'Error vs. exact solution: %12.8e' % err
         f.write(out + '\n')
         print(out)
 
         # filter statistics by type (number of iterations)
-        filtered_stats_classic = filter_stats(stats_classic, type='niter')
-        filtered_stats_multigrid = filter_stats(stats_multigrid, type='niter')
+        filtered_stats = filter_stats(stats, type='niter')
 
         # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts_classic = sort_stats(filtered_stats_classic, sortby='time')
-        iter_counts_multigrid = sort_stats(filtered_stats_multigrid, sortby='time')
+        iter_counts = sort_stats(filtered_stats, sortby='time')
 
         # compute and print statistics
-        for item_classic, item_multigrid in zip(iter_counts_classic, iter_counts_multigrid):
-            out = 'Number of iterations for time %4.2f (classic/multigrid): %1i / %1i' % \
-                  (item_classic[0], item_classic[1], item_multigrid[1])
+        for item in iter_counts:
+            out = 'Number of iterations for time %4.2f: %1i ' % (item[0], item[1])
             f.write(out + '\n')
             print(out)
-
-            if num_proc == 1:
-                assert item_classic[1] == item_multigrid[1], \
-                    'ERROR: number of iterations differ between classic and multigrid controller by %2i' \
-                    % (item_classic[1] - item_multigrid[1])
 
         f.write('\n')
         print()
 
-        assert all([item[1] <= 8 for item in iter_counts_multigrid]), \
-            "ERROR: weird iteration counts for multigrid, got %s" % iter_counts_multigrid
-        assert diff < 3.5E-09, "ERROR: difference between classic and multigrid controller is too large, got %s" % diff
+        assert all([item[1] <= 8 for item in iter_counts]), "ERROR: weird iteration counts, got %s" % iter_counts
 
     f.close()
 

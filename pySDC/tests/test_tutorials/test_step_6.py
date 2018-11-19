@@ -1,6 +1,6 @@
 import pkg_resources
 
-from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import main as main_A
+from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
 from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
 from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
 
