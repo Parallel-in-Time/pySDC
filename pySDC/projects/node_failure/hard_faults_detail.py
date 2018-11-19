@@ -10,7 +10,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
-from pySDC.projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
+from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 import pySDC.projects.node_failure.emulate_hard_faults as ft
 
 
@@ -123,9 +123,8 @@ def main(ft_setups, ft_strategies):
             ft.hard_step = ft_step
             ft.hard_iter = ft_iter
 
-            controller = allinclusive_classic_nonMPI_hard_faults(num_procs=num_procs,
-                                                                 controller_params=controller_params,
-                                                                 description=description)
+            controller = controller_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
+                                                       description=description)
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob

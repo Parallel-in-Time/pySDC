@@ -5,8 +5,8 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 
@@ -120,7 +120,7 @@ def run_variant(nsweeps):
     Tend = 0.032
 
     # instantiate controller
-    controller = allinclusive_classic_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob

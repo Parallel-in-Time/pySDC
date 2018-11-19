@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
@@ -8,7 +8,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-class allinclusive_matrix_nonMPI(allinclusive_multigrid_nonMPI):
+class allinclusive_matrix_nonMPI(controller_nonMPI):
     """
 
     PFASST controller, running serial matrix-based versions

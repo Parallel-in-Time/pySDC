@@ -2,7 +2,7 @@ import numpy as np
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 
@@ -89,8 +89,7 @@ def run_simulation():
         description['sweeper_params'] = sweeper_params
 
         # instantiate the controller (no controller parameters used here)
-        controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                 description=description)
+        controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
         # set time parameters
         t0 = 0.0

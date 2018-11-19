@@ -11,8 +11,8 @@ from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, r
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -100,8 +100,8 @@ def main():
     Tend = 1.0
 
     # instantiate controller
-    controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description, comm=time_comm)
-    # controller = allinclusive_multigrid_nonMPI(num_procs=2, controller_params=controller_params, description=description)
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
+    # controller = controller_nonMPI(num_procs=2, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob

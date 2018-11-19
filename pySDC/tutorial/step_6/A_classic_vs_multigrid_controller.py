@@ -3,8 +3,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -35,10 +35,10 @@ def main(num_proc_list=None, fname=None, multi_level=True):
         print(out)
 
         # instantiate controllers
-        controller_classic = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                         description=description)
-        controller_multigrid = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                             description=description)
+        controller_classic = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                               description=description)
+        controller_multigrid = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                                 description=description)
 
         # get initial values on finest level
         P = controller_classic.MS[0].levels[0].prob

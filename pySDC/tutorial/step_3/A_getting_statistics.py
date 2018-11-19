@@ -4,7 +4,7 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_list_of_types
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():
@@ -88,7 +88,7 @@ def run_simulation():
     description['step_params'] = step_params
 
     # instantiate the controller (no controller parameters used here)
-    controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # set time parameters
     t0 = 0.1

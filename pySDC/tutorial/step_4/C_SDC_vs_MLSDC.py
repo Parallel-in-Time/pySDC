@@ -5,7 +5,7 @@ from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():
@@ -76,10 +76,9 @@ def main():
     description_mlsdc['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # instantiate the controller (no controller parameters used here)
-    controller_sdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                 description=description_sdc)
-    controller_mlsdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                   description=description_mlsdc)
+    controller_sdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description_sdc)
+    controller_mlsdc = controller_nonMPI(num_procs=1, controller_params=controller_params,
+                                         description=description_mlsdc)
 
     # set time parameters
     t0 = 0.0

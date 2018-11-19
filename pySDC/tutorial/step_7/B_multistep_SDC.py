@@ -5,7 +5,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
@@ -74,10 +74,10 @@ def main():
     num_proc = 8
 
     # instantiate controllers
-    controller_mssdc = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                     description=description_mssdc)
-    controller_pfasst = allinclusive_multigrid_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                                      description=description_pfasst)
+    controller_mssdc = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                         description=description_mssdc)
+    controller_pfasst = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
+                                          description=description_pfasst)
 
     # get initial values on finest level
     P = controller_mssdc.MS[0].levels[0].prob

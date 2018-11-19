@@ -8,7 +8,7 @@ from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel import linear
 from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import linearized_implicit_fixed_parallel_prec
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
 from pySDC.projects.parallelSDC.ErrReductionHook import err_reduction_hook
@@ -77,8 +77,7 @@ def main():
             description['level_params'] = level_params
 
             # instantiate the controller
-            controller = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                     description=description)
+            controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob

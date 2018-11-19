@@ -1,8 +1,8 @@
 from mpi4py import MPI
 import sys
 
-from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -88,10 +88,10 @@ if __name__ == "__main__":
 
     # instantiate controllers
     if len(sys.argv) >= 2 and sys.argv[1] == '1':
-            controller = allinclusive_classic_MPI(controller_params=controller_params, description=description,
+            controller = controller_MPI(controller_params=controller_params, description=description,
                                                   comm=comm)
     else:
-        controller = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
+        controller = controller_MPI(controller_params=controller_params, description=description,
                                                 comm=comm)
     # get initial values on finest level
     P = controller.S.levels[0].prob

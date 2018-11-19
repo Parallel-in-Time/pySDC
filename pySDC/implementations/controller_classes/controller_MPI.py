@@ -6,7 +6,7 @@ from pySDC.core.Step import step
 from pySDC.core.Errors import ControllerError
 
 
-class allinclusive_multigrid_MPI(controller):
+class controller_MPI(controller):
     """
 
     PFASST controller, running parallel version of PFASST in blocks (MG-style)
@@ -24,7 +24,7 @@ class allinclusive_multigrid_MPI(controller):
        """
 
         # call parent's initialization routine
-        super(allinclusive_multigrid_MPI, self).__init__(controller_params)
+        super(controller_MPI, self).__init__(controller_params)
 
         # create single step per processor
         self.S = step(description)

@@ -1,6 +1,6 @@
 import os
 
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters_ml
 
@@ -20,8 +20,7 @@ def main():
     num_proc = 8
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                             description=description)
+    controller = controller_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

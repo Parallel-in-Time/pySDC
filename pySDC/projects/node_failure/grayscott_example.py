@@ -1,7 +1,7 @@
 import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
-from pySDC.projects.node_failure.allinclusive_classic_nonMPI_hard_faults import allinclusive_classic_nonMPI_hard_faults
+from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
@@ -85,9 +85,8 @@ def main(ft_strategies):
 
     ft.hard_random = 0.03
 
-    controller = allinclusive_classic_nonMPI_hard_faults(num_procs=num_procs,
-                                                         controller_params=controller_params,
-                                                         description=description)
+    controller = controller_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
+                                               description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

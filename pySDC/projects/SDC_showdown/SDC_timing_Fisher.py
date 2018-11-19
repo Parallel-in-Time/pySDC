@@ -10,7 +10,7 @@ from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import pySDC.helpers.plot_helper as plt_helper
@@ -125,8 +125,7 @@ def run_SDC_variant(variant=None, inexact=False):
     Tend = 1.0
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

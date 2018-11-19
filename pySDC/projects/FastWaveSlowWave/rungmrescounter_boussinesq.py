@@ -7,7 +7,7 @@ from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussine
 from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
 from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main(cwd=''):
@@ -74,8 +74,8 @@ def main(cwd=''):
     # ORDER OF DIRK/IMEX EQUAL TO NUMBER OF SDC ITERATIONS AND THUS SDC ORDER
     dirk_order = step_params['maxiter']
 
-    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                             description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                   description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

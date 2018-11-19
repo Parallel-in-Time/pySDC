@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import pySDC.helpers.plot_helper as plt_helper
 
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.verlet import verlet
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
@@ -147,8 +147,8 @@ def run_simulation(prob=None):
     print(out)
 
     # instantiate the controller
-    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                             description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                   description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

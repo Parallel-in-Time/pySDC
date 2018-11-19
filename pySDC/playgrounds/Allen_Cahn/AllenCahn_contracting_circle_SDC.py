@@ -11,7 +11,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit, \
     allencahn_semiimplicit_v2, allencahn_multiimplicit, allencahn_multiimplicit_v2
 
@@ -144,7 +144,7 @@ def run_SDC_variant(variant=None, inexact=False):
     Tend = 0.032
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
                                                description=description)
 
     # get initial values on finest level

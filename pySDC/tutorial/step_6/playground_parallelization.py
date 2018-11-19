@@ -1,8 +1,8 @@
 from mpi4py import MPI
 import sys
 
-from pySDC.implementations.controller_classes.allinclusive_classic_MPI import allinclusive_classic_MPI
-from pySDC.implementations.controller_classes.allinclusive_multigrid_MPI import allinclusive_multigrid_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.tutorial.step_6.A_classic_vs_multigrid_controller import set_parameters_ml
@@ -19,10 +19,8 @@ if __name__ == "__main__":
     description, controller_params, t0, Tend = set_parameters_ml()
 
     # instantiate controllers
-    controller_classic = allinclusive_classic_MPI(controller_params=controller_params, description=description,
-                                                  comm=comm)
-    controller_multigrid = allinclusive_multigrid_MPI(controller_params=controller_params, description=description,
-                                                      comm=comm)
+    controller_classic = controller_MPI(controller_params=controller_params, description=description, comm=comm)
+    controller_multigrid = controller_MPI(controller_params=controller_params, description=description, comm=comm)
     # get initial values on finest level
     P = controller_classic.S.levels[0].prob
     uinit = P.u_exact(t0)

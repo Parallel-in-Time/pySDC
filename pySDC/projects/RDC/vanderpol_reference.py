@@ -4,7 +4,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():
@@ -54,8 +54,7 @@ def main():
     description['step_params'] = step_params
 
     # instantiate the controller
-    controller_ref = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                 description=description)
+    controller_ref = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller_ref.MS[0].levels[0].prob

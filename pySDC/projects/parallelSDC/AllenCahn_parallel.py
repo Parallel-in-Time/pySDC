@@ -8,7 +8,7 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
 from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_MPI
@@ -123,8 +123,7 @@ def run_variant(variant=None):
     Tend = 0.004
 
     # instantiate controller
-    controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

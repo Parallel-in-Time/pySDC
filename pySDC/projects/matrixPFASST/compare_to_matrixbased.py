@@ -9,7 +9,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh as mesh_to_mesh_nocoarse
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_matrix_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -228,8 +228,8 @@ def compare_controllers(type=None, par=0.0, f=None):
     controller_mat = allinclusive_matrix_nonMPI(num_procs=4, controller_params=controller_params,
                                                 description=description)
 
-    controller_nomat = allinclusive_multigrid_nonMPI(num_procs=4, controller_params=controller_params,
-                                                     description=description)
+    controller_nomat = controller_nonMPI(num_procs=4, controller_params=controller_params,
+                                         description=description)
 
     # get initial values on finest level
     P = controller_nomat.MS[0].levels[0].prob

@@ -1,9 +1,9 @@
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.projects.node_failure.emulate_hard_faults import hard_fault_injection
 
 
-class allinclusive_classic_nonMPI_hard_faults(allinclusive_classic_nonMPI):
+class controller_nonMPI_hard_faults(controller_nonMPI):
     """
 
     PFASST controller, running serialized version of PFASST in classical style, allows node failure before fine sweep

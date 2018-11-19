@@ -7,7 +7,7 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -66,7 +66,7 @@ def main():
         description['level_params'] = level_params
 
         # instantiate the controller
-        controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
+        controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
                                                    description=description)
 
         # get initial values on finest level

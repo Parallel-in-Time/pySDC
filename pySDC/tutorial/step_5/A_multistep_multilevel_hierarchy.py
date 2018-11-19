@@ -3,7 +3,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # instantiate controller
-    controller = allinclusive_classic_nonMPI(num_procs=10, controller_params={}, description=description)
+    controller = controller_nonMPI(num_procs=10, controller_params={}, description=description)
 
     # check number of levels
     f = open('step_5_A_out.txt', 'w')

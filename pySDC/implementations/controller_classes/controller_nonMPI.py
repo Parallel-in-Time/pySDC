@@ -8,7 +8,7 @@ from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
 
 
-class allinclusive_multigrid_nonMPI(controller):
+class controller_nonMPI(controller):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
@@ -29,7 +29,7 @@ class allinclusive_multigrid_nonMPI(controller):
             raise ControllerError('predict flag is ignored, use predict_type instead')
 
         # call parent's initialization routine
-        super(allinclusive_multigrid_nonMPI, self).__init__(controller_params)
+        super(controller_nonMPI, self).__init__(controller_params)
 
         self.MS = [stepclass.step(description)]
 

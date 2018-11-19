@@ -7,7 +7,7 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.playgrounds.order_test.HeatEquation_1D_FD_forced_time import heat1d_forced_time
 
 from pySDC.playgrounds.order_test.hook_update_problem_params import update_problem_params
@@ -67,7 +67,7 @@ def main():
         description['problem_params'] = problem_params
 
         # instantiate the controller
-        controller = allinclusive_multigrid_nonMPI(num_procs=1, controller_params=controller_params,
+        controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
                                                    description=description)
 
         # get initial values on finest level

@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -74,8 +74,7 @@ def run_RDC(cwd=''):
     ref_sol = np.load(cwd + 'data/vdp_ref.npy')
 
     # instantiate the controller
-    controller_rdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                 description=description)
+    controller_rdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller_rdc.MS[0].levels[0].prob
@@ -95,8 +94,7 @@ def run_RDC(cwd=''):
     results.append((err, mean_niter))
 
     sweeper_params['num_nodes'] = [sweeper_params['num_nodes'], 10]
-    controller_mlrdc = allinclusive_classic_nonMPI(num_procs=1, controller_params=controller_params,
-                                                   description=description)
+    controller_mlrdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     uend_mlrdc, stats_mlrdc = controller_mlrdc.run(u0=uinit, t0=t0, Tend=Tend)
 
@@ -110,8 +108,7 @@ def run_RDC(cwd=''):
     print('MLRDC     : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
-    controller_pfasst = allinclusive_classic_nonMPI(num_procs=10, controller_params=controller_params,
-                                                    description=description)
+    controller_pfasst = controller_nonMPI(num_procs=10, controller_params=controller_params, description=description)
 
     uend_pfasst, stats_pfasst = controller_pfasst.run(u0=uinit, t0=t0, Tend=Tend)
 

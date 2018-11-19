@@ -3,7 +3,7 @@ from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic 
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 if __name__ == "__main__":
     num_procs = 1
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # quickly generate block of steps
-    controller = allinclusive_classic_nonMPI(num_procs=num_procs, controller_params=controller_params,
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
                                              description=description)
 
     # get initial values on finest level
