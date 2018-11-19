@@ -5,6 +5,8 @@ from collections import namedtuple
 import os
 import numpy as np
 
+from mpi4py import MPI
+
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from pySDC.implementations.datatype_classes.mesh import mesh
@@ -12,13 +14,16 @@ from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advect
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+
+from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
+from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
 
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])
 
 
-def main():
+def main(comm=None):
+
     # initialize level parameters (part I)
     level_params = dict()
     level_params['restol'] = 1E-08
@@ -26,7 +31,8 @@ def main():
     # initialize sweeper parameters (part I)
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = 3
+    sweeper_params['num_nodes'] = comm.Get_size()
+    sweeper_params['comm'] = comm
 
     # initialize step parameters
     step_params = dict()
@@ -37,7 +43,7 @@ def main():
     controller_params['logger_level'] = 30
 
     # set up list of Q-delta types and setups
-    qd_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
+    qd_list = ['IEpar', 'Qpar', 'MIN', 'MIN3']
     setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
                   ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
                   ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
@@ -69,9 +75,10 @@ def main():
                 description = dict()
                 description['dtype_u'] = mesh
                 description['dtype_f'] = mesh
-                description['sweeper_class'] = generic_implicit  # pass sweeper
+                description['sweeper_class'] = generic_implicit_MPI  # pass sweeper
                 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
                 description['step_params'] = step_params  # pass step parameters
+                description['base_transfer_class'] = base_transfer_mpi
 
                 print('working on: %s - %s - %s' % (qd_type, setup, param))
 
@@ -152,13 +159,14 @@ def main():
                 id = ID(setup=setup, qd_type=qd_type, param=param)
                 results[id] = niter
 
-    assert len(results) == (6 + 6 + 10 + 5) * 5 + 4, 'ERROR: did not get all results, got %s' % len(results)
+    assert len(results) == (6 + 6 + 10 + 5) * 4 + 4, 'ERROR: did not get all results, got %s' % len(results)
 
-    # write out for later visualization
-    file = open('data/parallelSDC_iterations_precond.pkl', 'wb')
-    pickle.dump(results, file)
+    if comm.Get_rank() == 0:
+        # write out for later visualization
+        file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'wb')
+        pickle.dump(results, file)
 
-    assert os.path.isfile('data/parallelSDC_iterations_precond.pkl'), 'ERROR: pickle did not create file'
+        assert os.path.isfile('data/parallelSDC_iterations_precond_MPI.pkl'), 'ERROR: pickle did not create file'
 
 
 def plot_iterations():
@@ -166,7 +174,7 @@ def plot_iterations():
     Helper routine to plot iteration counts
     """
 
-    file = open('data/parallelSDC_iterations_precond.pkl', 'rb')
+    file = open('data/parallelSDC_iterations_precond_MPI.pkl', 'rb')
     results = pickle.load(file)
 
     # find the lists/header required for plotting
@@ -181,12 +189,12 @@ def plot_iterations():
     print('Found these type of preconditioners:', qd_type_list)
     print('Found these setups:', setup_list)
 
-    assert len(qd_type_list) == 5, 'ERROR did not find five preconditioners, got %s' % qd_type_list
+    assert len(qd_type_list) == 4, 'ERROR did not find four preconditioners, got %s' % qd_type_list
     assert len(setup_list) == 4, 'ERROR: did not find three setup, got %s' % setup_list
 
-    qd_type_list = ['LU', 'IE', 'IEpar', 'Qpar', 'MIN']
-    marker_list = [None, None, 's', 'o', '^']
-    color_list = ['k', 'k', 'r', 'g', 'b']
+    qd_type_list = ['IEpar', 'Qpar', 'MIN', 'MIN3']
+    marker_list = ['s', 'o', '^', 'v']
+    color_list = ['r', 'g', 'b', 'c']
 
     plt_helper.setup_mpl()
 
@@ -202,15 +210,8 @@ def plot_iterations():
                     if key.setup == setup and key.qd_type == qd_type:
                         xvalue = results[setup][1].index(key.param)
                         niter[xvalue] = results[key]
-            if qd_type == 'LU':
-                ls = '--'
-                lw = 0.5
-            elif qd_type == 'IE':
-                ls = '-.'
-                lw = 0.5
-            else:
-                ls = '-'
-                lw = 1
+            ls = '-'
+            lw = 1
             plt_helper.plt.semilogx(results[setup][1], niter, label=qd_type, lw=lw, linestyle=ls, color=color,
                                     marker=marker, markeredgecolor='k')
 
@@ -233,7 +234,7 @@ def plot_iterations():
         plt_helper.plt.grid()
 
         # save plot as PDF and PGF
-        fname = 'data/parallelSDC_preconditioner_' + setup
+        fname = 'data/parallelSDC_preconditioner_MPI_' + setup
         plt_helper.savefig(fname)
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
@@ -242,5 +243,7 @@ def plot_iterations():
 
 
 if __name__ == "__main__":
-    main()
-    plot_iterations()
+    comm = MPI.COMM_WORLD
+    main(comm=comm)
+    if comm.Get_rank() == 0:
+        plot_iterations()
