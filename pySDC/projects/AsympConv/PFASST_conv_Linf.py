@@ -11,7 +11,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.projects.matrixPFASST.allinclusive_matrix_nonMPI import allinclusive_matrix_nonMPI
+from pySDC.projects.matrixPFASST.controller_matrix_nonMPI import controller_matrix_nonMPI
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -71,7 +71,6 @@ def run_diffusion(QI):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -179,7 +178,6 @@ def run_advection(QI):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()

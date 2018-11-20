@@ -8,7 +8,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
-class allinclusive_matrix_nonMPI(controller_nonMPI):
+class controller_matrix_nonMPI(controller_nonMPI):
     """
 
     PFASST controller, running serial matrix-based versions
@@ -33,7 +33,7 @@ class allinclusive_matrix_nonMPI(controller_nonMPI):
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
 
         # call parent's initialization routine
-        super(allinclusive_matrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
+        super(controller_matrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
                                                          description=description)
 
         self.nsteps = len(self.MS)

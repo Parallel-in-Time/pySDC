@@ -52,7 +52,6 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['predict'] = False
     # controller_params['hook_class'] = get_update
 
     # Fill description dictionary for easy hierarchy creation

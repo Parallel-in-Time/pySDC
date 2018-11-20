@@ -49,7 +49,6 @@ def main():
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = libpfasst_output
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()

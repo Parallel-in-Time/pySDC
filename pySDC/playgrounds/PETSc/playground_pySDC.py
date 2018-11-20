@@ -79,7 +79,6 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    # controller_params['predict'] = False
     # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation

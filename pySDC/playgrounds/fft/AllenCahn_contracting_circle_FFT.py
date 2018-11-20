@@ -60,7 +60,6 @@ def setup_parameters():
     controller_params = dict()
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = monitor
-    controller_params['predict'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
