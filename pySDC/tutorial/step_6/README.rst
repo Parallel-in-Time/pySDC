@@ -1,7 +1,7 @@
 Step-6: Advanced PFASST controllers
 ===================================
 
-We discuss controller implementations and features besides the standard classic and serial PFASST controller in this step.
+We discuss controller implementations, features and parallelization of PFASST controller in this step.
 
 Part A: The nonMPI controller
 ------------------------------------------
