@@ -73,7 +73,7 @@ def run_simulation():
 
     qd_combinations = [('IE', 'EE'), ('IE', 'PIC'),
                        ('LU', 'EE'), ('LU', 'PIC'),
-                       ('MIN3', 'PIC'), ('MIN3', 'EE'),
+                       # ('MIN3', 'PIC'), ('MIN3', 'EE'),
                        ('PIC', 'EE'), ('PIC', 'PIC')]
 
     results = dict()
@@ -154,7 +154,7 @@ def show_results(cwd=''):
 
     plt_helper.plt.xlabel('k')
     plt_helper.plt.ylabel('Number of iterations')
-    plt_helper.plt.legend(loc='lower right')
+    plt_helper.plt.legend(loc='lower right', )
 
     fname = 'data/harmonic_qd_iterations'
     plt_helper.savefig(fname)
