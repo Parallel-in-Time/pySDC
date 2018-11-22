@@ -33,6 +33,11 @@ class harmonic_oscillator(ptype):
         # invoke super init, passing nparts, dtype_u and dtype_f
         super(harmonic_oscillator, self).__init__(1, dtype_u, dtype_f, problem_params)
 
+        if self.params.phase != 0.0:
+            raise ProblemError('Phase != 0 not implemented yet')
+        if self.params.amp != 1.0:
+            raise ProblemError('amp != 1 not implemented yet')
+
     def eval_f(self, u, t):
         """
         Routine to compute the RHS
