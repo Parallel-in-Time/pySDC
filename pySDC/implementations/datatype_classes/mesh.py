@@ -205,6 +205,7 @@ class rhs_imex_mesh(object):
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
                   or another rhs_imex_mesh object
+            val (float): an initial number (default: 0.0)
         Raises:
             DataError: if init is none of the types above
         """

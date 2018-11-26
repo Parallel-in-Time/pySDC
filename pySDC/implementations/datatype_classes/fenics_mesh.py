@@ -4,13 +4,10 @@ import dolfin as df
 
 class fenics_mesh(object):
     """
-    Mesh data type with arbitrary dimensions
-
-    This data type can be used whenever structured data with a single unknown per point in space is required
+    FEniCS Function data type with arbitrary dimensions
 
     Attributes:
         values (np.ndarray): contains the ndarray of the values
-        V: function space
     """
 
     def __init__(self, init=None, val=0.0):
@@ -18,28 +15,22 @@ class fenics_mesh(object):
         Initialization routine
 
         Args:
-            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another mesh object
-            val: initial value (default: None)
+            init: can either be a FunctionSpace or another fenics_mesh object
+            val: initial value (default: 0.0)
         Raises:
             DataError: if init is none of the types above
         """
-
-        # if init is another mesh, do a deepcopy (init by copy)
-        if isinstance(init, fenics_mesh):
-            self.values = df.Function(init.V, init.values)
-            self.V = init.V
-        # if init is a number or a tuple of numbers, create mesh object with val as initial value
-        else:
+        # if init is another fenic_mesh, do a deepcopy (init by copy)
+        if isinstance(init, type(self)):
+            self.values = init.values.copy(deepcopy=True)
+        # if init is FunctionSpace, create mesh object with val as initial value
+        elif isinstance(init, df.Function):
+            self.values = init.copy(deepcopy=True)
+        elif isinstance(init, df.FunctionSpace):
             self.values = df.Function(init)
-            self.V = init
-        # (FIXME: cannot define type of functionspace)
-        # elif isinstance(init, type(df.FunctionSpace)):
-        #     self.values = df.Function(init)
-        #     self.V = init
-        # something is wrong, if none of the ones above hit
-        # else:
-        #     raise DataError('something went wrong during %s initialization' % type(init))
+            self.values.vector()[:] = val
+        else:
+            raise DataError('something went wrong during %s initialization' % type(init))
 
     def __add__(self, other):
         """
@@ -56,7 +47,7 @@ class fenics_mesh(object):
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a + b changes a as well!
             me = fenics_mesh(other)
-            me.values = df.Function(self.V, self.values.vector() + other.values.vector())
+            me.values.vector()[:] = self.values.vector()[:] + other.values.vector()[:]
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
@@ -76,7 +67,7 @@ class fenics_mesh(object):
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a - b changes a as well!
             me = fenics_mesh(other)
-            me.values = df.Function(self.V, self.values.vector() - other.values.vector())
+            me.values.vector()[:] = self.values.vector()[:] - other.values.vector()[:]
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
@@ -96,7 +87,7 @@ class fenics_mesh(object):
         if isinstance(other, float):
             # always create new mesh, since otherwise c = f*a changes a as well!
             me = fenics_mesh(self)
-            me.values = df.Function(self.V, other * self.values.vector())
+            me.values.vector()[:] = other * self.values.vector()[:]
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
@@ -119,7 +110,7 @@ class fenics_mesh(object):
 
 class rhs_fenics_mesh(object):
     """
-    RHS data type for meshes with implicit and explicit components
+    RHS data type for fenics_meshes with implicit and explicit components
 
     This data type can be used to have RHS with 2 components (here implicit and explicit)
 
@@ -128,25 +119,25 @@ class rhs_fenics_mesh(object):
         expl (fenics_mesh): explicit part
     """
 
-    def __init__(self, init):
+    def __init__(self, init, val=0.0):
         """
         Initialization routine
 
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
                   or another rhs_imex_mesh object
+            val (float): an initial number (default: 0.0)
         Raises:
             DataError: if init is none of the types above
         """
-
         # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
         if isinstance(init, type(self)):
             self.impl = fenics_mesh(init.impl)
             self.expl = fenics_mesh(init.expl)
         # if init is a number or a tuple of numbers, create mesh object with None as initial value
         elif isinstance(init, df.FunctionSpace):
-            self.impl = fenics_mesh(init)
-            self.expl = fenics_mesh(init)
+            self.impl = fenics_mesh(init, val=val)
+            self.expl = fenics_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -192,3 +183,24 @@ class rhs_fenics_mesh(object):
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+
+    def __rmul__(self, other):
+        """
+        Overloading the right multiply by factor operator for mesh types
+
+        Args:
+            other (float): factor
+        Raises:
+            DataError: is other is not a float
+        Returns:
+            rhs_fenics_mesh: copy of original values scaled by factor
+        """
+
+        if isinstance(other, float):
+            # always create new mesh, since otherwise c = f*a changes a as well!
+            me = rhs_fenics_mesh(self)
+            me.impl = other * self.impl
+            me.expl = other * self.expl
+            return me
+        else:
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))

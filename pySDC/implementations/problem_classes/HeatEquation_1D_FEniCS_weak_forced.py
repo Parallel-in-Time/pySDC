@@ -44,7 +44,7 @@ class fenics_heat(ptype):
                 raise ParameterError(msg)
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
+        logging.getLogger('FFC').setLevel(logging.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
 
         # set solver and form parameters
@@ -59,7 +59,7 @@ class fenics_heat(ptype):
         # define function space for future reference
         self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().array()))
+        print('DoFs on this level:', len(tmp.vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat, self).__init__(self.V, dtype_u, dtype_f, problem_params)

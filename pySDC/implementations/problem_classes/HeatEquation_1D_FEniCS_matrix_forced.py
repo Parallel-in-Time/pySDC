@@ -43,8 +43,8 @@ class fenics_heat(ptype):
                 raise ParameterError(msg)
 
         # set logger level for FFC and dolfin
-        df.set_log_level(df.WARNING)
         logging.getLogger('FFC').setLevel(logging.WARNING)
+        logging.getLogger('UFL').setLevel(logging.WARNING)
 
         # set solver and form parameters
         df.parameters["form_compiler"]["optimize"] = True
@@ -58,7 +58,7 @@ class fenics_heat(ptype):
         # define function space for future reference
         self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'])
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().array()))
+        print('DoFs on this level:', len(tmp.vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat, self).__init__(self.V, dtype_u, dtype_f, problem_params)
@@ -120,8 +120,7 @@ class fenics_heat(ptype):
         """
 
         self.g.t = t
-        fexpl = self.dtype_u(self.V)
-        fexpl.values = df.Function(self.V, df.interpolate(self.g, self.V).vector())
+        fexpl = self.dtype_u(df.interpolate(self.g, self.V))
 
         return fexpl
 
@@ -138,7 +137,7 @@ class fenics_heat(ptype):
         """
 
         tmp = self.dtype_u(self.V)
-        tmp.values = df.Function(self.V, self.K * u.values.vector())
+        self.K.mult(u.values.vector(), tmp.values.vector())
         fimpl = self.__invert_mass_matrix(tmp)
 
         return fimpl
@@ -172,7 +171,7 @@ class fenics_heat(ptype):
         """
 
         me = self.dtype_u(self.V)
-        me.values = df.Function(self.V, self.M * u.values.vector())
+        self.M.mult(u.values.vector(), me.values.vector())
 
         return me
 
@@ -211,7 +210,6 @@ class fenics_heat(ptype):
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
 
-        me = self.dtype_u(self.V)
-        me.values = df.interpolate(u0, self.V)
+        me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me
