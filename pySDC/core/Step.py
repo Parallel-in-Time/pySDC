@@ -236,7 +236,10 @@ class step(FrozenClass):
 
         # pass u0 to u[0] on the finest level 0
         P = self.levels[0].prob
-        self.levels[0].u[0] = P.dtype_u(u0)
+        if P.has_mass_matrix:
+            self.levels[0].u[0] = P.dtype_u(P.apply_mass_matrix(u0))
+        else:
+            self.levels[0].u[0] = P.dtype_u(u0)
 
     @property
     def prev(self):

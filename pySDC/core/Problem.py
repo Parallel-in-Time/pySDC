@@ -46,8 +46,16 @@ class ptype(object):
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
 
+        self.has_mass_matrix = False
+
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE
         """
         raise NotImplementedError('ERROR: problem has to implement eval_f(self, u, t)')
+
+    def apply_mass_matrix(self, u):
+        """
+        Abstract interface to apply mass matrix (only needed for FEM)
+        """
+        raise NotImplementedError('ERROR: if you want a mass matrix, implement apply_mass_matrix(u)')

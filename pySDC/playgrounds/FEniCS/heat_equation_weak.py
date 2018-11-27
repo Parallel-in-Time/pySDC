@@ -1,6 +1,6 @@
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.problem_classes.AdvectionDiffusion_1D_FEniCS_matrix_periodic import fenics_adv_diff_1d
-from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat_weak_imex, fenics_heat_weak_fullyimplicit
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = fenics_heat
+    description['problem_class'] = fenics_heat_weak_imex
     description['problem_params'] = problem_params
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh

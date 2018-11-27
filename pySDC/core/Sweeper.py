@@ -255,6 +255,7 @@ class sweeper(object):
 
         # get current level and problem description
         L = self.level
+        P = L.prob
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated
@@ -265,8 +266,11 @@ class sweeper(object):
         res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
-            # add u0 and subtract u at current node
-            res[m] += L.u[0] - L.u[m + 1]
+            if P.has_mass_matrix:
+                # add u0 and subtract u at current node
+                res[m] += L.u[0] - P.apply_mass_matrix(L.u[m + 1])
+            else:
+                res[m] += L.u[0] - L.u[m + 1]
             # add tau if associated
             if L.tau[m] is not None:
                 res[m] += L.tau[m]

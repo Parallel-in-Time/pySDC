@@ -127,13 +127,16 @@ class imex_1st_order(sweeper):
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
         else:
-            # start with u0 and add integral over the full interval (using coll.weights)
-            L.uend = P.dtype_u(L.u[0])
-            for m in range(self.coll.num_nodes):
-                L.uend += L.dt * self.coll.weights[m] * (L.f[m + 1].impl + L.f[m + 1].expl)
-            # add up tau correction of the full interval (last entry)
-            if L.tau[-1] is not None:
-                L.uend += L.tau[-1]
+            if P.has_mass_matrix:
+                raise NotImplementedError('Mass matrix sweeper does not work with coll_update yet')
+            else:
+                # start with u0 and add integral over the full interval (using coll.weights)
+                L.uend = P.dtype_u(L.u[0])
+                for m in range(self.coll.num_nodes):
+                    L.uend += L.dt * self.coll.weights[m] * (L.f[m + 1].impl + L.f[m + 1].expl)
+                # add up tau correction of the full interval (last entry)
+                if L.tau[-1] is not None:
+                    L.uend += L.tau[-1]
 
         return None
 

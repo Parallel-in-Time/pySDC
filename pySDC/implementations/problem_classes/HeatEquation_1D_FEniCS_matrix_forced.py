@@ -49,6 +49,7 @@ class fenics_heat(ptype):
         # set solver and form parameters
         df.parameters["form_compiler"]["optimize"] = True
         df.parameters["form_compiler"]["cpp_optimize"] = True
+        df.parameters['allow_extrapolation'] = True
 
         # set mesh and refinement (for multilevel)
         mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
@@ -80,6 +81,8 @@ class fenics_heat(ptype):
         # set forcing term as expression
         self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
                                degree=self.params.order)
+        # self.g = df.Expression('0', a=np.pi, b=self.params.nu, t=self.params.t0,
+        #                        degree=self.params.order)
         # set boundary values
         self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
 
@@ -98,7 +101,7 @@ class fenics_heat(ptype):
         """
 
         A = self.M - factor * self.K
-        b = self.__apply_mass_matrix(rhs)
+        b = self.apply_mass_matrix(rhs)
 
         self.bc.apply(A, b.values.vector())
 
@@ -159,7 +162,7 @@ class fenics_heat(ptype):
         f.expl = self.__eval_fexpl(u, t)
         return f
 
-    def __apply_mass_matrix(self, u):
+    def apply_mass_matrix(self, u):
         """
         Routine to apply mass matrix
 
@@ -171,6 +174,7 @@ class fenics_heat(ptype):
         """
 
         me = self.dtype_u(self.V)
+        # self.bc.apply(self.M, u.values.vector())
         self.M.mult(u.values.vector(), me.values.vector())
 
         return me
@@ -213,3 +217,68 @@ class fenics_heat(ptype):
         me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me
+
+
+# noinspection PyUnusedLocal
+class fenics_heat_mass(fenics_heat):
+    """
+    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper
+
+    Attributes:
+        has_mass_matrix (bool): indicates whether to modify swepers and initial conditions
+    """
+
+    def __init__(self, problem_params, dtype_u, dtype_f):
+        """
+        Initialization routine
+        """
+
+        super(fenics_heat_mass, self).__init__(problem_params, dtype_u, dtype_f)
+
+        self.has_mass_matrix = True
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Dolfin's linear solver for (M-dtA)u = rhs
+
+        Args:
+            rhs (dtype_f): right-hand side for the nonlinear system
+            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)
+            t (float): current time
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        A = self.M - factor * self.K
+
+        self.bc.apply(A, rhs.values.vector())
+
+        u = self.dtype_u(u0)
+        df.solve(A, u.values.vector(), rhs.values.vector())
+
+        return u
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate both parts of the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS divided into two parts
+        """
+
+        f = self.dtype_f(self.V)
+
+        self.bc.apply(self.K, u.values.vector())
+        self.K.mult(u.values.vector(), f.impl.values.vector())
+
+        self.g.t = t
+        f.expl = self.dtype_u(df.interpolate(self.g, self.V))
+        f.expl = self.apply_mass_matrix(f.expl)
+
+        return f
