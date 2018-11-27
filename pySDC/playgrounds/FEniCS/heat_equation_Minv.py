@@ -33,14 +33,14 @@ if __name__ == "__main__":
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
-    problem_params['refinements'] = [0]
+    problem_params['refinements'] = [1, 0]
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
 
     base_transfer_params = dict()
-    base_transfer_params['finter'] = True
+    # base_transfer_params['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()

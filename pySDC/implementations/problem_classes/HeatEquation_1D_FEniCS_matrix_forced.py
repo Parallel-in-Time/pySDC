@@ -174,7 +174,7 @@ class fenics_heat(ptype):
         """
 
         me = self.dtype_u(self.V)
-        # self.bc.apply(self.M, u.values.vector())
+        self.bc.apply(self.M, u.values.vector())
         self.M.mult(u.values.vector(), me.values.vector())
 
         return me
@@ -224,18 +224,7 @@ class fenics_heat_mass(fenics_heat):
     """
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper
 
-    Attributes:
-        has_mass_matrix (bool): indicates whether to modify swepers and initial conditions
     """
-
-    def __init__(self, problem_params, dtype_u, dtype_f):
-        """
-        Initialization routine
-        """
-
-        super(fenics_heat_mass, self).__init__(problem_params, dtype_u, dtype_f)
-
-        self.has_mass_matrix = True
 
     def solve_system(self, rhs, factor, u0, t):
         """

@@ -46,8 +46,6 @@ class ptype(object):
         self.dtype_u = dtype_u
         self.dtype_f = dtype_f
 
-        self.has_mass_matrix = False
-
     def eval_f(self, u, t):
         """
         Abstract interface to RHS computation of the ODE

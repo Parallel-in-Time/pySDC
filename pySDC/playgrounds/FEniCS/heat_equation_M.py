@@ -5,6 +5,8 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
+from pySDC.playgrounds.FEniCS.imex_1st_order_mass import imex_1st_order_mass
+from pySDC.playgrounds.FEniCS.BaseTransfer_mass import base_transfer_mass
 
 if __name__ == "__main__":
     num_procs = 1
@@ -33,14 +35,14 @@ if __name__ == "__main__":
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
-    problem_params['refinements'] = [0]
+    problem_params['refinements'] = [1, 0]
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
 
     base_transfer_params = dict()
-    base_transfer_params['finter'] = True
+    # base_transfer_params['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -48,12 +50,13 @@ if __name__ == "__main__":
     description['problem_params'] = problem_params
     description['dtype_u'] = fenics_mesh
     description['dtype_f'] = rhs_fenics_mesh
-    description['sweeper_class'] = imex_1st_order # pass sweeper (see part B)
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh_fenics  # pass spatial transfer class
-    description['base_transfer_params'] = base_transfer_params  # pass paramters for spatial transfer
+    description['sweeper_class'] = imex_1st_order_mass
+    description['sweeper_params'] = sweeper_params
+    description['level_params'] = level_params
+    description['step_params'] = step_params
+    description['space_transfer_class'] = mesh_to_mesh_fenics
+    description['base_transfer_class'] = base_transfer_mass
+    description['base_transfer_params'] = base_transfer_params
 
     # quickly generate block of steps
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
