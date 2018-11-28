@@ -14,12 +14,10 @@ from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_os
 from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import particles_to_particles
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.projects.Hamiltonian.hamiltonian_output import hamiltonian_output
+from pySDC.projects.Hamiltonian.stop_at_error_hook import stop_at_error_hook
 
 
-
-
-def run_simulation():
+def run_simulation(stop_at_error=False):
     """
     Routine to run the simulation of a second order problem
 
@@ -27,7 +25,7 @@ def run_simulation():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 0.0
     level_params['dt'] = 1.0
 
     # initialize sweeper parameters
@@ -48,7 +46,7 @@ def run_simulation():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['hook_class'] = hamiltonian_output  # specialized hook class for more statistics and output
+    controller_params['hook_class'] = stop_at_error_hook
     controller_params['logger_level'] = 30
 
     # Fill description dictionary for easy hierarchy creation
@@ -67,8 +65,8 @@ def run_simulation():
     num_procs = 1
 
     rlim_left = 0
-    rlim_right = 50
-    nstep = 26
+    rlim_right = 16.0
+    nstep = 34
     ks = np.linspace(rlim_left, rlim_right, nstep)[1:]
 
     qd_combinations = [('IE', 'EE'), ('IE', 'PIC'),
@@ -154,7 +152,8 @@ def show_results(cwd=''):
 
     plt_helper.plt.xlabel('k')
     plt_helper.plt.ylabel('Number of iterations')
-    plt_helper.plt.legend(loc='lower right', )
+    plt_helper.plt.legend(loc='upper left', )
+    plt_helper.plt.ylim([0, 15])
 
     fname = 'data/harmonic_qd_iterations'
     plt_helper.savefig(fname)

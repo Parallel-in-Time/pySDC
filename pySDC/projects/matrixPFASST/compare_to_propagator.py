@@ -221,8 +221,7 @@ def compare_controllers(type=None, par=0.0, f=None):
     print(out)
 
     # instantiate controller
-    controller = controller_matrix_nonMPI(num_procs=4, controller_params=controller_params,
-                                            description=description)
+    controller = controller_matrix_nonMPI(num_procs=4, controller_params=controller_params, description=description)
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)

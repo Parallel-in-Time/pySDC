@@ -194,7 +194,7 @@ class controller(object):
 
         # get residual and check against prescribed tolerance (plus check number of iterations
         res = L.status.residual
-        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol
+        converged = S.status.iter >= S.params.maxiter or res <= L.params.restol or S.status.force_done
 
         return converged
 

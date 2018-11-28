@@ -34,7 +34,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         # call parent's initialization routine
         super(controller_matrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
-                                                         description=description)
+                                                       description=description)
 
         self.nsteps = len(self.MS)
         self.nlevels = len(self.MS[0].levels)
