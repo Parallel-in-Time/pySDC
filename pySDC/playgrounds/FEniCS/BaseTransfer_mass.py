@@ -45,10 +45,10 @@ class base_transfer_mass(base_transfer):
         # restrict fine values in space
         tmp_u = []
         for m in range(1, SF.coll.num_nodes + 1):
-            tmp_u.append(self.space_transfer.restrict(F.u[m]))
+            tmp_u.append(self.space_transfer.project(F.u[m]))
 
         # restrict collocation values
-        G.u[0] = self.space_transfer.restrict(F.u[0])
+        G.u[0] = self.space_transfer.project(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes):
@@ -138,7 +138,7 @@ class base_transfer_mass(base_transfer):
         # we need to update u0 here for the predictor step, since here the new values for the fine sweep are not
         # received from the previous processor but interpolated from the coarse level.
         # need to restrict F.u[0] again here, since it might have changed in PFASST
-        G.uold[0] = self.space_transfer.restrict(F.u[0])
+        G.uold[0] = self.space_transfer.project(F.u[0])
 
         # interpolate values in space first
         tmp_u = [self.space_transfer.prolong(G.u[0] - G.uold[0])]
@@ -192,8 +192,8 @@ class base_transfer_mass(base_transfer):
             tmp_f.append(self.space_transfer.prolong(G.f[m] - G.fold[m]))
 
         # interpolate values in collocation
-        F.u[0] += tmp_u[0]
-        F.f[0] += tmp_f[0]
+        # F.u[0] += tmp_u[0]
+        # F.f[0] += tmp_f[0]
         for n in range(1, SF.coll.num_nodes + 1):
             for m in range(1, SG.coll.num_nodes + 1):
                 F.u[n] += self.Pcoll[n - 1, m - 1] * tmp_u[m]

@@ -64,9 +64,6 @@ class fenics_heat(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat, self).__init__(self.V, dtype_u, dtype_f, problem_params)
 
-        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
-                               degree=self.params.order)
-
         # Stiffness term (Laplace)
         u = df.TrialFunction(self.V)
         v = df.TestFunction(self.V)
@@ -84,7 +81,10 @@ class fenics_heat(ptype):
         # self.g = df.Expression('0', a=np.pi, b=self.params.nu, t=self.params.t0,
         #                        degree=self.params.order)
         # set boundary values
-        self.bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
+        bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
+
+        bc.apply(self.M)
+        bc.apply(self.K)
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -100,13 +100,10 @@ class fenics_heat(ptype):
             dtype_u: solution as mesh
         """
 
-        A = self.M - factor * self.K
         b = self.apply_mass_matrix(rhs)
 
-        self.bc.apply(A, b.values.vector())
-
         u = self.dtype_u(u0)
-        df.solve(A, u.values.vector(), b.values.vector())
+        df.solve(self.M - factor * self.K, u.values.vector(), b.values.vector())
 
         return u
 
@@ -174,7 +171,6 @@ class fenics_heat(ptype):
         """
 
         me = self.dtype_u(self.V)
-        self.bc.apply(self.M, u.values.vector())
         self.M.mult(u.values.vector(), me.values.vector())
 
         return me
@@ -192,12 +188,9 @@ class fenics_heat(ptype):
 
         me = self.dtype_u(self.V)
 
-        A = 1.0 * self.M
         b = self.dtype_u(u)
 
-        self.bc.apply(A, b.values.vector())
-
-        df.solve(A, me.values.vector(), b.values.vector())
+        df.solve(self.M, me.values.vector(), b.values.vector())
 
         return me
 
@@ -213,7 +206,6 @@ class fenics_heat(ptype):
         """
 
         u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
-
         me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me
@@ -240,12 +232,8 @@ class fenics_heat_mass(fenics_heat):
             dtype_u: solution as mesh
         """
 
-        A = self.M - factor * self.K
-
-        self.bc.apply(A, rhs.values.vector())
-
         u = self.dtype_u(u0)
-        df.solve(A, u.values.vector(), rhs.values.vector())
+        df.solve(self.M - factor * self.K, u.values.vector(), rhs.values.vector())
 
         return u
 
@@ -263,7 +251,6 @@ class fenics_heat_mass(fenics_heat):
 
         f = self.dtype_f(self.V)
 
-        self.bc.apply(self.K, u.values.vector())
         self.K.mult(u.values.vector(), f.impl.values.vector())
 
         self.g.t = t

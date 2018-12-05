@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 10
 
     # initialize sweeper parameters
     sweeper_params = dict()

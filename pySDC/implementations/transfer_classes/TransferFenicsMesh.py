@@ -26,6 +26,24 @@ class mesh_to_mesh_fenics(space_transfer):
 
         pass
 
+    def project(self, F):
+        """
+        Restriction implementation via projection
+
+        Args:
+            F: the fine level data
+        """
+        if isinstance(F, fenics_mesh):
+            u_coarse = fenics_mesh(df.project(F.values, self.coarse_prob.init))
+        elif isinstance(F, rhs_fenics_mesh):
+            u_coarse = rhs_fenics_mesh(self.coarse_prob.init)
+            u_coarse.impl.values = df.project(F.impl.values, self.coarse_prob.init)
+            u_coarse.expl.values = df.project(F.expl.values, self.coarse_prob.init)
+        else:
+            raise TransferError('Unknown type of fine data, got %s' % type(F))
+
+        return u_coarse
+
     def restrict(self, F):
         """
         Restriction implementation
