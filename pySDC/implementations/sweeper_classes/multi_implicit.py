@@ -106,8 +106,6 @@ class multi_implicit(sweeper):
             # implicit solve with prefactor stemming from Q1
             L.u[m + 1] = P.solve_system_1(rhs, L.dt * self.Q1[m + 1, m + 1], L.u[m + 1],
                                           L.time + L.dt * self.coll.nodes[m])
-            # evaluate preliminary f for computing the second component
-            L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])  # TODO: UGLY, remove
 
             # substract Q2F2(u^k) and add Q2F(u^k+1)
             rhs = L.u[m + 1] - Q2int[m]
