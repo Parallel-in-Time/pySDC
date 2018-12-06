@@ -164,6 +164,21 @@ class controller_MPI(controller):
             lvl.status.time = time
             lvl.status.sweep = 1
 
+    @staticmethod
+    def recv(target, source, tag=None, comm=None):
+        """
+        Receive function
+
+        Args:
+            target: level which will receive the values
+            source: level which initiated the send
+            tag: identifier to check if this message is really for me
+            comm: communicator
+        """
+        target.u[0].recv(source=source, tag=tag, comm=comm)
+        # re-evaluate f on left interval boundary
+        target.f[0] = target.prob.eval_f(target.u[0], target.time)
+
     def predictor(self, comm):
         """
         Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
@@ -191,7 +206,7 @@ class controller_MPI(controller):
                 self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    self.S.status.iter))
-                self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
             # do the sweep with new values
@@ -230,7 +245,7 @@ class controller_MPI(controller):
                     self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        self.S.status.iter, p))
-                    self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
                 self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
                 # do the sweep with new values
@@ -321,7 +336,7 @@ class controller_MPI(controller):
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    0, self.S.status.iter))
-                self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.last and self.params.fine_comm:
                 req_send.wait()
@@ -408,7 +423,7 @@ class controller_MPI(controller):
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        0, self.S.status.iter))
-                    self.S.levels[0].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                 if not self.S.status.last and self.params.fine_comm:
                     req_send.wait()
@@ -448,7 +463,7 @@ class controller_MPI(controller):
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                            l, self.S.status.iter))
-                        self.S.levels[l].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                        self.recv(target=self.S.levels[l], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
                     if not self.S.status.last and self.params.fine_comm:
                         req_send.wait()
@@ -475,7 +490,7 @@ class controller_MPI(controller):
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    len(self.S.levels) - 1, self.S.status.iter))
-                self.S.levels[-1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
             # do the sweep
@@ -534,7 +549,8 @@ class controller_MPI(controller):
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                                l - 1, self.S.status.iter))
-                            self.S.levels[l - 1].u[0].recv(source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
+                                      comm=comm)
 
                         if not self.S.status.last and self.params.fine_comm:
                             req_send.wait()
