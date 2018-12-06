@@ -1,5 +1,4 @@
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.problem_classes.AdvectionDiffusion_1D_FEniCS_matrix_periodic import fenics_adv_diff_1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -20,7 +19,7 @@ if __name__ == "__main__":
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 10
+    step_params['maxiter'] = 20
 
     # initialize sweeper parameters
     sweeper_params = dict()

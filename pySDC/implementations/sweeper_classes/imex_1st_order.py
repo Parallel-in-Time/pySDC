@@ -81,7 +81,7 @@ class imex_1st_order(sweeper):
         # get QF(u^k)
         integral = self.integrate()
         for m in range(M):
-            # subtract QIFI(u^k)_m - QEFE(u^k)_m
+            # subtract QIFI(u^k)_m + QEFE(u^k)_m
             for j in range(M + 1):
                 integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
             # add initial value

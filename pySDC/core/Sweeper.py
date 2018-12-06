@@ -235,11 +235,12 @@ class sweeper(object):
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
 
-        # copy u[0] to all collocation nodes, evaluate RHS
         for m in range(1, self.coll.num_nodes + 1):
+            # copy u[0] to all collocation nodes, evaluate RHS
             if self.params.spread:
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
+            # start with zero everywhere
             else:
                 L.u[m] = P.dtype_u(init=P.init, val=0)
                 L.f[m] = P.dtype_f(init=P.init, val=0)

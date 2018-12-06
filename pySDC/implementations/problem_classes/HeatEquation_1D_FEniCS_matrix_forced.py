@@ -32,8 +32,8 @@ class fenics_heat(ptype):
         """
 
         # define the Dirichlet boundary
-        def Boundary(x, on_boundary):
-            return on_boundary
+        # def Boundary(x, on_boundary):
+        #     return on_boundary
 
         # these parameters will be used later, so assert their existence
         essential_keys = ['c_nvars', 't0', 'family', 'order', 'refinements', 'nu']
@@ -76,15 +76,15 @@ class fenics_heat(ptype):
         self.K = df.assemble(a_K)
 
         # set forcing term as expression
-        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
+        self.g = df.Expression('-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
                                degree=self.params.order)
         # self.g = df.Expression('0', a=np.pi, b=self.params.nu, t=self.params.t0,
         #                        degree=self.params.order)
         # set boundary values
-        bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
-
-        bc.apply(self.M)
-        bc.apply(self.K)
+        # bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)
+        #
+        # bc.apply(self.M)
+        # bc.apply(self.K)
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -205,7 +205,7 @@ class fenics_heat(ptype):
             dtype_u: exact solution
         """
 
-        u0 = df.Expression('sin(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
+        u0 = df.Expression('cos(a*x[0]) * cos(t)', a=np.pi, t=t, degree=self.params.order)
         me = self.dtype_u(df.interpolate(u0, self.V))
 
         return me
