@@ -81,7 +81,7 @@ class multi_implicit(sweeper):
         integral = self.integrate()
         for m in range(M):
             # subtract Q1F1(u^k)_m
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 integral[m] -= L.dt * self.Q1[m + 1, j] * L.f[j].comp1
             # add initial value
             integral[m] += L.u[0]
@@ -93,14 +93,14 @@ class multi_implicit(sweeper):
         Q2int = []
         for m in range(M):
             Q2int.append(P.dtype_u(P.init, val=0))
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 Q2int[-1] += L.dt * self.Q2[m + 1, j] * L.f[j].comp2
 
         # do the sweep
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 rhs += L.dt * self.Q1[m + 1, j] * L.f[j].comp1
 
             # implicit solve with prefactor stemming from Q1
@@ -109,7 +109,7 @@ class multi_implicit(sweeper):
 
             # substract Q2F2(u^k) and add Q2F(u^k+1)
             rhs = L.u[m + 1] - Q2int[m]
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 rhs += L.dt * self.Q2[m + 1, j] * L.f[j].comp2
 
             L.u[m + 1] = P.solve_system_2(rhs, L.dt * self.Q2[m + 1, m + 1], L.u[m + 1],  # TODO: is this a good guess?

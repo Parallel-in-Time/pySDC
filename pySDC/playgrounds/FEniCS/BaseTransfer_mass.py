@@ -48,12 +48,14 @@ class base_transfer_mass(base_transfer):
             tmp_u.append(self.space_transfer.project(F.u[m]))
 
         # restrict collocation values
+        G.u[0] = self.space_transfer.restrict(F.u[0])
         for n in range(1, SG.coll.num_nodes + 1):
             G.u[n] = self.Rcoll[n - 1, 0] * tmp_u[0]
             for m in range(1, SF.coll.num_nodes):
                 G.u[n] += self.Rcoll[n - 1, m] * tmp_u[m]
 
         # re-evaluate f on coarse level
+        G.f[0] = PG.eval_f(G.u[0], G.time)
         for m in range(1, SG.coll.num_nodes + 1):
             G.f[m] = PG.eval_f(G.u[m], G.time + G.dt * SG.coll.nodes[m - 1])
 
@@ -102,9 +104,6 @@ class base_transfer_mass(base_transfer):
         for m in range(1, SG.coll.num_nodes + 1):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
-
-        G.u[0] = self.space_transfer.restrict(F.u[0])
-        G.f[0] = PG.eval_f(G.u[0], G.time)
 
         G.u[0] = self.space_transfer.restrict(PF.apply_mass_matrix(F.u[0]))
 

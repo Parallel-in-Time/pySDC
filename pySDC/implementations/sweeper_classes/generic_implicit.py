@@ -77,7 +77,7 @@ class generic_implicit(sweeper):
         for m in range(M):
 
             # get -QdF(u^k)_m
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 integral[m] -= L.dt * self.QI[m + 1, j] * L.f[j]
 
             # add initial value
@@ -90,7 +90,7 @@ class generic_implicit(sweeper):
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd

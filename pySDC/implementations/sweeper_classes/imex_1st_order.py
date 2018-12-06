@@ -82,7 +82,7 @@ class imex_1st_order(sweeper):
         integral = self.integrate()
         for m in range(M):
             # subtract QIFI(u^k)_m + QEFE(u^k)_m
-            for j in range(M + 1):
+            for j in range(1, M + 1):
                 integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
             # add initial value
             integral[m] += L.u[0]
@@ -94,7 +94,7 @@ class imex_1st_order(sweeper):
         for m in range(0, M):
             # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
             rhs = P.dtype_u(integral[m])
-            for j in range(m + 1):
+            for j in range(1, m + 1):
                 rhs += L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
 
             # implicit solve with prefactor stemming from QI
