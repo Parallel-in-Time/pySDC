@@ -4,8 +4,8 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.playgrounds.FEniCS.imex_1st_order_mass import imex_1st_order_mass
-from pySDC.playgrounds.FEniCS.BaseTransfer_mass import base_transfer_mass
+from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass
+from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 
 if __name__ == "__main__":
     num_procs = 1

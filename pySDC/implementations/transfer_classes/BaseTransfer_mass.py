@@ -45,7 +45,7 @@ class base_transfer_mass(base_transfer):
         # restrict fine values in space
         tmp_u = []
         for m in range(1, SF.coll.num_nodes + 1):
-            tmp_u.append(self.space_transfer.project(F.u[m]))
+            tmp_u.append(self.space_transfer.restrict(F.u[m]))
 
         # restrict collocation values
         G.u[0] = self.space_transfer.restrict(F.u[0])
@@ -105,7 +105,9 @@ class base_transfer_mass(base_transfer):
             G.uold[m] = PG.dtype_u(G.u[m])
             G.fold[m] = PG.dtype_f(G.f[m])
 
-        G.u[0] = self.space_transfer.restrict(PF.apply_mass_matrix(F.u[0]))
+        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
+        if F.level_index == 0:
+            G.u[0] = self.space_transfer.restrict(PF.apply_mass_matrix(F.u[0]))
 
         # works as a predictor
         G.status.unlocked = True

@@ -76,7 +76,7 @@ class fenics_vortex_2d(ptype):
         self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'],
                                   constrained_domain=PeriodicBoundary())
         tmp = df.Function(self.V)
-        print('DoFs on this level:', len(tmp.vector().array()))
+        print('DoFs on this level:', len(tmp.vector().vector()[:]))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_vortex_2d, self).__init__(self.V, dtype_u, dtype_f, problem_params)

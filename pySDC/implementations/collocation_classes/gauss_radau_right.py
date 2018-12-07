@@ -34,8 +34,8 @@ class CollGaussRadau_Right(CollBase):
             tright (float): right interval boundary (usually 1)
         """
         super(CollGaussRadau_Right, self).__init__(num_nodes, tleft, tright)
-        if num_nodes < 2:
-            raise CollocationError("Number of nodes should be at least 2 for Gauss-Radau, but is %d" % num_nodes)
+        if num_nodes < 1:
+            raise CollocationError("Number of nodes should be at least 1 for Gauss-Radau, but is %d" % num_nodes)
         self.order = 2 * self.num_nodes - 1
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
@@ -58,6 +58,9 @@ class CollGaussRadau_Right(CollBase):
         M = self.num_nodes
         a = self.tleft
         b = self.tright
+
+        if M == 1:
+            return [b]
 
         alpha = 1.0
         beta = 0.0

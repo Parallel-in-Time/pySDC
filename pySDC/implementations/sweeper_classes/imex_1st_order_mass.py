@@ -7,7 +7,7 @@ class imex_1st_order_mass(imex_1st_order):
     """
     Custom sweeper class, implements Sweeper.py
 
-    First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass matrix
+    First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix
     """
 
     def update_nodes(self):
@@ -34,13 +34,14 @@ class imex_1st_order_mass(imex_1st_order):
         # get QF(u^k)
         integral = self.integrate()
 
+        # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
         if L.level_index == 0:
             u0 = P.apply_mass_matrix(L.u[0])
         else:
             u0 = L.u[0]
 
         for m in range(M):
-            # subtract QIFI(u^k)_m - QEFE(u^k)_m
+            # subtract QIFI(u^k)_m + QEFE(u^k)_m
             for j in range(M + 1):
                 integral[m] -= L.dt * (self.QI[m + 1, j] * L.f[j].impl + self.QE[m + 1, j] * L.f[j].expl)
             # add initial value
@@ -108,6 +109,7 @@ class imex_1st_order_mass(imex_1st_order):
         res_norm = []
         res = self.integrate()
         for m in range(self.coll.num_nodes):
+            # This is somewhat ugly, but we have to apply the mass matrix on u0 only on the finest level
             if L.level_index == 0:
                 res[m] += P.apply_mass_matrix(L.u[0] - L.u[m + 1])
             else:
