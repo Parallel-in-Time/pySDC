@@ -21,13 +21,13 @@ before_install:
   - chmod +x $HOME/miniconda${PYTHON_VERSION}.sh
   - "$HOME/miniconda${PYTHON_VERSION}.sh -b;"
   - export PATH=/home/travis/miniconda${PYTHON_VERSION}/bin:$PATH
-  - conda update --yes conda
+#  - conda update --yes conda
 
 install:
   - conda install --yes python=${TRAVIS_PYTHON_VERSION}
-#  - conda install --yes -c conda-forge fenics
   - conda install --yes -c conda-forge mpich petsc4py mpi4py pyfftw
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
+  - conda install --yes -c conda-forge fenics
   - conda list
   - pip install travis-sphinx
 
