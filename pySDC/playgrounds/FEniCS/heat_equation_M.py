@@ -41,7 +41,7 @@ if __name__ == "__main__":
     controller_params['logger_level'] = 20
 
     base_transfer_params = dict()
-    # base_transfer_params['finter'] = True
+    base_transfer_params['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
