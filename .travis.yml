@@ -24,7 +24,8 @@ before_install:
 #  - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} libcxx
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION}
+  - conda install --yes -c conda-forge libcxx
   - conda install --yes -c conda-forge mpich petsc4py mpi4py pyfftw
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
   - conda install --yes -c conda-forge fenics
