@@ -4,8 +4,7 @@ dist: xenial
 language: python
 
 python:
-  - '2.7'
-  - '3.6'
+  - '3.7'
 
 addons:
   apt:
@@ -16,19 +15,18 @@ addons:
       - dvipng
 
 before_install:
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then export PYTHON_VERSION=2; wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O $HOME/miniconda2.sh; fi
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then export PYTHON_VERSION=3; wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda3.sh; fi
-  - chmod +x $HOME/miniconda${PYTHON_VERSION}.sh
-  - "$HOME/miniconda${PYTHON_VERSION}.sh -b;"
-  - export PATH=/home/travis/miniconda${PYTHON_VERSION}/bin:$PATH
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda3.sh; fi
+  - chmod +x $HOME/miniconda3.sh
+  - "$HOME/miniconda3.sh -b;"
+  - export PATH=/home/travis/miniconda3/bin:$PATH
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION}
+  - conda install --yes python=3.7
   - conda install --yes -c conda-forge mpich petsc4py mpi4py pyfftw fenics
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
   - conda list
   - pip install travis-sphinx
-  - ln -sf /home/travis/miniconda${PYTHON_VERSION}/lib/libstdc++.so.6.0.25 /home/travis/miniconda${PYTHON_VERSION}/lib/libstdc++.so.6
+  - ln -sf /home/travis/miniconda3/lib/libstdc++.so.6.0.25 /home/travis/miniconda3/lib/libstdc++.so.6
 
 script:
   - "./docs/update_apidocs.sh"
@@ -36,18 +34,7 @@ script:
 #  - export OMPI_MCA_btl_vader_single_copy_mechanism=none
   - export PYTHONPATH=$PYTHONPATH:../../..
   - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
-  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx build; fi
+  - travis-sphinx build
 
 after_success:
-  - if [[ $PYTHON_VERSION == 3 ]]; then travis-sphinx deploy; fi
-
-deploy:
-  - provider: pypi
-    edge:
-      branch: jc-pypi
-    user: pancetta
-    password:
-      secure: id5Pg/GL/YdXFmbi5h4xLmmyv/0L8lj9Rlr7lFJBrHrmkHIlu78NgO+LnQsGvhSrZqdDvZwRzFFCKRLiDugp07rzfwM41ROPrcgwnSRuqnzG2sUecNulNGHHoqej/z8nG5Ss8k2+viMqpOjhhZoY3LR0D1nFxRzu3HtHs0MKpRc=
-    on:
-      tags: true
-      condition: $TRAVIS_PYTHON_VERSION = "2.7"
+  - travis-sphinx deploy
