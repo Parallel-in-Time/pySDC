@@ -17,7 +17,7 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.projects.Hamiltonian.stop_at_error_hook import stop_at_error_hook
 
 
-def run_simulation(stop_at_error=False):
+def run_simulation():
     """
     Routine to run the simulation of a second order problem
 
@@ -31,7 +31,7 @@ def run_simulation(stop_at_error=False):
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = 5
+    sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['spread'] = False
 
     # initialize problem parameters for the Penning trap
@@ -57,22 +57,23 @@ def run_simulation(stop_at_error=False):
     description['sweeper_class'] = verlet
     description['level_params'] = level_params
     description['step_params'] = step_params
-    # description['space_transfer_class'] = particles_to_particles
+    description['space_transfer_class'] = particles_to_particles
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
-    num_procs = 1
+    Tend = 4.0
+    num_procs = 4
 
     rlim_left = 0
     rlim_right = 16.0
     nstep = 34
     ks = np.linspace(rlim_left, rlim_right, nstep)[1:]
 
-    qd_combinations = [('IE', 'EE'), ('IE', 'PIC'),
-                       ('LU', 'EE'), ('LU', 'PIC'),
-                       # ('MIN3', 'PIC'), ('MIN3', 'EE'),
-                       ('PIC', 'EE'), ('PIC', 'PIC')]
+    # qd_combinations = [('IE', 'EE'), ('IE', 'PIC'),
+    #                    ('LU', 'EE'), ('LU', 'PIC'),
+    #                    # ('MIN3', 'PIC'), ('MIN3', 'EE'),
+    #                    ('PIC', 'EE'), ('PIC', 'PIC')]
+    qd_combinations = [('IE', 'EE'), ('PIC', 'PIC')]
 
     results = dict()
     results['ks'] = ks
@@ -103,15 +104,17 @@ def run_simulation(stop_at_error=False):
             # call main function to get things done...
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+            uex = P.u_exact(Tend)
+
+            print('Error after run: %s' % abs(uex - uend))
+
             # filter statistics by type (number of iterations)
             filtered_stats = filter_stats(stats, type='niter')
 
             # convert filtered statistics to list of iterations count, sorted by process
             iter_counts = sort_stats(filtered_stats, sortby='time')
 
-            assert len(iter_counts) == 1, 'ERROR: more than one record for iterations, got %s' % iter_counts
-
-            niters[i] = iter_counts[0][1]
+            niters[i] = np.mean(np.array([item[1] for item in iter_counts]))
 
             # print('Worked on k = %s, took %s iterations' % (k, results[i]))
 
