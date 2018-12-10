@@ -130,7 +130,7 @@ def run_sdc_variants(variant=None):
     print('Time to solution: %6.4f sec.' % timing[0][1])
 
     assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-    assert err <= 4.04E-08, 'Error is too high, got %s' % err
+    assert err <= 4.1E-08, 'Error is too high, got %s' % err
 
     print()
 
