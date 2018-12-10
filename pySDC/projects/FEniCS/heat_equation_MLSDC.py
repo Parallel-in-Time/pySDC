@@ -6,6 +6,9 @@ from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
+from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
+from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
@@ -28,27 +31,31 @@ def setup(t0=None):
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 30
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
+    # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
+    sweeper_params['num_nodes'] = [3, 1]
 
     problem_params = dict()
     problem_params['nu'] = 0.1
     problem_params['t0'] = t0  # ugly, but necessary to set up this ProblemClass
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
-    problem_params['order'] = [4]
-    problem_params['refinements'] = [1]
+    # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
+    # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and not
+    # in the nodes and order, the mass inverse approach is way better, ie. halves the number of iterations!
+    problem_params['order'] = [4, 1]
+    problem_params['refinements'] = [1, 0]
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
 
     base_transfer_params = dict()
-    # base_transfer_params['finter'] = True
+    base_transfer_params['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -60,12 +67,13 @@ def setup(t0=None):
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
+    description['space_transfer_class'] = mesh_to_mesh_fenics
     description['base_transfer_params'] = base_transfer_params
 
     return description, controller_params
 
 
-def run_sdc_variants(variant=None):
+def run_mlsdc_variants(variant=None):
     """
     Main routine to run the different implementations of the heat equation with FEniCS
 
@@ -83,6 +91,7 @@ def run_sdc_variants(variant=None):
         description['level_params']['restol'] /= 500
         description['problem_class'] = fenics_heat_mass
         description['sweeper_class'] = imex_1st_order_mass
+        description['base_transfer_class'] = base_transfer_mass
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
         description['sweeper_class'] = imex_1st_order
@@ -136,9 +145,9 @@ def run_sdc_variants(variant=None):
 
 
 def main():
-    run_sdc_variants(variant='mass_inv')
-    run_sdc_variants(variant='mass')
-    run_sdc_variants(variant='weak')
+    run_mlsdc_variants(variant='mass_inv')
+    run_mlsdc_variants(variant='mass')
+    run_mlsdc_variants(variant='weak')
 
 
 if __name__ == "__main__":
