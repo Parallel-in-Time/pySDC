@@ -24,15 +24,14 @@ before_install:
 #  - conda update --yes conda
 
 install:
-  - conda install --yes python=${TRAVIS_PYTHON_VERSION} libgcc
-#  - conda install --yes -c conda-forge libcxx
-  - conda install --yes -c conda-forge mpich petsc4py mpi4py pyfftw
+  - conda install --yes python=${TRAVIS_PYTHON_VERSION}
+  - conda install --yes -c conda-forge mpich petsc4py mpi4py pyfftw fenics
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx
-  - conda install --yes -c conda-forge fenics
   - conda list
   - pip install travis-sphinx
 
 script:
+  - ln -sf /home/travis/miniconda${PYTHON_VERSION}/lib/libstdc++.so.6.0.25 /home/travis/miniconda${PYTHON_VERSION}/lib/libstdc++.so.6
   - "./docs/update_apidocs.sh"
   - which nosetests
 #  - export OMPI_MCA_btl_vader_single_copy_mechanism=none
