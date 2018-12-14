@@ -147,7 +147,8 @@ def run_pfasst_variants(variant=None):
 def main():
     run_pfasst_variants(variant='mass_inv')
     # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
-    # will not work together) or because of inconsistent use of the mass matrix.
+    # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
+    # correction is not satisfied, mass matrix does not permute with restriction).
     # run_pfasst_variants(variant='mass')
     # run_pfasst_variants(variant='weak')
 
