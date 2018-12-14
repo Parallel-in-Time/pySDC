@@ -290,7 +290,7 @@ class fenics_heat_weak_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        sol = self.dtype_u(u0.values)
+        sol = self.dtype_u(u0)
 
         df.solve(self.u * self.v * df.dx - factor * self.a_K == rhs.values * self.v * df.dx, sol.values, self.bc)
 

@@ -29,7 +29,6 @@ install:
 
 script:
   - "./docs/update_apidocs.sh"
-#  - export PYTHONPATH=$PYTHONPATH:../../..
   - nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - travis-sphinx build
 
