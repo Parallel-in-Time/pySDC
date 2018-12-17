@@ -118,7 +118,7 @@ def create_plots(cwd=''):
         if file is not ref:
             for item in stats:
                 if item[0] in range(minstep, maxstep):
-                    ax.text(item[0] + 0.5 - (maxstep - nsteps), item[1] - 1 + 0.5, r'\text{\Lightning}',
+                    ax.text(item[0] + 0.5 - (maxstep - nsteps), item[1] - 1 + 0.5, 'X',
                             horizontalalignment='center', verticalalignment='center')
 
         ax.axis([0, nsteps, 0, maxiter - 1])
