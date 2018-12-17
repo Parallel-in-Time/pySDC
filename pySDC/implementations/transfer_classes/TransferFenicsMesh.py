@@ -1,4 +1,3 @@
-from __future__ import division
 import dolfin as df
 
 from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh

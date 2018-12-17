@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 from petsc4py import PETSc
 

@@ -1,5 +1,4 @@
 # Solves Heat equation on a periodic domain, using raw VecScatter
-from __future__ import division
 import time, pstats, io, cProfile
 import sys, petsc4py
 petsc4py.init(sys.argv)

@@ -1,4 +1,3 @@
-from __future__ import division
 from scipy.interpolate import BarycentricInterpolator
 from scipy.integrate import quad
 import numpy as np

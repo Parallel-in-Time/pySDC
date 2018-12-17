@@ -1,4 +1,3 @@
-from __future__ import division
 from collections import defaultdict
 import os
 import dill

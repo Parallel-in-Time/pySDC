@@ -1,4 +1,3 @@
-from __future__ import division
 from numba import jit
 import numpy as np
 

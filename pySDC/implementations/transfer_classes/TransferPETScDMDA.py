@@ -1,4 +1,3 @@
-from __future__ import division
 
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError

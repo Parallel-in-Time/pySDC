@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper

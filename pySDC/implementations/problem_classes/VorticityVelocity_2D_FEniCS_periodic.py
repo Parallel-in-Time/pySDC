@@ -1,4 +1,3 @@
-from __future__ import division
 
 import dolfin as df
 import numpy as np

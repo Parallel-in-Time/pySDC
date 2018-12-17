@@ -1,4 +1,3 @@
-from __future__ import division
 from pySDC.core.Hooks import hooks
 import numpy as np
 import matplotlib.pyplot as plt
