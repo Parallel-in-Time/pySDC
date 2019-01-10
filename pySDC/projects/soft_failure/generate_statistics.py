@@ -163,7 +163,7 @@ def vanderpol_setup():
     return description, controller_params
 
 
-def run_clean_simulations(type=None, f=None):
+def run_clean_simulations(type=None):
     """
     A simple code to run fault-free simulations
 
@@ -184,10 +184,6 @@ def run_clean_simulations(type=None, f=None):
     # set time parameters
     t0 = 0.0
     Tend = description['level_params']['dt']
-
-    # out = '\nCLEAN RUN: Working with %s setup..' % type
-    # f.write(out + '\n')
-    # print(out)
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -210,7 +206,7 @@ def run_clean_simulations(type=None, f=None):
     return iter_counts[0][1]
 
 
-def run_faulty_simulations(type=None, niters=None, f=None):
+def run_faulty_simulations(type=None, niters=None, cwd=''):
     """
     A simple program to run faulty simulations
 
@@ -218,6 +214,7 @@ def run_faulty_simulations(type=None, niters=None, f=None):
         type (str): setup type
         niters (int): number of iterations in clean run
         f: file handler
+        cwd (str): current workind directory
     """
 
     if type == 'diffusion':
@@ -233,11 +230,7 @@ def run_faulty_simulations(type=None, niters=None, f=None):
     t0 = 0.0
     Tend = description['level_params']['dt']
 
-    out = '\nFAULTY RUN: Working with %s setup..' % type
-    f.write(out + '\n')
-    print(out)
-
-    filehandle_injections = open('dump_injections_' + type + '.txt', 'w')
+    filehandle_injections = open(cwd + 'data/dump_injections_' + type + '.txt', 'w')
 
     controller_params['hook_class'] = fault_hook
     description['sweeper_params']['allow_fault_correction'] = True
@@ -262,10 +255,13 @@ def run_faulty_simulations(type=None, niters=None, f=None):
 
     filehandle_injections.close()
 
-    dill.dump(results, open("results_" + type + ".pkl", "wb"))
+    dill.dump(results, open(cwd + "data/results_" + type + ".pkl", "wb"))
 
 
-def process_statistics(type=None, results=None):
+def process_statistics(type=None, cwd=''):
+
+    results = dill.load(open(cwd + "data/results_" + type + ".pkl", "rb"))
+
     # get minimal length of residual vector
     minlen = 1000
     nruns = 0
@@ -314,7 +310,7 @@ def process_statistics(type=None, results=None):
 
     # call helper routine to produce residual plot
     # fname = 'residuals.png'
-    fname = type + '_' + str(nruns) + '_' + 'runs' + '_' + 'residuals.png'
+    fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'residuals.png'
     show_residual_across_simulation(stats=stats, fname=fname)
     meanres /= nruns
     # print(minres)
@@ -327,7 +323,7 @@ def process_statistics(type=None, results=None):
     # print(medianres)
     # call helper routine to produce residual plot of minres, maxres, meanres and medianres
     # fname = 'min_max_residuals.png'
-    fname = type + '_' + str(nruns) + '_' + 'runs' + '_' + 'min_max_residuals.png'
+    fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'min_max_residuals.png'
     show_min_max_residual_across_simulation(stats=stats, fname=fname, minres=minres, maxres=maxres, meanres=meanres,
                                             medianres=medianres, maxiter=minlen)
 
@@ -340,7 +336,7 @@ def process_statistics(type=None, results=None):
     # print(maxiter)
     # call helper routine to produce histogram of maxiter
     # fname = 'iter_hist.png'
-    fname = type + '_' + str(nruns) + '_' + 'runs' + '_' + 'iter_hist.png'
+    fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'iter_hist.png'
     show_iter_hist(stats=stats, fname=fname, maxiter=maxiter, nruns=nruns)
 
     # initialize sum of nfaults_detected
@@ -360,7 +356,7 @@ def process_statistics(type=None, results=None):
         nfm += fault_stats.nfaults_missed
         nfpc += fault_stats.nfalse_positives_in_correction
 
-    g = open(type + '_' + str(nruns) + '_' + 'runs' + '_' + 'Statistics.txt', 'w')
+    g = open(cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'Statistics.txt', 'w')
     out = 'Type: ' + type + ' ' + str(nruns) + ' runs'
     g.write(out + '\n')
     # detector metrics (Sloan, Kumar, Bronevetsky 2012)
@@ -392,27 +388,21 @@ def process_statistics(type=None, results=None):
 
 
 def main():
-    f = open('generate_statistics.txt', 'w')
 
     # type = 'diffusion'
-    # niters = run_clean_simulations(type=type, f=f)
-    # run_faulty_simulations(type=type, niters=niters, f=f)
-    # results = dill.load(open("results_" + type + ".pkl", "rb"))
-    # process_statistics(type=type, results=results)
-    #
+    # niters = run_clean_simulations(type=type)
+    # run_faulty_simulations(type=type, niters=niters)
+    # process_statistics(type=type)
+
     # type = 'reaction'
-    # niters = run_clean_simulations(type=type, f=f)
-    # run_faulty_simulations(type=type, niters=niters, f=f)
-    # results = dill.load(open("results_" + type + ".pkl", "rb"))
-    # process_statistics(type=type, results=results)
+    # niters = run_clean_simulations(type=type)
+    # run_faulty_simulations(type=type, niters=niters)
+    # process_statistics(type=type)
 
     type = 'vanderpol'
-    niters = run_clean_simulations(type=type, f=f)
-    run_faulty_simulations(type=type, niters=niters, f=f)
-    results = dill.load(open("results_" + type + ".pkl", "rb"))
-    process_statistics(type=type, results=results)
-
-    f.close()
+    niters = run_clean_simulations(type=type)
+    run_faulty_simulations(type=type, niters=niters)
+    process_statistics(type=type)
 
 
 if __name__ == "__main__":
