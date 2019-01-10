@@ -15,9 +15,8 @@ from pySDC.projects.soft_failure.FaultHooks import fault_hook
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
-from pySDC.projects.soft_failure.visualization import show_residual_across_simulation
-from pySDC.projects.soft_failure.visualization_residual import show_min_max_residual_across_simulation
-from pySDC.projects.soft_failure.histogram import show_iter_hist
+from pySDC.projects.soft_failure.visualization_helper import show_residual_across_simulation, \
+    show_min_max_residual_across_simulation, show_iter_hist
 
 
 def diffusion_setup():
@@ -324,7 +323,7 @@ def process_statistics(type=None, cwd=''):
     # call helper routine to produce residual plot of minres, maxres, meanres and medianres
     # fname = 'min_max_residuals.png'
     fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'min_max_residuals.png'
-    show_min_max_residual_across_simulation(stats=stats, fname=fname, minres=minres, maxres=maxres, meanres=meanres,
+    show_min_max_residual_across_simulation(fname=fname, minres=minres, maxres=maxres, meanres=meanres,
                                             medianres=medianres, maxiter=minlen)
 
     # calculate maximum number of iterations per test run
@@ -337,7 +336,7 @@ def process_statistics(type=None, cwd=''):
     # call helper routine to produce histogram of maxiter
     # fname = 'iter_hist.png'
     fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'iter_hist.png'
-    show_iter_hist(stats=stats, fname=fname, maxiter=maxiter, nruns=nruns)
+    show_iter_hist(fname=fname, maxiter=maxiter, nruns=nruns)
 
     # initialize sum of nfaults_detected
     nfd = 0
