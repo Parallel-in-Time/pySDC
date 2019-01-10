@@ -1,4 +1,5 @@
 import matplotlib
+import os
 from pySDC.helpers.stats_helper import filter_stats
 import numpy as np
 from matplotlib import rc
@@ -48,3 +49,5 @@ def show_residual_across_simulation(stats, fname):
     plt.plot(np.linspace(1, maxiter, num=maxiter), residual)
 
     plt.savefig(fname)
+
+    assert os.path.isfile(fname), 'ERROR: plotting did not create PNG file'

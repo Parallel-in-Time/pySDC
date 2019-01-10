@@ -1,4 +1,5 @@
 import matplotlib
+import os
 import numpy as np
 from matplotlib import rc
 matplotlib.use('Agg')
@@ -42,3 +43,5 @@ def show_min_max_residual_across_simulation(stats, fname, minres, maxres, meanre
     plt.legend()
 
     plt.savefig(fname)
+
+    assert os.path.isfile(fname), 'ERROR: plotting did not create PNG file'
