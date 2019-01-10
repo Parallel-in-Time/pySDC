@@ -1,3 +1,5 @@
+import copy
+
 from pySDC.core.Errors import DataError
 
 from petsc4py import PETSc
@@ -25,7 +27,7 @@ class petsc_data(object):
 
         # if init is another petsc data type, do a copy (init by copy)
         if isinstance(init, type(self)):
-            self.values = init.values.copy()
+            self.values = copy.deepcopy(init.values)
         # if init is a DMDA, create an empty object
         elif isinstance(init, PETSc.DMDA):
             self.values = init.createGlobalVec()

@@ -163,8 +163,8 @@ class heat2d_petsc_forced(ptype):
 
         # evaluate forcing term for explicit part
         fa = self.init.getVecArray(f.expl.values)
-        xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye))
-        fa[:, :] = -np.sin(np.pi * self.params.freq * xv * self.dx) * \
+        xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye), indexing='ij')
+        fa[self.xs:self.xe, self.ys:self.ye] = -np.sin(np.pi * self.params.freq * xv * self.dx) * \
             np.sin(np.pi * self.params.freq * yv * self.dy) * \
             (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
 
