@@ -1,5 +1,7 @@
 import numpy as np
 
+from pySDC.implementations.datatype_classes.mesh import mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -10,7 +12,7 @@ class vanderpol(ptype):
     Example implementing the van der pol oscillator
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

@@ -3,6 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg, spsolve
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -19,7 +21,7 @@ class allencahn_fullyimplicit(ptype):
         dx: distance between two spatial nodes (same for both directions)
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 
@@ -183,11 +185,20 @@ class allencahn_fullyimplicit(ptype):
 class allencahn_semiimplicit(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
-
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
     """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type with implicit and explicit parts (will be passed parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(allencahn_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
 
     def eval_f(self, u, t):
         """
@@ -248,11 +259,20 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
-
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
     """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type with implicit and explicit parts (will be passed parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(allencahn_semiimplicit_v2, self).__init__(problem_params, dtype_u, dtype_f)
 
     def eval_f(self, u, t):
         """
@@ -335,11 +355,20 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 class allencahn_multiimplicit(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
-
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
     """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_comp2_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type with 2 components (will be passed parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(allencahn_multiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
 
     def eval_f(self, u, t):
         """
@@ -456,11 +485,20 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
-
-    Attributes:
-        A: second-order FD discretization of the 2D laplace operator
-        dx: distance between two spatial nodes (same for both directions)
     """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_comp2_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type with 2 components (will be passed parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(allencahn_multiimplicit_v2, self).__init__(problem_params, dtype_u, dtype_f)
 
     def eval_f(self, u, t):
         """

@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.sparse.linalg import spsolve
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import getWave1DMatrix, \
     getWave1DAdvectionMatrix
 from pySDC.core.Problem import ptype
@@ -22,7 +24,7 @@ class acoustic_1d_imex(ptype):
 
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 

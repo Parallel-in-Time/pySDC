@@ -85,8 +85,12 @@ class step(FrozenClass):
             descr (dict): dictionary containing the description of the levels as list per key
         """
 
-        assert 'dtype_u' not in descr
-        assert 'dtype_f' not in descr
+        if 'dtype_u' in descr:
+            raise ParameterError('Deprecated parameter dtype_u, please remove from description dictionary and specify'
+                                 'directly in the problem class')
+        if 'dtype_f' in descr:
+            raise ParameterError('Deprecated parameter dtype_f, please remove from description dictionary and specify'
+                                 'directly in the problem class')
 
         # assert the existence of all the keys we need to set up at least on level
         essential_keys = ['problem_class', 'sweeper_class', 'sweeper_params', 'level_params']

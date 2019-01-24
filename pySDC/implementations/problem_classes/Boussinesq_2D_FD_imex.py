@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.sparse.linalg import gmres
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DMatrix
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DUpwindMatrix
@@ -17,14 +19,14 @@ class boussinesq_2d_imex(ptype):
     Example implementing the 2D Boussinesq equation for different boundary conditions
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         # these parameters will be used later, so assert their existence

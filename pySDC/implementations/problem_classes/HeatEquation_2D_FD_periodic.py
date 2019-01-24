@@ -3,6 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
+from pySDC.implementations.datatype_classes.mesh import mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -17,7 +19,7 @@ class heat2d_periodic(ptype):
         A: second-order FD discretization of the 2D laplace operator
         dx: distance between two spatial nodes (here: being the same in both dimensions)
     """
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

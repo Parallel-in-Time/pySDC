@@ -2,6 +2,8 @@ import numpy as np
 
 import pyfftw
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -19,14 +21,14 @@ class allencahn2d_imex(ptype):
         ifft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         if 'L' not in problem_params:

@@ -2,8 +2,9 @@
 import numpy as np
 from numba import jit
 
-from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
+
+from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
 
@@ -13,7 +14,7 @@ class penningtrap(ptype):
     Example implementing particles in a penning trap
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
@@ -107,7 +108,7 @@ class penningtrap(ptype):
         u0 = self.params.u0
         N = self.params.nparts
 
-        u = particles((3, N))
+        u = self.dtype_u((3, N))
 
         if u0[2][0] is not 1 or u0[3][0] is not 1:
             raise ProblemError('so far only q = m = 1 is implemented')
@@ -174,7 +175,7 @@ class penningtrap(ptype):
         if N != 1:
             raise ProblemError('u_exact is only valid for a single particle')
 
-        u = particles((3, 1))
+        u = self.dtype_u((3, 1))
 
         wbar = np.sqrt(2) * wE
 
@@ -221,7 +222,7 @@ class penningtrap(ptype):
 
         N = self.params.nparts
 
-        rhs = acceleration((3, self.params.nparts))
+        rhs = self.dtype_f((3, self.params.nparts))
 
         for n in range(N):
             rhs.values[:, n] = part.q[n] / part.m[n] * (f.elec.values[:, n] +

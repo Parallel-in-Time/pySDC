@@ -3,6 +3,8 @@ import numpy as np
 import random
 import logging
 
+from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
 
@@ -23,14 +25,14 @@ class fenics_grayscott(ptype):
         M: full mass matrix for both parts
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=fenics_mesh, dtype_f=fenics_mesh):
         """
         Initialization routine
 
         Args:
             problem_params: custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: FEniCS mesh data type (will be passed to parent class)
+            dtype_f: FEniCS mesh data data type (will be passed to parent class)
         """
 
         # define the Dirichlet boundary

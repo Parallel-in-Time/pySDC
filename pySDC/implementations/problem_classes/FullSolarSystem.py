@@ -1,8 +1,7 @@
 
-import numpy as np
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
-from pySDC.implementations.datatype_classes.particles import particles, acceleration
 from pySDC.core.Errors import ParameterError
 
 
@@ -12,14 +11,14 @@ class full_solar_system(outer_solar_system):
     Example implementing the full solar system problem
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: particle data type (will be passed to parent class)
+            dtype_f: acceleration data type (will be passed to parent class)
         """
 
         if 'sun_only' not in problem_params:
@@ -48,7 +47,7 @@ class full_solar_system(outer_solar_system):
             dtype_u: exact/initial position and velocity
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
-        me = particles(self.init)
+        me = self.dtype_u(self.init)
 
         # initial positions and velocities taken from
         # https://www.aanda.org/articles/aa/full/2002/08/aa1405/aa1405.right.html

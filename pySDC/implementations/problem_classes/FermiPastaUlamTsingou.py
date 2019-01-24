@@ -1,8 +1,9 @@
 from numba import jit
 import numpy as np
 
-from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
+
+from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
 
 
@@ -12,14 +13,14 @@ class fermi_pasta_ulam_tsingou(ptype):
     Example implementing the outer solar system problem
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: particle data type (will be passed to parent class)
+            dtype_f: acceleration data type (will be passed to parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -49,7 +50,7 @@ class fermi_pasta_ulam_tsingou(ptype):
         Returns:
             dtype_f: RHS
         """
-        me = acceleration(self.init, val=0.0)
+        me = self.dtype_f(self.init, val=0.0)
 
         self.fast_acceleration(self.params.npart, self.params.alpha, u.pos.values, me.values[1:self.params.npart - 1])
 
@@ -66,7 +67,7 @@ class fermi_pasta_ulam_tsingou(ptype):
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
 
-        me = particles(self.init)
+        me = self.dtype_u(self.init)
 
         for n in range(self.params.npart):
             me.pos.values[n] = np.sin(self.params.k * np.pi * n / (self.params.npart - 1))

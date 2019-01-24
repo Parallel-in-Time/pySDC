@@ -1,9 +1,10 @@
 
 import numpy as np
 
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
+
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal
@@ -12,7 +13,7 @@ class henon_heiles(ptype):
     Example implementing the harmonic oscillator
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
 
@@ -42,7 +43,7 @@ class henon_heiles(ptype):
         Returns:
             dtype_f: RHS
         """
-        me = acceleration(2)
+        me = self.dtype_f(2)
         me.values[0] = -u.pos.values[0] - 2 * u.pos.values[0] * u.pos.values[1]
         me.values[1] = -u.pos.values[1] - u.pos.values[0] ** 2 + u.pos.values[1] ** 2
         return me
@@ -57,7 +58,7 @@ class henon_heiles(ptype):
             dtype_u: exact/initial position and velocity
         """
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
-        me = particles(2)
+        me = self.dtype_u(2)
 
         q1 = 0.0
         q2 = 0.2

@@ -3,6 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
 
+from pySDC.implementations.datatype_classes.mesh import mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -17,14 +19,14 @@ class heat1d_periodic(ptype):
         A: second-order FD discretization of the 1D laplace operator
         dx: distance between two spatial nodes
     """
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type (will be passed to parent class)
         """
 
         # these parameters will be used later, so assert their existence

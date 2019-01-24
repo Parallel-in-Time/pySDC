@@ -2,6 +2,8 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 
 # noinspection PyUnusedLocal
 class heat1d_forced(heat1d):
@@ -9,7 +11,7 @@ class heat1d_forced(heat1d):
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1],
     discretized using central finite differences
     """
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 

@@ -1,6 +1,8 @@
 import numpy as np
 import pyfftw
 
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
 
@@ -19,14 +21,14 @@ class advectiondiffusion1d_imex(ptype):
         irfft_object: planned IFFT for backward transformation, real-valued output
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type with implicit and explicit component (will be passed to parent class)
         """
 
         if 'L' not in problem_params:
@@ -140,6 +142,20 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,
     fully-implicit time-stepping
     """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed to parent class)
+            dtype_f: mesh data type (will be passed to parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(advectiondiffusion1d_implicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
+                                                            dtype_f=dtype_f)
 
     def eval_f(self, u, t):
         """

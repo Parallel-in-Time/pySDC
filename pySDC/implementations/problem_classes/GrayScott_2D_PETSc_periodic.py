@@ -1,6 +1,8 @@
 import numpy as np
 from petsc4py import PETSc
 
+from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
+
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
 
@@ -234,14 +236,14 @@ class petsc_grayscott_multiimplicit(ptype):
     Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u, dtype_f):
+    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_2comp_petsc_data):
         """
         Initialization routine
 
         Args:
             problem_params: custom parameters for the example
-            dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_u: PETSc data type (will be passed to parent class)
+            dtype_f: PETSc data type with 2 components (will be passed to parent class)
         """
 
         # define the Dirichlet boundary
@@ -496,6 +498,20 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
+    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=petsc_data):
+        """
+        Initialization routine
+
+        Args:
+            problem_params: custom parameters for the example
+            dtype_u: PETSc data type (will be passed to parent class)
+            dtype_f: PETSc data type (will be passed to parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(petsc_grayscott_fullyimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
+                                                            dtype_f=dtype_f)
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -555,6 +571,20 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
     """
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
+
+    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_imex_petsc_data):
+        """
+        Initialization routine
+
+        Args:
+            problem_params: custom parameters for the example
+            dtype_u: PETSc data type (will be passed to parent class)
+            dtype_f: PETSc data type with implicit and explicit parts (will be passed to parent class)
+        """
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(petsc_grayscott_semiimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
+                                                           dtype_f=dtype_f)
 
     def eval_f(self, u, t):
         """
