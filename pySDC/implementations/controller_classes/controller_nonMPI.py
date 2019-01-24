@@ -1,11 +1,10 @@
-import copy as cp
 import itertools
-
-import dill
+import copy as cp
 import numpy as np
+import dill
 
-from pySDC.core import Step as stepclass
 from pySDC.core.Controller import controller
+from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
 
 
@@ -445,6 +444,7 @@ class controller_nonMPI(controller):
                         else:
                             S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
                 else:
+                    S.levels[0].sweep.compute_end_point()
                     self.hooks.post_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
 
