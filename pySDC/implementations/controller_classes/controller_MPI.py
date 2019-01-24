@@ -395,7 +395,6 @@ class controller_MPI(controller):
 
             else:
 
-                self.S.levels[0].sweep.compute_end_point()  # TODO: is this really necessary?
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
 
