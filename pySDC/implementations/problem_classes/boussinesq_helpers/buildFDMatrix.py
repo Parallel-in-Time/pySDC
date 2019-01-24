@@ -1,7 +1,8 @@
-import numpy as np
-import scipy.sparse as sp
-import scipy.linalg as la
 import sys
+
+import numpy as np
+import scipy.linalg as la
+import scipy.sparse as sp
 
 
 # Only for periodic BC because we have advection only in x direction

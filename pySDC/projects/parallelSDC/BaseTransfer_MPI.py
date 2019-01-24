@@ -1,10 +1,10 @@
 import logging
-import scipy.sparse as sp
-import numpy as np
-from mpi4py import MPI
 
-from pySDC.helpers.pysdc_helper import FrozenClass
+import numpy as np
+import scipy.sparse as sp
+
 from pySDC.core.Errors import UnlockError
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes

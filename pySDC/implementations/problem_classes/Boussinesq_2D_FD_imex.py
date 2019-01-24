@@ -1,16 +1,14 @@
 import numpy as np
 from scipy.sparse.linalg import gmres
 
+from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DMatrix
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DUpwindMatrix
-from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
 from pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes import Callback, logging
-
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError
+from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
 
 
 # noinspection PyUnusedLocal

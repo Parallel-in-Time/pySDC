@@ -1,5 +1,6 @@
-from pySDC.core.Hooks import hooks
 import dolfin as df
+
+from pySDC.core.Hooks import hooks
 
 file = df.File('output1d/grayscott.pvd')  # dirty, but this has to be unique (and not per step or level)
 

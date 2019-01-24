@@ -2,8 +2,8 @@ import numpy as np
 from mpi4py import MPI
 
 from pySDC.core.Controller import controller
-from pySDC.core.Step import step
 from pySDC.core.Errors import ControllerError
+from pySDC.core.Step import step
 
 
 class controller_MPI(controller):

@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 from pylab import rcParams
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
-from pySDC.implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 

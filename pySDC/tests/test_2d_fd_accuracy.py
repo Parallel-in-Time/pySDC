@@ -1,8 +1,9 @@
-import numpy as np
 from collections import namedtuple
 
-from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+import numpy as np
+
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')

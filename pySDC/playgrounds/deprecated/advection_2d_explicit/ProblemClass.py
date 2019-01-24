@@ -1,10 +1,11 @@
 import numpy as np
 from clawpack import pyclaw
 from clawpack import riemann
-
-from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC.core.Problem import ptype
 from unflatten import unflatten
+
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
+
 
 class advection_2d_explicit(ptype):
     """

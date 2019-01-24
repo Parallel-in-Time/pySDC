@@ -1,10 +1,12 @@
-import numpy as np
 import math
-from scipy.sparse.linalg import gmres
-import scipy.sparse as sp
-from pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes import logging, Callback
-from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
 from decimal import *
+
+import numpy as np
+import scipy.sparse as sp
+from scipy.sparse.linalg import gmres
+
+from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
+from pySDC.implementations.problem_classes.boussinesq_helpers.helper_classes import logging, Callback
 
 
 #

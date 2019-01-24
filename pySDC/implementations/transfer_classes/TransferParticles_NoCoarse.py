@@ -1,6 +1,6 @@
+from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
-from pySDC.core.Errors import TransferError
 
 
 class particles_to_particles(space_transfer):

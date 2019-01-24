@@ -4,8 +4,8 @@ import scipy.sparse.linalg as LA
 from clawpack import pyclaw
 from clawpack import riemann
 
-from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 
 
 class sharpclaw(ptype):

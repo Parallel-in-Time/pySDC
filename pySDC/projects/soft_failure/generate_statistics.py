@@ -1,20 +1,16 @@
 from __future__ import division
-import numpy as np
+
 import dill
-
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
-from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-from pySDC.projects.soft_failure.implicit_sweeper_faults import implicit_sweeper_faults
-from pySDC.projects.soft_failure.FaultHooks import fault_hook
+import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
+from pySDC.projects.soft_failure.FaultHooks import fault_hook
+from pySDC.projects.soft_failure.implicit_sweeper_faults import implicit_sweeper_faults
 from pySDC.projects.soft_failure.visualization_helper import show_residual_across_simulation, \
     show_min_max_residual_across_simulation, show_iter_hist
 

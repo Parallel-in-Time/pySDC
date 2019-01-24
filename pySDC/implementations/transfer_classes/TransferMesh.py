@@ -3,9 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 
 import pySDC.helpers.transfer_helper as th
-from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
-
+from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
 
 

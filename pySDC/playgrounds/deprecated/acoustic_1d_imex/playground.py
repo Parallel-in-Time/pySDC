@@ -2,8 +2,8 @@ import numpy as np
 import pySDC.core.deprecated.PFASST_stepwise as mp
 from ProblemClass import acoustic_1d_imex
 from matplotlib import pyplot as plt
-
 from pySDC.projects.FastWaveSlowWave.HookClass import plot_solution
+
 from pySDC.core import CollocationClasses as collclass
 from pySDC.core import Log
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh

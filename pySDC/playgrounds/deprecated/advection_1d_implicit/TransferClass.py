@@ -1,9 +1,9 @@
 
 import numpy as np
+from pySDC.core.Transfer import transfer
 
 import pySDC.helpers.transfer_helper as th
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
-from pySDC.core.Transfer import transfer
 
 
 # FIXME: extend this to ndarrays

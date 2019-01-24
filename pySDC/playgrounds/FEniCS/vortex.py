@@ -1,9 +1,8 @@
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d
-from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh, rhs_fenics_mesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic import fenics_vortex_2d
+from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
 if __name__ == "__main__":
     num_procs = 1

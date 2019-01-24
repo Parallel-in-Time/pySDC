@@ -1,6 +1,5 @@
-from pySDC.core.Hooks import hooks
-import numpy as np
 import pySDC.helpers.plot_helper as plt_helper
+from pySDC.core.Hooks import hooks
 
 
 class output(hooks):

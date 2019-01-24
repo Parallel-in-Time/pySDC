@@ -1,13 +1,12 @@
 import numpy as np
 
-from pySDC.projects.FastWaveSlowWave.HookClass_boussinesq import gmres_tolerance
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
-from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
-from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
+from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
+from pySDC.implementations.problem_classes.boussinesq_helpers.unflatten import unflatten
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.projects.FastWaveSlowWave.HookClass_boussinesq import gmres_tolerance
 
 
 def main(cwd=''):

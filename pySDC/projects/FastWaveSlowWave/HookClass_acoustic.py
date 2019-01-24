@@ -1,5 +1,6 @@
-from pySDC.core.Hooks import hooks
 import numpy as np
+
+from pySDC.core.Hooks import hooks
 
 
 class dump_energy(hooks):

@@ -1,9 +1,9 @@
-from mpi4py import MPI
 import sys
 
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.tutorial.step_6.A_run_non_MPI_controller import set_parameters_ml
 
 if __name__ == "__main__":

@@ -2,11 +2,11 @@ import pySDC.core.Methods as mp
 from ProblemClass import advection_2d_explicit
 from matplotlib import pyplot as plt
 
-from pySDC.playgrounds.deprecated.advection_2d_explicit import plot_solution
 from pySDC.core import CollocationClasses as collclass
 from pySDC.core import Log
 from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.playgrounds.deprecated.advection_2d_explicit import plot_solution
 
 if __name__ == "__main__":
 

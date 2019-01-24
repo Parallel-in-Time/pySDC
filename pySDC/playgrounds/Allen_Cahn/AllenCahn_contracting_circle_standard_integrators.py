@@ -1,7 +1,8 @@
-import numpy as np
 import time
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
 
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit

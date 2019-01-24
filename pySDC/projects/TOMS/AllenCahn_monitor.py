@@ -1,6 +1,6 @@
-from pySDC.core.Hooks import hooks
 import numpy as np
-import matplotlib.pyplot as plt
+
+from pySDC.core.Hooks import hooks
 
 
 class monitor(hooks):

@@ -1,7 +1,7 @@
-import numpy as np
-from matplotlib import rc
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import animation
+from matplotlib import rc
 
 
 def create_animation(cwd=''):

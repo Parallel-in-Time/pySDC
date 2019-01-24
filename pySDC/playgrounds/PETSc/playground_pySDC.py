@@ -1,20 +1,15 @@
 import sys
 
-from mpi4py import MPI
-import time
-from petsc4py import PETSc
-
 import numpy as np
-
-from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
+
 
 def main():
 

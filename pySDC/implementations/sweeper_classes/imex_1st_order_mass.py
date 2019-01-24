@@ -1,5 +1,3 @@
-import numpy as np
-
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 

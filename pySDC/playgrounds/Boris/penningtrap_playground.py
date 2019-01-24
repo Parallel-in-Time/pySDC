@@ -1,13 +1,11 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.implementations.datatype_classes.particles import particles, fields
-from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
+import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
+from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.playgrounds.Boris.penningtrap_HookClass import particles_output
 
 

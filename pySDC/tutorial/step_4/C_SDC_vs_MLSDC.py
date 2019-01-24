@@ -1,11 +1,9 @@
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():
@@ -55,8 +53,6 @@ def main():
     description_sdc = dict()
     description_sdc['problem_class'] = heat1d  # pass problem class
     description_sdc['problem_params'] = problem_params_sdc  # pass problem parameters
-    description_sdc['dtype_u'] = mesh  # pass data type for u
-    description_sdc['dtype_f'] = mesh  # pass data type for f
     description_sdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description_sdc['sweeper_params'] = sweeper_params_sdc  # pass sweeper parameters
     description_sdc['level_params'] = level_params  # pass level parameters
@@ -66,8 +62,6 @@ def main():
     description_mlsdc = dict()
     description_mlsdc['problem_class'] = heat1d  # pass problem class
     description_mlsdc['problem_params'] = problem_params_mlsdc  # pass problem parameters
-    description_mlsdc['dtype_u'] = mesh  # pass data type for u
-    description_mlsdc['dtype_f'] = mesh  # pass data type for f
     description_mlsdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description_mlsdc['sweeper_params'] = sweeper_params_mlsdc  # pass sweeper parameters
     description_mlsdc['level_params'] = level_params  # pass level parameters

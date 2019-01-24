@@ -10,15 +10,11 @@
 
 import sys
 
-from mpi4py import MPI
-import time
 import numpy as np
-from matplotlib import pylab
-
+from mpi4py import MPI
 
 
 def main():
-    import petsc4py
     from petsc4py import PETSc
 
     # set MPI communicator

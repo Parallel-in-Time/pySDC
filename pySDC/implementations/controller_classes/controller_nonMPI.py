@@ -1,10 +1,11 @@
-import itertools
 import copy as cp
-import numpy as np
-import dill
+import itertools
 
-from pySDC.core.Controller import controller
+import dill
+import numpy as np
+
 from pySDC.core import Step as stepclass
+from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError, CommunicationError
 
 

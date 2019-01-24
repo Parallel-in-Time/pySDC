@@ -1,5 +1,6 @@
-from pySDC.core.Sweeper import sweeper
 from mpi4py import MPI
+
+from pySDC.core.Sweeper import sweeper
 
 
 class generic_implicit_MPI(sweeper):

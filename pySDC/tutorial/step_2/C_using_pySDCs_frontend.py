@@ -1,9 +1,7 @@
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 def main():

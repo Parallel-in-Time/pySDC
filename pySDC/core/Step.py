@@ -1,9 +1,9 @@
 import logging
 
 from pySDC.core import Level as levclass
-from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.core.Errors import ParameterError
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
@@ -86,10 +86,10 @@ class step(FrozenClass):
         """
 
         if 'dtype_u' in descr:
-            raise ParameterError('Deprecated parameter dtype_u, please remove from description dictionary and specify'
+            raise ParameterError('Deprecated parameter dtype_u, please remove from description dictionary and specify '
                                  'directly in the problem class')
         if 'dtype_f' in descr:
-            raise ParameterError('Deprecated parameter dtype_f, please remove from description dictionary and specify'
+            raise ParameterError('Deprecated parameter dtype_f, please remove from description dictionary and specify '
                                  'directly in the problem class')
 
         # assert the existence of all the keys we need to set up at least on level

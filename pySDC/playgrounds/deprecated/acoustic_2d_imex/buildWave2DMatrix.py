@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from build2DFDMatrix import get2DMatrix, getBCHorizontal, getBCVertical, get2DUpwindMatrix
+from build2DFDMatrix import get2DMatrix, getBCHorizontal, get2DUpwindMatrix
 
 def getWave2DUpwindMatrix(N, dx):
 

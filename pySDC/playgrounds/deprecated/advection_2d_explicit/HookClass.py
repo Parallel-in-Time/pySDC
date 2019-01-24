@@ -1,13 +1,8 @@
-from pySDC.core.Hooks import hooks
-from pySDC.core.Stats import stats
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import pyplot as plt
+
+from pySDC.core.Hooks import hooks
+
 
 class plot_solution(hooks):
 

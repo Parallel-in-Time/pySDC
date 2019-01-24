@@ -1,7 +1,5 @@
 
 import indiesolver
-import json
-import numpy as np
 
 params = {}
 

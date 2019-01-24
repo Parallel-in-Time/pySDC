@@ -1,8 +1,9 @@
-import pySDC.helpers.plot_helper as plt_helper
-
 import os
-import numpy as np
+
 import matplotlib.colors as colors
+import numpy as np
+
+import pySDC.helpers.plot_helper as plt_helper
 
 
 def is_number(s):

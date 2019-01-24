@@ -3,9 +3,9 @@
 .. moduleauthor:: Torbjörn Klatt <t.klatt@fz-juelich.de>
 """
 
-import os
 import importlib
 import inspect
+import os
 
 
 def get_modules_in_path(base_package):

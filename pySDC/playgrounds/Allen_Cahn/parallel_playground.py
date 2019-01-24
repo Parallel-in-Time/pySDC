@@ -1,5 +1,5 @@
-from mpi4py import MPI
 import h5py
+from mpi4py import MPI
 
 rank = MPI.COMM_WORLD.rank  # The process ID (integer 0-3 for 4-process run)
 

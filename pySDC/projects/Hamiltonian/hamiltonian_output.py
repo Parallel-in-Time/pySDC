@@ -1,5 +1,4 @@
 from pySDC.core.Hooks import hooks
-import numpy as np
 
 
 class hamiltonian_output(hooks):

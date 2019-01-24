@@ -1,10 +1,5 @@
-import logging
-import scipy.sparse as sp
-import numpy as np
-
-from pySDC.core.Errors import UnlockError
-
 from pySDC.core.BaseTransfer import base_transfer
+from pySDC.core.Errors import UnlockError
 
 
 class base_transfer_mass(base_transfer):

@@ -1,12 +1,12 @@
+import logging
+import random
+
 import dolfin as df
 import numpy as np
-import random
-import logging
 
-from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
 
 
 # noinspection PyUnusedLocal

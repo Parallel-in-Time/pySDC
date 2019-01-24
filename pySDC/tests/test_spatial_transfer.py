@@ -1,10 +1,11 @@
-import numpy as np
 from collections import namedtuple
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+import numpy as np
+
 from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 # setup id for gathering the results (will sort by nvars)

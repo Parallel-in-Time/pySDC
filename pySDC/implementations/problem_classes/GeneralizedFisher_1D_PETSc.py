@@ -1,10 +1,9 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
 
 
 class Fisher_full(object):

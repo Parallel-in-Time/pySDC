@@ -9,9 +9,9 @@
 # details.
 
 import sys
+import time
 
 from mpi4py import MPI
-import time
 
 
 class Poisson2D(object):
@@ -54,7 +54,6 @@ class Poisson2D(object):
 
 
 def main():
-    import petsc4py
     from petsc4py import PETSc
 
     # set MPI communicator

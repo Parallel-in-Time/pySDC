@@ -1,7 +1,6 @@
 
-from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
-
+from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data, rhs_2comp_petsc_data
 
 

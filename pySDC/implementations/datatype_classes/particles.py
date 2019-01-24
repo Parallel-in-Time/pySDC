@@ -1,6 +1,7 @@
 
-import numpy as np
 import copy as cp
+
+import numpy as np
 
 from pySDC.core.Errors import DataError
 

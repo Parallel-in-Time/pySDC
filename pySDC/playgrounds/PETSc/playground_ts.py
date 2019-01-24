@@ -1,6 +1,8 @@
 # Solves Heat equation on a periodic domain, using raw VecScatter
-import time, pstats, io, cProfile
-import sys, petsc4py
+import petsc4py
+import sys
+import time
+
 petsc4py.init(sys.argv)
 
 from petsc4py import PETSc

@@ -1,15 +1,14 @@
 import os
+
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor import monitor
 
 

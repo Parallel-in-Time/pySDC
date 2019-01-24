@@ -1,5 +1,3 @@
-from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
-
 import dolfin as df
 
 mesh1 = df.UnitSquareMesh(2, 2)

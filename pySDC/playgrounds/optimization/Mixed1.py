@@ -1,6 +1,6 @@
 
 import indiesolver
-import json
+
 
 def evaluate(solution):
     x = solution["parameters"]

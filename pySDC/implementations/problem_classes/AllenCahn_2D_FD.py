@@ -1,12 +1,12 @@
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import cg, spsolve
+from scipy.sparse.linalg import cg
 
+from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
 
-from pySDC.core.Problem import ptype
-from pySDC.core.Errors import ParameterError, ProblemError
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 

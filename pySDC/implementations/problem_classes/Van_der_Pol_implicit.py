@@ -1,9 +1,8 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal

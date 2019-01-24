@@ -2,8 +2,6 @@ import matplotlib as mpl
 mpl.use('pgf')
 import matplotlib.pyplot as plt
 
-import numpy as np
-
 
 def figsize(textwidth, scale, ratio):
     fig_width_pt = textwidth                            # Get this from LaTeX using \the\textwidth

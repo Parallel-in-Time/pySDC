@@ -1,7 +1,7 @@
 
 import indiesolver
-import json
 import numpy as np
+
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 

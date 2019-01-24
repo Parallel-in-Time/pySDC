@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.linalg
+
 from pySDC.core.Sweeper import sweeper
 
 

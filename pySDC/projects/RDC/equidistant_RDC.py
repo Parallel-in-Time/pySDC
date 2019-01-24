@@ -1,10 +1,9 @@
 import numpy as np
-
-from pySDC.implementations.collocation_classes.equidistant import Equidistant
-from pySDC.core.Errors import CollocationError, ParameterError
-
 from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator
+
+from pySDC.core.Errors import CollocationError, ParameterError
+from pySDC.implementations.collocation_classes.equidistant import Equidistant
 
 
 class MyBarycentricInterpolator(BarycentricInterpolator):

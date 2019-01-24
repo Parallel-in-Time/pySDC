@@ -3,9 +3,9 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
 
-from pySDC.playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes import mesh
+from pySDC.playgrounds.deprecated.advection_1d_implicit.getFDMatrix import getFDMatrix
 
 
 class advection(ptype):

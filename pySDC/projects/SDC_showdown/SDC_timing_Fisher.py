@@ -1,18 +1,17 @@
-import pickle
 import os
+import pickle
+
 import numpy as np
 
+import pySDC.helpers.plot_helper as plt_helper
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc import petsc_fisher_multiimplicit, \
     petsc_fisher_fullyimplicit, petsc_fisher_semiimplicit
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-import pySDC.helpers.plot_helper as plt_helper
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 
 
 def setup_parameters():

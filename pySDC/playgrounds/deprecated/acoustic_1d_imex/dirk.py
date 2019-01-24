@@ -1,7 +1,9 @@
-import numpy as np
 import math
-import scipy.sparse.linalg as LA
+
+import numpy as np
 import scipy.sparse as sp
+import scipy.sparse.linalg as LA
+
 
 class dirk:
 

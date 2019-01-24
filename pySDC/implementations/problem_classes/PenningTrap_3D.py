@@ -2,10 +2,9 @@
 import numpy as np
 from numba import jit
 
-from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
 
 # noinspection PyUnusedLocal

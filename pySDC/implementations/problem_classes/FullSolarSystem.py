@@ -1,8 +1,7 @@
 
-from pySDC.implementations.datatype_classes.particles import particles, acceleration
-
-from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
 from pySDC.core.Errors import ParameterError
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
+from pySDC.implementations.problem_classes.OuterSolarSystem import outer_solar_system
 
 
 # noinspection PyUnusedLocal

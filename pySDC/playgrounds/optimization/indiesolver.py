@@ -1,6 +1,7 @@
+import json
 import socket
 import time
-import json
+
 
 class indiesolver:
     def initialize(self, url, port, token):

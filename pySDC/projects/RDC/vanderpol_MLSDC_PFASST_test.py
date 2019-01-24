@@ -1,13 +1,10 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-
 from pySDC.projects.RDC.equidistant_RDC import Equidistant_RDC
 
 

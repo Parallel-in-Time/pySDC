@@ -1,10 +1,10 @@
+import logging
 import os
 import sys
-import logging
 
-from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
+from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes

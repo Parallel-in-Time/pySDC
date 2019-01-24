@@ -1,6 +1,7 @@
 import numpy as np
-import scipy.sparse as sp
 import scipy.linalg as LA
+import scipy.sparse as sp
+
 
 def getFDMatrix(N, order, dx):
   if order == 1:

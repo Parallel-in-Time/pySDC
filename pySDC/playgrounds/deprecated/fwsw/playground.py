@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pySDC.core.deprecated.PFASST_stepwise as mp
 
-from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 from pySDC.implementations.problem_classes.FastWaveSlowWave_Scalar import swfw_scalar
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.core import CollocationClasses as collclass

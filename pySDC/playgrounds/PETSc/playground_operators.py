@@ -8,19 +8,11 @@
 # Also look at the petsc4py/src/PETSc/Vec.pyx file for petsc4py implementation
 # details.
 
-import sys
-
-from mpi4py import MPI
-import time
 import numpy as np
-from matplotlib import pylab
-
-import pySDC.helpers.transfer_helper as th
 
 
 def main():
 
-    import petsc4py
     from petsc4py import PETSc
 
     n_fine = 5

@@ -1,10 +1,9 @@
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
 
 
 # noinspection PyUnusedLocal

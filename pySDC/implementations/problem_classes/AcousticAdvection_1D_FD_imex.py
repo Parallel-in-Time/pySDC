@@ -1,13 +1,11 @@
 import numpy as np
 from scipy.sparse.linalg import spsolve
 
+from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-
 from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import getWave1DMatrix, \
     getWave1DAdvectionMatrix
-from pySDC.core.Problem import ptype
-
-from pySDC.core.Errors import ParameterError
 
 
 # noinspection PyUnusedLocal

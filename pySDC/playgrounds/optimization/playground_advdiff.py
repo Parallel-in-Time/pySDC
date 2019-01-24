@@ -1,16 +1,11 @@
 import numpy as np
-
-from pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT import advectiondiffusion1d_imex, advectiondiffusion1d_implicit
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.transfer_classes.TransferMesh_FFT import mesh_to_mesh_fft
-from pySDC.implementations.controller_classes.allinclusive_classic_nonMPI import allinclusive_classic_nonMPI
 from pySDC.implementations.controller_classes.allinclusive_multigrid_nonMPI import allinclusive_multigrid_nonMPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT import advectiondiffusion1d_implicit
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.transfer_classes.TransferMesh_FFT import mesh_to_mesh_fft
 from pySDC.playgrounds.fft.libpfasst_output import libpfasst_output
 
 

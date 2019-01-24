@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
+
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix import getMatrix, getUpwindMatrix, \
     getBCLeft, getBCRight
 

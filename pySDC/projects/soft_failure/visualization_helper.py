@@ -1,8 +1,11 @@
-import matplotlib
 import os
-from pySDC.helpers.stats_helper import filter_stats
+
+import matplotlib
 import numpy as np
 from matplotlib import rc
+
+from pySDC.helpers.stats_helper import filter_stats
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 

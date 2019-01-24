@@ -1,10 +1,9 @@
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.particles import particles, acceleration
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.particles import particles, acceleration
 
 
 # noinspection PyUnusedLocal

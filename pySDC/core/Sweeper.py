@@ -1,12 +1,12 @@
 import logging
+
 import numpy as np
 import scipy.linalg
 import scipy.optimize as opt
 
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
 from pySDC.helpers.pysdc_helper import FrozenClass
-from pySDC.core.Errors import ParameterError
-
 from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right

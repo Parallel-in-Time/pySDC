@@ -1,4 +1,3 @@
-import numpy as np
 from pySDC.core.Sweeper import sweeper
 
 

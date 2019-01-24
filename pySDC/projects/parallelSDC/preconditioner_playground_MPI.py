@@ -1,22 +1,20 @@
-import pySDC.helpers.plot_helper as plt_helper
-
+import os
 import pickle
 from collections import namedtuple
-import os
-import numpy as np
 
+import numpy as np
 from mpi4py import MPI
 
+import pySDC.helpers.plot_helper as plt_helper
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
-from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-
 from pySDC.projects.parallelSDC.generic_implicit_MPI import generic_implicit_MPI
+
 # from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi
 
 ID = namedtuple('ID', ['setup', 'qd_type', 'param'])

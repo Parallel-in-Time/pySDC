@@ -1,11 +1,9 @@
 import numpy as np
-
 import pyfftw
 
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 
 # noinspection PyUnusedLocal

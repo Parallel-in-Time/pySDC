@@ -1,6 +1,7 @@
-from pySDC.core.Hooks import hooks
-import progressbar
 import numpy as np
+import progressbar
+
+from pySDC.core.Hooks import hooks
 
 
 class particles_output(hooks):

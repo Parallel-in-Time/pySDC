@@ -1,10 +1,10 @@
-import numpy as np
-from datetime import datetime
 import struct
+from datetime import datetime
 
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+import numpy as np
 
 from pySDC.helpers.pysdc_helper import FrozenClass
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 
 class _fault_stats(FrozenClass):

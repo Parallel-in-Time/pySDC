@@ -1,16 +1,13 @@
-from mpi4py import MPI
 import sys
 
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-
-from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 
 def set_parameters_ml():

@@ -1,11 +1,8 @@
 
 import indiesolver
 import numpy as np
-import scipy
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
 
 
 def evaluate(solution):

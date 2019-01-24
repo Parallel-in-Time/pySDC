@@ -1,5 +1,4 @@
 from petsc4py import PETSc
-import numpy as np
 
 
 def main():

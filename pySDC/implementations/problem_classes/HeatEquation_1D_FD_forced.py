@@ -1,8 +1,7 @@
 import numpy as np
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 
 # noinspection PyUnusedLocal

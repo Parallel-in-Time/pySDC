@@ -1,18 +1,16 @@
-from collections import defaultdict
 import os
+from collections import defaultdict
+
 import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.sweeper_classes.verlet import verlet
-from pySDC.implementations.datatype_classes.particles import particles, acceleration
 from pySDC.implementations.problem_classes.FermiPastaUlamTsingou import fermi_pasta_ulam_tsingou
+from pySDC.implementations.sweeper_classes.verlet import verlet
 from pySDC.implementations.transfer_classes.TransferParticles_NoCoarse import particles_to_particles
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.projects.Hamiltonian.hamiltonian_and_energy_output import hamiltonian_and_energy_output
 
 

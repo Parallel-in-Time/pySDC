@@ -1,9 +1,8 @@
-import numpy as np
 import os
 
-import pySDC.helpers.plot_helper as plt_helper
+import numpy as np
 
-from pylab import rcParams
+import pySDC.helpers.plot_helper as plt_helper
 
 axis_font = {'fontname': 'Arial', 'size': '8', 'family': 'serif'}
 fs = 8

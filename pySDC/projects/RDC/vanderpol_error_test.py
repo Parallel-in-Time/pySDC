@@ -8,7 +8,6 @@ import numpy as np
 import pickle
 import os
 
-from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI

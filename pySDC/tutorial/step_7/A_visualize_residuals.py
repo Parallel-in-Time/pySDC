@@ -1,11 +1,9 @@
 import os
 
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-from pySDC.tutorial.step_6.A_run_non_MPI_controller import set_parameters_ml
-
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.tutorial.step_6.A_run_non_MPI_controller import set_parameters_ml
 
 
 def main():

@@ -1,10 +1,7 @@
 import numpy as np
 
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
 

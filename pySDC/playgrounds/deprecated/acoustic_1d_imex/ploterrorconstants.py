@@ -1,8 +1,9 @@
+from subprocess import call
+
 import numpy as np
 from matplotlib import pyplot as plt
-from pylab import rcParams
 from matplotlib.ticker import ScalarFormatter
-from subprocess import call
+from pylab import rcParams
 
 fs     = 8
 order  = np.array([])

@@ -1,5 +1,5 @@
-from petsc4py import PETSc
 import numpy as np
+from petsc4py import PETSc
 
 n = 4
 dx = 1.0/(n + 1)

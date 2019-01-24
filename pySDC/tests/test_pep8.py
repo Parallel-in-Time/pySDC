@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import os.path
+
 import nose.tools
 import pep8
 

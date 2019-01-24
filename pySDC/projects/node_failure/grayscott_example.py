@@ -1,13 +1,12 @@
 import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
-from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.implementations.datatype_classes.fenics_mesh import fenics_mesh
-from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott
+from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
+from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
+from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 
 
 # noinspection PyShadowingNames,PyShadowingBuiltins

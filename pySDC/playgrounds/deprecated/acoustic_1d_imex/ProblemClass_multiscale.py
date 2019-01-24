@@ -12,10 +12,10 @@ r"""
 
 import numpy as np
 import scipy.sparse.linalg as LA
-
 from buildWave1DMatrix import getWave1DMatrix, getWave1DAdvectionMatrix
-from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
+
 from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes import mesh, rhs_imex_mesh
 
 
 class acoustic_1d_imex(ptype):

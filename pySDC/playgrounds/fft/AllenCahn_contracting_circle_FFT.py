@@ -1,18 +1,16 @@
-import pySDC.helpers.plot_helper as plt_helper
-import matplotlib.ticker as ticker
+import os
 
 import dill
-import os
+import matplotlib.ticker as ticker
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+import pySDC.helpers.plot_helper as plt_helper
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
-
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
 

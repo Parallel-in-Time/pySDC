@@ -1,10 +1,9 @@
 import numpy as np
 from petsc4py import PETSc
 
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data
 
 
 # noinspection PyUnusedLocal
@@ -21,14 +20,14 @@ class heat2d_petsc_forced(ptype):
         ksp: PETSc linear solver object
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_imex_petsc_data):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
             dtype_u: PETSc data type (will be passed parent class)
-            dtype_f: PETSc data type (will be passed parent class)
+            dtype_f: PETSc data type with implicit and explicit parts (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence

@@ -2,10 +2,9 @@
 import numpy as np
 import pyfftw
 
-
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
-from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.core.Errors import TransferError
+from pySDC.core.SpaceTransfer import space_transfer
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 
 class mesh_to_mesh_fft2d(space_transfer):

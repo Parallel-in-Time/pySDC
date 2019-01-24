@@ -2,10 +2,9 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
-from pySDC.implementations.datatype_classes.mesh import mesh
-
-from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Problem import ptype
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal

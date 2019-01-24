@@ -1,7 +1,7 @@
+import matplotlib
 import numpy as np
 import scipy.linalg as LA
 
-import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pylab as plt
 from matplotlib import rc

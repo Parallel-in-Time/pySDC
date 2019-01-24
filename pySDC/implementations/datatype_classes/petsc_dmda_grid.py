@@ -1,8 +1,8 @@
 import copy
 
-from pySDC.core.Errors import DataError
-
 from petsc4py import PETSc
+
+from pySDC.core.Errors import DataError
 
 
 class petsc_data(object):
