@@ -38,6 +38,9 @@ class generalized_fisher(ptype):
         if (problem_params['nvars'] + 1) % 2 != 0:
             raise ProblemError('setup requires nvars = 2^p - 1')
 
+        if 'stop_at_nan' not in problem_params:
+            problem_params['stop_at_nan'] = True
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(generalized_fisher, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
@@ -118,8 +121,13 @@ class generalized_fisher(ptype):
             # increase iteration count
             n += 1
 
+        if np.isnan(res) and self.params.stop_at_nan:
+            raise ProblemError('Newton got nan after %i iterations, aborting...' % n)
+        elif np.isnan(res):
+            self.logger.warning('Newton got nan after %i iterations...' % n)
+
         if n == self.params.newton_maxiter:
-            raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
+            self.logger.warning('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u
 
