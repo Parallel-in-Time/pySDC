@@ -85,8 +85,11 @@ class step(FrozenClass):
             descr (dict): dictionary containing the description of the levels as list per key
         """
 
+        assert 'dtype_u' not in descr
+        assert 'dtype_f' not in descr
+
         # assert the existence of all the keys we need to set up at least on level
-        essential_keys = ['problem_class', 'dtype_u', 'dtype_f', 'sweeper_class', 'sweeper_params', 'level_params']
+        essential_keys = ['problem_class', 'sweeper_class', 'sweeper_params', 'level_params']
         for key in essential_keys:
             if key not in descr:
                 msg = 'need %s to instantiate step, only got %s' % (key, str(descr.keys()))
@@ -131,8 +134,6 @@ class step(FrozenClass):
 
             L = levclass.level(problem_class=descr_list[l]['problem_class'],
                                problem_params=descr_list[l]['problem_params'],
-                               dtype_u=descr_list[l]['dtype_u'],
-                               dtype_f=descr_list[l]['dtype_f'],
                                sweeper_class=descr_list[l]['sweeper_class'],
                                sweeper_params=descr_list[l]['sweeper_params'],
                                level_params=descr_list[l]['level_params'],

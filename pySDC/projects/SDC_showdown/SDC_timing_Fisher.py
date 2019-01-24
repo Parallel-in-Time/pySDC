@@ -4,7 +4,6 @@ import numpy as np
 
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc import petsc_fisher_multiimplicit, \
     petsc_fisher_fullyimplicit, petsc_fisher_semiimplicit
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -69,8 +68,6 @@ def setup_parameters():
     description = dict()
     description['problem_class'] = None  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = petsc_data  # pass data type for u
-    description['dtype_f'] = None  # pass data type for f
     description['sweeper_class'] = None  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -100,15 +97,12 @@ def run_SDC_variant(variant=None, inexact=False):
     # add stuff based on variant
     if variant == 'fully-implicit':
         description['problem_class'] = petsc_fisher_fullyimplicit
-        description['dtype_f'] = petsc_data
         description['sweeper_class'] = generic_implicit
     elif variant == 'semi-implicit':
         description['problem_class'] = petsc_fisher_semiimplicit
-        description['dtype_f'] = rhs_imex_petsc_data
         description['sweeper_class'] = imex_1st_order
     elif variant == 'multi-implicit':
         description['problem_class'] = petsc_fisher_multiimplicit
-        description['dtype_f'] = rhs_2comp_petsc_data
         description['sweeper_class'] = multi_implicit
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)
@@ -209,7 +203,7 @@ def show_results(fname):
     return None
 
 
-def main():
+def main(cwd=''):
     """
     Main driver
 
@@ -225,7 +219,7 @@ def main():
         results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
-    fname = 'data/timings_SDC_variants_Fisher'
+    fname = cwd + 'data/timings_SDC_variants_Fisher'
     file = open(fname + '.pkl', 'wb')
     pickle.dump(results, file)
     file.close()

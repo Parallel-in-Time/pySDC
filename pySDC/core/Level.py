@@ -44,16 +44,13 @@ class level(FrozenClass):
         tau (list of dtype_u): FAS correction, allocated via step class if necessary
     """
 
-    def __init__(self, problem_class, problem_params, dtype_u, dtype_f, sweeper_class, sweeper_params,
-                 level_params, level_index):
+    def __init__(self, problem_class, problem_params, sweeper_class, sweeper_params, level_params, level_index):
         """
         Initialization routine
 
         Args:
             problem_class: problem class
             problem_params (dict): parameters for the problem to be initialized
-            dtype_u: data type of the dofs
-            dtype_f: data type of the RHS
             sweeper_class: sweeper class
             sweeper_params (dict): parameters for the sweeper (contains collocation)
             level_params (dict): parameters given by the user, will be added as attributes
@@ -62,7 +59,7 @@ class level(FrozenClass):
 
         # instantiate sweeper, problem and hooks
         self.__sweep = sweeper_class(sweeper_params)
-        self.__prob = problem_class(problem_params, dtype_u, dtype_f)
+        self.__prob = problem_class(problem_params)
 
         # set level parameters and status
         self.params = _Pars(level_params)
