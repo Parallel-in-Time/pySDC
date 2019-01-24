@@ -1,23 +1,23 @@
 
 import numpy as np
 
-from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, fields, acceleration
 
+from pySDC.core.Problem import ptype
 
 class planewave_single(ptype):
     """
     Example implementing a single particle spiraling in a trap
     """
 
-    def __init__(self, cparams, dtype_u, dtype_f):
+    def __init__(self, cparams, dtype_u=particles, dtype_f=fields):
         """
         Initialization routine
 
         Args:
             cparams: custom parameters for the example
             dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_f: fields data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -45,7 +45,7 @@ class planewave_single(ptype):
             E and B field for the particle (external only)
         """
 
-        f = fields((3, self.nparts))
+        f = self.dtype_f((3, self.nparts))
 
         R = np.linalg.norm(part.pos.values[:, 0], 2)
         f.elec.values[0, 0] = self.params.a0 / (R ** 3) * part.pos.values[0, 0]
@@ -68,7 +68,7 @@ class planewave_single(ptype):
 
         u0 = self.params.u0
         # some abbreviations
-        u = particles((3, 1))
+        u = self.dtype_u((3, 1))
 
         u.pos.values[0, 0] = u0[0][0]
         u.pos.values[1, 0] = u0[0][1]

@@ -74,8 +74,6 @@ def run_diffusion(nsweeps):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heat1d  # pass problem class
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -184,8 +182,6 @@ def run_advection(nsweeps):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = advection1d  # pass problem class
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

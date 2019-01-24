@@ -40,8 +40,6 @@ if __name__ == "__main__":
     description = {}
     description['problem_class'] = advection
     description['problem_params'] = pparams
-    description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = 5
     description['sweeper_class'] = generic_LU

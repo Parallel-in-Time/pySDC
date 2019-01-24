@@ -64,8 +64,6 @@ def setup_parameters():
     description = dict()
     description['problem_class'] = allencahn_fullyimplicit  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -122,8 +120,6 @@ def setup_parameters_FFT():
     description = dict()
     description['problem_class'] = allencahn2d_imex  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = rhs_imex_mesh  # pass data type for f
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

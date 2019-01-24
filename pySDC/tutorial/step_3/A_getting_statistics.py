@@ -80,8 +80,6 @@ def run_simulation():
     description = dict()
     description['problem_class'] = heat1d_forced
     description['problem_params'] = problem_params
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

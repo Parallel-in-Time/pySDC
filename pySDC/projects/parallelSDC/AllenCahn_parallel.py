@@ -66,8 +66,6 @@ def run_variant(variant=None):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = allencahn_fullyimplicit
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
 

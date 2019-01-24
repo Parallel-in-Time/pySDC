@@ -47,8 +47,6 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_vortex_2d
     description['problem_params'] = problem_params
-    description['dtype_u'] = fenics_mesh
-    description['dtype_f'] = rhs_fenics_mesh
     description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

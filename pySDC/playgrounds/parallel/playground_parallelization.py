@@ -58,8 +58,6 @@ def set_parameters_ml():
     description = dict()
     description['problem_class'] = heat2d_periodic  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

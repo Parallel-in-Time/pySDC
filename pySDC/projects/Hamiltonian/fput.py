@@ -56,8 +56,6 @@ def setup_fput():
     description = dict()
     description['problem_class'] = fermi_pasta_ulam_tsingou
     description['problem_params'] = problem_params
-    description['dtype_u'] = particles
-    description['dtype_f'] = acceleration
     description['sweeper_class'] = verlet
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

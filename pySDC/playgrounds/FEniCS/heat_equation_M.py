@@ -47,8 +47,6 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_heat_mass
     description['problem_params'] = problem_params
-    description['dtype_u'] = fenics_mesh
-    description['dtype_f'] = rhs_fenics_mesh
     description['sweeper_class'] = imex_1st_order_mass
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

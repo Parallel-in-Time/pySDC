@@ -51,8 +51,6 @@ def main():
     description = dict()
     description['problem_class'] = advection1d  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters

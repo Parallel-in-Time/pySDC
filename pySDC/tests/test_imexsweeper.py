@@ -46,8 +46,6 @@ class TestImexSweeper(unittest.TestCase):
     self.description = {}
     self.description['problem_class'] = swfw_scalar
     self.description['problem_params'] = self.pparams
-    self.description['dtype_u'] = mesh
-    self.description['dtype_f'] = rhs_imex_mesh
     self.description['sweeper_class'] = imex
     self.description['level_params'] = lparams
 

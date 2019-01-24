@@ -55,9 +55,6 @@ def main():
     # description['problem_class'] = advectiondiffusion1d_imex # pass problem class
     description['problem_class'] = advectiondiffusion1d_implicit # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    # description['dtype_f'] = rhs_imex_mesh # pass data type for f
-    description['dtype_f'] = mesh # pass data type for f
     # description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters

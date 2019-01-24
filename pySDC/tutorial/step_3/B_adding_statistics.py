@@ -72,8 +72,6 @@ def run_penning_trap_simulation():
     description = dict()
     description['problem_class'] = penningtrap
     description['problem_params'] = problem_params
-    description['dtype_u'] = particles
-    description['dtype_f'] = fields
     description['sweeper_class'] = boris_2nd_order
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

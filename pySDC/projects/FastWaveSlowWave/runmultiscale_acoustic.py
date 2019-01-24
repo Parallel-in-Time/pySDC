@@ -59,8 +59,6 @@ def compute_and_plot_solutions():
     description = dict()
     description['problem_class'] = acoustic_1d_imex_multiscale
     description['problem_params'] = problem_params
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params
     description['step_params'] = step_params

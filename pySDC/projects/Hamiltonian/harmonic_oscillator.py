@@ -51,8 +51,6 @@ def run_simulation():
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     description['problem_class'] = harmonic_oscillator
-    description['dtype_u'] = particles
-    description['dtype_f'] = acceleration
     description['sweeper_class'] = verlet
     description['level_params'] = level_params
     description['step_params'] = step_params

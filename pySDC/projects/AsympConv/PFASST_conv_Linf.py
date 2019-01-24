@@ -76,8 +76,6 @@ def run_diffusion(QI):
     description = dict()
     description['problem_class'] = heat1d  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['step_params'] = step_params  # pass step parameters
@@ -183,8 +181,6 @@ def run_advection(QI):
     description = dict()
     description['problem_class'] = advection1d  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['step_params'] = step_params  # pass step parameters

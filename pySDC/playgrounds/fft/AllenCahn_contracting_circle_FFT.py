@@ -65,8 +65,6 @@ def setup_parameters():
     description = dict()
     description['problem_class'] = None  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = None  # pass data type for f
     description['sweeper_class'] = None  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -95,7 +93,6 @@ def run_SDC_variant(variant=None, inexact=False):
     # add stuff based on variant
     if variant == 'semi-implicit':
         description['problem_class'] = allencahn2d_imex
-        description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)

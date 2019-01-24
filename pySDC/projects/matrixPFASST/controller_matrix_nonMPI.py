@@ -25,10 +25,6 @@ class controller_matrix_nonMPI(controller_nonMPI):
            description: all the parameters to set up the rest (levels, problems, transfer, ...)
        """
 
-        assert description['dtype_u'] is mesh or cmesh, \
-            'ERROR: matrix version will only work with mesh data type for u, got %s' % description['dtype_u']
-        assert description['dtype_f'] is mesh or cmesh, \
-            'ERROR: matrix version will only work with mesh data type for f, got %s' % description['dtype_f']
         assert description['sweeper_class'] is generic_implicit, \
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
 

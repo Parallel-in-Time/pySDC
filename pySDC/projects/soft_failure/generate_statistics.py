@@ -55,8 +55,6 @@ def diffusion_setup():
     description = dict()
     description['problem_class'] = heat1d  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = implicit_sweeper_faults  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -105,8 +103,6 @@ def reaction_setup():
     description = dict()
     description['problem_class'] = generalized_fisher  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = implicit_sweeper_faults  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -152,8 +148,6 @@ def vanderpol_setup():
     description = dict()
     description['problem_class'] = vanderpol
     description['problem_params'] = problem_params
-    description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
     description['sweeper_class'] = implicit_sweeper_faults
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

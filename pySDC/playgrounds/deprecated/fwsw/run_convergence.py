@@ -36,8 +36,6 @@ if __name__ == "__main__":
     description = {}
     description['problem_class'] = swfw_scalar
     description['problem_params'] = pparams
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
     description['collocation_class'] = collclass.CollGaussLegendre
     description['num_nodes'] = [3]
     description['do_LU'] = False

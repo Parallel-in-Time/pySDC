@@ -73,8 +73,6 @@ def setup_parameters():
     description = dict()
     description['problem_class'] = None  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = None  # pass data type for f
     description['sweeper_class'] = None  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -101,32 +99,27 @@ def run_SDC_variant(variant=None, inexact=False):
     # add stuff based on variant
     if variant == 'fully-implicit':
         description['problem_class'] = allencahn_fullyimplicit
-        description['dtype_f'] = mesh
         description['sweeper_class'] = generic_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
     elif variant == 'semi-implicit':
         description['problem_class'] = allencahn_semiimplicit
-        description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['lin_maxiter'] = 10
     elif variant == 'semi-implicit_v2':
         description['problem_class'] = allencahn_semiimplicit_v2
-        description['dtype_f'] = rhs_imex_mesh
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
     elif variant == 'multi-implicit':
         description['problem_class'] = allencahn_multiimplicit
-        description['dtype_f'] = rhs_comp2_mesh
         description['sweeper_class'] = multi_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
             description['problem_params']['lin_maxiter'] = 10
     elif variant == 'multi-implicit_v2':
         description['problem_class'] = allencahn_multiimplicit_v2
-        description['dtype_f'] = rhs_comp2_mesh
         description['sweeper_class'] = multi_implicit
         if inexact:
             description['problem_params']['newton_maxiter'] = 1

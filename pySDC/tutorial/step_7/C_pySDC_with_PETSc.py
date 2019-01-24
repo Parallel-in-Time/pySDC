@@ -79,8 +79,6 @@ def main():
     description = dict()
     description['problem_class'] = heat2d_petsc_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = petsc_data  # pass PETSc data type for u
-    description['dtype_f'] = rhs_imex_petsc_data  # pass PETSc data type for f
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

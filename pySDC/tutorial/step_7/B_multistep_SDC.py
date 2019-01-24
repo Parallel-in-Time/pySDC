@@ -47,8 +47,6 @@ def main():
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heat1d  # pass problem class
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = mesh  # pass data type for f
     description['sweeper_class'] = generic_LU  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

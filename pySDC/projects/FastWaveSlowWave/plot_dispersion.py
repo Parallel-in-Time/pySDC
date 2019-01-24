@@ -56,8 +56,6 @@ def compute_and_plot_dispersion():
     description = dict()
     description['problem_class'] = swfw_scalar  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['dtype_u'] = mesh  # pass data type for u
-    description['dtype_f'] = rhs_imex_mesh  # pass data type for f
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

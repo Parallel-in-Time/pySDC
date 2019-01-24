@@ -55,8 +55,6 @@ def compute_and_plot_itererror():
     # Fill description dictionary for easy hierarchy creation
     description = dict()
     description['problem_class'] = acoustic_1d_imex
-    description['dtype_u'] = mesh
-    description['dtype_f'] = rhs_imex_mesh
     description['sweeper_class'] = imex_1st_order
     description['step_params'] = step_params
     description['level_params'] = level_params

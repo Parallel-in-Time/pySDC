@@ -14,14 +14,14 @@ class penningtrap(ptype):
     Example implementing particles in a penning trap
     """
 
-    def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
+    def __init__(self, problem_params, dtype_u=particles, dtype_f=fields):
         """
         Initialization routine
 
         Args:
             problem_params (dict): custom parameters for the example
             dtype_u: particle data type (will be passed parent class)
-            dtype_f: acceleration data type (will be passed parent class)
+            dtype_f: fields data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -86,7 +86,7 @@ class penningtrap(ptype):
         N = self.params.nparts
 
         Emat = np.diag([1, 1, -2])
-        f = fields((3, self.params.nparts))
+        f = self.dtype_f((3, self.params.nparts))
 
         f.elec.values = self.get_interactions(part)
 
@@ -222,7 +222,7 @@ class penningtrap(ptype):
 
         N = self.params.nparts
 
-        rhs = self.dtype_f((3, self.params.nparts))
+        rhs = acceleration((3, self.params.nparts))
 
         for n in range(N):
             rhs.values[:, n] = part.q[n] / part.m[n] * (f.elec.values[:, n] +

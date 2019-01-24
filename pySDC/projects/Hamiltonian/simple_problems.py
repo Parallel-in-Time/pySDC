@@ -56,8 +56,6 @@ def setup_harmonic():
     description = dict()
     description['problem_class'] = harmonic_oscillator
     description['problem_params'] = problem_params
-    description['dtype_u'] = particles
-    description['dtype_f'] = acceleration
     description['sweeper_class'] = verlet
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
@@ -103,8 +101,6 @@ def setup_henonheiles():
     description = dict()
     description['problem_class'] = henon_heiles
     description['problem_params'] = problem_params
-    description['dtype_u'] = particles
-    description['dtype_f'] = acceleration
     description['sweeper_class'] = verlet
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params

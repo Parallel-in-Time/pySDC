@@ -51,8 +51,6 @@ def main():
     description = dict()
     description['problem_class'] = generalized_fisher_jac
     description['problem_params'] = problem_params
-    description['dtype_u'] = mesh
-    description['dtype_f'] = mesh
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params

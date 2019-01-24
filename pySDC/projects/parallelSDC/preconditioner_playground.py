@@ -67,8 +67,6 @@ def main():
 
                 # fill description for the controller
                 description = dict()
-                description['dtype_u'] = mesh
-                description['dtype_f'] = mesh
                 description['sweeper_class'] = generic_implicit  # pass sweeper
                 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
                 description['step_params'] = step_params  # pass step parameters
