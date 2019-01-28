@@ -38,12 +38,13 @@ class monitor(hooks):
 
         self.init_radius = L.prob.params.radius
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='computed_radius', value=radius)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='interface_width', value=interface_width)
+        if L.time == 0.0:
+            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
+                              sweep=L.status.sweep, type='computed_radius', value=radius)
+            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
+                              sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
+            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
+                              sweep=L.status.sweep, type='interface_width', value=interface_width)
 
     def post_step(self, step, level_number):
         """

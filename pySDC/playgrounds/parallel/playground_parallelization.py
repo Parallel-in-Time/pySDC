@@ -80,13 +80,7 @@ if __name__ == "__main__":
     # get parameters from Part A
     description, controller_params, t0, Tend = set_parameters_ml()
 
-    # instantiate controllers
-    if len(sys.argv) >= 2 and sys.argv[1] == '1':
-            controller = controller_MPI(controller_params=controller_params, description=description,
-                                                  comm=comm)
-    else:
-        controller = controller_MPI(controller_params=controller_params, description=description,
-                                                comm=comm)
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
     # get initial values on finest level
     P = controller.S.levels[0].prob
     uinit = P.u_exact(t0)

@@ -8,7 +8,7 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
@@ -32,7 +32,7 @@ def setup_parameters():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [2, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -46,13 +46,13 @@ def setup_parameters():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128), (32, 32)]
-    problem_params['eps'] = [0.04, 0.04]
+    problem_params['nvars'] = [(256, 256), (64, 64)]
+    problem_params['eps'] = [0.04, 0.16]
     problem_params['radius'] = 0.25
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 50
 
     # initialize controller parameters
     controller_params = dict()
@@ -72,13 +72,12 @@ def setup_parameters():
     return description, controller_params
 
 
-def run_SDC_variant(variant=None, inexact=False):
+def run_SDC_variant(variant=None):
     """
     Routine to run particular SDC variant
 
     Args:
         variant (str): string describing the variant
-        inexact (bool): flag to use inexact nonlinear solve (or nor)
 
     Returns:
         timing (float)
@@ -92,6 +91,9 @@ def run_SDC_variant(variant=None, inexact=False):
     if variant == 'semi-implicit':
         description['problem_class'] = allencahn2d_imex
         description['sweeper_class'] = imex_1st_order
+    elif variant == 'semi-implicit-stab':
+        description['problem_class'] = allencahn2d_imex_stab
+        description['sweeper_class'] = imex_1st_order
     else:
         raise NotImplemented('Wrong variant specified, got %s' % variant)
 
@@ -100,8 +102,7 @@ def run_SDC_variant(variant=None, inexact=False):
     Tend = 0.032
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=8, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=8, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -207,13 +208,13 @@ def show_results(fname, cwd=''):
 
         xcoords = [item0[0] for item0 in computed_radii]
         radii = [item0[1] for item0 in computed_radii]
-        if key[0] + ' ' + key[1] == 'semi-implicit exact':
+        if key[0] + ' ' + key[1] == 'semi-implicit-stab exact':
             ax.plot(xcoords, radii, label=(key[0] + ' ' + key[1]).replace('_v2', ' mod.'))
 
         exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
 
-        diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
-        max_pos = int(np.argmax(diff))
+        # diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
+        # max_pos = int(np.argmax(diff))
         # assert max(diff) < 0.07, 'ERROR: computed radius is too far away from exact radius, got %s' % max(diff)
         # assert 0.028 < computed_radii[max_pos][0] < 0.03, \
         #     'ERROR: largest difference is at wrong time, got %s' % computed_radii[max_pos][0]
@@ -278,9 +279,9 @@ def main(cwd=''):
 
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['semi-implicit']:
+    for variant in ['semi-implicit-stab']:
 
-        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+        results[(variant, 'exact')] = run_SDC_variant(variant=variant)
 
     # dump result
     fname = 'data/results_SDC_variants_AllenCahn_1E-03'
