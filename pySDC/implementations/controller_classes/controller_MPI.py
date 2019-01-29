@@ -77,6 +77,10 @@ class controller_MPI(controller):
         all_time = [t0 + sum(all_dt[0:i]) for i in range(num_procs)]
         time = all_time[rank]
         all_active = all_time < Tend - 10 * np.finfo(float).eps
+
+        if not any(all_active):
+            raise ControllerError('Nothing to do, check t0, dt and Tend')
+
         active = all_active[rank]
         if not all(all_active):
             comm_active = self.comm.Split(active)

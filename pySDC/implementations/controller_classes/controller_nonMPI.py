@@ -101,6 +101,9 @@ class controller_nonMPI(controller):
         # determine which steps are still active (time < Tend)
         active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
 
+        if not any(active):
+            raise ControllerError('Nothing to do, check t0, dt and Tend.')
+
         # compress slots according to active steps, i.e. remove all steps which have times above Tend
         active_slots = list(itertools.compress(slots, active))
 

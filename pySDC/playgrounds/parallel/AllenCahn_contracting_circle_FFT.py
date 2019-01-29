@@ -97,7 +97,7 @@ def run_SDC_variant(variant=None):
         raise NotImplemented('Wrong variant specified, got %s' % variant)
 
     # setup parameters "in time"
-    t0 = 0
+    t0 = 0.0
     Tend = 0.032
 
     # set MPI communicator
@@ -141,29 +141,20 @@ def run_SDC_variant(variant=None):
 
     rank = comm.Get_rank()
 
+    # filter statistics by variant (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
+
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+
+    # compute and print statistics
+    niters = np.array([item[1] for item in iter_counts])
+    print(f'Mean number of iterations on rank {rank}: {np.mean(niters):.4f}')
+
     if rank == 0:
-
-        # filter statistics by variant (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
-
-        # compute and print statistics
-        niters = np.array([item[1] for item in iter_counts])
-        out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-        print(out)
-        out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-        print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
-        print(out)
-        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-        print(out)
-
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-        print('Time to solution: %6.4f sec.' % timing[0][1])
+        print(f'---> Time to solution: {timing[0][1]:.4f} sec.')
         print()
 
     return stats
