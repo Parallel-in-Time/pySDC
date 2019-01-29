@@ -359,9 +359,11 @@ class controller_nonMPI(controller):
 
         self.logger.debug(stage)
 
+        MS_active = [S for S in MS if S.status.stage is not 'DONE']
+
         if stage == 'SPREAD':
             # (potentially) serial spreading phase
-            for S in MS:
+            for S in MS_active:
 
                 # first stage: spread values
                 self.hooks.pre_step(step=S, level_number=0)
@@ -380,15 +382,15 @@ class controller_nonMPI(controller):
         elif stage == 'PREDICT':
             # call predictor (serial)
 
-            for S in MS:
+            for S in MS_active:
                 self.hooks.pre_predict(step=S, level_number=0)
 
             MS = self.predictor(MS)
 
-            for S in MS:
+            for S in MS_active:
                 self.hooks.post_predict(step=S, level_number=0)
 
-            for S in MS:
+            for S in MS_active:
                 # update stage
                 S.status.stage = 'IT_CHECK'
 
@@ -398,7 +400,7 @@ class controller_nonMPI(controller):
 
             # check whether to stop iterating (parallel)
 
-            for S in MS:
+            for S in MS_active:
 
                 # send updated values forward
                 self.hooks.pre_comm(step=S, level_number=0)
@@ -420,7 +422,7 @@ class controller_nonMPI(controller):
                 if S.status.iter > 0:
                     self.hooks.post_iteration(step=S, level_number=0)
 
-            for S in MS:
+            for S in MS_active:
                 if not S.status.first:
                     self.hooks.pre_comm(step=S, level_number=0)
                     S.status.prev_done = S.prev.status.done  # "communicate"
@@ -453,15 +455,15 @@ class controller_nonMPI(controller):
         elif stage == 'IT_FINE':
             # do fine sweep for all steps (virtually parallel)
 
-            for S in MS:
+            for S in MS_active:
                 S.levels[0].status.sweep = 0
 
             for k in range(self.nsweeps[0]):
 
-                for S in MS:
+                for S in MS_active:
                     S.levels[0].status.sweep += 1
 
-                for S in MS:
+                for S in MS_active:
                     # send updated values forward
                     self.hooks.pre_comm(step=S, level_number=0)
                     if self.params.fine_comm and not S.status.last:
@@ -476,14 +478,14 @@ class controller_nonMPI(controller):
                         self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
                     self.hooks.post_comm(step=S, level_number=0, add_to_stats=(k == self.nsweeps[0] - 1))
 
-                for S in MS:
+                for S in MS_active:
                     # standard sweep workflow: update nodes, compute residual, log progress
                     self.hooks.pre_sweep(step=S, level_number=0)
                     S.levels[0].sweep.update_nodes()
                     S.levels[0].sweep.compute_residual()
                     self.hooks.post_sweep(step=S, level_number=0)
 
-            for S in MS:
+            for S in MS_active:
                 # update stage
                 S.status.stage = 'IT_CHECK'
 
@@ -492,7 +494,7 @@ class controller_nonMPI(controller):
         elif stage == 'IT_UP':
             # go up the hierarchy from finest to coarsest level (parallel)
 
-            for S in MS:
+            for S in MS_active:
 
                 S.transfer(source=S.levels[0], target=S.levels[1])
 
@@ -502,7 +504,7 @@ class controller_nonMPI(controller):
 
                 for k in range(self.nsweeps[l]):
 
-                    for S in MS:
+                    for S in MS_active:
 
                         # send updated values forward
                         self.hooks.pre_comm(step=S, level_number=l)
@@ -518,18 +520,18 @@ class controller_nonMPI(controller):
                             self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
                         self.hooks.post_comm(step=S, level_number=l)
 
-                    for S in MS:
+                    for S in MS_active:
 
                         self.hooks.pre_sweep(step=S, level_number=l)
                         S.levels[l].sweep.update_nodes()
                         S.levels[l].sweep.compute_residual()
                         self.hooks.post_sweep(step=S, level_number=l)
 
-                for S in MS:
+                for S in MS_active:
                     # transfer further up the hierarchy
                     S.transfer(source=S.levels[l], target=S.levels[l + 1])
 
-            for S in MS:
+            for S in MS_active:
                 # update stage
                 S.status.stage = 'IT_COARSE'
 
@@ -538,7 +540,7 @@ class controller_nonMPI(controller):
         elif stage == 'IT_COARSE':
             # sweeps on coarsest level (serial/blocking)
 
-            for S in MS:
+            for S in MS_active:
 
                 # receive from previous step (if not first)
                 self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
@@ -575,7 +577,7 @@ class controller_nonMPI(controller):
 
             for l in range(self.nlevels - 1, 0, -1):
 
-                for S in MS:
+                for S in MS_active:
                     # prolong values
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
@@ -584,7 +586,7 @@ class controller_nonMPI(controller):
 
                     for k in range(self.nsweeps[l - 1]):
 
-                        for S in MS:
+                        for S in MS_active:
 
                             # send updated values forward
                             self.hooks.pre_comm(step=S, level_number=l - 1)
@@ -602,14 +604,14 @@ class controller_nonMPI(controller):
                             self.hooks.post_comm(step=S, level_number=l - 1,
                                                  add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
-                        for S in MS:
+                        for S in MS_active:
 
                             self.hooks.pre_sweep(step=S, level_number=l - 1)
                             S.levels[l - 1].sweep.update_nodes()
                             S.levels[l - 1].sweep.compute_residual()
                             self.hooks.post_sweep(step=S, level_number=l - 1)
 
-            for S in MS:
+            for S in MS_active:
                 # update stage
                 S.status.stage = 'IT_FINE'
 

@@ -1,11 +1,13 @@
 import numpy as np
+import sys
 
 from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
+# from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
+from pySDC.implementations.problem_classes.AllenCahn_2D_parFFT import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
@@ -29,7 +31,7 @@ def setup_parameters():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [3, 1]
+    level_params['nsweeps'] = [1]#, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -43,8 +45,8 @@ def setup_parameters():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(256, 256), (64, 64)]
-    problem_params['eps'] = [0.04, 0.16]
+    problem_params['nvars'] = [(256, 256)]#, (64, 64)]
+    problem_params['eps'] = [0.04]#, 0.16]
     problem_params['radius'] = 0.25
 
     # initialize step parameters
@@ -53,7 +55,7 @@ def setup_parameters():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
     controller_params['hook_class'] = monitor
 
     # fill description dictionary for easy step instantiation
@@ -101,8 +103,34 @@ def run_SDC_variant(variant=None):
     # set MPI communicator
     comm = MPI.COMM_WORLD
 
+    world_rank = comm.Get_rank()
+    world_size = comm.Get_size()
+
+    # split world communicator to create space-communicators
+    if len(sys.argv) >= 2:
+        color = int(world_rank / int(sys.argv[1]))
+    else:
+        color = int(world_rank / 1)
+    space_comm = comm.Split(color=color)
+    space_size = space_comm.Get_size()
+    space_rank = space_comm.Get_rank()
+
+    # split world communicator to create time-communicators
+    if len(sys.argv) >= 2:
+        color = int(world_rank % int(sys.argv[1]))
+    else:
+        color = int(world_rank / world_size)
+    time_comm = comm.Split(color=color)
+    time_size = time_comm.Get_size()
+    time_rank = time_comm.Get_rank()
+
+    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
+                                                                        time_rank, time_size))
+
+    description['problem_params']['comm'] = space_comm
+
     # instantiate controller
-    controller = controller_MPI(controller_params=controller_params, description=description, comm=comm)
+    controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob
@@ -151,7 +179,7 @@ def main(cwd=''):
 
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['semi-implicit-stab']:
+    for variant in ['semi-implicit']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant)
 

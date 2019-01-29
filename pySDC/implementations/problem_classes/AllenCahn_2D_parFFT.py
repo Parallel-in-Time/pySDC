@@ -1,5 +1,7 @@
 import numpy as np
-import pyfftw
+
+from mpi4py import MPI
+from mpiFFT4py.line import R2C
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -33,8 +35,10 @@ class allencahn2d_imex(ptype):
             problem_params['L'] = 1.0
         if 'init_type' not in problem_params:
             problem_params['init_type'] = 'circle'
+        if 'comm' not in problem_params:
+            problem_params['comm'] = MPI.COMM_WORLD
 
-        # these parameters will be used later, so assert their existence
+            # these parameters will be used later, so assert their existence
         essential_keys = ['nvars', 'nu', 'eps', 'L', 'radius']
         for key in essential_keys:
             if key not in problem_params:
@@ -49,33 +53,36 @@ class allencahn2d_imex(ptype):
         if problem_params['nvars'][0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
+        self.FFT = R2C(np.asarray(problem_params['nvars']), np.asarray((1, 1)), problem_params['comm'], "double")
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn2d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
+        super(allencahn2d_imex, self).__init__(init=self.FFT.real_shape(), dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
         self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
-        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
+        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.init[0])])
+        self.yvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.init[1])])
 
-        kx = np.zeros(self.init[0])
-        ky = np.zeros(self.init[1] // 2 + 1)
-        for i in range(0, int(self.init[0] / 2) + 1):
+        cinit = self.FFT.complex_shape()
+
+        kx = np.zeros(cinit[0])
+        ky = np.zeros(cinit[1])
+        for i in range(0, int(cinit[0] / 2) + 1):
             kx[i] = 2 * np.pi / self.params.L * i
-        for i in range(0, int(self.init[1] // 2) + 1):
+        for i in range(0, cinit[1]):
             ky[i] = 2 * np.pi / self.params.L * i
-        for i in range(int(self.init[0] / 2) + 1, self.init[0]):
-            kx[i] = 2 * np.pi / self.params.L * (-self.init[0] + i)
+        for i in range(int(cinit[0] / 2) + 1, cinit[0]):
+            kx[i] = 2 * np.pi / self.params.L * (-cinit[0] + i)
 
-        self.lap = np.zeros((self.init[0], self.init[1] // 2 + 1))
-        for i in range(self.init[0]):
-            for j in range(self.init[1] // 2 + 1):
+        self.lap = np.zeros((cinit[0], cinit[1]))
+        for i in range(cinit[0]):
+            for j in range(cinit[1]):
                 self.lap[i, j] = -kx[i] ** 2 - ky[j] ** 2
 
-        rfft_in = pyfftw.empty_aligned(self.init, dtype='float64')
-        fft_out = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
-        ifft_in = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
-        irfft_out = pyfftw.empty_aligned(self.init, dtype='float64')
-        self.rfft_object = pyfftw.FFTW(rfft_in, fft_out, direction='FFTW_FORWARD', axes=(0, 1))
-        self.irfft_object = pyfftw.FFTW(ifft_in, irfft_out, direction='FFTW_BACKWARD', axes=(0, 1))
+        print(self.init, cinit)
+
+        # self.U = np.zeros(self.FFT.real_shape(), dtype=self.FFT.real)
+        self.U_hat = np.zeros(self.FFT.complex_shape(), dtype=self.FFT.complex)
 
     def eval_f(self, u, t):
         """
@@ -91,11 +98,14 @@ class allencahn2d_imex(ptype):
 
         f = self.dtype_f(self.init)
         v = u.values.flatten()
-        tmp = self.lap * self.rfft_object(u.values)
-        f.impl.values[:] = self.irfft_object(tmp)
+
+        self.FFT.fft2(u.values, self.U_hat)
+        tmp = self.lap * self.U_hat
+        self.FFT.ifft2(tmp, f.impl.values[:])
+
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
-            f.expl.values = f.expl.values.reshape(self.params.nvars)
+            f.expl.values = f.expl.values.reshape(self.init)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -113,9 +123,9 @@ class allencahn2d_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-
-        tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = self.irfft_object(tmp)
+        self.FFT.fft2(rhs.values, self.U_hat)
+        tmp = self.U_hat / (1.0 - factor * self.lap)
+        self.FFT.ifft2(tmp, me.values[:])
 
         return me
 
@@ -133,9 +143,9 @@ class allencahn2d_imex(ptype):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            for i in range(self.params.nvars[0]):
-                for j in range(self.params.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
+            for i in range(self.init[0]):
+                for j in range(self.init[1]):
+                    r2 = self.xvalues[i] ** 2 + self.yvalues[j] ** 2
                     me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
         elif self.params.init_type == 'checkerboard':
             xv, yv = np.meshgrid(self.xvalues, self.xvalues)
@@ -201,7 +211,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         f = self.dtype_f(self.init)
         v = u.values.flatten()
         tmp = self.lap * self.rfft_object(u.values)
-        f.impl.values[:] = self.irfft_object(tmp)
+        f.impl.values[:] = np.real(self.irfft_object(tmp))
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) + \
                 2.0 / self.params.eps ** 2 * v
@@ -225,6 +235,6 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         me = self.dtype_u(self.init)
 
         tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = self.irfft_object(tmp)
+        me.values[:] = np.real(self.irfft_object(tmp))
 
         return me
