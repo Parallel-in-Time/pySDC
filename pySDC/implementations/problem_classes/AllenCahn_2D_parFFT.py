@@ -53,31 +53,32 @@ class allencahn2d_imex(ptype):
         if problem_params['nvars'][0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
-        self.FFT = R2C(np.asarray(problem_params['nvars']), np.asarray((1, 1)), problem_params['comm'], "double")
+        self.FFT = R2C(np.asarray(problem_params['nvars']),
+                       np.asarray((problem_params['L'], problem_params['L'])),
+                       problem_params['comm'], "double")
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn2d_imex, self).__init__(init=self.FFT.real_shape(), dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
+        self.rank = self.params.comm.Get_rank()
+
         self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
-        self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.init[0])])
+        self.xvalues = np.array([i * self.dx - self.params.L / 2.0
+                                 for i in range(self.rank * self.init[0], (self.rank + 1) * self.init[0])])
         self.yvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.init[1])])
 
         cinit = self.FFT.complex_shape()
 
         kx = np.zeros(cinit[0])
         ky = np.zeros(cinit[1])
-        for i in range(0, int(cinit[0] / 2) + 1):
-            kx[i] = 2 * np.pi / self.params.L * i
-        for i in range(0, cinit[1]):
-            ky[i] = 2 * np.pi / self.params.L * i
-        for i in range(int(cinit[0] / 2) + 1, cinit[0]):
-            kx[i] = 2 * np.pi / self.params.L * (-cinit[0] + i)
 
-        self.lap = np.zeros((cinit[0], cinit[1]))
-        for i in range(cinit[0]):
-            for j in range(cinit[1]):
-                self.lap[i, j] = -kx[i] ** 2 - ky[j] ** 2
+        kx[:int(cinit[0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(cinit[0] / 2) + 1)
+        kx[int(cinit[0] / 2) + 1:] = 2 * np.pi / self.params.L * np.arange(int(cinit[0] / 2) + 1 - cinit[0], 0)
+        ky[:] = 2 * np.pi / self.params.L * np.arange(self.rank * cinit[1], (self.rank + 1) * cinit[1])
+
+        xv, yv = np.meshgrid(kx, ky, indexing='ij')
+        self.lap = -xv ** 2 - yv ** 2
 
         print(self.init, cinit)
 
@@ -143,12 +144,11 @@ class allencahn2d_imex(ptype):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            for i in range(self.init[0]):
-                for j in range(self.init[1]):
-                    r2 = self.xvalues[i] ** 2 + self.yvalues[j] ** 2
-                    me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+            xv, yv = np.meshgrid(self.xvalues, self.yvalues, indexing='ij')
+            me.values[:, :] = np.tanh((self.params.radius - np.sqrt(xv ** 2 + yv ** 2)) /
+                                      (np.sqrt(2) * self.params.eps))
         elif self.params.init_type == 'checkerboard':
-            xv, yv = np.meshgrid(self.xvalues, self.xvalues)
+            xv, yv = np.meshgrid(self.xvalues, self.yvalues, indexing='ij')
             me.values[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
         elif self.params.init_type == 'random':
             me.values[:, :] = np.random.uniform(-1, 1, self.init)

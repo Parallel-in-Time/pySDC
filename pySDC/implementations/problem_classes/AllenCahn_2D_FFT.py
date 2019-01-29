@@ -58,17 +58,14 @@ class allencahn2d_imex(ptype):
 
         kx = np.zeros(self.init[0])
         ky = np.zeros(self.init[1] // 2 + 1)
-        for i in range(0, int(self.init[0] / 2) + 1):
-            kx[i] = 2 * np.pi / self.params.L * i
-        for i in range(0, int(self.init[1] // 2) + 1):
-            ky[i] = 2 * np.pi / self.params.L * i
-        for i in range(int(self.init[0] / 2) + 1, self.init[0]):
-            kx[i] = 2 * np.pi / self.params.L * (-self.init[0] + i)
 
-        self.lap = np.zeros((self.init[0], self.init[1] // 2 + 1))
-        for i in range(self.init[0]):
-            for j in range(self.init[1] // 2 + 1):
-                self.lap[i, j] = -kx[i] ** 2 - ky[j] ** 2
+        kx[:int(self.init[0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(self.init[0] / 2) + 1)
+        kx[int(self.init[0] / 2) + 1:] = 2 * np.pi / self.params.L * \
+            np.arange(int(self.init[0] / 2) + 1 - self.init[0], 0)
+        ky[:] = 2 * np.pi / self.params.L * np.arange(0, self.init[1] // 2 + 1)
+
+        xv, yv = np.meshgrid(kx, ky, indexing='ij')
+        self.lap = -xv ** 2 - yv ** 2
 
         rfft_in = pyfftw.empty_aligned(self.init, dtype='float64')
         fft_out = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
@@ -133,10 +130,9 @@ class allencahn2d_imex(ptype):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            for i in range(self.params.nvars[0]):
-                for j in range(self.params.nvars[1]):
-                    r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                    me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+            xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
+            me.values[:, :] = np.tanh((self.params.radius - np.sqrt(xv ** 2 + yv ** 2)) /
+                                      (np.sqrt(2) * self.params.eps))
         elif self.params.init_type == 'checkerboard':
             xv, yv = np.meshgrid(self.xvalues, self.xvalues)
             me.values[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
@@ -172,19 +168,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         """
         super(allencahn2d_imex_stab, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
 
-        kx = np.zeros(self.init[0])
-        ky = np.zeros(self.init[1] // 2 + 1)
-        for i in range(0, int(self.init[0] / 2) + 1):
-            kx[i] = 2 * np.pi / self.params.L * i
-        for i in range(0, int(self.init[1] // 2) + 1):
-            ky[i] = 2 * np.pi / self.params.L * i
-        for i in range(int(self.init[0] / 2) + 1, self.init[0]):
-            kx[i] = 2 * np.pi / self.params.L * (-self.init[0] + i)
-
-        self.lap = np.zeros((self.init[0], self.init[1] // 2 + 1))
-        for i in range(self.init[0]):
-            for j in range(self.init[1] // 2 + 1):
-                self.lap[i, j] = -kx[i] ** 2 - ky[j] ** 2 - 2.0 / self.params.eps ** 2
+        self.lap -= 2.0 / self.params.eps ** 2
 
     def eval_f(self, u, t):
         """

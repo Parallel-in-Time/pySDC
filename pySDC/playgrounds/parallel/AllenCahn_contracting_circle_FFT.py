@@ -10,7 +10,9 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.problem_classes.AllenCahn_2D_parFFT import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
-from pySDC.projects.TOMS.AllenCahn_monitor import monitor
+from pySDC.playgrounds.parallel.AllenCahn_parallel_monitor import monitor
+
+import pySDC.helpers.plot_helper as plt_helper
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -98,7 +100,7 @@ def run_SDC_variant(variant=None):
 
     # setup parameters "in time"
     t0 = 0.0
-    Tend = 0.032
+    Tend = 0.02
 
     # set MPI communicator
     comm = MPI.COMM_WORLD
@@ -128,6 +130,8 @@ def run_SDC_variant(variant=None):
                                                                         time_rank, time_size))
 
     description['problem_params']['comm'] = space_comm
+    # set level depending on rank
+    controller_params['logger_level'] = controller_params['logger_level'] if space_rank == 0 else 99
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -136,8 +140,18 @@ def run_SDC_variant(variant=None):
     P = controller.S.levels[0].prob
     uinit = P.u_exact(t0)
 
+    # if time_rank == 0:
+    #     plt_helper.plt.imshow(uinit.values)
+    #     plt_helper.savefig(f'uinit_{space_rank}', save_pdf=False, save_pgf=False, save_png=True)
+    # exit()
+
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    if time_rank == 0:
+        plt_helper.plt.imshow(uend.values)
+        plt_helper.savefig(f'uend_{space_rank}', save_pdf=False, save_pgf=False, save_png=True)
+    # exit()
 
     rank = comm.Get_rank()
 
