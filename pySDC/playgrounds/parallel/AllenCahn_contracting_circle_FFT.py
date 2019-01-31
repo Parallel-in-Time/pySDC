@@ -6,8 +6,8 @@ from mpi4py import MPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-# from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
-from pySDC.implementations.problem_classes.AllenCahn_2D_parFFT import allencahn2d_imex, allencahn2d_imex_stab
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
+# from pySDC.implementations.problem_classes.AllenCahn_2D_parFFT import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
 from pySDC.playgrounds.parallel.AllenCahn_parallel_monitor import monitor
@@ -33,7 +33,7 @@ def setup_parameters():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [1]#, 1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -47,8 +47,8 @@ def setup_parameters():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(256, 256)]#, (64, 64)]
-    problem_params['eps'] = [0.04]#, 0.16]
+    problem_params['nvars'] = [(256, 256), (64, 64)]
+    problem_params['eps'] = [0.04, 0.16]
     problem_params['radius'] = 0.25
 
     # initialize step parameters
@@ -148,9 +148,9 @@ def run_SDC_variant(variant=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    if time_rank == 0:
-        plt_helper.plt.imshow(uend.values)
-        plt_helper.savefig(f'uend_{space_rank}', save_pdf=False, save_pgf=False, save_png=True)
+    # if time_rank == 0:
+    #     plt_helper.plt.imshow(uend.values)
+    #     plt_helper.savefig(f'uend_{space_rank}', save_pdf=False, save_pgf=False, save_png=True)
     # exit()
 
     rank = comm.Get_rank()
