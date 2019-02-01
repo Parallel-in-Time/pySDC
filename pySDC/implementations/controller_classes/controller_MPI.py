@@ -99,6 +99,8 @@ class controller_MPI(controller):
         # call pre-run hook
         self.hooks.pre_run(step=self.S, level_number=0)
 
+        comm_active.Barrier()
+
         # while any process still active...
         while active:
 
