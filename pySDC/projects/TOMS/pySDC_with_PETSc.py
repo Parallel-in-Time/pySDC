@@ -47,7 +47,7 @@ def main():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 0.125
-    level_params['nsweeps'] = [1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -62,7 +62,7 @@ def main():
     problem_params['freq'] = 2  # frequency for the test value
     problem_params['nvars'] = [(129, 129), (65, 65)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm  # pass space-communicator to problem class
-    problem_params['sol_tol'] = 1E-12  # set tolerance to PETSc' linear solver
+    problem_params['sol_tol'] = 1E-10  # set tolerance to PETSc' linear solver
 
     # initialize step parameters
     step_params = dict()
@@ -136,6 +136,9 @@ def main():
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
+
+        print('   Iteration count linear solver: %i' % P.ksp_itercount)
+        print('   Mean Iteration count per call: %4.2f' % (P.ksp_itercount / max(P.ksp_ncalls, 1)))
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 

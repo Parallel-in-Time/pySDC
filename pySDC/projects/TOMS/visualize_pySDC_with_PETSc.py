@@ -98,7 +98,7 @@ def visualize_matrix(result=None):
     plt_helper.newfig(textwidth=120, scale=1.5)
     cmap = plt_helper.plt.get_cmap('RdYlGn_r')
     new_cmap = truncate_colormap(cmap, 0.1, 0.9)
-    plt_helper.plt.imshow(mat, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto')
+    plt_helper.plt.imshow(mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto')
 
     for key, item in result.items():
         timing = "{:3.1f}".format(item)

@@ -68,12 +68,15 @@ class heat2d_petsc_forced(ptype):
         # setup solver
         self.ksp = PETSc.KSP()
         self.ksp.create(comm=self.params.comm)
-        self.ksp.setType('cg')
+        self.ksp.setType('gmres')
         pc = self.ksp.getPC()
         pc.setType('none')
-        self.ksp.setInitialGuessNonzero(True)
+        # self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
+
+        self.ksp_ncalls = 0
+        self.ksp_itercount = 0
 
     def __get_A(self):
         """
@@ -188,6 +191,8 @@ class heat2d_petsc_forced(ptype):
         me = self.dtype_u(u0)
         self.ksp.setOperators(self.Id - factor * self.A)
         self.ksp.solve(rhs.values, me.values)
+        self.ksp_ncalls += 1
+        self.ksp_itercount += int(self.ksp.getIterationNumber())
 
         return me
 
