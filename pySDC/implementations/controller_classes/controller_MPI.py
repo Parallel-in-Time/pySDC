@@ -462,7 +462,8 @@ class controller_MPI(controller):
                         self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                            l, self.S.status.iter))
-                        self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+                        self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter,
+                                                                       comm=comm)
 
                     if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
@@ -546,8 +547,9 @@ class controller_MPI(controller):
                             self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                                l - 1, self.S.status.iter))
-                            self.req_send[l - 1] = self.S.levels[l - 1].uend.isend(dest=self.S.next, tag=self.S.status.iter,
-                                                                       comm=comm)
+                            self.req_send[l - 1] = self.S.levels[l - 1].uend.isend(dest=self.S.next,
+                                                                                   tag=self.S.status.iter,
+                                                                                   comm=comm)
 
                         if not self.S.status.first and not self.S.status.prev_done and self.params.fine_comm:
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
