@@ -4,10 +4,9 @@
     <comment>Scaling test with pySDC</comment>
 
     <parameterset name="param_set_spacetime">
-      <parameter name="i">0,1,2,3</parameter>
-      <parameter name="nnodes" mode="python" type="int">[1,1,1,1][$i]</parameter>
-      <parameter name="ntasks" mode="python" type="int">[4,8,16,24][$i]</parameter>
-      <parameter name="space_size" mode="python" type="int">${nnodes}*${ntasks}//4</parameter>
+      <parameter name="nnodes" type="int">1</parameter>
+      <parameter name="ntasks" type="int">24</parameter>
+      <parameter name="space_size" mode="python" type="int">${nnodes}*${ntasks}//24</parameter>
     </parameterset>
 
     <!-- Files -->
@@ -38,7 +37,7 @@
       <use>param_set_spacetime</use> <!-- use existing parameterset -->
       <use>files</use>        <!-- use existing fileset -->
       <use>substitute</use>   <!-- use existing substituteset -->
-      <do done_file="ready">sbatch run_pySDC_with_PETSc.exe</do>   <!-- shell command -->
+      <do done_file="ready">sbatch -A cstma run_pySDC_with_PETSc.exe</do>   <!-- shell command -->
     </step>
 
     <!-- Analyse -->

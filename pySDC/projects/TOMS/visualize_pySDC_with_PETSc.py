@@ -169,8 +169,8 @@ def main(cwd=''):
 
     """
     result = {}
-    files = ['data/result_MLSDC.dat', 'data/result_PFASST_2.dat', 'data/result_PFASST_4.dat',
-             'data/result_PFASST_6.dat', 'data/result_PFASST_12.dat', 'data/result_PFASST_24.dat']
+    files = ['data/result_PFASST_1_NEW.dat', 'data/result_PFASST_2_NEW.dat', 'data/result_PFASST_4_NEW.dat',
+             'data/result_PFASST_6_NEW.dat', 'data/result_PFASST_12_NEW.dat', 'data/result_PFASST_24_NEW.dat']
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
     visualize_matrix(result=result)
