@@ -98,7 +98,8 @@ def visualize_matrix(result=None):
     plt_helper.newfig(textwidth=120, scale=1.5)
     cmap = plt_helper.plt.get_cmap('RdYlGn_r')
     new_cmap = truncate_colormap(cmap, 0.1, 0.9)
-    plt_helper.plt.imshow(mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto')
+    plt_helper.plt.imshow(mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap,
+                          aspect='auto')
 
     for key, item in result.items():
         timing = "{:3.1f}".format(item)
@@ -126,7 +127,7 @@ def visualize_speedup(result=None):
         result: dictionary containing the runtimes
     """
     process_list_MLSDC = [1, 2, 4, 6, 12, 24]
-    process_list_PFASST = [24, 48, 96, 144, 288, 576]
+    process_list_PFASST = [24, 48, 96, 144, 288]
 
     timing_MLSDC = np.zeros(len(process_list_MLSDC))
     timing_PFASST = np.zeros((len(process_list_PFASST)))
@@ -179,6 +180,7 @@ def main(cwd=''):
     files = ['data/result_MLSDC.dat', 'data/result_PFASST_multinode_24.dat']
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
+    result.pop((24, 24))
     visualize_speedup(result=result)
 
 
