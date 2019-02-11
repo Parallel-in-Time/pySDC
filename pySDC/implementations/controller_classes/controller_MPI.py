@@ -331,10 +331,12 @@ class controller_MPI(controller):
             # check whether to stop iterating (parallel)
 
             self.hooks.pre_comm(step=self.S, level_number=0)
+
+            if self.req_send[0] is not None:
+                self.req_send[0].wait()
             self.S.levels[0].sweep.compute_end_point()
+
             if not self.S.status.last and self.params.fine_comm:
-                if self.req_send[0] is not None:
-                    self.req_send[0].wait()
                 self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    0, self.S.status.iter))
@@ -401,6 +403,14 @@ class controller_MPI(controller):
 
             else:
 
+                # Need to finish alll pending isend requests. These will occur for the first active process, since
+                # in the last iteration the wait statement will not be called ("send and forget")
+                for req in self.req_send:
+                    if req is not None:
+                        req.wait()
+                if self.req_status is not None:
+                    self.req_status.wait()
+
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'
 
@@ -416,10 +426,12 @@ class controller_MPI(controller):
                 self.S.levels[0].status.sweep += 1
 
                 self.hooks.pre_comm(step=self.S, level_number=0)
+
+                if self.req_send[0] is not None:
+                    self.req_send[0].wait()
                 self.S.levels[0].sweep.compute_end_point()
+
                 if not self.S.status.last and self.params.fine_comm:
-                    if self.req_send[0] is not None:
-                        self.req_send[0].wait()
                     self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        0, self.S.status.iter))
@@ -455,10 +467,12 @@ class controller_MPI(controller):
                 for k in range(nsweeps):
 
                     self.hooks.pre_comm(step=self.S, level_number=l)
+
+                    if self.req_send[l] is not None:
+                        self.req_send[l].wait()
                     self.S.levels[l].sweep.compute_end_point()
+
                     if not self.S.status.last and self.params.fine_comm:
-                        if self.req_send[l] is not None:
-                            self.req_send[l].wait()
                         self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                            l, self.S.status.iter))
@@ -540,10 +554,12 @@ class controller_MPI(controller):
                     for k in range(nsweeps):
 
                         self.hooks.pre_comm(step=self.S, level_number=l - 1)
+
+                        if self.req_send[l - 1] is not None:
+                            self.req_send[l - 1].wait()
                         self.S.levels[l - 1].sweep.compute_end_point()
+
                         if not self.S.status.last and self.params.fine_comm:
-                            if self.req_send[l - 1] is not None:
-                                self.req_send[l - 1].wait()
                             self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                                l - 1, self.S.status.iter))
