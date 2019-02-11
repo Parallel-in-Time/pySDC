@@ -5,8 +5,8 @@
 
     <parameterset name="param_set_spacetime">
       <parameter name="nnodes" type="int">1</parameter>
-      <parameter name="ntasks" type="int">24</parameter>
-      <parameter name="space_size" mode="python" type="int">${nnodes}*${ntasks}//24</parameter>
+      <parameter name="ntasks" type="int">12, 24</parameter>
+      <parameter name="space_size" mode="python" type="int">12</parameter>
     </parameterset>
 
     <!-- Files -->
