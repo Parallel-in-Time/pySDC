@@ -12,6 +12,9 @@ def test_B():
     main_B()
 
 def test_C_1x1():
+    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
+    import mpi4py
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
@@ -30,6 +33,9 @@ def test_C_1x1():
                               (p.returncode, num_procs)
 
 def test_C_1x2():
+    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
+    import mpi4py
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
@@ -47,6 +53,9 @@ def test_C_1x2():
                               (p.returncode, num_procs)
 
 def test_C_2x2():
+    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
+    import mpi4py
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'

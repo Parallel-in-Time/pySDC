@@ -127,7 +127,7 @@ def visualize_speedup(result=None):
         result: dictionary containing the runtimes
     """
     process_list_MLSDC = [1, 2, 4, 6, 12, 24]
-    process_list_PFASST = [24, 48, 96, 144, 288]
+    process_list_PFASST = [24, 48, 96, 144, 288, 576]
 
     timing_MLSDC = np.zeros(len(process_list_MLSDC))
     timing_PFASST = np.zeros((len(process_list_PFASST)))
@@ -177,10 +177,10 @@ def main(cwd=''):
     visualize_matrix(result=result)
 
     result = {}
-    files = ['data/result_MLSDC.dat', 'data/result_PFASST_multinode_24.dat']
+    files = ['data/result_MLSDC_NEW.dat', 'data/result_PFASST_multinode_24_NEW.dat']
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
-    result.pop((24, 24))
+    # result.pop((24, 24))
     visualize_speedup(result=result)
 
 

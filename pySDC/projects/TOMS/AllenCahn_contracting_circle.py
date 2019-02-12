@@ -211,7 +211,7 @@ def show_results(fname, cwd=''):
     ax1.set_ylabel('time (sec)')
 
     ax2 = ax1.twinx()
-    ax2.bar(xcoords, heights_niters, color='r', align='edge', width=0.3, label='iterations (right axis)')
+    ax2.bar(xcoords, heights_niters, color='lightcoral', align='edge', width=0.3, label='iterations (right axis)')
     ax2.set_ylabel('mean number of iterations')
 
     ax1.set_xticks(xcoords)

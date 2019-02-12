@@ -9,6 +9,9 @@ def main(cwd):
         cwd: current working directory
     """
 
+    # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
+    import mpi4py
+
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
