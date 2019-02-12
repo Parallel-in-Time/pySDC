@@ -8,8 +8,9 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front, allencahn_front_finel
+from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit, allencahn_front_semiimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
+from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor_Bayreuth import monitor
 
 
@@ -26,14 +27,14 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1.0 / 4
+    level_params['restol'] = 1E-03
+    level_params['dt'] = 16.0 / 1
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [3]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
@@ -42,11 +43,11 @@ def setup_parameters():
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nvars'] = 2047
+    problem_params['nvars'] = 127
     problem_params['dw'] = -0.04
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-08
+    problem_params['newton_tol'] = 1E-04
     problem_params['lin_tol'] = 1E-08
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
@@ -54,11 +55,11 @@ def setup_parameters():
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 50
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
     controller_params['hook_class'] = monitor
 
     # fill description dictionary for easy step instantiation
@@ -69,6 +70,7 @@ def setup_parameters():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+
 
     return description, controller_params
 
@@ -90,21 +92,16 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # add stuff based on variant
     if variant == 'fully-implicit':
-        # description['problem_class'] = allencahn_front
-        description['problem_class'] = allencahn_front_finel
+        description['problem_class'] = allencahn_front_fullyimplicit
+        # description['problem_class'] = allencahn_front_finel
         description['sweeper_class'] = generic_implicit
         if inexact:
-            description['problem_params']['newton_maxiter'] = 1
-    # elif variant == 'semi-implicit':
-    #     description['problem_class'] = allencahn_semiimplicit
-    #     description['sweeper_class'] = imex_1st_order
-    #     if inexact:
-    #         description['problem_params']['lin_maxiter'] = 10
-    # elif variant == 'semi-implicit_v2':
-    #     description['problem_class'] = allencahn_semiimplicit_v2
-    #     description['sweeper_class'] = imex_1st_order
-    #     if inexact:
-    #         description['problem_params']['newton_maxiter'] = 1
+            description['problem_params']['newton_maxiter'] = 200
+    elif variant == 'semi-implicit':
+        description['problem_class'] = allencahn_front_semiimplicit
+        description['sweeper_class'] = imex_1st_order
+        if inexact:
+            description['problem_params']['lin_maxiter'] = 10
     # elif variant == 'multi-implicit':
     #     description['problem_class'] = allencahn_multiimplicit
     #     description['sweeper_class'] = multi_implicit
@@ -127,7 +124,7 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 1.0
+    Tend = 32.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -147,8 +144,8 @@ def run_SDC_variant(variant=None, inexact=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    plt_helper.plt.plot(uend.values)
-    plt_helper.savefig('uend', save_pdf=False, save_pgf=False, save_png=True)
+    # plt_helper.plt.plot(uend.values)
+    # plt_helper.savefig('uend', save_pdf=False, save_pgf=False, save_png=True)
     # exit()
 
     # filter statistics by variant (number of iterations)
@@ -320,9 +317,10 @@ def main(cwd=''):
     results = {}
     # for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
     for variant in ['fully-implicit']:
+    # for variant in ['semi-implicit']:
 
-        results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
-        # results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
+        # results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
+        results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)
 
     # dump result
     # fname = 'data/results_SDC_variants_AllenCahn_1E-03'

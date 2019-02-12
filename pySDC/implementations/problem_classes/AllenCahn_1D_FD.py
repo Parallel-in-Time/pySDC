@@ -5,11 +5,10 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 
 
-# noinspection PyUnusedLocal
-class allencahn_front(ptype):
+class allencahn_front_fullyimplicit(ptype):
     """
     Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
     with driving force, 0-1 formulation (Bayreuth example)
@@ -44,7 +43,7 @@ class allencahn_front(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_front, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(allencahn_front_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
@@ -92,7 +91,6 @@ class allencahn_front(ptype):
         """
 
         u = self.dtype_u(u0).values
-        z = self.dtype_u(self.init, val=0.0).values
         eps2 = self.params.eps ** 2
         dw = self.params.dw
 
@@ -188,15 +186,94 @@ class allencahn_front(ptype):
         return me
 
 
-# noinspection PyUnusedLocal
-class allencahn_front_finel(allencahn_front):
+class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
     """
     Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
-    with driving force, 0-1 formulation (Bayreuth example), Finel's trick/parametrization
+    with driving force, 0-1 formulation (Bayreuth example), semi-implicit time-stepping
 
     Attributes:
         A: second-order FD discretization of the 1D laplace operator
         dx: distance between two spatial nodes
+    """
+
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+        """
+        Initialization routine
+
+        Args:
+            problem_params (dict): custom parameters for the example
+            dtype_u: mesh data type (will be passed parent class)
+            dtype_f: mesh data type with implicit and explicit components (will be passed parent class)
+        """
+
+        # these parameters will be used later, so assert their existence
+        essential_keys = ['nvars', 'dw', 'eps', 'newton_maxiter', 'newton_tol', 'interval']
+        for key in essential_keys:
+            if key not in problem_params:
+                msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
+                raise ParameterError(msg)
+
+        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
+        if (problem_params['nvars'] + 1) % 2 != 0:
+            raise ProblemError('setup requires nvars = 2^p - 1')
+
+        if 'stop_at_nan' not in problem_params:
+            problem_params['stop_at_nan'] = True
+
+        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        super(allencahn_front_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+        # set up boundary values to embed inner points
+        v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
+        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+
+        self.uext.values[1:-1] = u.values[:]
+
+        f = self.dtype_f(self.init)
+        f.impl.values = self.A.dot(self.uext.values)[1:-1]
+        f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
+            6.0 * self.params.dw * u.values * (1.0 - u.values)
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple linear solver for (I-factor*A)u = rhs
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float): abbrev. for the local stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        me = self.dtype_u(self.init)
+        self.uext.values[0] = 0.0
+        self.uext.values[-1] = 0.0
+        self.uext.values[1:-1] = rhs.values[:]
+        me.values = spsolve(sp.eye(self.params.nvars + 2, format='csc') - factor * self.A, self.uext.values)[1:-1]
+        # me.values = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A[1:-1, 1:-1], rhs.values)
+        return me
+
+
+class allencahn_front_finel(allencahn_front_fullyimplicit):
+    """
+    Example implementing the Allen-Cahn equation in 1D with finite differences and inhomogeneous Dirichlet-BC,
+    with driving force, 0-1 formulation (Bayreuth example), Finel's trick/parametrization
     """
 
     # noinspection PyTypeChecker

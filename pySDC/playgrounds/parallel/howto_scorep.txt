@@ -1,0 +1,14 @@
+module load CubeGUI
+module load CubeLib
+module load Vampir
+
+export PATH=/p/project/ccstma/scorep/5.0-trunk_mprobefix_intel-prarstation-papi/bin:$PATH
+
+module load Intel ParaStationMPI SciPy-Stack petsc4py mpi4py FFTW JUBE
+
+srun python -m scorep --mpi pySDC_with_PETSc.py 1
+
+export SCOREP_PROFILING_MAX_CALLPATH_DEPTH=90
+
+export SCOREP_ENABLE_TRACING=1
+export SCOREP_TOTAL_MEMORY=256M
