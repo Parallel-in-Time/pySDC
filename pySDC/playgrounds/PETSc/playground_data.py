@@ -12,7 +12,10 @@ def main():
     dx = 1.0/(n - 1)
     dy = dx
     comm= PETSc.COMM_WORLD
-    da = PETSc.DMDA().create([n, n], dof=2, stencil_width=1, comm=comm)
+    da = PETSc.DMDA().create([n, n], dof=1, stencil_width=1, comm=comm)
+    dar = da.refine()
+    print(dar.getSizes())
+    exit()
 
     rank = PETSc.COMM_WORLD.getRank()
     # comm=

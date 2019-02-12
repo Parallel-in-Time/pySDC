@@ -39,26 +39,28 @@ class heat2d_petsc_forced(ptype):
         if 'sol_maxiter' not in problem_params:
             problem_params['sol_maxiter'] = None
 
-        essential_keys = ['nvars', 'nu', 'freq', 'comm']
+        essential_keys = ['cnvars', 'nu', 'freq', 'comm', 'refine']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
         # make sure parameters have the correct form
-        if len(problem_params['nvars']) != 2:
-            raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
+        if len(problem_params['cnvars']) != 2:
+            raise ProblemError('this is a 2d example, got %s' % problem_params['cnvars'])
 
         # create DMDA object which will be used for all grid operations
-        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], stencil_width=1,
+        da = PETSc.DMDA().create([problem_params['cnvars'][0], problem_params['cnvars'][1]], stencil_width=1,
                                  comm=problem_params['comm'])
+        for _ in range(problem_params['refine']):
+            da = da.refine()
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heat2d_petsc_forced, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx, dy and get local ranges
-        self.dx = 1.0 / (self.params.nvars[0] - 1)
-        self.dy = 1.0 / (self.params.nvars[1] - 1)
+        self.dx = 1.0 / (self.init.getSizes()[0] - 1)
+        self.dy = 1.0 / (self.init.getSizes()[1] - 1)
         (self.xs, self.xe), (self.ys, self.ye) = self.init.getRanges()
 
         # compute discretization matrix A and identity
