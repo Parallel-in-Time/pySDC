@@ -23,7 +23,7 @@ Getting started
 
 The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <https://github.com/Parallel-in-Time/pySDC>`_, and PyPI, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_.
 Either use ``pip install pySDC`` to get the latest stable release including the core dependencies or check out the code on Github.
-Note that using ``pip install pySDC`` or ``python setup.py install`` will only install the core dependencies, omitting `mpi4py` and `petsc4py` (see below).
+Note that using ``pip install pySDC`` or ``python setup.py install`` will only install the core dependencies, omitting e.g. `mpi4py`, 'fenics` and `petsc4py` (see below).
 All package requirements are listed in the files `requirements.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements.txt>`_ .
 
 To check your installation, run
@@ -41,16 +41,16 @@ You may need to update your ``PYTHONPATH`` by running
 in particular if you want to run any of the playgrounds, projects or tutorials.
 All ``import`` statements there assume that the `pySDC`'s base directory is part of ``PYTHONPATH``.
 
-Note: When installing both `mpi4py` and `petsc4py`, make sure they use the same MPI installation (e.g. MPICH3).
+Note: When installing `mpi4py`, `fenics` and `petsc4py`, make sure they use the same MPI installation (e.g. MPICH3).
 You can achieve this e.g. by using the `Anaconda distribution <https://www.anaconda.com/distribution/>`_ of Python and then run
 
 .. code-block:: bash
 
-   conda install -c conda-forge mpich petsc4py mpi4py
+   conda install -c conda-forge mpich petsc4py mpi4py fenics
 
 Most of the code is tested automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_, so a working version of the installation process can always be found in the `install`-block of the `.travis.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.travis.yml>`_ file.
 
 For many examples, `LaTeX` is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
-When using `FEniCS` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
+When using `fenics` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
 
 For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <http://www.parallel-in-time.org/pySDC>`_.
