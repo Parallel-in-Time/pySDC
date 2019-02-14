@@ -1,6 +1,27 @@
 Changelog
 ---------
 
+- February 14, 2019: Released version 3 of `pySDC`. This release contains some breaking changes to the API. In detail:
+
+  - **Dropped Python 2 support**: Starting with this version, `pySDC` relies on Python 3. Various incompabilities led
+    to inconsistent treatment of dependencies, so that parts of the code had to use Python 2 while other relied on
+    Python 3 or could do both. We follow `A pledge to migrate to Python 3 <https://python3statement.org/>`_ with this decision,
+    as most prominent dependencies of `pySDC` already do.
+  - **Unified controllers**: Instead of providing (and maintaining) four different controllers, this release only has
+    one for emulated and one for MPI-based time-parallelization (``controller_nonMPI`` and ``controller_MPI``).
+    This should avoid further confusion and makes the code easier to maintain. Both controllers use the multigrid
+    perspective for the algorithm (first exchange data, than compute updates), but the classical way of determining
+    when to stop locally (each time-step is stopped when ready, if the previous one is ready, too). The complete multigrid
+    behavior can be restored using a flag. All included projects and tutorials have been adapted to this.
+  - **No more data types in the front-ends**: The redundant use of data type specifications in the description dictionaries
+    has been removed. Data types are now declared within each problem class (more precisely, in the header of the
+    ``__init__``-method to allow inhertiance). All included projects and tutorials have been adapted to this.
+  - **Renewed FEniCS support**: This release revives the deprecated `FEniCS <https://fenicsproject.org/>`_ support, now requiring at least FEniCS 2018.1.
+    The integration is tested using Travis-CI.
+  - **More consistent handling of local initial conditions**: The treatment of ``u[0]`` and ``f[0]`` has been fixed and
+    made consistent throughout the code.
+  - As usual, many bugs have been discovered and fixed.
+
 - May 23, 3018: Version 2.4 adds support for `petsc4py <https://bitbucket.org/petsc/petsc4py>`_!
   You can now use `PETSc <http://www.mcs.anl.gov/petsc/>`_ data types (`pySDC` ships with DMDA for distributed structured grids) and parallel solvers right from your examples and problem classes.
   There is also a new tutorial (7.C) showing this in a bit more detail, including communicator splitting for parallelization in space and time.

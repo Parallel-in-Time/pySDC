@@ -9,13 +9,13 @@ Features
 --------
 
 - Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet, multi-level, diagonal, multi-step
-- Variants of PFASST: classic (libpfasst-style) and multigrid, virtual parallel or MPI-based parallel
+- Variants of PFASST: virtual parallel or MPI-based parallel, classical of multigrid perspective
 - 7 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
 - Works with `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_ and `FEniCS <https://fenicsproject.org/>`_
 - Continuous integration via `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_
-- Fully compatible with Python 2.7 and 3.6 (or higher)
+- Fully compatible with 3.6 (or higher)
 
 
 Getting started
