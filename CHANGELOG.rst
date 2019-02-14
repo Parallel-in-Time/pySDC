@@ -1,7 +1,9 @@
 Changelog
 ---------
 
-- February 14, 2019: Released version 3 of `pySDC`. This release contains some breaking changes to the API. In detail:
+- February 14, 2019: Released version 3 of `pySDC`. This release is accompanied by the **ACM TOMS paper**
+  `"pySDC --  Prototyping spectral deferred corrections" <https://doi.org/10.1145/3310410>`_.
+  It release contains some breaking changes to the API. In detail:
 
   - **Dropped Python 2 support**: Starting with this version, `pySDC` relies on Python 3. Various incompabilities led
     to inconsistent treatment of dependencies, so that parts of the code had to use Python 2 while other relied on
