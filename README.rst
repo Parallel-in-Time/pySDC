@@ -50,5 +50,7 @@ You can achieve this e.g. by using the `Anaconda distribution <https://www.anaco
 
 Most of the code is tested automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_, so a working version of the installation process can always be found in the `install`-block of the `.travis.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.travis.yml>`_ file.
 
+For many examples, `LaTeX` is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
+When using `FEniCS` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
 
 For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <http://www.parallel-in-time.org/pySDC>`_.
