@@ -8,9 +8,12 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_periodic_fullyimplicit, allencahn_periodic_semiimplicit
+from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_periodic_fullyimplicit, allencahn_periodic_semiimplicit, allencahn_periodic_multiimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+from pySDC.implementations.transfer_classes.TransferMesh_FFT import mesh_to_mesh_fft
 from pySDC.playgrounds.Allen_Cahn.AllenCahn_monitor_Bayreuth import monitor
 
 
@@ -29,24 +32,24 @@ def setup_parameters():
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 2E-02
-    level_params['nsweeps'] = 1
+    level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [5]
+    sweeper_params['num_nodes'] = [3]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
-    sweeper_params['spread'] = False
+    sweeper_params['spread'] = True
 
     # This comes as read-in for the problem class
     problem_params = dict()
-    problem_params['nvars'] = 128 * 8
-    problem_params['dw'] = -0.04
-    problem_params['eps'] = 0.04
-    problem_params['newton_maxiter'] = 100
+    problem_params['nvars'] = [128 * 8]#, 128 * 4]
+    problem_params['dw'] = [-0.04]
+    problem_params['eps'] = [0.04]
+    problem_params['newton_maxiter'] = 200
     problem_params['newton_tol'] = 1E-08
     problem_params['lin_tol'] = 1E-08
     problem_params['lin_maxiter'] = 100
@@ -55,7 +58,12 @@ def setup_parameters():
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 20
+
+    # initialize space transfer parameters
+    space_transfer_params = dict()
+    space_transfer_params['rorder'] = 2
+    space_transfer_params['iorder'] = 6
 
     # initialize controller parameters
     controller_params = dict()
@@ -70,6 +78,8 @@ def setup_parameters():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+    # description['space_transfer_class'] = mesh_to_mesh_fft  # pass spatial transfer class
+    # description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     return description, controller_params
 
@@ -101,12 +111,12 @@ def run_SDC_variant(variant=None, inexact=False):
         description['sweeper_class'] = imex_1st_order
         if inexact:
             description['problem_params']['lin_maxiter'] = 10
-    # elif variant == 'multi-implicit':
-    #     description['problem_class'] = allencahn_multiimplicit
-    #     description['sweeper_class'] = multi_implicit
-    #     if inexact:
-    #         description['problem_params']['newton_maxiter'] = 1
-    #         description['problem_params']['lin_maxiter'] = 10
+    elif variant == 'multi-implicit':
+        description['problem_class'] = allencahn_periodic_multiimplicit
+        description['sweeper_class'] = multi_implicit
+        if inexact:
+            description['problem_params']['newton_maxiter'] = 1
+            description['problem_params']['lin_maxiter'] = 10
     # elif variant == 'multi-implicit_v2':
     #     description['problem_class'] = allencahn_multiimplicit_v2
     #     description['sweeper_class'] = multi_implicit
@@ -123,7 +133,7 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 1.0# * description['level_params']['dt']
+    Tend = description['level_params']['dt']
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -315,8 +325,9 @@ def main(cwd=''):
     # Loop over variants, exact and inexact solves
     results = {}
     # for variant in ['multi-implicit', 'semi-implicit', 'fully-implicit', 'semi-implicit_v2', 'multi-implicit_v2']:
-    for variant in ['fully-implicit']:
+    # for variant in ['fully-implicit']:
     # for variant in ['semi-implicit']:
+    for variant in ['multi-implicit']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant, inexact=False)
         # results[(variant, 'inexact')] = run_SDC_variant(variant=variant, inexact=True)

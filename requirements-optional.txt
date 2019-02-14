@@ -1,4 +1,0 @@
-mpi4py>=2.0.0
-petsc4py>=3.9.0
-sympy>=1.0
-

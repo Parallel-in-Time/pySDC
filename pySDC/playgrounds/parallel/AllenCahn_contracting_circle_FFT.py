@@ -32,7 +32,7 @@ def setup_parameters():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['dt'] = 1E-02
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -184,7 +184,7 @@ def main(cwd=''):
 
     # Loop over variants, exact and inexact solves
     results = {}
-    for variant in ['semi-implicit']:
+    for variant in ['semi-implicit-stab']:
 
         results[(variant, 'exact')] = run_SDC_variant(variant=variant)
 
