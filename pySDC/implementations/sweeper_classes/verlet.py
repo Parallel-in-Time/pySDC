@@ -55,6 +55,7 @@ class verlet(sweeper):
 
         # trapezoidal rule
         QT = 0.5 * (QI + QE)
+        # QT = QI
 
         # Qx as in the paper
         Qx = np.dot(QE, QT) + 0.5 * QE * QE
@@ -129,6 +130,24 @@ class verlet(sweeper):
 
         # indicate presence of new values at this level
         L.status.updated = True
+
+        # # do the sweep (alternative description)
+        # for m in range(0, M):
+        #     # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
+        #     L.u[m + 1] = P.dtype_u(integral[m])
+        #     for j in range(1, m + 1):
+        #         # add QxF(u^{k+1})
+        #         L.u[m + 1].pos += L.dt * (L.dt * self.Qx[m + 1, j] * L.f[j])
+        #
+        #     # get RHS with new positions
+        #     L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+        #
+        # for m in range(0, M):
+        #     for n in range(0, M):
+        #         L.u[m + 1].vel += L.dt * self.QT[m + 1, n + 1] * L.f[n + 1]
+        #
+        # # indicate presence of new values at this level
+        # L.status.updated = True
 
         return None
 
