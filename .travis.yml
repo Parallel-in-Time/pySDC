@@ -24,8 +24,8 @@ before_install:
 install:
   - conda install --yes -c conda-forge mpich-mpicc petsc4py mpi4py pyfftw fenics
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx cython
+  - conda install -c bccp pfft-python
   - conda list
-  - pip install pfft-python
   - pip install travis-sphinx
   - ln -sf /home/travis/miniconda3/lib/libstdc++.so.6.0.25 /home/travis/miniconda3/lib/libstdc++.so.6
 
