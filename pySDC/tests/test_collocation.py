@@ -12,8 +12,8 @@ def setup():
     global classes, t_start, t_end
 
     # generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
-    t_start = np.random.rand(1) * 0.2
-    t_end = 0.8 + np.random.rand(1) * 0.2
+    t_start = np.random.rand(1)[0] * 0.2
+    t_end = 0.8 + np.random.rand(1)[0] * 0.2
     classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 
 
@@ -28,6 +28,7 @@ def test_canintegratepolynomials():
 def check_canintegratepolynomials(collclass,t_start,t_end):
 
     for M in range(2,13):
+
         coll = collclass(M, t_start, t_end)
 
         # some basic consistency tests
