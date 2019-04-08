@@ -47,7 +47,7 @@ for n in range(nruns):
 
     # set initial condition
     u = pm.create(type='real')
-    u = u.apply(doublesine, kind='index', out=Ellipsis)
+    u.apply(doublesine, kind='index', out=Ellipsis)
 
     # save initial condition
     u_old = pm.create(type='real', value=u)
@@ -63,6 +63,11 @@ for n in range(nruns):
 
     # compute Laplacian
     uxx = u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
+
+    v = 1E-09 * uxx + 2*uxx - 1
+    print(type(v))
+    print(np.amax(abs(v)))
+    exit()
 
     # compute residual of (I-dt*A)u = u_old
     res = max(np.amax(abs(u.preview() - dt*uxx.preview() - u_old.preview())), res)
