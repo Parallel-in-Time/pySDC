@@ -49,9 +49,10 @@ class allencahn2d_imex(ptype):
         self.pm = ParticleMesh(BoxSize=problem_params['L'], Nmesh=list(problem_params['nvars']), dtype='f8',
                                plan_method='measure', comm=problem_params['comm'])
 
+        # create test RealField to get the local dimensions (there's probably a better way to do that)
         tmp = self.pm.create(type='real')
 
-        # invoke super init, passing ParticleMesh as init
+        # invoke super init, passing the communicator and the local dimensions as init
         super(allencahn2d_imex, self).__init__(init=(self.pm.comm, tmp.value.shape), dtype_u=dtype_u, dtype_f=dtype_f,
                                                params=problem_params)
 
@@ -123,16 +124,18 @@ class allencahn2d_imex(ptype):
             r2 = sum(ri ** 2 for ri in r)
             return np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
 
+        def checkerboard(i, v):
+            r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
+            return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
+
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init)
         if self.params.init_type == 'circle':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values = tmp_u.apply(circle, kind='index').value
-        # elif self.params.init_type == 'checkerboard':
-        #     xv, yv = np.meshgrid(self.xvalues, self.xvalues)
-        #     me.values[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
-        # elif self.params.init_type == 'random':
-        #     me.values[:, :] = np.random.uniform(-1, 1, self.init)
+        elif self.params.init_type == 'checkerboard':
+            tmp_u = self.pm.create(type='real', value=0.0)
+            me.values = tmp_u.apply(checkerboard, kind='index').value
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

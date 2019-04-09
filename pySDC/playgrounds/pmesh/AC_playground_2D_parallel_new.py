@@ -57,7 +57,7 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    # sweeper_params['spread'] = False
+    sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
@@ -89,7 +89,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 4*0.001
+    Tend = 32*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
