@@ -1,4 +1,4 @@
-import copy as cp
+from mpi4py import MPI
 
 import numpy as np
 from pmesh.pm import ParticleMesh
@@ -104,11 +104,24 @@ class pmesh_datatype(object):
         Returns:
             float: absolute maximum of all mesh values
         """
-
         # take absolute values of the mesh values
-        absval = abs(self.values)
-        # return maximum
-        return np.amax(absval)
+        local_absval = np.amax(abs(self.values))
+
+        comm = self.values.pm.comm
+        if comm is not None:
+            if comm.Get_size() > 1:
+                global_absval = comm.allreduce(sendobj=local_absval, op=MPI.MAX)
+            else:
+                global_absval = local_absval
+        else:
+            global_absval = local_absval
+
+        return global_absval
+
+        # # take absolute values of the mesh values
+        # absval = abs(self.values)
+        # # return maximum
+        # return np.amax(absval)
 
     # def apply_mat(self, A):
     #     """
