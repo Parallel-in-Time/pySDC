@@ -9,7 +9,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH_new import allencahn2d_imex
+from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH_new import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_monitor_new import monitor
 
@@ -80,6 +80,7 @@ def main():
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = allencahn2d_imex
+    # description['problem_class'] = allencahn2d_imex_stab
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters

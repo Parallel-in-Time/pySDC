@@ -142,71 +142,56 @@ class allencahn2d_imex(ptype):
         return me
 
 
-# class allencahn2d_imex_stab(allencahn2d_imex):
-#     """
-#     Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
-#     stabilized splitting
-#
-#     Attributes:
-#         xvalues: grid points in space
-#         dx: mesh width
-#         lap: spectral operator for Laplacian
-#         rfft_object: planned real FFT for forward transformation
-#         irfft_object: planned IFFT for backward transformation
-#     """
-#
-#     def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
-#         """
-#         Initialization routine
-#
-#         Args:
-#             problem_params (dict): custom parameters for the example
-#             dtype_u: mesh data type (will be passed to parent class)
-#             dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
-#         """
-#         super(allencahn2d_imex_stab, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
-#
-#         self.lap -= 2.0 / self.params.eps ** 2
-#
-#     def eval_f(self, u, t):
-#         """
-#         Routine to evaluate the RHS
-#
-#         Args:
-#             u (dtype_u): current values
-#             t (float): current time
-#
-#         Returns:
-#             dtype_f: the RHS
-#         """
-#
-#         f = self.dtype_f(self.init)
-#         v = u.values.flatten()
-#         tmp = self.lap * self.rfft_object(u.values)
-#         f.impl.values[:] = self.irfft_object(tmp)
-#         if self.params.eps > 0:
-#             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) + \
-#                 2.0 / self.params.eps ** 2 * v
-#             f.expl.values = f.expl.values.reshape(self.params.nvars)
-#         return f
-#
-#     def solve_system(self, rhs, factor, u0, t):
-#         """
-#         Simple FFT solver for the diffusion part
-#
-#         Args:
-#             rhs (dtype_f): right-hand side for the linear system
-#             factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-#             u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-#             t (float): current time (e.g. for time-dependent BCs)
-#
-#         Returns:
-#             dtype_u: solution as mesh
-#         """
-#
-#         me = self.dtype_u(self.init)
-#
-#         tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
-#         me.values[:] = self.irfft_object(tmp)
-#
-#         return me
+class allencahn2d_imex_stab(allencahn2d_imex):
+    """
+    Example implementing Allen-Cahn equation in 2D using PMESH for solving linear parts, IMEX time-stepping with
+    stabilized splitting
+    """
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+
+        def Laplacian(k, v):
+            k2 = sum(ki ** 2 for ki in k) + 2.0 / self.params.eps ** 2
+            return -k2 * v
+
+        f = self.dtype_f(self.init)
+        tmp_u = self.pm.create(type='real', value=u.values)
+        f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
+        if self.params.eps > 0:
+            f.expl.values = 1.0 / self.params.eps ** 2 * u.values * (1.0 - u.values ** self.params.nu) + \
+                2.0 / self.params.eps ** 2 * u.values
+        return f
+
+    def solve_system(self, rhs, factor, u0, t):
+        """
+        Simple FFT solver for the diffusion part
+
+        Args:
+            rhs (dtype_f): right-hand side for the linear system
+            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
+            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
+            t (float): current time (e.g. for time-dependent BCs)
+
+        Returns:
+            dtype_u: solution as mesh
+        """
+
+        def linear_solve(k, v):
+            k2 = sum(ki ** 2 for ki in k) + 2.0 / self.params.eps ** 2
+            return 1.0 / (1.0 + factor * k2) * v
+
+        me = self.dtype_u(self.init)
+        tmp_rhs = self.pm.create(type='real', value=rhs.values)
+        me.values = tmp_rhs.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis).value
+
+        return me
