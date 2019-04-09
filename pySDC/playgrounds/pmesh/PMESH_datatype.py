@@ -31,8 +31,8 @@ class pmesh_datatype(object):
         if isinstance(init, ParticleMesh):
             self.values = init.create(type='real', value=val)
         elif isinstance(init, type(self)):
-            # self.values = init.values.pm.create(type='real', value=init.values)
-            self.values = init.values
+            self.values = init.values.pm.create(type='real', value=init.values)
+            # self.values = init.values
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

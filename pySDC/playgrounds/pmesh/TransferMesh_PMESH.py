@@ -32,11 +32,14 @@ class pmesh_to_pmesh(space_transfer):
         """
         if isinstance(F, pmesh_datatype):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            G.values = self.coarse_prob.init.upsample(F.values, keep_mean=True)
+            F.values.resample(G.values)
+            # G.values = self.coarse_prob.init.upsample(F.values, keep_mean=True)
         elif isinstance(F, rhs_imex_pmesh):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            G.impl.values = self.coarse_prob.init.upsample(F.impl.values, keep_mean=True)
-            G.expl.values = self.coarse_prob.init.upsample(F.expl.values, keep_mean=True)
+            F.impl.values.resample(G.impl.values)
+            F.expl.values.resample(G.expl.values)
+            # G.impl.values = self.coarse_prob.init.upsample(F.impl.values, keep_mean=True)
+            # G.expl.values = self.coarse_prob.init.upsample(F.expl.values, keep_mean=True)
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
