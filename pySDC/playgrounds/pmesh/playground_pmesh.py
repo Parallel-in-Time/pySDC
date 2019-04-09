@@ -5,7 +5,7 @@ import numpy as np
 import time
 from pmesh.pm import ParticleMesh
 
-from pySDC.playgrounds.pmesh.pmesh_datatype import pmesh_datatype, rhs_imex_pmesh
+from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
 
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]

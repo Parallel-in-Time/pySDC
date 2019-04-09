@@ -33,8 +33,6 @@ class pmesh_datatype(object):
         elif isinstance(init, type(self)):
             # self.values = init.values.pm.create(type='real', value=init.values)
             self.values = init.values
-        # elif isinstance(init, np.ndarray):
-        #     self.values = self.init.create(type='real', value=init)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

@@ -12,7 +12,8 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
-from pySDC.playgrounds.pmesh.AllenCahn_2D_pmesh import allencahn2d_imex
+from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH import allencahn2d_imex
+from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 
 import matplotlib.pyplot as plt
 
@@ -49,7 +50,7 @@ def setup_parameters():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(256, 256)]#, (64, 64)]
+    problem_params['nvars'] = [(256, 256), (64, 64)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
 
@@ -70,7 +71,7 @@ def setup_parameters():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    # description['space_transfer_class'] = mesh_to_mesh_fft2d
+    description['space_transfer_class'] = pmesh_to_pmesh
 
     return description, controller_params
 
@@ -106,7 +107,7 @@ def run_SDC_variant(variant=None):
     # Tend = 0.01
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=8, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
