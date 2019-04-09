@@ -1,5 +1,5 @@
 from mpi4py import MPI
-
+import copy as cp
 import numpy as np
 from pmesh.pm import ParticleMesh
 
@@ -28,10 +28,14 @@ class pmesh_datatype(object):
         """
 
         # if init is another mesh, do a deepcopy (init by copy)
-        if isinstance(init, ParticleMesh):
-            self.values = init.create(type='real', value=val)
-        elif isinstance(init, type(self)):
-            self.values = init.values.pm.create(type='real', value=init.values)
+        if isinstance(init, pmesh_datatype):
+            self.comm = init.comm
+            self.values = cp.deepcopy(init.values)
+        # if init is a number or a tuple of numbers, create mesh object with val as initial value
+        elif isinstance(init, tuple):
+            self.comm = init[0]
+            self.values = np.empty(init[1], dtype=np.float64)
+            self.values[:] = val
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -106,7 +110,7 @@ class pmesh_datatype(object):
         # take absolute values of the mesh values
         local_absval = np.amax(abs(self.values))
 
-        comm = self.values.pm.comm
+        comm = self.comm
         if comm is not None:
             if comm.Get_size() > 1:
                 global_absval = comm.allreduce(sendobj=local_absval, op=MPI.MAX)
@@ -153,7 +157,7 @@ class pmesh_datatype(object):
             None
         """
 
-        comm.send(self.values.value, dest=dest, tag=tag)
+        comm.send(self.values, dest=dest, tag=tag)
         return None
 
     def isend(self, dest=None, tag=None, comm=None):
@@ -168,7 +172,7 @@ class pmesh_datatype(object):
         Returns:
             request handle
         """
-        return comm.isend(self.values.value, dest=dest, tag=tag)
+        return comm.isend(self.values, dest=dest, tag=tag)
 
     def recv(self, source=None, tag=None, comm=None):
         """
@@ -182,7 +186,7 @@ class pmesh_datatype(object):
         Returns:
             None
         """
-        self.values = self.values.pm.create(type='real', value=comm.recv(source=source, tag=tag))
+        self.values = comm.recv(source=source, tag=tag)
         return None
 
     def bcast(self, root=None, comm=None):
@@ -197,7 +201,7 @@ class pmesh_datatype(object):
             broadcasted values
         """
         me = pmesh_datatype(self)
-        me.values = self.values.pm.create(type='real', value=comm.bcast(self.values.value, root=root))
+        me.values = comm.bcast(self.values, root=root)
         return me
 
 
@@ -228,9 +232,12 @@ class rhs_imex_pmesh(object):
         if isinstance(init, type(self)):
             self.impl = pmesh_datatype(init.impl)
             self.expl = pmesh_datatype(init.expl)
-        elif isinstance(init, ParticleMesh):
-            self.impl = pmesh_datatype(init)
-            self.expl = pmesh_datatype(init)
+        # elif isinstance(init, ParticleMesh):
+        #     self.impl = pmesh_datatype(init)
+        #     self.expl = pmesh_datatype(init)
+        elif isinstance(init, tuple) or isinstance(init, int):
+            self.impl = pmesh_datatype(init, val=val)
+            self.expl = pmesh_datatype(init, val=val)
         # # if init is a number or a tuple of numbers, create mesh object with None as initial value
         # elif isinstance(init, tuple) or isinstance(init, int):
         #     self.impl = pmesh_datatype(init, val=val)

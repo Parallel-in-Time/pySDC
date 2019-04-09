@@ -12,8 +12,8 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
-from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH import allencahn2d_imex
-from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
+from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH_new import allencahn2d_imex
+from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
 
 import matplotlib.pyplot as plt
 
@@ -61,7 +61,7 @@ def setup_parameters():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    controller_params['hook_class'] = monitor
+    # controller_params['hook_class'] = monitor
 
     # fill description dictionary for easy step instantiation
     description = dict()

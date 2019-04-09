@@ -5,7 +5,7 @@ import numpy as np
 import time
 from pmesh.pm import ParticleMesh
 
-from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
+from pySDC.playgrounds.pmesh.PMESH_datatype_new import pmesh_datatype, rhs_imex_pmesh
 
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
@@ -38,13 +38,7 @@ size = comm.Get_size()
 
 t0 = time.time()
 pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measure', comm=comm)
-
-u = pmesh_datatype(pm)
-u.values.apply(circle, kind='index', out=Ellipsis)
-v = pmesh_datatype(u)
-v.values.value[0] = 1
-print(np.amax(abs(u-v)))
-exit()
+tmp = pm.create(type='real')
 t1 = time.time()
 
 print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
@@ -57,8 +51,9 @@ for n in range(nruns):
     # set initial condition
     # u = pmesh_datatype(init=pm)
     # u.values.apply(circle, kind='index', out=Ellipsis)
-    u = rhs_imex_pmesh(init=pm)
-    u.impl.values.apply(circle, kind='index', out=Ellipsis)
+    u = rhs_imex_pmesh(init=(pm.comm, tmp.value.shape))
+    tmp = pm.create(type='real', value=0.0)
+    u.impl.value = tmp.apply(circle, kind='index', out=Ellipsis).value
 
     # save initial condition
     u_old = pmesh_datatype(init=u.impl)
@@ -72,13 +67,15 @@ for n in range(nruns):
         return 1.0 / factor * v
 
     # solve (I-dt*A)u = u_old
-    sol = pmesh_datatype(init=pm)
-    sol.values = u.impl.values.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis)
+    sol = pmesh_datatype(init=(pm.comm, tmp.value.shape))
+    tmp = pm.create(type='real', value=u.impl.values)
+    sol.values = tmp.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis).value
 
     # compute Laplacian
     # lap = sol.values.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
-    lap = pmesh_datatype(init=pm)
-    lap.values = sol.values.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
+    lap = pmesh_datatype(init=(pm.comm, tmp.value.shape))
+    tmp = pm.create(type='real', value=sol.values)
+    lap.values = tmp.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
 
     # compute residual of (I-dt*A)u = u_old
     res = max(abs(sol - dt*lap - u_old), res)
