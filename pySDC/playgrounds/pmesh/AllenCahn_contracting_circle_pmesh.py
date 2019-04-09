@@ -1,10 +1,11 @@
 import os
-
+import matplotlib
+matplotlib.use('TkAgg')
 import dill
 import matplotlib.ticker as ticker
 import numpy as np
 
-import pySDC.helpers.plot_helper as plt_helper
+# import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -12,6 +13,8 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
 from pySDC.playgrounds.pmesh.AllenCahn_2D_pmesh import allencahn2d_imex
+
+import matplotlib.pyplot as plt
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -57,7 +60,7 @@ def setup_parameters():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
-    # controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = monitor
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -99,8 +102,8 @@ def run_SDC_variant(variant=None):
 
     # setup parameters "in time"
     t0 = 0
-    # Tend = 0.032
-    Tend = 1E-03
+    Tend = 0.032
+    # Tend = 0.01
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -108,6 +111,12 @@ def run_SDC_variant(variant=None):
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+
+    # plt.figure(1)
+    # plt.imshow(uinit.values)
+    # plt.colorbar()
+    # plt.show()
+    # exit()
 
     # plt_helper.plt.imshow(uinit.values)
     # plt_helper.plt.show()
@@ -292,7 +301,7 @@ def main(cwd=''):
     assert os.path.isfile(cwd + fname + '.pkl'), 'ERROR: dill did not create file'
 
     # visualize
-    show_results(fname, cwd=cwd)
+    # show_results(fname, cwd=cwd)
 
 
 if __name__ == "__main__":

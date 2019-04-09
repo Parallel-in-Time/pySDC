@@ -16,7 +16,7 @@ class pmesh_datatype(object):
         values (np.ndarray): contains the ndarray of the values
     """
 
-    def __init__(self, init=None, val=None):
+    def __init__(self, init=None, val=0.0):
         """
         Initialization routine
 
@@ -29,9 +29,10 @@ class pmesh_datatype(object):
 
         # if init is another mesh, do a deepcopy (init by copy)
         if isinstance(init, ParticleMesh):
-            self.values = init.create(type='real')
+            self.values = init.create(type='real', value=val)
         elif isinstance(init, type(self)):
-            self.values = init.values.pm.create(type='real', value=init.values)
+            # self.values = init.values.pm.create(type='real', value=init.values)
+            self.values = init.values
         # elif isinstance(init, np.ndarray):
         #     self.values = self.init.create(type='real', value=init)
         # something is wrong, if none of the ones above hit
@@ -93,7 +94,7 @@ class pmesh_datatype(object):
         if isinstance(other, float) or isinstance(other, complex):
             # always create new mesh, since otherwise c = f*a changes a as well!
             me = pmesh_datatype(self)
-            me.values = self.values * other
+            me.values = other * self.values
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
@@ -185,7 +186,9 @@ class pmesh_datatype(object):
         Returns:
             broadcasted values
         """
-        return comm.bcast(self.values.value, root=root)
+        me = pmesh_datatype(self)
+        me.values = self.values.pm.create(type='real', value=comm.bcast(self.values.value, root=root))
+        return me
 
 
 class rhs_imex_pmesh(object):

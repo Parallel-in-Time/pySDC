@@ -9,14 +9,13 @@ from pySDC.playgrounds.pmesh.pmesh_datatype import pmesh_datatype, rhs_imex_pmes
 
 class allencahn2d_imex(ptype):
     """
-    Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping
+    Example implementing Allen-Cahn equation in 2D using PMESH for solving linear parts, IMEX time-stepping
+
+    PMESH: https://github.com/rainwoodman/pmesh
 
     Attributes:
         xvalues: grid points in space
         dx: mesh width
-        lap: spectral operator for Laplacian
-        rfft_object: planned real FFT for forward transformation
-        irfft_object: planned IFFT for backward transformation
     """
 
     def __init__(self, problem_params, dtype_u=pmesh_datatype, dtype_f=rhs_imex_pmesh):
@@ -25,8 +24,8 @@ class allencahn2d_imex(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
+            dtype_u: pmesh data type (will be passed to parent class)
+            dtype_f: pmesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         if 'L' not in problem_params:
@@ -43,17 +42,21 @@ class allencahn2d_imex(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        # we assert that nvars looks very particular here.. this will be necessary for coarsening in space later on
         if len(problem_params['nvars']) != 2:
             raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
 
-        pm = ParticleMesh(BoxSize=1.0, Nmesh=list(problem_params['nvars']), dtype='f8', plan_method='measure',
-                          comm=problem_params['comm'])
+        # Creating ParticleMesh structure
+        pm = ParticleMesh(BoxSize=problem_params['L'], Nmesh=list(problem_params['nvars']), dtype='f8',
+                          plan_method='measure', comm=problem_params['comm'])
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
+        # invoke super init, passing ParticleMesh as init
         super(allencahn2d_imex, self).__init__(init=pm, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
+        # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
+        self.dy = self.params.L / problem_params['nvars'][1]
+        self.xvalues = [i * self.dx - problem_params['L'] / 2 for i in range(problem_params['nvars'][0])]
+        self.yvalues = [i * self.dy - problem_params['L'] / 2 for i in range(problem_params['nvars'][1])]
 
     def eval_f(self, u, t):
         """
@@ -72,7 +75,7 @@ class allencahn2d_imex(ptype):
             return -k2 * v
 
         f = self.dtype_f(self.init)
-        f.impl.values = u.values.r2c().apply(Laplacian).c2r()
+        f.impl.values = u.values.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * u.values * (1.0 - u.values ** self.params.nu)
         return f
@@ -95,8 +98,13 @@ class allencahn2d_imex(ptype):
             k2 = sum(ki ** 2 for ki in k)
             return 1.0 / (1.0 + factor * k2) * v
 
+        def Laplacian(k, v):
+            k2 = sum(ki ** 2 for ki in k)
+            return -k2 * v
+
         me = self.dtype_u(self.init)
-        me.values = rhs.values.r2c().apply(linear_solve).c2r()
+        me.values = rhs.values.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis)
+
         return me
 
     def u_exact(self, t):
@@ -111,12 +119,12 @@ class allencahn2d_imex(ptype):
         """
 
         def circle(i, v):
-            r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
+            r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
             r2 = sum(ri ** 2 for ri in r)
             return np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
-        me = self.dtype_u(self.init, val=0.0)
+        me = self.dtype_u(self.init)
         if self.params.init_type == 'circle':
             me.values.apply(circle, kind='index', out=Ellipsis)
         # elif self.params.init_type == 'checkerboard':

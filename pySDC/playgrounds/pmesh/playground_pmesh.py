@@ -1,14 +1,11 @@
 from mpi4py import MPI
 import matplotlib
 matplotlib.use("TkAgg")
-
 import numpy as np
-import pfft
 import time
-import matplotlib.pyplot as plt
-from numpy.fft import rfft2, irfft2
+from pmesh.pm import ParticleMesh
 
-from pmesh.pm import ParticleMesh, RealField, ComplexField
+from pySDC.playgrounds.pmesh.pmesh_datatype import pmesh_datatype, rhs_imex_pmesh
 
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
@@ -26,6 +23,11 @@ def Laplacian(k, v):
     # k2[k2 == 0] = 1.0
     return -k2 * v
 
+def circle(i, v):
+    r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
+    r2 = sum(ri ** 2 for ri in r)
+    return np.tanh((0.25 - np.sqrt(r2)) / (np.sqrt(2) * 0.04))
+
 
 nvars = 128
 nruns = 1000
@@ -36,6 +38,12 @@ size = comm.Get_size()
 
 t0 = time.time()
 pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measure', comm=comm)
+
+# u = pm.create(type='real')
+# u.apply(circle, kind='index', out=Ellipsis)
+# v = u.pm.create(type='real', value=u)
+# print(np.amax(abs(u-v)))
+# exit()
 t1 = time.time()
 
 print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
@@ -46,11 +54,15 @@ t0 = time.time()
 for n in range(nruns):
 
     # set initial condition
-    u = pm.create(type='real')
-    u.apply(doublesine, kind='index', out=Ellipsis)
+    # u = pmesh_datatype(init=pm)
+    # u.values.apply(circle, kind='index', out=Ellipsis)
+    u = rhs_imex_pmesh(init=pm)
+    u.impl.values.apply(circle, kind='index', out=Ellipsis)
 
     # save initial condition
-    u_old = pm.create(type='real', value=u)
+    u_old = pmesh_datatype(init=u.impl)
+
+    dt = 0.121233 / (n + 1)
 
     def linear_solve(k, v):
         global dt
@@ -59,18 +71,16 @@ for n in range(nruns):
         return 1.0 / factor * v
 
     # solve (I-dt*A)u = u_old
-    u = u.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis)
+    sol = pmesh_datatype(init=pm)
+    sol.values = u.impl.values.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis)
 
     # compute Laplacian
-    uxx = u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
-
-    v = 1E-09 * uxx + 2*uxx - 1
-    print(type(v))
-    print(np.amax(abs(v)))
-    exit()
+    # lap = sol.values.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
+    lap = pmesh_datatype(init=pm)
+    lap.values = sol.values.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis)
 
     # compute residual of (I-dt*A)u = u_old
-    res = max(np.amax(abs(u.preview() - dt*uxx.preview() - u_old.preview())), res)
+    res = max(abs(sol - dt*lap - u_old), res)
 t1 = time.time()
 
 print(f'PMESH residual: {res:6.4e}')  # Should be approx. 5.9E-11
