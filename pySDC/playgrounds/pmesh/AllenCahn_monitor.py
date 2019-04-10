@@ -12,6 +12,7 @@ class monitor(hooks):
         super(monitor, self).__init__()
 
         self.init_radius = None
+        self.ndim = 0
 
     def pre_run(self, step, level_number):
         """
@@ -39,26 +40,13 @@ class monitor(hooks):
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-        # radius1 = 0
-        # rows, cols = np.where(L.u[0].values > 0.0)
-        # for r in rows:
-        #     radius1 = max(radius1, abs(L.prob.xvalues[r]))
-
-        # rows1 = np.where(L.u[0].values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] > -0.99)
-        # rows2 = np.where(L.u[0].values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] < 0.99)
-        # interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps
-
         self.init_radius = L.prob.params.radius
-
-        print(radius, self.init_radius)
 
         if L.time == 0.0:
             self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                               sweep=L.status.sweep, type='computed_radius', value=radius)
             self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                               sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
-            # self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-            #                   sweep=L.status.sweep, type='interface_width', value=interface_width)
 
     def post_step(self, step, level_number):
         """
@@ -86,16 +74,9 @@ class monitor(hooks):
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-        exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0))
-        # rows1 = np.where(L.uend.values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] > -0.99)
-        # rows2 = np.where(L.uend.values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] < 0.99)
-        # interface_width = (rows2[0][-1] - rows1[0][0]) * L.prob.dx / L.prob.params.eps
-
-        print(radius, exact_radius)
+        exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
 
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='computed_radius', value=radius)
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='exact_radius', value=exact_radius)
-        # self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-        #                   sweep=L.status.sweep, type='interface_width', value=interface_width)

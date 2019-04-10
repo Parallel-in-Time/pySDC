@@ -10,7 +10,7 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
-from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
+from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_monitor import monitor
 
 
@@ -31,7 +31,7 @@ def main():
     else:
         color = int(world_rank / 1)
     space_comm = comm.Split(color=color)
-    space_size = space_comm.Get_size()
+    # space_size = space_comm.Get_size()
     space_rank = space_comm.Get_rank()
 
     # split world communicator to create time-communicators
@@ -40,11 +40,11 @@ def main():
     else:
         color = int(world_rank / world_size)
     time_comm = comm.Split(color=color)
-    time_size = time_comm.Get_size()
+    # time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    # print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank,
+    #                                                                     space_size, time_rank, time_size))
 
     # initialize level parameters
     level_params = dict()
@@ -63,7 +63,7 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128, 128)]#, (64, 64)]
+    problem_params['nvars'] = [(128, 128)]#, 128)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
@@ -79,8 +79,8 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = allencahn_imex
-    # description['problem_class'] = allencahn_imex_stab
+    # description['problem_class'] = allencahn_imex
+    description['problem_class'] = allencahn_imex_stab
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -90,7 +90,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1*0.001
+    Tend = 32*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -102,18 +102,18 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
-
     if space_rank == 0:
 
+        # filter statistics by type (number of iterations)
+        filtered_stats = filter_stats(stats, type='niter')
+
+        # convert filtered statistics to list of iterations count, sorted by process
+        iter_counts = sort_stats(filtered_stats, sortby='time')
+
         # compute and print statistics
-        for item in iter_counts:
-            out = 'Number of iterations for time %4.2f: %2i' % item
-            print(out)
+        # for item in iter_counts:
+        #     out = 'Number of iterations for time %4.2f: %2i' % item
+        #     print(out)
 
         niters = np.array([item[1] for item in iter_counts])
         out = f'Mean number of iterations on rank {time_rank}: {np.mean(niters):.4f}'
@@ -123,6 +123,20 @@ def main():
 
         out = f'Time to solution on rank {time_rank}: {timing[0][1]:.4f} sec.'
         print(out)
+
+        # convert filtered statistics to list of computed radii, sorted by time
+        computed_radii = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
+        exact_radii = sort_stats(filter_stats(stats, type='exact_radius'), sortby='time')
+
+        # print radii
+        for cr, er in zip(computed_radii, exact_radii):
+            if er[1] > 0:
+                err = abs(cr[1] - er[1])/er[1]
+            else:
+                err = 1.0
+            out = f'Computed/exact/error radius for time {cr[0]:4.2f}: ' \
+                  f'{cr[1]:6.4f} / {er[1]:6.4f} / {err:6.4e}'
+            print(out)
 
 
 if __name__ == "__main__":

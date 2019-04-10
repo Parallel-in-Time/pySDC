@@ -13,7 +13,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex
-from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
+from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 
 import matplotlib.pyplot as plt
 
