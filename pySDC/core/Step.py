@@ -28,6 +28,7 @@ class _Status(FrozenClass):
         self.done = None
         self.force_done = None
         self.prev_done = None
+        self.time_size = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 

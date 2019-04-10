@@ -180,6 +180,8 @@ class controller_nonMPI(controller):
             self.MS[p].status.iter = 0
             self.MS[p].status.stage = 'SPREAD'
             self.MS[p].status.force_done = False
+            self.MS[p].status.time_size = len(active_slots)
+
             for l in self.MS[p].levels:
                 l.tag = None
                 l.status.sweep = 1

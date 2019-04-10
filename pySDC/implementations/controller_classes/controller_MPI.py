@@ -37,6 +37,9 @@ class controller_MPI(controller):
         num_procs = self.comm.Get_size()
         rank = self.comm.Get_rank()
 
+        # insert data on time communicator to the steps (helpful here and there)
+        self.S.status.time_size = num_procs
+
         if self.params.dump_setup and rank == 0:
             self.dump_setup(step=self.S, controller_params=controller_params, description=description)
 
@@ -166,6 +169,8 @@ class controller_MPI(controller):
         self.req_status = None
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
+
+        self.S.status.time_size = size
 
         for lvl in self.S.levels:
             lvl.status.time = time

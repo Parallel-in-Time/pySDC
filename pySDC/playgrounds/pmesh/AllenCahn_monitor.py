@@ -97,7 +97,7 @@ class monitor(hooks):
             step.status.slot * self.size * L.uend.values.nbytes
         print(self.rank, local_offset / L.uend.values.nbytes)
         self.fh.Write_at_all(self.offset, L.uend.values)
-        self.offset += self.size * L.uend.values.nbytes
+        self.offset += step.status.time_size * self.size * L.uend.values.nbytes
 
     def post_run(self, step, level_number):
         """
