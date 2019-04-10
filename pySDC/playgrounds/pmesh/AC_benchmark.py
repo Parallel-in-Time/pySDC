@@ -90,7 +90,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 4*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -110,6 +110,8 @@ def main():
         # convert filtered statistics to list of iterations count, sorted by process
         iter_counts = sort_stats(filtered_stats, sortby='time')
 
+        print()
+
         # compute and print statistics
         # for item in iter_counts:
         #     out = 'Number of iterations for time %4.2f: %2i' % item
@@ -124,17 +126,19 @@ def main():
         out = f'Time to solution on rank {time_rank}: {timing[0][1]:.4f} sec.'
         print(out)
 
+        print()
+
         # convert filtered statistics to list of computed radii, sorted by time
         computed_radii = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
         exact_radii = sort_stats(filter_stats(stats, type='exact_radius'), sortby='time')
 
-        # print radii
+        # print radii and error over time
         for cr, er in zip(computed_radii, exact_radii):
             if er[1] > 0:
                 err = abs(cr[1] - er[1])/er[1]
             else:
                 err = 1.0
-            out = f'Computed/exact/error radius for time {cr[0]:4.2f}: ' \
+            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
                   f'{cr[1]:6.4f} / {er[1]:6.4f} / {err:6.4e}'
             print(out)
 
