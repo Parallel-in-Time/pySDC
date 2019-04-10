@@ -11,7 +11,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH import allencahn2d_imex
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
-from pySDC.playgrounds.pmesh.AllenCahn_monitor import monitor
+from pySDC.playgrounds.pmesh.AllenCahn_monitor_old import monitor
 
 
 def main():

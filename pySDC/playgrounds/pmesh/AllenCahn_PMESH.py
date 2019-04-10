@@ -4,12 +4,12 @@ from pmesh.pm import ParticleMesh
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.playgrounds.pmesh.PMESH_datatype_new import pmesh_datatype, rhs_imex_pmesh
+from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
 
 
-class allencahn2d_imex(ptype):
+class allencahn_imex(ptype):
     """
-    Example implementing Allen-Cahn equation in 2D using PMESH for solving linear parts, IMEX time-stepping
+    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping
 
     PMESH: https://github.com/rainwoodman/pmesh
 
@@ -42,8 +42,8 @@ class allencahn2d_imex(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        if len(problem_params['nvars']) != 2:
-            raise ProblemError('this is a 2d example, got %s' % problem_params['nvars'])
+        if not (isinstance(problem_params['nvars'], tuple) and len(problem_params['nvars']) > 1):
+            raise ProblemError('Need at least two dimensions')
 
         # Creating ParticleMesh structure
         self.pm = ParticleMesh(BoxSize=problem_params['L'], Nmesh=list(problem_params['nvars']), dtype='f8',
@@ -53,8 +53,8 @@ class allencahn2d_imex(ptype):
         tmp = self.pm.create(type='real')
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn2d_imex, self).__init__(init=(self.pm.comm, tmp.value.shape), dtype_u=dtype_u, dtype_f=dtype_f,
-                                               params=problem_params)
+        super(allencahn_imex, self).__init__(init=(self.pm.comm, tmp.value.shape), dtype_u=dtype_u, dtype_f=dtype_f,
+                                             params=problem_params)
 
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
@@ -142,9 +142,9 @@ class allencahn2d_imex(ptype):
         return me
 
 
-class allencahn2d_imex_stab(allencahn2d_imex):
+class allencahn_imex_stab(allencahn_imex):
     """
-    Example implementing Allen-Cahn equation in 2D using PMESH for solving linear parts, IMEX time-stepping with
+    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping with
     stabilized splitting
     """
 

@@ -1,6 +1,6 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
+from pySDC.playgrounds.pmesh.PMESH_datatype_old import pmesh_datatype, rhs_imex_pmesh
 
 
 class pmesh_to_pmesh(space_transfer):

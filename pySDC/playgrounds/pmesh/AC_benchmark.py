@@ -9,9 +9,9 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH_new import allencahn2d_imex, allencahn2d_imex_stab
+from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
-from pySDC.playgrounds.pmesh.AllenCahn_monitor_new import monitor
+from pySDC.playgrounds.pmesh.AllenCahn_monitor import monitor
 
 
 def main():
@@ -63,7 +63,7 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(256, 256), (64, 64)]
+    problem_params['nvars'] = [(128, 128, 128)]#, (64, 64)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
@@ -79,8 +79,8 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = allencahn2d_imex
-    # description['problem_class'] = allencahn2d_imex_stab
+    description['problem_class'] = allencahn_imex
+    # description['problem_class'] = allencahn_imex_stab
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -90,7 +90,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 1*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)

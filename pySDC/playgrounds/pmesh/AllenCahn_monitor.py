@@ -1,5 +1,5 @@
 import numpy as np
-
+from mpi4py import MPI
 from pySDC.core.Hooks import hooks
 
 
@@ -24,13 +24,25 @@ class monitor(hooks):
         super(monitor, self).pre_run(step, level_number)
         L = step.levels[0]
 
-        c = np.count_nonzero(L.u[0].values.value[:] > 0.0)
-        radius = np.sqrt(c / np.pi) * L.prob.dx
+        self.ndim = len(L.u[0].values.shape)
 
-        radius1 = 0
-        rows, cols = np.where(L.u[0].values.value[:] > 0.0)
-        for r in rows:
-            radius1 = max(radius1, abs(L.prob.xvalues[r]))
+        c_local = np.count_nonzero(L.u[0].values > 0.0)
+        comm = L.prob.pm.comm
+        if comm is not None:
+            c_global = comm.allreduce(sendobj=c_local, op=MPI.SUM)
+        else:
+            c_global = c_local
+        if self.ndim == 3:
+            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
+        elif self.ndim == 2:
+            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+        else:
+            raise NotImplementedError('Can use this only for 2 or 3D problems')
+
+        # radius1 = 0
+        # rows, cols = np.where(L.u[0].values > 0.0)
+        # for r in rows:
+        #     radius1 = max(radius1, abs(L.prob.xvalues[r]))
 
         # rows1 = np.where(L.u[0].values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] > -0.99)
         # rows2 = np.where(L.u[0].values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] < 0.99)
@@ -61,8 +73,18 @@ class monitor(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        c = np.count_nonzero(L.uend.values.value[:] >= 0.0)
-        radius = np.sqrt(c / np.pi) * L.prob.dx
+        c_local = np.count_nonzero(L.uend.values > 0.0)
+        comm = L.prob.pm.comm
+        if comm is not None:
+            c_global = comm.allreduce(sendobj=c_local, op=MPI.SUM)
+        else:
+            c_global = c_local
+        if self.ndim == 3:
+            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
+        elif self.ndim == 2:
+            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+        else:
+            raise NotImplementedError('Can use this only for 2 or 3D problems')
 
         exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0))
         # rows1 = np.where(L.uend.values['g'][int((L.prob.nvars[0]) / 2), :int((L.prob.nvars[0]) / 2)] > -0.99)

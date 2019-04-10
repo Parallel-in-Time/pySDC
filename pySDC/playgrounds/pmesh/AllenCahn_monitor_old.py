@@ -24,11 +24,11 @@ class monitor(hooks):
         super(monitor, self).pre_run(step, level_number)
         L = step.levels[0]
 
-        c = np.count_nonzero(L.u[0].values > 0.0)
+        c = np.count_nonzero(L.u[0].values.value[:] > 0.0)
         radius = np.sqrt(c / np.pi) * L.prob.dx
 
         radius1 = 0
-        rows, cols = np.where(L.u[0].values > 0.0)
+        rows, cols = np.where(L.u[0].values.value[:] > 0.0)
         for r in rows:
             radius1 = max(radius1, abs(L.prob.xvalues[r]))
 
@@ -61,7 +61,7 @@ class monitor(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        c = np.count_nonzero(L.uend.values >= 0.0)
+        c = np.count_nonzero(L.uend.values.value[:] >= 0.0)
         radius = np.sqrt(c / np.pi) * L.prob.dx
 
         exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0))

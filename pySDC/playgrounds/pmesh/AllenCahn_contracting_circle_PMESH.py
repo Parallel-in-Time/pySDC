@@ -12,7 +12,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.TOMS.AllenCahn_monitor import monitor
 
-from pySDC.playgrounds.pmesh.AllenCahn_2D_PMESH_new import allencahn2d_imex
+from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH_new import pmesh_to_pmesh
 
 import matplotlib.pyplot as plt
@@ -93,7 +93,7 @@ def run_SDC_variant(variant=None):
 
     # add stuff based on variant
     if variant == 'semi-implicit':
-        description['problem_class'] = allencahn2d_imex
+        description['problem_class'] = allencahn_imex
         description['sweeper_class'] = imex_1st_order
     # elif variant == 'semi-implicit-stab':
     #     description['problem_class'] = allencahn2d_imex_stab

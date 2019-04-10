@@ -4,7 +4,7 @@ from pmesh.pm import ParticleMesh
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
+from pySDC.playgrounds.pmesh.PMESH_datatype_old import pmesh_datatype, rhs_imex_pmesh
 
 
 class allencahn2d_imex(ptype):
