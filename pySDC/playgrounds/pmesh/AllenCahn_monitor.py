@@ -93,11 +93,17 @@ class monitor(hooks):
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='exact_radius', value=exact_radius)
 
-        local_offset = self.offset + self.rank * L.uend.values.nbytes + \
-            step.status.slot * self.size * L.uend.values.nbytes
-        print(self.rank, local_offset / L.uend.values.nbytes)
-        self.fh.Write_at_all(self.offset, L.uend.values)
-        self.offset += step.status.time_size * self.size * L.uend.values.nbytes
+        nbytes_local = L.uend.values.nbytes
+        if self.comm is not None:
+            nbytes_global = self.comm.allgather(nbytes_local)
+        else:
+            nbytes_global = [nbytes_local]
+
+        # compute local offset and write
+        local_offset = self.offset + step.status.slot * sum(nbytes_global[:]) + sum(nbytes_global[:self.rank])
+        self.fh.Write_at_all(local_offset, L.uend.values)
+        # update offset by adding space-time block
+        self.offset += step.status.time_size * sum(nbytes_global[:])
 
     def post_run(self, step, level_number):
         """
