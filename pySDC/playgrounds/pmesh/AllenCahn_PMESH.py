@@ -152,6 +152,7 @@ class allencahn_imex(ptype):
                         data += np.tanh((rand_radii[indexi, indexj] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # get rid of the 1
             data -= 1
+            assert np.all(data <= 1.0)
             return data
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
