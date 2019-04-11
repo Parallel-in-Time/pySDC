@@ -72,6 +72,7 @@ class dump(hooks):
 
         # set step count
         self.time_step = 1
+        exit()
 
     def post_step(self, step, level_number):
         """
