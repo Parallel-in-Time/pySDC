@@ -9,7 +9,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
-from pySDC.playgrounds.pmesh.AllenCahn_monitor import monitor
+from pySDC.playgrounds.pmesh.AllenCahn_monitor_and_dump import monitor_and_dump
 
 
 def run_simulation(name=''):
@@ -74,7 +74,7 @@ def run_simulation(name=''):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
-    controller_params['hook_class'] = monitor
+    controller_params['hook_class'] = monitor_and_dump
 
     # fill description dictionary for easy step instantiation
     description = dict()

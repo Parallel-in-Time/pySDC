@@ -29,8 +29,12 @@ def plot_data(name=''):
         array = array.reshape(obj['shape'], order='C')
 
         plt.figure()
+
         plt.imshow(array, vmin=-1, vmax=1)
+
         plt.colorbar()
+        plt.title(f"Time: {obj['time']:6.4f}")
+
         plt.savefig(f'data/{name}_{index}.png', rasterized=True, bbox_inches='tight')
         plt.close()
 
