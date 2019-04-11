@@ -1,7 +1,5 @@
 import sys
-
 import numpy as np
-import matplotlib.pyplot as plt
 from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -14,9 +12,9 @@ from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_monitor import monitor
 
 
-def main():
+def run_simulation(name=''):
     """
-    A simple test program to do PFASST runs for the heat equation
+    A simple test program to do PFASST runs for the AC equation
     """
 
     # set MPI communicator
@@ -67,6 +65,7 @@ def main():
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
+    problem_params['name'] = name
 
     # initialize step parameters
     step_params = dict()
@@ -90,7 +89,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 4*0.001
+    Tend = 32*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -111,11 +110,6 @@ def main():
         iter_counts = sort_stats(filtered_stats, sortby='time')
 
         print()
-
-        # compute and print statistics
-        # for item in iter_counts:
-        #     out = 'Number of iterations for time %4.2f: %2i' % item
-        #     print(out)
 
         niters = np.array([item[1] for item in iter_counts])
         out = f'Mean number of iterations on rank {time_rank}: {np.mean(niters):.4f}'
@@ -144,4 +138,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    name = 'AC-test'
+    run_simulation(name=name)
