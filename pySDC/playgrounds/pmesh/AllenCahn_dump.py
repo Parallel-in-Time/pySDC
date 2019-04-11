@@ -10,7 +10,7 @@ class dump(hooks):
         """
         Initialization of Allen-Cahn monitoring
         """
-        super(monitor, self).__init__()
+        super(dump, self).__init__()
 
         self.init_radius = None
         self.ndim = None
@@ -29,7 +29,7 @@ class dump(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        super(monitor, self).pre_run(step, level_number)
+        super(dump, self).pre_run(step, level_number)
         L = step.levels[0]
 
         # get space-communicator and data
@@ -72,7 +72,6 @@ class dump(hooks):
 
         # set step count
         self.time_step = 1
-        exit()
 
     def post_step(self, step, level_number):
         """
@@ -82,7 +81,7 @@ class dump(hooks):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        super(monitor, self).post_step(step, level_number)
+        super(dump, self).post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[0]

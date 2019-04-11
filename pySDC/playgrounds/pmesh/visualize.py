@@ -42,6 +42,6 @@ def plot_data(name=''):
 if __name__ == "__main__":
 
     # name = 'AC-test'
-    name = 'AC-2D-applicatio'
+    name = 'AC-2D-application'
 
     plot_data(name=name)

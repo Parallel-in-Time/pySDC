@@ -128,6 +128,29 @@ class allencahn_imex(ptype):
             r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
             return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
 
+        def circle_rand(i, v):
+            L = [int(l) for l in v.BoxSize]
+            r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, L)]
+            rshift = r.copy()
+            ndim = len(r)
+            data = 0
+            # get random radii for circles/spheres
+            rand_radii = (0.5 - 2 * self.params.eps) * np.random.random_sample(size=tuple(L)) + self.params.eps
+            # distribnute circles/spheres
+            if ndim == 2:
+                for indexi, i in enumerate(range(-L[0] + 1, L[0], 2)):
+                    for indexj, j in enumerate(range(-L[1] + 1, L[1], 2)):
+                        # shift x and y coordinate depending on which box we are in
+                        rshift[0] = r[0] + i/2
+                        rshift[1] = r[1] + j/2
+                        # build radius
+                        r2 = sum(ri ** 2 for ri in rshift)
+                        # add this blob, shifted by 1 to avoid issues with adding up negative contributions
+                        data += np.tanh((rand_radii[indexi, indexj] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
+            # get rid of the 1
+            data -= 1
+            return data
+
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init)
         if self.params.init_type == 'circle':
@@ -136,6 +159,9 @@ class allencahn_imex(ptype):
         elif self.params.init_type == 'checkerboard':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values = tmp_u.apply(checkerboard, kind='index').value
+        elif self.params.init_type == 'circle_rand':
+            tmp_u = self.pm.create(type='real', value=0.0)
+            me.values = tmp_u.apply(circle_rand, kind='index').value
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

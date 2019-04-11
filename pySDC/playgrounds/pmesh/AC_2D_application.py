@@ -10,6 +10,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
+from pySDC.playgrounds.pmesh.visualize import plot_data
 
 
 def run_simulation(name=''):
@@ -60,12 +61,13 @@ def run_simulation(name=''):
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 2
-    problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128)]#, 128)]
+    problem_params['L'] = 16.0
+    problem_params['nvars'] = [(2048, 2048)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
+    problem_params['init_type'] = 'circle_rand'
 
     # initialize step parameters
     step_params = dict()
@@ -120,23 +122,8 @@ def run_simulation(name=''):
         out = f'Time to solution on rank {time_rank}: {timing[0][1]:.4f} sec.'
         print(out)
 
-        print()
-
-        # convert filtered statistics to list of computed radii, sorted by time
-        computed_radii = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
-        exact_radii = sort_stats(filter_stats(stats, type='exact_radius'), sortby='time')
-
-        # print radii and error over time
-        for cr, er in zip(computed_radii, exact_radii):
-            if er[1] > 0:
-                err = abs(cr[1] - er[1])/er[1]
-            else:
-                err = 1.0
-            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
-                  f'{cr[1]:6.4f} / {er[1]:6.4f} / {err:6.4e}'
-            print(out)
-
 
 if __name__ == "__main__":
-    name = 'AC-2D-applicatio'
+    name = 'AC-2D-application'
     run_simulation(name=name)
+    plot_data(name=name)
