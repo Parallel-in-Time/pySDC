@@ -135,7 +135,10 @@ class allencahn_imex(ptype):
             ndim = len(r)
             data = 0
             # get random radii for circles/spheres
-            rand_radii = (0.5 - 2 * self.params.eps) * np.random.random_sample(size=tuple(L)) + self.params.eps
+            np.random.seed(1)
+            lbound = 3.0 * self.params.eps
+            ubound = 0.5 - self.params.eps
+            rand_radii = (ubound - lbound) * np.random.random_sample(size=tuple(L)) + lbound
             # distribnute circles/spheres
             if ndim == 2:
                 for indexi, i in enumerate(range(-L[0] + 1, L[0], 2)):

@@ -10,7 +10,6 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
-from pySDC.playgrounds.pmesh.visualize import plot_data
 
 
 def run_simulation(name=''):
@@ -126,4 +125,3 @@ def run_simulation(name=''):
 if __name__ == "__main__":
     name = 'AC-2D-application'
     run_simulation(name=name)
-    plot_data(name=name)
