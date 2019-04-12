@@ -48,7 +48,7 @@ def run_simulation(name=''):
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -61,7 +61,7 @@ def run_simulation(name=''):
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 16.0
-    problem_params['nvars'] = [(2048, 2048)]
+    problem_params['nvars'] = [(48 * 48, 48 * 48), (16 * 48, 16 * 48)]
     problem_params['eps'] = [0.04]
     problem_params['dw'] = [-0.04]
     problem_params['radius'] = 0.25
@@ -91,7 +91,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 96 * 0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
