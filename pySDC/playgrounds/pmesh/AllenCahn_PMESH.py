@@ -84,28 +84,9 @@ class allencahn_imex(ptype):
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
 
-        # if self.params.eps > 0:
-        #     f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-        #         6.0 * self.params.dw * u.values * (1.0 - u.values)
-
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
-
-        Rt_local = f.impl.values.sum() + f.expl.values.sum()
-        if self.pm.comm is not None:
-            Rt_global = self.pm.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
-        else:
-            Rt_global = Rt_local
-
-        Ht_local = np.sum(6.0 * u.values * (1.0 - u.values))
-        if self.pm.comm is not None:
-            Ht_global = self.pm.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
-        else:
-            Ht_global = Rt_local
-
-        dw = Rt_global / Ht_global
-
-        f.expl.values -= 6.0 * dw * u.values * (1.0 - u.values)
+            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
+                6.0 * self.params.dw * u.values * (1.0 - u.values)
 
         return f
 
@@ -189,6 +170,56 @@ class allencahn_imex(ptype):
         return me
 
 
+class allencahn_imex_timeforcing(allencahn_imex):
+    """
+    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping,
+    time-dependent forcing
+    """
+
+    def eval_f(self, u, t):
+        """
+        Routine to evaluate the RHS
+
+        Args:
+            u (dtype_u): current values
+            t (float): current time
+
+        Returns:
+            dtype_f: the RHS
+        """
+
+        def Laplacian(k, v):
+            k2 = sum(ki ** 2 for ki in k)
+            return -k2 * v
+
+        f = self.dtype_f(self.init)
+        tmp_u = self.pm.create(type='real', value=u.values)
+        f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
+
+        if self.params.eps > 0:
+            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
+
+        # build sum over RHS without driving force
+        Rt_local = f.impl.values.sum() + f.expl.values.sum()
+        if self.pm.comm is not None:
+            Rt_global = self.pm.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+        else:
+            Rt_global = Rt_local
+
+        # build sum over driving force term
+        Ht_local = np.sum(6.0 * u.values * (1.0 - u.values))
+        if self.pm.comm is not None:
+            Ht_global = self.pm.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+        else:
+            Ht_global = Rt_local
+
+        # add/substract time-dependent driving force
+        dw = Rt_global / Ht_global
+        f.expl.values -= 6.0 * dw * u.values * (1.0 - u.values)
+
+        return f
+
+
 class allencahn_imex_stab(allencahn_imex):
     """
     Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping with
@@ -208,16 +239,16 @@ class allencahn_imex_stab(allencahn_imex):
         """
 
         def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 2.0 / self.params.eps ** 2
+            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
             return -k2 * v
 
         f = self.dtype_f(self.init)
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
         if self.params.eps > 0:
-            f.expl.values = 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
+            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
                 6.0 * self.params.dw * u.values * (1.0 - u.values) + \
-                2.0 / self.params.eps ** 2 * u.values
+                1.0 / self.params.eps ** 2 * u.values
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -235,7 +266,7 @@ class allencahn_imex_stab(allencahn_imex):
         """
 
         def linear_solve(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 2.0 / self.params.eps ** 2
+            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
             return 1.0 / (1.0 + factor * k2) * v
 
         me = self.dtype_u(self.init)

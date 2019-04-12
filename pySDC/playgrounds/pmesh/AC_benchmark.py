@@ -79,8 +79,8 @@ def run_simulation(name=''):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = allencahn_imex
-    # description['problem_class'] = allencahn_imex_stab
+    # description['problem_class'] = allencahn_imex
+    description['problem_class'] = allencahn_imex_stab
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -90,7 +90,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 35*0.001
+    Tend = 10*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
