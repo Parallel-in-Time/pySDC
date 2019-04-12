@@ -34,9 +34,11 @@ class allencahn_imex(ptype):
             problem_params['init_type'] = 'circle'
         if 'comm' not in problem_params:
             problem_params['comm'] = None
+        if 'dw' not in problem_params:
+            problem_params['dw'] = 0.0
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'nu', 'eps', 'L', 'radius']
+        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -82,7 +84,8 @@ class allencahn_imex(ptype):
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
         if self.params.eps > 0:
-            f.expl.values = 1.0 / self.params.eps ** 2 * u.values * (1.0 - u.values ** self.params.nu)
+            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
+                6.0 * self.params.dw * u.values * (1.0 - u.values)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -122,11 +125,7 @@ class allencahn_imex(ptype):
         def circle(i, v):
             r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
             r2 = sum(ri ** 2 for ri in r)
-            return np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
-
-        def checkerboard(i, v):
-            r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
-            return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
+            return 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
 
         def circle_rand(i, v):
             L = [int(l) for l in v.BoxSize]
@@ -151,7 +150,7 @@ class allencahn_imex(ptype):
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
                         data += np.tanh((rand_radii[indexi, indexj] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # get rid of the 1
-            data -= 1
+            data *= 0.5
             assert np.all(data <= 1.0)
             return data
 
@@ -160,9 +159,6 @@ class allencahn_imex(ptype):
         if self.params.init_type == 'circle':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values = tmp_u.apply(circle, kind='index').value
-        elif self.params.init_type == 'checkerboard':
-            tmp_u = self.pm.create(type='real', value=0.0)
-            me.values = tmp_u.apply(checkerboard, kind='index').value
         elif self.params.init_type == 'circle_rand':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values = tmp_u.apply(circle_rand, kind='index').value
@@ -198,7 +194,8 @@ class allencahn_imex_stab(allencahn_imex):
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
         if self.params.eps > 0:
-            f.expl.values = 1.0 / self.params.eps ** 2 * u.values * (1.0 - u.values ** self.params.nu) + \
+            f.expl.values = 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
+                6.0 * self.params.dw * u.values * (1.0 - u.values) + \
                 2.0 / self.params.eps ** 2 * u.values
         return f
 

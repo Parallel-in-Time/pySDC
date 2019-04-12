@@ -63,6 +63,7 @@ def run_simulation(name=''):
     problem_params['L'] = 16.0
     problem_params['nvars'] = [(2048, 2048)]
     problem_params['eps'] = [0.04]
+    problem_params['dw'] = [-0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
@@ -123,5 +124,6 @@ def run_simulation(name=''):
 
 
 if __name__ == "__main__":
-    name = 'AC-2D-application'
+    # name = 'AC-2D-application'
+    name = 'AC-2D-application-forced'
     run_simulation(name=name)

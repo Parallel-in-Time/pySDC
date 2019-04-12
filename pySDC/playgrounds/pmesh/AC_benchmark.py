@@ -10,6 +10,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_monitor_and_dump import monitor_and_dump
+from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
 
 
 def run_simulation(name=''):
@@ -59,10 +60,10 @@ def run_simulation(name=''):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 2
     problem_params['L'] = 1.0
     problem_params['nvars'] = [(128, 128)]#, 128)]
     problem_params['eps'] = [0.04]
+    problem_params['dw'] = [-0.00]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
@@ -78,8 +79,8 @@ def run_simulation(name=''):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    # description['problem_class'] = allencahn_imex
-    description['problem_class'] = allencahn_imex_stab
+    description['problem_class'] = allencahn_imex
+    # description['problem_class'] = allencahn_imex_stab
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -89,7 +90,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 35*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -138,5 +139,5 @@ def run_simulation(name=''):
 
 
 if __name__ == "__main__":
-    name = 'AC-test'
+    name = 'AC-test-constforce'
     run_simulation(name=name)

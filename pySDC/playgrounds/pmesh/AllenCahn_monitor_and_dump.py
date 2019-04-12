@@ -43,17 +43,30 @@ class monitor_and_dump(hooks):
 
         # compute numerical radius
         self.ndim = len(L.u[0].values.shape)
-        c_local = np.count_nonzero(L.u[0].values > 0.0)
+        v_local = L.u[0].values[L.u[0].values > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
-            c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
+            v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
         else:
-            c_global = c_local
+            v_global = v_local
         if self.ndim == 3:
-            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
+            radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
         elif self.ndim == 2:
-            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+            radius = np.sqrt(v_global / np.pi) * L.prob.dx
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
+
+
+        # c_local = np.count_nonzero(L.u[0].values > 0.5)
+        # if self.comm is not None:
+        #     c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
+        # else:
+        #     c_global = c_local
+        # if self.ndim == 3:
+        #     radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
+        # elif self.ndim == 2:
+        #     radius = np.sqrt(c_global / np.pi) * L.prob.dx
+        # else:
+        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
 
         self.init_radius = L.prob.params.radius
 
@@ -110,17 +123,30 @@ class monitor_and_dump(hooks):
         L = step.levels[0]
 
         # compute numerical radius
-        c_local = np.count_nonzero(L.uend.values > 0.0)
+        # v_local = np.sum(L.uend.values)
+        v_local = L.uend.values[L.uend.values > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
-            c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
+            v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
         else:
-            c_global = c_local
+            v_global = v_local
         if self.ndim == 3:
-            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
+            radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
         elif self.ndim == 2:
-            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+            radius = np.sqrt(v_global / np.pi) * L.prob.dx
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
+
+        # c_local = np.count_nonzero(L.uend.values > 0.5)
+        # if self.comm is not None:
+        #     c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
+        # else:
+        #     c_global = c_local
+        # if self.ndim == 3:
+        #     radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
+        # elif self.ndim == 2:
+        #     radius = np.sqrt(c_global / np.pi) * L.prob.dx
+        # else:
+        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
 
         # compute exact radius
         exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
