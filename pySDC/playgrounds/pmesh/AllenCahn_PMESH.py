@@ -1,5 +1,5 @@
 import numpy as np
-
+from mpi4py import MPI
 from pmesh.pm import ParticleMesh
 
 from pySDC.core.Errors import ParameterError, ProblemError
@@ -83,9 +83,30 @@ class allencahn_imex(ptype):
         f = self.dtype_f(self.init)
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
+
+        # if self.params.eps > 0:
+        #     f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
+        #         6.0 * self.params.dw * u.values * (1.0 - u.values)
+
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-                6.0 * self.params.dw * u.values * (1.0 - u.values)
+            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
+
+        Rt_local = f.impl.values.sum() + f.expl.values.sum()
+        if self.pm.comm is not None:
+            Rt_global = self.pm.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+        else:
+            Rt_global = Rt_local
+
+        Ht_local = np.sum(6.0 * u.values * (1.0 - u.values))
+        if self.pm.comm is not None:
+            Ht_global = self.pm.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+        else:
+            Ht_global = Rt_local
+
+        dw = Rt_global / Ht_global
+
+        f.expl.values -= 6.0 * dw * u.values * (1.0 - u.values)
+
         return f
 
     def solve_system(self, rhs, factor, u0, t):
