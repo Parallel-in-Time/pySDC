@@ -44,8 +44,8 @@ def plot_data(name=''):
 if __name__ == "__main__":
 
     # name = 'AC-test'
-    # name = 'AC-test-constforce'
+    name = 'AC-test-constforce'
     # name = 'AC-2D-application'
-    name = 'AC-2D-application-forced'
+    # name = 'AC-2D-application-forced'
 
     plot_data(name=name)
