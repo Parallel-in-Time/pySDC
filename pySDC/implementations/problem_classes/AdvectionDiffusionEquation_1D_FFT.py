@@ -1,5 +1,4 @@
 import numpy as np
-import pyfftw
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -58,13 +57,6 @@ class advectiondiffusion1d_imex(ptype):
         self.ddx = kx * 1j
         self.lap = -kx ** 2
 
-        rfft_in = pyfftw.empty_aligned(self.init, dtype='float64')
-        fft_out = pyfftw.empty_aligned(self.init // 2 + 1, dtype='complex128')
-        ifft_in = pyfftw.empty_aligned(self.init // 2 + 1, dtype='complex128')
-        irfft_out = pyfftw.empty_aligned(self.init, dtype='float64')
-        self.rfft_object = pyfftw.FFTW(rfft_in, fft_out, direction='FFTW_FORWARD')
-        self.irfft_object = pyfftw.FFTW(ifft_in, irfft_out, direction='FFTW_BACKWARD')
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -78,11 +70,11 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        tmp_u = self.rfft_object(u.values)
+        tmp_u = np.fft.rfft(u.values)
         tmp_impl = self.params.nu * self.lap * tmp_u
         tmp_expl = -self.params.c * self.ddx * tmp_u
-        f.impl.values[:] = self.irfft_object(tmp_impl)
-        f.expl.values[:] = self.irfft_object(tmp_expl)
+        f.impl.values[:] = np.fft.irfft(tmp_impl)
+        f.expl.values[:] = np.fft.irfft(tmp_expl)
 
         return f
 
@@ -101,8 +93,8 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-        tmp = self.rfft_object(rhs.values) / (1.0 - self.params.nu * factor * self.lap)
-        me.values[:] = self.irfft_object(tmp)
+        tmp = np.fft.rfft(rhs.values) / (1.0 - self.params.nu * factor * self.lap)
+        me.values[:] = np.fft.irfft(tmp)
 
         return me
 
@@ -169,9 +161,9 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         f = self.dtype_f(self.init)
-        tmp_u = self.rfft_object(u.values)
+        tmp_u = np.fft.rfft(u.values)
         tmp = self.params.nu * self.lap * tmp_u - self.params.c * self.ddx * tmp_u
-        f.values[:] = np.real(self.irfft_object(tmp))
+        f.values[:] = np.fft.irfft(tmp)
 
         return f
 
@@ -190,7 +182,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         me = self.dtype_u(self.init)
-        tmp = self.rfft_object(rhs.values) / (1.0 - factor * (self.params.nu * self.lap - self.params.c * self.ddx))
-        me.values[:] = np.real(self.irfft_object(tmp))
+        tmp = np.fft.rfft(rhs.values) / (1.0 - factor * (self.params.nu * self.lap - self.params.c * self.ddx))
+        me.values[:] = np.fft.irfft(tmp)
 
         return me
