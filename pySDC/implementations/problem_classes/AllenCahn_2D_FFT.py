@@ -1,5 +1,4 @@
 import numpy as np
-import pyfftw
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -67,13 +66,6 @@ class allencahn2d_imex(ptype):
         xv, yv = np.meshgrid(kx, ky, indexing='ij')
         self.lap = -xv ** 2 - yv ** 2
 
-        rfft_in = pyfftw.empty_aligned(self.init, dtype='float64')
-        fft_out = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
-        ifft_in = pyfftw.empty_aligned((self.init[0], self.init[1] // 2 + 1), dtype='complex128')
-        irfft_out = pyfftw.empty_aligned(self.init, dtype='float64')
-        self.rfft_object = pyfftw.FFTW(rfft_in, fft_out, direction='FFTW_FORWARD', axes=(0, 1))
-        self.irfft_object = pyfftw.FFTW(ifft_in, irfft_out, direction='FFTW_BACKWARD', axes=(0, 1))
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -88,8 +80,8 @@ class allencahn2d_imex(ptype):
 
         f = self.dtype_f(self.init)
         v = u.values.flatten()
-        tmp = self.lap * self.rfft_object(u.values)
-        f.impl.values[:] = self.irfft_object(tmp)
+        tmp = self.lap * np.fft.rfft2(u.values)
+        f.impl.values[:] = np.fft.irfft2(tmp)
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
             f.expl.values = f.expl.values.reshape(self.params.nvars)
@@ -111,8 +103,8 @@ class allencahn2d_imex(ptype):
 
         me = self.dtype_u(self.init)
 
-        tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = self.irfft_object(tmp)
+        tmp = np.fft.rfft2(rhs.values) / (1.0 - factor * self.lap)
+        me.values[:] = np.fft.irfft2(tmp)
 
         return me
 
@@ -184,8 +176,8 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
         f = self.dtype_f(self.init)
         v = u.values.flatten()
-        tmp = self.lap * self.rfft_object(u.values)
-        f.impl.values[:] = self.irfft_object(tmp)
+        tmp = self.lap * np.fft.rfft2(u.values)
+        f.impl.values[:] = np.fft.irfft2(tmp)
         if self.params.eps > 0:
             f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) + \
                 2.0 / self.params.eps ** 2 * v
@@ -208,7 +200,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
         me = self.dtype_u(self.init)
 
-        tmp = self.rfft_object(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = self.irfft_object(tmp)
+        tmp = np.fft.rfft2(rhs.values) / (1.0 - factor * self.lap)
+        me.values[:] = np.fft.irfft2(tmp)
 
         return me
