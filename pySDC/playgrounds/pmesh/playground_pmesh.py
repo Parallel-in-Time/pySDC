@@ -7,6 +7,9 @@ from pmesh.pm import ParticleMesh
 
 from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
 
+from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmesh
+
+
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
     # xx, yy = np.meshgrid(r[0], r[1])
@@ -41,7 +44,10 @@ pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measu
 tmp = pm.create(type='real')
 t1 = time.time()
 
+a = pmesh_datatype((pm, (2, (4, 4))))
+
 print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
+exit()
 
 dt = 0.121233
 res = 0.0
