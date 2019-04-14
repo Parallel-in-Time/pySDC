@@ -64,32 +64,32 @@ class mesh_to_mesh_fft2d(space_transfer):
         """
         if isinstance(G, mesh):
             F = mesh(self.fine_prob.init)
-            tmpG = np.fft.rfft2(G.values) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
+            tmpG = np.fft.fft2(G.values)
             tmpF = np.zeros(self.fine_prob.init, dtype=np.complex128)
             halfG = int(self.coarse_prob.init[0] / 2)
             tmpF[0:halfG, 0:halfG] = tmpG[0:halfG, 0:halfG]
             tmpF[self.fine_prob.init[0] - halfG:, 0:halfG] = tmpG[halfG:, 0:halfG]
             tmpF[0:halfG, self.fine_prob.init[0] - halfG:] = tmpG[0:halfG, halfG:]
             tmpF[self.fine_prob.init[0] - halfG:, self.fine_prob.init[0] - halfG:] = tmpG[halfG:, halfG:]
-            F.values[:] = np.fft.ifft2(tmpF)
+            F.values[:] = np.real(np.fft.ifft2(tmpF)) * self.ratio * 2
         elif isinstance(G, rhs_imex_mesh):
             F = rhs_imex_mesh(G)
-            tmpG_impl = np.fft.rfft2(G.impl.values) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
+            tmpG_impl = np.fft.fft2(G.impl.values)
             tmpF_impl = np.zeros(self.fine_prob.init, dtype=np.complex128)
             halfG = int(self.coarse_prob.init[0] / 2)
             tmpF_impl[0:halfG, 0:halfG] = tmpG_impl[0:halfG, 0:halfG]
             tmpF_impl[self.fine_prob.init[0] - halfG:, 0:halfG] = tmpG_impl[halfG:, 0:halfG]
             tmpF_impl[0:halfG, self.fine_prob.init[0] - halfG:] = tmpG_impl[0:halfG, halfG:]
             tmpF_impl[self.fine_prob.init[0] - halfG:, self.fine_prob.init[0] - halfG:] = tmpG_impl[halfG:, halfG:]
-            F.impl.values[:] = np.fft.irfft2(tmpF_impl)
-            tmpG_expl = np.fft.rfft2(G.expl.values) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
+            F.impl.values[:] = np.real(np.fft.ifft2(tmpF_impl)) * self.ratio * 2
+            tmpG_expl = np.fft.fft2(G.expl.values) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
             tmpF_expl = np.zeros(self.fine_prob.init, dtype=np.complex128)
             halfG = int(self.coarse_prob.init[0] / 2)
             tmpF_expl[0:halfG, 0:halfG] = tmpG_expl[0:halfG, 0:halfG]
             tmpF_expl[self.fine_prob.init[0] - halfG:, 0:halfG] = tmpG_expl[halfG:, 0:halfG]
             tmpF_expl[0:halfG, self.fine_prob.init[0] - halfG:] = tmpG_expl[0:halfG, halfG:]
             tmpF_expl[self.fine_prob.init[0] - halfG:, self.fine_prob.init[0] - halfG:] = tmpG_expl[halfG:, halfG:]
-            F.expl.values[:] = np.fft.irfft2(tmpF_expl)
+            F.expl.values[:] = np.real(np.fft.ifft2(tmpF_expl)) * self.ratio * 2
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F
