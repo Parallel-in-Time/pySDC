@@ -100,7 +100,7 @@ class monitor_and_dump(hooks):
             json_obj['time'] = L.time
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
-            json_obj['shape'] = L.prob.params.nvars
+            json_obj['shape'] = L.prob.init[1]
             json_obj['elementsize'] = L.u[0].values.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:
@@ -180,7 +180,7 @@ class monitor_and_dump(hooks):
             json_obj['time'] = L.time + L.dt
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
-            json_obj['shape'] = L.prob.params.nvars
+            json_obj['shape'] = L.prob.init[1]
             json_obj['elementsize'] = L.uend.values.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:

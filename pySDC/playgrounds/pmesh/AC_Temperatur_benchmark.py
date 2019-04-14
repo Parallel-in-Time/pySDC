@@ -11,6 +11,7 @@ from pySDC.playgrounds.pmesh.AllenCahn_Temperature_PMESH import allencahn_imex
 from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
 from pySDC.playgrounds.pmesh.AllenCahn_Temperatur_monitor_and_dump import monitor_and_dump
 from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
+from pySDC.playgrounds.pmesh.visualize_Temperature import plot_data
 
 
 def run_simulation(name=''):
@@ -64,6 +65,8 @@ def run_simulation(name=''):
     problem_params['nvars'] = [(128, 128)]#, 128)]
     problem_params['eps'] = [0.04]
     problem_params['dw'] = [-23.6]
+    problem_params['D'] = [0.1]
+    problem_params['TM'] = [1.0]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
@@ -90,7 +93,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 10*0.001
+    Tend = 32*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -139,5 +142,7 @@ def run_simulation(name=''):
 
 
 if __name__ == "__main__":
-    name = 'AC-test-constforce'
+    name = 'AC-temperature-test'
     run_simulation(name=name)
+    plot_data(name=name)
+

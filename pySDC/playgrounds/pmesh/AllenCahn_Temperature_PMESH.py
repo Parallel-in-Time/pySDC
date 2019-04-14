@@ -34,11 +34,9 @@ class allencahn_imex(ptype):
             problem_params['init_type'] = 'circle'
         if 'comm' not in problem_params:
             problem_params['comm'] = None
-        if 'dw' not in problem_params:
-            problem_params['dw'] = 0.0
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw']
+        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw', 'D', 'TM']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -90,7 +88,29 @@ class allencahn_imex(ptype):
 
         if self.params.eps > 0:
             f.expl.values[..., 0] = - 2.0 / self.params.eps ** 2 * u.values[..., 0] * (1.0 - u.values[..., 0]) * (1.0 - 2.0 * u.values[..., 0]) - \
-                6.0 * self.params.dw * u.values[..., 0] * (1.0 - u.values[..., 0])
+                6.0 * self.params.dw * (u.values[..., 1] - self.params.TM) / self.params.TM * u.values[..., 0] * (1.0 - u.values[..., 0])
+
+        # # build sum over RHS without driving force
+        # Rt_local = f.impl.values[..., 0].sum() + f.expl.values[..., 0].sum()
+        # if self.pm.comm is not None:
+        #     Rt_global = self.pm.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+        # else:
+        #     Rt_global = Rt_local
+        #
+        # # build sum over driving force term
+        # Ht_local = np.sum(6.0 * (u.values[..., 1] - self.params.TM) / self.params.TM * u.values[..., 0] * (1.0 - u.values[..., 0]))
+        # if self.pm.comm is not None:
+        #     Ht_global = self.pm.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+        # else:
+        #     Ht_global = Rt_local
+        #
+        # # add/substract time-dependent driving force
+        # dw = Rt_global / Ht_global
+        # f.expl.values[..., 0] -= 6.0 * dw * (u.values[..., 1] - self.params.TM) / self.params.TM * u.values[..., 0] * (1.0 - u.values[..., 0])
+
+        tmp_u = self.pm.create(type='real', value=u.values[..., 1])
+        f.impl.values[..., 1] = self.params.D * tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
+        f.expl.values[..., 1] = -f.impl.values[..., 0] - f.expl.values[..., 0]
 
         return f
 
@@ -112,9 +132,15 @@ class allencahn_imex(ptype):
             k2 = sum(ki ** 2 for ki in k)
             return 1.0 / (1.0 + factor * k2) * v
 
+        def linear_solve_param(k, v):
+            k2 = sum(ki ** 2 for ki in k)
+            return 1.0 / (1.0 + self.params.D * factor * k2) * v
+
         me = self.dtype_u(self.init, val=0.0)
         tmp_rhs = self.pm.create(type='real', value=rhs.values[..., 0])
         me.values[..., 0] = tmp_rhs.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis).value
+        tmp_rhs = self.pm.create(type='real', value=rhs.values[..., 1])
+        me.values[..., 1] = tmp_rhs.r2c().apply(linear_solve_param, out=Ellipsis).c2r(out=Ellipsis).value
         return me
 
     def u_exact(self, t):
@@ -160,14 +186,25 @@ class allencahn_imex(ptype):
             assert np.all(data <= 1.0)
             return data
 
+        def sines(i, v):
+            r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
+            return np.sin(2 * 2 * np.pi * r[0]) * np.sin(2 * 2 * np.pi * r[1])
+
+        def scaled_circle(i, v):
+            r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
+            r2 = sum(ri ** 2 for ri in r)
+            return 0.5 * 0.1 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))) + 0.9
+
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values[..., 0] = tmp_u.apply(circle, kind='index').value
+            tmp_u = self.pm.create(type='real', value=0.0)
+            me.values[..., 1] = tmp_u.apply(scaled_circle, kind='index').value
         elif self.params.init_type == 'circle_rand':
             tmp_u = self.pm.create(type='real', value=0.0)
-            me.values = tmp_u.apply(circle_rand, kind='index').value
+            me.values[..., 0] = tmp_u.apply(circle_rand, kind='index').value
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 
