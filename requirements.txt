@@ -1,11 +1,16 @@
-nose>=1.3.7
+# These packages are required for pySDC's base functionality, installing those is sufficient to start playing
 numpy>=1.15.4
 scipy>=0.17.1
-matplotlib>=1.5.3
-pep8
 dill>=0.2.6
+# These packages are used in examples or for testing, they can be omitted if necessary
+matplotlib>=1.5.3
 numba>=0.35
+sympy>=1.0
+nose>=1.3.7
+pep8
+# These packages are required for some of the more involved examples (and data types etc.), can be omitted
 petsc4py>=3.10.0
 mpi4py>=3.0.0
-pyfftw>=0.11.0
 fenics>=2018.1.0
+pmesh>=0.1.54
+

@@ -9,6 +9,7 @@ class hooks(object):
     Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)
 
     Attributes:
+        __t0_setup (float): private variable to get starting time of setup
         __t0_run (float): private variable to get starting time of the run
         __t0_predict (float): private variable to get starting time of the predictor
         __t0_step (float): private variable to get starting time of the step
@@ -20,6 +21,7 @@ class hooks(object):
         __t1_step (float): private variable to get end time of the step
         __t1_iteration (float): private variable to get end time of the iteration
         __t1_sweep (float): private variable to get end time of the sweep
+        __t1_setup (float): private variable to get end time of setup
         __t1_comm (list): private variable to hold timing of the communication (!)
         logger: logger instance for output
         __stats (dict): dictionary for gathering the statistics of a run
@@ -30,6 +32,7 @@ class hooks(object):
         """
         Initialization routine
         """
+        self.__t0_setup = None
         self.__t0_run = None
         self.__t0_predict = None
         self.__t0_step = None
@@ -41,6 +44,7 @@ class hooks(object):
         self.__t1_step = None
         self.__t1_iteration = None
         self.__t1_sweep = None
+        self.__t1_setup = None
         self.__t1_comm = []
 
         self.logger = logging.getLogger('hooks')
@@ -79,6 +83,16 @@ class hooks(object):
         Function to reset the stats for multiple runs
         """
         self.__stats = {}
+
+    def pre_setup(self, step, level_number):
+        """
+        Default routine called before setup starts
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        self.__t0_setup = time.time()
 
     def pre_run(self, step, level_number):
         """
@@ -258,3 +272,16 @@ class hooks(object):
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           sweep=L.status.sweep, type='timing_run', value=self.__t1_run - self.__t0_run)
+
+    def post_setup(self, step, level_number):
+        """
+        Default routine called after setup
+
+        Args:
+            step (pySDC.Step.step): the current step
+            level_number (int): the current level number
+        """
+        self.__t1_setup = time.time()
+
+        self.add_to_stats(process=-1, time=-1, level=-1, iter=-1, sweep=-1, type='timing_setup',
+                          value=self.__t1_setup - self.__t0_setup)

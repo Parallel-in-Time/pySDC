@@ -116,8 +116,11 @@ def run_simulation(name=''):
         out = f'Mean number of iterations on rank {time_rank}: {np.mean(niters):.4f}'
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
+        out = f'Setup time on rank {time_rank}: {timing[0][1]:.4f} sec.'
+        print(out)
 
+        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
         out = f'Time to solution on rank {time_rank}: {timing[0][1]:.4f} sec.'
         print(out)
 

@@ -110,6 +110,8 @@ class controller_nonMPI(controller):
         # initialize block of steps with u0
         self.restart_block(active_slots, time, u0)
 
+        self.hooks.post_setup(step=None, level_number=None)
+
         # call pre-run hook
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)

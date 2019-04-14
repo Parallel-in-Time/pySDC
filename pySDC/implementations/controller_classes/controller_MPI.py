@@ -99,6 +99,9 @@ class controller_MPI(controller):
         self.restart_block(num_procs, time, u0)
         uend = u0
 
+        # call post-setup hook
+        self.hooks.post_setup(step=None, level_number=None)
+
         # call pre-run hook
         self.hooks.pre_run(step=self.S, level_number=0)
 

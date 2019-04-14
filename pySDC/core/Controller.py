@@ -38,6 +38,12 @@ class controller(object):
             controller_params (dict): parameter set for the controller and the steps
         """
 
+        # check if we have a hook on this list. if not, use default class.
+        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
+        self.__hooks = controller_params['hook_class']()
+
+        self.hooks.pre_setup(step=None, level_number=None)
+
         self.params = _Pars(controller_params)
 
         self.__setup_custom_logger(self.params.logger_level, self.params.log_to_file, self.params.fname)
@@ -45,11 +51,6 @@ class controller(object):
 
         # if self.params.dump_setup and self.params.logger_level > 20:
         #     self.logger.warning('Will not dump setup, logging level is too high, need at most 20')
-
-        # check if we have a hook on this list. if not, use default class.
-        controller_params['hook_class'] = controller_params.get('hook_class', hookclass.hooks)
-
-        self.__hooks = controller_params['hook_class']()
 
         pass
 
