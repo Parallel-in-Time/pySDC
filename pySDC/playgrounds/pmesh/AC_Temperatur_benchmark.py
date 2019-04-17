@@ -62,7 +62,7 @@ def run_simulation(name=''):
     # initialize problem parameters
     problem_params = dict()
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128)]#, 128)]
+    problem_params['nvars'] = [(128, 128), (64, 64)]#, 128)]
     problem_params['eps'] = [0.04]
     problem_params['dw'] = [-23.6]
     problem_params['D'] = [0.1]
@@ -93,7 +93,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 4*0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -144,5 +144,5 @@ def run_simulation(name=''):
 if __name__ == "__main__":
     name = 'AC-temperature-test'
     run_simulation(name=name)
-    plot_data(name=name)
+    # plot_data(name=name)
 

@@ -7,9 +7,9 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
-from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
-from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
+from pySDC.playgrounds.pmesh.AllenCahn_PMESH_NEW import allencahn_imex, allencahn_imex_stab
+from pySDC.playgrounds.pmesh.TransferMesh_PMESH_NEW import pmesh_to_pmesh
+from pySDC.playgrounds.pmesh.AllenCahn_dump_NEW import dump
 
 
 def run_simulation(name=''):
