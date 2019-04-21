@@ -85,19 +85,19 @@ class pmesh_to_pmesh(space_transfer):
         elif isinstance(G, rhs_imex_pmesh):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             # convert numpy array to RealField
-            # tmp_F = self.fine_prob.pm.create(type='real', value=0.0)
+            tmp_F = self.fine_prob.pm.create(type='real', value=0.0)
             tmp_G = self.coarse_prob.pm.create(type='real', value=G.impl.values)
             # resample coarse to fine
-            tmp_G.resample(self.tmp_F)
+            tmp_G.resample(tmp_F)
             # copy values to data structure
-            F.impl.values = self.tmp_F.value / 2
+            F.impl.values = tmp_F.value
             # convert numpy array to RealField
-            # tmp_F = self.fine_prob.pm.create(type='real', value=0.0)
-            # tmp_G = self.coarse_prob.pm.create(type='real', value=G.expl.values)
+            tmp_F = self.fine_prob.pm.create(type='real', value=0.0)
+            tmp_G = self.coarse_prob.pm.create(type='real', value=G.expl.values)
             # resample coarse to fine
-            # tmp_G.resample(self.tmp_F)
+            tmp_G.resample(tmp_F)
             # copy values to data structure
-            F.expl.values = self.tmp_F.value / 2
+            F.expl.values = tmp_F.value / 2
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         t1 = time.time()

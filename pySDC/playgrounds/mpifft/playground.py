@@ -33,8 +33,10 @@ nvars = 128
 ndim = 2
 axes = tuple(range(ndim))
 N = np.array([nvars] * ndim, dtype=int)
+print(N, axes)
 fft = PFFT(subcomm, N, axes=axes, dtype=np.float, slab=True)
-L = np.array([2*np.pi] * ndim, dtype=float)
+# L = np.array([2*np.pi] * ndim, dtype=float)
+L = np.array([1] * ndim, dtype=float)
 
 print(fft.subcomm)
 
@@ -46,8 +48,11 @@ K2 = np.sum(K*K, 0, dtype=float)
 u = newDistArray(fft, False)
 print(u.subcomm)
 uex = newDistArray(fft, False)
-u[:] = np.sin(2 * X[0]) * np.sin(2 * X[1])
-uex[:] = -2.0 * 4.0 * np.sin(2 * X[0]) * np.sin(2 * X[1])
+
+u[:] = np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
+print(u.shape, X[0].shape)
+exit()
+uex[:] = -2.0 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
 u_hat = fft.forward(u)
 
 lap_u_hat = -K2 * u_hat
@@ -61,13 +66,13 @@ print('Laplace error:', err)
 ratio = 2
 Nc = np.array([nvars // ratio] * ndim, dtype=int)
 fftc = PFFT(MPI.COMM_WORLD, Nc, axes=axes, dtype=np.float, slab=True)
-
+print(Nc, fftc.global_shape())
 Xc = get_local_mesh(fftc, L)
 
 uex = newDistArray(fft, False)
 uexc = newDistArray(fftc, False)
-uex[:] = np.sin(2 * X[0]) * np.sin(2 * X[1])
-uexc[:] = np.sin(2 * Xc[0]) * np.sin(2 * Xc[1])
+uex[:] = np.sin(2 * np.pi* X[0]) * np.sin(2 * np.pi* X[1])
+uexc[:] = np.sin(2 * np.pi* Xc[0]) * np.sin(2 * np.pi* Xc[1])
 
 uc = uex[::ratio, ::ratio]
 local_error = np.amax(abs(uc - uexc))

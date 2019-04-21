@@ -7,9 +7,10 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.pmesh.AllenCahn_PMESH import allencahn_imex, allencahn_imex_stab
-from pySDC.playgrounds.pmesh.TransferMesh_PMESH import pmesh_to_pmesh
-from pySDC.playgrounds.pmesh.AllenCahn_dump import dump
+from pySDC.playgrounds.mpifft.AllenCahn_FFT import allencahn_imex#, allencahn_imex_stab
+from pySDC.playgrounds.mpifft.AllenCahn_monitor_and_dump import monitor_and_dump
+from pySDC.playgrounds.mpifft.TransferMesh_FFT import fft_to_fft
+
 
 
 def run_simulation(name=''):
@@ -61,7 +62,7 @@ def run_simulation(name=''):
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 16.0
-    problem_params['nvars'] = [(48 * 24, 48 * 24), (24 * 24, 24 * 24)]
+    problem_params['nvars'] = [(48 * 24, 48 * 24), (8 * 24, 8 * 24)]
     problem_params['eps'] = [0.04]
     problem_params['dw'] = [-0.04]
     problem_params['radius'] = 0.25
@@ -76,7 +77,7 @@ def run_simulation(name=''):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
-    # controller_params['hook_class'] = dump
+    # controller_params['hook_class'] = monitor_and_dump
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -87,11 +88,11 @@ def run_simulation(name=''):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = pmesh_to_pmesh
+    description['space_transfer_class'] = fft_to_fft
 
     # set time parameters
     t0 = 0.0
-    Tend = 1 * 0.001
+    Tend = 2 * 0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
