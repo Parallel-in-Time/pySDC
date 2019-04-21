@@ -49,7 +49,7 @@ class fft_to_fft(space_transfer):
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         t1 = time.time()
-        print(f'Space restrict: {t1 - t0}')
+        # print(f'Space restrict: {t1 - t0}')
         return G
 
     def prolong(self, G):
@@ -73,5 +73,5 @@ class fft_to_fft(space_transfer):
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         t1 = time.time()
-        print(f'Space interpolate: {t1 - t0}')
+        # print(f'Space interpolate: {t1 - t0}')
         return F

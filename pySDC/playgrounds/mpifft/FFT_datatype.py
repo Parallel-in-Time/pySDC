@@ -4,6 +4,7 @@ import numpy as np
 from pySDC.core.Errors import DataError
 from mpi4py_fft import newDistArray, PFFT
 
+
 class fft_datatype(object):
     """
     Mesh data type with arbitrary dimensions, will contain PMESH values and communicator
@@ -104,7 +105,6 @@ class fft_datatype(object):
         local_absval = np.amax(abs(self.values))
 
         comm = self.fft.subcomm
-        # print(self.values.commsizes)
         if comm is not None:
             if np.any([c.Get_size() > 1 for c in comm]):
                 global_absval = comm[0].allreduce(sendobj=local_absval, op=MPI.MAX)  # TODO: is this correct?
@@ -157,7 +157,7 @@ class fft_datatype(object):
         Returns:
             None
         """
-        self.values = comm.recv(source=source, tag=tag)
+        self.values[:] = comm.recv(source=source, tag=tag)
         return None
 
     def bcast(self, root=None, comm=None):
@@ -172,7 +172,7 @@ class fft_datatype(object):
             broadcasted values
         """
         me = fft_datatype(self)
-        me.values = comm.bcast(self.values, root=root)
+        me.values[:] = comm.bcast(self.values, root=root)
         return me
 
 
