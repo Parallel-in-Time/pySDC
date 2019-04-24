@@ -101,7 +101,7 @@ class allencahn_imex(ptype):
 
         u_hat = self.fft.forward(u.values)
         lap_u_hat = -self.K2 * u_hat
-        f.impl.values = self.fft.backward(lap_u_hat)
+        f.impl.values = self.fft.backward(lap_u_hat, f.impl.values)
 
         if self.params.eps > 0:
             f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
@@ -126,7 +126,7 @@ class allencahn_imex(ptype):
         me = self.dtype_u(self.init)
         rhs_hat = self.fft.forward(rhs.values)
         rhs_hat /= (1.0 + factor * self.K2)
-        me.values = self.fft.backward(rhs_hat)
+        me.values = self.fft.backward(rhs_hat, me.values)
 
         return me
 
