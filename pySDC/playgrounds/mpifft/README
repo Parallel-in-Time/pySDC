@@ -1,0 +1,3 @@
+Installation mpi4py_fft auf JURECA:
+module load Intel ParaStationMPI SciPy-Stack mpi4py FFTW JUBE
+export FFTW_LIBRARY_DIR=/usr/local/software/jureca/Stages/2018b/software/FFTW/3.3.8-gpsmpi-2018b/lib/

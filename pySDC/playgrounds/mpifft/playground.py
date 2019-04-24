@@ -1,6 +1,8 @@
 import numpy as np
 from mpi4py import MPI
 from mpi4py_fft import PFFT, newDistArray, DistArray
+import time
+import copy as cp
 
 
 def get_local_mesh(FFT, L):
@@ -11,6 +13,7 @@ def get_local_mesh(FFT, L):
         X[i] = (X[i]*L[i]/N[i])
     X = [np.broadcast_to(x, FFT.shape(False)) for x in X]
     return X
+
 
 def get_local_wavenumbermesh(FFT, L):
     """Returns local wavenumber mesh."""
@@ -26,10 +29,11 @@ def get_local_wavenumbermesh(FFT, L):
         Ks[i] = (Ks[i]*Lp[i]).astype(float)
     return [np.broadcast_to(k, FFT.shape(True)) for k in Ks]
 
+
 comm = MPI.COMM_WORLD
 subcomm = comm.Split()
 print(subcomm)
-nvars = 128
+nvars = 1280
 ndim = 2
 axes = tuple(range(ndim))
 N = np.array([nvars] * ndim, dtype=int)
@@ -51,7 +55,7 @@ uex = newDistArray(fft, False)
 
 u[:] = np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
 print(u.shape, X[0].shape)
-exit()
+# exit()
 uex[:] = -2.0 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
 u_hat = fft.forward(u)
 
@@ -94,3 +98,29 @@ print(type(u), type(ucopy), u is ucopy)
 u[0] = 1
 print(ucopy[0, 0])
 print(np.all(u == ucopy))
+
+nruns = 30000
+s = 0
+t0 = time.time()
+for i in range(nruns):
+    u = newDistArray(fft, False, val=i)
+    v = u.copy()
+    u[0][0] = 0
+    # print(u[0][0], v[0][0])
+    s += u[0][0] - v[0][0]
+t1 = time.time()
+print(s + nruns*(nruns-1)/2, t1-t0)
+
+s = 0
+t0 = time.time()
+for i in range(nruns):
+    u = np.full((nvars, nvars), fill_value=i, dtype=np.float64)
+    # u = np.empty((nvars, nvars), dtype=np.float64)
+    # u[:] = i
+    v = u.copy()
+    # v = cp.deepcopy(u)
+    u[0][0] = 0
+    # print(u[0][0], v[0][0])
+    s += u[0][0] - v[0][0]
+t1 = time.time()
+print(s + nruns*(nruns-1)/2, t1-t0)

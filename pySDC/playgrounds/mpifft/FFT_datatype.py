@@ -29,7 +29,7 @@ class fft_datatype(object):
             self.values = init.values.copy()
         elif isinstance(init, PFFT):
             self.fft = init
-            self.values = newDistArray(self.fft, False, val=val)
+            self.values = newDistArray(self.fft, True, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

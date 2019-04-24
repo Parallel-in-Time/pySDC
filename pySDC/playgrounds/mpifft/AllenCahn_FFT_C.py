@@ -58,7 +58,7 @@ class allencahn_imex(ptype):
         super(allencahn_imex, self).__init__(init=self.fft, dtype_u=dtype_u, dtype_f=dtype_f,
                                              params=problem_params)
 
-        L = np.array([self.params.L] * ndim, dtype=float)
+        L = np.array([self.params.L] * ndim, dtype=int)
 
         # get local mesh
         X = np.ogrid[self.fft.local_slice(False)]
@@ -99,13 +99,13 @@ class allencahn_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        u_hat = self.fft.forward(u.values)
-        lap_u_hat = -self.K2 * u_hat
-        f.impl.values = self.fft.backward(lap_u_hat)
+        f.impl.values = -self.K2 * u.values
 
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-                6.0 * self.params.dw * u.values * (1.0 - u.values)
+            tmp = self.fft.backward(u.values)
+            tmpf = - 2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - \
+                6.0 * self.params.dw * tmp * (1.0 - tmp)
+            f.expl.values[:] = self.fft.forward(tmpf)
 
         return f
 
@@ -124,9 +124,7 @@ class allencahn_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-        rhs_hat = self.fft.forward(rhs.values)
-        rhs_hat /= (1.0 + factor * self.K2)
-        me.values = self.fft.backward(rhs_hat)
+        me.values = rhs.values / (1.0 + factor * self.K2)
 
         return me
 
@@ -155,16 +153,18 @@ class allencahn_imex(ptype):
             ubound = 0.5 - self.params.eps
             rand_radii = (ubound - lbound) * np.random.random_sample(size=tuple([L] * ndim)) + lbound
             # distribute circles/spheres
+            tmp = newDistArray(self.fft, False)
             if ndim == 2:
                 for i in range(0, L):
                     for j in range(0, L):
                         # build radius
                         r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
-                        me.values += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
+                        tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # normalize to [0,1]
-            me.values *= 0.5
-            assert np.all(me.values <= 1.0)
+            tmp *= 0.5
+            assert np.all(tmp <= 1.0)
+            me.values[:] = self.fft.forward(tmp)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

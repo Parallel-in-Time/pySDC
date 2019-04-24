@@ -15,7 +15,7 @@ class mesh(object):
         values (np.ndarray): contains the ndarray of the values
     """
 
-    def __init__(self, init=None, val=None):
+    def __init__(self, init=None, val=0.0):
         """
         Initialization routine
 
@@ -32,8 +32,7 @@ class mesh(object):
             self.values = cp.deepcopy(init.values)
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         elif isinstance(init, tuple) or isinstance(init, int):
-            self.values = np.empty(init, dtype=np.float64)
-            self.values[:] = val
+            self.values = np.full(init, fill_value=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
