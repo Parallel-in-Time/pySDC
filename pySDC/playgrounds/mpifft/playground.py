@@ -33,7 +33,7 @@ def get_local_wavenumbermesh(FFT, L):
 comm = MPI.COMM_WORLD
 subcomm = comm.Split()
 print(subcomm)
-nvars = 1280
+nvars = 128
 ndim = 2
 axes = tuple(range(ndim))
 N = np.array([nvars] * ndim, dtype=int)
@@ -75,22 +75,40 @@ Xc = get_local_mesh(fftc, L)
 
 uex = newDistArray(fft, False)
 uexc = newDistArray(fftc, False)
-uex[:] = np.sin(2 * np.pi* X[0]) * np.sin(2 * np.pi* X[1])
-uexc[:] = np.sin(2 * np.pi* Xc[0]) * np.sin(2 * np.pi* Xc[1])
+r2 = (X[0] - 0.5) ** 2 + (X[1] - 0.5) ** 2
+uex[:] = 0.5 * (1.0 + np.tanh((0.25 - np.sqrt(r2)) / (np.sqrt(2) * 0.04)))
+r2c = (Xc[0] - 0.5) ** 2 + (Xc[1] - 0.5) ** 2
+uexc[:] = 0.5 * (1.0 + np.tanh((0.25 - np.sqrt(r2c)) / (np.sqrt(2) * 0.04)))
 
 uc = uex[::ratio, ::ratio]
 local_error = np.amax(abs(uc - uexc))
 err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
-print('Restriction error:', err)
+print('Restriction error real:', err)
+
+uexcs = fftc.forward(uexc)
+uc = uex[::ratio, ::ratio]
+ucs = fftc.forward(uc)
+local_error = np.amax(abs(ucs - uexcs))
+err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
+print('Restriction error spectral:', err)
 
 uexc_hat = fftc.forward(uexc)
 fft_pad = PFFT(MPI.COMM_WORLD, Nc, padding=[ratio] * ndim, axes=axes, dtype=np.float, slab=True)
 uf = newDistArray(fft_pad, False)
 uf = fft_pad.backward(uexc_hat, uf)
-
 local_error = np.amax(abs(uf - uex))
 err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
-print('Interpolation error:', err)
+print('Interpolation error real:', err)
+
+uexcs = fftc.forward(uexc)
+fft_pad = PFFT(MPI.COMM_WORLD, Nc, padding=[ratio] * ndim, axes=axes, dtype=np.float, slab=True)
+uf = fft_pad.backward(uexc_hat)
+ufs = fft.forward(uf)
+uexs = fft.forward(uex)
+local_error = np.amax(abs(ufs - uexs))
+err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
+print('Interpolation error spectral:', err)
+exit()
 
 u = newDistArray(fft, False)
 ucopy = u.copy()

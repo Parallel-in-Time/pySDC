@@ -9,6 +9,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.mpifft.AllenCahn_FFT import allencahn_imex
 from pySDC.playgrounds.mpifft.AllenCahn_monitor_and_dump import monitor_and_dump
+from pySDC.playgrounds.mpifft.TransferMesh_FFT import fft_to_fft
 
 
 def run_simulation(name=''):
@@ -59,7 +60,7 @@ def run_simulation(name=''):
     # initialize problem parameters
     problem_params = dict()
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128)]#, 128)]
+    problem_params['nvars'] = [(128, 128), (32, 32)]
     problem_params['eps'] = [0.04]
     # problem_params['dw'] = [-23.6]
     problem_params['radius'] = 0.25
@@ -84,7 +85,7 @@ def run_simulation(name=''):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    # description['space_transfer_class'] = pmesh_to_pmesh
+    description['space_transfer_class'] = fft_to_fft
 
     # set time parameters
     t0 = 0.0

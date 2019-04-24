@@ -107,7 +107,9 @@ class fft_datatype(object):
         comm = self.fft.subcomm
         if comm is not None:
             if np.any([c.Get_size() > 1 for c in comm]):
-                global_absval = comm[0].allreduce(sendobj=local_absval, op=MPI.MAX)  # TODO: is this correct?
+                global_absval = 0.0
+                for c in comm:
+                    global_absval = max(c.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)  # TODO: is this correct?
             else:
                 global_absval = local_absval
         else:
