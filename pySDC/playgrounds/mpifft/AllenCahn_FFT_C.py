@@ -55,7 +55,8 @@ class allencahn_imex(ptype):
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_imex, self).__init__(init=self.fft, dtype_u=dtype_u, dtype_f=dtype_f,
+        spectral = True
+        super(allencahn_imex, self).__init__(init=(self.fft, spectral), dtype_u=dtype_u, dtype_f=dtype_f,
                                              params=problem_params)
 
         L = np.array([self.params.L] * ndim, dtype=int)
@@ -140,10 +141,12 @@ class allencahn_imex(ptype):
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
-        me = self.dtype_u(self.init, val=0)
+        me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
+            tmp = newDistArray(self.fft, False)
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
-            me.values[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            tmp[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            me.values[:] = self.fft.forward(tmp)
         elif self.params.init_type == 'circle_rand':
             ndim = len(me.values.shape)
             L = int(self.params.L)

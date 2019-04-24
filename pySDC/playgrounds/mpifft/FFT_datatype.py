@@ -27,9 +27,9 @@ class fft_datatype(object):
         if isinstance(init, fft_datatype):
             self.fft = init.fft
             self.values = init.values.copy()
-        elif isinstance(init, PFFT):
-            self.fft = init
-            self.values = newDistArray(self.fft, False, val=val)
+        elif isinstance(init, tuple) and isinstance(init[0], PFFT):
+            self.fft = init[0]
+            self.values = newDistArray(self.fft, init[1], val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -200,7 +200,7 @@ class rhs_imex_fft(object):
         if isinstance(init, type(self)):
             self.impl = fft_datatype(init.impl)
             self.expl = fft_datatype(init.expl)
-        elif isinstance(init, PFFT):
+        elif isinstance(init, tuple) and isinstance(init[0], PFFT):
             self.impl = fft_datatype(init, val=val)
             self.expl = fft_datatype(init, val=val)
         # something is wrong, if none of the ones above hit

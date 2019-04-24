@@ -55,7 +55,8 @@ class allencahn_imex(ptype):
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_imex, self).__init__(init=self.fft, dtype_u=dtype_u, dtype_f=dtype_f,
+        spectral = False
+        super(allencahn_imex, self).__init__(init=(self.fft, spectral), dtype_u=dtype_u, dtype_f=dtype_f,
                                              params=problem_params)
 
         L = np.array([self.params.L] * ndim, dtype=float)
