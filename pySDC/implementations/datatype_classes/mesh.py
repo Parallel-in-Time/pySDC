@@ -29,7 +29,7 @@ class mesh(object):
 
         # if init is another mesh, do a deepcopy (init by copy)
         if isinstance(init, mesh):
-            self.values = cp.deepcopy(init.values)
+            self.values = init.values.copy()
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         elif isinstance(init, tuple) or isinstance(init, int):
             self.values = np.full(init, fill_value=val)
@@ -51,7 +51,7 @@ class mesh(object):
 
         if isinstance(other, mesh):
             # always create new mesh, since otherwise c = a + b changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values + other.values
             return me
         else:
@@ -71,7 +71,7 @@ class mesh(object):
 
         if isinstance(other, mesh):
             # always create new mesh, since otherwise c = a - b changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values - other.values
             return me
         else:
@@ -91,7 +91,7 @@ class mesh(object):
 
         if isinstance(other, float) or isinstance(other, complex):
             # always create new mesh, since otherwise c = f*a changes a as well!
-            me = mesh(np.shape(self.values))
+            me = mesh(self)
             me.values = self.values * other
             return me
         else:
@@ -236,7 +236,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, rhs_imex_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = self.impl.values - other.impl.values
             me.expl.values = self.expl.values - other.expl.values
             return me
@@ -257,7 +257,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, rhs_imex_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = self.impl.values + other.impl.values
             me.expl.values = self.expl.values + other.expl.values
             return me
@@ -278,7 +278,7 @@ class rhs_imex_mesh(object):
 
         if isinstance(other, float):
             # always create new rhs_imex_mesh
-            me = rhs_imex_mesh(np.shape(self.impl.values))
+            me = rhs_imex_mesh(self)
             me.impl.values = other * self.impl.values
             me.expl.values = other * self.expl.values
             return me
@@ -354,7 +354,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, rhs_comp2_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = self.comp1.values - other.comp1.values
             me.comp2.values = self.comp2.values - other.comp2.values
             return me
@@ -375,7 +375,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, rhs_comp2_mesh):
             # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = self.comp1.values + other.comp1.values
             me.comp2.values = self.comp2.values + other.comp2.values
             return me
@@ -396,7 +396,7 @@ class rhs_comp2_mesh(object):
 
         if isinstance(other, float):
             # always create new rhs_imex_mesh
-            me = rhs_comp2_mesh(np.shape(self.comp1.values))
+            me = rhs_comp2_mesh(self)
             me.comp1.values = other * self.comp1.values
             me.comp2.values = other * self.comp2.values
             return me

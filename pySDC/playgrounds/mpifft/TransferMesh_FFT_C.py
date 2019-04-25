@@ -41,9 +41,9 @@ class fft_to_fft(space_transfer):
         t0 = time.time()
         if isinstance(F, fft_datatype):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            tmpF = self.fine_prob.fft.backward(F.values)
+            tmpF = self.fine_prob.fft.backward(F)
             tmpG = tmpF[::int(self.ratio[0]), ::int(self.ratio[1])]
-            G.values = self.coarse_prob.fft.forward(tmpG, G.values)
+            G[:] = self.coarse_prob.fft.forward(tmpG, G)
         elif isinstance(F, rhs_imex_fft):
             raise NotImplementedError()
         else:
@@ -62,14 +62,14 @@ class fft_to_fft(space_transfer):
         t0 = time.time()
         if isinstance(G, fft_datatype):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
-            tmpF = self.fft_pad.backward(G.values)
-            F.values = self.fine_prob.fft.forward(tmpF, F.values)
+            tmpF = self.fft_pad.backward(G)
+            F[:] = self.fine_prob.fft.forward(tmpF, F)
         elif isinstance(G, rhs_imex_fft):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
-            tmpF = self.fft_pad.backward(G.impl.values)
-            F.impl.values = self.fine_prob.fft.forward(tmpF, F.impl.values)
-            tmpF = self.fft_pad.backward(G.expl.values)
-            F.expl.values = self.fine_prob.fft.forward(tmpF, F.expl.values)
+            tmpF = self.fft_pad.backward(G.impl)
+            F.impl[:] = self.fine_prob.fft.forward(tmpF, F.impl)
+            tmpF = self.fft_pad.backward(G.expl)
+            F.expl[:] = self.fine_prob.fft.forward(tmpF, F.expl)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         t1 = time.time()

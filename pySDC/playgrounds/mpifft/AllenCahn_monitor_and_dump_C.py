@@ -42,8 +42,8 @@ class monitor_and_dump(hooks):
             self.size = 1
 
         # compute numerical radius
-        self.ndim = len(L.u[0].values.shape)
-        tmp = L.prob.fft.backward(L.u[0].values)
+        tmp = L.prob.fft.backward(L.u[0])
+        self.ndim = len(tmp.shape)
         v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
             v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
@@ -56,19 +56,6 @@ class monitor_and_dump(hooks):
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-
-        # c_local = np.count_nonzero(L.u[0].values > 0.5)
-        # if self.comm is not None:
-        #     c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
-        # else:
-        #     c_global = c_local
-        # if self.ndim == 3:
-        #     radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
-        # elif self.ndim == 2:
-        #     radius = np.sqrt(c_global / np.pi) * L.prob.dx
-        # else:
-        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
-
         self.init_radius = L.prob.params.radius
 
         # write to stats
@@ -79,7 +66,7 @@ class monitor_and_dump(hooks):
                               sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
 
         # compute local offset for I/O
-        nbytes_local = L.u[0].values.nbytes
+        nbytes_local = tmp.nbytes
         if self.comm is not None:
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
@@ -124,8 +111,7 @@ class monitor_and_dump(hooks):
         L = step.levels[0]
 
         # compute numerical radius
-        # v_local = np.sum(L.uend.values)
-        tmp = L.prob.fft.backward(L.uend.values[:])
+        tmp = L.prob.fft.backward(L.uend)
         v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
             v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
@@ -138,18 +124,6 @@ class monitor_and_dump(hooks):
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-        # c_local = np.count_nonzero(L.uend.values > 0.5)
-        # if self.comm is not None:
-        #     c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
-        # else:
-        #     c_global = c_local
-        # if self.ndim == 3:
-        #     radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
-        # elif self.ndim == 2:
-        #     radius = np.sqrt(c_global / np.pi) * L.prob.dx
-        # else:
-        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
-
         # compute exact radius
         exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
 
@@ -160,7 +134,7 @@ class monitor_and_dump(hooks):
                           sweep=L.status.sweep, type='exact_radius', value=exact_radius)
 
         # compute local offset for I/O
-        nbytes_local = L.uend.values.nbytes
+        nbytes_local = tmp.nbytes
         if self.comm is not None:
             nbytes_global = self.comm.allgather(nbytes_local)
         else:

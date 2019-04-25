@@ -33,7 +33,7 @@ def get_local_wavenumbermesh(FFT, L):
 comm = MPI.COMM_WORLD
 subcomm = comm.Split()
 print(subcomm)
-nvars = 128
+nvars = 8
 ndim = 2
 axes = tuple(range(ndim))
 N = np.array([nvars] * ndim, dtype=int)
@@ -50,6 +50,7 @@ K = np.array(K).astype(float)
 K2 = np.sum(K*K, 0, dtype=float)
 
 u = newDistArray(fft, False)
+print(type(u))
 print(u.subcomm)
 uex = newDistArray(fft, False)
 
@@ -100,12 +101,18 @@ local_error = np.amax(abs(uf - uex))
 err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
 print('Interpolation error real:', err)
 
-uexcs = fftc.forward(uexc)
-fft_pad = PFFT(MPI.COMM_WORLD, Nc, padding=[ratio] * ndim, axes=axes, dtype=np.float, slab=True)
-uf = fft_pad.backward(uexc_hat)
-ufs = fft.forward(uf)
+
 uexs = fft.forward(uex)
-local_error = np.amax(abs(ufs - uexs))
+fft_pad = PFFT(MPI.COMM_WORLD, Nc, padding=[ratio] * ndim, axes=axes, dtype=np.float, slab=True)
+# uf = fft_pad.backward(uexc_hat)
+# ufs = fft.forward(uf)
+ufs = np.pad(uexc_hat, [(0, Nc[0]), (0, Nc[1]//2)], mode='constant')
+# ufs[:][0] *= 2
+print(uexc_hat[1])
+print(uexs[1])
+print(uexc_hat.shape, ufs.shape, uexs.shape)
+
+local_error = np.amax(abs(ufs/4 - uexs))
 err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
 print('Interpolation error spectral:', err)
 exit()

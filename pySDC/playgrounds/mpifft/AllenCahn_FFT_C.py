@@ -100,13 +100,13 @@ class allencahn_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        f.impl.values = -self.K2 * u.values
+        f.impl = -self.K2 * u
 
         if self.params.eps > 0:
-            tmp = self.fft.backward(u.values)
+            tmp = self.fft.backward(u)
             tmpf = - 2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - \
                 6.0 * self.params.dw * tmp * (1.0 - tmp)
-            f.expl.values[:] = self.fft.forward(tmpf)
+            f.expl[:] = self.fft.forward(tmpf)
 
         return f
 
@@ -124,10 +124,7 @@ class allencahn_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        me = self.dtype_u(self.init)
-        me.values = rhs.values / (1.0 + factor * self.K2)
-
-        return me
+        return rhs / (1.0 + factor * self.K2)
 
     def u_exact(self, t):
         """
@@ -143,12 +140,12 @@ class allencahn_imex(ptype):
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
-            tmp = newDistArray(self.fft, False)
+            # tmp = newDistArray(self.fft, False)
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
-            tmp[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
-            me.values[:] = self.fft.forward(tmp)
+            tmp = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            me[:] = self.fft.forward(tmp)
         elif self.params.init_type == 'circle_rand':
-            ndim = len(me.values.shape)
+            ndim = len(me.shape)
             L = int(self.params.L)
             # get random radii for circles/spheres
             np.random.seed(1)
@@ -167,7 +164,7 @@ class allencahn_imex(ptype):
             # normalize to [0,1]
             tmp *= 0.5
             assert np.all(tmp <= 1.0)
-            me.values[:] = self.fft.forward(tmp)
+            me[:] = self.fft.forward(tmp)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

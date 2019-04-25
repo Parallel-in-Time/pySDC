@@ -60,7 +60,7 @@ def run_simulation(name=''):
     # initialize problem parameters
     problem_params = dict()
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128), (32, 32)]#, 128)]
+    problem_params['nvars'] = [(128, 128)]#, (32, 32)]#, 128)]
     problem_params['eps'] = [0.04]
     # problem_params['dw'] = [-23.6]
     problem_params['radius'] = 0.25

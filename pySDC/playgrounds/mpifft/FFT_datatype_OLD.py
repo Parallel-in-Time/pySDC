@@ -2,61 +2,120 @@ from mpi4py import MPI
 import numpy as np
 
 from pySDC.core.Errors import DataError
-from mpi4py_fft import PFFT, DistArray
+from mpi4py_fft import newDistArray, PFFT
 
 
-class fft_datatype(DistArray):
+class fft_datatype(object):
     """
+    Mesh data type with arbitrary dimensions, will contain PMESH values and communicator
+
+    Attributes:
+        values (np.ndarray): contains the ndarray of the values
+        comm: MPI communicator or None
     """
 
-    def __new__(cls, init, val=0.0, rank=0):
-        if isinstance(init, tuple):
-            pfft = init[0]
-            forward_output = init[1]
+    def __init__(self, init=None, val=0.0):
+        """
+        Initialization routine
 
-            global_shape = pfft.global_shape(forward_output)
-            p0 = pfft.pencil[forward_output]
-            if forward_output is True:
-                dtype = pfft.forward.output_array.dtype
-            else:
-                dtype = pfft.forward.input_array.dtype
-            global_shape = (len(global_shape),) * rank + global_shape
-            subcomm = p0.subcomm
-            obj = DistArray.__new__(cls, global_shape, subcomm=subcomm, val=val, dtype=dtype,
-                                    rank=rank)
-        elif isinstance(init, fft_datatype):
-            global_shape = init.global_shape
-            subcomm = init.subcomm
-            dtype = init.dtype
-            obj = DistArray.__new__(cls, global_shape, subcomm=subcomm, val=val, dtype=dtype,
-                                    rank=rank)
-            obj[:] = init[:]
+        Args:
+            init: another pmesh_datatype or a tuple containing the communicator and the local dimensions
+            val (float): an initial number (default: 0.0)
+        Raises:
+            DataError: if init is none of the types above
+        """
+        if isinstance(init, fft_datatype):
+            self.fft = init.fft
+            self.values = init.values.copy()
+        elif isinstance(init, tuple) and isinstance(init[0], PFFT):
+            self.fft = init[0]
+            self.values = newDistArray(self.fft, init[1], val=val)
+        # something is wrong, if none of the ones above hit
         else:
-            raise DataError('something went wrong during %s initialization' % type(init))
+            raise DataError('something went wrong during %s initialization' % type(self))
 
-        return obj
+    def __add__(self, other):
+        """
+        Overloading the addition operator for mesh types
+
+        Args:
+            other: mesh object to be added
+        Raises:
+            DataError: if other is not a mesh object
+        Returns:
+            sum of caller and other values (self+other)
+        """
+
+        if isinstance(other, type(self)):
+            # always create new mesh, since otherwise c = a + b changes a as well!
+            me = fft_datatype(self)
+            me.values = self.values + other.values
+            return me
+        else:
+            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
+
+    def __sub__(self, other):
+        """
+        Overloading the subtraction operator for mesh types
+
+        Args:
+            other: mesh object to be subtracted
+        Raises:
+            DataError: if other is not a mesh object
+        Returns:
+            differences between caller and other values (self-other)
+        """
+
+        if isinstance(other, type(self)):
+            # always create new mesh, since otherwise c = a - b changes a as well!
+            me = fft_datatype(self)
+            me.values = self.values - other.values
+            return me
+        else:
+            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
+
+    def __rmul__(self, other):
+        """
+        Overloading the right multiply by factor operator for mesh types
+
+        Args:
+            other (float): factor
+        Raises:
+            DataError: is other is not a float
+        Returns:
+            copy of original values scaled by factor
+        """
+
+        if isinstance(other, float) or isinstance(other, complex):
+            # always create new mesh, since otherwise c = f*a changes a as well!
+            me = fft_datatype(self)
+            me.values = other * self.values
+            return me
+        else:
+            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
 
     def __abs__(self):
         """
-        Overloading the abs operator for fft mesh types
+        Overloading the abs operator for mesh types
 
         Returns:
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(np.amax(DistArray.__abs__(self)))
+        local_absval = np.amax(abs(self.values))
 
-        if self.subcomm is not None:
-            if np.any([c.Get_size() > 1 for c in self.subcomm]):
+        comm = self.fft.subcomm
+        if comm is not None:
+            if np.any([c.Get_size() > 1 for c in comm]):
                 global_absval = 0.0
-                for c in self.subcomm:
-                    global_absval = max(c.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
+                for c in comm:
+                    global_absval = max(c.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)  # TODO: is this correct?
             else:
                 global_absval = local_absval
         else:
             global_absval = local_absval
 
-        return float(global_absval)
+        return global_absval
 
     def send(self, dest=None, tag=None, comm=None):
         """
@@ -71,7 +130,7 @@ class fft_datatype(DistArray):
             None
         """
 
-        comm.Send(self[:], dest=dest, tag=tag)
+        comm.send(self.values, dest=dest, tag=tag)
         return None
 
     def isend(self, dest=None, tag=None, comm=None):
@@ -86,7 +145,7 @@ class fft_datatype(DistArray):
         Returns:
             request handle
         """
-        return comm.Isend(self[:], dest=dest, tag=tag)
+        return comm.isend(self.values, dest=dest, tag=tag)
 
     def recv(self, source=None, tag=None, comm=None):
         """
@@ -100,7 +159,7 @@ class fft_datatype(DistArray):
         Returns:
             None
         """
-        comm.Recv(self[:], source=source, tag=tag)
+        self.values[:] = comm.recv(source=source, tag=tag)
         return None
 
     def bcast(self, root=None, comm=None):
@@ -114,12 +173,20 @@ class fft_datatype(DistArray):
         Returns:
             broadcasted values
         """
-        comm.Bcast(self[:], root=root)
-        return self
+        me = fft_datatype(self)
+        me.values[:] = comm.bcast(self.values, root=root)
+        return me
 
 
 class rhs_imex_fft(object):
     """
+    RHS data type for PMESH datatypes with implicit and explicit components
+
+    This data type can be used to have RHS with 2 components (here implicit and explicit)
+
+    Attributes:
+        impl: implicit part as pmesh_datatype
+        expl: explicit part as pmesh_datatype
     """
 
     def __init__(self, init, val=0.0):
@@ -155,6 +222,7 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, type(self)):
+            # always create new rhs_imex_mesh, since otherwise c = a - b changes a as well!
             me = rhs_imex_fft(self)
             me.impl = self.impl - other.impl
             me.expl = self.expl - other.expl
@@ -175,6 +243,7 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, type(self)):
+            # always create new rhs_imex_mesh, since otherwise c = a + b changes a as well!
             me = rhs_imex_fft(self)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl
@@ -195,11 +264,10 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, float):
+            # always create new rhs_imex_mesh
             me = rhs_imex_fft(self)
             me.impl = other * self.impl
             me.expl = other * self.expl
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-
-

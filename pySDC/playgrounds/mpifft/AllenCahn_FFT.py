@@ -100,13 +100,13 @@ class allencahn_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        u_hat = self.fft.forward(u.values)
+        u_hat = self.fft.forward(u)
         lap_u_hat = -self.K2 * u_hat
-        f.impl.values = self.fft.backward(lap_u_hat, f.impl.values)
+        f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-                6.0 * self.params.dw * u.values * (1.0 - u.values)
+            f.expl = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
+                6.0 * self.params.dw * u * (1.0 - u)
 
         return f
 
@@ -125,9 +125,9 @@ class allencahn_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-        rhs_hat = self.fft.forward(rhs.values)
+        rhs_hat = self.fft.forward(rhs)
         rhs_hat /= (1.0 + factor * self.K2)
-        me.values = self.fft.backward(rhs_hat, me.values)
+        me[:] = self.fft.backward(rhs_hat)
 
         return me
 
@@ -143,12 +143,12 @@ class allencahn_imex(ptype):
         """
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
-        me = self.dtype_u(self.init, val=0)
+        me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
-            me.values[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            me[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
         elif self.params.init_type == 'circle_rand':
-            ndim = len(me.values.shape)
+            ndim = len(me.shape)
             L = int(self.params.L)
             # get random radii for circles/spheres
             np.random.seed(1)
@@ -162,10 +162,10 @@ class allencahn_imex(ptype):
                         # build radius
                         r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
-                        me.values += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
+                        me[:] += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # normalize to [0,1]
-            me.values *= 0.5
-            assert np.all(me.values <= 1.0)
+            me[:] *= 0.5
+            assert np.all(me <= 1.0)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

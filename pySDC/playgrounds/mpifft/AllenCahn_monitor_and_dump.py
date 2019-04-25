@@ -42,9 +42,9 @@ class monitor_and_dump(hooks):
             self.size = 1
 
         # compute numerical radius
-        self.ndim = len(L.u[0].values.shape)
-        tmp = L.u[0].values[:]
-        v_local = tmp[L.u[0].values[:] > 2 * L.prob.params.eps].sum()
+        tmp = L.u[0][:]
+        self.ndim = len(tmp.shape)
+        v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
             v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
         else:
@@ -79,7 +79,7 @@ class monitor_and_dump(hooks):
                               sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
 
         # compute local offset for I/O
-        nbytes_local = L.u[0].values.nbytes
+        nbytes_local = tmp.nbytes
         if self.comm is not None:
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
@@ -89,20 +89,20 @@ class monitor_and_dump(hooks):
         # dump initial data
         fname = f"./data/{L.prob.params.name}_{0:08d}"
         fh = MPI.File.Open(self.comm, fname + ".dat", self.amode)
-        fh.Write_at_all(local_offset, L.u[0].values)
+        fh.Write_at_all(local_offset, tmp)
         fh.Close()
 
         # write json description
         if self.rank == 0 and step.status.slot == 0:
             json_obj = dict()
             json_obj['type'] = 'dataset'
-            json_obj['datatype'] = str(L.u[0].values.dtype)
-            json_obj['endian'] = str(L.u[0].values.dtype.byteorder)
+            json_obj['datatype'] = str(tmp.dtype)
+            json_obj['endian'] = str(tmp.dtype.byteorder)
             json_obj['time'] = L.time
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
             json_obj['shape'] = L.prob.params.nvars
-            json_obj['elementsize'] = L.u[0].values.dtype.itemsize
+            json_obj['elementsize'] = tmp.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:
                 json.dump(json_obj, fp)
@@ -125,8 +125,8 @@ class monitor_and_dump(hooks):
 
         # compute numerical radius
         # v_local = np.sum(L.uend.values)
-        tmp = L.uend.values[:]
-        v_local = tmp[L.uend.values > 2 * L.prob.params.eps].sum()
+        tmp = L.uend[:]
+        v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
             v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
         else:
@@ -160,7 +160,7 @@ class monitor_and_dump(hooks):
                           sweep=L.status.sweep, type='exact_radius', value=exact_radius)
 
         # compute local offset for I/O
-        nbytes_local = L.uend.values.nbytes
+        nbytes_local = tmp.nbytes
         if self.comm is not None:
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
@@ -170,20 +170,20 @@ class monitor_and_dump(hooks):
         #  dump initial data
         fname = f"./data/{L.prob.params.name}_{self.time_step + step.status.slot:08d}"
         fh = MPI.File.Open(self.comm, fname + ".dat", self.amode)
-        fh.Write_at_all(local_offset, L.uend.values)
+        fh.Write_at_all(local_offset, tmp)
         fh.Close()
 
         # write json description
         if self.rank == 0:
             json_obj = dict()
             json_obj['type'] = 'dataset'
-            json_obj['datatype'] = str(L.uend.values.dtype)
-            json_obj['endian'] = str(L.uend.values.dtype.byteorder)
+            json_obj['datatype'] = str(tmp.dtype)
+            json_obj['endian'] = str(tmp.dtype.byteorder)
             json_obj['time'] = L.time + L.dt
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
             json_obj['shape'] = L.prob.params.nvars
-            json_obj['elementsize'] = L.uend.values.dtype.itemsize
+            json_obj['elementsize'] = tmp.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:
                 json.dump(json_obj, fp)

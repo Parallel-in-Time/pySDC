@@ -5,6 +5,7 @@ from mpi4py_fft import PFFT
 import numpy as np
 import time
 
+
 class fft_to_fft(space_transfer):
     """
     Custon base_transfer class, implements Transfer.py
@@ -41,11 +42,11 @@ class fft_to_fft(space_transfer):
         t0 = time.time()
         if isinstance(F, fft_datatype):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            G.values = F.values[::int(self.ratio[0]), ::int(self.ratio[1])]
+            G[:] = F[::int(self.ratio[0]), ::int(self.ratio[1])]
         elif isinstance(F, rhs_imex_fft):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            G.impl.values = F.impl.values[::int(self.ratio[0]), ::int(self.ratio[1])]
-            G.expl.values = F.expl.values[::int(self.ratio[0]), ::int(self.ratio[1])]
+            G.impl[:] = F.impl[::int(self.ratio[0]), ::int(self.ratio[1])]
+            G.expl[:] = F.expl[::int(self.ratio[0]), ::int(self.ratio[1])]
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         t1 = time.time()
@@ -62,14 +63,14 @@ class fft_to_fft(space_transfer):
         t0 = time.time()
         if isinstance(G, fft_datatype):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
-            G_hat = self.coarse_prob.fft.forward(G.values)
-            F.values = self.fft_pad.backward(G_hat, F.values)
+            G_hat = self.coarse_prob.fft.forward(G)
+            F[:] = self.fft_pad.backward(G_hat, F)
         elif isinstance(G, rhs_imex_fft):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
-            G_hat = self.coarse_prob.fft.forward(G.impl.values)
-            F.impl.values = self.fft_pad.backward(G_hat, F.impl.values)
-            G_hat = self.coarse_prob.fft.forward(G.expl.values)
-            F.expl.values = self.fft_pad.backward(G_hat, F.expl.values)
+            G_hat = self.coarse_prob.fft.forward(G.impl)
+            F.impl[:] = self.fft_pad.backward(G_hat, F.impl)
+            G_hat = self.coarse_prob.fft.forward(G.expl)
+            F.expl[:] = self.fft_pad.backward(G_hat, F.expl)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         t1 = time.time()

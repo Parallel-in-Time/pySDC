@@ -49,7 +49,7 @@ def run_simulation(name=''):
     level_params = dict()
     level_params['restol'] = 1E-08
     level_params['dt'] = 1E-03
-    level_params['nsweeps'] = [1]
+    level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -62,7 +62,7 @@ def run_simulation(name=''):
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 16.0
-    problem_params['nvars'] = [(48 * 24, 48 * 24)]#, (8 * 24, 8 * 24)]
+    problem_params['nvars'] = [(48 * 24, 48 * 24), (8 * 24, 8 * 24)]
     problem_params['eps'] = [0.04]
     problem_params['dw'] = [-0.04]
     problem_params['radius'] = 0.25
