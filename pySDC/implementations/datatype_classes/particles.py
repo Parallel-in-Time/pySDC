@@ -235,7 +235,7 @@ class particles(object):
             self.m = cp.deepcopy(init.m)
         # if init is a number, create particles object and pick the corresponding initial values
         elif isinstance(init, int):
-            if isinstance(val, int) or or isinstance(val, float) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.pos = particles.position(init, val=val)
                 self.vel = particles.velocity(init, val=val)
                 self.q = np.zeros(init)
