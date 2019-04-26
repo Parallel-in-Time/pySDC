@@ -22,7 +22,7 @@ before_install:
   - conda update --yes -n base -c defaults conda
 
 install:
-  - conda install --yes -c conda-forge mpich-mpicc petsc4py mpi4py fenics mpi4py_fft
+  - conda install --yes -c conda-forge mpich-mpicc petsc4py mpi4py fenics mpi4py-fft
   - conda install --yes pip numpy scipy matplotlib nose pep8 coverage sympy dill numba sphinx cython
   - conda list
 #  - pip install pfft-python pmesh
