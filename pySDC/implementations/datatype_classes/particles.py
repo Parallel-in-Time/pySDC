@@ -252,7 +252,7 @@ class particles(object):
             else:
                 raise DataError('type of val is wrong, got %s', val)
         elif isinstance(init, tuple):
-            if isinstance(val, int) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.pos = particles.position(init, val=val)
                 self.vel = particles.velocity(init, val=val)
                 self.q = np.zeros(init[-1])
@@ -703,7 +703,7 @@ class fields(object):
             self.magn = fields.magnetic(init.magn)
         # if init is a number, create fields object and pick the corresponding initial values
         elif isinstance(init, int) or isinstance(init, tuple):
-            if isinstance(val, int) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.elec = fields.electric(init, val=val)
                 self.magn = fields.magnetic(init, val=val)
             elif isinstance(val, tuple) and len(val) == 2:
