@@ -63,7 +63,7 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         # transform collocation problem forward
         Guv = []
         for m in range(M):
-            Guv.append(P.dtype_u(P.init, val=0))
+            Guv.append(P.dtype_u(P.init, val=0.0))
             for j in range(M):
                 Guv[m] += self.Vi[m, j] * Gu[j]
 

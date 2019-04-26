@@ -169,8 +169,8 @@ class generic_implicit_MPI(sweeper):
             L.u[self.rank + 1] = P.dtype_u(L.u[0])
             L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
         else:
-            L.u[self.rank + 1] = P.dtype_u(init=P.init, val=0)
-            L.f[self.rank + 1] = P.dtype_f(init=P.init, val=0)
+            L.u[self.rank + 1] = P.dtype_u(init=P.init, val=0.0)
+            L.f[self.rank + 1] = P.dtype_f(init=P.init, val=0.0)
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True

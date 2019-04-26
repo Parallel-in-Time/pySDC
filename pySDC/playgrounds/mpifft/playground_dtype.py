@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import copy
 from mpi4py import MPI
 from mpi4py_fft import PFFT
 from pySDC.playgrounds.mpifft.FFT_datatype import fft_datatype
@@ -8,17 +9,14 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 class mytype(np.ndarray):
 
-    # def __new__(cls, global_shape, dtype=np.float, buffer=None):
-    #     obj = np.ndarray.__new__(cls, global_shape, dtype=dtype, buffer=buffer)
-    #     return obj
-
     def __new__(cls, init, val=0.0):
         if isinstance(init, mytype):
-            obj = np.ndarray.__new__(cls, init.shape, dtype=init.dtype, buffer=None)
+            obj = np.ndarray.__new__(cls, init.shape, dtype=np.float, buffer=None)
             obj[:] = init[:]
+            # obj = init.copy()
         elif isinstance(init, tuple):
             obj = np.ndarray.__new__(cls, init, dtype=np.float, buffer=None)
-            obj[:] = val
+            obj.fill(val)
         else:
             raise NotImplementedError(type(init))
         return obj
@@ -27,36 +25,56 @@ class mytype(np.ndarray):
         return float(np.amax(np.ndarray.__abs__(self)))
 
 
-nvars = 400
-nruns = 100000
+nvars = 32
+nruns = 100 * 16
 
 res = 0
 t0 = time.perf_counter()
 m = mytype((nvars, nvars), val=2.0)
 for i in range(nruns):
     o = mytype(m)
-    m[:] = 4.0
-    res = max(res, abs(m + o))
+    o[:] = 4.0
+    n = mytype(m)
+    for j in range(i):
+        n += o
+    res = max(res, abs(n))
 t1 = time.perf_counter()
 print(res, t1-t0)
+
+# res = 0
+# t0 = time.perf_counter()
+# m = mytype((nvars, nvars), val=2.0)
+# for i in range(nruns):
+#     o = mytype(m)
+#     o.values[:] = 4.0
+#     res = max(res, abs(m + o))
+# t1 = time.perf_counter()
+# print(res, t1-t0)
 
 res = 0
 t0 = time.perf_counter()
 m = mesh(init=(nvars, nvars), val=2.0)
 for i in range(nruns):
     o = mesh(init=m)
-    m.values[:] = 4.0
-    res = max(res, abs(m + o))
+    o.values[:] = 4.0
+    n = mesh(init=m)
+    for j in range(i):
+        n += o
+    res = max(res, abs(n))
 t1 = time.perf_counter()
 print(res, t1-t0)
 
-exit()
-# n = mytype((nvars, nvars), val=2.0)
+m = mytype((nvars, nvars), val=2.0)
+n = mytype((nvars, nvars), val=2.0)
 m[:] = -1
 n[:] = 2.9
-print(n)
+# print(n)
 o = mytype(m)
-print(o is m)
+m[0, 0] = 2
+assert o[0, 0] == -1
+assert o is not m
+exit()
+
 print(type(m))
 print(type(m+n))
 print(abs(m))

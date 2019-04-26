@@ -227,8 +227,8 @@ class controller_matrix_nonMPI(controller_nonMPI):
                 lvl.status.time = time[p]
                 P = lvl.prob
                 for m in range(1, lvl.sweep.coll.num_nodes + 1):
-                    lvl.u[m] = P.dtype_u(init=P.init, val=0)
-                    lvl.f[m] = P.dtype_f(init=P.init, val=0)
+                    lvl.u[m] = P.dtype_u(init=P.init, val=0.0)
+                    lvl.f[m] = P.dtype_f(init=P.init, val=0.0)
 
         self.u0 = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values))
 

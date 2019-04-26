@@ -131,7 +131,7 @@ class advection_2d_explicit(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars,val=0)
+        fimpl = mesh(self.nvars,val=0.0)
         # fimpl.values = self.A.dot(u.values)
         
         return fimpl

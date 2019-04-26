@@ -111,7 +111,7 @@ class acoustic_2d_imex(ptype):
 
         temp = u.values.flatten()
         temp = self.M.dot(temp)
-        fimpl = mesh(self.nvars,val=0)
+        fimpl = mesh(self.nvars,val=0.0)
         # NOTE: M = -A, therefore add a minus here
         fimpl.values = unflatten(-self.c_s*temp, 3, self.N[0], self.N[1])
         
