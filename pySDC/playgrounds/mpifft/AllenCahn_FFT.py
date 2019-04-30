@@ -216,89 +216,72 @@ class allencahn_imex_timeforcing(allencahn_imex):
             dtype_f: the RHS
         """
 
-        def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k)
-            return -k2 * v
-
         f = self.dtype_f(self.init)
-        tmp_u = self.pm.create(type='real', value=u.values)
-        f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
 
-        if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
+        if self.params.spectral:
 
-        # build sum over RHS without driving force
-        Rt_local = f.impl.values.sum() + f.expl.values.sum()
-        if self.pm.comm is not None:
-            Rt_global = self.pm.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+            f.impl = -self.K2 * u
+
+            tmp = newDistArray(self.fft, False)
+            tmp[:] = self.fft.backward(u, tmp)
+
+            if self.params.eps > 0:
+                tmpf = -2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp)
+            else:
+                tmpf = self.dtype_f(self.init, val=0.0)
+
+            # build sum over RHS without driving force
+            Rt_local = float(np.sum(self.fft.backward(f.impl) + tmpf))
+            if self.params.comm is not None:
+                Rt_global = self.params.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+            else:
+                Rt_global = Rt_local
+
+            # build sum over driving force term
+            Ht_local = float(np.sum(6.0 * tmp * (1.0 - tmp)))
+            if self.params.comm is not None:
+                Ht_global = self.params.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+            else:
+                Ht_global = Rt_local
+
+            # add/substract time-dependent driving force
+            if Ht_global != 0.0:
+                dw = Rt_global / Ht_global
+            else:
+                dw = 0.0
+
+            tmpf -= 6.0 * dw * tmp * (1.0 - tmp)
+            f.expl[:] = self.fft.forward(tmpf)
+
         else:
-            Rt_global = Rt_local
 
-        # build sum over driving force term
-        Ht_local = np.sum(6.0 * u.values * (1.0 - u.values))
-        if self.pm.comm is not None:
-            Ht_global = self.pm.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
-        else:
-            Ht_global = Rt_local
+            u_hat = self.fft.forward(u)
+            lap_u_hat = -self.K2 * u_hat
+            f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
-        # add/substract time-dependent driving force
-        dw = Rt_global / Ht_global
-        f.expl.values -= 6.0 * dw * u.values * (1.0 - u.values)
+            if self.params.eps > 0:
+                f.expl = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+
+            # build sum over RHS without driving force
+            Rt_local = float(np.sum(f.impl + f.expl))
+            if self.params.comm is not None:
+                Rt_global = self.params.comm.allreduce(sendobj=Rt_local, op=MPI.SUM)
+            else:
+                Rt_global = Rt_local
+
+            # build sum over driving force term
+            Ht_local = float(np.sum(6.0 * u * (1.0 - u)))
+            if self.params.comm is not None:
+                Ht_global = self.params.comm.allreduce(sendobj=Ht_local, op=MPI.SUM)
+            else:
+                Ht_global = Rt_local
+
+            # add/substract time-dependent driving force
+            if Ht_global != 0.0:
+                dw = Rt_global / Ht_global
+            else:
+                dw = 0.0
+
+            f.expl -= 6.0 * dw * u * (1.0 - u)
 
         return f
-
-
-class allencahn_imex_stab(allencahn_imex):
-    """
-    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping with
-    stabilized splitting
-    """
-
-    def eval_f(self, u, t):
-        """
-        Routine to evaluate the RHS
-
-        Args:
-            u (dtype_u): current values
-            t (float): current time
-
-        Returns:
-            dtype_f: the RHS
-        """
-
-        def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
-            return -k2 * v
-
-        f = self.dtype_f(self.init)
-        tmp_u = self.pm.create(type='real', value=u.values)
-        f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
-        if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-                6.0 * self.params.dw * u.values * (1.0 - u.values) + \
-                1.0 / self.params.eps ** 2 * u.values
-        return f
-
-    def solve_system(self, rhs, factor, u0, t):
-        """
-        Simple FFT solver for the diffusion part
-
-        Args:
-            rhs (dtype_f): right-hand side for the linear system
-            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)
-            u0 (dtype_u): initial guess for the iterative solver (not used here so far)
-            t (float): current time (e.g. for time-dependent BCs)
-
-        Returns:
-            dtype_u: solution as mesh
-        """
-
-        def linear_solve(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
-            return 1.0 / (1.0 + factor * k2) * v
-
-        me = self.dtype_u(self.init)
-        tmp_rhs = self.pm.create(type='real', value=rhs.values)
-        me.values = tmp_rhs.r2c().apply(linear_solve, out=Ellipsis).c2r(out=Ellipsis).value
-
-        return me

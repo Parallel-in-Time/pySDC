@@ -7,7 +7,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.mpifft.AllenCahn_FFT import allencahn_imex
+from pySDC.playgrounds.mpifft.AllenCahn_FFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.playgrounds.mpifft.AllenCahn_monitor_and_dump import monitor_and_dump
 from pySDC.playgrounds.mpifft.TransferMesh_FFT import fft_to_fft
 
@@ -62,12 +62,12 @@ def run_simulation(name=''):
     problem_params['L'] = 1.0
     problem_params['nvars'] = [(128, 128), (32, 32)]
     problem_params['eps'] = [0.04]
-    # problem_params['dw'] = [-23.6]
+    problem_params['dw'] = [-23.6]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
     problem_params['init_type'] = 'circle'
-    problem_params['spectral'] = True
+    problem_params['spectral'] = False
 
     # initialize step parameters
     step_params = dict()
@@ -80,8 +80,8 @@ def run_simulation(name=''):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = allencahn_imex
-    # description['problem_class'] = allencahn_imex_stab
+    # description['problem_class'] = allencahn_imex
+    description['problem_class'] = allencahn_imex_timeforcing
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
