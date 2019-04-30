@@ -40,7 +40,7 @@ class allencahn_imex(ptype):
             problem_params['dw'] = 0.0
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw']
+        essential_keys = ['nvars', 'eps', 'L', 'radius', 'dw', 'spectral']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -55,9 +55,8 @@ class allencahn_imex(ptype):
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        spectral = False
-        super(allencahn_imex, self).__init__(init=(self.fft, spectral), dtype_u=dtype_u, dtype_f=dtype_f,
-                                             params=problem_params)
+        super(allencahn_imex, self).__init__(init=(self.fft, problem_params['spectral']),
+                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         L = np.array([self.params.L] * ndim, dtype=float)
 
@@ -100,13 +99,25 @@ class allencahn_imex(ptype):
 
         f = self.dtype_f(self.init)
 
-        u_hat = self.fft.forward(u)
-        lap_u_hat = -self.K2 * u_hat
-        f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
+        if self.params.spectral:
 
-        if self.params.eps > 0:
-            f.expl = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
-                6.0 * self.params.dw * u * (1.0 - u)
+            f.impl = -self.K2 * u
+
+            if self.params.eps > 0:
+                tmp = self.fft.backward(u)
+                tmpf = - 2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - \
+                    6.0 * self.params.dw * tmp * (1.0 - tmp)
+                f.expl[:] = self.fft.forward(tmpf)
+
+        else:
+
+            u_hat = self.fft.forward(u)
+            lap_u_hat = -self.K2 * u_hat
+            f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
+
+            if self.params.eps > 0:
+                f.expl = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
+                    6.0 * self.params.dw * u * (1.0 - u)
 
         return f
 
@@ -124,10 +135,16 @@ class allencahn_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        me = self.dtype_u(self.init)
-        rhs_hat = self.fft.forward(rhs)
-        rhs_hat /= (1.0 + factor * self.K2)
-        me[:] = self.fft.backward(rhs_hat)
+        if self.params.spectral:
+
+            me = rhs / (1.0 + factor * self.K2)
+
+        else:
+
+            me = self.dtype_u(self.init)
+            rhs_hat = self.fft.forward(rhs)
+            rhs_hat /= (1.0 + factor * self.K2)
+            me[:] = self.fft.backward(rhs_hat)
 
         return me
 
@@ -146,7 +163,11 @@ class allencahn_imex(ptype):
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             r2 = (self.X[0] - 0.5) ** 2 + (self.X[1] - 0.5) ** 2
-            me[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+            if self.params.spectral:
+                tmp = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
+                me[:] = self.fft.forward(tmp)
+            else:
+                me[:] = 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
         elif self.params.init_type == 'circle_rand':
             ndim = len(me.shape)
             L = int(self.params.L)
@@ -156,16 +177,21 @@ class allencahn_imex(ptype):
             ubound = 0.5 - self.params.eps
             rand_radii = (ubound - lbound) * np.random.random_sample(size=tuple([L] * ndim)) + lbound
             # distribute circles/spheres
+            tmp = newDistArray(self.fft, False)
             if ndim == 2:
                 for i in range(0, L):
                     for j in range(0, L):
                         # build radius
                         r2 = (self.X[0] + i - L + 0.5) ** 2 + (self.X[1] + j - L + 0.5) ** 2
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
-                        me[:] += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
+                        tmp += np.tanh((rand_radii[i, j] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # normalize to [0,1]
-            me[:] *= 0.5
-            assert np.all(me <= 1.0)
+            tmp *= 0.5
+            assert np.all(tmp <= 1.0)
+            if self.params.spectral:
+                me[:] = self.fft.forward(tmp)
+            else:
+                me[:] = tmp[:]
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 

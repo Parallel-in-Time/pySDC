@@ -26,6 +26,10 @@ class fft_to_fft(space_transfer):
         # invoke super initialization
         super(fft_to_fft, self).__init__(fine_prob, coarse_prob, params)
 
+        assert self.fine_prob.params.spectral == self.coarse_prob.params.spectral
+
+        self.spectral = self.fine_prob.params.spectral
+
         Nf = list(self.fine_prob.fft.global_shape())
         Nc = list(self.coarse_prob.fft.global_shape())
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
@@ -39,18 +43,18 @@ class fft_to_fft(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        t0 = time.time()
         if isinstance(F, fft_datatype):
-            G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            G[:] = F[::int(self.ratio[0]), ::int(self.ratio[1])]
-        elif isinstance(F, rhs_imex_fft):
-            G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            G.impl[:] = F.impl[::int(self.ratio[0]), ::int(self.ratio[1])]
-            G.expl[:] = F.expl[::int(self.ratio[0]), ::int(self.ratio[1])]
+            if self.spectral:
+                G = self.coarse_prob.dtype_u(self.coarse_prob.init)
+                tmpF = self.fine_prob.fft.backward(F)
+                tmpG = tmpF[::int(self.ratio[0]), ::int(self.ratio[1])]
+                G[:] = self.coarse_prob.fft.forward(tmpG, G)
+            else:
+                G = self.coarse_prob.dtype_u(self.coarse_prob.init)
+                G[:] = F[::int(self.ratio[0]), ::int(self.ratio[1])]
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
-        t1 = time.time()
-        # print(f'Space restrict: {t1 - t0}')
+
         return G
 
     def prolong(self, G):
@@ -60,19 +64,29 @@ class fft_to_fft(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        t0 = time.time()
         if isinstance(G, fft_datatype):
-            F = self.fine_prob.dtype_u(self.fine_prob.init)
-            G_hat = self.coarse_prob.fft.forward(G)
-            F[:] = self.fft_pad.backward(G_hat, F)
+            if self.spectral:
+                F = self.fine_prob.dtype_u(self.fine_prob.init)
+                tmpF = self.fft_pad.backward(G)
+                F[:] = self.fine_prob.fft.forward(tmpF, F)
+            else:
+                F = self.fine_prob.dtype_u(self.fine_prob.init)
+                G_hat = self.coarse_prob.fft.forward(G)
+                F[:] = self.fft_pad.backward(G_hat, F)
         elif isinstance(G, rhs_imex_fft):
-            F = self.fine_prob.dtype_f(self.fine_prob.init)
-            G_hat = self.coarse_prob.fft.forward(G.impl)
-            F.impl[:] = self.fft_pad.backward(G_hat, F.impl)
-            G_hat = self.coarse_prob.fft.forward(G.expl)
-            F.expl[:] = self.fft_pad.backward(G_hat, F.expl)
+            if self.spectral:
+                F = self.fine_prob.dtype_f(self.fine_prob.init)
+                tmpF = self.fft_pad.backward(G.impl)
+                F.impl[:] = self.fine_prob.fft.forward(tmpF, F.impl)
+                tmpF = self.fft_pad.backward(G.expl)
+                F.expl[:] = self.fine_prob.fft.forward(tmpF, F.expl)
+            else:
+                F = self.fine_prob.dtype_f(self.fine_prob.init)
+                G_hat = self.coarse_prob.fft.forward(G.impl)
+                F.impl[:] = self.fft_pad.backward(G_hat, F.impl)
+                G_hat = self.coarse_prob.fft.forward(G.expl)
+                F.expl[:] = self.fft_pad.backward(G_hat, F.expl)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
-        t1 = time.time()
-        # print(f'Space interpolate: {t1 - t0}')
+
         return F

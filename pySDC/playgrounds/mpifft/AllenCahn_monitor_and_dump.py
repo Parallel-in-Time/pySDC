@@ -42,7 +42,10 @@ class monitor_and_dump(hooks):
             self.size = 1
 
         # compute numerical radius
-        tmp = L.u[0][:]
+        if L.prob.params.spectral:
+            tmp = L.prob.fft.backward(L.u[0])
+        else:
+            tmp = L.u[0][:]
         self.ndim = len(tmp.shape)
         v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
@@ -124,8 +127,10 @@ class monitor_and_dump(hooks):
         L = step.levels[0]
 
         # compute numerical radius
-        # v_local = np.sum(L.uend.values)
-        tmp = L.uend[:]
+        if L.prob.params.spectral:
+            tmp = L.prob.fft.backward(L.uend)
+        else:
+            tmp = L.uend[:]
         v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
         if self.comm is not None:
             v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)

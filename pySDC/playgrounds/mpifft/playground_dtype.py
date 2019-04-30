@@ -25,7 +25,7 @@ class mytype(np.ndarray):
         return float(np.amax(np.ndarray.__abs__(self)))
 
 
-nvars = 32
+nvars = 16
 nruns = 100 * 16
 
 res = 0
@@ -36,7 +36,7 @@ for i in range(nruns):
     o[:] = 4.0
     n = mytype(m)
     for j in range(i):
-        n += o
+        n += 0.1 * j * o
     res = max(res, abs(n))
 t1 = time.perf_counter()
 print(res, t1-t0)
@@ -59,7 +59,7 @@ for i in range(nruns):
     o.values[:] = 4.0
     n = mesh(init=m)
     for j in range(i):
-        n += o
+        n += 0.1 * j * o
     res = max(res, abs(n))
 t1 = time.perf_counter()
 print(res, t1-t0)

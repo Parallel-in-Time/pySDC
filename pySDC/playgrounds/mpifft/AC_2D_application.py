@@ -69,6 +69,7 @@ def run_simulation(name=''):
     problem_params['comm'] = space_comm
     problem_params['name'] = name
     problem_params['init_type'] = 'circle_rand'
+    problem_params['spectral'] = True
 
     # initialize step parameters
     step_params = dict()
