@@ -1,9 +1,8 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.playgrounds.mpifft.FFT_datatype import fft_datatype, rhs_imex_fft
+from pySDC.implementations.datatype_classes.MPIFFT_datatype import fft_datatype, rhs_imex_fft
 from mpi4py_fft import PFFT
 import numpy as np
-import time
 
 
 class fft_to_fft(space_transfer):

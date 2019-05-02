@@ -7,9 +7,8 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
-from pySDC.playgrounds.mpifft.AllenCahn_FFT import allencahn_imex#, allencahn_imex_stab
-from pySDC.playgrounds.mpifft.AllenCahn_monitor_and_dump import monitor_and_dump
-from pySDC.playgrounds.mpifft.TransferMesh_FFT import fft_to_fft
+from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex#, allencahn_imex_stab
+from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 
 

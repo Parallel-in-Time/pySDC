@@ -1,9 +1,8 @@
 import numpy as np
 import time
-import copy
 from mpi4py import MPI
 from mpi4py_fft import PFFT
-from pySDC.playgrounds.mpifft.FFT_datatype import fft_datatype
+from pySDC.implementations.datatype_classes.MPIFFT_datatype import fft_datatype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 

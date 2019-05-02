@@ -4,7 +4,7 @@ from mpi4py_fft import PFFT
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.playgrounds.mpifft.FFT_datatype import fft_datatype, rhs_imex_fft
+from pySDC.implementations.datatype_classes.MPIFFT_datatype import fft_datatype, rhs_imex_fft
 
 from mpi4py_fft import newDistArray
 

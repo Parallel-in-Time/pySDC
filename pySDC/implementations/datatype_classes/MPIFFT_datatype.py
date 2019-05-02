@@ -201,5 +201,3 @@ class rhs_imex_fft(object):
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-
-
