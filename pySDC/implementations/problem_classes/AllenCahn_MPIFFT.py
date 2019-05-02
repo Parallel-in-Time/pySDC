@@ -11,13 +11,16 @@ from mpi4py_fft import newDistArray
 
 class allencahn_imex(ptype):
     """
-    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping
+    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping
 
-    PMESH: https://github.com/rainwoodman/pmesh
+    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/
 
     Attributes:
-        xvalues: grid points in space
-        dx: mesh width
+        fft: fft object
+        X: grid coordinates in real space
+        K2: Laplace operator in spectral space
+        dx: mesh width in x direction
+        dy: mesh width in y direction
     """
 
     def __init__(self, problem_params, dtype_u=fft_datatype, dtype_f=rhs_imex_fft):
@@ -26,8 +29,8 @@ class allencahn_imex(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: pmesh data type (will be passed to parent class)
-            dtype_f: pmesh data type wuth implicit and explicit parts (will be passed to parent class)
+            dtype_u: fft data type (will be passed to parent class)
+            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         if 'L' not in problem_params:
@@ -200,7 +203,7 @@ class allencahn_imex(ptype):
 
 class allencahn_imex_timeforcing(allencahn_imex):
     """
-    Example implementing Allen-Cahn equation in 2-3D using PMESH for solving linear parts, IMEX time-stepping,
+    Example implementing Allen-Cahn equation in 2-3D using mpi4py-fft for solving linear parts, IMEX time-stepping,
     time-dependent forcing
     """
 

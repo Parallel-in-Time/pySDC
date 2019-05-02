@@ -6,9 +6,10 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
+
+from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
 
 
 def run_simulation(nprocs_space=None):
@@ -72,6 +73,7 @@ def run_simulation(nprocs_space=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
+    controller_params['hook_class'] = dump
     controller_params['predict_type'] = 'pfasst_burnin'
 
     # fill description dictionary for easy step instantiation
