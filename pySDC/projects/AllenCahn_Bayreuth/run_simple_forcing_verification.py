@@ -14,7 +14,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
-from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_monitor_and_dump import monitor_and_dump
+from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_monitor import monitor
 
 
 def run_simulation(name='', spectral=None, nprocs_space=None):
@@ -78,7 +78,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
-    controller_params['hook_class'] = monitor_and_dump
+    controller_params['hook_class'] = monitor
     controller_params['predict_type'] = 'pfasst_burnin'
 
     # fill description dictionary for easy step instantiation
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
     # Add parser to get number of processors in space (have to do this here to enable automatic testing)
     parser = ArgumentParser()
-    parser.add_argument("-n", "--nprocs_space", help='Specified the number of processors in space', type=int)
+    parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     args = parser.parse_args()
 
     main(nprocs_space=args.nprocs_space)
