@@ -15,7 +15,7 @@ In detail, the code checks:
 - constant driving force: for a particular value of the driving force ``dw``, the circle's radius stays constant (more or less)
 - time-dependent driving force: weighting the RHS and the driving force allows to determine a force to keep the radius constant, too
 
-Further scripts
----------------
+Further scripts/files
+---------------------
 
 - ``AllenCahn_monitor_and_dump.py``: computes the radii for the verification problems and dumps the solution via MPI I/O

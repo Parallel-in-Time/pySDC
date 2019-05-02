@@ -23,7 +23,7 @@ Getting started
 
 The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <https://github.com/Parallel-in-Time/pySDC>`_, and PyPI, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_.
 Either use ``pip install pySDC`` to get the latest stable release including the core dependencies or check out the code on Github.
-Note that using ``pip install pySDC`` or ``python setup.py install`` will only install the core dependencies, omitting e.g. `mpi4py`, 'fenics` and `petsc4py` (see below).
+Note that using ``pip install pySDC`` or ``python setup.py install`` will only install the core dependencies, omitting e.g. `mpi4py`, `fenics` and `petsc4py` (see below).
 All package requirements are listed in the files `requirements.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements.txt>`_ .
 
 To check your installation, run
