@@ -39,3 +39,4 @@ Further scripts/files
 - ``AllenCahn_monitor.py``: computes the radii for the verification problems
 - ``AllenCahn_dump.py``: dumps the solution via MPI I/O
 - ``visualize.py``: simple script to turn data from the dump routines into pngs
+- ``run_pySC_AC.exe``: jobscript for JURECA
