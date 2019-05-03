@@ -104,7 +104,7 @@ class dump(hooks):
         if L.prob.params.spectral:
             if hasattr(L.prob, 'ncomp'):
                 tmp1 = newDistArray(L.prob.fft, False)
-                tmp = np.zeros(tmp1.shape+(L.prob.ncomp,))
+                tmp = np.zeros(tmp1.shape + (L.prob.ncomp,))
                 for i in range(L.prob.ncomp):
                     tmp[..., i] = L.prob.fft.backward(L.uend[..., i])
             else:

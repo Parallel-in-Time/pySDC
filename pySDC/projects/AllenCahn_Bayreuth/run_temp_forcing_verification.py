@@ -11,7 +11,7 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT import allencahn_temp_imex#, allencahn_imex_timeforcing
+from pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT import allencahn_temp_imex
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
@@ -60,7 +60,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     # initialize problem parameters
     problem_params = dict()
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128)]  #, (32, 32)]
+    problem_params['nvars'] = [(128, 128), (32, 32)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['TM'] = 1.0
@@ -93,14 +93,14 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 128 * 0.001
+    Tend = 32 * 0.001
 
     if space_rank == 0:
         out = f'---------> Running {name} with spectral={spectral} and {space_size} process(es) in space...'
         print(out)
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=8, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
