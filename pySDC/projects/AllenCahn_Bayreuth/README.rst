@@ -16,23 +16,24 @@ In detail, the code checks:
 - constant driving force: for a particular value of the driving force ``dw``, the circle's radius stays constant (more or less)
 - time-dependent driving force: weighting the RHS and the driving force allows to determine a force to keep the radius constant, too
 
-The script ``run_temp_forcing_verification.py`` ... TODO
+The script ``run_temp_forcing_verification.py`` runs a specific setup with temperature-based forcing. The datatype now has two components.
+Verification is done using a numerical simulation created with ``run_temp_forcing_reference.py``. Errors and order of accuracy is tested.
 
-These problem setups are all tested with CI. They run serial or parallel in space, but serial in time (mimicking PFASST, though).
+These small-scale problem setups are all tested with CI. They run serial or parallel in space, but serial in time (mimicking PFASST, though).
 
 Benchmark
 ---------
 
-The script ``run_simple_forcing_verification.py`` can be used to benchmark the code for simple driving force on larger HPC machines.
+The script ``run_simple_forcing_verification.py`` can be used to benchmark the code for simple driving forces on larger HPC machines.
 It takes the number of processes in space as well as the setup type (as in the verification code) as input parameters.
 It can be run serial/parallel in space and/or time.
 
-These codes are not tested with CI.
+These larger-scale codes are not tested with CI.
 
 Application
 -----------
 
-ToDo (add movie for time-dependent forcing)
+TODO
 
 Further/related files
 ---------------------

@@ -1,14 +1,10 @@
 import subprocess
-import os
-
-import numpy as np
-from mpi4py import MPI
 
 from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
 
-# def test_main_serial():
-#     main()
-#     visualize_radii()
+def test_main_serial():
+    main()
+    visualize_radii()
 
 def test_main_parallel():
 
