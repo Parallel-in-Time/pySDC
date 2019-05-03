@@ -188,7 +188,7 @@ class allencahn_imex(ptype):
 
         def sines(i, v):
             r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
-            return np.sin(2 * 2 * np.pi * r[0]) * np.sin(2 * 2 * np.pi * r[1])
+            return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
 
         def scaled_circle(i, v):
             r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
@@ -201,7 +201,7 @@ class allencahn_imex(ptype):
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values[..., 0] = tmp_u.apply(circle, kind='index').value
             tmp_u = self.pm.create(type='real', value=0.0)
-            me.values[..., 1] = tmp_u.apply(scaled_circle, kind='index').value
+            me.values[..., 1] = tmp_u.apply(sines, kind='index').value
         elif self.params.init_type == 'circle_rand':
             tmp_u = self.pm.create(type='real', value=0.0)
             me.values[..., 0] = tmp_u.apply(circle_rand, kind='index').value

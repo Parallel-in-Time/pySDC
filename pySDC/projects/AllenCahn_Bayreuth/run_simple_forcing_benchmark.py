@@ -50,7 +50,7 @@ def run_simulation(name=None, nprocs_space=None):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = True
+    sweeper_params['spread'] = False
 
     # initialize problem parameters
     problem_params = dict()
@@ -96,7 +96,7 @@ def run_simulation(name=None, nprocs_space=None):
     t0 = 0.0
     Tend = 32 * 0.001
 
-    if space_rank == 0:
+    if space_rank == 0 and time_rank == 0:
         out = f'---------> Running {name} with {time_size} process(es) in time and {space_size} process(es) in space...'
         print(out)
 
