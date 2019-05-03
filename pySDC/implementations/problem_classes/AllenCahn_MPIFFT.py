@@ -57,8 +57,11 @@ class allencahn_imex(ptype):
         axes = tuple(range(ndim))
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
 
+        # get test data to figure out type and dimensions
+        tmp_u = newDistArray(self.fft, problem_params['spectral'])
+
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_imex, self).__init__(init=(self.fft, problem_params['spectral']),
+        super(allencahn_imex, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         L = np.array([self.params.L] * ndim, dtype=float)

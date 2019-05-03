@@ -175,7 +175,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         elif name == 'AC-test-constforce':
             if spectral:
                 exp_iters = 3.90625
-                exp_err = 3.1178e-04
+                exp_err = 4.678e-04
             else:
                 exp_iters = 5.21875
                 exp_err = 6.2384e-04

@@ -5,32 +5,36 @@ from pySDC.core.Errors import DataError
 from mpi4py_fft import PFFT, DistArray
 
 
-class fft_datatype(np.ndarray):
+class fft_datatype(DistArray):
     """
     """
 
-    def __new__(cls, init, val=0.0):
-        if isinstance(init, fft_datatype):
-            obj = np.ndarray.__new__(cls, init.shape, dtype=init.dtype, buffer=None)
+    def __new__(cls, init, val=0.0, rank=0):
+        if isinstance(init, tuple):
+            pfft = init[0]
+            forward_output = init[1]
+
+            global_shape = pfft.global_shape(forward_output)
+            p0 = pfft.pencil[forward_output]
+            if forward_output is True:
+                dtype = pfft.forward.output_array.dtype
+            else:
+                dtype = pfft.forward.input_array.dtype
+            global_shape = (len(global_shape),) * rank + global_shape
+            subcomm = p0.subcomm
+            obj = DistArray.__new__(cls, global_shape, subcomm=subcomm, val=val, dtype=dtype,
+                                    rank=rank)
+        elif isinstance(init, fft_datatype):
+            global_shape = init.global_shape
+            subcomm = init.subcomm
+            dtype = init.dtype
+            obj = DistArray.__new__(cls, global_shape, subcomm=subcomm, val=val, dtype=dtype,
+                                    rank=rank)
             obj[:] = init[:]
-            obj._comm = init._comm
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
-            obj = np.ndarray.__new__(cls, init[0], dtype=init[2], buffer=None)
-            obj.fill(val)
-            obj._comm = init[1]
         else:
-            raise NotImplementedError(type(init))
+            raise DataError('something went wrong during %s initialization' % type(init))
+
         return obj
-
-    @property
-    def comm(self):
-        return self._comm
-
-    def __array_finalize__(self, obj):
-        if obj is None:
-            return
-        self._comm = getattr(obj, '_comm', None)
 
     def __abs__(self):
         """
@@ -40,12 +44,13 @@ class fft_datatype(np.ndarray):
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(np.amax(np.ndarray.__abs__(self)))
+        local_absval = float(np.amax(DistArray.__abs__(self)))
 
-        if self.comm is not None:
-            if self.comm.Get_size() > 1:
+        if self.subcomm is not None:
+            if np.any([c.Get_size() > 1 for c in self.subcomm]):
                 global_absval = 0.0
-                global_absval = max(self.comm.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
+                for c in self.subcomm:
+                    global_absval = max(c.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
             else:
                 global_absval = local_absval
         else:
@@ -130,7 +135,7 @@ class rhs_imex_fft(object):
         if isinstance(init, type(self)):
             self.impl = fft_datatype(init.impl)
             self.expl = fft_datatype(init.expl)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)):
+        elif isinstance(init, tuple) and isinstance(init[0], PFFT):
             self.impl = fft_datatype(init, val=val)
             self.expl = fft_datatype(init, val=val)
         # something is wrong, if none of the ones above hit
