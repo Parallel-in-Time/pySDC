@@ -16,6 +16,8 @@ In detail, the code checks:
 - constant driving force: for a particular value of the driving force ``dw``, the circle's radius stays constant (more or less)
 - time-dependent driving force: weighting the RHS and the driving force allows to determine a force to keep the radius constant, too
 
+The script ``run_temp_forcing_verification.py`` ... TODO
+
 These problem setups are all tested with CI. They run serial or parallel in space, but serial in time (mimicking PFASST, though).
 
 Benchmark
@@ -40,11 +42,13 @@ The following files are also listed under this project:
 - ``AllenCahn_monitor_and_dump.py``: computes the radii for the verification problems and dumps the solution via MPI I/O
 - ``AllenCahn_monitor.py``: computes the radii for the verification problems
 - ``AllenCahn_dump.py``: dumps the solution via MPI I/O
-- ``visualize.py``: simple script to turn data from the dump routines into pngs
+- ``visualize.py``: simple script to turn field data from the dump routines into pngs
+- ``visualize_temp.py``: simple script to turn field and temperature data from the dump routines into pngs and movies
 - ``run_pySC_AC.exe``: jobscript for JURECA
 
 The project uses in particular these implementations from the ``implementations`` folder:
 
 - ``parallel_mesh.py`` in the ``datatype_classes``: contains numpy-based data with a communicator
 - ``AllenCahn_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for simple forcing terms
+- ``AllenCahn_Temp_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for temperature-based forcing
 
