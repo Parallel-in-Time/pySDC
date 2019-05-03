@@ -2,15 +2,29 @@ from mpi4py import MPI
 import numpy as np
 
 from pySDC.core.Errors import DataError
-from mpi4py_fft import PFFT, DistArray
 
 
-class fft_datatype(np.ndarray):
+class parallel_mesh(np.ndarray):
     """
+    Numpy-based datatype for parallel meshes. Includes a communicator and expects a dtype to allow complex data.
+
+    Attributes:
+        _comm: MPI communicator or None
     """
 
     def __new__(cls, init, val=0.0):
-        if isinstance(init, fft_datatype):
+        """
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a parallel_mesh.
+
+        Args:
+            init: either another parallel_mesh or a tuple containing the dimensions, the communicator and the dtype
+            val: value to initialize
+
+        Returns:
+            obj of type parallel_mesh
+
+        """
+        if isinstance(init, parallel_mesh):
             obj = np.ndarray.__new__(cls, init.shape, dtype=init.dtype, buffer=None)
             obj[:] = init[:]
             obj._comm = init._comm
@@ -25,16 +39,22 @@ class fft_datatype(np.ndarray):
 
     @property
     def comm(self):
+        """
+        Getter for the communicator
+        """
         return self._comm
 
     def __array_finalize__(self, obj):
+        """
+        Finalizing the datatype. Without this, new datatypes do not 'inherit' the communicator.
+        """
         if obj is None:
             return
         self._comm = getattr(obj, '_comm', None)
 
     def __abs__(self):
         """
-        Overloading the abs operator for fft mesh types
+        Overloading the abs operator
 
         Returns:
             float: absolute maximum of all mesh values
@@ -113,8 +133,13 @@ class fft_datatype(np.ndarray):
         return self
 
 
-class rhs_imex_fft(object):
+class parallel_imex_mesh(object):
     """
+    Numpy-based datatype for IMEX RHS of parallel meshes.
+
+    Attributes:
+        impl (parallel_mesh): implicit part
+        expl (parallel_mesh): explicit part
     """
 
     def __init__(self, init, val=0.0):
@@ -128,11 +153,11 @@ class rhs_imex_fft(object):
             DataError: if init is none of the types above
         """
         if isinstance(init, type(self)):
-            self.impl = fft_datatype(init.impl)
-            self.expl = fft_datatype(init.expl)
+            self.impl = parallel_mesh(init.impl)
+            self.expl = parallel_mesh(init.expl)
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)):
-            self.impl = fft_datatype(init, val=val)
-            self.expl = fft_datatype(init, val=val)
+            self.impl = parallel_mesh(init, val=val)
+            self.expl = parallel_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -150,7 +175,7 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, type(self)):
-            me = rhs_imex_fft(self)
+            me = parallel_imex_mesh(self)
             me.impl = self.impl - other.impl
             me.expl = self.expl - other.expl
             return me
@@ -170,7 +195,7 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, type(self)):
-            me = rhs_imex_fft(self)
+            me = parallel_imex_mesh(self)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl
             return me
@@ -179,7 +204,7 @@ class rhs_imex_fft(object):
 
     def __rmul__(self, other):
         """
-        Overloading the right multiply by factor operator for mesh types
+        Overloading the right multiply by factor operator for rhs types
 
         Args:
             other (float): factor
@@ -190,7 +215,7 @@ class rhs_imex_fft(object):
         """
 
         if isinstance(other, float):
-            me = rhs_imex_fft(self)
+            me = parallel_imex_mesh(self)
             me.impl = other * self.impl
             me.expl = other * self.expl
             return me

@@ -1,6 +1,6 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.MPIFFT_datatype import fft_datatype, rhs_imex_fft
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 from mpi4py_fft import PFFT
 import numpy as np
 
@@ -42,7 +42,7 @@ class fft_to_fft(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, fft_datatype):
+        if isinstance(F, parallel_mesh):
             if self.spectral:
                 G = self.coarse_prob.dtype_u(self.coarse_prob.init)
                 tmpF = self.fine_prob.fft.backward(F)
@@ -63,7 +63,7 @@ class fft_to_fft(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, fft_datatype):
+        if isinstance(G, parallel_mesh):
             if self.spectral:
                 F = self.fine_prob.dtype_u(self.fine_prob.init)
                 tmpF = self.fft_pad.backward(G)
@@ -72,7 +72,7 @@ class fft_to_fft(space_transfer):
                 F = self.fine_prob.dtype_u(self.fine_prob.init)
                 G_hat = self.coarse_prob.fft.forward(G)
                 F[:] = self.fft_pad.backward(G_hat, F)
-        elif isinstance(G, rhs_imex_fft):
+        elif isinstance(G, parallel_imex_mesh):
             if self.spectral:
                 F = self.fine_prob.dtype_f(self.fine_prob.init)
                 tmpF = self.fft_pad.backward(G.impl)

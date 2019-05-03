@@ -74,7 +74,7 @@ def run_simulation(name=None, nprocs_space=None):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
-    controller_params['predict_type'] = 'pfasst_burnin'
+    controller_params['predict_type'] = 'fine_only'
 
     # fill description dictionary for easy step instantiation
     description = dict()
