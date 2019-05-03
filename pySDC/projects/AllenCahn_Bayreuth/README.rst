@@ -19,7 +19,8 @@ In detail, the code checks:
 The script ``run_temp_forcing_verification.py`` runs a specific setup with temperature-based forcing. The datatype now has two components.
 Verification is done using a numerical simulation created with ``run_temp_forcing_reference.py``. Errors and order of accuracy is tested.
 
-These small-scale problem setups are all tested with CI. They run serial or parallel in space, but serial in time (mimicking PFASST, though).
+These small-scale problem setups are all tested with CI.
+They run serial or parallel in space (although testing for the temperature setup only works in serial), but serial in time (mimicking PFASST, though).
 
 Benchmark
 ---------
