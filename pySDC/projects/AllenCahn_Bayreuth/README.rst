@@ -3,7 +3,7 @@ Allen-Cahn problems from Bayreuth
 
 This project provides code for running, testing, benchmarking and playing with Allen-Cahn-type problems in material science.
 The setups come from `ParaPhase <http://paraphase.de>`_ partner `Bayreuth <https://www.metalle.uni-bayreuth.de>`_ and the codes should demonstrate correctness, parallelization and flexibility of the implementation with pySDC.
-Many (possibly all) code in this project need `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ which can be installed via pip or conda.
+Many (possibly all) codes in this project need `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ which can be installed via pip or conda.
 
 Verification
 ------------
@@ -32,11 +32,19 @@ Application
 
 ToDo (add movie for time-dependent forcing)
 
-Further scripts/files
+Further/related files
 ---------------------
+
+The following files are also listed under this project:
 
 - ``AllenCahn_monitor_and_dump.py``: computes the radii for the verification problems and dumps the solution via MPI I/O
 - ``AllenCahn_monitor.py``: computes the radii for the verification problems
 - ``AllenCahn_dump.py``: dumps the solution via MPI I/O
 - ``visualize.py``: simple script to turn data from the dump routines into pngs
 - ``run_pySC_AC.exe``: jobscript for JURECA
+
+The project uses in particular these implementations from the ``implementations`` folder:
+
+- ``parallel_mesh.py`` in the ``datatype_classes``: contains numpy-based data with a communicator
+- ``AllenCahn_MPIFFT.py`` in the ``problem_classes``: contains the implementation of the problem for simple forcing terms
+

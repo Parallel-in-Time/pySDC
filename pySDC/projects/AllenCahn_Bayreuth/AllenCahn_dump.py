@@ -1,6 +1,7 @@
 import numpy as np
 import json
 from mpi4py import MPI
+from mpi4py_fft import newDistArray
 from pySDC.core.Hooks import hooks
 
 
@@ -40,7 +41,13 @@ class dump(hooks):
 
         # get real space values
         if L.prob.params.spectral:
-            tmp = L.prob.fft.backward(L.u[0])
+            if hasattr(L.prob, 'ncomp'):
+                tmp1 = newDistArray(L.prob.fft, False)
+                tmp = np.zeros(tmp1.shape + (L.prob.ncomp,))
+                for i in range(L.prob.ncomp):
+                    tmp[..., i] = L.prob.fft.backward(L.u[0][..., i])
+            else:
+                tmp = L.prob.fft.backward(L.u[0])
         else:
             tmp = L.u[0][:]
 
@@ -58,6 +65,10 @@ class dump(hooks):
         fh.Write_at_all(local_offset, tmp)
         fh.Close()
 
+        sizes = list(L.prob.params.nvars)
+        if hasattr(L.prob, 'ncomp'):
+            sizes.append(L.prob.ncomp)
+
         # write json description
         if self.rank == 0 and step.status.slot == 0:
             json_obj = dict()
@@ -67,7 +78,7 @@ class dump(hooks):
             json_obj['time'] = L.time
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
-            json_obj['shape'] = L.prob.params.nvars
+            json_obj['shape'] = sizes
             json_obj['elementsize'] = tmp.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:
@@ -91,7 +102,13 @@ class dump(hooks):
 
         # get real space values
         if L.prob.params.spectral:
-            tmp = L.prob.fft.backward(L.uend)
+            if hasattr(L.prob, 'ncomp'):
+                tmp1 = newDistArray(L.prob.fft, False)
+                tmp = np.zeros(tmp1.shape+(L.prob.ncomp,))
+                for i in range(L.prob.ncomp):
+                    tmp[..., i] = L.prob.fft.backward(L.uend[..., i])
+            else:
+                tmp = L.prob.fft.backward(L.uend)
         else:
             tmp = L.uend[:]
 
@@ -109,6 +126,10 @@ class dump(hooks):
         fh.Write_at_all(local_offset, tmp)
         fh.Close()
 
+        sizes = list(L.prob.params.nvars)
+        if hasattr(L.prob, 'ncomp'):
+            sizes.append(L.prob.ncomp)
+
         # write json description
         if self.rank == 0:
             json_obj = dict()
@@ -118,7 +139,7 @@ class dump(hooks):
             json_obj['time'] = L.time + L.dt
             json_obj['space_comm_size'] = self.size
             json_obj['time_comm_size'] = step.status.time_size
-            json_obj['shape'] = L.prob.params.nvars
+            json_obj['shape'] = sizes
             json_obj['elementsize'] = tmp.dtype.itemsize
 
             with open(fname + '.json', 'w') as fp:
