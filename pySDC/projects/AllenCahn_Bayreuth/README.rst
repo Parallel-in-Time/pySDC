@@ -34,7 +34,7 @@ These larger-scale codes are not tested with CI.
 Application
 -----------
 
-TODO
+None yet.
 
 Further/related files
 ---------------------

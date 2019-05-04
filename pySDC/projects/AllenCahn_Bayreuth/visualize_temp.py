@@ -5,11 +5,12 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
+from argparse import ArgumentParser
 
 import imageio
 
 
-def plot_data(name=''):
+def plot_data(path='./data', name='', output='.'):
     """
     Visualization using numpy arrays (written via MPI I/O) and json description
 
@@ -17,23 +18,24 @@ def plot_data(name=''):
       > ffmpeg -i data/name_%08d.png name.mp4
 
     Args:
+        path (str): path to data files
         name (str): name of the simulation (expects data to be in data path)
+        output (str): path to output
     """
 
-    json_files = sorted(glob.glob(f'./data/{name}_*.json'))
-    data_files = sorted(glob.glob(f'./data/{name}_*.dat'))
+    json_files = sorted(glob.glob(f'{path}/{name}_*.json'))
+    data_files = sorted(glob.glob(f'{path}/{name}_*.dat'))
 
     for json_file, data_file in zip(json_files, data_files):
         with open(json_file, 'r') as fp:
             obj = json.load(fp)
 
-        index = json_file.split('_')[1].split('.')[0]
+        index = json_file.split('_')[-1].split('.')[0]
         print(f'Working on step {index}...')
 
         array = np.fromfile(data_file, dtype=obj['datatype'])
         array = array.reshape(obj['shape'], order='C')
 
-        # fig = plt.figure(figsize=(6, 4))
         fig = plt.figure()
 
         grid = AxesGrid(fig, 111,
@@ -41,7 +43,7 @@ def plot_data(name=''):
                         axes_pad=0.15,
                         cbar_mode='single',
                         cbar_location='right',
-                        cbar_pad=0.1
+                        cbar_pad=0.15
                         )
 
         im = grid[0].imshow(array[..., 0], vmin=0, vmax=1)
@@ -54,12 +56,11 @@ def plot_data(name=''):
 
         grid.cbar_axes[0].colorbar(im)
 
-        plt.savefig(f'data/{name}_{index}.png', rasterized=True, bbox_inches='tight')
+        plt.savefig(f'{output}/{name}_{index}.png', rasterized=True, bbox_inches='tight')
         plt.close()
-        # break
 
 
-def make_movie(name=''):
+def make_movie(path='./data', name='', output='.'):
     """
     Visualization using numpy arrays (written via MPI I/O) and json description
 
@@ -67,11 +68,14 @@ def make_movie(name=''):
       > ffmpeg -i data/name_%08d.png name.mp4
 
     Args:
+        path (str): path to data files
         name (str): name of the simulation (expects data to be in data path)
+        output (str): path to output
     """
 
-    json_files = sorted(glob.glob(f'./data/{name}_*.json'))
-    data_files = sorted(glob.glob(f'./data/{name}_*.dat'))
+    json_files = sorted(glob.glob(f'{path}/{name}_*.json'))
+    data_files = sorted(glob.glob(f'{path}/{name}_*.dat'))
+
     img_list = []
     c = 0
     for json_file, data_file in zip(json_files, data_files):
@@ -105,11 +109,11 @@ def make_movie(name=''):
         # if c == 3:
         #     break
 
-    fname = f'{name}.mp4'
+    fname = f'{output}/{name}.mp4'
     imageio.mimsave(fname, img_list, fps=8)
 
 
-def make_movie_from_files(name=''):
+def make_movie_from_files(path='./data', name='', output='.'):
     """
     Visualization using numpy arrays (written via MPI I/O) and json description
 
@@ -117,23 +121,34 @@ def make_movie_from_files(name=''):
       > ffmpeg -i data/name_%08d.png name.mp4
 
     Args:
+        path (str): path to data files
         name (str): name of the simulation (expects data to be in data path)
+        output (str): path to output
     """
 
-    img_files = sorted(glob.glob(f'data/{name}_*.png'))
+    img_files = sorted(glob.glob(f'{path}/{name}_*.png'))
+    print(f'{path}{name}')
 
     images = []
     for fimg in img_files:
         img = imageio.imread(fimg)
         print(fimg, img.shape)
         images.append(imageio.imread(fimg))
-    fname = f'{name}.mp4'
+    fname = f'{output}/{name}.mp4'
     imageio.mimsave(fname, images, fps=8)
 
 
 if __name__ == "__main__":
 
-    name = 'AC-test-tempforce'
-    plot_data(name=name)
-    # make_movie(name=name)
-    make_movie_from_files(name=name)
+    parser = ArgumentParser()
+    parser.add_argument("-p", "--path", help='Path to data files', type=str, default='./data')
+    parser.add_argument("-n", "--name", help='Name of the simulation', type=str)
+    parser.add_argument("-o", "--output", help='Path for output file', type=str, default='.')
+    args = parser.parse_args()
+
+    # name = 'AC-test-tempforce'
+    name = 'AC-bench-tempforce'
+
+    plot_data(path=args.path, name=args.name, output=args.output)
+    # make_movie(path=args.path, name=args.name, output=args.output)
+    make_movie_from_files(path=args.path, name=args.name, output=args.output)
