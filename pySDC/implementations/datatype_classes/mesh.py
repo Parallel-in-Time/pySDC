@@ -27,7 +27,7 @@ class mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another mesh, do a deepcopy (init by copy)
+        # if init is another mesh, do a copy (init by copy)
         if isinstance(init, mesh):
             self.values = init.values.copy()
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
@@ -210,7 +210,7 @@ class rhs_imex_mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
+        # if init is another rhs_imex_mesh, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.impl = mesh(init.impl)
             self.expl = mesh(init.expl)
@@ -328,7 +328,7 @@ class rhs_comp2_mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
+        # if init is another rhs_imex_mesh, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.comp1 = mesh(init.comp1)
             self.comp2 = mesh(init.comp2)
