@@ -25,7 +25,7 @@ def main():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['MIN2']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
     sweeper_params['do_coll_update'] = False
 
     # initialize problem parameters

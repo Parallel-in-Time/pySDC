@@ -38,7 +38,7 @@ def setup_parameters():
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # initialize problem parameters
     problem_params = dict()

@@ -48,7 +48,7 @@ def run_diffusion(QI):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = [QI, 'LU']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # initialize problem parameters
     problem_params = dict()
@@ -151,7 +151,7 @@ def run_advection(QI):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = [QI, 'LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # initialize problem parameters
     problem_params = dict()

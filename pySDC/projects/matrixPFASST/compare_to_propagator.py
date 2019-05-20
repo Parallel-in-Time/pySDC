@@ -29,7 +29,7 @@ def diffusion_setup(par=0.0):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
@@ -82,7 +82,7 @@ def advection_setup(par=0.0):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
@@ -138,7 +138,7 @@ def scalar_equation_setup():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3, 2]
     sweeper_params['QI'] = 'LU'
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()

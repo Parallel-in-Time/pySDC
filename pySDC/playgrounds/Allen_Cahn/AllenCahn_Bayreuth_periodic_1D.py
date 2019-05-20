@@ -42,7 +42,7 @@ def setup_parameters():
     sweeper_params['Q2'] = ['LU']
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # This comes as read-in for the problem class
     problem_params = dict()
