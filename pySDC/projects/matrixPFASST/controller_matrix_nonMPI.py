@@ -190,7 +190,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
                             np.kron(np.ones(self.nnodes), np.eye(self.nspace))).T
         Treduce = np.kron(np.concatenate([[0] * (self.nsteps * self.nnodes - 1), [1]]), np.eye(self.nspace))
 
-        if self.MS[0].levels[0].sweep.params.spread:
+        if self.MS[0].levels[0].sweep.params.initial_guess == 'spread':
             mat = np.linalg.matrix_power(iter_mat, niter).dot(Tspread)
             # mat = iter_mat_smoother.dot(Tspread) + precond_smoother.dot(Tnospread)
         else:
@@ -232,7 +232,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         self.u0 = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values))
 
-        if self.MS[0].levels[0].sweep.params.spread:
+        if self.MS[0].levels[0].sweep.params.initial_guess == 'spread':
             self.u = np.kron(np.ones(self.nsteps * self.nnodes), u0.values)
         else:
             self.u = self.u0.copy()

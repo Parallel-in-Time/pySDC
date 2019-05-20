@@ -27,7 +27,7 @@ class mesh(object):
 
         # if init is another mesh, do a copy (init by copy)
         if isinstance(init, mesh):
-            self.values = init.values.copy()
+            self.values = np.copy(init.values)
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         elif isinstance(init, tuple) or isinstance(init, int):
             self.values = np.empty(init, dtype=np.complex)

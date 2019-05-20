@@ -159,7 +159,7 @@ def run_SDC_variant(variant=None, inexact=False):
     print('Error vs. PDE solution: %6.4e' % err)
     print()
 
-    assert err < 7E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
+    assert err < 9.2E-05, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
     assert np.mean(niters) <= 10, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
     return timing[0][1], np.mean(niters)

@@ -165,7 +165,7 @@ class generic_implicit_MPI(sweeper):
         # evaluate RHS at left point
         L.f[0] = P.eval_f(L.u[0], L.time)
 
-        if self.params.spread:
+        if self.params.initial_guess == 'spread':
             L.u[self.rank + 1] = P.dtype_u(L.u[0])
             L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
         else:

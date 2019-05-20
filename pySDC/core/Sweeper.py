@@ -17,7 +17,7 @@ class _Pars(FrozenClass):
     def __init__(self, pars):
 
         self.do_coll_update = False
-        self.init_guess = 'spread'
+        self.initial_guess = 'spread'
 
         for k, v in pars.items():
             if k is not 'collocation_class':
@@ -237,15 +237,15 @@ class sweeper(object):
 
         for m in range(1, self.coll.num_nodes + 1):
             # copy u[0] to all collocation nodes, evaluate RHS
-            if self.params.init_guess == 'spread':
+            if self.params.initial_guess == 'spread':
                 L.u[m] = P.dtype_u(L.u[0])
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * self.coll.nodes[m - 1])
             # start with zero everywhere
-            elif self.params.init_guess == 'zero':
+            elif self.params.initial_guess == 'zero':
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
             else:
-                raise ParameterError(f'initial_guess option {self.params.init_guess} not implemented')
+                raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 
         # indicate that this level is now ready for sweeps
         L.status.unlocked = True
