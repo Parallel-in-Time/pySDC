@@ -34,7 +34,7 @@ def setup_outer_solar_system():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
     sweeper_params['num_nodes'] = [5, 3]
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
@@ -80,7 +80,7 @@ def setup_full_solar_system():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
     sweeper_params['num_nodes'] = [5, 3]
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()

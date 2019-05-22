@@ -71,7 +71,7 @@ class mesh_to_mesh_1d_periodic(transfer):
         """
 
         if isinstance(F,mesh):
-            u_coarse = mesh(self.init_c,val=0)
+            u_coarse = mesh(self.init_c,val=0.0)
             u_coarse.values = self.Rspace.dot(F.values)
         elif isinstance(F,rhs_imex_mesh):
             u_coarse = rhs_imex_mesh(self.init_c)
@@ -89,7 +89,7 @@ class mesh_to_mesh_1d_periodic(transfer):
         """
 
         if isinstance(G,mesh):
-            u_fine = mesh(self.init_c,val=0)
+            u_fine = mesh(self.init_c,val=0.0)
             u_fine.values = self.Pspace.dot(G.values)
         elif isinstance(G,rhs_imex_mesh):
             u_fine = rhs_imex_mesh(self.init_c)

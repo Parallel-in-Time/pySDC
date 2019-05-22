@@ -110,6 +110,8 @@ class controller_nonMPI(controller):
         # initialize block of steps with u0
         self.restart_block(active_slots, time, u0)
 
+        self.hooks.post_setup(step=None, level_number=None)
+
         # call pre-run hook
         for S in self.MS:
             self.hooks.pre_run(step=S, level_number=0)
@@ -180,6 +182,8 @@ class controller_nonMPI(controller):
             self.MS[p].status.iter = 0
             self.MS[p].status.stage = 'SPREAD'
             self.MS[p].status.force_done = False
+            self.MS[p].status.time_size = len(active_slots)
+
             for l in self.MS[p].levels:
                 l.tag = None
                 l.status.sweep = 1

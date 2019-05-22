@@ -37,7 +37,7 @@ def setup_parameters():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # This comes as read-in for the problem class
     problem_params = dict()
@@ -93,7 +93,7 @@ def setup_parameters_FFT():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # This comes as read-in for the problem class
     problem_params = dict()

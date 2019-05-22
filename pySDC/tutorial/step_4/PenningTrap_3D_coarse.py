@@ -22,7 +22,7 @@ class penningtrap_coarse(penningtrap):
         N = self.params.nparts
 
         Emat = np.diag([1, 1, -2])
-        f = self.dtype_f((3, self.init), val=0)
+        f = self.dtype_f((3, self.init), val=0.0)
 
         # only compute external forces here: O(N) instead of O(N*N)
         for n in range(N):

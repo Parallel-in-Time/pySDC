@@ -36,9 +36,9 @@ class particles(object):
                 DataError: if init is none of the types above
             """
 
-            # if init is another position, do a deepcopy (init by copy)
+            # if init is another position, do a copy (init by copy)
             if isinstance(init, type(self)):
-                self.values = cp.deepcopy(init.values)
+                self.values = init.values.copy()
             # if init is a number, create position object with val as initial value
             elif isinstance(init, int) or isinstance(init, tuple):
                 self.values = np.empty(init)
@@ -135,9 +135,9 @@ class particles(object):
                 DataError: if init is none of the types above
             """
 
-            # if init is another velocity, do a deepcopy (init by copy)
+            # if init is another velocity, do a copy (init by copy)
             if isinstance(init, type(self)):
-                self.values = cp.deepcopy(init.values)
+                self.values = init.values.copy()
             # if init is a number, create velocity object with val as initial value
             elif isinstance(init, int) or isinstance(init, tuple):
                 self.values = np.empty(init)
@@ -227,15 +227,15 @@ class particles(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another particles object, do a deepcopy (init by copy)
+        # if init is another particles object, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.pos = particles.position(init.pos)
             self.vel = particles.velocity(init.vel)
-            self.q = cp.deepcopy(init.q)
-            self.m = cp.deepcopy(init.m)
+            self.q = init.q.copy()
+            self.m = init.m.copy()
         # if init is a number, create particles object and pick the corresponding initial values
         elif isinstance(init, int):
-            if isinstance(val, int) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.pos = particles.position(init, val=val)
                 self.vel = particles.velocity(init, val=val)
                 self.q = np.zeros(init)
@@ -252,7 +252,7 @@ class particles(object):
             else:
                 raise DataError('type of val is wrong, got %s', val)
         elif isinstance(init, tuple):
-            if isinstance(val, int) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.pos = particles.position(init, val=val)
                 self.vel = particles.velocity(init, val=val)
                 self.q = np.zeros(init[-1])
@@ -395,10 +395,10 @@ class particles(object):
             None
         """
         part = comm.recv(source=source, tag=tag)
-        self.pos = cp.deepcopy(part.pos)
-        self.vel = cp.deepcopy(part.vel)
-        self.m = cp.deepcopy(part.m)
-        self.q = cp.deepcopy(part.q)
+        self.pos = part.pos.copy()
+        self.vel = part.vel.copy()
+        self.m = part.m.copy()
+        self.q = part.q.copy()
         return None
 
 
@@ -421,9 +421,9 @@ class acceleration(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another particles object, do a deepcopy (init by copy)
+        # if init is another particles object, do a copy (init by copy)
         if isinstance(init, acceleration):
-            self.values = cp.deepcopy(init.values)
+            self.values = init.values.copy()
         # if init is a number, create acceleration object with val as initial value
         elif isinstance(init, int) or isinstance(init, tuple):
             self.values = np.empty(init)
@@ -525,9 +525,9 @@ class fields(object):
                 DataError: if init is none of the types above
             """
 
-            # if init is another electric object, do a deepcopy (init by copy)
+            # if init is another electric object, do a copy (init by copy)
             if isinstance(init, type(self)):
-                self.values = cp.deepcopy(init.values)
+                self.values = init.values.copy()
             # if init is a number, create electric object with val as initial value
             elif isinstance(init, int) or isinstance(init, tuple):
                 self.values = np.empty(init)
@@ -615,9 +615,9 @@ class fields(object):
                 DataError: if init is none of the types above
             """
 
-            # if init is another magnetic object, do a deepcopy (init by copy)
+            # if init is another magnetic object, do a copy (init by copy)
             if isinstance(init, type(self)):
-                self.values = cp.deepcopy(init.values)
+                self.values = init.values.copy()
             # if init is a number, create magnetic object with val as initial value
             elif isinstance(init, int) or isinstance(init, tuple):
                 self.values = np.empty(init)
@@ -697,13 +697,13 @@ class fields(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another fields object, do a deepcopy (init by copy)
+        # if init is another fields object, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.elec = fields.electric(init.elec)
             self.magn = fields.magnetic(init.magn)
         # if init is a number, create fields object and pick the corresponding initial values
         elif isinstance(init, int) or isinstance(init, tuple):
-            if isinstance(val, int) or val is None:
+            if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.elec = fields.electric(init, val=val)
                 self.magn = fields.magnetic(init, val=val)
             elif isinstance(val, tuple) and len(val) == 2:

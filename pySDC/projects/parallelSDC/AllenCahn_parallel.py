@@ -36,7 +36,7 @@ def run_variant(variant=None):
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # This comes as read-in for the problem class
     problem_params = dict()

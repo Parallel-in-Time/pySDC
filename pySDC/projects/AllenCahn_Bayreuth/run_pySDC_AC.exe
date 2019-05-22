@@ -1,0 +1,13 @@
+#!/bin/bash -x
+#SBATCH --nodes=8
+#SBATCH --ntasks-per-node=24
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:10:00
+#SBATCH --partition=devel
+
+export LD_PRELOAD=$EBROOTIMKL/mkl/lib/intel64/libmkl_def.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_avx2.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_core.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_lp64.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_thread.so:$EBROOTIMKL/lib/intel64/libiomp5.so
+
+export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC
+srun python run_simple_forcing_benchmark.py -n 192
+touch ready

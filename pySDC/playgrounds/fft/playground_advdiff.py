@@ -25,7 +25,7 @@ def main():
     sweeper_params['collocation_class'] = CollGaussLobatto
     sweeper_params['num_nodes'] = [5, 3, 2]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['spread'] = True
+    sweeper_params['initial_guess'] = 'spread'
     sweeper_params['do_coll_update'] = False
 
     # initialize problem parameters

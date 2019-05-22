@@ -41,7 +41,7 @@ def setup_parameters():
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
-    sweeper_params['spread'] = False
+    sweeper_params['initial_guess'] = 'zero'
 
     # This comes as read-in for the problem class
     problem_params = dict()

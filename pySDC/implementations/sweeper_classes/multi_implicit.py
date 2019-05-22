@@ -50,7 +50,7 @@ class multi_implicit(sweeper):
         # integrate RHS over all collocation nodes
         for m in range(1, self.coll.num_nodes + 1):
             # new instance of dtype_u, initialize values with 0
-            me.append(P.dtype_u(P.init, val=0))
+            me.append(P.dtype_u(P.init, val=0.0))
             for j in range(1, self.coll.num_nodes + 1):
                 me[-1] += L.dt * self.coll.Qmat[m, j] * (L.f[j].comp1 + L.f[j].comp2)
 
@@ -91,7 +91,7 @@ class multi_implicit(sweeper):
         # store Q2F2(u^k) for later usage
         Q2int = []
         for m in range(M):
-            Q2int.append(P.dtype_u(P.init, val=0))
+            Q2int.append(P.dtype_u(P.init, val=0.0))
             for j in range(1, M + 1):
                 Q2int[-1] += L.dt * self.Q2[m + 1, j] * L.f[j].comp2
 

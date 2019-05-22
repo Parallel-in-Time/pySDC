@@ -1,5 +1,3 @@
-import copy as cp
-
 import numpy as np
 
 from pySDC.core.Errors import DataError
@@ -27,9 +25,9 @@ class mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another mesh, do a deepcopy (init by copy)
+        # if init is another mesh, do a copy (init by copy)
         if isinstance(init, mesh):
-            self.values = cp.deepcopy(init.values)
+            self.values = np.copy(init.values)
         # if init is a number or a tuple of numbers, create mesh object with val as initial value
         elif isinstance(init, tuple) or isinstance(init, int):
             self.values = np.empty(init, dtype=np.complex)
@@ -179,7 +177,7 @@ class rhs_imex_mesh(object):
             DataError: if init is none of the types above
         """
 
-        # if init is another rhs_imex_mesh, do a deepcopy (init by copy)
+        # if init is another rhs_imex_mesh, do a copy (init by copy)
         if isinstance(init, type(self)):
             self.impl = mesh(init.impl)
             self.expl = mesh(init.expl)

@@ -122,7 +122,7 @@ class acoustic_1d_imex(ptype):
         b = np.concatenate( (u.values[0,:], u.values[1,:]) )
         sol = self.A.dot(b)
         
-        fimpl             = mesh(self.nvars,val=0)
+        fimpl             = mesh(self.nvars,val=0.0)
         fimpl.values[0,:], fimpl.values[1,:] = np.split(sol, 2)
         
         return fimpl
