@@ -11,6 +11,6 @@ pep8
 # These packages are required for some of the more involved examples (and data types etc.), can be omitted
 petsc4py>=3.10.0
 mpi4py>=3.0.0
-fenics>=2018.1.0
-pmesh>=0.1.54
+fenics=2018.1.0
+mpi4py-fft>=2.0.2
 
