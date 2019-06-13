@@ -120,25 +120,31 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         # convert filtered statistics to list of computed radii, sorted by time
         computed_radii = sort_stats(filter_stats(stats, type='computed_radius'), sortby='time')
         exact_radii = sort_stats(filter_stats(stats, type='exact_radius'), sortby='time')
+        computed_vol = sort_stats(filter_stats(stats, type='computed_volume'), sortby='time')
+        exact_vol = sort_stats(filter_stats(stats, type='exact_volume'), sortby='time')
 
         # print and store radii and error over time
         err_test = 0.0
         results = dict()
-        for cr, er in zip(computed_radii, exact_radii):
+        for cr, er, cv, ev in zip(computed_radii, exact_radii, computed_vol, exact_vol):
             if name == 'AC-test-noforce':
                 exrad = er[1]
+                exvol = ev[1]
             else:
                 exrad = computed_radii[0][1]
+                exvol = computed_vol[0][1]
             if exrad > 0:
-                err = abs(cr[1] - exrad) / exrad
+                errr = abs(cr[1] - exrad) / exrad
+                errv = abs(cv[1] - exvol) / exvol
             else:
-                err = 1.0
+                errr = 1.0
+                errv = 1.0
             if cr[0] == 0.025:
-                err_test = err
+                err_test = errr
             out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
-                  f'{cr[1]:8.6f} / {exrad:8.6f} / {err:6.4e}'
+                  f'{cr[1]:8.6f} / {exrad:8.6f} / {errr:6.4e}'
             print(out)
-            results[cr[0]] = (cr[1], exrad, err)
+            results[cr[0]] = (cr[1], exrad, errr, cv[1], exvol, errv)
         fname = f'./data/{name}_results.json'
         with open(fname, 'w') as fp:
             json.dump(results, fp, sort_keys=True, indent=4)
@@ -214,9 +220,12 @@ def visualize_radii():
         xcoords = [k for k in results]
         computed_radii = [v[0] for k, v in results.items()]
         exact_radii = [v[1] for k, v in results.items()]
+        computed_vol = [v[3] for k, v in results.items()]
+        exact_vol = [v[4] for k, v in results.items()]
 
         # compute bound for y-axis
         max_rad = max(max(computed_radii), max(exact_radii))
+        max_vol = max(max(computed_vol), max(exact_vol))
 
         # set up plot for radii
         fig, ax = plt_helper.newfig(textwidth=238.96, scale=1.0)
@@ -236,6 +245,31 @@ def visualize_radii():
         ax.legend(loc=3)
         # ax.set_title(file.split('/')[-1].replace('_results.json', ''))
         f = file.replace('_results.json', '_radii')
+        plt_helper.savefig(f)
+
+        # test if all went well
+        assert glob.glob(f'{f}.pdf'), 'ERROR: plotting did not create PDF file'
+        assert glob.glob(f'{f}.pgf'), 'ERROR: plotting did not create PGF file'
+        assert glob.glob(f'{f}.png'), 'ERROR: plotting did not create PNG file'
+
+        # set up plot for volumes
+        fig, ax = plt_helper.newfig(textwidth=238.96, scale=1.0)
+
+        # and plot
+        ax.plot(xcoords, computed_vol, label='Computed volume')
+        ax.plot(xcoords, exact_vol, color='k', linestyle='--', linewidth=1, label='Exact volume')
+
+        # beautify and save plot
+        ax.set_ylim([-0.01, max_vol * 1.1])
+        ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.2f'))
+        # ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%1.2f'))
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
+        ax.set_ylabel('radius')
+        ax.set_xlabel('time')
+        ax.grid()
+        ax.legend(loc=3)
+        # ax.set_title(file.split('/')[-1].replace('_results.json', ''))
+        f = file.replace('_results.json', '_volume')
         plt_helper.savefig(f)
 
         # test if all went well

@@ -13,8 +13,10 @@ class monitor_and_dump(hooks):
         super(monitor_and_dump, self).__init__()
 
         self.init_radius = None
+        self.init_vol = None
         self.ndim = None
-        self.corr = None
+        self.corr_rad = None
+        self.corr_vol = None
 
         self.comm = None
         self.rank = None
@@ -50,36 +52,29 @@ class monitor_and_dump(hooks):
 
         self.ndim = len(tmp.shape)
 
-        # compute numerical radius
-
-        # v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
-        # # v_local = tmp[:].sum()
-        # if self.comm is not None:
-        #     v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
-        # else:
-        #     v_global = v_local
-        # if self.ndim == 3:
-        #     radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0/3.0) * L.prob.dx
-        # elif self.ndim == 2:
-        #     radius = np.sqrt(v_global / np.pi) * L.prob.dx
-        # else:
-        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
-
-        c_local = np.count_nonzero(tmp >= 0.5)
+        # compute numerical radius and volume
+        # c_local = np.count_nonzero(tmp >= 0.5)
+        c_local = float(tmp[:].sum())
         if self.comm is not None:
             c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
         else:
             c_global = c_local
         if self.ndim == 3:
-            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
+            vol = c_global * L.prob.dx ** 3
+            radius = (vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
+            self.init_vol = np.pi * 4.0 / 3.0 * L.prob.params.radius ** 3
         elif self.ndim == 2:
-            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+            vol = c_global * L.prob.dx ** 2
+            radius = np.sqrt(vol / np.pi)
+            self.init_vol = np.pi * L.prob.params.radius ** 2
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
         self.init_radius = L.prob.params.radius
-        self.corr = self.init_radius / radius
-        radius *= self.corr
+        self.corr_rad = self.init_radius / radius
+        self.corr_vol = self.init_vol / vol
+        radius *= self.corr_rad
+        vol *= self.corr_vol
 
         # write to stats
         if L.time == 0.0:
@@ -87,6 +82,10 @@ class monitor_and_dump(hooks):
                               sweep=L.status.sweep, type='computed_radius', value=radius)
             self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                               sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
+            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
+                              sweep=L.status.sweep, type='computed_volume', value=vol)
+            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
+                              sweep=L.status.sweep, type='exact_volume', value=self.init_vol)
 
         # compute local offset for I/O
         nbytes_local = tmp.nbytes
@@ -139,43 +138,40 @@ class monitor_and_dump(hooks):
         else:
             tmp = L.uend[:]
 
-        # compute numerical radius
-
-        # v_local = tmp[tmp > 2 * L.prob.params.eps].sum()
-        # # v_local = tmp[:].sum()
-        # if self.comm is not None:
-        #     v_global = self.comm.allreduce(sendobj=v_local, op=MPI.SUM)
-        # else:
-        #     v_global = v_local
-        # if self.ndim == 3:
-        #     radius = (v_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
-        # elif self.ndim == 2:
-        #     radius = np.sqrt(v_global / np.pi) * L.prob.dx
-        # else:
-        #     raise NotImplementedError('Can use this only for 2 or 3D problems')
-
-        c_local = np.count_nonzero(tmp >= 0.5)
+        # compute numerical radius and volume
+        # c_local = np.count_nonzero(tmp >= 0.5)
+        # c_local = float(tmp[tmp > 2 * L.prob.params.eps].sum())
+        c_local = float(tmp[:].sum())
         if self.comm is not None:
             c_global = self.comm.allreduce(sendobj=c_local, op=MPI.SUM)
         else:
             c_global = c_local
+
         if self.ndim == 3:
-            radius = (c_global / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0) * L.prob.dx
+            vol = c_global * L.prob.dx ** 3
+            radius = (vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
+            exact_vol = np.pi * 4.0 / 3.0 * (max(self.init_radius ** 2 - 4.0 * (L.time + L.dt), 0)) ** (3.0 / 2.0)
+            exact_radius = (exact_vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
         elif self.ndim == 2:
-            radius = np.sqrt(c_global / np.pi) * L.prob.dx
+            vol = c_global * L.prob.dx ** 2
+            radius = np.sqrt(vol / np.pi)
+            exact_vol = np.pi * max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0)
+            exact_radius = np.sqrt(exact_vol / np.pi)
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
-        radius *= self.corr
-
-        # compute exact radius
-        exact_radius = np.sqrt(max(self.init_radius ** 2 - 2.0 * (self.ndim - 1) * (L.time + L.dt), 0))
+        radius *= self.corr_rad
+        vol *= self.corr_vol
 
         # write to stats
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='computed_radius', value=radius)
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='exact_radius', value=exact_radius)
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
+                          sweep=L.status.sweep, type='computed_volume', value=vol)
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
+                          sweep=L.status.sweep, type='exact_volume', value=exact_vol)
 
         # compute local offset for I/O
         nbytes_local = tmp.nbytes
