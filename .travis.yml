@@ -24,7 +24,7 @@ before_install:
 install:
   - conda install --yes -c conda-forge mpich-mpicc petsc4py mpi4py fenics=2018.1.0 mpi4py-fft
   - conda install --yes scipy matplotlib dill numba
-  - conda install --yes pip nose pep8 coverage sphinx
+  - conda install --yes pip nose pep8 coverage sphinx=1.8.5
   - conda list
   - pip install travis-sphinx
 
