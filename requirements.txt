@@ -16,4 +16,4 @@ mpi4py-fft>=2.0.2
 # These packages are used for CI/CD and can be ignored
 pip
 coverage
-sphinx==1.8.5
+sphinx==2.1.2
