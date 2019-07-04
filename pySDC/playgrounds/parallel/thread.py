@@ -8,17 +8,38 @@ def sleep(n):
     tmp = np.random.rand(n)
 
 
-def recv(rbuf, comm):
-    comm.Recv(rbuf[:], source=0, tag=99)
+def recv(rbuf, source, comm):
+    comm.Recv(rbuf[:], source=source, tag=99)
 
 
 # def send(sbuf, comm):
 #     comm.Send(sbuf[:], dest=1, tag=99)
 
 
-def isend(sbuf, comm):
-    req = comm.Isend(sbuf[:], dest=1, tag=99)
+def isend(sbuf, dest, comm):
+    return comm.Isend(sbuf[:], dest=dest, tag=99)
+    # req.Wait()
+
+
+def wait(req):
     req.Wait()
+
+
+def send_stuff(th, space_rank, time_rank, time_comm):
+    sbuf = np.empty(40000000)
+    sbuf[0] = space_rank
+    sbuf[1:4] = np.random.rand(3)
+    req = isend(sbuf, time_rank + 1, time_comm)
+    th[0] = threading.Thread(target=wait, name='Wait-Thread', args=(req,))
+    th[0].start()
+    print(f"{time_rank}/{space_rank} - Original data: {sbuf[0:4]}")
+
+
+def recv_stuff(space_rank, time_rank, time_comm):
+    rbuf = np.empty(40000000)
+    sleep(10000000 * time_rank)
+    recv(rbuf, time_rank - 1, time_comm)
+    print(f"{time_rank}/{space_rank} - Received data: {rbuf[0:4]}")
 
 
 def main(nprocs_space=None):
@@ -30,7 +51,6 @@ def main(nprocs_space=None):
 
     world_rank = comm.Get_rank()
     world_size = comm.Get_size()
-    assert world_size == 2 * nprocs_space
 
     # split world communicator to create space-communicators
     color = int(world_rank / nprocs_space)
@@ -41,25 +61,23 @@ def main(nprocs_space=None):
     color = int(world_rank % nprocs_space)
     time_comm = comm.Split(color=color)
     time_rank = time_comm.Get_rank()
+    time_size = time_comm.Get_size()
+
+    th = [None]
 
     comm.Barrier()
 
     t0 = time.time()
 
-    if time_rank == 0:
-        sbuf = np.empty(40000000)
-        sbuf[0] = space_rank
-        sbuf[1:4] = np.random.rand(3)
-        send_thread = threading.Thread(target=isend, args=(sbuf, time_comm))
-        send_thread.start()
+    if time_rank < time_size - 1:
+        send_stuff(th, space_rank, time_rank, time_comm)
+
+    if time_rank > 0:
+        recv_stuff(space_rank, time_rank, time_comm)
+
+    if time_rank < time_size - 1:
         sleep(100000000)
-        send_thread.join()
-        print(f"{time_rank}/{space_rank} - Original data: {sbuf[0:4]}")
-    else:
-        rbuf = np.empty(40000000)
-        sleep(10000000)
-        recv(rbuf, time_comm)
-        print(f"{time_rank}/{space_rank} - Received data: {rbuf[0:4]}")
+        th[0].join()
 
     t1 = time.time()
 

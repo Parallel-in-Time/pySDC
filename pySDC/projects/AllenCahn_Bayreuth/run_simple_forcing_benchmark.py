@@ -4,7 +4,8 @@ from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+# from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_MPI_old import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
@@ -39,6 +40,8 @@ def run_simulation(name=None, nprocs_space=None):
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
+    # print(time_size, space_size, world_size)
+
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
@@ -54,14 +57,16 @@ def run_simulation(name=None, nprocs_space=None):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['L'] = 16.0
-    problem_params['nvars'] = [(48 * 48, 48 * 48), (8 * 48, 8 * 48)]
+    problem_params['L'] = 4.0
+    # problem_params['L'] = 16.0
+    problem_params['nvars'] = [(48 * 12, 48 * 12), (8 * 12, 8 * 12)]
+    # problem_params['nvars'] = [(48 * 48, 48 * 48), (8 * 48, 8 * 48)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
     problem_params['name'] = name
     problem_params['init_type'] = 'circle_rand'
-    problem_params['spectral'] = True
+    problem_params['spectral'] = False
 
     if name == 'AC-bench-constforce':
         problem_params['dw'] = [-23.59]
@@ -93,7 +98,7 @@ def run_simulation(name=None, nprocs_space=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32 * 0.001
+    Tend = 12 * 0.001
 
     if space_rank == 0 and time_rank == 0:
         out = f'---------> Running {name} with {time_size} process(es) in time and {space_size} process(es) in space...'
