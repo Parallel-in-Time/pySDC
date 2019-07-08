@@ -5,6 +5,8 @@ from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError
 from pySDC.core.Step import step
 
+import scorep.user as spu
+
 
 class controller_MPI(controller):
     """
@@ -111,7 +113,10 @@ class controller_MPI(controller):
         while active:
 
             while not self.S.status.done:
+                name = f'REGION -- {self.S.status.stage} -- {self.S.status.slot}'
+                spu.region_begin(name)
                 self.pfasst(comm_active, num_procs)
+                spu.region_end(name)
 
             time += self.S.dt
 

@@ -1,0 +1,21 @@
+#!/bin/bash -x
+#SBATCH --nodes=#NNODES#
+#SBATCH --ntasks-per-node=#NTASKS#
+#SBATCH --cpus-per-task=#NCPUS#
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:05:00
+#SBATCH --partition=batch
+
+module load #COMPILER_AND_MPI# SciPy-Stack mpi4py FFTW
+
+export LD_PRELOAD=$EBROOTIMKL/mkl/lib/intel64/libmkl_def.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_avx2.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_core.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_lp64.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_thread.so:$EBROOTIMKL/lib/intel64/libiomp5.so
+
+export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC_deploy
+
+export HWT=#NCPUS#
+export FLAG=#FLAG#
+
+srun $FLAG python run_simple_forcing_benchmark.py -n #SPACE_SIZE#
+#srun $FLAG python run_simple_forcing_benchmark.py -n 1
+touch ready
