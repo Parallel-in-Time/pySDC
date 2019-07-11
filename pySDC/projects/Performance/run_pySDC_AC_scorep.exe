@@ -1,35 +1,64 @@
 #!/bin/bash -x
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=8
 #SBATCH --cpus-per-task=1
 #SBATCH --output=run.out
 #SBATCH --error=run.err
 #SBATCH --time=00:05:00
 #SBATCH --partition=devel
 
+#export MPI=intel
+#export MPI=psmpi
+export MPI=psmpi-mt
+
+if [ "$MPI" = "intel" ]; then
+
+    module load Intel IntelMPI SciPy-Stack mpi4py FFTW PAPI Scalasca
+
+    export LD_PRELOAD=/usr/local/software/jureca/Stages/2019a/software/impi/2019.3.199-iccifort-2019.3.199-GCC-8.3.0/intel64/lib/libmpi.so
+    export PATH=/p/project/ccstma/scorep/6.0-trunk-mprobefix_intel-impi-papi/bin:$PATH
+    #export I_MPI_ASYNC_PROGRESS=1
+    #export I_MPI_ASYNC_PROGRESS_THREADS=2
+
+    source /p/home/jusers/speck1/jureca/venv/IMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi" ]; then
+
+    module load Intel ParaStationMPI SciPy-Stack mpi4py FFTW PAPI Scalasca
+
+    export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-parastation-papi/bin:$PATH
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi-mt" ]; then
+
+    module load Intel ParaStationMPI/5.2.2-1-mt SciPy-Stack mpi4py FFTW PAPI Scalasca
+
+    export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-parastation-papi/bin:$PATH
+
+    export MPIR_CVAR_ASYNC_PROGRESS=1
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI-mt/bin/activate
+
+fi
+
 module unload Score-P
 
-export LD_PRELOAD=$EBROOTIMKL/mkl/lib/intel64/libmkl_def.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_avx2.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_core.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_lp64.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_thread.so:$EBROOTIMKL/lib/intel64/libiomp5.so
-
-export LD_PRELOAD=/usr/local/software/jureca/Stages/2019a/software/impi/2019.3.199-iccifort-2019.3.199-GCC-8.3.0/intel64/lib/libmpi.so
-
-#export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-parastation-papi/bin:$PATH
-export PATH=/p/project/ccstma/scorep/6.0-trunk-mprobefix_intel-impi-papi/bin:$PATH
-export SCOREP_EXPERIMENT_DIRECTORY=scorep-4x2x1-regions-intel
+export SCOREP_EXPERIMENT_DIRECTORY=scorep-test-$MPI
 export SCOREP_PROFILING_MAX_CALLPATH_DEPTH=90
 export SCOREP_ENABLE_TRACING=1
 #export SCOREP_TOTAL_MEMORY=64M
 export SCOREP_METRIC_PAPI=PAPI_TOT_INS
 
-
 export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC_deploy
-#export I_MPI_ASYNC_PROGRESS=1
-#export I_MPI_ASYNC_PROGRESS_THREADS=2
-#export MPIR_CVAR_ASYNC_PROGRESS=1
 
 #export HWT=2
 #export PIN=`./correct_pinning.sh`
 
-srun --cpu_bind=sockets python -m scorep --mpp=mpi run_simple_forcing_benchmark.py -n 1
+srun --cpu_bind=sockets python -m scorep --mpp=mpi run_simple_forcing_benchmark.py -n 2
 srun scout.mpi --time-correct $SCOREP_EXPERIMENT_DIRECTORY/traces.otf2
 touch ready

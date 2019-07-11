@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jube>
-  <benchmark name="pySDC AC scaling test" outpath="bench_run_MVA_SPinT">
+  <benchmark name="pySDC AC scaling test" outpath="bench_run_SPxTS">
     <comment>Scaling test with pySDC</comment>
 
     <parameterset name="param_set">
-      <parameter name="nnodes" type="int">1, 2, 4, 6, 12</parameter>
-<!--      <parameter name="ntasks" type="int">1, 2, 4, 6, 12, 24</parameter>-->
-      <parameter name="ntasks" type="int">24</parameter>
-      <parameter name="ncpus" type="int">1, 2</parameter>
-      <parameter name="space_size" mode="python" type="int">$ntasks</parameter>
-<!--      <parameter name="compiler_and_mpi" type="str">Intel IntelMPI, Intel ParaStationMPI, GCC MVAPICH2</parameter>-->
-      <parameter name="compiler_and_mpi" type="str">GCC MVAPICH2</parameter>
-      <parameter name="flag" type="str">, --cpu_bind=sockets, `./correct_pinning.sh`</parameter>
+      <parameter name="nnodes" type="int">1</parameter>
+<!--      <parameter name="nnodes" type="int">1, 2, 4, 6, 12</parameter>-->
+<!--      <parameter name="ntasks" type="int">1, 2, 4, 6, 12</parameter>-->
+      <parameter name="ntasks" type="int">1</parameter>
+      <parameter name="ncpus" type="int">1, 2, 4, 12</parameter>
+<!--      <parameter name="space_size" mode="python" type="int">$ntasks</parameter>-->
+      <parameter name="space_size" type="int">1</parameter>
+      <parameter name="mpi" type="str">psmpi-mt</parameter>
+      <parameter name="flag" type="str">--cpu_bind=sockets</parameter>
     </parameterset>
 
     <!-- Files -->
     <fileset name="files">
       <copy>run_pySDC_AC.tmpl</copy>
       <copy>run_simple_forcing_benchmark.py</copy>
-      <copy>correct_pinning.sh</copy>
     </fileset>
 
     <!-- Substitute -->
@@ -30,7 +30,7 @@
       <sub source="#NTASKS#" dest="$ntasks" />
       <sub source="#NCPUS#" dest="$ncpus" />
       <sub source="#SPACE_SIZE#" dest="$space_size" />
-      <sub source="#COMPILER_AND_MPI#" dest="$compiler_and_mpi" />
+      <sub source="#MPI#" dest="$mpi" />
       <sub source="#FLAG#" dest="$flag" />
     </substituteset>
 
@@ -60,11 +60,12 @@
     <result>
       <use>analyse</use> <!-- use existing analyser -->
       <table name="result" style="pretty" sort="space_size">
-<!--        <column>nnodes</column>-->
+        <column>nnodes</column>
         <column>ntasks</column>
-        <column>ncpus</column>
-        <column>flag</column>
+<!--        <column>flag</column>-->
         <column>space_size</column>
+        <column>ncpus</column>
+        <column>mpi</column>
         <column>timing_pat</column>
         <column>niter_pat</column>
       </table>

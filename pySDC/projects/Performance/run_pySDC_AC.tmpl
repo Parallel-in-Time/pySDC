@@ -5,17 +5,45 @@
 #SBATCH --output=run.out
 #SBATCH --error=run.err
 #SBATCH --time=00:05:00
-#SBATCH --partition=batch
+#SBATCH --partition=devel
 
-module load #COMPILER_AND_MPI# SciPy-Stack mpi4py FFTW
+export MPI=#MPI#
 
-export LD_PRELOAD=$EBROOTIMKL/mkl/lib/intel64/libmkl_def.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_avx2.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_core.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_lp64.so:$EBROOTIMKL/mkl/lib/intel64/libmkl_intel_thread.so:$EBROOTIMKL/lib/intel64/libiomp5.so
+if [ "$MPI" = "intel" ]; then
+
+    module load Intel IntelMPI SciPy-Stack mpi4py FFTW
+
+    #export I_MPI_ASYNC_PROGRESS=1
+    #export I_MPI_ASYNC_PROGRESS_THREADS=1
+
+    source /p/home/jusers/speck1/jureca/venv/IMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi" ]; then
+
+    module load Intel ParaStationMPI SciPy-Stack mpi4py FFTW
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi-mt" ]; then
+
+    module load Intel ParaStationMPI/5.2.2-1-mt SciPy-Stack mpi4py FFTW
+
+    export MPIR_CVAR_ASYNC_PROGRESS=1
+    export OMP_NUM_THREADS=#NCPUS#
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI-mt/bin/activate
+
+fi
 
 export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC_deploy
 
 export HWT=#NCPUS#
 export FLAG=#FLAG#
 
+which python
 srun $FLAG python run_simple_forcing_benchmark.py -n #SPACE_SIZE#
-#srun $FLAG python run_simple_forcing_benchmark.py -n 1
 touch ready
