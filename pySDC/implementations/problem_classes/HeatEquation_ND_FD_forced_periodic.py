@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import cg, gmres
+from scipy.sparse.linalg import gmres, spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -29,12 +29,16 @@ class heatNd_periodic(ptype):
 
         # these parameters will be used later, so assert their existence
 
+        if 'order' not in problem_params:
+            problem_params['order'] = 2
         if 'lintol' not in problem_params:
             problem_params['lintol'] = 1E-12
         if 'liniter' not in problem_params:
             problem_params['liniter'] = 10000
+        if 'direct_solver' not in problem_params:
+            problem_params['direct_solver'] = False
 
-        essential_keys = ['nvars', 'nu', 'freq', 'ndim', 'lintol', 'liniter']
+        essential_keys = ['nvars', 'nu', 'freq', 'order', 'ndim', 'lintol', 'liniter', 'direct_solver']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -62,13 +66,13 @@ class heatNd_periodic(ptype):
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
-        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.ndim)
+        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.ndim, self.params.order)
         xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = np.meshgrid(*[xvalues for _ in range(self.params.ndim)])
         self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
 
     @staticmethod
-    def __get_A(N, nu, dx, ndim):
+    def __get_A(N, nu, dx, ndim, order):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -82,8 +86,20 @@ class heatNd_periodic(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        stencil = [1, -2, 1]
-        zero_pos = 2
+        if order == 2:
+            stencil = [1, -2, 1]
+            zero_pos = 2
+        elif order == 4:
+            stencil = [-1 / 12, 4 / 3, -5 / 2, 4 / 3, -1 / 12]
+            zero_pos = 3
+        elif order == 6:
+            stencil = [1 / 90, -3 / 20, 3 / 2, -49 / 18, 3 / 2, -3 / 20, 1 / 90]
+            zero_pos = 4
+        elif order == 8:
+            stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315,	-1 / 560]
+            zero_pos = 5
+        else:
+            raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
         offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
                                   [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
@@ -145,10 +161,12 @@ class heatNd_periodic(ptype):
         """
 
         me = self.dtype_u(self.init)
-        # me.values = cg(self.Id - factor * self.A,
-        #                rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lintol)[0]
-        me.values = gmres(self.Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(),
-                          tol=self.params.lintol, maxiter=self.params.liniter)[0]
+
+        if self.params.direct_solver:
+            me.values = spsolve(self.Id - factor * self.A, rhs.values.flatten())
+        else:
+            me.values = gmres(self.Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(),
+                              tol=self.params.lintol, maxiter=self.params.liniter)[0]
         me.values = me.values.reshape(self.params.nvars)
         return me
 

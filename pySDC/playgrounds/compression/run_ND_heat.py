@@ -26,11 +26,12 @@ def setup(dt=None, ndim=None):
     # initialize problem parameters
     problem_params = dict()
     problem_params['ndim'] = ndim  # will be iterated over
+    problem_params['order'] = 8  # order of accuracy for FD discretization in space
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = tuple(2 for _ in range(ndim))  # frequencies
     problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
-    # problem_params['lintol'] = 1E-04  # number of dofs
-    problem_params['liniter'] = 10  # number of dofs
+    problem_params['direct_solver'] = False  # do GMRES instead of LU
+    problem_params['liniter'] = 10  # number of GMRES iterations
 
     # initialize step parameters
     step_params = dict()
@@ -92,7 +93,7 @@ def run_simulations():
             # filter statistics by type (error after time-step)
             errors = sort_stats(filter_stats(stats, type='error_after_step'), sortby='time')
             for err in errors:
-                out = f'   Error after step {err[0]}: {err[1]:8.4e}'
+                out = f'   Error after step {err[0]:8.4f}: {err[1]:8.4e}'
                 print(out)
 
             # filter statistics by type (error after time-step)
