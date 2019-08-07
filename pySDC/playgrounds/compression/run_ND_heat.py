@@ -5,14 +5,16 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_periodic
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
+# from pySDC.implementations.transfer_classes.TransferMesh_FFT import mesh_to_mesh_fft
 from pySDC.playgrounds.compression.HookClass_error_output import error_output
 
 
-def setup(dt=None, ndim=None):
+def setup(dt=None, ndim=None, ml=False):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-08
     level_params['dt'] = dt  # time-step size
     level_params['nsweeps'] = 1
 
@@ -29,17 +31,27 @@ def setup(dt=None, ndim=None):
     problem_params['order'] = 8  # order of accuracy for FD discretization in space
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = tuple(2 for _ in range(ndim))  # frequencies
-    problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
+    if ml:
+        problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
+    else:
+        problem_params['nvars'] = tuple(64 for _ in range(ndim))  # number of dofs
     problem_params['direct_solver'] = False  # do GMRES instead of LU
-    problem_params['liniter'] = 10  # number of GMRES iterations
+    # problem_params['liniter'] = 10  # number of GMRES iterations
 
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
+    step_params['err_tol'] = 1E-08
+
+    # initialize space transfer parameters
+    space_transfer_params = dict()
+    space_transfer_params['rorder'] = 2
+    space_transfer_params['iorder'] = 6
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -50,31 +62,36 @@ def setup(dt=None, ndim=None):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+    # description['space_transfer_class'] = mesh_to_mesh_fft  # pass spatial transfer class
+    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     return description, controller_params
 
 
-def run_simulations():
+def run_simulations(ml=False, nprocs=None):
     """
     A simple test program to do SDC runs for the heat equation in various dimensions
     """
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 0.125
 
-    dt_list = [(Tend - t0) / 2 ** i for i in range(2)]
-    ndim_list = [1, 2, 3]
+    nsteps_list = [1]#range(8, 9)
+    ndim_list = [1]
 
     for ndim in ndim_list:
-        for dt in dt_list:
+        for nsteps in nsteps_list:
+
+            dt = (Tend - t0) / nsteps
 
             print(f'Working on {ndim} dimensions with time-step size {dt}...')
 
-            description, controller_params = setup(dt, ndim)
+            description, controller_params = setup(dt, ndim, ml)
 
             # instantiate controller
-            controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+            controller = controller_nonMPI(num_procs=nprocs, controller_params=controller_params, description=description)
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -106,4 +123,5 @@ def run_simulations():
 
 
 if __name__ == "__main__":
-    run_simulations()
+    run_simulations(ml=False, nprocs=1)
+    run_simulations(ml=True, nprocs=1)

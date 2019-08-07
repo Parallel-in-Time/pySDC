@@ -2,28 +2,28 @@ from pySDC.core.Hooks import hooks
 import numpy as np
 
 
-class error_est(hooks):
+class iteration_estimator(hooks):
     """
     Hook class to add output of error
     """
 
     def __init__(self):
 
-        super(error_est, self).__init__()
+        super(iteration_estimator, self).__init__()
 
         self.diff_old = None
         self.diff_first = None
-        self.eta = 1E-04
+        self.eta = 1E-07
 
     def pre_step(self, step, level_number):
-        super(error_est, self).pre_step(step, level_number)
+        super(iteration_estimator, self).pre_step(step, level_number)
         # some abbreviations
         L = step.levels[level_number]
         self.diff_old = 1.0
 
 
     def pre_iteration(self, step, level_number):
-        super(error_est, self).pre_iteration(step, level_number)
+        super(iteration_estimator, self).pre_iteration(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
@@ -38,7 +38,7 @@ class error_est(hooks):
             level_number: the current level number
         """
 
-        super(error_est, self).post_sweep(step, level_number)
+        super(iteration_estimator, self).post_sweep(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
@@ -57,11 +57,9 @@ class error_est(hooks):
             Kest = np.log(self.eta * (1 - Ltilde) / self.diff_first) / np.log(Ltilde)
             if np.ceil(Kest) <= step.status.iter:
                 step.status.force_done = True
-            # errest = (self.eta - Ltilde ** Kest * self.diff_first / (1 - Ltilde)) / (Ltilde ** (Kest - step.status.iter - 1))
-            # print(step.status.iter, errest, np.ceil(Kest))
-            print(step.status.iter, np.ceil(Kest))
+            print(f' At time {L.time}, iterations {step.status.iter}, '
+                  f'we predict {int(np.ceil(Kest)) - step.status.iter} more to reach the local error tolerance..')
             # L.u[2].values[:] += self.eta / 2
-
 
     def post_step(self, step, level_number):
         """
@@ -71,7 +69,7 @@ class error_est(hooks):
             level_number: the current level number
         """
 
-        super(error_est, self).post_step(step, level_number)
+        super(iteration_estimator, self).post_step(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
