@@ -18,6 +18,7 @@ class _Pars(FrozenClass):
         self.log_to_file = False
         self.dump_setup = True
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
+        self.use_iteration_estimator = False
 
         for k, v in params.items():
             setattr(self, k, v)

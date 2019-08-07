@@ -73,6 +73,44 @@ class controller_nonMPI(controller):
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
 
+    @staticmethod
+    def check_iteration_estimator(MS):
+        """
+        Method to check the iteration estimator
+
+        Args:
+            MS (list): list of currently active steps
+        """
+        diff_new = 0.0
+        Kest_loc = 99
+
+        # go through active steps and compute difference, Ltilde, Kest up to this step
+        for S in MS:
+            L = S.levels[0]
+
+            for m in range(1, L.sweep.coll.num_nodes + 1):
+                diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
+
+            if S.status.iter == 1:
+                S.status.diff_old_loc = diff_new
+                S.status.diff_first_loc = diff_new
+            elif S.status.iter > 1:
+                Ltilde_loc = diff_new / S.status.diff_old_loc
+                S.status.diff_old_loc = diff_new
+                Kest_loc = np.log(S.params.err_tol * (1 - Ltilde_loc) / S.status.diff_first_loc) / np.log(Ltilde_loc)
+                print(f'LOCAL: {L.time}, {S.status.iter}: {int(np.ceil(Kest_loc))}, {Ltilde_loc}, {L.status.residual}')
+                # You should not stop prematurely on earlier steps, since later steps may need more accuracy to reach
+                # the tolerance themselves. The final Kest_loc is the one that counts.
+                # if np.ceil(Kest_loc) <= S.status.iter:
+                #     S.status.force_done = True
+
+        # set global Kest as last local one, force stop if done
+        for S in MS:
+            if S.status.iter > 1:
+                Kest_glob = Kest_loc
+                if np.ceil(Kest_glob) <= S.status.iter:
+                    S.status.force_done = True
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -378,6 +416,9 @@ class controller_nonMPI(controller):
                 # call predictor from sweeper
                 S.levels[0].sweep.predict()
 
+                # store pervious iterate to compute difference later on
+                S.levels[0].uold[:] = S.levels[0].u[:]
+
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST with predict
                     S.status.stage = 'PREDICT'
@@ -392,7 +433,7 @@ class controller_nonMPI(controller):
             for S in MS_active:
                 self.hooks.pre_predict(step=S, level_number=0)
 
-            MS = self.predictor(MS)
+            MS = self.predictor(MS_active)
 
             for S in MS_active:
                 self.hooks.post_predict(step=S, level_number=0)
@@ -424,6 +465,12 @@ class controller_nonMPI(controller):
                 self.hooks.post_comm(step=S, level_number=0)
 
                 S.levels[0].sweep.compute_residual()
+
+            if self.params.use_iteration_estimator:
+                self.check_iteration_estimator(MS_active)
+
+            for S in MS_active:
+
                 S.status.done = self.check_convergence(S)
 
                 if S.status.iter > 0:
@@ -445,6 +492,10 @@ class controller_nonMPI(controller):
                     # increment iteration count here (and only here)
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
+
+                    # store pervious iterate to compute difference later on
+                    S.levels[0].uold[:] = S.levels[0].u[:]
+
                     if len(S.levels) > 1:  # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
                     else:  # SDC or MSSDC
