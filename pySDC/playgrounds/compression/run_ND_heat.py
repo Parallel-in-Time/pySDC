@@ -14,7 +14,7 @@ def setup(dt=None, ndim=None, ml=False):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1E-10
     level_params['dt'] = dt  # time-step size
     level_params['nsweeps'] = 1
 
@@ -41,12 +41,13 @@ def setup(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['err_tol'] = 1E-08
+    step_params['err_tol'] = 1E-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 6
+    space_transfer_params['periodic'] = True
 
     # initialize controller parameters
     controller_params = dict()
@@ -76,9 +77,9 @@ def run_simulations(ml=False, nprocs=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 0.125
+    Tend = 1.0
 
-    nsteps_list = [1]#range(8, 9)
+    nsteps_list = [8]
     ndim_list = [1]
 
     for ndim in ndim_list:
@@ -125,3 +126,4 @@ def run_simulations(ml=False, nprocs=None):
 if __name__ == "__main__":
     run_simulations(ml=False, nprocs=1)
     run_simulations(ml=True, nprocs=1)
+    # run_simulations(ml=True, nprocs=8)
