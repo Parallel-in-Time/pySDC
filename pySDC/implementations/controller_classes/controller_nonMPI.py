@@ -98,8 +98,9 @@ class controller_nonMPI(controller):
                 Ltilde_loc = min(diff_new / S.status.diff_old_loc, 0.9)
                 S.status.diff_old_loc = diff_new
                 alpha = 1 / (1 - Ltilde_loc) * S.status.diff_first_loc
-                Kest_loc = np.log(S.params.err_tol / alpha) / np.log(Ltilde_loc)
-                print(f'LOCAL: {L.time}, {S.status.iter}: {int(np.ceil(Kest_loc))}, {Ltilde_loc}, {L.status.residual}')
+                Kest_loc = np.log(S.params.err_tol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
+                print(f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(Kest_loc))}, {Ltilde_loc:8.6e}, '
+                      f'{Kest_loc:8.6e}, {Ltilde_loc ** S.status.iter * alpha:8.6e}')
                 # You should not stop prematurely on earlier steps, since later steps may need more accuracy to reach
                 # the tolerance themselves. The final Kest_loc is the one that counts.
                 # if np.ceil(Kest_loc) <= S.status.iter:
