@@ -418,8 +418,9 @@ class controller_nonMPI(controller):
                 # call predictor from sweeper
                 S.levels[0].sweep.predict()
 
-                # store pervious iterate to compute difference later on
-                S.levels[0].uold[:] = S.levels[0].u[:]
+                if self.params.use_iteration_estimator:
+                    # store pervious iterate to compute difference later on
+                    S.levels[0].uold[:] = S.levels[0].u[:]
 
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST with predict
@@ -495,8 +496,9 @@ class controller_nonMPI(controller):
                     S.status.iter += 1
                     self.hooks.pre_iteration(step=S, level_number=0)
 
-                    # store pervious iterate to compute difference later on
-                    S.levels[0].uold[:] = S.levels[0].u[:]
+                    if self.params.use_iteration_estimator:
+                        # store pervious iterate to compute difference later on
+                        S.levels[0].uold[:] = S.levels[0].u[:]
 
                     if len(S.levels) > 1:  # MLSDC or PFASST
                         S.status.stage = 'IT_UP'
