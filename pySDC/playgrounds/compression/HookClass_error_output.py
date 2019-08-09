@@ -10,7 +10,6 @@ class error_output(hooks):
         super(error_output, self).__init__()
         self.uex = None
 
-
     # def post_iteration(self, step, level_number):
     #     """
     #     Default routine called after each iteration
@@ -46,7 +45,6 @@ class error_output(hooks):
 
         description = step.params.description
         description['level_params']['restol'] = 1E-14
-        # description['problem_params']['nvars'] = (64,)
         description['problem_params']['direct_solver'] = True
 
         controller_params = step.params.controller_params
