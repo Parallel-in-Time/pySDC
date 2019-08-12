@@ -7,9 +7,9 @@
 #SBATCH --time=00:05:00
 #SBATCH --partition=devel
 
-#export MPI=intel
+export MPI=intel
 #export MPI=psmpi
-export MPI=psmpi-mt
+#export MPI=psmpi-mt
 
 if [ "$MPI" = "intel" ]; then
 
@@ -48,7 +48,8 @@ fi
 
 module unload Score-P
 
-export SCOREP_EXPERIMENT_DIRECTORY=scorep-test-$MPI
+#export SCOREP_EXPERIMENT_DIRECTORY=scorep-test-$MPI
+export SCOREP_EXPERIMENT_DIRECTORY=scorep-4x2x1-regions-$MPI
 export SCOREP_PROFILING_MAX_CALLPATH_DEPTH=90
 export SCOREP_ENABLE_TRACING=1
 #export SCOREP_TOTAL_MEMORY=64M
