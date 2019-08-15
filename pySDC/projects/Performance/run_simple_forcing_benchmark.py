@@ -4,12 +4,13 @@ from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-# from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
+from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
 
-from pySDC.projects.Performance.controller_MPI_scorep import controller_MPI
+# from pySDC.projects.Performance.controller_MPI_scorep import controller_MPI
 
 
 def run_simulation(name=None, nprocs_space=None):
@@ -82,6 +83,7 @@ def run_simulation(name=None, nprocs_space=None):
     controller_params = dict()
     controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
     controller_params['predict_type'] = 'fine_only'
+    controller_params['hook_class'] = dump  # activate to get data output at each step
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -101,7 +103,7 @@ def run_simulation(name=None, nprocs_space=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 12 * 0.001
+    Tend = 240 * 0.001
 
     if space_rank == 0 and time_rank == 0:
         out = f'---------> Running {name} with {time_size} process(es) in time and {space_size} process(es) in space...'

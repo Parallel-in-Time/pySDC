@@ -120,7 +120,7 @@ class dump(hooks):
             nbytes_global = [nbytes_local]
         local_offset = sum(nbytes_global[:self.rank])
 
-        #  dump initial data
+        #  dump data
         fname = f"./data/{L.prob.params.name}_{self.time_step + step.status.slot:08d}"
         fh = MPI.File.Open(self.comm, fname + ".dat", self.amode)
         fh.Write_at_all(local_offset, tmp)

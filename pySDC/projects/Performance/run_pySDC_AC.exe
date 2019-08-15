@@ -1,0 +1,18 @@
+#!/bin/bash -x
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=24
+#SBATCH --cpus-per-task=1
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:30:00
+#SBATCH --partition=batch
+
+module load Intel IntelMPI SciPy-Stack mpi4py FFTW
+
+source /p/home/jusers/speck1/jureca/venv/IMPI/bin/activate
+
+export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC_deploy
+
+which python
+srun --cpu_bind=sockets python run_simple_forcing_benchmark.py -n 24
+touch ready

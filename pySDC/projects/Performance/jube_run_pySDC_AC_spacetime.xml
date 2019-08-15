@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jube>
-  <benchmark name="pySDC AC scaling test" outpath="bench_run_SPxTS">
+  <benchmark name="pySDC AC scaling test" outpath="bench_run_SPxTP">
     <comment>Scaling test with pySDC</comment>
 
     <parameterset name="param_set">
-      <parameter name="nnodes" type="int">1</parameter>
-<!--      <parameter name="nnodes" type="int">1, 2, 4, 6, 12</parameter>-->
-<!--      <parameter name="ntasks" type="int">1, 2, 4, 6, 12</parameter>-->
-      <parameter name="ntasks" type="int">1</parameter>
-      <parameter name="ncpus" type="int">1, 2, 4, 12</parameter>
-<!--      <parameter name="space_size" mode="python" type="int">$ntasks</parameter>-->
-      <parameter name="space_size" type="int">1</parameter>
-      <parameter name="mpi" type="str">psmpi-mt</parameter>
+      <parameter name="i">0, 1, 2, 3, 4</parameter>
+      <parameter name="nnodes" mode="python" type="int">[ 1,  1,  2,  4,  6][$i]</parameter>
+      <parameter name="ntasks" mode="python" type="int">[12, 24, 24, 24, 24][$i]</parameter>
+      <parameter name="ncpus" type="int">1</parameter>
+      <parameter name="space_size" mode="python" type="int">$ntasks</parameter>
+      <parameter name="mpi" type="str">intel</parameter>
       <parameter name="flag" type="str">--cpu_bind=sockets</parameter>
     </parameterset>
 
@@ -65,7 +63,7 @@
 <!--        <column>flag</column>-->
         <column>space_size</column>
         <column>ncpus</column>
-        <column>mpi</column>
+<!--        <column>mpi</column>-->
         <column>timing_pat</column>
         <column>niter_pat</column>
       </table>
