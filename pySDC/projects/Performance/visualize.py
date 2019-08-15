@@ -73,7 +73,7 @@ def plot_data(name=''):
         plt_helper.plt.yticks(range(-2, 3))
         cbar = plt_helper.plt.colorbar()
         cbar.set_label('concentration')
-        plt_helper.plt.title(f"Time: {obj['time']:6.4f}")
+        # plt_helper.plt.title(f"Time: {obj['time']:6.4f}")
 
         # save plot, beautify
         fname = f'data/{name}_{index}'

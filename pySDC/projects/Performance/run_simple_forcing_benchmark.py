@@ -83,7 +83,7 @@ def run_simulation(name=None, nprocs_space=None):
     controller_params = dict()
     controller_params['logger_level'] = 30 if space_rank == 0 else 99  # set level depending on rank
     controller_params['predict_type'] = 'fine_only'
-    controller_params['hook_class'] = dump  # activate to get data output at each step
+    # controller_params['hook_class'] = dump  # activate to get data output at each step
 
     # fill description dictionary for easy step instantiation
     description = dict()
