@@ -159,15 +159,10 @@ class controller_nonMPI(controller):
         # main loop: as long as at least one step is still active (time < Tend), do something
         while any(active):
 
-            MS_active = []
-            for p in active_slots:
-                MS_active.append(self.MS[p])
-
-            while not all([MS_active[p].status.done for p in range(len(MS_active))]):
-                MS_active = self.pfasst(MS_active)
-
-            for p in range(len(MS_active)):
-                self.MS[active_slots[p]] = MS_active[p]
+            MS_active = [self.MS[p] for p in active_slots]
+            done = False
+            while not done:
+                done = self.pfasst(MS_active)
 
             # uend is uend of the last active step in the list
             uend = self.MS[active_slots[-1]].levels[0].uend
@@ -263,154 +258,22 @@ class controller_nonMPI(controller):
         source.sweep.compute_end_point()
         source.tag = cp.deepcopy(tag)
 
-    def predictor(self, MS):
-        """
-        Predictor function, extracted from the stepwise implementation (will be also used by matrix sweppers)
-
-        Args:
-            MS: all active steps
-
-        Returns:
-            all active steps
-        """
-
-        if self.params.predict_type is None:
-            pass
-
-        elif self.params.predict_type == 'fine_only':
-
-            # do a fine sweep only
-            for S in MS:
-                S.levels[0].sweep.update_nodes()
-
-        elif self.params.predict_type == 'libpfasst_style':
-
-            # loop over all steps
-            for S in MS:
-
-                # restrict to coarsest level
-                for l in range(1, len(S.levels)):
-                    S.transfer(source=S.levels[l - 1], target=S.levels[l])
-
-            # run in serial on coarse level
-            for S in MS:
-
-                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-                # receive from previous step (if not first)
-                if not S.status.first:
-                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
-                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
-                    self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
-                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
-
-                # do the coarse sweep
-                S.levels[-1].sweep.update_nodes()
-
-                self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-                # send to succ step
-                if not S.status.last:
-                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
-                                      % (S.status.slot, len(S.levels) - 1, 0))
-                    self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
-                self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)
-
-            # go back to fine level, sweeping
-            for l in range(self.nlevels - 1, 0, -1):
-
-                for S in MS:
-                    # prolong values
-                    S.transfer(source=S.levels[l], target=S.levels[l - 1])
-
-                    if l - 1 > 0:
-                        S.levels[l - 1].sweep.update_nodes()
-
-            # end with a fine sweep
-            for S in MS:
-                S.levels[0].sweep.update_nodes()
-
-        elif self.params.predict_type == 'pfasst_burnin':
-
-            # loop over all steps
-            for S in MS:
-
-                # restrict to coarsest level
-                for l in range(1, len(S.levels)):
-                    S.transfer(source=S.levels[l - 1], target=S.levels[l])
-
-            # loop over all steps
-            for q in range(len(MS)):
-
-                # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
-                for p in range(q, len(MS)):
-                    S = MS[p]
-
-                    # do the sweep with new values
-                    S.levels[-1].sweep.update_nodes()
-
-                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-                    # send updated values on coarsest level
-                    self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
-                                      % (S.status.slot, len(S.levels) - 1, 0))
-                    self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
-                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
-
-                # loop over last steps: [2,3,4], [3,4], [4]
-                for p in range(q + 1, len(MS)):
-                    S = MS[p]
-                    # receive values sent during previous sweep
-                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
-                    self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
-                                      (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
-                    self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
-                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=(p == len(MS) - 1))
-
-            # loop over all steps
-            for S in MS:
-
-                # interpolate back to finest level
-                for l in range(len(S.levels) - 1, 0, -1):
-                    S.transfer(source=S.levels[l], target=S.levels[l - 1])
-
-            # end this with a fine sweep
-            for S in MS:
-                S.levels[0].sweep.update_nodes()
-
-        elif self.params.predict_type == 'fmg':
-            # TODO: implement FMG predictor
-            raise NotImplementedError('FMG predictor is not yet implemented')
-
-        else:
-            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
-
-        return MS
-
-    def pfasst(self, MS):
+    def pfasst(self, local_MS_active):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
-        For the workflow of this controller, check out one of our PFASST talks
+        For the workflow of this controller, check out one of our PFASST talks or the pySDC paper
+
+        This method changes self.MS directly by accessing active steps through local_MS_active. Nothing is returned.
 
         Args:
-            MS: all active steps
-
-        Returns:
-            all active steps
+            local_MS_active (list): all active steps
         """
 
-        # if all stages are the same (or DONE), continue, otherwise abort
-        stages = [S.status.stage for S in MS if S.status.stage is not 'DONE']
-        if stages[1:] == stages[:-1]:
-            stage = stages[0]
-        else:
-            raise ControllerError('not all stages are equal')
-
-        self.logger.debug(stage)
-
-        MS_active = [S for S in MS if S.status.stage is not 'DONE']
-
-        if stage == 'SPREAD':
+        def spread(local_MS_running):
             # (potentially) serial spreading phase
-            for S in MS_active:
+
+            for S in local_MS_running:
 
                 # first stage: spread values
                 self.hooks.pre_step(step=S, level_number=0)
@@ -428,30 +291,132 @@ class controller_nonMPI(controller):
                 else:
                     S.status.stage = 'IT_CHECK'
 
-            return MS
-
-        elif stage == 'PREDICT':
+        def predict(local_MS_running):
             # call predictor (serial)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 self.hooks.pre_predict(step=S, level_number=0)
 
-            MS = self.predictor(MS_active)
+            if self.params.predict_type is None:
+                pass
 
-            for S in MS_active:
+            elif self.params.predict_type == 'fine_only':
+
+                # do a fine sweep only
+                for S in local_MS_running:
+                    S.levels[0].sweep.update_nodes()
+
+            elif self.params.predict_type == 'libpfasst_style':
+
+                # loop over all steps
+                for S in local_MS_running:
+
+                    # restrict to coarsest level
+                    for l in range(1, len(S.levels)):
+                        S.transfer(source=S.levels[l - 1], target=S.levels[l])
+
+                # run in serial on coarse level
+                for S in local_MS_running:
+
+                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
+                    # receive from previous step (if not first)
+                    if not S.status.first:
+                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                          (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
+                        self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
+
+                    # do the coarse sweep
+                    S.levels[-1].sweep.update_nodes()
+
+                    self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
+                    # send to succ step
+                    if not S.status.last:
+                        self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                          % (S.status.slot, len(S.levels) - 1, 0))
+                        self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+                    self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)
+
+                # go back to fine level, sweeping
+                for l in range(self.nlevels - 1, 0, -1):
+
+                    for S in local_MS_running:
+                        # prolong values
+                        S.transfer(source=S.levels[l], target=S.levels[l - 1])
+
+                        if l - 1 > 0:
+                            S.levels[l - 1].sweep.update_nodes()
+
+                # end with a fine sweep
+                for S in local_MS_running:
+                    S.levels[0].sweep.update_nodes()
+
+            elif self.params.predict_type == 'pfasst_burnin':
+
+                # loop over all steps
+                for S in local_MS_running:
+
+                    # restrict to coarsest level
+                    for l in range(1, len(S.levels)):
+                        S.transfer(source=S.levels[l - 1], target=S.levels[l])
+
+                # loop over all steps
+                for q in range(len(local_MS_running)):
+
+                    # loop over last steps: [1,2,3,4], [2,3,4], [3,4], [4]
+                    for p in range(q, len(local_MS_running)):
+                        S = local_MS_running[p]
+
+                        # do the sweep with new values
+                        S.levels[-1].sweep.update_nodes()
+
+                        self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
+                        # send updated values on coarsest level
+                        self.logger.debug('Process %2i provides data on level %2i with tag %s -- PREDICT'
+                                          % (S.status.slot, len(S.levels) - 1, 0))
+                        self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))
+                        self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)
+
+                    # loop over last steps: [2,3,4], [3,4], [4]
+                    for p in range(q + 1, len(local_MS_running)):
+                        S = local_MS_running[p]
+                        # receive values sent during previous sweep
+                        self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
+                        self.logger.debug('Process %2i receives from %2i on level %2i with tag %s -- PREDICT' %
+                                          (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))
+                        self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))
+                        self.hooks.post_comm(step=S, level_number=len(S.levels) - 1,
+                                             add_to_stats=(p == len(local_MS_running) - 1))
+
+                # loop over all steps
+                for S in local_MS_running:
+
+                    # interpolate back to finest level
+                    for l in range(len(S.levels) - 1, 0, -1):
+                        S.transfer(source=S.levels[l], target=S.levels[l - 1])
+
+                # end this with a fine sweep
+                for S in local_MS_running:
+                    S.levels[0].sweep.update_nodes()
+
+            elif self.params.predict_type == 'fmg':
+                # TODO: implement FMG predictor
+                raise NotImplementedError('FMG predictor is not yet implemented')
+
+            else:
+                raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
+
+            for S in local_MS_running:
                 self.hooks.post_predict(step=S, level_number=0)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 # update stage
                 S.status.stage = 'IT_CHECK'
 
-            return MS
-
-        elif stage == 'IT_CHECK':
-
+        def it_check(local_MS_running):
             # check whether to stop iterating (parallel)
 
-            for S in MS_active:
+            for S in local_MS_running:
 
                 # send updated values forward
                 self.hooks.pre_comm(step=S, level_number=0)
@@ -470,16 +435,16 @@ class controller_nonMPI(controller):
                 S.levels[0].sweep.compute_residual()
 
             if self.params.use_iteration_estimator:
-                self.check_iteration_estimator(MS_active)
+                self.check_iteration_estimator(local_MS_running)
 
-            for S in MS_active:
+            for S in local_MS_running:
 
                 S.status.done = self.check_convergence(S)
 
                 if S.status.iter > 0:
                     self.hooks.post_iteration(step=S, level_number=0)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 if not S.status.first:
                     self.hooks.pre_comm(step=S, level_number=0)
                     S.status.prev_done = S.prev.status.done  # "communicate"
@@ -488,7 +453,7 @@ class controller_nonMPI(controller):
 
                 if self.params.all_to_done:
                     self.hooks.pre_comm(step=S, level_number=0)
-                    S.status.done = all([T.status.done for T in MS])
+                    S.status.done = all([T.status.done for T in local_MS_running])
                     self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
 
                 if not S.status.done:
@@ -501,9 +466,9 @@ class controller_nonMPI(controller):
                         S.levels[0].uold[:] = S.levels[0].u[:]
 
                     if len(S.levels) > 1:  # MLSDC or PFASST
-                        S.status.stage = 'IT_UP'
+                        S.status.stage = 'IT_DOWN'
                     else:  # SDC or MSSDC
-                        if len(MS) == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+                        if len(local_MS_running) == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
                             S.status.stage = 'IT_FINE'
                         else:
                             S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
@@ -512,20 +477,18 @@ class controller_nonMPI(controller):
                     self.hooks.post_step(step=S, level_number=0)
                     S.status.stage = 'DONE'
 
-            return MS
-
-        elif stage == 'IT_FINE':
+        def it_fine(local_MS_running):
             # do fine sweep for all steps (virtually parallel)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 S.levels[0].status.sweep = 0
 
             for k in range(self.nsweeps[0]):
 
-                for S in MS_active:
+                for S in local_MS_running:
                     S.levels[0].status.sweep += 1
 
-                for S in MS_active:
+                for S in local_MS_running:
                     # send updated values forward
                     self.hooks.pre_comm(step=S, level_number=0)
                     if not S.status.last:
@@ -540,24 +503,21 @@ class controller_nonMPI(controller):
                         self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
                     self.hooks.post_comm(step=S, level_number=0, add_to_stats=(k == self.nsweeps[0] - 1))
 
-                for S in MS_active:
+                for S in local_MS_running:
                     # standard sweep workflow: update nodes, compute residual, log progress
                     self.hooks.pre_sweep(step=S, level_number=0)
                     S.levels[0].sweep.update_nodes()
                     S.levels[0].sweep.compute_residual()
                     self.hooks.post_sweep(step=S, level_number=0)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 # update stage
                 S.status.stage = 'IT_CHECK'
 
-            return MS
+        def it_down(local_MS_running):
+            # go down the hierarchy from finest to coarsest level (parallel)
 
-        elif stage == 'IT_UP':
-            # go up the hierarchy from finest to coarsest level (parallel)
-
-            for S in MS_active:
-
+            for S in local_MS_running:
                 S.transfer(source=S.levels[0], target=S.levels[1])
 
             for l in range(1, self.nlevels - 1):
@@ -566,7 +526,7 @@ class controller_nonMPI(controller):
 
                 for k in range(self.nsweeps[l]):
 
-                    for S in MS_active:
+                    for S in local_MS_running:
 
                         # send updated values forward
                         self.hooks.pre_comm(step=S, level_number=l)
@@ -582,27 +542,24 @@ class controller_nonMPI(controller):
                             self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
                         self.hooks.post_comm(step=S, level_number=l)
 
-                    for S in MS_active:
-
+                    for S in local_MS_running:
                         self.hooks.pre_sweep(step=S, level_number=l)
                         S.levels[l].sweep.update_nodes()
                         S.levels[l].sweep.compute_residual()
                         self.hooks.post_sweep(step=S, level_number=l)
 
-                for S in MS_active:
-                    # transfer further up the hierarchy
+                for S in local_MS_running:
+                    # transfer further down the hierarchy
                     S.transfer(source=S.levels[l], target=S.levels[l + 1])
 
-            for S in MS_active:
+            for S in local_MS_running:
                 # update stage
                 S.status.stage = 'IT_COARSE'
 
-            return MS
-
-        elif stage == 'IT_COARSE':
+        def it_coarse(local_MS_running):
             # sweeps on coarsest level (serial/blocking)
 
-            for S in MS_active:
+            for S in local_MS_running:
 
                 # receive from previous step (if not first)
                 self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)
@@ -628,18 +585,16 @@ class controller_nonMPI(controller):
 
                 # update stage
                 if len(S.levels) > 1:  # MLSDC or PFASST
-                    S.status.stage = 'IT_DOWN'
+                    S.status.stage = 'IT_UP'
                 else:  # MSSDC
                     S.status.stage = 'IT_CHECK'
 
-            return MS
-
-        elif stage == 'IT_DOWN':
-            # prolong corrections down to finest level (parallel)
+        def it_up(local_MS_running):
+            # prolong corrections up to finest level (parallel)
 
             for l in range(self.nlevels - 1, 0, -1):
 
-                for S in MS_active:
+                for S in local_MS_running:
                     # prolong values
                     S.transfer(source=S.levels[l], target=S.levels[l - 1])
 
@@ -648,7 +603,7 @@ class controller_nonMPI(controller):
 
                     for k in range(self.nsweeps[l - 1]):
 
-                        for S in MS_active:
+                        for S in local_MS_running:
 
                             # send updated values forward
                             self.hooks.pre_comm(step=S, level_number=l - 1)
@@ -666,19 +621,40 @@ class controller_nonMPI(controller):
                             self.hooks.post_comm(step=S, level_number=l - 1,
                                                  add_to_stats=(k == self.nsweeps[l - 1] - 1))
 
-                        for S in MS_active:
-
+                        for S in local_MS_running:
                             self.hooks.pre_sweep(step=S, level_number=l - 1)
                             S.levels[l - 1].sweep.update_nodes()
                             S.levels[l - 1].sweep.compute_residual()
                             self.hooks.post_sweep(step=S, level_number=l - 1)
 
-            for S in MS_active:
+            for S in local_MS_running:
                 # update stage
                 S.status.stage = 'IT_FINE'
 
-            return MS
+        def default(local_MS_running):
+            raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
 
+        # if all stages are the same (or DONE), continue, otherwise abort
+        stages = [S.status.stage for S in local_MS_active if S.status.stage is not 'DONE']
+        if stages[1:] == stages[:-1]:
+            stage = stages[0]
         else:
+            raise ControllerError('not all stages are equal')
 
-            raise ControllerError('Unknown stage, got %s' % stage)
+        self.logger.debug(stage)
+
+        MS_running = [S for S in local_MS_active if S.status.stage is not 'DONE']
+
+        switcher = {
+            'SPREAD': spread,
+            'PREDICT': predict,
+            'IT_CHECK': it_check,
+            'IT_FINE': it_fine,
+            'IT_DOWN': it_down,
+            'IT_COARSE': it_coarse,
+            'IT_UP': it_up
+        }
+
+        switcher.get(stage, default)(MS_running)
+
+        return all([S.status.done for S in local_MS_active])
