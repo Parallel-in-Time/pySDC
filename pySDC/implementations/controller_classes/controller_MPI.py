@@ -57,6 +57,47 @@ class controller_MPI(controller):
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
 
+    @staticmethod
+    def check_iteration_estimator(S):
+        """
+        Method to check the iteration estimator
+
+        Args:
+           S: active step
+        """
+        diff_new = 0.0
+        Kest_loc = 99
+
+        # go through active steps and compute difference, Ltilde, Kest up to this step
+        for S in MS:
+            L = S.levels[0]
+
+            for m in range(1, L.sweep.coll.num_nodes + 1):
+                diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
+
+            if S.status.iter == 1:
+                S.status.diff_old_loc = diff_new
+                S.status.diff_first_loc = diff_new
+            elif S.status.iter > 1:
+                Ltilde_loc = min(diff_new / S.status.diff_old_loc, 0.9)
+                S.status.diff_old_loc = diff_new
+                alpha = 1 / (1 - Ltilde_loc) * S.status.diff_first_loc
+                Kest_loc = np.log(S.params.err_tol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
+                print(f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(Kest_loc))}, {Ltilde_loc:8.6e}, '
+                      f'{Kest_loc:8.6e}, {Ltilde_loc ** S.status.iter * alpha:8.6e}')
+                # You should not stop prematurely on earlier steps, since later steps may need more accuracy to reach
+                # the tolerance themselves. The final Kest_loc is the one that counts.
+                # if np.ceil(Kest_loc) <= S.status.iter:
+                #     S.status.force_done = True
+
+        # set global Kest as last local one, force stop if done
+        for S in MS:
+            if S.status.iter > 1:
+                Kest_glob = Kest_loc
+                if np.ceil(Kest_glob) <= S.status.iter:
+                    S.status.force_done = True
+
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the parallel version of SDC, MSSDC, MLSDC and PFASST
@@ -170,8 +211,10 @@ class controller_MPI(controller):
         for l in self.S.levels:
             l.tag = None
         self.req_status = None
+        self.req_est = None
         self.req_send = [None] * len(self.S.levels)
         self.S.status.prev_done = False
+        self.S.status.force_done = False
 
         self.S.status.time_size = size
 
@@ -215,6 +258,10 @@ class controller_MPI(controller):
 
             # call predictor from sweeper
             self.S.levels[0].sweep.predict()
+
+            if self.params.use_iteration_estimator:
+                # store pervious iterate to compute difference later on
+                self.S.levels[0].uold[:] = self.S.levels[0].u[:]
 
             # update stage
             if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
@@ -347,7 +394,51 @@ class controller_MPI(controller):
                                    0, self.S.status.iter))
                 self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
 
+            diff_new = 0.0
+            L = self.S.levels[0]
+            if self.params.use_iteration_estimator:
+
+                for m in range(1, L.sweep.coll.num_nodes + 1):
+                    diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
+
+                if self.req_est is not None:
+                    self.req_est.wait()
+
+                # recv est
+                if not self.S.status.first and not self.S.status.prev_done:
+                    prev_est = comm.recv(source=self.S.prev, tag=999)
+                    self.logger.debug('recv est: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
+                                       99, self.S.status.iter))
+                    diff_new = max(prev_est, diff_new)
+
+                # send est forward
+                if not self.S.status.last:
+                    self.logger.debug('isend est: status %s, process %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
+                                       99, self.S.status.iter))
+                    self.req_est = comm.isend(diff_new, dest=self.S.next, tag=999)
+
             self.hooks.post_comm(step=self.S, level_number=0)
+
+            if self.params.use_iteration_estimator:
+                if self.S.status.iter == 1:
+                    self.S.status.diff_old_loc = diff_new
+                    self.S.status.diff_first_loc = diff_new
+                elif self.S.status.iter > 1:
+                    Ltilde_loc = min(diff_new / self.S.status.diff_old_loc, 0.9)
+                    self.S.status.diff_old_loc = diff_new
+                    alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
+                    Kest_loc = np.log(self.S.params.err_tol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
+                    print(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+                          f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+                          f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+                    self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+                                      f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+                                      f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+                    Kest_glob = Kest_loc
+                    if np.ceil(Kest_glob) <= self.S.status.iter:
+                        self.S.status.force_done = True
 
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
@@ -392,6 +483,11 @@ class controller_MPI(controller):
                 self.S.status.iter += 1
 
                 self.hooks.pre_iteration(step=self.S, level_number=0)
+
+                if self.params.use_iteration_estimator:
+                    # store pervious iterate to compute difference later on
+                    self.S.levels[0].uold[:] = self.S.levels[0].u[:]
+
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_DOWN'
                 else:
