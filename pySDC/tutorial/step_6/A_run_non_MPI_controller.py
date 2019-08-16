@@ -107,7 +107,7 @@ def set_parameters_ml():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 10
+    controller_params['logger_level'] = 30
     controller_params['all_to_done'] = False  # can ask the controller to keep iterating all steps until the end
     controller_params['use_iteration_estimator'] = True  # activate iteration estimator
 
