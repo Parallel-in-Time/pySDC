@@ -10,7 +10,6 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, params):
-        self.fine_comm = True
         self.mssdc_jac = True
         self.predict_type = None
         self.all_to_done = False

@@ -455,13 +455,13 @@ class controller_nonMPI(controller):
 
                 # send updated values forward
                 self.hooks.pre_comm(step=S, level_number=0)
-                if self.params.fine_comm and not S.status.last:
+                if not S.status.last:
                     self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                       % (S.status.slot, 0, S.status.iter))
                     self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
                 # receive values
-                if self.params.fine_comm and not S.status.prev_done and not S.status.first:
+                if not S.status.prev_done and not S.status.first:
                     self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                       (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                     self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
@@ -528,13 +528,13 @@ class controller_nonMPI(controller):
                 for S in MS_active:
                     # send updated values forward
                     self.hooks.pre_comm(step=S, level_number=0)
-                    if self.params.fine_comm and not S.status.last:
+                    if not S.status.last:
                         self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                           % (S.status.slot, 0, S.status.iter))
                         self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
                     # # receive values
-                    if self.params.fine_comm and not S.status.prev_done and not S.status.first:
+                    if not S.status.prev_done and not S.status.first:
                         self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                           (S.status.slot, S.prev.status.slot, 0, S.status.iter))
                         self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
@@ -570,13 +570,13 @@ class controller_nonMPI(controller):
 
                         # send updated values forward
                         self.hooks.pre_comm(step=S, level_number=l)
-                        if self.params.fine_comm and not S.status.last:
+                        if not S.status.last:
                             self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                               % (S.status.slot, l, S.status.iter))
                             self.send(S.levels[l], tag=(l, S.status.iter, S.status.slot))
 
                         # # receive values
-                        if self.params.fine_comm and not S.status.prev_done and not S.status.first:
+                        if not S.status.prev_done and not S.status.first:
                             self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                               (S.status.slot, S.prev.status.slot, l, S.status.iter))
                             self.recv(S.levels[l], S.prev.levels[l], tag=(l, S.status.iter, S.prev.status.slot))
@@ -652,13 +652,13 @@ class controller_nonMPI(controller):
 
                             # send updated values forward
                             self.hooks.pre_comm(step=S, level_number=l - 1)
-                            if self.params.fine_comm and not S.status.last:
+                            if not S.status.last:
                                 self.logger.debug('Process %2i provides data on level %2i with tag %s'
                                                   % (S.status.slot, l - 1, S.status.iter))
                                 self.send(S.levels[l - 1], tag=(l - 1, S.status.iter, S.status.slot))
 
                             # # receive values
-                            if self.params.fine_comm and not S.status.prev_done and not S.status.first:
+                            if not S.status.prev_done and not S.status.first:
                                 self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
                                                   (S.status.slot, S.prev.status.slot, l - 1, S.status.iter))
                                 self.recv(S.levels[l - 1], S.prev.levels[l - 1], tag=(l - 1, S.status.iter,
