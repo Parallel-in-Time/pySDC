@@ -483,11 +483,11 @@ class controller_MPI(controller):
                             _ = comm.recv(source=self.S.prev, tag=9999)
                             req.wait()
 
-                if comm.iprobe(source=self.S.prev, tag=9999):
-                    self.S.status.done = comm.recv(source=self.S.prev, tag=9999)
-                    if not self.S.status.last:
-                        self.logger.debug(f'{self.S.status.slot} is done {self.S.status.done}, sending to {self.S.next}..')
-                        comm.send(self.S.status.done, dest=self.S.next, tag=9999)
+                # if comm.iprobe(source=self.S.prev, tag=9999):
+                #     self.S.status.done = comm.recv(source=self.S.prev, tag=9999)
+                #     if not self.S.status.last:
+                #         self.logger.debug(f'{self.S.status.slot} is done {self.S.status.done}, sending to {self.S.next}..')
+                #         comm.send(self.S.status.done, dest=self.S.next, tag=9999)
 
             # if not readys, keep doing stuff
             if not self.S.status.done:
@@ -617,6 +617,9 @@ class controller_MPI(controller):
             Coarse sweep
             """
 
+            if self.req_send[-1] is not None:
+                self.req_send[-1].wait()
+
             # receive from previous step (if not first)
             self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
             if not self.S.status.first and not self.S.status.prev_done:
@@ -639,10 +642,10 @@ class controller_MPI(controller):
             # send to next step
             self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
             if not self.S.status.last:
-                self.logger.debug('send data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    len(self.S.levels) - 1, self.S.status.iter))
-                self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+                self.req_send[-1] = self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
 
             # update stage
@@ -720,4 +723,22 @@ class controller_MPI(controller):
             'IT_UP': it_up
         }
 
-        switcher.get(stage, default)()
+        if comm.iprobe(source=self.S.prev, tag=9999):
+            self.S.status.done = comm.recv(source=self.S.prev, tag=9999)
+            if not self.S.status.last:
+                self.logger.debug(f'{self.S.status.slot} is done {self.S.status.done}, sending to {self.S.next}..')
+                comm.send(self.S.status.done, dest=self.S.next, tag=9999)
+
+            self.hooks.post_iteration(step=self.S, level_number=0)
+            for req in self.req_send:
+                if req is not None:
+                    req.Cancel()
+            if self.req_status is not None:
+                self.req_status.Cancel()
+            if self.req_est is not None:
+                self.req_est.Cancel()
+            
+            self.S.status.stage = 'DONE'
+            self.hooks.post_step(step=self.S, level_number=0)
+        else:
+            switcher.get(stage, default)()
