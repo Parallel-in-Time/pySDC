@@ -194,14 +194,14 @@ class controller_MPI(controller):
         """
 
         # store link to previous step
-        self.S.prev = self.S.status.slot - 1
-        self.S.next = self.S.status.slot + 1
+        self.S.prev = (self.S.status.slot - 1) % size
+        self.S.next = (self.S.status.slot + 1) % size
 
         # resets step
         self.S.reset_step()
         # determine whether I am the first and/or last in line
-        self.S.status.first = self.S.prev == -1
-        self.S.status.last = self.S.next == size
+        self.S.status.first = self.S.prev == size - 1
+        self.S.status.last = self.S.next == 0
         # intialize step with u0
         self.S.init_step(u0)
         # reset some values
@@ -407,38 +407,19 @@ class controller_MPI(controller):
                 # recv est
                 if not self.S.status.first and not self.S.status.prev_done:
                     prev_est = comm.recv(source=self.S.prev, tag=999)
-                    self.logger.debug('recv est: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
-                                       99, self.S.status.iter))
+                    self.logger.debug('recv est: status %s, process %s, time %s, source %s, tag %s, iter %s' %
+                                      (prev_est, self.S.status.slot, self.S.time, self.S.prev,
+                                       9999, self.S.status.iter))
                     diff_new = max(prev_est, diff_new)
 
                 # send est forward
                 if not self.S.status.last:
                     self.logger.debug('isend est: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
-                                       99, self.S.status.iter))
+                                      (diff_new, self.S.status.slot, self.S.time, self.S.next,
+                                       9999, self.S.status.iter))
                     self.req_est = comm.isend(diff_new, dest=self.S.next, tag=999)
 
             self.hooks.post_comm(step=self.S, level_number=0)
-
-            if self.params.use_iteration_estimator:
-                if self.S.status.iter == 1:
-                    self.S.status.diff_old_loc = diff_new
-                    self.S.status.diff_first_loc = diff_new
-                elif self.S.status.iter > 1:
-                    Ltilde_loc = min(diff_new / self.S.status.diff_old_loc, 0.9)
-                    self.S.status.diff_old_loc = diff_new
-                    alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
-                    Kest_loc = np.log(self.S.params.err_tol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-                    print(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                          f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
-                          f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
-                    self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                                      f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
-                                      f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
-                    Kest_glob = Kest_loc
-                    if np.ceil(Kest_glob) <= self.S.status.iter:
-                        self.S.status.force_done = True
 
             self.S.levels[0].sweep.compute_residual()
             self.S.status.done = self.check_convergence(self.S)
@@ -460,10 +441,10 @@ class controller_MPI(controller):
                 # recv status
                 if not self.S.status.first and not self.S.status.prev_done:
                     self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
-                    self.logger.debug('recv status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.next,
+                    self.logger.debug('recv status: status %s, process %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev,
                                        99, self.S.status.iter))
-                    self.S.status.done = self.S.status.done and self.S.status.prev_done
+                    # self.S.status.done = self.S.status.done and self.S.status.prev_done  #TODO
 
                 # send status forward
                 if not self.S.status.last:
@@ -477,8 +458,40 @@ class controller_MPI(controller):
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
 
+            if self.params.use_iteration_estimator:
+                if self.S.status.iter == 1:
+                    self.S.status.diff_old_loc = diff_new
+                    self.S.status.diff_first_loc = diff_new
+                elif self.S.status.iter > 1:
+                    Ltilde_loc = min(diff_new / self.S.status.diff_old_loc, 0.9)
+                    self.S.status.diff_old_loc = diff_new
+                    alpha = 1 / (1 - Ltilde_loc) * self.S.status.diff_first_loc
+                    Kest_loc = np.log(self.S.params.err_tol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
+                    print(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+                          f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+                          f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+                    self.logger.debug(f'LOCAL: {L.time:8.4f}, {self.S.status.iter}: {int(np.ceil(Kest_loc))}, '
+                                      f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, '
+                                      f'{Ltilde_loc ** self.S.status.iter * alpha:8.6e}')
+                    Kest_glob = Kest_loc
+                    if np.ceil(Kest_glob) <= self.S.status.iter:
+                        if self.S.status.last:
+                            self.S.status.done = True
+                            self.logger.debug(f'{self.S.status.slot} is done, sending to {self.S.next}..')
+                            req = comm.isend(self.S.status.done, dest=self.S.next, tag=9999)
+                            self.logger.debug(f'{self.S.status.slot} is done, waiting for {self.S.prev}..')
+                            _ = comm.recv(source=self.S.prev, tag=9999)
+                            req.wait()
+
+                if comm.iprobe(source=self.S.prev, tag=9999):
+                    self.S.status.done = comm.recv(source=self.S.prev, tag=9999)
+                    if not self.S.status.last:
+                        self.logger.debug(f'{self.S.status.slot} is done {self.S.status.done}, sending to {self.S.next}..')
+                        comm.send(self.S.status.done, dest=self.S.next, tag=9999)
+
             # if not readys, keep doing stuff
             if not self.S.status.done:
+
                 # increment iteration count here (and only here)
                 self.S.status.iter += 1
 
@@ -505,6 +518,8 @@ class controller_MPI(controller):
                         req.wait()
                 if self.req_status is not None:
                     self.req_status.wait()
+                if self.req_est is not None:
+                    self.req_est.wait()
 
                 self.hooks.post_step(step=self.S, level_number=0)
                 self.S.status.stage = 'DONE'

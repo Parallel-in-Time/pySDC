@@ -81,7 +81,7 @@ def set_parameters_ml():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 0E-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
@@ -107,9 +107,9 @@ def set_parameters_ml():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['all_to_done'] = True  # can ask the controller to keep iterating all steps until the end
-    controller_params['use_iteration_estimator'] = False  # can ask the controller to keep iterating all steps until the end
+    controller_params['logger_level'] = 10
+    controller_params['all_to_done'] = False  # can ask the controller to keep iterating all steps until the end
+    controller_params['use_iteration_estimator'] = True  # activate iteration estimator
 
     # fill description dictionary for easy step instantiation
     description = dict()
