@@ -271,7 +271,12 @@ class controller_nonMPI(controller):
         """
 
         def spread(local_MS_running):
-            # (potentially) serial spreading phase
+            """
+            Spreading phase
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
 
@@ -292,7 +297,12 @@ class controller_nonMPI(controller):
                     S.status.stage = 'IT_CHECK'
 
         def predict(local_MS_running):
-            # call predictor (serial)
+            """
+            Predictor phase
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
                 self.hooks.pre_predict(step=S, level_number=0)
@@ -414,7 +424,12 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_CHECK'
 
         def it_check(local_MS_running):
-            # check whether to stop iterating (parallel)
+            """
+            Key routine to check for convergence/termination
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
 
@@ -478,7 +493,12 @@ class controller_nonMPI(controller):
                     S.status.stage = 'DONE'
 
         def it_fine(local_MS_running):
-            # do fine sweep for all steps (virtually parallel)
+            """
+            Fine sweeps
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
                 S.levels[0].status.sweep = 0
@@ -515,7 +535,12 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_CHECK'
 
         def it_down(local_MS_running):
-            # go down the hierarchy from finest to coarsest level (parallel)
+            """
+            Go down the hierarchy from finest to coarsest level
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
                 S.transfer(source=S.levels[0], target=S.levels[1])
@@ -557,7 +582,12 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_COARSE'
 
         def it_coarse(local_MS_running):
-            # sweeps on coarsest level (serial/blocking)
+            """
+            Coarse sweep
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for S in local_MS_running:
 
@@ -590,7 +620,12 @@ class controller_nonMPI(controller):
                     S.status.stage = 'IT_CHECK'
 
         def it_up(local_MS_running):
-            # prolong corrections up to finest level (parallel)
+            """
+            Prolong corrections up to finest level (parallel)
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
 
             for l in range(self.nlevels - 1, 0, -1):
 
@@ -632,6 +667,12 @@ class controller_nonMPI(controller):
                 S.status.stage = 'IT_FINE'
 
         def default(local_MS_running):
+            """
+            Default routine to catch wrong status
+
+            Args:
+                local_MS_running (list): list of currently running steps
+            """
             raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
 
         # if all stages are the same (or DONE), continue, otherwise abort
