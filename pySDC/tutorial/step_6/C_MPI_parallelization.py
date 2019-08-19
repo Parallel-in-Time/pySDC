@@ -30,6 +30,10 @@ def main(cwd):
         cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../../' +
                fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
+        # while True:
+        #     line = p.stdout.readline()
+        #     print(line)
+        #     if not line: break
         p.wait()
         assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                                   (p.returncode, num_procs)
@@ -48,6 +52,10 @@ def main(cwd):
         cmd = ('mpirun -np ' + str(num_procs) + ' python playground_parallelization.py ../../../' +
                fname).split()
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
+        # while True:
+        #     line = p.stdout.readline()
+        #     print(line)
+        #     if not line: break
         p.wait()
         assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                                   (p.returncode, num_procs)

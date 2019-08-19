@@ -197,7 +197,6 @@ class controller_MPI(controller):
         """
         req = target.u[0].irecv(source=source, tag=tag, comm=comm)
         self.wait_with_interrupt(request=req)
-        req.Wait()
         # re-evaluate f on left interval boundary
         target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
@@ -329,7 +328,9 @@ class controller_MPI(controller):
 
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
-                self.S.status.prev_done = comm.recv(source=self.S.prev, tag=99)
+                tmp = np.empty(1, dtype=int)
+                comm.Irecv((tmp, MPI.INT), source=self.S.prev, tag=99).Wait()
+                self.S.status.prev_done = tmp
                 self.logger.debug('recv status: status %s, process %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev,
                                    99, self.S.status.iter))
@@ -340,7 +341,8 @@ class controller_MPI(controller):
                 self.logger.debug('isend status: status %s, process %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
                                    99, self.S.status.iter))
-                self.req_status = comm.isend(self.S.status.done, dest=self.S.next, tag=99)
+                tmp = np.array(self.S.status.done, dtype=int)
+                self.req_status = comm.Isend((tmp, MPI.INT), dest=self.S.next, tag=99)
 
             self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
@@ -414,7 +416,7 @@ class controller_MPI(controller):
                     self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                        self.S.status.iter))
-                    self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+                    self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
                 self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
 
                 # go back to fine level, sweeping
@@ -455,7 +457,7 @@ class controller_MPI(controller):
                             'send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
                             (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                              self.S.status.iter, p))
-                        self.S.levels[-1].uend.send(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+                        self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
                     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1,
                                          add_to_stats=(p == self.S.status.slot))
 
