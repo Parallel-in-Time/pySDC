@@ -44,7 +44,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['err_tol'] = 1E-07
+    step_params['errtol'] = 1E-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
