@@ -117,22 +117,6 @@ class petsc_data(object):
         A.mult(self.values, me.values)
         return me
 
-    def send(self, dest=None, tag=None, comm=None):
-        """
-        Routine for sending data forward in time (blocking)
-
-        Args:
-            dest (int): target rank
-            tag (int): communication tag
-            comm: communicator
-
-        Returns:
-            None
-        """
-
-        comm.send(self.values.getArray(), dest=dest, tag=tag)
-        return None
-
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
@@ -145,9 +129,9 @@ class petsc_data(object):
         Returns:
             request handle
         """
-        return comm.isend(self.values.getArray(), dest=dest, tag=tag)
+        return comm.Isend(self.values.getArray(), dest=dest, tag=tag)
 
-    def recv(self, source=None, tag=None, comm=None):
+    def irecv(self, source=None, tag=None, comm=None):
         """
         Routine for receiving in time
 
@@ -159,8 +143,9 @@ class petsc_data(object):
         Returns:
             None
         """
-        self.values.setArray(comm.recv(source=source, tag=tag))
-        return None
+        # self.values.setArray(comm.recv(source=source, tag=tag))
+        return comm.Irecv(self.values, source=source, tag=tag)
+        # return None
 
     def bcast(self, root=None, comm=None):
         """

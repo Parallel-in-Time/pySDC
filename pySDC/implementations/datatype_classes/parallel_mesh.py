@@ -73,22 +73,6 @@ class parallel_mesh(np.ndarray):
 
         return float(global_absval)
 
-    def send(self, dest=None, tag=None, comm=None):
-        """
-        Routine for sending data forward in time (blocking)
-
-        Args:
-            dest (int): target rank
-            tag (int): communication tag
-            comm: communicator
-
-        Returns:
-            None
-        """
-
-        comm.Send(self[:], dest=dest, tag=tag)
-        return None
-
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
@@ -103,7 +87,7 @@ class parallel_mesh(np.ndarray):
         """
         return comm.Isend(self[:], dest=dest, tag=tag)
 
-    def recv(self, source=None, tag=None, comm=None):
+    def irecv(self, source=None, tag=None, comm=None):
         """
         Routine for receiving in time
 
@@ -115,8 +99,7 @@ class parallel_mesh(np.ndarray):
         Returns:
             None
         """
-        comm.Recv(self[:], source=source, tag=tag)
-        return None
+        return comm.Irecv(self[:], source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
         """
