@@ -105,7 +105,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['err_tol'] = 1E-07
+    step_params['errtol'] = 1E-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -160,7 +160,7 @@ def setup_auzinger(dt=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['err_tol'] = 1E-07
+    step_params['errtol'] = 1E-07
 
     # initialize controller parameters
     controller_params = dict()
@@ -263,5 +263,3 @@ if __name__ == "__main__":
 
     run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
     run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)
-
-    # run_simulations(ml=True, nprocs=8)
