@@ -197,6 +197,8 @@ class controller_MPI(controller):
         """
         req = target.u[0].irecv(source=source, tag=tag, comm=comm)
         self.wait_with_interrupt(request=req)
+        if self.S.status.force_done:
+            return None
         # re-evaluate f on left interval boundary
         target.f[0] = target.prob.eval_f(target.u[0], target.time)
 
@@ -211,10 +213,13 @@ class controller_MPI(controller):
             while not request.Test():
                 print(f'{self.S.status.slot} is waiting during {self.S.status.stage}..')
                 if self.req_ibcast.Test():
-                    request.Cancel()
                     print(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
+                    self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
+                    self.S.status.force_done = True
                     return None
-        if request is not None:
+            else:
+                request.Wait()
+        elif request is not None:
             request.Wait()
 
     def check_iteration_estimate(self, comm):
@@ -236,19 +241,26 @@ class controller_MPI(controller):
         self.hooks.pre_comm(step=self.S, level_number=0)
 
         self.wait_with_interrupt(request=self.req_diff)
+        if self.S.status.force_done:
+            return None
 
-        if not self.S.status.first and not self.S.status.prev_done:
-            prev_diff = comm.recv(source=self.S.prev, tag=999)
+        if not self.S.status.first:
+            prev_diff = np.empty(1, dtype=float)
+            req = comm.Irecv((prev_diff, MPI.DOUBLE), source=self.S.prev, tag=999)
+            self.wait_with_interrupt(request=req)
+            if self.S.status.force_done:
+                return None
             self.logger.debug('recv diff: status %s, process %s, time %s, source %s, tag %s, iter %s' %
                               (prev_diff, self.S.status.slot, self.S.time, self.S.prev,
-                               9999, self.S.status.iter))
-            diff_new = max(prev_diff, diff_new)
+                               999, self.S.status.iter))
+            diff_new = max(prev_diff[0], diff_new)
 
         if not self.S.status.last:
             self.logger.debug('isend diff: status %s, process %s, time %s, target %s, tag %s, iter %s' %
                               (diff_new, self.S.status.slot, self.S.time, self.S.next,
-                               9999, self.S.status.iter))
-            self.req_diff = comm.isend(diff_new, dest=self.S.next, tag=999)
+                               999, self.S.status.iter))
+            tmp = np.array(diff_new, dtype=float)
+            self.req_diff = comm.Isend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
 
         self.hooks.post_comm(step=self.S, level_number=0)
 
@@ -291,6 +303,8 @@ class controller_MPI(controller):
         self.hooks.pre_comm(step=self.S, level_number=0)
 
         self.wait_with_interrupt(request=self.req_send[0])
+        if self.S.status.force_done:
+            return None
 
         self.S.levels[0].sweep.compute_end_point()
 
@@ -325,6 +339,8 @@ class controller_MPI(controller):
 
             # check if an open request of the status send is pending
             self.wait_with_interrupt(request=self.req_status)
+            if self.S.status.force_done:
+                return None
 
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
@@ -370,7 +386,7 @@ class controller_MPI(controller):
 
             if self.params.use_iteration_estimator:
                 # store pervious iterate to compute difference later on
-                self.S.levels[0].uold[:] = self.S.levels[0].u[:]
+                self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
 
             # update stage
             if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
@@ -484,11 +500,12 @@ class controller_MPI(controller):
             """
             Key routine to check for convergence/termination
             """
-
             if not self.params.use_iteration_estimator:
                 self.check_residual(comm=comm)
             else:
                 self.check_iteration_estimate(comm=comm)
+            if self.S.status.force_done:
+                return None
 
             if self.S.status.iter > 0:
                 self.hooks.post_iteration(step=self.S, level_number=0)
@@ -503,7 +520,7 @@ class controller_MPI(controller):
 
                 if self.params.use_iteration_estimator:
                     # store pervious iterate to compute difference later on
-                    self.S.levels[0].uold[:] = self.S.levels[0].u[:]
+                    self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
 
                 if len(self.S.levels) > 1:  # MLSDC or PFASST
                     self.S.status.stage = 'IT_DOWN'
@@ -554,6 +571,9 @@ class controller_MPI(controller):
                 self.hooks.pre_comm(step=self.S, level_number=0)
 
                 self.wait_with_interrupt(request=self.req_send[0])
+                if self.S.status.force_done:
+                    return None
+
                 self.S.levels[0].sweep.compute_end_point()
 
                 if not self.S.status.last:
@@ -567,6 +587,8 @@ class controller_MPI(controller):
                                       (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                        self.S.status.iter, self.S.status.iter))
                     self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    if self.S.status.force_done:
+                        return None
 
                 self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=(k == nsweeps - 1))
 
@@ -595,6 +617,9 @@ class controller_MPI(controller):
                     self.hooks.pre_comm(step=self.S, level_number=l)
 
                     self.wait_with_interrupt(request=self.req_send[l])
+                    if self.S.status.force_done:
+                        return None
+
                     self.S.levels[l].sweep.compute_end_point()
 
                     if not self.S.status.last:
@@ -609,6 +634,8 @@ class controller_MPI(controller):
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                            self.S.status.iter, self.S.status.iter))
                         self.recv(target=self.S.levels[l], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                        if self.S.status.force_done:
+                            return None
 
                     self.hooks.post_comm(step=self.S, level_number=l)
 
@@ -629,6 +656,8 @@ class controller_MPI(controller):
             """
 
             self.wait_with_interrupt(request=self.req_send[-1])
+            if self.S.status.force_done:
+                return None
 
             # receive from previous step (if not first)
             self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
@@ -637,6 +666,8 @@ class controller_MPI(controller):
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    self.S.status.iter, self.S.status.iter))
                 self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                if self.S.status.force_done:
+                    return None
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
             # do the sweep
@@ -685,6 +716,9 @@ class controller_MPI(controller):
                         self.hooks.pre_comm(step=self.S, level_number=l - 1)
 
                         self.wait_with_interrupt(request=self.req_send[l - 1])
+                        if self.S.status.force_done:
+                            return None
+
                         self.S.levels[l - 1].sweep.compute_end_point()
 
                         if not self.S.status.last:
@@ -701,6 +735,8 @@ class controller_MPI(controller):
                                                self.S.status.iter, self.S.status.iter))
                             self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
                                       comm=comm)
+                            if self.S.status.force_done:
+                                return None
 
                         self.hooks.post_comm(step=self.S, level_number=l - 1, add_to_stats=(k == nsweeps - 1))
 
@@ -722,16 +758,6 @@ class controller_MPI(controller):
 
         self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
 
-        switcher = {
-            'SPREAD': spread,
-            'PREDICT': predict,
-            'IT_CHECK': it_check,
-            'IT_FINE': it_fine,
-            'IT_DOWN': it_down,
-            'IT_COARSE': it_coarse,
-            'IT_UP': it_up
-        }
-
         # Wait for interrupt, if iteration estimator is used
         if self.params.use_iteration_estimator and stage == 'SPREAD' and not self.S.status.last:
             done = np.empty(1)
@@ -742,13 +768,18 @@ class controller_MPI(controller):
             self.logger.debug(f'{self.S.status.slot} is done..')
             self.S.status.done = True
 
+            if not stage == 'IT_CHECK':
+                self.logger.debug(f'Rewinding {self.S.status.slot} after {stage}..')
+                self.S.levels[0].u[1:] = self.S.levels[0].uold[1:]
+
             self.hooks.post_iteration(step=self.S, level_number=0)
+
             for req in self.req_send:
-                if req is not None:
+                if req is not None and req != MPI.REQUEST_NULL:
                     req.Cancel()
-            if self.req_status is not None:
+            if self.req_status is not None and self.req_status != MPI.REQUEST_NULL:
                 self.req_status.Cancel()
-            if self.req_diff is not None:
+            if self.req_diff is not None and self.req_diff != MPI.REQUEST_NULL:
                 self.req_diff.Cancel()
 
             self.S.status.stage = 'DONE'
@@ -756,4 +787,14 @@ class controller_MPI(controller):
 
         else:
             # Start cycling, if not interrupted
+            switcher = {
+                'SPREAD': spread,
+                'PREDICT': predict,
+                'IT_CHECK': it_check,
+                'IT_FINE': it_fine,
+                'IT_DOWN': it_down,
+                'IT_COARSE': it_coarse,
+                'IT_UP': it_up
+            }
+
             switcher.get(stage, default)()
