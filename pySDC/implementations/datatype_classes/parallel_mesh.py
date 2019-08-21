@@ -85,7 +85,7 @@ class parallel_mesh(np.ndarray):
         Returns:
             request handle
         """
-        return comm.Isend(self[:], dest=dest, tag=tag)
+        return comm.Issend(self[:], dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
         """

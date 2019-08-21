@@ -129,7 +129,7 @@ class petsc_data(object):
         Returns:
             request handle
         """
-        return comm.Isend(self.values.getArray(), dest=dest, tag=tag)
+        return comm.Issend(self.values.getArray(), dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
         """
