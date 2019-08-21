@@ -31,8 +31,6 @@ class controller_MPI(controller):
 
         # pass communicator for future use
         self.comm = comm
-        # add request handler for status send
-        self.req_status = None
 
         num_procs = self.comm.Get_size()
         rank = self.comm.Get_rank()
@@ -45,6 +43,8 @@ class controller_MPI(controller):
 
         num_levels = len(self.S.levels)
 
+        # add request handler for status send
+        self.req_status = None
         # add request handle container for isend
         self.req_send = [None] * num_levels
         self.req_ibcast = None
@@ -211,15 +211,12 @@ class controller_MPI(controller):
         """
         if request is not None and self.req_ibcast is not None:
             while not request.Test():
-                print(f'{self.S.status.slot} is waiting during {self.S.status.stage}..')
                 if self.req_ibcast.Test():
-                    print(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
+                    self.logger.debug(f'{self.S.status.slot} has been cancelled during {self.S.status.stage}..')
                     self.S.status.stage = f'CANCELLED_{self.S.status.stage}'
                     self.S.status.force_done = True
                     return None
-            else:
-                request.Wait()
-        elif request is not None:
+        if request is not None:
             request.Wait()
 
     def check_iteration_estimate(self, comm):
@@ -260,7 +257,7 @@ class controller_MPI(controller):
                               (diff_new, self.S.status.slot, self.S.time, self.S.next,
                                999, self.S.status.iter))
             tmp = np.array(diff_new, dtype=float)
-            self.req_diff = comm.Isend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
+            self.req_diff = comm.Issend((tmp, MPI.DOUBLE), dest=self.S.next, tag=999)
 
         self.hooks.post_comm(step=self.S, level_number=0)
 
@@ -345,7 +342,7 @@ class controller_MPI(controller):
             # recv status
             if not self.S.status.first and not self.S.status.prev_done:
                 tmp = np.empty(1, dtype=int)
-                comm.Irecv((tmp, MPI.INT), source=self.S.prev, tag=99).Wait()
+                comm.Isrecv((tmp, MPI.INT), source=self.S.prev, tag=99).Wait()
                 self.S.status.prev_done = tmp
                 self.logger.debug('recv status: status %s, process %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.prev_done, self.S.status.slot, self.S.time, self.S.prev,
@@ -358,7 +355,7 @@ class controller_MPI(controller):
                                   (self.S.status.done, self.S.status.slot, self.S.time, self.S.next,
                                    99, self.S.status.iter))
                 tmp = np.array(self.S.status.done, dtype=int)
-                self.req_status = comm.Isend((tmp, MPI.INT), dest=self.S.next, tag=99)
+                self.req_status = comm.Issend((tmp, MPI.INT), dest=self.S.next, tag=99)
 
             self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=True)
 
@@ -625,15 +622,15 @@ class controller_MPI(controller):
                     if not self.S.status.last:
                         self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                           self.S.status.iter, self.S.status.iter))
-                        self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next, tag=self.S.status.iter,
+                                           l * 100 + self.S.status.iter, self.S.status.iter))
+                        self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next, tag=l * 100 + self.S.status.iter,
                                                                        comm=comm)
 
                     if not self.S.status.first and not self.S.status.prev_done:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                           self.S.status.iter, self.S.status.iter))
-                        self.recv(target=self.S.levels[l], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                                           l * 100 + self.S.status.iter, self.S.status.iter))
+                        self.recv(target=self.S.levels[l], source=self.S.prev, tag=l * 100 + self.S.status.iter, comm=comm)
                         if self.S.status.force_done:
                             return None
 
@@ -655,19 +652,16 @@ class controller_MPI(controller):
             Coarse sweep
             """
 
-            self.wait_with_interrupt(request=self.req_send[-1])
-            if self.S.status.force_done:
-                return None
-
             # receive from previous step (if not first)
             self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
             if not self.S.status.first and not self.S.status.prev_done:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   self.S.status.iter, self.S.status.iter))
-                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                                   (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
+                self.recv(target=self.S.levels[-1], source=self.S.prev, tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter, comm=comm)
                 if self.S.status.force_done:
                     return None
+
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
             # do the sweep
@@ -685,8 +679,12 @@ class controller_MPI(controller):
             if not self.S.status.last:
                 self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   self.S.status.iter, self.S.status.iter))
-                self.req_send[-1] = self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+                                   (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
+                self.req_send[-1] = self.S.levels[-1].uend.isend(dest=self.S.next, tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter, comm=comm)
+                self.wait_with_interrupt(request=self.req_send[-1])
+                if self.S.status.force_done:
+                    return None
+
             self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
 
             # update stage
@@ -724,16 +722,16 @@ class controller_MPI(controller):
                         if not self.S.status.last:
                             self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                               self.S.status.iter, self.S.status.iter))
+                                               (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
                             self.req_send[l - 1] = self.S.levels[l - 1].uend.isend(dest=self.S.next,
-                                                                                   tag=self.S.status.iter,
+                                                                                   tag=(l - 1) * 100 + self.S.status.iter,
                                                                                    comm=comm)
 
                         if not self.S.status.first and not self.S.status.prev_done:
                             self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                               (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                               self.S.status.iter, self.S.status.iter))
-                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=self.S.status.iter,
+                                               (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
+                            self.recv(target=self.S.levels[l - 1], source=self.S.prev, tag=(l - 1) * 100 + self.S.status.iter,
                                       comm=comm)
                             if self.S.status.force_done:
                                 return None
