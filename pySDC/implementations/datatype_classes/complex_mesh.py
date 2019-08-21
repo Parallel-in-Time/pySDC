@@ -121,7 +121,7 @@ class mesh(object):
         Returns:
             request handle
         """
-        return comm.Isend(self.values, dest=dest, tag=tag)
+        return comm.Issend(self.values, dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
         """
