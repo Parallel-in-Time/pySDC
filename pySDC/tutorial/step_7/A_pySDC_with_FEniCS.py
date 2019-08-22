@@ -6,16 +6,16 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass, fenics_heat
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat_weak_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_order_mass, imex_1st_order
-from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
 
-def setup(t0=None):
+def setup(t0=None, ml=None):
     """
     Helper routine to set up parameters
 
     Args:
         t0 (float): initial time
+        ml (bool): use single or multiple levels
 
     Returns:
         description and controller_params parameter dictionaries
@@ -28,24 +28,31 @@ def setup(t0=None):
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 30
+    step_params['maxiter'] = 20
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
-    sweeper_params['num_nodes'] = [3, 1]
+    if ml:
+        # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
+        sweeper_params['num_nodes'] = [3, 1]
+    else:
+        sweeper_params['num_nodes'] = [3]
 
     problem_params = dict()
     problem_params['nu'] = 0.1
     problem_params['t0'] = t0  # ugly, but necessary to set up this ProblemClass
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
-    # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
-    # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and not
-    # in the nodes and order, the mass inverse approach is way better, ie. halves the number of iterations!
-    problem_params['order'] = [4, 1]
-    problem_params['refinements'] = [1, 0]
+    if ml:
+        # We can do rather aggressive coarsening here. As long as we have 1 node on the coarse level, all is "well" (ie.
+        # MLSDC does not take more iterations than SDC, but also not less). If we just coarsen in the refinement (and
+        # not in the nodes and order, the mass inverse approach is way better, ie. halves the number of iterations!
+        problem_params['order'] = [4, 1]
+        problem_params['refinements'] = [1, 0]
+    else:
+        problem_params['order'] = [4]
+        problem_params['refinements'] = [1]
 
     # initialize controller parameters
     controller_params = dict()
@@ -68,25 +75,25 @@ def setup(t0=None):
     return description, controller_params
 
 
-def run_pfasst_variants(variant=None):
+def run_variants(variant=None, ml=None, num_procs = None):
     """
     Main routine to run the different implementations of the heat equation with FEniCS
 
     Args:
         variant (str): specifies the variant
+        ml (bool): use single or multiple levels
+        num_procs (int): number of processors in time
     """
     Tend = 1.0
-    num_procs = 5
     t0 = 0.0
 
-    description, controller_params = setup(t0=t0)
+    description, controller_params = setup(t0=t0, ml=ml)
 
     if variant == 'mass':
         # Note that we need to reduce the tolerance for the residual here, since otherwise the error will be too high
         description['level_params']['restol'] /= 500
         description['problem_class'] = fenics_heat_mass
         description['sweeper_class'] = imex_1st_order_mass
-        description['base_transfer_class'] = base_transfer_mass
     elif variant == 'mass_inv':
         description['problem_class'] = fenics_heat
         description['sweeper_class'] = imex_1st_order
@@ -110,7 +117,10 @@ def run_pfasst_variants(variant=None):
     uex = P.u_exact(Tend)
     err = abs(uex - uend) / abs(uex)
 
-    out = 'Variant %s -- error at time %s: %s' % (variant, Tend, err)
+    f = open('step_7_A_out.txt', 'a')
+
+    out = f'Variant {variant} with ml={ml} and num_procs={num_procs} -- error at time {Tend}: {err}'
+    f.write(out + '\n')
     print(out)
 
     # filter statistics by type (number of iterations)
@@ -121,31 +131,49 @@ def run_pfasst_variants(variant=None):
 
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    f.write(out + '\n')
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    f.write(out + '\n')
     print(out)
     out = '   Position of max/min number of iterations: %2i -- %2i' % \
           (int(np.argmax(niters)), int(np.argmin(niters)))
+    f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    f.write(out + '\n')
     print(out)
 
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-    print('Time to solution: %6.4f sec.' % timing[0][1])
+    out = f'Time to solution: {timing[0][1]:6.4f} sec.'
+    f.write(out + '\n')
+    print(out)
 
-    # assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-    # assert err <= 4.1E-08, 'Error is too high, got %s' % err
+    if num_procs == 1:
+        assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+        assert err <= 4.1E-08, 'Error is too high, got %s' % err
+    else:
+        assert np.mean(niters) <= 11.6, 'Mean number of iterations is too high, got %s' % np.mean(niters)
+        assert err <= 4.0E-08, 'Error is too high, got %s' % err
 
+    f.write('\n')
     print()
+    f.close()
 
 
 def main():
-    run_pfasst_variants(variant='mass_inv')
+    run_variants(variant='mass_inv', ml=False, num_procs=1)
+    run_variants(variant='mass', ml=False, num_procs=1)
+    run_variants(variant='weak', ml=False, num_procs=1)
+    run_variants(variant='mass_inv', ml=True, num_procs=1)
+    run_variants(variant='mass', ml=True, num_procs=1)
+    run_variants(variant='weak', ml=True, num_procs=1)
+    run_variants(variant='mass_inv', ml=True, num_procs=5)
     # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
     # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
     # correction is not satisfied, mass matrix does not permute with restriction).
-    # run_pfasst_variants(variant='mass')
-    # run_pfasst_variants(variant='weak')
+    # run_pfasst_variants(variant='mass', ml=True, num_procs=5)
+    # run_pfasst_variants(variant='weak', ml=True, num_procs=5)
 
 
 if __name__ == "__main__":

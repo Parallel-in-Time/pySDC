@@ -7,6 +7,18 @@ In the following, we show a few examples of pySDC + X.
 Part A: pySDC and FEniCS
 ------------------------
 
+In this example, pySDC is coupled with the FEniCS framework foir using finite elements in space.
+This implies significant changes to the algorithm, depending on whether or not the mass matrix should be inverted.
+SDC, MLSDC and PFASST can be used without changes when the right-hand side of the ODE is defined with the inverse of the mass matrix.
+Otherwise, the mass matrix has to be used for e.g. the tau-correction.
+This example tests different variants of this methodology for SDC, MLSDC and PFASST.
+
+Important things to note:
+
+- This example shows that even core routines like the `BaseTransfer` can be overwritten if needed.
+- It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be found in the `implementations` folder.
+
+.. include:: doc_step_7_C.rst
 
 Part B: mpi4py-fft for parallel Fourier transforms
 --------------------------------------------------
