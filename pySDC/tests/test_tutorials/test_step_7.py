@@ -1,15 +1,15 @@
 import os
 import subprocess
 
-from pySDC.tutorial.step_7.A_visualize_residuals import main as main_A
-from pySDC.tutorial.step_7.B_multistep_SDC import main as main_B
+from pySDC.tutorial.step_7.A_pySDC_with_FEniCS import main as main_A
+# from pySDC.tutorial.step_7.B_multistep_SDC import main as main_B
 
 
 def test_A():
     main_A()
 
-def test_B():
-    main_B()
+# def test_B():
+#     main_B()
 
 def test_C_1x1():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
