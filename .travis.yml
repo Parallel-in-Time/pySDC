@@ -28,7 +28,7 @@ install:
 
 script:
   - "./docs/update_apidocs.sh"
-  - nosetests -v --with-timer --timer-ok 60.0s --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
+  - nosetests -v --with-timer --timer-ok 60.0 --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
   - travis-sphinx build
 
 after_success:
