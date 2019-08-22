@@ -40,7 +40,7 @@ def main():
     # compute and print statistics
     min_iter = 99
     max_iter = 0
-    f = open('step_7_A_out.txt', 'w')
+    f = open('step_8_A_out.txt', 'w')
     for item in iter_counts:
         out = 'Number of iterations for time %4.2f: %1i' % item
         f.write(out + '\n')
@@ -51,7 +51,7 @@ def main():
 
     # call helper routine to produce residual plot
 
-    fname = 'step_7_residuals.png'
+    fname = 'step_8_residuals.png'
     show_residual_across_simulation(stats=stats, fname=fname)
 
     assert err < 6.1555e-05, 'ERROR: error is too large, got %s' % err
