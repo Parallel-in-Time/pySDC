@@ -17,6 +17,7 @@ Tutorial
    tutorial/step_5.rst
    tutorial/step_6.rst
    tutorial/step_7.rst
+   tutorial/step_8.rst
 
 Playgrounds
 -----------
