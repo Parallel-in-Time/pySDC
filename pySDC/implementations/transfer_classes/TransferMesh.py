@@ -146,26 +146,50 @@ class mesh_to_mesh(space_transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
         if isinstance(F, mesh):
-            F.values = F.values.flatten()
-            G = F.apply_mat(self.Rspace)
-            G.values = G.values.reshape(self.coarse_prob.params.nvars)
-            F.values = F.values.reshape(self.fine_prob.params.nvars)
+            G = self.coarse_prob.dtype_u(self.coarse_prob.init)
+            if hasattr(self.fine_prob, 'ncomp'):
+                for i in range(self.fine_prob.ncomp):
+                    tmpF = F.values[..., i].flatten()
+                    tmpG = self.Rspace.dot(tmpF)
+                    G.values[..., i] = tmpG.reshape(self.coarse_prob.params.nvars)
+            else:
+                tmpF = F.values.flatten()
+                tmpG = self.Rspace.dot(tmpF)
+                G.values[:] = tmpG.reshape(self.coarse_prob.params.nvars)
         elif isinstance(F, rhs_imex_mesh):
-            F.impl.values = F.impl.values.flatten()
-            F.expl.values = F.expl.values.flatten()
-            G = F.apply_mat(self.Rspace)
-            G.impl.values = G.impl.values.reshape(self.coarse_prob.params.nvars)
-            G.expl.values = G.expl.values.reshape(self.coarse_prob.params.nvars)
-            F.impl.values = F.impl.values.reshape(self.fine_prob.params.nvars)
-            F.expl.values = F.expl.values.reshape(self.fine_prob.params.nvars)
+            G = self.coarse_prob.dtype_f(self.coarse_prob.init)
+            if hasattr(self.fine_prob, 'ncomp'):
+                for i in range(self.fine_prob.ncomp):
+                    tmpF = F.impl.values[..., i].flatten()
+                    tmpG = self.Rspace.dot(tmpF)
+                    G.impl.values[..., i] = tmpG.reshape(self.coarse_prob.params.nvars)
+                    tmpF = F.expl.values[..., i].flatten()
+                    tmpG = self.Rspace.dot(tmpF)
+                    G.expl.values[..., i] = tmpG.reshape(self.coarse_prob.params.nvars)
+            else:
+                tmpF = F.impl.values.flatten()
+                tmpG = self.Rspace.dot(tmpF)
+                G.impl.values = tmpG.reshape(self.coarse_prob.params.nvars)
+                tmpF = F.expl.values.flatten()
+                tmpG = self.Rspace.dot(tmpF)
+                G.expl.values = tmpG.reshape(self.coarse_prob.params.nvars)
         elif isinstance(F, rhs_comp2_mesh):
-            F.comp1.values = F.comp1.values.flatten()
-            F.comp2.values = F.comp2.values.flatten()
-            G = F.apply_mat(self.Rspace)
-            G.comp1.values = G.comp1.values.reshape(self.coarse_prob.params.nvars)
-            G.comp2.values = G.comp2.values.reshape(self.coarse_prob.params.nvars)
-            F.comp1.values = F.comp1.values.reshape(self.fine_prob.params.nvars)
-            F.comp2.values = F.comp2.values.reshape(self.fine_prob.params.nvars)
+            G = self.coarse_prob.dtype_f(self.coarse_prob.init)
+            if hasattr(self.fine_prob, 'ncomp'):
+                for i in range(self.fine_prob.ncomp):
+                    tmpF = F.comp1.values[..., i].flatten()
+                    tmpG = self.Rspace.dot(tmpF)
+                    G.comp1.values[..., i] = tmpG.reshape(self.coarse_prob.params.nvars)
+                    tmpF = F.comp2.values[..., i].flatten()
+                    tmpG = self.Rspace.dot(tmpF)
+                    G.comp2.values[..., i] = tmpG.reshape(self.coarse_prob.params.nvars)
+            else:
+                tmpF = F.comp1.values.flatten()
+                tmpG = self.Rspace.dot(tmpF)
+                G.comp1.values = tmpG.reshape(self.coarse_prob.params.nvars)
+                tmpF = F.comp2.values.flatten()
+                tmpG = self.Rspace.dot(tmpF)
+                G.comp2.values = tmpG.reshape(self.coarse_prob.params.nvars)
         else:
             raise TransferError('Wrong data type for restriction, got %s' % type(F))
         return G
