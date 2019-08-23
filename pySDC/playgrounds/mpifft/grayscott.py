@@ -53,11 +53,13 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 500
+    step_params['errtol'] = 1E-07
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30 if rank == 0 else 99
     # controller_params['predict_type'] = 'fine_only'
+    controller_params['use_iteration_estimator'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -71,7 +73,7 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 20
+    Tend = 3500
 
     f = None
     if rank == 0:
@@ -103,19 +105,19 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # plt.figure()
-    # plt.imshow(uend[..., 0])#, vmin=0, vmax=1)
-    # plt.title('u')
-    # plt.colorbar()
-    # plt.figure()
-    # plt.imshow(uend[..., 1])#, vmin=0, vmax=1)
-    # plt.title('v')
-    # plt.colorbar()
+    plt.figure()
+    plt.imshow(P.fft.backward(uend[..., 0]))#, vmin=0, vmax=1)
+    plt.title('u')
+    plt.colorbar()
+    plt.figure()
+    plt.imshow(P.fft.backward(uend[..., 1]))#, vmin=0, vmax=1)
+    plt.title('v')
+    plt.colorbar()
     # plt.figure()
     # plt.imshow(uend[..., 0] + uend[..., 1])
     # plt.title('sum')
     # plt.colorbar()
-    # plt.show()
+    plt.show()
     # # exit()
 
     if rank == 0:
@@ -157,12 +159,12 @@ def main():
 
     Note: This can also be run with "mpirun -np 2 python grayscott.py"
     """
-    run_simulation(spectral=False, ml=False, num_procs=1)
+    # run_simulation(spectral=False, ml=False, num_procs=1)
     run_simulation(spectral=True, ml=False, num_procs=1)
-    run_simulation(spectral=False, ml=True, num_procs=1)
-    run_simulation(spectral=True, ml=True, num_procs=1)
-    run_simulation(spectral=False, ml=True, num_procs=10)
-    run_simulation(spectral=True, ml=True, num_procs=10)
+    # run_simulation(spectral=False, ml=True, num_procs=1)
+    # run_simulation(spectral=True, ml=True, num_procs=1)
+    # run_simulation(spectral=False, ml=True, num_procs=10)
+    # run_simulation(spectral=True, ml=True, num_procs=10)
 
 
 if __name__ == "__main__":

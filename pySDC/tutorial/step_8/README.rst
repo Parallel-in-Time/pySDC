@@ -34,6 +34,22 @@ Important things to note:
 
 .. include:: doc_step_8_B.rst
 
+Part C: Iteration estimator
+---------------------------
+
+One may ask when to stop the SDC, MLSDC, PFASST iterations. So far, we have used a residual threshold or a fixed number of iterations to stop the process.
+Another option is to estimate the number of iterations it takes to reach a given error w.r.t. the exact collocation solution.
+This can be done by using two consecutive iterates to estimate the Lipschitz constant of the iteration procedure.
+Adding a few magic/safety constants here and there and you can guess when to stop.
+This example takes three different test cases and checks how well the iteration estimator drives the iterates below the threshold.
+
+Important things to note:
+
+- The estimator also works for PFASST, where is ensures that up to each step (!) the tolerance is met.
+- The method also works for the parallel `controller_MPI` controller by using interrupts for checking when to stop (not tested here).
+
+.. include:: doc_step_8_C.rst
+
 Part X: To be continued...
 --------------------------
 
