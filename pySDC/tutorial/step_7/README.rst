@@ -31,7 +31,7 @@ This example tests SDC, MLSDC and PFASST.
 
 Important things to note:
 
-- The code runs both in serial using just `python B_pySDC_with_mpi4pifft.py` and also in parallel using `mpirun -np 2 python B_pySDC_with_mpi4pifft.py`.
+- The code runs both in serial using just `python B_pySDC_with_mpi4pyfft.py` and also in parallel using `mpirun -np 2 python B_pySDC_with_mpi4pyfft.py`.
 - The nonlinear Schrödinger example is not expected to work well with PFASST. In fact, SDC and MLSDC converge for larger time-steps, but PFASST does not.
 
 .. include:: doc_step_7_B.rst
