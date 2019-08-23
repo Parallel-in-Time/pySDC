@@ -1,11 +1,12 @@
 import numpy as np
 from mpi4py import MPI
+import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
+from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 
@@ -25,7 +26,7 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-01 / 2
+    level_params['dt'] = 1E-00
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -33,6 +34,7 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QE'] = ['EE']  # You can try PIC here, but PFASST doesn't like this..
     sweeper_params['initial_guess'] = 'zero'
 
     # initialize problem parameters
@@ -43,10 +45,14 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         problem_params['nvars'] = [(128, 128)]
     problem_params['spectral'] = spectral
     problem_params['comm'] = comm
+    problem_params['Du'] = 0.00002
+    problem_params['Dv'] = 0.00001
+    problem_params['A'] = 0.04
+    problem_params['B'] = 0.1
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 50
+    step_params['maxiter'] = 500
 
     # initialize controller parameters
     controller_params = dict()
@@ -56,7 +62,7 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_params'] = problem_params  # pass problem parameters
-    description['problem_class'] = nonlinearschroedinger_imex
+    description['problem_class'] = grayscott_imex
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -65,12 +71,12 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 20
 
     f = None
     if rank == 0:
-        f = open('step_7_B_out.txt', 'a')
-        out = f'Running with ml={ml} and num_procs={num_procs}...'
+        f = open('GS_out.txt', 'a')
+        out = f'Running with ml = {ml} and num_procs = {num_procs}...'
         f.write(out + '\n')
         print(out)
 
@@ -81,10 +87,36 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
+    # plt.figure()
+    # plt.imshow(uinit[..., 0], vmin=0, vmax=1)
+    # plt.title('v')
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(uinit[..., 1], vmin=0, vmax=1)
+    # plt.title('v')
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(uinit[..., 0] + uinit[..., 1])
+    # plt.title('sum')
+    # plt.colorbar()
+
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    uex = P.u_exact(Tend)
-    err = abs(uex - uend)
+
+    # plt.figure()
+    # plt.imshow(uend[..., 0])#, vmin=0, vmax=1)
+    # plt.title('u')
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(uend[..., 1])#, vmin=0, vmax=1)
+    # plt.title('v')
+    # plt.colorbar()
+    # plt.figure()
+    # plt.imshow(uend[..., 0] + uend[..., 1])
+    # plt.title('sum')
+    # plt.colorbar()
+    # plt.show()
+    # # exit()
 
     if rank == 0:
         # filter statistics by type (number of iterations)
@@ -109,24 +141,10 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         f.write(out + '\n')
         print(out)
 
-        out = f'Error: {err:6.4e}'
-        f.write(out + '\n')
-        print(out)
-
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
         out = f'Time to solution: {timing[0][1]:6.4f} sec.'
         f.write(out + '\n')
         print(out)
-
-        assert err <= 1.133E-05, 'Error is too high, got %s' % err
-        if ml:
-            if num_procs > 1:
-                maxmean = 12.5
-            else:
-                maxmean = 6.6
-        else:
-            maxmean = 12.7
-        assert np.mean(niters) <= maxmean, 'Mean number of iterations is too high, got %s' % np.mean(niters)
 
         f.write('\n')
         print()
@@ -137,7 +155,7 @@ def main():
     """
     Little helper routine to run the whole thing
 
-    Note: This can also be run with "mpirun -np 2 python B_pySDC_with_mpi4pifft.py"
+    Note: This can also be run with "mpirun -np 2 python grayscott.py"
     """
     run_simulation(spectral=False, ml=False, num_procs=1)
     run_simulation(spectral=True, ml=False, num_procs=1)
