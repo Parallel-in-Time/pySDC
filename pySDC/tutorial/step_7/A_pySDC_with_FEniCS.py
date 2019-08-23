@@ -75,7 +75,7 @@ def setup(t0=None, ml=None):
     return description, controller_params
 
 
-def run_variants(variant=None, ml=None, num_procs = None):
+def run_variants(variant=None, ml=None, num_procs=None):
     """
     Main routine to run the different implementations of the heat equation with FEniCS
 
