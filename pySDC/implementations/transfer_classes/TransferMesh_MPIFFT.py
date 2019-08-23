@@ -34,9 +34,8 @@ class fft_to_fft(space_transfer):
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
         axes = tuple(range(len(Nf)))
 
-        tmp_u = newDistArray(self.fine_prob.fft, self.spectral)
-
-        self.fft_pad = PFFT(self.coarse_prob.params.comm, Nc, padding=self.ratio, axes=axes, dtype=tmp_u.dtype,
+        self.fft_pad = PFFT(self.coarse_prob.params.comm, Nc, padding=self.ratio, axes=axes,
+                            dtype=self.coarse_prob.fft.dtype(False),
                             slab=True)
 
     def restrict(self, F):
