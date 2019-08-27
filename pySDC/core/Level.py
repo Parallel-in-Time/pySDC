@@ -7,6 +7,7 @@ class _Pars(FrozenClass):
         self.dt = None
         self.restol = 0.0
         self.nsweeps = 1
+        self.residual_type = 'full_abs'
         for k, v in params.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point

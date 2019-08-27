@@ -10,6 +10,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex_diffusion, grayscott_imex_linear, \
     grayscott_mi_diffusion, grayscott_mi_linear
+# from pySDC.implementations.problem_classes.GrayScott_FFT import grayscott_imex_linear
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 
@@ -31,6 +32,7 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     level_params['restol'] = 1E-12
     level_params['dt'] = 1E-00
     level_params['nsweeps'] = [1]
+    level_params['residual_type'] = 'last_abs'
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -57,7 +59,6 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     problem_params['B'] = 0.1
     problem_params['newton_maxiter'] = 100
     problem_params['newton_tol'] = 1E-11
-
 
     # initialize step parameters
     step_params = dict()
@@ -128,10 +129,12 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     plt.figure()
     plt.imshow(P.fft.backward(uend[..., 0]))#, vmin=0, vmax=1)
+    # plt.imshow(np.fft.irfft2(uend.values[..., 0]))#, vmin=0, vmax=1)
     plt.title('u')
     plt.colorbar()
     plt.figure()
     plt.imshow(P.fft.backward(uend[..., 1]))#, vmin=0, vmax=1)
+    # plt.imshow(np.fft.irfft2(uend.values[..., 1]))#, vmin=0, vmax=1)
     plt.title('v')
     plt.colorbar()
     # plt.figure()

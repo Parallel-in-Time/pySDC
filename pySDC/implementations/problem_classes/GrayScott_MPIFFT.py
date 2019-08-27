@@ -55,7 +55,7 @@ class grayscott_imex_diffusion(ptype):
         self.ndim = len(problem_params['nvars'])
         axes = tuple(range(self.ndim))
         self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64,
-                        collapse=True)
+                        collapse=True, backend='fftw')
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
