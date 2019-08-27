@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 from mpi4py import MPI
 from mpi4py_fft import PFFT
 
@@ -380,12 +381,23 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             dg10 = -factor * (tmpv ** 2)
             dg11 = 1 - factor * (2 * tmpu * tmpv - self.params.B)
 
-            for ix, iy in np.ndindex(tmpu.shape):
-                a = np.array([tmpgu[ix, iy], tmpgv[ix, iy]])
-                dg = np.array([[dg00[ix, iy], dg01[ix, iy]], [dg10[ix, iy], dg11[ix, iy]]])
-                b = np.linalg.inv(dg).dot(a)
-                tmpu[ix, iy] -= b[0]
-                tmpv[ix, iy] -= b[1]
+            # interleave and unravel to put into sparse matrix
+            dg00I = np.ravel(np.kron(dg00, np.array([1, 0])))
+            dg01I = np.ravel(np.kron(dg01, np.array([1, 0])))
+            dg10I = np.ravel(np.kron(dg10, np.array([1, 0])))
+            dg11I = np.ravel(np.kron(dg11, np.array([0, 1])))
+
+            # put into sparse matrix
+            dg = sp.diags(dg00I, offsets=0) + sp.diags(dg11I, offsets=0)
+            dg += sp.diags(dg01I, offsets=1, shape=dg.shape) + sp.diags(dg10I, offsets=-1, shape=dg.shape)
+
+            # interleave g terms to apply inverse to it
+            g = np.kron(tmpgu.flatten(), np.array([1, 0])) + np.kron(tmpgv.flatten(), np.array([0, 1]))
+            # invert dg matrix
+            b = sp.linalg.spsolve(dg, g)
+            # update real space vectors
+            tmpu[:] -= b[::2].reshape(self.params.nvars)
+            tmpv[:] -= b[1::2].reshape(self.params.nvars)
 
             # increase iteration count
             n += 1
@@ -535,12 +547,23 @@ class grayscott_mi_linear(grayscott_imex_linear):
             dg10 = -factor * (tmpv ** 2)
             dg11 = 1 - factor * (2 * tmpu * tmpv)
 
-            for ix, iy in np.ndindex(tmpu.shape):
-                a = np.array([tmpgu[ix, iy], tmpgv[ix, iy]])
-                dg = np.array([[dg00[ix, iy], dg01[ix, iy]], [dg10[ix, iy], dg11[ix, iy]]])
-                b = np.linalg.inv(dg).dot(a)
-                tmpu[ix, iy] -= b[0]
-                tmpv[ix, iy] -= b[1]
+            # interleave and unravel to put into sparse matrix
+            dg00I = np.ravel(np.kron(dg00, np.array([1, 0])))
+            dg01I = np.ravel(np.kron(dg01, np.array([1, 0])))
+            dg10I = np.ravel(np.kron(dg10, np.array([1, 0])))
+            dg11I = np.ravel(np.kron(dg11, np.array([0, 1])))
+
+            # put into sparse matrix
+            dg = sp.diags(dg00I, offsets=0) + sp.diags(dg11I, offsets=0)
+            dg += sp.diags(dg01I, offsets=1, shape=dg.shape) + sp.diags(dg10I, offsets=-1, shape=dg.shape)
+
+            # interleave g terms to apply inverse to it
+            g = np.kron(tmpgu.flatten(), np.array([1, 0])) + np.kron(tmpgv.flatten(), np.array([0, 1]))
+            # invert dg matrix
+            b = sp.linalg.spsolve(dg, g)
+            # update real-space vectors
+            tmpu[:] -= b[::2].reshape(self.params.nvars)
+            tmpv[:] -= b[1::2].reshape(self.params.nvars)
 
             # increase iteration count
             n += 1
