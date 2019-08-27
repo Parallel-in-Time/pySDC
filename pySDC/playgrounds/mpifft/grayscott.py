@@ -10,7 +10,6 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
 from pySDC.implementations.problem_classes.GrayScott_MPIFFT import grayscott_imex_diffusion, grayscott_imex_linear, \
     grayscott_mi_diffusion, grayscott_mi_linear
-# from pySDC.implementations.problem_classes.GrayScott_FFT import grayscott_imex_linear
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
 
 
@@ -30,7 +29,7 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-00
+    level_params['dt'] = 8E-00
     level_params['nsweeps'] = [1]
     level_params['residual_type'] = 'last_abs'
 
@@ -57,12 +56,12 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     problem_params['Dv'] = 0.00001
     problem_params['A'] = 0.04
     problem_params['B'] = 0.1
-    problem_params['newton_maxiter'] = 100
+    problem_params['newton_maxiter'] = 50
     problem_params['newton_tol'] = 1E-11
 
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 500
+    step_params['maxiter'] = 100
     step_params['errtol'] = 1E-09
 
     # initialize controller parameters
@@ -95,7 +94,7 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 4
+    Tend = 32
 
     f = None
     if rank == 0:
@@ -127,21 +126,21 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    plt.figure()
-    plt.imshow(P.fft.backward(uend[..., 0]))#, vmin=0, vmax=1)
-    # plt.imshow(np.fft.irfft2(uend.values[..., 0]))#, vmin=0, vmax=1)
-    plt.title('u')
-    plt.colorbar()
-    plt.figure()
-    plt.imshow(P.fft.backward(uend[..., 1]))#, vmin=0, vmax=1)
-    # plt.imshow(np.fft.irfft2(uend.values[..., 1]))#, vmin=0, vmax=1)
-    plt.title('v')
-    plt.colorbar()
     # plt.figure()
-    # plt.imshow(uend[..., 0] + uend[..., 1])
-    # plt.title('sum')
+    # plt.imshow(P.fft.backward(uend[..., 0]))#, vmin=0, vmax=1)
+    # # plt.imshow(np.fft.irfft2(uend.values[..., 0]))#, vmin=0, vmax=1)
+    # plt.title('u')
     # plt.colorbar()
-    plt.show()
+    # plt.figure()
+    # plt.imshow(P.fft.backward(uend[..., 1]))#, vmin=0, vmax=1)
+    # # plt.imshow(np.fft.irfft2(uend.values[..., 1]))#, vmin=0, vmax=1)
+    # plt.title('v')
+    # plt.colorbar()
+    # # plt.figure()
+    # # plt.imshow(uend[..., 0] + uend[..., 1])
+    # # plt.title('sum')
+    # # plt.colorbar()
+    # plt.show()
     # # exit()
 
     if rank == 0:
@@ -185,14 +184,14 @@ def main():
     """
     # run_simulation(spectral=False, splitting_type='diffusion', ml=False, num_procs=1)
     # run_simulation(spectral=True, splitting_type='diffusion', ml=False, num_procs=1)
-    run_simulation(spectral=True, splitting_type='linear', ml=False, num_procs=1)
+    # run_simulation(spectral=True, splitting_type='linear', ml=False, num_procs=1)
     # run_simulation(spectral=False, splitting_type='diffusion', ml=True, num_procs=1)
     # run_simulation(spectral=True, splitting_type='diffusion', ml=True, num_procs=1)
     # run_simulation(spectral=False, splitting_type='diffusion', ml=True, num_procs=10)
     # run_simulation(spectral=True, splitting_type='diffusion', ml=True, num_procs=10)
 
     # run_simulation(spectral=False, splitting_type='mi_diffusion', ml=False, num_procs=1)
-    # run_simulation(spectral=True, splitting_type='mi_diffusion', ml=False, num_procs=1)
+    run_simulation(spectral=True, splitting_type='mi_diffusion', ml=False, num_procs=1)
     # run_simulation(spectral=False, splitting_type='mi_linear', ml=False, num_procs=1)
     # run_simulation(spectral=True, splitting_type='mi_linear', ml=False, num_procs=1)
 
