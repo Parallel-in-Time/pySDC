@@ -13,7 +13,7 @@ def main():
         req = comm.isend(data, dest=1)
         req.wait()
     elif rank == 1:
-        # data = comm.recv(source=0)
+        data = comm.recv(source=0)
         print(data)
     #
     # if rank == 0:
