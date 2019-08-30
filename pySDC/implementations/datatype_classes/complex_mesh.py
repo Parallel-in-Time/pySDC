@@ -109,22 +109,6 @@ class mesh(object):
         # return maximum
         return np.amax(absval)
 
-    def send(self, dest=None, tag=None, comm=None):
-        """
-        Routine for sending data forward in time (blocking)
-
-        Args:
-            dest (int): target rank
-            tag (int): communication tag
-            comm: communicator
-
-        Returns:
-            None
-        """
-
-        comm.send(self.values, dest=dest, tag=tag)
-        return None
-
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
@@ -137,9 +121,9 @@ class mesh(object):
         Returns:
             request handle
         """
-        return comm.isend(self.values, dest=dest, tag=tag)
+        return comm.Issend(self.values, dest=dest, tag=tag)
 
-    def recv(self, source=None, tag=None, comm=None):
+    def irecv(self, source=None, tag=None, comm=None):
         """
         Routine for receiving in time
 
@@ -151,8 +135,7 @@ class mesh(object):
         Returns:
             None
         """
-        self.values = comm.recv(source=source, tag=tag)
-        return None
+        return comm.Irecv(self.values, source=source, tag=tag)
 
 
 class rhs_imex_mesh(object):

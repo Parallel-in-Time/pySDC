@@ -82,8 +82,14 @@ class controller_matrix_nonMPI(controller_nonMPI):
             Nc = np.zeros((nnodesc, nnodesc))
             Nc[:, -1] = 1
 
-            TcfA = self.MS[0].base_transfer.space_transfer.Pspace.todense()
-            TfcA = self.MS[0].base_transfer.space_transfer.Rspace.todense()
+            if hasattr(self.MS[0].base_transfer.space_transfer, 'Pspace'):
+                TcfA = self.MS[0].base_transfer.space_transfer.Pspace.todense()
+            else:
+                TcfA = np.eye(self.nspace_c)
+            if hasattr(self.MS[0].base_transfer.space_transfer, 'Rspace'):
+                TfcA = self.MS[0].base_transfer.space_transfer.Rspace.todense()
+            else:
+                TfcA = np.eye(self.nspace)
             TcfQ = self.MS[0].base_transfer.Pcoll
             TfcQ = self.MS[0].base_transfer.Rcoll
 

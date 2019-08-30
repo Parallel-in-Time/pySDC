@@ -21,7 +21,6 @@ if __name__ == "__main__":
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
     sparams['maxiter'] = 10
-    sparams['fine_comm'] = True
 
     # This comes as read-in for the problem class
     pparams = {}

@@ -140,8 +140,7 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
             # if last send succeeded on this level or if last rank, send new values (otherwise: try again)
             if not S.levels[0].tag or S.status.last or S.next.status.done:
-                if self.params.fine_comm:
-                    self.send(S.levels[0], tag=True)
+                self.send(S.levels[0], tag=True)
                 S.status.stage = 'IT_CHECK'
             else:
                 S.status.stage = 'IT_FINE_SEND'
@@ -192,8 +191,7 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
                 # send if last send succeeded on this level (otherwise: abort with error (FIXME))
                 if not S.levels[l].tag or S.status.last or S.next.status.done:
-                    if self.params.fine_comm:
-                        self.send(S.levels[l], tag=True)
+                    self.send(S.levels[l], tag=True)
                 else:
                     print('SEND ERROR', l, S.levels[l].tag)
                     exit()
@@ -270,7 +268,7 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
             for l in range(len(S.levels) - 1, 0, -1):
 
                 # if applicable, try to receive values from IT_UP, otherwise abort (fixme)
-                if self.params.fine_comm and not S.status.first and not S.prev.status.done:
+                if not S.status.first and not S.prev.status.done:
                     if S.prev.levels[l - 1].tag:
                         self.recv(S.levels[l - 1], S.prev.levels[l - 1])
                         S.prev.levels[l - 1].tag = False
