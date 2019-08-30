@@ -2,8 +2,8 @@ Changelog
 ---------
 
 - August 30, 2019: Version 3.1 adds many more examples like the nonlinear Schrödinger equation, more on Gray-Scott and in particular Allen-Cahn.
-  Those are many implemented using the parallel FFT library `mpi4pi-fft <https://bitbucket.org/mpi4py/mpi4py-fft/src/master/>`_, which can now be used with pySDC.
-  There are now 8 tutorials, where step 7 shows the usage of three external libraries with pySDC: mpi4py, FEniCS and petsc4py.
+  Those are many implemented using the parallel FFT library `mpi4pi-fft <https://bitbucket.org/mpi4py/mpi4py-fft/src/master/>`_, which can now be used with `pySDC`.
+  There are now 8 tutorials, where step 7 shows the usage of three external libraries with `pySDC`: mpi4py, FEniCS and petsc4py.
   The MPI controller has been improved after performaning a detailed performance analysis using `Score-P <https://www.vi-hps.org/projects/score-p/>`_ and `Extrae <https://www.vi-hps.org/Tools/Extrae.html>`_.
   Finally: first steps towards error/iteration estimators are taken, too.
 

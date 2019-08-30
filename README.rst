@@ -10,7 +10,7 @@ Features
 
 - Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet, multi-level, diagonal, multi-step
 - Variants of PFASST: virtual parallel or MPI-based parallel, classical of multigrid perspective
-- 7 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics
+- 8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
 - Works with `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_ , `FEniCS <https://fenicsproject.org/>`_ and `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_
@@ -22,9 +22,20 @@ Getting started
 ---------------
 
 The code is hosted on GitHub, see `https://github.com/Parallel-in-Time/pySDC <https://github.com/Parallel-in-Time/pySDC>`_, and PyPI, see `https://pypi.python.org/pypi/pySDC <https://pypi.python.org/pypi/pySDC>`_.
-Either use ``pip install pySDC`` to get the latest stable release including the core dependencies or check out the code on Github.
-Note that using ``pip install pySDC`` or ``python setup.py install`` will only install the core dependencies, omitting e.g. `mpi4py`, `fenics` and `petsc4py` (see below).
-All package requirements are listed in the files `requirements.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements.txt>`_ .
+Use
+
+.. code-block:: bash
+
+   pip install pySDC
+
+to get the latest stable release including the core dependencies.
+Note that this will omit some of the more complex packages not required for the core functionality of `pySDC`, e.g. `mpi4py`, `fenics` and `petsc4py` (see below).
+All requirements are listed in the files `requirements.txt <https://github.com/Parallel-in-Time/pySDC/blob/master/requirements.txt>`_ .
+To work with the source files, checkout the code from Github and install the dependencies e.g. by using a `conda <https://conda.io/en/latest/>`_ environment and
+
+.. code-block:: bash
+
+   conda install -c conda-forge --file requirements.txt
 
 To check your installation, run
 
@@ -36,13 +47,13 @@ You may need to update your ``PYTHONPATH`` by running
 
 .. code-block:: bash
 
-   export PYTHONPATH=$PYTHONPATH:../../..
+   export PYTHONPATH=$PYTHONPATH:/path/to/pySDC/root/folder
 
 in particular if you want to run any of the playgrounds, projects or tutorials.
 All ``import`` statements there assume that the `pySDC`'s base directory is part of ``PYTHONPATH``.
 
 Note: When installing `mpi4py`, `fenics` and `petsc4py`, make sure they use the same MPI installation (e.g. MPICH3).
-You can achieve this e.g. by using the `Anaconda distribution <https://www.anaconda.com/distribution/>`_ of Python and then run
+You can achieve this e.g. by
 
 .. code-block:: bash
 
