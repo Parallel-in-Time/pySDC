@@ -1,45 +1,48 @@
-Step-7: Advanced topics
-=======================
+Step-7: pySDC with external libraries
+=====================================
 
-Since we now have explored the basic features of pySDC, we are actually ready to do some serious science (e.g. in the projects).
-However, we gather here further interesting cases, e.g. special flags or more alternative implementations of components.
+pySDC can be used with external libraries, in particular for spatial discretization, parallelization and solving of linear and/or nonlinear systems.
+In the following, we show a few examples of pySDC + X.
 
-Part A: Visualizing Residuals
------------------------------
+Part A: pySDC and FEniCS
+------------------------
 
-In this part, we briefly introduce the visualization of residuals, built in into pySDC's plugins.
-The application is (supposed) to be simple: merely put the ``stats`` object into the function ``show_residual_across_simulation`` and look at the resulting figure.
+In this example, pySDC is coupled with the `FEniCS framework <https://fenicsproject.org/>`_ for using finite elements in space.
+This implies significant changes to the algorithm, depending on whether or not the mass matrix should be inverted.
+SDC, MLSDC and PFASST can be used without changes when the right-hand side of the ODE is defined with the inverse of the mass matrix.
+Otherwise, the mass matrix has to be used for e.g. the tau-correction.
+This example tests different variants of this methodology for SDC, MLSDC and PFASST.
 
 Important things to note:
 
-- The function visualizes simply the residuals over all processes and all iterations, but only for a single block.
-- The function itself is pretty straightforward and does not require passing the number of processes or iterations.
+- This example shows that even core routines like the `BaseTransfer` can be overwritten if needed.
+- It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be found in the `implementations` folder.
 
 .. include:: doc_step_7_A.rst
 
-Part B: Multi-step SDC
-----------------------
+Part B: mpi4py-fft for parallel Fourier transforms
+--------------------------------------------------
 
-One interesting question when playing around with the different configurations is this: what happens, if we want parallel time-steps but only a single level?
-The result is called multi-step SDC. Here, after each sweep the result is sent forward, but is picked up in the next (and not current) iteration.
-This corresponds to performing only the smoother stage in a multigrid scheme.
-Parallelization is dead-simple and no coarsening strategy is needed.
-Yet, the missing stabilization of the coarse level leads to a significant increase in iterations, when more time-steps are computed in parallel.
-To prevent this, information can be sent forward immediately, but then this is not a parallel algorithm anymore..
+The most prominent parallel solver is, probably, the FFT.
+While many implementations or wrappers for Python exist, we decided to use `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_, which provided the easiest installation, a simple API and good parallel scaling.
+As an example we here test the nonlinear Schrödinger equation, using the IMEX sweeper to treat the nonlinear parts explicitly.
+The code allows to work both in real and spectral space, while the latter is usually faster.
+This example tests SDC, MLSDC and PFASST.
 
 Important things to note:
 
-- Use the controller parameter ``mssdc_jac`` to controll whether the method should be "parallel" (Jacobi-like) or "serial" (Gauss-like).
-- We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
+- The code runs both in serial using just `python B_pySDC_with_mpi4pyfft.py` and also in parallel using `mpirun -np 2 python B_pySDC_with_mpi4pyfft.py`.
+- The nonlinear Schrödinger example is not expected to work well with PFASST. In fact, SDC and MLSDC converge for larger time-steps, but PFASST does not.
 
 .. include:: doc_step_7_B.rst
+
 
 Part C: Time-parallel pySDC with space-parallel PETSc
 -----------------------------------------------------
 
 With rather unfavorable scaling properties, parallel-in-time methods are only really useful when spatial parallelization is maxed out.
 To work with spatial parallelization, this part shows how to (1) include and work with an external library and (2) set up space- and time-parallel runs.
-We use again the forced heat equation as our testbed and PETSc for the space-parallel data structures and linear solver.
+We use again the forced heat equation as our testbed and `PETSc <http://www.mcs.anl.gov/petsc/>`_ for the space-parallel data structures and linear solver.
 See `implementations/datatype_classes/petsc_dmda_grid.py` and `implementations/problem_classes/HeatEquation_2D_PETSc_forced.py` for details on the PETSc bindings.
 
 Important things to note:
@@ -48,8 +51,3 @@ Important things to note:
 - Below we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.
 
 .. include:: doc_step_7_C.rst
-
-Part X: To be continued...
---------------------------
-
-We shall see what comes next...

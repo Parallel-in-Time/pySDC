@@ -98,6 +98,7 @@ def set_parameters_ml():
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
+    step_params['errtol'] = 1E-05
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -108,6 +109,7 @@ def set_parameters_ml():
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['all_to_done'] = True  # can ask the controller to keep iterating all steps until the end
+    controller_params['use_iteration_estimator'] = False  # activate iteration estimator
 
     # fill description dictionary for easy step instantiation
     description = dict()

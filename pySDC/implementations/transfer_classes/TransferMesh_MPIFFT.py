@@ -33,7 +33,10 @@ class fft_to_fft(space_transfer):
         Nc = list(self.coarse_prob.fft.global_shape())
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
         axes = tuple(range(len(Nf)))
-        self.fft_pad = PFFT(self.coarse_prob.params.comm, Nc, padding=self.ratio, axes=axes, dtype=np.float, slab=True)
+
+        self.fft_pad = PFFT(self.coarse_prob.params.comm, Nc, padding=self.ratio, axes=axes,
+                            dtype=self.coarse_prob.fft.dtype(False),
+                            slab=True)
 
     def restrict(self, F):
         """

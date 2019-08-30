@@ -31,9 +31,6 @@ class mesh_to_mesh(space_transfer):
         # invoke super initialization
         super(mesh_to_mesh, self).__init__(fine_prob, coarse_prob, params)
 
-        self.Rspace = sp.eye(self.coarse_prob.params.nvars)
-        self.Pspace = sp.eye(self.fine_prob.params.nvars)
-
     def restrict(self, F):
         """
         Restriction implementation
