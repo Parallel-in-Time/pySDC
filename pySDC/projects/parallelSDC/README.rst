@@ -22,7 +22,7 @@ This part also contains ``minimization.py``, producing the heat maps for the spe
 .. include:: doc_parallelSDC_preconditioner.rst
 
 Node-parallel SDC with MPI
----------------------------------
+--------------------------
 
 The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
 We test again the aforementioned ideas, but now add the ``MIN3`` approach: These values have been obtained using Indie Solver,
@@ -45,7 +45,7 @@ This part also contains the code ``newton_vs_sdc.py`` where simplified and inexa
 .. include:: doc_parallelSDC_nonlinear.rst
 
 Node-parallel SDC with MPI
----------------------------------
+--------------------------
 
 The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
 We test again the aforementioned ideas, but now add the ``MIN3`` approach: These values have been obtained using Indie Solver,

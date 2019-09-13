@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/Performance/README.rst
