@@ -1,0 +1,49 @@
+#!/bin/bash -x
+#SBATCH --nodes=#NNODES#
+#SBATCH --ntasks-per-node=#NTASKS#
+#SBATCH --cpus-per-task=#NCPUS#
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:05:00
+#SBATCH --partition=batch
+
+export MPI=#MPI#
+
+if [ "$MPI" = "intel" ]; then
+
+    module load Intel IntelMPI SciPy-Stack mpi4py FFTW
+
+    #export I_MPI_ASYNC_PROGRESS=1
+    #export I_MPI_ASYNC_PROGRESS_THREADS=1
+
+    source /p/home/jusers/speck1/jureca/venv/IMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi" ]; then
+
+    module load Intel ParaStationMPI SciPy-Stack mpi4py FFTW
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI/bin/activate
+
+fi
+
+if [ "$MPI" = "psmpi-mt" ]; then
+
+    module load Intel ParaStationMPI/5.2.2-1-mt SciPy-Stack mpi4py FFTW
+
+    export MPIR_CVAR_ASYNC_PROGRESS=1
+    export OMP_NUM_THREADS=#NCPUS#
+
+    source /p/home/jusers/speck1/jureca/venv/PSMPI-mt/bin/activate
+
+fi
+
+export PYTHONPATH=$PYTHONPATH:/p/project/ccstma/cstma000/pySDC_deploy
+
+export HWT=#NCPUS#
+export FLAG=#FLAG#
+
+which python
+srun $FLAG python run_simple_forcing_benchmark.py -n #SPACE_SIZE#
+touch ready

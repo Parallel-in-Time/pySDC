@@ -1,0 +1,1 @@
+{"type": "dataset", "datatype": "float64", "endian": "=", "time": 0.024000000000000014, "space_comm_size": 24, "time_comm_size": 1, "shape": [576, 576], "elementsize": 8}

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jube>
+  <benchmark name="pySDC AC scaling test" outpath="bench_run_SPxTP">
+    <comment>Scaling test with pySDC</comment>
+
+    <parameterset name="param_set">
+      <parameter name="i">0, 1, 2, 3, 4</parameter>
+      <parameter name="nnodes" mode="python" type="int">[ 1,  1,  2,  4,  6][$i]</parameter>
+      <parameter name="ntasks" mode="python" type="int">[12, 24, 24, 24, 24][$i]</parameter>
+      <parameter name="ncpus" type="int">1</parameter>
+      <parameter name="space_size" mode="python" type="int">$ntasks</parameter>
+      <parameter name="mpi" type="str">intel</parameter>
+      <parameter name="flag" type="str">--cpu_bind=sockets</parameter>
+    </parameterset>
+
+    <!-- Files -->
+    <fileset name="files">
+      <copy>run_pySDC_AC.tmpl</copy>
+      <copy>run_simple_forcing_benchmark.py</copy>
+    </fileset>
+
+    <!-- Substitute -->
+    <substituteset name="substitute">
+      <!-- Substitute files -->
+      <iofile in="run_pySDC_AC.tmpl" out="run_pySDC_AC.exe" />
+      <!-- Substitute commands -->
+      <sub source="#NNODES#" dest="$nnodes" />
+      <sub source="#NTASKS#" dest="$ntasks" />
+      <sub source="#NCPUS#" dest="$ncpus" />
+      <sub source="#SPACE_SIZE#" dest="$space_size" />
+      <sub source="#MPI#" dest="$mpi" />
+      <sub source="#FLAG#" dest="$flag" />
+    </substituteset>
+
+    <!-- Regex pattern -->
+    <patternset name="pattern">
+      <pattern name="timing_pat" type="float">Time to solution: $jube_pat_fp sec.</pattern>
+      <pattern name="niter_pat" type="float">Mean number of iterations: $jube_pat_fp</pattern>
+    </patternset>
+    
+    <!-- Operation -->
+    <step name="sub_step">
+      <use>param_set</use> <!-- use existing parameterset -->
+      <use>files</use>        <!-- use existing fileset -->
+      <use>substitute</use>   <!-- use existing substituteset -->
+      <do done_file="ready">sbatch -A cstma run_pySDC_AC.exe</do>   <!-- shell command -->
+    </step>
+
+    <!-- Analyse -->
+    <analyser name="analyse">
+      <use>pattern</use> <!-- use existing patternset -->
+      <analyse step="sub_step">
+        <file>run.out</file> <!-- file which should be scanned -->
+      </analyse>
+    </analyser>
+
+    <!-- Create result table -->
+    <result>
+      <use>analyse</use> <!-- use existing analyser -->
+      <table name="result" style="pretty" sort="space_size">
+        <column>nnodes</column>
+        <column>ntasks</column>
+<!--        <column>flag</column>-->
+        <column>space_size</column>
+        <column>ncpus</column>
+<!--        <column>mpi</column>-->
+        <column>timing_pat</column>
+        <column>niter_pat</column>
+      </table>
+    </result>
+
+  </benchmark>
+</jube>

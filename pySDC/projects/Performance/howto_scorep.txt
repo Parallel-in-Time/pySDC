@@ -1,0 +1,33 @@
+Required modules on JURECA:
+
+    module load Intel ParaStationMPI SciPy-Stack petsc4py mpi4py FFTW
+    module load Scalasca CubeLib CubeGUI Vampir PAPI
+    module unload Score-P
+
+
+Build bindings (unless fixed in the official release/installed version):
+
+    cd $PROJECT/tools/scorep_binding_python-master
+    export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-impi-papi/bin:$PATH
+    pip install --user .
+
+
+In your jobscript:
+
+export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-parastation-papi/bin:$PATH
+export SCOREP_PROFILING_MAX_CALLPATH_DEPTH=90
+export SCOREP_ENABLE_TRACING=1
+export SCOREP_TOTAL_MEMORY=256M
+export SCOREP_EXPERIMENT_DIRECTORY=data/mydir
+
+srun python -m scorep --mpi run_simple_forcing_benchmark.py -n N
+srun scout.mpi --time-correct $SCOREP_EXPERIMENT_DIRECTORY/traces.otf2
+
+
+Workflow:
+* Activate scorep-controller in the main Python file
+* Run job without tracing, only do profiling (export SCOREP_ENABLE_TRACING=0)
+* scorep-score -c N $SCOREP_EXPERIMENT_DIRECTORY/profile.cubex
+* Check memory requirements, adapt in job script (export SCOREP_TOTAL_MEMORY=XXX) and restart job with tracing (export SCOREP_ENABLE_TRACING=1)
+* square $SCOREP_EXPERIMENT_DIRECTORY
+
