@@ -1,0 +1,35 @@
+#!/bin/bash -x
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=24
+#SBATCH --cpus-per-task=1
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:05:00
+#SBATCH --partition=devel
+
+export HWT=1
+export PIN=`./correct_pinning.sh`
+
+
+#export SCOREP_ENABLE_TRACING=1
+#export PATH=/p/project/ccstma/scorep/6.0-trunk-mrobefix_intel-parastation-papi/bin:$PATH
+#export PATH=/p/project/ccstma/scorep/6.0-trunk-mprobefix_intel-impi-papi/bin:$PATH
+
+#srun python -m scorep --mpp=mpi rma.py
+#srun python -m scorep --mpp=mpi isend.py
+#srun python -m scorep --mpp=mpi thread.py
+
+#srun python rma.py
+#srun python isend.py
+#srun --cpu_bind=sockets python thread.py -n 12
+#srun --cpu_bind=sockets --hint=multithread python thread.py -n 12
+
+echo -e "\n\nDEFAULT PINNING\n---------------------------\n"
+srun --label python thread.py -n 24
+echo -e "\n\nSOCKET PINNING\n---------------------------\n"
+srun --cpu_bind=sockets python thread.py -n 24
+echo -e "\n\nBROEMMEL PINNING\n---------------------------\n"
+srun $PIN --label python thread.py -n 24
+#srun $PIN --label ./show_affinity_jureca.x
+
+touch ready

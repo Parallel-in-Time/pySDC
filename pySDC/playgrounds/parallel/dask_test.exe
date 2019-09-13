@@ -1,0 +1,12 @@
+#!/bin/bash -x
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --output=run.out
+#SBATCH --error=run.err
+#SBATCH --time=00:05:00
+#SBATCH --partition=devel
+
+source /p/home/jusers/speck1/juwels/venv/dask/bin/activate
+
+srun --cpu_bind=sockets python dask_test.py
+touch ready
