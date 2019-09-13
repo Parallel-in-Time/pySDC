@@ -1,7 +1,7 @@
 module load JUBE
 
-Set up template for the jobscript: run_pySDC_AC.tmpl
-Set up xml file for JuBE: jube_run_pySDC_AC.xml
+Set up template for the jobscript, e.g.: run_pySDC_AC.tmpl
+Set up xml file for JuBE, e.g.: jube_run_pySDC_AC.xml
 
 > jube run jube_run_pySDC_AC.xml
 > watch jube continue <DIR> --hide-animation --id <ID>
