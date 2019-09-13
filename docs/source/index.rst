@@ -40,6 +40,7 @@ Projects
    projects/Hamiltonian.rst
    projects/SDC_showdown.rst
    projects/AllenCahn_Bayreuth.rst
+   projects/performance.rst
 
 
 Tests
