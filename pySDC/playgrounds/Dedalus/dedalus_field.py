@@ -167,7 +167,6 @@ class dedalus_field(object):
         Returns:
             request handle
         """
-        # return comm.Issend(self.values[:], dest=dest, tag=tag)
         return comm.Issend(self.values['g'][:], dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
@@ -182,7 +181,6 @@ class dedalus_field(object):
         Returns:
             None
         """
-        # self.values['g'] = comm.recv(source=source, tag=tag)
         return comm.Irecv(self.values['g'][:], source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
