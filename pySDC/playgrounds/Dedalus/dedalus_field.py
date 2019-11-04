@@ -39,8 +39,8 @@ class dedalus_field(object):
                 self.values[-1]['g'] = f['g']
         elif isinstance(init, tuple):
             self.values = []
-            for i in range(init[0]):
-                self.values.append(init[1].new_field())
+            for i in range(init[1]):
+                self.values.append(init[0].new_field())
 
         # elif isinstance(init, type(self)):
         #     if hasattr(init, 'values'):
