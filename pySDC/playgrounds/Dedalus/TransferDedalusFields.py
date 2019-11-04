@@ -29,7 +29,7 @@ class dedalus_field_transfer(space_transfer):
         # invoke super initialization
         super(dedalus_field_transfer, self).__init__(fine_prob, coarse_prob, params)
 
-        self.ratio = list(fine_prob.init.global_grid_shape() / coarse_prob.init.global_grid_shape())
+        self.ratio = list(fine_prob.init[0].global_grid_shape() / coarse_prob.init[0].global_grid_shape())
 
         assert self.ratio.count(self.ratio[0]) == len(self.ratio)
 
@@ -43,18 +43,18 @@ class dedalus_field_transfer(space_transfer):
         if isinstance(F, dedalus_field):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
             for l in range(len(G.values)):
-                FG = self.fine_prob.init.new_field()
+                FG = self.fine_prob.init[0].new_field()
                 FG['g'] = F.values[l]['g']
                 FG.set_scales(scales=1.0 / self.ratio[0])
                 G.values[l]['g'] = FG['g']
         elif isinstance(F, rhs_imex_dedalus_field):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             for l in range(len(G.impl.values)):
-                FG = self.fine_prob.init.new_field()
+                FG = self.fine_prob.init[0].new_field()
                 FG['g'] = F.impl.values[l]['g']
                 FG.set_scales(scales=1.0 / self.ratio[0])
                 G.impl.values[l]['g'] = FG['g']
-                FG = self.fine_prob.init.new_field()
+                FG = self.fine_prob.init[0].new_field()
                 FG['g'] = F.expl.values[l]['g']
                 FG.set_scales(scales=1.0 / self.ratio[0])
                 G.expl.values[l]['g'] = FG['g']
@@ -72,18 +72,18 @@ class dedalus_field_transfer(space_transfer):
         if isinstance(G, dedalus_field):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
             for l in range(len(F.values)):
-                GF = self.coarse_prob.init.new_field()
+                GF = self.coarse_prob.init[0].new_field()
                 GF['g'] = G.values[l]['g']
                 GF.set_scales(scales=self.ratio[0])
                 F.values[l]['g'] = GF['g']
         elif isinstance(G, rhs_imex_dedalus_field):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             for l in range(len(F.impl.values)):
-                GF = self.coarse_prob.init.new_field()
+                GF = self.coarse_prob.init[0].new_field()
                 GF['g'] = G.impl.values[l]['g']
                 GF.set_scales(scales=self.ratio[0])
                 F.impl.values[l]['g'] = GF['g']
-                GF = self.coarse_prob.init.new_field()
+                GF = self.coarse_prob.init[0].new_field()
                 GF['g'] = G.expl.values[l]['g']
                 GF.set_scales(scales=self.ratio[0])
                 F.expl.values[l]['g'] = GF['g']

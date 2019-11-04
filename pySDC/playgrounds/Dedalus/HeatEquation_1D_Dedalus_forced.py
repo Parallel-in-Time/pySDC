@@ -40,16 +40,18 @@ class heat1d_dedalus_forced(ptype):
         domain = de.Domain([xbasis], grid_dtype=np.float64, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d_dedalus_forced, self).__init__(init=domain, dtype_u=dtype_u, dtype_f=dtype_f,
+        super(heat1d_dedalus_forced, self).__init__(init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f,
                                                     params=problem_params)
 
-        self.x = self.init.grid(0, scales=1)
+        self.x = self.init[0].grid(0, scales=1)
         self.rhs = self.dtype_u(self.init, val=0.0)
-        self.problem = de.IVP(domain=self.init, variables=['u'])
+        self.problem = de.IVP(domain=self.init[0], variables=['u', 'v'])
         self.problem.parameters['nu'] = self.params.nu
         self.problem.add_equation("dt(u) - nu * dx(dx(u)) = 0")
+        self.problem.add_equation("dt(v) - nu * dx(dx(v)) = 0")
         self.solver = self.problem.build_solver(de.timesteppers.SBDF1)
         self.u = self.solver.state['u']
+        self.v = self.solver.state['v']
 
     def eval_f(self, u, t):
         """
@@ -65,7 +67,9 @@ class heat1d_dedalus_forced(ptype):
 
         f = self.dtype_f(self.init)
         f.impl.values[0] = (self.params.nu * de.operators.differentiate(u.values[0], x=2)).evaluate()
+        f.impl.values[1] = (self.params.nu * de.operators.differentiate(u.values[1], x=2)).evaluate()
         f.expl.values[0]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        f.expl.values[1]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -84,11 +88,13 @@ class heat1d_dedalus_forced(ptype):
 
         # u = self.solver.state['u']
         self.u['g'] = rhs.values[0]['g']
+        self.v['g'] = rhs.values[1]['g']
 
         self.solver.step(factor)
 
         me = self.dtype_u(self.init)
         me.values[0]['g'] = self.u['g']
+        me.values[1]['g'] = self.v['g']
 
         return me
 
@@ -105,4 +111,5 @@ class heat1d_dedalus_forced(ptype):
 
         me = self.dtype_u(self.init)
         me.values[0]['g'] = np.sin(np.pi * self.params.freq * self.x) * np.cos(t)
+        me.values[1]['g'] = np.sin(np.pi * self.params.freq * self.x) * np.cos(t)
         return me
