@@ -42,20 +42,22 @@ class dedalus_field_transfer(space_transfer):
         """
         if isinstance(F, dedalus_field):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            FG = self.fine_prob.init.new_field()
-            FG['g'] = F.values['g']
-            FG.set_scales(scales=1.0 / self.ratio[0])
-            G.values['g'] = FG['g']
+            for l in range(len(G.values)):
+                FG = self.fine_prob.init.new_field()
+                FG['g'] = F.values[l]['g']
+                FG.set_scales(scales=1.0 / self.ratio[0])
+                G.values[l]['g'] = FG['g']
         elif isinstance(F, rhs_imex_dedalus_field):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            FG = self.fine_prob.init.new_field()
-            FG['g'] = F.impl.values['g']
-            FG.set_scales(scales=1.0 / self.ratio[0])
-            G.impl.values['g'] = FG['g']
-            FG = self.fine_prob.init.new_field()
-            FG['g'] = F.expl.values['g']
-            FG.set_scales(scales=1.0 / self.ratio[0])
-            G.expl.values['g'] = FG['g']
+            for l in range(len(G.impl.values)):
+                FG = self.fine_prob.init.new_field()
+                FG['g'] = F.impl.values[l]['g']
+                FG.set_scales(scales=1.0 / self.ratio[0])
+                G.impl.values[l]['g'] = FG['g']
+                FG = self.fine_prob.init.new_field()
+                FG['g'] = F.expl.values[l]['g']
+                FG.set_scales(scales=1.0 / self.ratio[0])
+                G.expl.values[l]['g'] = FG['g']
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
@@ -69,20 +71,22 @@ class dedalus_field_transfer(space_transfer):
         """
         if isinstance(G, dedalus_field):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
-            GF = self.coarse_prob.init.new_field()
-            GF['g'] = G.values['g']
-            GF.set_scales(scales=self.ratio[0])
-            F.values['g'] = GF['g']
+            for l in range(len(F.values)):
+                GF = self.coarse_prob.init.new_field()
+                GF['g'] = G.values[l]['g']
+                GF.set_scales(scales=self.ratio[0])
+                F.values[l]['g'] = GF['g']
         elif isinstance(G, rhs_imex_dedalus_field):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
-            GF = self.coarse_prob.init.new_field()
-            GF['g'] = G.impl.values['g']
-            GF.set_scales(scales=self.ratio[0])
-            F.impl.values['g'] = GF['g']
-            GF = self.coarse_prob.init.new_field()
-            GF['g'] = G.expl.values['g']
-            GF.set_scales(scales=self.ratio[0])
-            F.expl.values['g'] = GF['g']
+            for l in range(len(F.impl.values)):
+                GF = self.coarse_prob.init.new_field()
+                GF['g'] = G.impl.values[l]['g']
+                GF.set_scales(scales=self.ratio[0])
+                F.impl.values[l]['g'] = GF['g']
+                GF = self.coarse_prob.init.new_field()
+                GF['g'] = G.expl.values[l]['g']
+                GF.set_scales(scales=self.ratio[0])
+                F.expl.values[l]['g'] = GF['g']
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F

@@ -31,11 +31,32 @@ class dedalus_field(object):
 
         # if init is another mesh, do a deepcopy (init by copy)
         if isinstance(init, de.Domain):
-            self.values = init.new_field()
+            self.values = [init.new_field()]
         elif isinstance(init, type(self)):
-            # self.values = de.operators.FieldCopyField(init.values).evaluate()
-            self.values = init.values.domain.new_field()
-            self.values['g'] = init.values['g']
+            self.values = []
+            for f in init.values:
+                self.values.append(f.domain.new_field())
+                self.values[-1]['g'] = f['g']
+        elif isinstance(init, tuple):
+            self.values = []
+            for i in range(init[0]):
+                self.values.append(init[1].new_field())
+
+        # elif isinstance(init, type(self)):
+        #     if hasattr(init, 'values'):
+        #         self.values = init.values.domain.new_field()
+        #         self.values['g'] = init.values['g']
+        #     elif hasattr(init, 'list_of_values'):
+        #         self.list_of_values = []
+        #         for f in init.list_of_values:
+        #             self.list_of_values.append(f.domain.new_field())
+        #             self.list_of_values[-1]['g'] = f['g']
+        #     else:
+        #         raise DataError('something went really wrong during %s initialization' % type(self))
+        # elif isinstance(init, tuple):
+        #     self.list_of_values = []
+        #     for i in range(init[0]):
+        #         self.list_of_values.append(init[1].new_field())
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
 
@@ -53,8 +74,9 @@ class dedalus_field(object):
 
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a + b changes a as well!
-            me = dedalus_field(other.values.domain)
-            me.values['g'] = self.values['g'] + other.values['g']
+            me = dedalus_field(other)
+            for l in range(len(me.values)):
+                me.values[l]['g'] = self.values[l]['g'] + other.values[l]['g']
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
@@ -73,8 +95,9 @@ class dedalus_field(object):
 
         if isinstance(other, type(self)):
             # always create new mesh, since otherwise c = a - b changes a as well!
-            me = dedalus_field(other.values.domain)
-            me.values['g'] = self.values['g'] - other.values['g']
+            me = dedalus_field(other)
+            for l in range(len(me.values)):
+                me.values[l]['g'] = self.values[l]['g'] - other.values[l]['g']
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
@@ -93,8 +116,9 @@ class dedalus_field(object):
 
         if isinstance(other, float):
             # always create new mesh, since otherwise c = a * factor changes a as well!
-            me = dedalus_field(self.values.domain)
-            me.values['g'] = other * self.values['g']
+            me = dedalus_field(self)
+            for l in range(len(me.values)):
+                me.values[l]['g'] = other * self.values[l]['g']
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
@@ -108,9 +132,9 @@ class dedalus_field(object):
         """
 
         # take absolute values of the mesh values
-        local_absval = np.amax(abs(self.values['g']))
+        local_absval = np.amax([abs(f['g']) for f in self.values])
 
-        comm = self.values.domain.distributor.comm
+        comm = self.values[0].domain.distributor.comm
         if comm is not None:
             if comm.Get_size() > 1:
                 global_absval = comm.allreduce(sendobj=local_absval, op=MPI.MAX)
@@ -121,39 +145,39 @@ class dedalus_field(object):
 
         return global_absval
 
-    def apply_mat(self, A):
-        """
-        Matrix multiplication operator
+    # def apply_mat(self, A):
+    #     """
+    #     Matrix multiplication operator
+    #
+    #     Args:
+    #         A: a matrix
+    #
+    #     Returns:
+    #         mesh.mesh: component multiplied by the matrix A
+    #     """
+    #     if not A.shape[1] == self.values.shape[0]:
+    #         raise DataError("ERROR: cannot apply operator %s to %s" % (A.shape[1], self))
+    #
+    #     me = dedalus_field(self.values.domain)
+    #     me.values['g'] = A.dot(self.values['g'])
+    #
+    #     return me
 
-        Args:
-            A: a matrix
-
-        Returns:
-            mesh.mesh: component multiplied by the matrix A
-        """
-        if not A.shape[1] == self.values.shape[0]:
-            raise DataError("ERROR: cannot apply operator %s to %s" % (A.shape[1], self))
-
-        me = dedalus_field(self.values.domain)
-        me.values['g'] = A.dot(self.values['g'])
-
-        return me
-
-    def send(self, dest=None, tag=None, comm=None):
-        """
-        Routine for sending data forward in time (blocking)
-
-        Args:
-            dest (int): target rank
-            tag (int): communication tag
-            comm: communicator
-
-        Returns:
-            None
-        """
-
-        comm.send(self.values['g'], dest=dest, tag=tag)
-        return None
+    # def send(self, dest=None, tag=None, comm=None):
+    #     """
+    #     Routine for sending data forward in time (blocking)
+    #
+    #     Args:
+    #         dest (int): target rank
+    #         tag (int): communication tag
+    #         comm: communicator
+    #
+    #     Returns:
+    #         None
+    #     """
+    #
+    #     comm.send(self.values['g'], dest=dest, tag=tag)
+    #     return None
 
     def isend(self, dest=None, tag=None, comm=None):
         """
@@ -167,7 +191,12 @@ class dedalus_field(object):
         Returns:
             request handle
         """
-        return comm.Issend(self.values['g'][:], dest=dest, tag=tag)
+        req = None
+        for data in self.values:
+            if req is not None:
+                req.Free()
+            req = comm.Issend(data['g'][:], dest=dest, tag=tag)
+        return req
 
     def irecv(self, source=None, tag=None, comm=None):
         """
@@ -181,7 +210,13 @@ class dedalus_field(object):
         Returns:
             None
         """
-        return comm.Irecv(self.values['g'][:], source=source, tag=tag)
+        req = None
+        for data in self.values:
+            if req is not None:
+                req.Free()
+            req = comm.Irecv(data['g'], source=source, tag=tag)
+        return req
+        # return comm.Irecv(self.values['g'][:], source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
         """
@@ -194,8 +229,9 @@ class dedalus_field(object):
         Returns:
             broadcasted values
         """
-        me = dedalus_field(self.values.domain)
-        me.values['g'] = comm.bcast(self.values['g'], root=root)
+        me = dedalus_field(self)
+        for l in range(len(me.values)):
+            me.values[l]['g'] = comm.bcast(self.values[l]['g'], root=root)
         return me
 
 
@@ -226,7 +262,7 @@ class rhs_imex_dedalus_field(object):
         if isinstance(init, type(self)):
             self.impl = dedalus_field(init.impl)
             self.expl = dedalus_field(init.expl)
-        elif isinstance(init, de.Domain):
+        elif isinstance(init, de.Domain) or isinstance(init, tuple):
             self.impl = dedalus_field(init)
             self.expl = dedalus_field(init)
         else:
@@ -246,7 +282,7 @@ class rhs_imex_dedalus_field(object):
 
         if isinstance(other, rhs_imex_dedalus_field):
             # always create new rhs_imex_field, since otherwise c = a - b changes a as well!
-            me = rhs_imex_dedalus_field(self.impl.values.domain)
+            me = rhs_imex_dedalus_field(self.impl)
             me.impl = self.impl - other.impl
             me.expl = self.expl - other.expl
             return me
@@ -267,7 +303,7 @@ class rhs_imex_dedalus_field(object):
 
         if isinstance(other, rhs_imex_dedalus_field):
             # always create new rhs_imex_field, since otherwise c = a + b changes a as well!
-            me = rhs_imex_dedalus_field(self.impl.values.domain)
+            me = rhs_imex_dedalus_field(self.impl)
             me.impl = self.impl + other.impl
             me.expl = self.expl + other.expl
             return me
@@ -288,7 +324,7 @@ class rhs_imex_dedalus_field(object):
 
         if isinstance(other, float):
             # always create new rhs_imex_field
-            me = rhs_imex_dedalus_field(self.impl.values.domain)
+            me = rhs_imex_dedalus_field(self.impl)
             me.impl = other * self.impl
             me.expl = other * self.expl
             return me

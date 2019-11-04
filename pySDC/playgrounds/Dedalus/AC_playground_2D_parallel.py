@@ -63,7 +63,7 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 2
     problem_params['L'] = 1.0
-    problem_params['nvars'] = [(128, 128)]#, (64, 64)]
+    problem_params['nvars'] = [(128, 128), (64, 64)]
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['comm'] = space_comm
@@ -90,7 +90,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 27*0.001
+    Tend = 27 * 0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
