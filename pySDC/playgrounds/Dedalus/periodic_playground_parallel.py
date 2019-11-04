@@ -96,16 +96,16 @@ def main():
         out = 'Number of iterations for time %4.2f: %2i' % item
         print(out)
 
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    print(out)
-    # out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    # niters = np.array([item[1] for item in iter_counts])
+    # out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     # print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
-    print(out)
-    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-    print(out)
+    # # out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    # # print(out)
+    # out = '   Position of max/min number of iterations: %2i -- %2i' % \
+    #       (int(np.argmax(niters)), int(np.argmin(niters)))
+    # print(out)
+    # out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+    # print(out)
 
     print('CFL number: %4.2f' % (level_params['dt'] * problem_params['nu'] / (1.0 / problem_params['nvars'][0])**2))
     print('Error: %8.4e' % err)

@@ -64,8 +64,8 @@ class heat1d_dedalus_forced(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.impl.values = (self.params.nu * de.operators.differentiate(u.values, x=2)).evaluate()
-        f.expl.values['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        f.impl.values[0] = (self.params.nu * de.operators.differentiate(u.values[0], x=2)).evaluate()
+        f.expl.values[0]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -83,12 +83,12 @@ class heat1d_dedalus_forced(ptype):
         """
 
         # u = self.solver.state['u']
-        self.u['g'] = rhs.values['g']
+        self.u['g'] = rhs.values[0]['g']
 
         self.solver.step(factor)
 
         me = self.dtype_u(self.init)
-        me.values['g'] = self.u['g']
+        me.values[0]['g'] = self.u['g']
 
         return me
 
@@ -104,5 +104,5 @@ class heat1d_dedalus_forced(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me.values['g'] = np.sin(np.pi * self.params.freq * self.x) * np.cos(t)
+        me.values[0]['g'] = np.sin(np.pi * self.params.freq * self.x) * np.cos(t)
         return me
