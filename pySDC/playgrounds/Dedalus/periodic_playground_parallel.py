@@ -99,8 +99,8 @@ def main():
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     print(out)
-    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-    print(out)
+    # out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
+    # print(out)
     out = '   Position of max/min number of iterations: %2i -- %2i' % \
           (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
