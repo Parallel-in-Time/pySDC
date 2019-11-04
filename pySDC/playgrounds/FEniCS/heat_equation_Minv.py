@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-12
+    level_params['restol'] = 1E-10
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
     problem_params['order'] = [4]
-    problem_params['refinements'] = [1, 0]
+    problem_params['refinements'] = [1]
 
     # initialize controller parameters
     controller_params = dict()
