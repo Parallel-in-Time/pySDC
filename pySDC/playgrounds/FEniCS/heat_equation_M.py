@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-12
+    level_params['restol'] = 1E-10
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     controller_params['logger_level'] = 20
 
     base_transfer_params = dict()
-    base_transfer_params['finter'] = True
+    # base_transfer_params['finter'] = True
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
