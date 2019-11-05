@@ -37,6 +37,7 @@ class dedalus_field(object):
             for f in init.values:
                 self.values.append(f.domain.new_field())
                 self.values[-1]['g'] = f['g']
+                self.values[-1]['c'] = f['c']
         elif isinstance(init, tuple):
             self.values = []
             for i in range(init[1]):
