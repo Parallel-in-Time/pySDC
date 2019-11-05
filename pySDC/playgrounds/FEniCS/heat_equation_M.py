@@ -5,12 +5,16 @@ from pySDC.implementations.sweeper_classes.imex_1st_order_mass import imex_1st_o
 from pySDC.implementations.transfer_classes.BaseTransfer_mass import base_transfer_mass
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 
+from pySDC.playgrounds.FEniCS.HookClass_FEniCS_output import fenics_output
+
+from pySDC.helpers.stats_helper import filter_stats, sort_stats
+
 if __name__ == "__main__":
     num_procs = 1
 
     t0 = 0
     dt = 0.2
-    Tend = 1.0
+    Tend = 0.2
 
     # initialize level parameters
     level_params = dict()
@@ -31,12 +35,13 @@ if __name__ == "__main__":
     problem_params['t0'] = t0  # ugly, but necessary to set up ProblemClass
     problem_params['c_nvars'] = [128]
     problem_params['family'] = 'CG'
-    problem_params['order'] = [4]
+    problem_params['order'] = [1]
     problem_params['refinements'] = [1, 0]
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
+    controller_params['hook_class'] = fenics_output
 
     base_transfer_params = dict()
     # base_transfer_params['finter'] = True
@@ -67,3 +72,9 @@ if __name__ == "__main__":
     uex = P.u_exact(Tend)
 
     print('(classical) error at time %s: %s' % (Tend, abs(uex - uend) / abs(uex)))
+
+    errors = sort_stats(filter_stats(stats, type='error'), sortby='iter')
+    residuals = sort_stats(filter_stats(stats, type='residual'), sortby='iter')
+
+    for err, res in zip(errors, residuals):
+        print(err[0], err[1], res[1])

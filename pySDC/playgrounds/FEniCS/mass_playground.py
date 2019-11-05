@@ -2,15 +2,20 @@ import dolfin as df
 import numpy as np
 import matplotlib.pyplot as plt
 
+import pySDC.helpers.plot_helper as plt_helper
+
+import pylustrator
+# pylustrator.start()
+
 
 N = 128  # Number of elements
-k = 127  # Wave frequency
-d = 1  # FE order
+k = 7  # Wave frequency
+d = 8  # FE order
 
 # Get mesh and function space (CG or DG)
 mesh = df.UnitIntervalMesh(N)
-V = df.FunctionSpace(mesh, "CG", d)
-# V = df.FunctionSpace(mesh, "DG", d)
+# V = df.FunctionSpace(mesh, "CG", d)
+V = df.FunctionSpace(mesh, "DG", d)
 
 # Build mass matrix
 u = df.TrialFunction(V)
@@ -33,12 +38,35 @@ fMw = np.fft.fft(Mw.vector()[:])
 fw2 = np.fft.fftshift(fw)
 fMw2 = np.fft.fftshift(fMw)
 
+fw2 /= np.amax(abs(fw2))
+fMw2 /= np.amax(abs(fMw2))
+
 # Plot
-plt.figure()
-plt.plot(abs(fw2))
+plt_helper.setup_mpl()
 
-plt.figure()
-plt.plot(abs(fMw2))
+plt_helper.newfig(240, 1, ratio=0.8)
+plt_helper.plt.plot(abs(fw2), lw=2, label=f'N = {N} \n degree = {d} \n wave number = {k}')
+plt_helper.plt.xticks([0, d * N / 4 - 1, d * N / 2 - 1, 3 * d * N / 4 - 1, d * N - 1],
+                      (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'))
+plt_helper.plt.xlabel('spectrum')
+plt_helper.plt.ylabel('normed amplitude')
+# plt_helper.plt.legend()
+plt_helper.plt.grid()
+# plt_helper.savefig('spectrum_noM_CG')
+# plt_helper.savefig('spectrum_noM_DG')
+plt_helper.savefig('spectrum_noM_DG_8')
 
-plt.show()
+plt_helper.newfig(240, 1, ratio=0.8)
+plt_helper.plt.plot(abs(fMw2), lw=2, label=f'N = {N} \n degree = {d} \n wave number = {k}')
+plt_helper.plt.xticks([0, d * N / 4 - 1, d * N / 2 - 1, 3 * d * N / 4 - 1, d * N - 1],
+                      (r'-$\pi$', r'-$\pi/2$', r'$0$', r'+$\pi$/2', r'+$\pi$'))
+plt_helper.plt.xlabel('spectrum')
+plt_helper.plt.ylabel('normed amplitude')
+# plt_helper.plt.legend()
+plt_helper.plt.grid()
+# plt_helper.savefig('spectrum_M_CG')
+# plt_helper.savefig('spectrum_M_DG')
+plt_helper.savefig('spectrum_M_DG_8')
+
+# plt.show()
 
