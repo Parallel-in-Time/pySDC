@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import signal
 
 from dedalus import public as de
 
@@ -25,7 +26,7 @@ class dynamo_2d_dedalus(ptype):
             problem_params['comm'] = None
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['nvars', 'Rm', 'kz', 'comm']
+        essential_keys = ['nvars', 'Rm', 'kz', 'comm', 'initial']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -138,7 +139,29 @@ class dynamo_2d_dedalus(ptype):
         xvar_loc = self.x.shape[0]
         yvar_loc = self.y.shape[1]
 
+        np.random.seed(0)
+
         me = self.dtype_u(self.init)
-        me.values[0]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
-        me.values[1]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+
+        if self.params.initial == 'random':
+
+            me.values[0]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+            me.values[1]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+
+        elif self.params.initial == 'low-res':
+
+            me.values[0]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+            me.values[1]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+
+            me.values[0].set_scales(4.0 / self.params.nvars[0])
+            # Need to do that because otherwise Dedalus tries to be clever..
+            tmpx = me.values[0]['g']
+            me.values[1].set_scales(4.0 / self.params.nvars[1])
+            # Need to do that because otherwise Dedalus tries to be clever..
+            tmpy = me.values[1]['g']
+
+            me.values[0].set_scales(1)
+            me.values[1].set_scales(1)
+
+
         return me
