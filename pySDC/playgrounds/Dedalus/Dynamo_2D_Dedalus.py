@@ -42,27 +42,30 @@ class dynamo_2d_dedalus(ptype):
         self.x = self.init[0].grid(0, scales=1)
         self.y = self.init[0].grid(1, scales=1)
 
-        self.rhs = self.dtype_u(self.init, val=0.0)
-        self.problem = de.IVP(domain=self.init[0], variables=['b_x', 'b_y'])
-        self.problem.parameters['Rm'] = self.params.Rm
-        self.problem.parameters['kz'] = self.params.kz
-        self.problem.add_equation("dt(b_x) - (1/Rm) * ( dx(dx(b_x)) + dy(dy(b_x)) - kz ** 2 * (b_x) ) = 0")
-        self.problem.add_equation("dt(b_y) - (1/Rm) * ( dx(dx(b_y)) + dy(dy(b_y)) - kz ** 2 * (b_y) ) = 0")
-        self.solver = self.problem.build_solver(de.timesteppers.SBDF1)
-        self.b_x = self.solver.state['b_x']
-        self.b_y = self.solver.state['b_y']
+        imp_var = ['b_x', 'b_y']
+        self.problem_imp = de.IVP(domain=self.init[0], variables=imp_var)
+        self.problem_imp.parameters['Rm'] = self.params.Rm
+        self.problem_imp.parameters['kz'] = self.params.kz
+        self.problem_imp.add_equation("dt(b_x) - (1/Rm) * ( dx(dx(b_x)) + dy(dy(b_x)) - kz ** 2 * (b_x) ) = 0")
+        self.problem_imp.add_equation("dt(b_y) - (1/Rm) * ( dx(dx(b_y)) + dy(dy(b_y)) - kz ** 2 * (b_y) ) = 0")
+        self.solver_imp = self.problem_imp.build_solver(de.timesteppers.SBDF1)
+        self.imp_var = []
+        for l in range(self.init[1]):
+            self.imp_var.append(self.solver_imp.state[imp_var[l]])
 
-        self.u_x = domain.new_field()
-        self.u_y = domain.new_field()
-        self.u_z = domain.new_field()
-        self.dx_uy = domain.new_field()
-        self.dy_ux = domain.new_field()
-
-        self.u_x['g'] = np.cos(self.y)
-        self.u_y['g'] = np.sin(self.x)
-        self.u_z['g'] = np.cos(self.x) + np.sin(self.y)
-        self.dx_uy['g'] = self.u_y.differentiate(x=1)['g']
-        self.dy_ux['g'] = self.u_x.differentiate(y=1)['g']
+        exp_var = ['b_x', 'b_y']
+        self.problem_exp = de.IVP(domain=self.init[0], variables=exp_var)
+        self.problem_exp.parameters['Rm'] = self.params.Rm
+        self.problem_exp.parameters['kz'] = self.params.kz
+        self.problem_exp.substitutions['u_x'] = 'cos(y)'
+        self.problem_exp.substitutions['u_y'] = 'sin(x)'
+        self.problem_exp.substitutions['u_z'] = 'cos(x) + sin(y)'
+        self.problem_exp.add_equation("dt(b_x) = -u_x * dx(b_x) - u_y * dy(b_x) - u_z*1j*kz *b_x  + b_y * dy(u_x)")
+        self.problem_exp.add_equation("dt(b_y) = -u_x * dx(b_y) - u_y * dy(b_y) - u_z*1j*kz *b_y  + b_x * dx(u_y)")
+        self.solver_exp = self.problem_exp.build_solver(de.timesteppers.SBDF1)
+        self.exp_var = []
+        for l in range(self.init[1]):
+            self.exp_var.append(self.solver_exp.state[exp_var[l]])
 
     def eval_f(self, u, t):
         """
@@ -76,22 +79,31 @@ class dynamo_2d_dedalus(ptype):
             dtype_f: the RHS with two parts
         """
 
+        pseudo_dt = 1E-05
+
         f = self.dtype_f(self.init)
 
-        dx_b_x = u.values[0].differentiate(x=1)
-        dy_b_x = u.values[0].differentiate(y=1)
-        dx_b_y = u.values[1].differentiate(x=1)
-        dy_b_y = u.values[1].differentiate(y=1)
+        for l in range(self.init[1]):
+            self.exp_var[l]['g'] = u.values[l]['g']
+            self.exp_var[l]['c'] = u.values[l]['c']
 
-        f.expl.values[0] = (-self.u_x * dx_b_x - self.u_y * dy_b_x - self.u_z * 1j * self.params.kz * u.values[0] +
-                            u.values[1] * self.dy_ux).evaluate()
-        f.expl.values[1] = (-self.u_x * dx_b_y - self.u_y * dy_b_y - self.u_z * 1j * self.params.kz * u.values[1] +
-                            u.values[0] * self.dx_uy).evaluate()
+        self.solver_exp.step(pseudo_dt)
 
-        f.impl.values[0] = (1.0 / self.params.Rm * (u.values[0].differentiate(x=2) + u.values[0].differentiate(y=2) -
-                                                    self.params.kz ** 2 * u.values[0])).evaluate()
-        f.impl.values[1] = (1.0 / self.params.Rm * (u.values[1].differentiate(x=2) + u.values[1].differentiate(y=2) -
-                                                    self.params.kz ** 2 * u.values[1])).evaluate()
+        for l in range(self.init[1]):
+            self.exp_var[l].set_scales(1)
+            f.expl.values[l]['g'] = 1.0 / pseudo_dt * (self.exp_var[l]['g'] - u.values[l]['g'])
+            f.expl.values[l]['c'] = 1.0 / pseudo_dt * (self.exp_var[l]['c'] - u.values[l]['c'])
+
+        for l in range(self.init[1]):
+            self.imp_var[l]['g'] = u.values[l]['g']
+            self.imp_var[l]['c'] = u.values[l]['c']
+
+        self.solver_imp.step(pseudo_dt)
+
+        for l in range(self.init[1]):
+            # self.imp_var[l].set_scales(1)
+            f.impl.values[l]['g'] = 1.0 / pseudo_dt * (self.imp_var[l]['g'] - u.values[l]['g'])
+            f.impl.values[l]['c'] = 1.0 / pseudo_dt * (self.imp_var[l]['c'] - u.values[l]['c'])
 
         return f
 
@@ -109,18 +121,18 @@ class dynamo_2d_dedalus(ptype):
             dtype_u: solution as mesh
         """
 
-        self.b_x['g'] = rhs.values[0]['g']
-        self.b_x['c'] = rhs.values[0]['c']
-        self.b_y['g'] = rhs.values[1]['g']
-        self.b_y['c'] = rhs.values[1]['c']
-
-        self.solver.step(factor)
-
         me = self.dtype_u(self.init)
-        me.values[0]['g'] = self.b_x['g']
-        me.values[0]['c'] = self.b_x['c']
-        me.values[1]['g'] = self.b_y['g']
-        me.values[1]['c'] = self.b_y['c']
+
+        for l in range(self.init[1]):
+            self.imp_var[l]['g'] = rhs.values[l]['g']
+            self.imp_var[l]['c'] = rhs.values[l]['c']
+
+        self.solver_imp.step(factor)
+
+        for l in range(self.init[1]):
+            # self.imp_var[l].set_scales(1)
+            me.values[l]['g'][:] = self.imp_var[l]['g']
+            me.values[l]['c'][:] = self.imp_var[l]['c']
 
         return me
 

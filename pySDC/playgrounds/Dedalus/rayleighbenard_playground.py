@@ -5,6 +5,7 @@ from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
@@ -54,16 +55,17 @@ def main():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
+    # sweeper_params['collocation_class'] = EquidistantNoLeft
     sweeper_params['num_nodes'] = [1]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['initial_guess'] = 'spread'
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['Ra'] = 1E+05
     problem_params['Pr'] = 1.0
-    problem_params['initial'] = 'low-res'
-    problem_params['nvars'] = [(32, 32)]  # number of degrees of freedom for each level
+    problem_params['initial'] = 'random'
+    problem_params['nvars'] = [(64, 32)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
 
     # initialize step parameters
@@ -90,7 +92,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 0.1
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)

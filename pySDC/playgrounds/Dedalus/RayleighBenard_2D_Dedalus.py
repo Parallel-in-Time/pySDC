@@ -33,29 +33,26 @@ class rayleighbenard_2d_dedalus(ptype):
 
         xbasis = de.Fourier('x', problem_params['nvars'][0], interval=(0, 2), dealias=3 / 2)
         zbasis = de.Chebyshev('z', problem_params['nvars'][1], interval=(-1 / 2, +1 / 2), dealias=3 / 2)
-        domain = de.Domain([xbasis, zbasis], grid_dtype=np.float64, comm=problem_params['comm'])
+        domain = de.Domain([xbasis, zbasis], grid_dtype=np.complex128, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(rayleighbenard_2d_dedalus, self).__init__(init=(domain, 6), dtype_u=dtype_u, dtype_f=dtype_f,
+        super(rayleighbenard_2d_dedalus, self).__init__(init=(domain, 3), dtype_u=dtype_u, dtype_f=dtype_f,
                                                         params=problem_params)
 
         self.x = self.init[0].grid(0, scales=1)
         self.z = self.init[0].grid(1, scales=1)
 
-        self.rhs = self.dtype_u(self.init, val=0.0)
         imp_var = ['T', 'u', 'w', 'Tz', 'uz', 'wz', 'p']
         self.problem_imp = de.IVP(domain=self.init[0], variables=imp_var)
-
         self.problem_imp.parameters['Ra'] = self.params.Ra
         self.problem_imp.parameters['Pr'] = self.params.Pr
-        self.problem_imp.add_equation("dx(u) + wz = 0 ")
-        self.problem_imp.add_equation("        dt(T) - ( dx(dx(T)) + dz(Tz) )        = 0")
+        self.problem_imp.add_equation(" dx(u) + wz = 0 ")
+        self.problem_imp.add_equation(" dt(T) - ( dx(dx(T)) + dz(Tz) )        = 0")
         self.problem_imp.add_equation(" dt(u) - ( dx(dx(u)) + dz(uz) ) +dx(p) = 0")  # need to look at Pr
-        self.problem_imp.add_equation(" dt(w) - ( dx(dx(w)) + dz(wz) ) +dz(p) = 0")  # Need to look at Pr
-
-        self.problem_imp.add_equation("Tz - dz(T) = 0")
-        self.problem_imp.add_equation("uz - dz(u) = 0")
-        self.problem_imp.add_equation("wz - dz(w) = 0")
+        self.problem_imp.add_equation(" dt(w) - ( dx(dx(w)) + dz(wz) ) +dz(p) - Ra*T  = 0")  # Need to look at Pr
+        self.problem_imp.add_equation(" Tz - dz(T) = 0")
+        self.problem_imp.add_equation(" uz - dz(u) = 0")
+        self.problem_imp.add_equation(" wz - dz(w) = 0")
 
         # Boundary conditions.
         self.problem_imp.add_bc("left(T) = 1")
@@ -67,26 +64,20 @@ class rayleighbenard_2d_dedalus(ptype):
         self.problem_imp.add_bc("left(p) = 0", condition="(nx == 0)")
         self.solver_imp = self.problem_imp.build_solver(de.timesteppers.SBDF1)
         self.imp_var = []
-        for var in imp_var:
-            self.imp_var.append(self.solver_imp.state[var])
+        for l in range(self.init[1]):
+            self.imp_var.append(self.solver_imp.state[imp_var[l]])
 
-        exp_var = ['T', 'u', 'w', 'Tz', 'uz', 'wz']
+        exp_var = ['T', 'u', 'w']
         self.problem_exp = de.IVP(domain=self.init[0], variables=exp_var)
-
         self.problem_exp.parameters['Ra'] = self.params.Ra
         self.problem_exp.parameters['Pr'] = self.params.Pr
-
-        self.problem_exp.add_equation("dt(T)    = -  (u * dx(T) + w * dz(T) )")
-        self.problem_exp.add_equation("dt(u)    = -  (u * dx(u) + w * dz(u) )")  # Need to look at pr
-        self.problem_exp.add_equation("dt(w)    = -  (u * dx(w) + w * dz(w) ) + Ra*T ")  # need to look at pr
-
-        self.problem_exp.add_equation("Tz    = dz(T)")
-        self.problem_exp.add_equation("uz    = dz(u)")
-        self.problem_exp.add_equation("wz    = dz(w)")
+        self.problem_exp.add_equation("dt(T) = - (u * dx(T) + w * dz(T) )")
+        self.problem_exp.add_equation("dt(u) = - (u * dx(u) + w * dz(u) )")  # Need to look at pr
+        self.problem_exp.add_equation("dt(w) = - (u * dx(w) + w * dz(w) ) ")  # need to look at pr
         self.solver_exp = self.problem_exp.build_solver(de.timesteppers.SBDF1)
         self.exp_var = []
-        for var in exp_var:
-            self.exp_var.append(self.solver_exp.state[var])
+        for l in range(self.init[1]):
+            self.exp_var.append(self.solver_exp.state[exp_var[l]])
 
     def eval_f(self, u, t):
         """
@@ -105,17 +96,6 @@ class rayleighbenard_2d_dedalus(ptype):
         f = self.dtype_f(self.init)
 
         for l in range(self.init[1]):
-            self.exp_var[l]['g'] = u.values[l]['g']
-            self.exp_var[l]['c'] = u.values[l]['c']
-
-        self.solver_exp.step(pseudo_dt)
-
-        for l in range(self.init[1]):
-            self.exp_var[l].set_scales(1)
-            f.expl.values[l]['g'] = 1.0 / pseudo_dt * (self.exp_var[l]['g'] - u.values[l]['g'])
-            f.expl.values[l]['c'] = 1.0 / pseudo_dt * (self.exp_var[l]['c'] - u.values[l]['c'])
-
-        for l in range(self.init[1]):
             self.imp_var[l]['g'] = u.values[l]['g']
             self.imp_var[l]['c'] = u.values[l]['c']
 
@@ -125,6 +105,20 @@ class rayleighbenard_2d_dedalus(ptype):
             # self.imp_var[l].set_scales(1)
             f.impl.values[l]['g'] = 1.0 / pseudo_dt * (self.imp_var[l]['g'] - u.values[l]['g'])
             f.impl.values[l]['c'] = 1.0 / pseudo_dt * (self.imp_var[l]['c'] - u.values[l]['c'])
+
+        print(self.solver_imp.timestepper.F[0].data.shape)
+        exit()
+
+        for l in range(self.init[1]):
+            self.exp_var[l]['g'] = u.values[l]['g']
+            self.exp_var[l]['c'] = u.values[l]['c']
+
+        self.solver_exp.step(pseudo_dt)
+
+        for l in range(self.init[1]):
+            self.exp_var[l].set_scales(1)
+            f.expl.values[l]['g'] = 1.0 / pseudo_dt * (self.exp_var[l]['g'] - u.values[l]['g'])# - f.impl.values[l]['g']
+            f.expl.values[l]['c'] = 1.0 / pseudo_dt * (self.exp_var[l]['c'] - u.values[l]['c'])# - f.impl.values[l]['c']
 
         return f
 
@@ -183,7 +177,6 @@ class rayleighbenard_2d_dedalus(ptype):
             me.values[0]['g'] = -self.z + 0.5 + np.random.random(size=(xvar_loc, zvar_loc)) * 1e-2
 
         elif self.params.initial == 'low-res':
-
 
             for l in range(self.init[1]):
                 me.values[l]['g'] = np.zeros((xvar_loc, zvar_loc))
