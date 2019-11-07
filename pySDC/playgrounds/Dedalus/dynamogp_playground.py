@@ -9,7 +9,7 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.Dedalus.TransferDedalusFields import dedalus_field_transfer
-from pySDC.playgrounds.Dedalus.Dynamo_2D_Dedalus import dynamo_2d_dedalus
+from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus import dynamogp_2d_dedalus
 from pySDC.playgrounds.Dedalus.Dynamo_monitor import monitor
 
 
@@ -48,7 +48,7 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-08
-    level_params['dt'] = 0.5
+    level_params['dt'] = 0.25
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -60,8 +60,8 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['Rm'] = 4
-    problem_params['kz'] = 0.45
+    problem_params['Rm'] = 3
+    problem_params['kx'] = 0.57
     problem_params['initial'] = 'low-res'
     problem_params['nvars'] = [(32, 32)]  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
@@ -79,7 +79,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = dynamo_2d_dedalus
+    description['problem_class'] = dynamogp_2d_dedalus
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -90,7 +90,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 10.0
+    Tend = 20.0
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
