@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import signal
 
 from dedalus import public as de
 
@@ -165,6 +164,5 @@ class dynamogp_2d_dedalus(ptype):
 
             me.values[0].set_scales(1)
             me.values[1].set_scales(1)
-
 
         return me
