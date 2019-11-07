@@ -78,6 +78,7 @@ class dedalus_field(object):
             me = dedalus_field(other)
             for l in range(len(me.values)):
                 me.values[l]['g'] = self.values[l]['g'] + other.values[l]['g']
+                me.values[l]['c'] = self.values[l]['c'] + other.values[l]['c']
             return me
         else:
             raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
@@ -99,6 +100,7 @@ class dedalus_field(object):
             me = dedalus_field(other)
             for l in range(len(me.values)):
                 me.values[l]['g'] = self.values[l]['g'] - other.values[l]['g']
+                me.values[l]['c'] = self.values[l]['c'] - other.values[l]['c']
             return me
         else:
             raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
@@ -120,6 +122,7 @@ class dedalus_field(object):
             me = dedalus_field(self)
             for l in range(len(me.values)):
                 me.values[l]['g'] = other * self.values[l]['g']
+                me.values[l]['c'] = other * self.values[l]['c']
             return me
         else:
             raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
