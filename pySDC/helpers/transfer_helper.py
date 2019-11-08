@@ -175,7 +175,10 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                     nn = sorted(nn)
 
                     circulating_one = np.asarray([1.0] + [0.0] * (k - 1))
-                    cont_arr = continue_periodic_array(coarse_grid, nn)
+                    if len(nn) > 0:
+                        cont_arr = continue_periodic_array(coarse_grid, nn)
+                    else:
+                        cont_arr = coarse_grid
 
                     if p > np.mean(fine_grid) and not (cont_arr[0] <= p <= cont_arr[-1]):
                         cont_arr += 1
