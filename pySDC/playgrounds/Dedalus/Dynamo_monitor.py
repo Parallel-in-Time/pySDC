@@ -18,7 +18,8 @@ class monitor(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        bx_max = np.amax(abs(L.u[0].values[0]['g']))
+        bx_max = np.amax(abs(L.u[0][..., 0]))
+        # bx_max = np.amax(abs(L.u[0].values[0]['g']))
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='bx_max', value=bx_max)
@@ -37,7 +38,8 @@ class monitor(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        bx_max = np.amax(abs(L.uend.values[0]['g']))
+        bx_max = np.amax(abs(L.uend[..., 0]))
+        # bx_max = np.amax(abs(L.uend.values[0]['g']))
 
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='bx_max', value=bx_max)
