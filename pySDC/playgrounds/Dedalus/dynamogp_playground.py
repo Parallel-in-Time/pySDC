@@ -9,7 +9,8 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.Dedalus.TransferDedalusFields import dedalus_field_transfer
-from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus import dynamogp_2d_dedalus
+# from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus import dynamogp_2d_dedalus
+from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus_NEW import dynamogp_2d_dedalus
 from pySDC.playgrounds.Dedalus.Dynamo_monitor import monitor
 
 
@@ -90,7 +91,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 20.0
+    Tend = 10.0
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -101,6 +102,9 @@ def main():
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    timings = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
+    print(f'Time it took to run the simulation: {timings:6.3f} seconds')
 
     if space_size == 1:
         bx_maxes = sort_stats(filter_stats(stats, type='bx_max'), sortby='time')

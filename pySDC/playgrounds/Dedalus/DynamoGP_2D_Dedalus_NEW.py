@@ -5,13 +5,13 @@ from dedalus import public as de
 from pySDC.core.Problem import ptype
 from pySDC.core.Errors import ParameterError
 
-from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_dedalus_field
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 class dynamogp_2d_dedalus(ptype):
     """
     """
-    def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -33,30 +33,32 @@ class dynamogp_2d_dedalus(ptype):
 
         ybasis = de.Fourier('y', problem_params['nvars'][0], interval=(0, 2 * np.pi), dealias=1)
         zbasis = de.Fourier('z', problem_params['nvars'][1], interval=(0, 2 * np.pi), dealias=1)
-        domain = de.Domain([ybasis, zbasis], grid_dtype=np.complex128, comm=problem_params['comm'])
+        self.domain = de.Domain([ybasis, zbasis], grid_dtype=np.complex128, comm=problem_params['comm'])
 
-        # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(dynamogp_2d_dedalus, self).__init__(init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f,
+        nvars = tuple(self.domain.local_grid_shape()) + (2,)
+
+        # invoke super init, passing number of dofs (and more), dtype_u and dtype_f
+        super(dynamogp_2d_dedalus, self).__init__(init=(nvars, self.domain.dist.comm, ybasis.grid_dtype),
+                                                  dtype_u=dtype_u, dtype_f=dtype_f,
                                                   params=problem_params)
 
-        self.y = self.init[0].grid(0, scales=1)
-        self.z = self.init[0].grid(1, scales=1)
+        self.y = self.domain.grid(0, scales=1)
+        self.z = self.domain.grid(1, scales=1)
 
-        self.rhs = self.dtype_u(self.init, val=0.0)
-        self.problem = de.IVP(domain=self.init[0], variables=['bz', 'by'])
+        self.problem = de.IVP(domain=self.domain, variables=['by', 'bz'])
         self.problem.parameters['Rm'] = self.params.Rm
         self.problem.parameters['kx'] = self.params.kx
-        self.problem.add_equation("dt(bz) - (1/Rm) * ( dz(dz(bz)) + dy(dy(bz)) - kx ** 2 * (bz) ) = 0")
         self.problem.add_equation("dt(by) - (1/Rm) * ( dz(dz(by)) + dy(dy(by)) - kx ** 2 * (by) ) = 0")
+        self.problem.add_equation("dt(bz) - (1/Rm) * ( dz(dz(bz)) + dy(dy(bz)) - kx ** 2 * (bz) ) = 0")
         self.solver = self.problem.build_solver(de.timesteppers.SBDF1)
-        self.bz = self.solver.state['bz']
         self.by = self.solver.state['by']
+        self.bz = self.solver.state['bz']
 
-        self.u = domain.new_field()
-        self.v = domain.new_field()
-        self.w = domain.new_field()
-        self.v_z = domain.new_field()
-        self.w_y = domain.new_field()
+        self.u = self.domain.new_field()
+        self.v = self.domain.new_field()
+        self.w = self.domain.new_field()
+        self.w_y = self.domain.new_field()
+        self.v_z = self.domain.new_field()
 
     def eval_f(self, u, t):
         """
@@ -78,23 +80,32 @@ class dynamogp_2d_dedalus(ptype):
         self.u['g'] = A * np.sin(self.z + np.sin(t)) + C * np.cos(self.y + np.cos(t))
         self.v['g'] = A * np.cos(self.z + np.sin(t))
         self.w['g'] = C * np.sin(self.y + np.cos(t))
-        self.v_z['g'] = self.v.differentiate(z=1)['g']
         self.w_y['g'] = self.w.differentiate(y=1)['g']
+        self.v_z['g'] = self.v.differentiate(z=1)['g']
 
-        by_y = u.values[0].differentiate(y=1)
-        by_z = u.values[0].differentiate(z=1)
-        bz_y = u.values[1].differentiate(y=1)
-        bz_z = u.values[1].differentiate(z=1)
+        self.by['g'] = u[..., 0]
+        self.bz['g'] = u[..., 1]
 
-        f.expl.values[0] = (-self.u * u.values[0] * 1j * self.params.kx - self.v * by_y - self.w * by_z +
-                            u.values[1] * self.v_z).evaluate()
-        f.expl.values[1] = (-self.u * u.values[1] * 1j * self.params.kx - self.v * bz_y - self.w * bz_z +
-                            u.values[0] * self.w_y).evaluate()
+        by_y = self.by.differentiate(y=1)
+        by_z = self.by.differentiate(z=1)
+        bz_y = self.bz.differentiate(y=1)
+        bz_z = self.bz.differentiate(z=1)
 
-        f.impl.values[0] = (1.0 / self.params.Rm * (u.values[0].differentiate(z=2) + u.values[0].differentiate(y=2) -
-                                                    self.params.kx ** 2 * u.values[0])).evaluate()
-        f.impl.values[1] = (1.0 / self.params.Rm * (u.values[1].differentiate(z=2) + u.values[1].differentiate(y=2) -
-                                                    self.params.kx ** 2 * u.values[1])).evaluate()
+        tmpfy = (-self.u * self.by * 1j * self.params.kx - self.v * by_y - self.w * by_z +
+                 self.bz * self.v_z).evaluate()
+        f.expl[..., 0] = tmpfy['g']
+        tmpfz = (-self.u * self.bz * 1j * self.params.kx - self.v * bz_y - self.w * bz_z +
+                 self.by * self.w_y).evaluate()
+        f.expl[..., 1] = tmpfz['g']
+
+        self.by['g'] = u[..., 0]
+        self.bz['g'] = u[..., 1]
+
+        pseudo_dt = 1E-05
+        self.solver.step(pseudo_dt)
+
+        f.impl[..., 0] = 1.0 / pseudo_dt * (self.by['g'] - u[..., 0])
+        f.impl[..., 1] = 1.0 / pseudo_dt * (self.bz['g'] - u[..., 1])
 
         return f
 
@@ -112,18 +123,14 @@ class dynamogp_2d_dedalus(ptype):
             dtype_u: solution as mesh
         """
 
-        self.bz['g'] = rhs.values[1]['g']
-        self.bz['c'] = rhs.values[1]['c']
-        self.by['g'] = rhs.values[0]['g']
-        self.by['c'] = rhs.values[0]['c']
+        self.by['g'] = rhs[..., 0]
+        self.bz['g'] = rhs[..., 1]
 
         self.solver.step(factor)
 
         me = self.dtype_u(self.init)
-        me.values[1]['g'] = self.bz['g']
-        me.values[1]['c'] = self.bz['c']
-        me.values[0]['g'] = self.by['g']
-        me.values[0]['c'] = self.by['c']
+        me[..., 0] = self.by['g']
+        me[..., 1] = self.bz['g']
 
         return me
 
@@ -138,8 +145,8 @@ class dynamogp_2d_dedalus(ptype):
             dtype_u: exact solution
         """
 
-        yvar_loc = self.y.shape[0]
         zvar_loc = self.z.shape[1]
+        yvar_loc = self.y.shape[0]
 
         np.random.seed(0)
 
@@ -147,22 +154,27 @@ class dynamogp_2d_dedalus(ptype):
 
         if self.params.initial == 'random':
 
-            me.values[0]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
-            me.values[1]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
+            me[..., 0] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
+            me[..., 1] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
 
         elif self.params.initial == 'low-res':
 
-            me.values[0]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
-            me.values[1]['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
+            tmp0 = self.domain.new_field()
+            tmp1 = self.domain.new_field()
+            tmp0['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
+            tmp1['g'] = np.random.uniform(low=-1e-5, high=1e-5, size=(yvar_loc, zvar_loc))
 
-            me.values[0].set_scales(4.0 / self.params.nvars[0])
+            tmp0.set_scales(4.0 / self.params.nvars[0])
             # Need to do that because otherwise Dedalus tries to be clever..
-            tmpx = me.values[0]['g']
-            me.values[1].set_scales(4.0 / self.params.nvars[1])
+            tmpx = tmp0['g']
+            tmp1.set_scales(4.0 / self.params.nvars[1])
             # Need to do that because otherwise Dedalus tries to be clever..
-            tmpy = me.values[1]['g']
+            tmpy = tmp1['g']
 
-            me.values[0].set_scales(1)
-            me.values[1].set_scales(1)
+            tmp0.set_scales(1)
+            tmp1.set_scales(1)
+
+            me[..., 0] = tmp0['g']
+            me[..., 1] = tmp1['g']
 
         return me
