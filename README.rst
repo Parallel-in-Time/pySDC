@@ -71,5 +71,5 @@ For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <h
 How to cite
 -----------
 
-If you use pySDC or parts of it in your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using [this paper](https://doi.org/10.1145/3310410).
+If you use pySDC or parts of it in your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using `this paper <https://doi.org/10.1145/3310410>`_.
 
