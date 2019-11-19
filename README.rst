@@ -71,5 +71,9 @@ For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <h
 How to cite
 -----------
 
-If you use pySDC or parts of it in your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using `this paper <https://doi.org/10.1145/3310410>`_.
+If you use pySDC or parts of it in your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using `this paper <https://doi.org/10.1145/3310410>`_:
+
+   Robert Speck, **Algorithm 997: pySDC—Prototyping Spectral Deferred Corrections**, 
+   ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019
+   `https://doi.org/10.1145/3310410 <https://doi.org/10.1145/3310410>`_
 
