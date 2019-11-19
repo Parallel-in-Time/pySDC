@@ -5,6 +5,7 @@ The `pySDC` project is a Python implementation of the spectral deferred correcti
 esp. the multilevel extension MLSDC and PFASST. It is intended for rapid prototyping and educational purposes.
 New ideas like e.g. sweepers or predictors can be tested and first toy problems can be easily implemented.
 
+
 Features
 --------
 
@@ -65,3 +66,10 @@ For many examples, `LaTeX` is used for the plots, i.e. a decent installation of 
 When using `fenics` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
 
 For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <http://www.parallel-in-time.org/pySDC>`_.
+
+
+How to cite
+-----------
+
+If you use pySDC or parts of it in your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using [this paper](https://doi.org/10.1145/3310410).
+
