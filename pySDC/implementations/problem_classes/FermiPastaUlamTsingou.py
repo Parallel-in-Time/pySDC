@@ -31,7 +31,8 @@ class fermi_pasta_ulam_tsingou(ptype):
         # invoke super init, passing nparts, dtype_u and dtype_f
         super(fermi_pasta_ulam_tsingou, self).__init__(problem_params['npart'], dtype_u, dtype_f, problem_params)
 
-        self.xvalues = np.array([i / (self.params.npart - 1) for i in range(self.params.npart)])
+        self.dx = (self.params.npart / 32) / (self.params.npart + 1)
+        self.xvalues = np.array([(i + 1) * self.dx for i in range(self.params.npart)])
 
     def eval_f(self, u, t):
         """
@@ -48,6 +49,10 @@ class fermi_pasta_ulam_tsingou(ptype):
         me.values[1:-1] = u.pos.values[:-2] - 2.0 * u.pos.values[1:-1] + u.pos.values[2:] + \
             self.params.alpha * ((u.pos.values[2:] - u.pos.values[1:-1]) ** 2 -
                                  (u.pos.values[1:-1] - u.pos.values[:-2]) ** 2)
+        me.values[0] = -2.0 * u.pos.values[0] + u.pos.values[1] + \
+            self.params.alpha * ((u.pos.values[1] - u.pos.values[0]) ** 2 - (u.pos.values[0]) ** 2)
+        me.values[-1] = u.pos.values[-2] - 2.0 * u.pos.values[-1] + \
+            self.params.alpha * ((u.pos.values[-1]) ** 2 - (u.pos.values[-1] - u.pos.values[-2]) ** 2)
 
         return me
 
@@ -81,6 +86,9 @@ class fermi_pasta_ulam_tsingou(ptype):
 
         ham = sum(0.5 * u.vel.values[:-1] ** 2 + 0.5 * (u.pos.values[1:] - u.pos.values[:-1]) ** 2 +
                   self.params.alpha / 3.0 * (u.pos.values[1:] - u.pos.values[:-1]) ** 3)
+        ham += 0.5 * u.vel.values[-1] ** 2 + 0.5 * (u.pos.values[-1]) ** 2 + \
+            self.params.alpha / 3.0 * (-u.pos.values[-1]) ** 3
+        ham += 0.5 * (u.pos.values[0]) ** 2 + self.params.alpha / 3.0 * (u.pos.values[0]) ** 3
         return ham
 
     def eval_mode_energy(self, u):
@@ -98,10 +106,13 @@ class fermi_pasta_ulam_tsingou(ptype):
 
         for k in self.params.energy_modes:
 
-            Qk = np.sqrt(2.0 / (self.params.npart - 1)) * np.dot(u.pos.values, np.sin(np.pi * k * self.xvalues))
-            Qkdot = np.sqrt(2.0 / (self.params.npart - 1)) * np.dot(u.vel.values, np.sin(np.pi * k * self.xvalues))
+            # Qk = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.pos.values, np.sin(np.pi * k * self.xvalues))
+            Qk = np.sqrt(2.0 * self.dx) * np.dot(u.pos.values, np.sin(np.pi * k * self.xvalues))
+            # Qkdot = np.sqrt(2.0 / (self.params.npart + 1)) * np.dot(u.vel.values, np.sin(np.pi * k * self.xvalues))
+            Qkdot = np.sqrt(2.0 * self.dx) * np.dot(u.vel.values, np.sin(np.pi * k * self.xvalues))
 
-            omegak2 = 4.0 * np.sin(k * np.pi / (2.0 * (self.params.npart - 1))) ** 2
+            # omegak2 = 4.0 * np.sin(k * np.pi / (2.0 * (self.params.npart + 1))) ** 2
+            omegak2 = 4.0 * np.sin(k * np.pi * self.dx / 2.0) ** 2
             energy[k] = 0.5 * (Qkdot ** 2 + omegak2 * Qk ** 2)
 
         return energy
