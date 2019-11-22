@@ -36,7 +36,7 @@ def setup_fput():
 
     # initialize problem parameters for the Penning trap
     problem_params = dict()
-    problem_params['npart'] = 32
+    problem_params['npart'] = 2048
     problem_params['alpha'] = 0.25
     problem_params['k'] = 1.0
     problem_params['energy_modes'] = [[1, 2, 3, 4]]
@@ -74,7 +74,7 @@ def run_simulation():
     t0 = 0.0
     # set this to 10000 to reproduce the picture in
     # http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations
-    Tend = 250.0
+    Tend = 1000.0
     num_procs = 1
 
     f = open('fput_out.txt', 'w')
