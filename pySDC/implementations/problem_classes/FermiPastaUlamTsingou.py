@@ -33,7 +33,7 @@ class fermi_pasta_ulam_tsingou(ptype):
 
         self.dx = (self.params.npart / 32) / (self.params.npart + 1)
         self.xvalues = np.array([(i + 1) * self.dx for i in range(self.params.npart)])
-        self.ones = np.ones(self.params.npart-2)
+        self.ones = np.ones(self.params.npart - 2)
 
     def eval_f(self, u, t):
         """

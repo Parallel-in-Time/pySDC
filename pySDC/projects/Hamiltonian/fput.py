@@ -31,7 +31,7 @@ def setup_fput():
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussLobatto
-    sweeper_params['num_nodes'] = [5]#, 3]
+    sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'
 
     # initialize problem parameters for the Penning trap
