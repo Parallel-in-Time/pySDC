@@ -134,5 +134,5 @@ class heat2d_periodic(ptype):
         xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
         xv, yv = np.meshgrid(xvalues, xvalues)
         me.values = np.sin(np.pi * self.params.freq * xv) * np.sin(np.pi * self.params.freq * yv) * \
-            np.exp(-t * self.params.nu * (np.pi * self.params.freq) ** 2)
+            np.exp(-t * self.params.nu * 2 * (np.pi * self.params.freq) ** 2)
         return me

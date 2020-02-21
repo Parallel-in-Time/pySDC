@@ -33,6 +33,7 @@ class fermi_pasta_ulam_tsingou(ptype):
 
         self.dx = (self.params.npart / 32) / (self.params.npart + 1)
         self.xvalues = np.array([(i + 1) * self.dx for i in range(self.params.npart)])
+        self.ones = np.ones(self.params.npart-2)
 
     def eval_f(self, u, t):
         """
@@ -46,13 +47,19 @@ class fermi_pasta_ulam_tsingou(ptype):
         """
         me = self.dtype_f(self.init, val=0.0)
 
-        me.values[1:-1] = u.pos.values[:-2] - 2.0 * u.pos.values[1:-1] + u.pos.values[2:] + \
-            self.params.alpha * ((u.pos.values[2:] - u.pos.values[1:-1]) ** 2 -
-                                 (u.pos.values[1:-1] - u.pos.values[:-2]) ** 2)
-        me.values[0] = -2.0 * u.pos.values[0] + u.pos.values[1] + \
-            self.params.alpha * ((u.pos.values[1] - u.pos.values[0]) ** 2 - (u.pos.values[0]) ** 2)
-        me.values[-1] = u.pos.values[-2] - 2.0 * u.pos.values[-1] + \
-            self.params.alpha * ((u.pos.values[-1]) ** 2 - (u.pos.values[-1] - u.pos.values[-2]) ** 2)
+        # me.values[1:-1] = u.pos.values[:-2] - 2.0 * u.pos.values[1:-1] + u.pos.values[2:] + \
+        #     self.params.alpha * ((u.pos.values[2:] - u.pos.values[1:-1]) ** 2 -
+        #                          (u.pos.values[1:-1] - u.pos.values[:-2]) ** 2)
+        # me.values[0] = -2.0 * u.pos.values[0] + u.pos.values[1] + \
+        #     self.params.alpha * ((u.pos.values[1] - u.pos.values[0]) ** 2 - (u.pos.values[0]) ** 2)
+        # me.values[-1] = u.pos.values[-2] - 2.0 * u.pos.values[-1] + \
+        #     self.params.alpha * ((u.pos.values[-1]) ** 2 - (u.pos.values[-1] - u.pos.values[-2]) ** 2)
+        me.values[1:-1] = (u.pos.values[:-2] - 2.0 * u.pos.values[1:-1] + u.pos.values[2:]) * \
+            (self.ones + self.params.alpha * (u.pos.values[2:] - u.pos.values[:-2]))
+        me.values[0] = (-2.0 * u.pos.values[0] + u.pos.values[1]) * \
+            (1 + self.params.alpha * (u.pos.values[1]))
+        me.values[-1] = (u.pos.values[-2] - 2.0 * u.pos.values[-1]) * \
+            (1 + self.params.alpha * (-u.pos.values[-2]))
 
         return me
 
