@@ -255,11 +255,11 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
 
 
 if __name__ == "__main__":
-    # run_simulations(type='diffusion', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
-    # run_simulations(type='diffusion', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)
+    run_simulations(type='diffusion', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
+    run_simulations(type='diffusion', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)
 
-    # run_simulations(type='advection', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
-    # run_simulations(type='advection', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)\
+    run_simulations(type='advection', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
+    run_simulations(type='advection', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)\
 
-    run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
-    run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)
+    # run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=False, nprocs=1)
+    # run_simulations(type='auzinger', ndim_list=[1], Tend=1.0, nsteps_list=[8], ml=True, nprocs=1)

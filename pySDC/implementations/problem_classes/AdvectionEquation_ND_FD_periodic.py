@@ -4,7 +4,7 @@ from scipy.sparse.linalg import gmres, spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 
 
 # noinspection PyUnusedLocal
@@ -17,7 +17,7 @@ class advectionNd_periodic(ptype):
         A: FD discretization of the ND grad operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -61,7 +61,8 @@ class advectionNd_periodic(ptype):
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectionNd_periodic, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
+        super(advectionNd_periodic, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
+                                                   dtype_u=dtype_u, dtype_f=dtype_f,
                                                    params=problem_params)
 
         # compute dx (equal in both dimensions) and get discretization matrix A
@@ -167,7 +168,7 @@ class advectionNd_periodic(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values.flatten()).reshape(self.params.nvars)
+        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -187,11 +188,11 @@ class advectionNd_periodic(ptype):
         me = self.dtype_u(self.init)
 
         if self.params.direct_solver:
-            me.values = spsolve(self.Id - factor * self.A, rhs.values.flatten())
+            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten())
         else:
-            me.values = gmres(self.Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(),
+            me[:] = gmres(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
                               tol=self.params.lintol, maxiter=self.params.liniter)[0]
-        me.values = me.values.reshape(self.params.nvars)
+        me[:] = me.reshape(self.params.nvars)
         return me
 
     def u_exact(self, t):
@@ -207,12 +208,12 @@ class advectionNd_periodic(ptype):
 
         me = self.dtype_u(self.init)
         if self.params.ndim == 1:
-            me.values = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
+            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t))
         elif self.params.ndim == 2:
-            me.values = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * \
+            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * \
                 np.sin(np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t))
         elif self.params.ndim == 3:
-            me.values = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * \
+            me[:] = np.sin(np.pi * self.params.freq[0] * (self.xv[0] - self.params.c * t)) * \
                 np.sin(np.pi * self.params.freq[1] * (self.xv[1] - self.params.c * t)) * \
                 np.sin(np.pi * self.params.freq[2] * (self.xv[2] - self.params.c * t))
         return me
