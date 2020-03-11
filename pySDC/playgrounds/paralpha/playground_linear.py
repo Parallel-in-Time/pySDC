@@ -9,7 +9,7 @@ from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic impo
 def run():
 
     nsteps = 8
-    L = 8
+    L = 4
     M = 3
     N = 16
 
@@ -60,6 +60,7 @@ def run():
     u0_M = np.kron(np.ones(M), uinit)
     u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
 
+    u = np.kron(np.ones(L * M), uinit)[:, None]
     u = u0.copy()
 
     maxiter = 10
