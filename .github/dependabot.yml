@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: fenics
+    versions:
+    - ">= 2019.1.a"
+    - "< 2019.2"
+  - dependency-name: sphinx
+    versions:
+    - "> 1.8.5"
