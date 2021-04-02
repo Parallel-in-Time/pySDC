@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator
+from scipy.special.orthogonal import roots_legendre
 
 from pySDC.core.Errors import CollocationError
 
@@ -110,17 +111,39 @@ class CollBase(object):
     @property
     def _gen_Qmatrix(self):
         """
-        Compute tleft-to-node integration matrix for later use in collocation formulation
+        Compute tleft-to-node integration matrix for later use in collocation
+        formulation
 
         Returns:
             numpy.ndarray: matrix containing the weights for tleft to node
         """
+        if self.nodes is None:
+            raise CollocationError(
+                f"Need nodes before computing weights, got {self.nodes}")
         M = self.num_nodes
         Q = np.zeros([M + 1, M + 1])
 
-        # for all nodes, get weights for the interval [tleft,node]
-        for m in np.arange(M):
-            Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+        # Generate Lagrange polynomials associated to the nodes
+        circ_one = np.zeros(self.num_nodes)
+        circ_one[0] = 1.0
+        tcks = []
+        for i in range(M):
+            tcks.append(BarycentricInterpolator(
+                self.nodes, np.roll(circ_one, i)))
+
+        # Generate evaluation points for quadrature
+        a, b = self.tleft, self.nodes[:, None]
+        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = tau[None, :], omega[None, :]
+        phi = (b-a)/2*tau + (b+a)/2
+
+        # Compute quadrature
+        intQ = np.array([
+            np.sum((b-a)/2 * omega * p(phi), axis=-1)
+            for p in tcks])
+
+        # Store into Q matrix
+        Q[1:, 1:] = intQ.T
 
         return Q
 
