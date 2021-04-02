@@ -19,7 +19,9 @@ before_install:
   - chmod +x $HOME/miniconda3.sh
   - "$HOME/miniconda3.sh -b;"
   - export PATH=/home/travis/miniconda3/bin:$PATH
-  - conda update --yes -n base -c defaults conda
+  - conda create -n test python=3.6
+  - conda activate test
+#   - conda update --yes -n base -c defaults conda
 
 install:
   - conda install --yes -c conda-forge --file requirements.txt
