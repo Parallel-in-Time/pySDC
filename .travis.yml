@@ -19,6 +19,7 @@ before_install:
   - chmod +x $HOME/miniconda3.sh
   - "$HOME/miniconda3.sh -b;"
   - export PATH=/home/travis/miniconda3/bin:$PATH
+  - conda init bash
   - conda create -n test -y python=3.6
   - conda activate test
 #   - conda update --yes -n base -c defaults conda
