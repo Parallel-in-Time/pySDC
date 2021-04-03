@@ -9,6 +9,7 @@ addons:
       - texlive-latex-recommended
       - texlive-fonts-recommended
       - texlive-latex-extra
+      - cm-super
       - dvipng
 
 before_install:
