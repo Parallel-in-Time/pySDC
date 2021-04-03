@@ -1,6 +1,13 @@
 .noseids
 /doc/latex
 /doc/html
+*out.txt
+*sdc.txt
+*detail.txt
+data/*
+step_*.png
+*.pkl
+*.swp
 
 # Created by https://www.gitignore.io
 
