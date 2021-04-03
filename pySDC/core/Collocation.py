@@ -88,7 +88,7 @@ class CollBase(object):
             numpy.ndarray: weights of the collocation formula given by the nodes
         """
         if self.nodes is None:
-            raise CollocationError("Need nodes before computing weights, got %s" % self.nodes)
+            raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
 
         circ_one = np.zeros(self.num_nodes)
         circ_one[0] = 1.0
@@ -96,9 +96,12 @@ class CollBase(object):
         for i in range(self.num_nodes):
             tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
 
-        weights = np.zeros(self.num_nodes)
-        for i in range(self.num_nodes):
-            weights[i] = quad(tcks[i], a, b, epsabs=1e-14)[0]
+        # Generate evaluation points for quadrature
+        tau, omega = roots_legendre(self.num_nodes)
+        phi = (b - a) / 2 * tau + (b + a) / 2
+
+        weights = [np.sum((b - a) / 2 * omega * p(phi)) for p in tcks]
+        weights = np.array(weights)
 
         return weights
 
