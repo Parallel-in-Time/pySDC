@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.complex_mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -14,7 +14,7 @@ class swfw_scalar(ptype):
     Attributes:
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -31,7 +31,7 @@ class swfw_scalar(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        init = (problem_params['lambda_s'].size, problem_params['lambda_f'].size)
+        init = ([problem_params['lambda_s'].size, problem_params['lambda_f'].size], None, np.dtype('complex128'))
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(swfw_scalar, self).__init__(init, dtype_u, dtype_f, problem_params)
@@ -53,7 +53,7 @@ class swfw_scalar(ptype):
         me = self.dtype_u(self.init)
         for i in range(self.params.lambda_s.size):
             for j in range(self.params.lambda_f.size):
-                me.values[i, j] = rhs.values[i, j] / (1.0 - factor * self.params.lambda_f[j])
+                me[i, j] = rhs[i, j] / (1.0 - factor * self.params.lambda_f[j])
 
         return me
 
@@ -72,7 +72,7 @@ class swfw_scalar(ptype):
         fexpl = self.dtype_u(self.init)
         for i in range(self.params.lambda_s.size):
             for j in range(self.params.lambda_f.size):
-                fexpl.values[i, j] = self.params.lambda_s[i] * u.values[i, j]
+                fexpl[i, j] = self.params.lambda_s[i] * u[i, j]
         return fexpl
 
     def __eval_fimpl(self, u, t):
@@ -90,7 +90,7 @@ class swfw_scalar(ptype):
         fimpl = self.dtype_u(self.init)
         for i in range(self.params.lambda_s.size):
             for j in range(self.params.lambda_f.size):
-                fimpl.values[i, j] = self.params.lambda_f[j] * u.values[i, j]
+                fimpl[i, j] = self.params.lambda_f[j] * u[i, j]
 
         return fimpl
 
@@ -125,5 +125,5 @@ class swfw_scalar(ptype):
         me = self.dtype_u(self.init)
         for i in range(self.params.lambda_s.size):
             for j in range(self.params.lambda_f.size):
-                me.values[i, j] = self.params.u0 * np.exp((self.params.lambda_f[j] + self.params.lambda_s[i]) * t)
+                me[i, j] = self.params.u0 * np.exp((self.params.lambda_f[j] + self.params.lambda_s[i]) * t)
         return me
