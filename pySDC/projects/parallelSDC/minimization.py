@@ -51,7 +51,7 @@ def main():
     cbar.set_label('spectral radius')
 
     fname = 'data/parallelSDC_minimizer_full.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
     plt.figure()
     xdim_part = xdim[int(0.25 * numsteps):int(0.75 * numsteps) + 1]
@@ -67,7 +67,7 @@ def main():
     cbar.set_label('spectral radius')
 
     fname = 'data/parallelSDC_minimizer_zoom.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
 
 if __name__ == "__main__":

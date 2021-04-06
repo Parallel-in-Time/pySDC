@@ -24,7 +24,7 @@ class monitor(hooks):
         super(monitor, self).pre_run(step, level_number)
         L = step.levels[0]
 
-        self.init_volume = L.prob.dx * sum(L.u[0].values)
+        self.init_volume = L.prob.dx * sum(L.u[0])
 
         print(self.init_volume)
 
@@ -44,11 +44,11 @@ class monitor(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        computed_volume = L.prob.dx * sum(L.uend.values)
+        computed_volume = L.prob.dx * sum(L.uend)
 
         uex = L.prob.u_exact(L.time + L.dt)
 
-        exact_volume = L.prob.dx * sum(uex.values)
+        exact_volume = L.prob.dx * sum(uex)
 
         print(exact_volume, computed_volume, abs(exact_volume - computed_volume), abs(L.uend - uex))
 

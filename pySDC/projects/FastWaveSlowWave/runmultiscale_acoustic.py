@@ -80,7 +80,7 @@ def compute_and_plot_solutions():
     dirk_m = dirk((P.A + P.Dx).astype('complex'), step_params['maxiter'])
     rkimex = rk_imex(P.A.astype('complex'), P.Dx.astype('complex'), step_params['maxiter'])
 
-    y0_tp = np.concatenate((uinit.values[0, :], uinit.values[1, :]))
+    y0_tp = np.concatenate((uinit[0, :], uinit[1, :]))
     y0_bdf = y0_tp
     y0_dirk = y0_tp.astype('complex')
     y0_imex = y0_tp.astype('complex')
@@ -127,7 +127,7 @@ def compute_and_plot_solutions():
     x_0 = 0.75
     x_1 = 0.25
 
-    print('Maximum pressure in SDC: %5.3e' % np.linalg.norm(uend.values[1, :], np.inf))
+    print('Maximum pressure in SDC: %5.3e' % np.linalg.norm(uend[1, :], np.inf))
     print('Maximum pressure in DIRK: %5.3e' % np.linalg.norm(pnew_dirk, np.inf))
     print('Maximum pressure in RK-IMEX: %5.3e' % np.linalg.norm(pnew_imex, np.inf))
 
@@ -138,7 +138,7 @@ def compute_and_plot_solutions():
     if np.linalg.norm(pnew_imex, np.inf) <= 2:
         plt.plot(P.mesh, pnew_imex, '+-', color='r', label='IMEX(' + str(rkimex.order) + ')', markevery=(1, 75),
                  mew=1.0)
-    plt.plot(P.mesh, uend.values[1, :], 'o-', color='b', label='SDC(' + str(step_params['maxiter']) + ')',
+    plt.plot(P.mesh, uend[1, :], 'o-', color='b', label='SDC(' + str(step_params['maxiter']) + ')',
              markevery=(25, 75))
     plt.plot(P.mesh, pnew_dirk, '-', color='g', label='DIRK(' + str(dirk_m.order) + ')')
 

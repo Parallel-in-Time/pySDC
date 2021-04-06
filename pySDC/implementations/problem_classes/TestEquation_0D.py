@@ -4,7 +4,7 @@ from scipy.sparse.linalg import splu
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 
 
 # noinspection PyUnusedLocal
@@ -16,7 +16,7 @@ class testequation0d(ptype):
         A: digonal matrix containing the parameters
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -39,8 +39,8 @@ class testequation0d(ptype):
         assert problem_params['nvars'] > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(testequation0d, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                             params=problem_params)
+        super(testequation0d, self).__init__(init=(problem_params['nvars'], None, np.dtype('complex128')),
+                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         self.A = self.__get_A(self.params.lambdas)
 
@@ -72,7 +72,7 @@ class testequation0d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values)
+        f[:] = self.A.dot(u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -91,7 +91,7 @@ class testequation0d(ptype):
 
         me = self.dtype_u(self.init)
         L = splu(sp.eye(self.params.nvars, format='csc') - factor * self.A)
-        me.values = L.solve(rhs.values)
+        me[:] = L.solve(rhs)
         return me
 
     def u_exact(self, t):
@@ -106,5 +106,5 @@ class testequation0d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me.values = self.params.u0 * np.exp(t * np.array(self.params.lambdas))
+        me[:] = self.params.u0 * np.exp(t * np.array(self.params.lambdas))
         return me

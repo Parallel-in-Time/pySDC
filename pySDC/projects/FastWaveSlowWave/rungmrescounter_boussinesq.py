@@ -91,7 +91,7 @@ def main(cwd=''):
     method_split = 'MIS4_4'
     #   method_split = 'RK3'
     splitp = SplitExplicit(P, method_split, problem_params)
-    u0 = uinit.values.flatten()
+    u0 = uinit.flatten()
     usplit = np.copy(u0)
     print(np.linalg.norm(usplit))
     for i in range(0, 2 * Nsteps):
@@ -132,7 +132,7 @@ def main(cwd=''):
     uref = unflatten(uref, 4, P.N[0], P.N[1])
 
     np.save(cwd + 'data/xaxis', P.xx)
-    np.save(cwd + 'data/sdc', uend.values)
+    np.save(cwd + 'data/sdc', uend)
     np.save(cwd + 'data/dirk', udirk)
     np.save(cwd + 'data/rkimex', uimex)
     np.save(cwd + 'data/split', usplit)
@@ -141,7 +141,7 @@ def main(cwd=''):
     print("diff split  ", np.linalg.norm(uref - usplit))
     print("diff dirk   ", np.linalg.norm(uref - udirk))
     print("diff rkimex ", np.linalg.norm(uref - uimex))
-    print("diff sdc    ", np.linalg.norm(uref - uend.values))
+    print("diff sdc    ", np.linalg.norm(uref - uend))
 
     print(" #### Logging report for Split    #### ")
     print("Total number of matrix multiplications: %5i" % splitp.logger.nsmall)

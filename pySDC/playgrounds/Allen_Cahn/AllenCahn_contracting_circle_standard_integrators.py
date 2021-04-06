@@ -179,7 +179,7 @@ def plot_radius(xcoords, exact_radius, radii):
     ax.grid()
     ax.legend(loc=3)
     fname = 'data/AC_contracting_circle_standard_integrators'
-    plt.savefig('{}.pdf'.format(fname), rasterized=True, bbox_inches='tight')
+    plt.savefig('{}.pdf'.format(fname),  bbox_inches='tight')
 
     # plt.show()
 

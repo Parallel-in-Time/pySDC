@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -18,7 +18,7 @@ class allencahn2d_imex(ptype):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -49,19 +49,19 @@ class allencahn2d_imex(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn2d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                               params=problem_params)
+        super(allencahn2d_imex, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
+                                               dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         self.dx = self.params.L / self.params.nvars[0]  # could be useful for hooks, too.
         self.xvalues = np.array([i * self.dx - self.params.L / 2.0 for i in range(self.params.nvars[0])])
 
-        kx = np.zeros(self.init[0])
-        ky = np.zeros(self.init[1] // 2 + 1)
+        kx = np.zeros(self.init[0][0])
+        ky = np.zeros(self.init[0][1] // 2 + 1)
 
-        kx[:int(self.init[0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(self.init[0] / 2) + 1)
-        kx[int(self.init[0] / 2) + 1:] = 2 * np.pi / self.params.L * \
-            np.arange(int(self.init[0] / 2) + 1 - self.init[0], 0)
-        ky[:] = 2 * np.pi / self.params.L * np.arange(0, self.init[1] // 2 + 1)
+        kx[:int(self.init[0][0] / 2) + 1] = 2 * np.pi / self.params.L * np.arange(0, int(self.init[0][0] / 2) + 1)
+        kx[int(self.init[0][0] / 2) + 1:] = 2 * np.pi / self.params.L * \
+            np.arange(int(self.init[0][0] / 2) + 1 - self.init[0][0], 0)
+        ky[:] = 2 * np.pi / self.params.L * np.arange(0, self.init[0][1] // 2 + 1)
 
         xv, yv = np.meshgrid(kx, ky, indexing='ij')
         self.lap = -xv ** 2 - yv ** 2
@@ -79,12 +79,11 @@ class allencahn2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        tmp = self.lap * np.fft.rfft2(u.values)
-        f.impl.values[:] = np.fft.irfft2(tmp)
+        v = u.flatten()
+        tmp = self.lap * np.fft.rfft2(u)
+        f.impl[:] = np.fft.irfft2(tmp)
         if self.params.eps > 0:
-            f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
-            f.expl.values = f.expl.values.reshape(self.params.nvars)
+            f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -103,8 +102,8 @@ class allencahn2d_imex(ptype):
 
         me = self.dtype_u(self.init)
 
-        tmp = np.fft.rfft2(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = np.fft.irfft2(tmp)
+        tmp = np.fft.rfft2(rhs) / (1.0 - factor * self.lap)
+        me[:] = np.fft.irfft2(tmp)
 
         return me
 
@@ -123,13 +122,12 @@ class allencahn2d_imex(ptype):
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             xv, yv = np.meshgrid(self.xvalues, self.xvalues, indexing='ij')
-            me.values[:, :] = np.tanh((self.params.radius - np.sqrt(xv ** 2 + yv ** 2)) /
-                                      (np.sqrt(2) * self.params.eps))
+            me[:, :] = np.tanh((self.params.radius - np.sqrt(xv ** 2 + yv ** 2)) / (np.sqrt(2) * self.params.eps))
         elif self.params.init_type == 'checkerboard':
             xv, yv = np.meshgrid(self.xvalues, self.xvalues)
-            me.values[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
+            me[:, :] = np.sin(2.0 * np.pi * xv) * np.sin(2.0 * np.pi * yv)
         elif self.params.init_type == 'random':
-            me.values[:, :] = np.random.uniform(-1, 1, self.init)
+            me[:, :] = np.random.uniform(-1, 1, self.init)
         else:
             raise NotImplementedError('type of initial value not implemented, got %s' % self.params.init_type)
 
@@ -149,7 +147,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -175,13 +173,12 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         """
 
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        tmp = self.lap * np.fft.rfft2(u.values)
-        f.impl.values[:] = np.fft.irfft2(tmp)
+        v = u.flatten()
+        tmp = self.lap * np.fft.rfft2(u)
+        f.impl[:] = np.fft.irfft2(tmp)
         if self.params.eps > 0:
-            f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) + \
-                2.0 / self.params.eps ** 2 * v
-            f.expl.values = f.expl.values.reshape(self.params.nvars)
+            f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu) +
+                         2.0 / self.params.eps ** 2 * v).reshape(self.params.nvars)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -200,7 +197,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
 
         me = self.dtype_u(self.init)
 
-        tmp = np.fft.rfft2(rhs.values) / (1.0 - factor * self.lap)
-        me.values[:] = np.fft.irfft2(tmp)
+        tmp = np.fft.rfft2(rhs) / (1.0 - factor * self.lap)
+        me[:] = np.fft.irfft2(tmp)
 
         return me

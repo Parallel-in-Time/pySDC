@@ -56,7 +56,7 @@ def plot_data(path='./data', name='', output='.'):
 
         grid.cbar_axes[0].colorbar(im)
 
-        plt.savefig(f'{output}/{name}_{index}.png', rasterized=True, bbox_inches='tight')
+        plt.savefig(f'{output}/{name}_{index}.png',  bbox_inches='tight')
         plt.close()
 
 

@@ -77,7 +77,7 @@ def main():
     plt.xlabel('Time')
     plt.ylabel('Energy')
 
-    plt.savefig('penningtrap_energy.png', rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig('penningtrap_energy.png',  transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":

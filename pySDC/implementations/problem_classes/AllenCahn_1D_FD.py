@@ -5,7 +5,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh, parallel_comp2_mesh
 
 
 class allencahn_front_fullyimplicit(ptype):
@@ -18,7 +18,7 @@ class allencahn_front_fullyimplicit(ptype):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -43,14 +43,15 @@ class allencahn_front_fullyimplicit(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_front_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(allencahn_front_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                                            dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
         self.xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
 
         self.A = self.__get_A(self.params.nvars, self.dx)
-        self.uext = self.dtype_u(self.init + 2, val=0.0)
+        self.uext = self.dtype_u((self.init[0] + 2, self.init[1], self.init[2]), val=0.0)
 
         self.newton_itercount = 0
         self.lin_itercount = 0
@@ -90,15 +91,15 @@ class allencahn_front_fullyimplicit(ptype):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values
+        u = self.dtype_u(u0)
         eps2 = self.params.eps ** 2
         dw = self.params.dw
 
         Id = sp.eye(self.params.nvars)
 
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
@@ -107,9 +108,9 @@ class allencahn_front_fullyimplicit(ptype):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            self.uext.values[1:-1] = u[:]
-            g = u - rhs.values \
-                - factor * (self.A.dot(self.uext.values)[1:-1] - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
+            self.uext[1:-1] = u[:]
+            g = u - rhs \
+                - factor * (self.A.dot(self.uext)[1:-1] - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
                             6.0 * dw * u * (1.0 - u))
 
             # if g is close to 0, then we are done
@@ -141,7 +142,7 @@ class allencahn_front_fullyimplicit(ptype):
         self.newton_itercount += n
 
         me = self.dtype_u(self.init)
-        me.values = u
+        me[:] = u[:]
 
         return me
 
@@ -158,15 +159,15 @@ class allencahn_front_fullyimplicit(ptype):
         """
         # set up boundary values to embed inner points
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
 
-        self.uext.values[1:-1] = u.values[:]
+        self.uext[1:-1] = u[:]
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(self.uext.values)[1:-1] - \
-            2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
-            6.0 * self.params.dw * u.values * (1.0 - u.values)
+        f[:] = self.A.dot(self.uext)[1:-1] - \
+            2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
+            6.0 * self.params.dw * u * (1.0 - u)
         return f
 
     def u_exact(self, t):
@@ -182,7 +183,7 @@ class allencahn_front_fullyimplicit(ptype):
 
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
         me = self.dtype_u(self.init, val=0.0)
-        me.values = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.params.eps)))
+        me[:] = 0.5 * (1 + np.tanh((self.xvalues - v * t) / (np.sqrt(2) * self.params.eps)))
         return me
 
 
@@ -196,7 +197,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -236,15 +237,15 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         """
         # set up boundary values to embed inner points
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
 
-        self.uext.values[1:-1] = u.values[:]
+        self.uext[1:-1] = u[:]
 
         f = self.dtype_f(self.init)
-        f.impl.values = self.A.dot(self.uext.values)[1:-1]
-        f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
-            6.0 * self.params.dw * u.values * (1.0 - u.values)
+        f.impl[:] = self.A.dot(self.uext)[1:-1]
+        f.expl[:] = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
+            6.0 * self.params.dw * u * (1.0 - u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -262,11 +263,10 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         """
 
         me = self.dtype_u(self.init)
-        self.uext.values[0] = 0.0
-        self.uext.values[-1] = 0.0
-        self.uext.values[1:-1] = rhs.values[:]
-        me.values = spsolve(sp.eye(self.params.nvars + 2, format='csc') - factor * self.A, self.uext.values)[1:-1]
-        # me.values = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A[1:-1, 1:-1], rhs.values)
+        self.uext[0] = 0.0
+        self.uext[-1] = 0.0
+        self.uext[1:-1] = rhs[:]
+        me[:] = spsolve(sp.eye(self.params.nvars + 2, format='csc') - factor * self.A, self.uext)[1:-1]
         return me
 
 
@@ -291,17 +291,15 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values
-        z = self.dtype_u(self.init, val=0.0).values
-        eps2 = self.params.eps ** 2
+        u = self.dtype_u(u0)
         dw = self.params.dw
         a2 = np.tanh(self.dx / (np.sqrt(2) * self.params.eps)) ** 2
 
         Id = sp.eye(self.params.nvars)
 
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
 
         A = self.A[1:-1, 1:-1]
         # start newton iteration
@@ -310,9 +308,9 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            self.uext.values[1:-1] = u[:]
+            self.uext[1:-1] = u[:]
             gprim = 1.0 / self.dx ** 2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) * (2.0 * u - 1.0)
-            g = u - rhs.values - factor * (self.A.dot(self.uext.values)[1:-1] - 1.0 * gprim - 6.0 * dw * u * (1.0 - u))
+            g = u - rhs - factor * (self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * dw * u * (1.0 - u))
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -346,7 +344,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         self.newton_itercount += n
 
         me = self.dtype_u(self.init)
-        me.values = u
+        me[:] = u[:]
 
         return me
 
@@ -363,16 +361,16 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         """
         # set up boundary values to embed inner points
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
-        self.uext.values[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
-        self.uext.values[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[0] = 0.5 * (1 + np.tanh((self.params.interval[0] - v * t) / (np.sqrt(2) * self.params.eps)))
+        self.uext[-1] = 0.5 * (1 + np.tanh((self.params.interval[1] - v * t) / (np.sqrt(2) * self.params.eps)))
 
-        self.uext.values[1:-1] = u.values[:]
+        self.uext[1:-1] = u[:]
 
         a2 = np.tanh(self.dx / (np.sqrt(2) * self.params.eps)) ** 2
-        gprim = 1.0 / self.dx ** 2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u.values - 1.0) ** 2) - 1) \
-            * (2.0 * u.values - 1.0)
+        gprim = 1.0 / self.dx ** 2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1) \
+            * (2.0 * u - 1.0)
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(self.uext.values)[1:-1] - 1.0 * gprim - 6.0 * self.params.dw * u.values * (1.0 - u.values)
+        f[:] = self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * self.params.dw * u * (1.0 - u)
         return f
 
 
@@ -386,7 +384,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -411,8 +409,8 @@ class allencahn_periodic_fullyimplicit(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_periodic_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f,
-                                                               problem_params)
+        super(allencahn_periodic_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                                               dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / self.params.nvars
@@ -464,7 +462,7 @@ class allencahn_periodic_fullyimplicit(ptype):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values
+        u = self.dtype_u(u0)
         eps2 = self.params.eps ** 2
         dw = self.params.dw
 
@@ -476,8 +474,8 @@ class allencahn_periodic_fullyimplicit(ptype):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            g = u - rhs.values - factor * (self.A.dot(u) - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
-                                           6.0 * dw * u * (1.0 - u))
+            g = u - rhs - factor * (self.A.dot(u) - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
+                                    6.0 * dw * u * (1.0 - u))
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -508,7 +506,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         self.newton_itercount += n
 
         me = self.dtype_u(self.init)
-        me.values = u
+        me[:] = u[:]
 
         return me
 
@@ -524,9 +522,8 @@ class allencahn_periodic_fullyimplicit(ptype):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values) - \
-            2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2 * u.values) - \
-            6.0 * self.params.dw * u.values * (1.0 - u.values)
+        f[:] = self.A.dot(u) - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
+            6.0 * self.params.dw * u * (1.0 - u)
         return f
 
     def u_exact(self, t):
@@ -542,8 +539,7 @@ class allencahn_periodic_fullyimplicit(ptype):
 
         v = 3.0 * np.sqrt(2) * self.params.eps * self.params.dw
         me = self.dtype_u(self.init, val=0.0)
-        me.values = 0.5 * (1 + np.tanh((self.params.radius - abs(self.xvalues) - v * t) /
-                                       (np.sqrt(2) * self.params.eps)))
+        me[:] = 0.5 * (1 + np.tanh((self.params.radius - abs(self.xvalues) - v * t) / (np.sqrt(2) * self.params.eps)))
         return me
 
 
@@ -553,7 +549,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -597,7 +593,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         me = self.dtype_u(u0)
-        me.values = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs.values)
+        me[:] = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs)
         return me
 
     def eval_f(self, u, t):
@@ -612,9 +608,9 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        f.impl.values = self.A.dot(u.values)
-        f.expl.values = -2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-            6.0 * self.params.dw * u.values * (1.0 - u.values) + 0.0 / self.params.eps ** 2 * u.values
+        f.impl[:] = self.A.dot(u)
+        f.expl[:] = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
+            6.0 * self.params.dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u
         return f
 
 
@@ -624,7 +620,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_comp2_mesh):
         """
         Initialization routine
 
@@ -668,7 +664,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         me = self.dtype_u(u0)
-        me.values = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs.values)
+        me[:] = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs)
         return me
 
     def eval_f(self, u, t):
@@ -683,9 +679,9 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        f.comp1.values = self.A.dot(u.values)
-        f.comp2.values = -2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-            6.0 * self.params.dw * u.values * (1.0 - u.values) + 0.0 / self.params.eps ** 2 * u.values
+        f.comp1[:] = self.A.dot(u)
+        f.comp2[:] = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
+            6.0 * self.params.dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u
         return f
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -702,7 +698,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
             dtype_u: solution as mesh
         """
 
-        u = self.dtype_u(u0).values
+        u = self.dtype_u(u0)
         eps2 = self.params.eps ** 2
         dw = self.params.dw
 
@@ -714,8 +710,8 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            g = u - rhs.values - factor * (- 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
-                                           6.0 * dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u)
+            g = u - rhs - factor * (- 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
+                                    6.0 * dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u)
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -746,6 +742,6 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         self.newton_itercount += n
 
         me = self.dtype_u(self.init)
-        me.values = u
+        me[:] = u[:]
 
         return me

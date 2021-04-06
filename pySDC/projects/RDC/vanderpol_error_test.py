@@ -146,7 +146,7 @@ def plot_RDC_results(cwd=''):
 
     # save plot as PNG, beautify
     fname = 'data/RDC_errors_vdp.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plot was not created'
 

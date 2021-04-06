@@ -3,7 +3,7 @@ from scipy.sparse.linalg import gmres
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMesh
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DMatrix
 from pySDC.implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix import getBoussinesq2DUpwindMatrix
@@ -17,7 +17,7 @@ class boussinesq_2d_imex(ptype):
     Example implementing the 2D Boussinesq equation for different boundary conditions
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -36,7 +36,8 @@ class boussinesq_2d_imex(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(boussinesq_2d_imex, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(boussinesq_2d_imex, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                                 dtype_u, dtype_f, problem_params)
 
         self.N = [self.params.nvars[1], self.params.nvars[2]]
 
@@ -68,16 +69,16 @@ class boussinesq_2d_imex(ptype):
             dtype_u: solution as mesh
         """
 
-        b = rhs.values.flatten()
+        b = rhs.flatten()
         cb = Callback()
 
-        sol, info = gmres(self.Id - factor * self.M, b, x0=u0.values.flatten(), tol=self.params.gmres_tol_limit,
+        sol, info = gmres(self.Id - factor * self.M, b, x0=u0.flatten(), tol=self.params.gmres_tol_limit,
                           restart=self.params.gmres_restart, maxiter=self.params.gmres_maxiter, callback=cb)
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call
         if factor != 0.0:
             self.gmres_logger.add(cb.getcounter())
         me = self.dtype_u(self.init)
-        me.values = unflatten(sol, 4, self.N[0], self.N[1])
+        me[:] = unflatten(sol, 4, self.N[0], self.N[1])
 
         return me
 
@@ -95,9 +96,9 @@ class boussinesq_2d_imex(ptype):
 
         # Evaluate right hand side
         fexpl = self.dtype_u(self.init)
-        temp = u.values.flatten()
+        temp = u.flatten()
         temp = self.D_upwind.dot(temp)
-        fexpl.values = unflatten(temp, 4, self.N[0], self.N[1])
+        fexpl[:] = unflatten(temp, 4, self.N[0], self.N[1])
 
         return fexpl
 
@@ -113,10 +114,10 @@ class boussinesq_2d_imex(ptype):
             implicit part of RHS
         """
 
-        temp = u.values.flatten()
+        temp = u.flatten()
         temp = self.M.dot(temp)
         fimpl = self.dtype_u(self.init)
-        fimpl.values = unflatten(temp, 4, self.N[0], self.N[1])
+        fimpl[:] = unflatten(temp, 4, self.N[0], self.N[1])
 
         return fimpl
 
@@ -154,11 +155,11 @@ class boussinesq_2d_imex(ptype):
         x_c = -50.0
 
         me = self.dtype_u(self.init)
-        me.values[0, :, :] = 0.0 * self.xx
-        me.values[1, :, :] = 0.0 * self.xx
-        # me.values[2,:,:] = 0.0*self.xx
-        # me.values[3,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
-        # me.values[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.05**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.2**2)
-        me.values[2, :, :] = dtheta * np.sin(np.pi * self.zz / H) / (1.0 + np.square(self.xx - x_c) / (a * a))
-        me.values[3, :, :] = 0.0 * self.xx
+        me[0, :, :] = 0.0 * self.xx
+        me[1, :, :] = 0.0 * self.xx
+        # me[2,:,:] = 0.0*self.xx
+        # me[3,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.15**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.15**2)
+        # me[2,:,:] = np.exp(-0.5*(self.xx-0.0)**2.0/0.05**2.0)*np.exp(-0.5*(self.zz-0.5)**2/0.2**2)
+        me[2, :, :] = dtheta * np.sin(np.pi * self.zz / H) / (1.0 + np.square(self.xx - x_c) / (a * a))
+        me[3, :, :] = 0.0 * self.xx
         return me

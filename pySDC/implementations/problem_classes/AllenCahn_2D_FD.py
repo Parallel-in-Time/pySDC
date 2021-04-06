@@ -5,7 +5,7 @@ from scipy.sparse.linalg import cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh, rhs_comp2_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh, parallel_comp2_mesh
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -21,7 +21,7 @@ class allencahn_fullyimplicit(ptype):
         dx: distance between two spatial nodes (same for both directions)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -47,7 +47,8 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_fullyimplicit, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                                      dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
@@ -100,8 +101,8 @@ class allencahn_fullyimplicit(ptype):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values.flatten()
-        z = self.dtype_u(self.init, val=0.0).values.flatten()
+        u = self.dtype_u(u0).flatten()
+        z = self.dtype_u(self.init, val=0.0).flatten()
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
@@ -113,7 +114,7 @@ class allencahn_fullyimplicit(ptype):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.values.flatten()
+            g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -135,7 +136,7 @@ class allencahn_fullyimplicit(ptype):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         me = self.dtype_u(self.init)
-        me.values = u.reshape(self.params.nvars)
+        me[:] = u.reshape(self.params.nvars)
 
         self.newton_ncalls += 1
         self.newton_itercount += n
@@ -154,9 +155,8 @@ class allencahn_fullyimplicit(ptype):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        f.values = self.A.dot(v) + 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
-        f.values = f.values.reshape(self.params.nvars)
+        v = u.flatten()
+        f[:] = (self.A.dot(v) + 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
 
         return f
 
@@ -176,7 +176,7 @@ class allencahn_fullyimplicit(ptype):
         for i in range(self.params.nvars[0]):
             for j in range(self.params.nvars[1]):
                 r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
-                me.values[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+                me[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
 
         return me
 
@@ -187,7 +187,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -212,11 +212,9 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        f.impl.values = self.A.dot(v)
-        f.expl.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
-        f.impl.values = f.impl.values.reshape(self.params.nvars)
-        f.expl.values = f.expl.values.reshape(self.params.nvars)
+        v = u.flatten()
+        f.impl[:] = self.A.dot(v).reshape(self.params.nvars)
+        f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
 
         return f
 
@@ -245,9 +243,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
-        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
-                       maxiter=self.params.lin_maxiter, callback=callback)[0]
-        me.values = me.values.reshape(self.params.nvars)
+        me[:] = cg(Id - factor * self.A, rhs.flatten(), x0=u0.flatten(), tol=self.params.lin_tol,
+                   maxiter=self.params.lin_maxiter, callback=callback)[0].reshape(self.params.nvars)
 
         self.lin_ncalls += 1
         self.lin_itercount += context.num_iter
@@ -261,7 +258,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -286,11 +283,9 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        f.impl.values = self.A.dot(v) - 1.0 / self.params.eps ** 2 * v ** (self.params.nu + 1)
-        f.expl.values = 1.0 / self.params.eps ** 2 * v
-        f.impl.values = f.impl.values.reshape(self.params.nvars)
-        f.expl.values = f.expl.values.reshape(self.params.nvars)
+        v = u.flatten()
+        f.impl[:] = (self.A.dot(v) - 1.0 / self.params.eps ** 2 * v ** (self.params.nu + 1)).reshape(self.params.nvars)
+        f.expl[:] = (1.0 / self.params.eps ** 2 * v).reshape(self.params.nvars)
 
         return f
 
@@ -308,8 +303,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values.flatten()
-        z = self.dtype_u(self.init, val=0.0).values.flatten()
+        u = self.dtype_u(u0).flatten()
+        z = self.dtype_u(self.init, val=0.0).flatten()
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
@@ -321,7 +316,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.values.flatten()
+            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -343,7 +338,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         me = self.dtype_u(self.init)
-        me.values = u.reshape(self.params.nvars)
+        me[:] = u.reshape(self.params.nvars)
 
         self.newton_ncalls += 1
         self.newton_itercount += n
@@ -357,7 +352,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_comp2_mesh):
         """
         Initialization routine
 
@@ -382,11 +377,9 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        f.comp1.values = self.A.dot(v)
-        f.comp2.values = 1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)
-        f.comp1.values = f.comp1.values.reshape(self.params.nvars)
-        f.comp2.values = f.comp2.values.reshape(self.params.nvars)
+        v = u.flatten()
+        f.comp1[:] = self.A.dot(v).reshape(self.params.nvars)
+        f.comp2[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
 
         return f
 
@@ -415,9 +408,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
         Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
 
-        me.values = cg(Id - factor * self.A, rhs.values.flatten(), x0=u0.values.flatten(), tol=self.params.lin_tol,
-                       maxiter=self.params.lin_maxiter, callback=callback)[0]
-        me.values = me.values.reshape(self.params.nvars)
+        me[:] = cg(Id - factor * self.A, rhs.flatten(), x0=u0.flatten(), tol=self.params.lin_tol,
+                   maxiter=self.params.lin_maxiter, callback=callback)[0].reshape(self.params.nvars)
 
         self.lin_ncalls += 1
         self.lin_itercount += context.num_iter
@@ -438,8 +430,8 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values.flatten()
-        z = self.dtype_u(self.init, val=0.0).values.flatten()
+        u = self.dtype_u(u0).flatten()
+        z = self.dtype_u(self.init, val=0.0).flatten()
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
@@ -451,7 +443,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - factor * (1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.values.flatten()
+            g = u - factor * (1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -473,7 +465,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         me = self.dtype_u(self.init)
-        me.values = u.reshape(self.params.nvars)
+        me[:] = u.reshape(self.params.nvars)
 
         self.newton_ncalls += 1
         self.newton_itercount += n
@@ -487,7 +479,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_comp2_mesh):
         """
         Initialization routine
 
@@ -512,11 +504,9 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.values.flatten()
-        f.comp1.values = self.A.dot(v) - 1.0 / self.params.eps ** 2 * v ** (self.params.nu + 1)
-        f.comp2.values = 1.0 / self.params.eps ** 2 * v
-        f.comp1.values = f.comp1.values.reshape(self.params.nvars)
-        f.comp2.values = f.comp2.values.reshape(self.params.nvars)
+        v = u.flatten()
+        f.comp1[:] = (self.A.dot(v) - 1.0 / self.params.eps ** 2 * v ** (self.params.nu + 1)).reshape(self.params.nvars)
+        f.comp2[:] = (1.0 / self.params.eps ** 2 * v).reshape(self.params.nvars)
 
         return f
 
@@ -534,8 +524,8 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             dtype_u: solution u
         """
 
-        u = self.dtype_u(u0).values.flatten()
-        z = self.dtype_u(self.init, val=0.0).values.flatten()
+        u = self.dtype_u(u0).flatten()
+        z = self.dtype_u(self.init, val=0.0).flatten()
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
@@ -547,7 +537,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.values.flatten()
+            g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -569,7 +559,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         #     raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         me = self.dtype_u(self.init)
-        me.values = u.reshape(self.params.nvars)
+        me[:] = u.reshape(self.params.nvars)
 
         self.newton_ncalls += 1
         self.newton_itercount += n
@@ -592,6 +582,5 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
         me = self.dtype_u(self.init)
 
-        me.values = 1.0 / (1.0 - factor * 1.0 / self.params.eps ** 2) * rhs.values
-        me.values = me.values.reshape(self.params.nvars)
+        me[:] = (1.0 / (1.0 - factor * 1.0 / self.params.eps ** 2) * rhs).reshape(self.params.nvars)
         return me

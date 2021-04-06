@@ -39,7 +39,7 @@ def plot_data(name=''):
         plt.colorbar()
         plt.title(f"Field - Time: {obj['time']:6.4f}")
 
-        plt.savefig(f'data/{name}_field_{index}.png', rasterized=True, bbox_inches='tight')
+        plt.savefig(f'data/{name}_field_{index}.png',  bbox_inches='tight')
         plt.close()
 
         plt.figure()
@@ -49,7 +49,7 @@ def plot_data(name=''):
         plt.colorbar()
         plt.title(f"Temperature - Time: {obj['time']:6.4f}")
 
-        plt.savefig(f'data/{name}_temperature_{index}.png', rasterized=True, bbox_inches='tight')
+        plt.savefig(f'data/{name}_temperature_{index}.png',  bbox_inches='tight')
         plt.close()
 
 
