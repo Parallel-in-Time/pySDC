@@ -5,6 +5,7 @@ from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 class mesh_to_mesh(space_transfer):
@@ -44,6 +45,10 @@ class mesh_to_mesh(space_transfer):
             G = cmesh(F)
         elif isinstance(F, rhs_imex_mesh):
             G = rhs_imex_mesh(F)
+        elif isinstance(F, parallel_mesh):
+            G = parallel_mesh(F)
+        elif isinstance(F, parallel_imex_mesh):
+            G = parallel_imex_mesh(F)
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
@@ -61,6 +66,10 @@ class mesh_to_mesh(space_transfer):
             F = cmesh(G)
         elif isinstance(G, rhs_imex_mesh):
             F = rhs_imex_mesh(G)
+        elif isinstance(G, parallel_mesh):
+            F = parallel_mesh(G)
+        elif isinstance(G, parallel_imex_mesh):
+            F = parallel_imex_mesh(G)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F

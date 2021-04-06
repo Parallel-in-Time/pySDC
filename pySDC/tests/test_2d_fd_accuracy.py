@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 
 # setup id for gathering the results (will sort by nvars)
@@ -49,7 +49,7 @@ def run_accuracy_check(nvars_list,problem_params):
 
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heat2d_periodic(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
 
         # create x values, use only inner points
         xvalues = np.array([i * prob.dx for i in range(prob.params.nvars[0])])
@@ -59,8 +59,7 @@ def run_accuracy_check(nvars_list,problem_params):
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap.values = -2*(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.kron(np.sin(np.pi * prob.params.freq * xvalues), np.sin(np.pi * prob.params.freq * xvalues))
-        u_lap.values = u_lap.values.reshape(nvars)
+        u_lap[:] = -2*(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.kron(np.sin(np.pi * prob.params.freq * xvalues), np.sin(np.pi * prob.params.freq * xvalues)).reshape(nvars)
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
 

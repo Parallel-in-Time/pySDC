@@ -65,4 +65,4 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     ax.set_xticklabels(np.arange(maxiter) + 1, minor=False)
     ax.set_yticklabels(np.arange(maxprocs + 1), minor=False)
 
-    plt.savefig(fname, rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig(fname,  transparent=True, bbox_inches='tight')

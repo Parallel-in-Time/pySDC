@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -19,7 +19,7 @@ class advectiondiffusion1d_imex(ptype):
         irfft_object: planned IFFT for backward transformation, real-valued output
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -44,8 +44,8 @@ class advectiondiffusion1d_imex(ptype):
             raise ProblemError('setup requires nvars = 2^p')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectiondiffusion1d_imex, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                                        params=problem_params)
+        super(advectiondiffusion1d_imex, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
+                                                        dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         self.xvalues = np.array([i * self.params.L / self.params.nvars - self.params.L / 2.0
                                  for i in range(self.params.nvars)])
@@ -70,11 +70,11 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        tmp_u = np.fft.rfft(u.values)
+        tmp_u = np.fft.rfft(u)
         tmp_impl = self.params.nu * self.lap * tmp_u
         tmp_expl = -self.params.c * self.ddx * tmp_u
-        f.impl.values[:] = np.fft.irfft(tmp_impl)
-        f.expl.values[:] = np.fft.irfft(tmp_expl)
+        f.impl[:] = np.fft.irfft(tmp_impl)
+        f.expl[:] = np.fft.irfft(tmp_expl)
 
         return f
 
@@ -93,8 +93,8 @@ class advectiondiffusion1d_imex(ptype):
         """
 
         me = self.dtype_u(self.init)
-        tmp = np.fft.rfft(rhs.values) / (1.0 - self.params.nu * factor * self.lap)
-        me.values[:] = np.fft.irfft(tmp)
+        tmp = np.fft.rfft(rhs) / (1.0 - self.params.nu * factor * self.lap)
+        me[:] = np.fft.irfft(tmp)
 
         return me
 
@@ -112,10 +112,10 @@ class advectiondiffusion1d_imex(ptype):
         me = self.dtype_u(self.init, val=0.0)
         if self.params.freq > 0:
             omega = 2.0 * np.pi * self.params.freq
-            me.values = np.sin(omega * (self.xvalues - self.params.c * t)) * np.exp(-t * self.params.nu * omega ** 2)
+            me[:] = np.sin(omega * (self.xvalues - self.params.c * t)) * np.exp(-t * self.params.nu * omega ** 2)
         elif self.params.freq == 0:
             np.random.seed(1)
-            me.values = np.random.rand(self.params.nvars)
+            me[:] = np.random.rand(self.params.nvars)
         else:
             t00 = 0.08
             if self.params.nu > 0:
@@ -123,7 +123,7 @@ class advectiondiffusion1d_imex(ptype):
                 for k in range(-nbox, nbox + 1):
                     for i in range(self.init):
                         x = self.xvalues[i] - self.params.c * t + k * self.params.L
-                        me.values[i] += np.sqrt(t00) / np.sqrt(t00 + t) * \
+                        me[i] += np.sqrt(t00) / np.sqrt(t00 + t) * \
                             np.exp(-x ** 2 / (4.0 * self.params.nu * (t00 + t)))
         return me
 
@@ -161,9 +161,9 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         f = self.dtype_f(self.init)
-        tmp_u = np.fft.rfft(u.values)
+        tmp_u = np.fft.rfft(u)
         tmp = self.params.nu * self.lap * tmp_u - self.params.c * self.ddx * tmp_u
-        f.values[:] = np.fft.irfft(tmp)
+        f[:] = np.fft.irfft(tmp)
 
         return f
 
@@ -182,7 +182,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         me = self.dtype_u(self.init)
-        tmp = np.fft.rfft(rhs.values) / (1.0 - factor * (self.params.nu * self.lap - self.params.c * self.ddx))
-        me.values[:] = np.fft.irfft(tmp)
+        tmp = np.fft.rfft(rhs) / (1.0 - factor * (self.params.nu * self.lap - self.params.c * self.ddx))
+        me[:] = np.fft.irfft(tmp)
 
         return me

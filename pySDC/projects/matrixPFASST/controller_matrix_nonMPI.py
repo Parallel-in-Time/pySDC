@@ -32,7 +32,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
         self.nsteps = len(self.MS)
         self.nlevels = len(self.MS[0].levels)
         self.nnodes = self.MS[0].levels[0].sweep.coll.num_nodes
-        self.nspace = self.MS[0].levels[0].prob.init
+        self.nspace = self.MS[0].levels[0].prob.init[0]
 
         self.dt = self.MS[0].levels[0].dt
         self.tol = self.MS[0].levels[0].params.restol
@@ -74,7 +74,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         if self.nlevels > 1:
             prob_c = self.MS[0].levels[1].prob
-            self.nspace_c = prob_c.init
+            self.nspace_c = prob_c.init[0]
 
             Ac = prob_c.A.todense()
             Qdc = self.MS[0].levels[1].sweep.QI[1:, 1:]
@@ -236,10 +236,10 @@ class controller_matrix_nonMPI(controller_nonMPI):
                     lvl.u[m] = P.dtype_u(init=P.init, val=0.0)
                     lvl.f[m] = P.dtype_f(init=P.init, val=0.0)
 
-        self.u0 = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0.values))
+        self.u0 = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), u0))
 
         if self.MS[0].levels[0].sweep.params.initial_guess == 'spread':
-            self.u = np.kron(np.ones(self.nsteps * self.nnodes), u0.values)
+            self.u = np.kron(np.ones(self.nsteps * self.nnodes), u0)
         else:
             self.u = self.u0.copy()
 
@@ -255,7 +255,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
             L = S.levels[level]
             P = L.prob
             nnodes = L.sweep.coll.num_nodes
-            nspace = P.init
+            nspace = P.init[0]
 
             first = S.status.slot * nnodes * nspace
             last = (S.status.slot + 1) * nnodes * nspace
@@ -265,7 +265,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
             for m in range(1, nnodes + 1):
                 mstart = first + (m - 1) * nspace
                 mend = first + m * nspace
-                L.u[m].values = u[mstart:mend]
+                L.u[m][:] = u[mstart:mend]
                 L.f[m] = P.eval_f(L.u[m], L.time + L.dt * L.sweep.coll.nodes[m - 1])
 
             S.levels[level].sweep.compute_end_point()

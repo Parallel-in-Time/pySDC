@@ -3,7 +3,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import getWave1DMatrix, \
     getWave1DAdvectionMatrix
 
@@ -22,7 +22,7 @@ class acoustic_1d_imex(ptype):
 
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=rhs_imex_mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -40,7 +40,8 @@ class acoustic_1d_imex(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(acoustic_1d_imex, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(acoustic_1d_imex, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                               dtype_u, dtype_f, problem_params)
 
         self.mesh = np.linspace(0.0, 1.0, self.params.nvars[1], endpoint=False)
         self.dx = self.mesh[1] - self.mesh[0]
@@ -65,12 +66,12 @@ class acoustic_1d_imex(ptype):
 
         M = self.Id - factor * self.A
 
-        b = np.concatenate((rhs.values[0, :], rhs.values[1, :]))
+        b = np.concatenate((rhs[0, :], rhs[1, :]))
 
         sol = spsolve(M, b)
 
         me = self.dtype_u(self.init)
-        me.values[0, :], me.values[1, :] = np.split(sol, 2)
+        me[0, :], me[1, :] = np.split(sol, 2)
 
         return me
 
@@ -86,11 +87,11 @@ class acoustic_1d_imex(ptype):
             explicit part of RHS
         """
 
-        b = np.concatenate((u.values[0, :], u.values[1, :]))
+        b = np.concatenate((u[0, :], u[1, :]))
         sol = self.Dx.dot(b)
 
         fexpl = self.dtype_u(self.init)
-        fexpl.values[0, :], fexpl.values[1, :] = np.split(sol, 2)
+        fexpl[0, :], fexpl[1, :] = np.split(sol, 2)
 
         return fexpl
 
@@ -106,11 +107,11 @@ class acoustic_1d_imex(ptype):
             implicit part of RHS
         """
 
-        b = np.concatenate((u.values[0, :], u.values[1, :]))
+        b = np.concatenate((u[:][0, :], u[:][1, :]))
         sol = self.A.dot(b)
 
         fimpl = self.dtype_u(self.init, val=0.0)
-        fimpl.values[0, :], fimpl.values[1, :] = np.split(sol, 2)
+        fimpl[0, :], fimpl[1, :] = np.split(sol, 2)
 
         return fimpl
 
@@ -146,8 +147,8 @@ class acoustic_1d_imex(ptype):
             return np.sin(k * 2.0 * np.pi * x) + np.sin(2.0 * np.pi * x)
 
         me = self.dtype_u(self.init)
-        me.values[0, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) - \
+        me[0, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) - \
             0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
-        me.values[1, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) + \
+        me[1, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) + \
             0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
         return me

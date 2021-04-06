@@ -81,7 +81,7 @@ def plot_error_and_positions(uinit, stats, a0):
     plt.xlabel('Time')
     plt.ylabel('Error in hamiltonian')
 
-    plt.savefig('spiraling_particle_error_ham.png', rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig('spiraling_particle_error_ham.png',  transparent=True, bbox_inches='tight')
 
     extract_stats = filter_stats(stats, type='position')
     sortedlist_stats = sort_stats(extract_stats, sortby='time')
@@ -96,7 +96,7 @@ def plot_error_and_positions(uinit, stats, a0):
     plt.ylabel('y')
 
     plt.scatter(xpositions, ypositions)
-    plt.savefig('spiraling_particle_positons.png', rasterized=True, transparent=True, bbox_inches='tight')
+    plt.savefig('spiraling_particle_positons.png',  transparent=True, bbox_inches='tight')
 
     plt.show()
 

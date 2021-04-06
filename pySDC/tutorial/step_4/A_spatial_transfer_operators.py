@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
@@ -37,24 +37,24 @@ def main():
 
         # instantiate fine problem
         problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-        Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        Pfine = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
 
         # instantiate coarse problem using half of the DOFs
         problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
-        Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        Pcoarse = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
 
         # instantiate spatial interpolation
         T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
 
         # set exact fine solution to compare with
         xvalues_fine = np.array([(i + 1) * Pfine.dx for i in range(Pfine.params.nvars)])
-        uexact_fine = Pfine.dtype_u(0)
-        uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
+        uexact_fine = Pfine.dtype_u(Pfine.init)
+        uexact_fine[:] = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
 
         # set exact coarse solution as source
         xvalues_coarse = np.array([(i + 1) * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
-        uexact_coarse = Pfine.dtype_u(0)
-        uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
+        uexact_coarse = Pfine.dtype_u(Pcoarse.init)
+        uexact_coarse[:] = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
 
         # do the interpolation/prolongation
         uinter = T.prolong(uexact_coarse)

@@ -4,6 +4,7 @@ import numpy as np
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
 class mesh_to_mesh_fft2d(space_transfer):
@@ -51,6 +52,13 @@ class mesh_to_mesh_fft2d(space_transfer):
             G = rhs_imex_mesh(self.coarse_prob.init, val=0.0)
             G.impl.values = F.impl.values[::self.ratio, ::self.ratio]
             G.expl.values = F.expl.values[::self.ratio, ::self.ratio]
+        elif isinstance(F, parallel_mesh):
+            G = parallel_mesh(self.coarse_prob.init, val=0.0)
+            G[:] = F[::self.ratio, ::self.ratio]
+        elif isinstance(F, parallel_imex_mesh):
+            G = parallel_imex_mesh(self.coarse_prob.init, val=0.0)
+            G.impl[:] = F.impl[::self.ratio, ::self.ratio]
+            G.expl[:] = F.expl[::self.ratio, ::self.ratio]
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
@@ -90,6 +98,36 @@ class mesh_to_mesh_fft2d(space_transfer):
             tmpF_expl[0:halfG, self.fine_prob.init[0] - halfG:] = tmpG_expl[0:halfG, halfG:]
             tmpF_expl[self.fine_prob.init[0] - halfG:, self.fine_prob.init[0] - halfG:] = tmpG_expl[halfG:, halfG:]
             F.expl.values[:] = np.real(np.fft.ifft2(tmpF_expl)) * self.ratio * 2
+        elif isinstance(G, parallel_mesh):
+            F = parallel_mesh(self.fine_prob.init)
+            tmpG = np.fft.fft2(G)
+            tmpF = np.zeros(self.fine_prob.init[0], dtype=np.complex128)
+            halfG = int(self.coarse_prob.init[0][0] / 2)
+            tmpF[0:halfG, 0:halfG] = tmpG[0:halfG, 0:halfG]
+            tmpF[self.fine_prob.init[0][0] - halfG:, 0:halfG] = tmpG[halfG:, 0:halfG]
+            tmpF[0:halfG, self.fine_prob.init[0][0] - halfG:] = tmpG[0:halfG, halfG:]
+            tmpF[self.fine_prob.init[0][0] - halfG:, self.fine_prob.init[0][0] - halfG:] = tmpG[halfG:, halfG:]
+            F[:] = np.real(np.fft.ifft2(tmpF)) * self.ratio * 2
+        elif isinstance(G, parallel_imex_mesh):
+            F = parallel_imex_mesh(G)
+            tmpG_impl = np.fft.fft2(G.impl)
+            tmpF_impl = np.zeros(self.fine_prob.init, dtype=np.complex128)
+            halfG = int(self.coarse_prob.init[0][0] / 2)
+            tmpF_impl[0:halfG, 0:halfG] = tmpG_impl[0:halfG, 0:halfG]
+            tmpF_impl[self.fine_prob.init[0][0] - halfG:, 0:halfG] = tmpG_impl[halfG:, 0:halfG]
+            tmpF_impl[0:halfG, self.fine_prob.init[0][0] - halfG:] = tmpG_impl[0:halfG, halfG:]
+            tmpF_impl[self.fine_prob.init[0][0] - halfG:, self.fine_prob.init[0][0] - halfG:] = \
+                tmpG_impl[halfG:, halfG:]
+            F.impl[:] = np.real(np.fft.ifft2(tmpF_impl)) * self.ratio * 2
+            tmpG_expl = np.fft.fft2(G.expl) / (self.coarse_prob.init[0] * self.coarse_prob.init[1])
+            tmpF_expl = np.zeros(self.fine_prob.init[0], dtype=np.complex128)
+            halfG = int(self.coarse_prob.init[0][0] / 2)
+            tmpF_expl[0:halfG, 0:halfG] = tmpG_expl[0:halfG, 0:halfG]
+            tmpF_expl[self.fine_prob.init[0][0] - halfG:, 0:halfG] = tmpG_expl[halfG:, 0:halfG]
+            tmpF_expl[0:halfG, self.fine_prob.init[0][0] - halfG:] = tmpG_expl[0:halfG, halfG:]
+            tmpF_expl[self.fine_prob.init[0][0] - halfG:, self.fine_prob.init[0][0] - halfG:] = \
+                tmpG_expl[halfG:, halfG:]
+            F.expl[:] = np.real(np.fft.ifft2(tmpF_expl)) * self.ratio * 2
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F

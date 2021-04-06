@@ -19,8 +19,8 @@ class vanderpol_jac(vanderpol):
             Jacobian matrix
         """
 
-        x1 = u.values[0]
-        x2 = u.values[1]
+        x1 = u[0]
+        x2 = u[1]
 
         dfdu = np.array([[0, 1], [-2 * self.params.mu * x1 * x2 - 1, self.params.mu * (1 - x1 ** 2)]])
 
@@ -42,5 +42,5 @@ class vanderpol_jac(vanderpol):
         """
 
         me = self.dtype_u(2)
-        me.values = spsolve(sp.eye(2) - factor * dfdu, rhs.values)
+        me[:] = spsolve(sp.eye(2) - factor * dfdu, rhs)
         return me

@@ -9,7 +9,7 @@ import os.path
 import scipy.sparse as sp
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by dt)
@@ -28,7 +28,7 @@ def main():
     problem_params['nvars'] = 16383  # number of DOFs in space
 
     # instantiate problem
-    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
 
     # instantiate collocation class, relative to the time interval [0,1]
     coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
@@ -83,7 +83,7 @@ def run_accuracy_check(prob, coll, dt_list):
         # get initial value at t0 = 0
         u0 = prob.u_exact(t=0)
         # fill in u0-vector as right-hand side for the collocation problem
-        u0_coll = np.kron(np.ones(coll.num_nodes), u0.values)
+        u0_coll = np.kron(np.ones(coll.num_nodes), u0)
         # get exact solution at Tend = dt
         uend = prob.u_exact(t=dt)
 
@@ -91,7 +91,7 @@ def run_accuracy_check(prob, coll, dt_list):
         u_coll = sp.linalg.spsolve(M, u0_coll)
 
         # compute error
-        err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend.values, np.inf)
+        err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend, np.inf)
         # get id for this dt and store error in results
         id = ID(dt=dt)
         results[id] = err
@@ -187,7 +187,7 @@ def plot_accuracy(results):
 
     # save plot as PDF, beautify
     fname = 'step_1_accuracy_test_coll.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
     return None
 

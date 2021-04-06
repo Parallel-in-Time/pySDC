@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh
+from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
 
 
 # noinspection PyUnusedLocal
@@ -12,7 +12,7 @@ class auzinger(ptype):
     Example implementing the Auzinger initial value problem
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 
@@ -30,7 +30,7 @@ class auzinger(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
-        super(auzinger, self).__init__(2, dtype_u, dtype_f, problem_params)
+        super(auzinger, self).__init__((2, None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
 
     def u_exact(self, t):
         """
@@ -43,8 +43,8 @@ class auzinger(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me.values[0] = np.cos(t)
-        me.values[1] = np.sin(t)
+        me[0] = np.cos(t)
+        me[1] = np.sin(t)
         return me
 
     def eval_f(self, u, t):
@@ -58,11 +58,11 @@ class auzinger(ptype):
             RHS, 2 components
         """
 
-        x1 = u.values[0]
-        x2 = u.values[1]
+        x1 = u[0]
+        x2 = u[1]
         f = self.dtype_f(self.init)
-        f.values[0] = -x2 + x1 * (1 - x1 ** 2 - x2 ** 2)
-        f.values[1] = x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)
+        f[0] = -x2 + x1 * (1 - x1 ** 2 - x2 ** 2)
+        f[1] = x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -81,16 +81,16 @@ class auzinger(ptype):
 
         # create new mesh object from u0 and set initial values for iteration
         u = self.dtype_u(u0)
-        x1 = u.values[0]
-        x2 = u.values[1]
+        x1 = u[0]
+        x2 = u[1]
 
         # start newton iteration
         n = 0
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = np.array([x1 - dt * (-x2 + x1 * (1 - x1 ** 2 - x2 ** 2)) - rhs.values[0],
-                          x2 - dt * (x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)) - rhs.values[1]])
+            g = np.array([x1 - dt * (-x2 + x1 * (1 - x1 ** 2 - x2 ** 2)) - rhs[0],
+                          x2 - dt * (x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)) - rhs[1]])
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -105,19 +105,19 @@ class auzinger(ptype):
             idg = np.linalg.inv(dg)
 
             # newton update: u1 = u0 - g/dg
-            u.values -= np.dot(idg, g)
+            u -= np.dot(idg, g)
 
             # set new values and increase iteration count
-            x1 = u.values[0]
-            x2 = u.values[1]
+            x1 = u[0]
+            x2 = u[1]
             n += 1
 
         return u
 
         # def eval_jacobian(self, u):
         #
-        #     x1 = u.values[0]
-        #     x2 = u.values[1]
+        #     x1 = u[0]
+        #     x2 = u[1]
         #
         #     dfdu = np.array([[1-3*x1**2-x2**2, -1-x1], [1+6*x2*x1, 3+3*x1**2-9*x2**2]])
         #
@@ -127,5 +127,5 @@ class auzinger(ptype):
         # def solve_system_jacobian(self, dfdu, rhs, factor, u0, t):
         #
         #     me = mesh(2)
-        #     me.values = LA.spsolve(sp.eye(2) - factor * dfdu, rhs.values)
+        #     me = LA.spsolve(sp.eye(2) - factor * dfdu, rhs)
         #     return me
