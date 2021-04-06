@@ -1,4 +1,5 @@
 import scipy.sparse as sp
+import numpy as np
 from scipy.sparse.linalg import spsolve
 
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
@@ -39,6 +40,6 @@ class generalized_fisher_jac(generalized_fisher):
             solution as mesh
         """
 
-        me = self.dtype_u(self.init)
+        me = self.dtype_u((self.init[0], self.init[1], np.dtype('complex128')))
         me[:] = spsolve(sp.eye(self.params.nvars) - factor * dfdu, rhs)
         return me

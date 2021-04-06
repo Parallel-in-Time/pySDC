@@ -63,20 +63,22 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         # transform collocation problem forward
         Guv = []
         for m in range(M):
-            Guv.append(P.dtype_u(P.init, val=0.0))
+            Guv.append(P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0+0.0j))
             for j in range(M):
                 Guv[m] += self.Vi[m, j] * Gu[j]
 
         # solve implicit system with Jacobian (just this one, does not change with the nodes)
         uv = []
         for m in range(M):  # hell yeah, this is parallel!!
-            uv.append(
-                P.solve_system_jacobian(dfdu, Guv[m], L.dt * self.D[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]))
+            uv.append(P.solve_system_jacobian(dfdu, Guv[m], L.dt * self.D[m], L.u[m + 1],
+                                              L.time + L.dt * self.coll.nodes[m]))
 
         # transform soultion backward
         for m in range(M):
+            tmp = P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0+0.0j)
             for j in range(M):
-                L.u[m + 1] += self.V[m, j] * uv[j]
+                tmp += self.V[m, j] * uv[j]
+            L.u[m + 1][:] += np.real(tmp)
 
         # evaluate f
         for m in range(M):  # hell yeah, this is parallel!!
