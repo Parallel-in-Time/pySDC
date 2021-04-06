@@ -5,4 +5,4 @@ def test_RDC_flavors():
 
     for item in results:
         assert item[0] < 9E-06, 'Error too high, got %s' % item[0]
-        assert item[1] < 12.1, 'Iterations too high, got %s' % item[1]
+        assert item[1] < 6.5, 'Iterations too high, got %s' % item[1]

@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.integrate import quad
+from scipy.special.orthogonal import roots_legendre
 from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Errors import CollocationError, ParameterError
@@ -118,11 +118,47 @@ class Equidistant_RDC(Equidistant):
         circ_one[0] = 1.0
         tcks = []
         for i in range(self.num_nodes):
-            # This is where the custom BarycentricInterpolator is called
             tcks.append(MyBarycentricInterpolator(self.nodes, np.roll(circ_one, i), self.fh_weights))
 
-        weights = np.zeros(self.num_nodes)
-        for i in range(self.num_nodes):
-            weights[i] = quad(tcks[i], a, b, epsabs=1e-14)[0]
+        # Generate evaluation points for quadrature
+        tau, omega = roots_legendre(self.num_nodes)
+        phi = (b - a) / 2 * tau + (b + a) / 2
+
+        weights = [np.sum((b - a) / 2 * omega * p(phi)) for p in tcks]
+        weights = np.array(weights)
 
         return weights
+
+    @property
+    def _gen_Qmatrix(self):
+        """
+        Compute tleft-to-node integration matrix for later use in collocation formulation
+
+        Returns:
+            numpy.ndarray: matrix containing the weights for tleft to node
+        """
+        if self.nodes is None:
+            raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
+        M = self.num_nodes
+        Q = np.zeros([M + 1, M + 1])
+
+        # Generate Lagrange polynomials associated to the nodes
+        circ_one = np.zeros(self.num_nodes)
+        circ_one[0] = 1.0
+        tcks = []
+        for i in range(M):
+            tcks.append(MyBarycentricInterpolator(self.nodes, np.roll(circ_one, i), self.fh_weights))
+
+        # Generate evaluation points for quadrature
+        a, b = self.tleft, self.nodes[:, None]
+        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = tau[None, :], omega[None, :]
+        phi = (b - a) / 2 * tau + (b + a) / 2
+
+        # Compute quadrature
+        intQ = np.array([np.sum((b - a) / 2 * omega * p(phi), axis=-1) for p in tcks])
+
+        # Store into Q matrix
+        Q[1:, 1:] = intQ.T
+
+        return Q
