@@ -59,7 +59,7 @@ class CollGaussRadau_Right(CollBase):
         b = self.tright
 
         if M == 1:
-            return [b]
+            return np.array([b])
 
         alpha = 1.0
         beta = 0.0
@@ -84,7 +84,7 @@ class CollGaussRadau_Right(CollBase):
 
         x = np.sort(np.linalg.eigvals(Mat))
 
-        nodes = np.concatenate((x, [1.0]))
+        nodes = np.array(np.concatenate((x, [1.0])))
 
         nodes = (a * (1 - nodes) + b * (1 + nodes)) / 2
 
