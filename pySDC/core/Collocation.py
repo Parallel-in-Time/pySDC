@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator
 from scipy.special.orthogonal import roots_legendre
 
