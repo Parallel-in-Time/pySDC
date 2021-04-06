@@ -21,8 +21,6 @@ before_install:
   - source ~/.bashrc
   - conda create -n test -y python=3.6
   - conda activate test
-  - conda update --all
-#   - conda update --yes -n base -c defaults conda
 
 install:
   - conda install --yes -c conda-forge --file requirements.txt
