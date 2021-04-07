@@ -110,16 +110,6 @@ def compare_preconditioners(f=None, list_of_k=None):
         print(errors_IE)
         print(errors_LU)
 
-    # out = '  Iteration counts for matrix-based version: %s' % iter_counts_mat
-    # f.write(out + '\n')
-    # print(out)
-    # out = '  Iteration counts for matrix-free version: %s' % iter_counts
-    # f.write(out + '\n')
-    # print(out)
-    #
-    # assert iter_counts == iter_counts_mat, \
-    #     'ERROR: number of iterations differ between matrix-based and matrix-free controller'
-
 
 def main():
 
