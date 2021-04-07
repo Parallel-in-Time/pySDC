@@ -86,6 +86,12 @@ class sweeper(object):
             QT = coll.Qmat[1:, 1:].T
             [_, _, U] = scipy.linalg.lu(QT, overwrite_a=True)
             QDmat[1:, 1:] = 2 * U.T
+        elif qd_type == 'TRAP':
+            for m in range(coll.num_nodes + 1):
+                QDmat[m, 1:m + 1] = coll.delta_m[0:m]
+            for m in range(coll.num_nodes + 1):
+                QDmat[m, 0:m] += coll.delta_m[0:m]
+            QDmat /= 2.0
         elif qd_type == 'IE':
             for m in range(coll.num_nodes + 1):
                 QDmat[m, 1:m + 1] = coll.delta_m[0:m]
