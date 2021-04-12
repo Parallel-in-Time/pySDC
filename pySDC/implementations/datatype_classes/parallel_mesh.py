@@ -12,7 +12,7 @@ class parallel_mesh(np.ndarray):
         _comm: MPI communicator or None
     """
 
-    def __new__(cls, init, val=0.0):
+    def __new__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
         """
         Instantiates new datatype. This ensures that even when manipulating data, the result is still a parallel_mesh.
 
@@ -25,12 +25,14 @@ class parallel_mesh(np.ndarray):
 
         """
         if isinstance(init, parallel_mesh):
-            obj = np.ndarray.__new__(cls, init.shape, dtype=init.dtype, buffer=None)
+            obj = np.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, buffer=buffer, offset=offset,
+                                     strides=strides, order=order)
             obj[:] = init[:]
             obj._comm = init._comm
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], np.dtype):
-            obj = np.ndarray.__new__(cls, init[0], dtype=init[2], buffer=None)
+            obj = np.ndarray.__new__(cls, init[0], dtype=init[2], buffer=buffer, offset=offset,
+                                     strides=strides, order=order)
             obj.fill(val)
             obj._comm = init[1]
         else:
@@ -51,6 +53,23 @@ class parallel_mesh(np.ndarray):
         if obj is None:
             return
         self._comm = getattr(obj, '_comm', None)
+
+    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
+        """
+        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+        """
+        args = []
+        comm = None
+        for i, input_ in enumerate(inputs):
+            if isinstance(input_, parallel_mesh):
+                args.append(input_.view(np.ndarray))
+                comm = input_.comm
+            else:
+                args.append(input_)
+        results = super(parallel_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(parallel_mesh)
+        if not method == 'reduce':
+            results._comm = comm
+        return results
 
     def __abs__(self):
         """
@@ -118,11 +137,13 @@ class parallel_mesh(np.ndarray):
 
 class parallel_imex_mesh(object):
     """
-    Numpy-based datatype for IMEX RHS of parallel meshes.
+    RHS data type for meshes with implicit and explicit components
+
+    This data type can be used to have RHS with 2 components (here implicit and explicit)
 
     Attributes:
-        impl (parallel_mesh): implicit part
-        expl (parallel_mesh): explicit part
+        impl (parallel_mesh.parallel_mesh): implicit part
+        expl (parallel_mesh.parallel_mesh): explicit part
     """
 
     def __init__(self, init, val=0.0):
@@ -130,89 +151,32 @@ class parallel_imex_mesh(object):
         Initialization routine
 
         Args:
-            init: another pmesh_datatype or a tuple containing the communicator and the local dimensions
+            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
+                  or another parallel_imex_mesh object
             val (float): an initial number (default: 0.0)
         Raises:
             DataError: if init is none of the types above
         """
+
         if isinstance(init, type(self)):
             self.impl = parallel_mesh(init.impl)
             self.expl = parallel_mesh(init.expl)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)):
+        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
+                and isinstance(init[2], np.dtype):
             self.impl = parallel_mesh(init, val=val)
             self.expl = parallel_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
 
-    def __sub__(self, other):
-        """
-        Overloading the subtraction operator for rhs types
-
-        Args:
-            other: rhs object to be subtracted
-        Raises:
-            DataError: if other is not a rhs object
-        Returns:
-            differences between caller and other values (self-other)
-        """
-
-        if isinstance(other, type(self)):
-            me = parallel_imex_mesh(self)
-            me.impl = self.impl - other.impl
-            me.expl = self.expl - other.expl
-            return me
-        else:
-            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
-
-    def __add__(self, other):
-        """
-         Overloading the addition operator for rhs types
-
-        Args:
-            other: rhs object to be added
-        Raises:
-            DataError: if other is not a rhs object
-        Returns:
-            sum of caller and other values (self-other)
-        """
-
-        if isinstance(other, type(self)):
-            me = parallel_imex_mesh(self)
-            me.impl = self.impl + other.impl
-            me.expl = self.expl + other.expl
-            return me
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
-
-    def __rmul__(self, other):
-        """
-        Overloading the right multiply by factor operator for rhs types
-
-        Args:
-            other (float): factor
-        Raises:
-            DataError: is other is not a float
-        Returns:
-             copy of original values scaled by factor
-        """
-
-        if isinstance(other, float):
-            me = parallel_imex_mesh(self)
-            me.impl = other * self.impl
-            me.expl = other * self.expl
-            return me
-        else:
-            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))
-
 
 class parallel_comp2_mesh(object):
     """
-    Numpy-based datatype for multi-implicit RHS of parallel meshes.
+    RHS data type for meshes with 2 components
 
     Attributes:
-        comp1 (parallel_mesh): first part
-        comp2 (parallel_mesh): second part
+        comp1 (parallel_mesh.parallel_mesh): first part
+        comp2 (parallel_mesh.parallel_mesh): second part
     """
 
     def __init__(self, init, val=0.0):
@@ -220,77 +184,20 @@ class parallel_comp2_mesh(object):
         Initialization routine
 
         Args:
-            init: another pmesh_datatype or a tuple containing the communicator and the local dimensions
-            val (float): an initial number (default: 0.0)
+            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
+                  or another parallel_comp2_mesh object
         Raises:
             DataError: if init is none of the types above
         """
+
         if isinstance(init, type(self)):
             self.comp1 = parallel_mesh(init.comp1)
             self.comp2 = parallel_mesh(init.comp2)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)):
+        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
+                and isinstance(init[2], np.dtype):
             self.comp1 = parallel_mesh(init, val=val)
             self.comp2 = parallel_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
 
-    def __sub__(self, other):
-        """
-        Overloading the subtraction operator for rhs types
-
-        Args:
-            other: rhs object to be subtracted
-        Raises:
-            DataError: if other is not a rhs object
-        Returns:
-            differences between caller and other values (self-other)
-        """
-
-        if isinstance(other, type(self)):
-            me = parallel_imex_mesh(self)
-            me.comp1 = self.comp1 - other.comp1
-            me.comp2 = self.comp2 - other.comp2
-            return me
-        else:
-            raise DataError("Type error: cannot subtract %s from %s" % (type(other), type(self)))
-
-    def __add__(self, other):
-        """
-         Overloading the addition operator for rhs types
-
-        Args:
-            other: rhs object to be added
-        Raises:
-            DataError: if other is not a rhs object
-        Returns:
-            sum of caller and other values (self-other)
-        """
-
-        if isinstance(other, type(self)):
-            me = parallel_imex_mesh(self)
-            me.comp1 = self.comp1 + other.comp1
-            me.comp2 = self.comp2 + other.comp2
-            return me
-        else:
-            raise DataError("Type error: cannot add %s to %s" % (type(other), type(self)))
-
-    def __rmul__(self, other):
-        """
-        Overloading the right multiply by factor operator for rhs types
-
-        Args:
-            other (float): factor
-        Raises:
-            DataError: is other is not a float
-        Returns:
-             copy of original values scaled by factor
-        """
-
-        if isinstance(other, float):
-            me = parallel_imex_mesh(self)
-            me.comp1 = other * self.comp1
-            me.comp2 = other * self.comp2
-            return me
-        else:
-            raise DataError("Type error: cannot multiply %s to %s" % (type(other), type(self)))

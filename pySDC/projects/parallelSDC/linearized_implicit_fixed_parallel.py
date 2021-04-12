@@ -63,7 +63,7 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         # transform collocation problem forward
         Guv = []
         for m in range(M):
-            Guv.append(P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0+0.0j))
+            Guv.append(P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0 + 0.0j))
             for j in range(M):
                 Guv[m] += self.Vi[m, j] * Gu[j]
 
@@ -75,7 +75,7 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
 
         # transform soultion backward
         for m in range(M):
-            tmp = P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0+0.0j)
+            tmp = P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0 + 0.0j)
             for j in range(M):
                 tmp += self.V[m, j] * uv[j]
             L.u[m + 1][:] += np.real(tmp)

@@ -56,7 +56,7 @@ class linearized_implicit_parallel(generic_implicit):
         # transform collocation problem forward
         Guv = []
         for m in range(M):
-            Guv.append(P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0+0.0j))
+            Guv.append(P.dtype_u((P.init[0], P.init[1], np.dtype('complex128')), val=0.0 + 0.0j))
             for j in range(M):
                 Guv[m] += self.Vi[m, j] * Gu[j]
 
