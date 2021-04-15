@@ -20,7 +20,7 @@ class _Pars(FrozenClass):
         self.initial_guess = 'spread'
 
         for k, v in pars.items():
-            if k is not 'collocation_class':
+            if k != 'collocation_class':
                 setattr(self, k, v)
 
         self._freeze()
