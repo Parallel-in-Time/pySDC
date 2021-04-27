@@ -70,8 +70,8 @@ def plot_error_and_positions(uinit, stats, a0):
     extract_stats = filter_stats(stats, type='energy')
     sortedlist_stats = sort_stats(extract_stats, sortby='time')
 
-    R0 = np.linalg.norm(uinit.pos.values[:])
-    H0 = 1 / 2 * np.dot(uinit.vel.values[:], uinit.vel.values[:]) + a0 / R0
+    R0 = np.linalg.norm(uinit.pos[:])
+    H0 = 1 / 2 * np.dot(uinit.vel[:].T, uinit.vel[:]) + a0 / R0
 
     energy_err = [abs(entry[1] - H0) / H0 for entry in sortedlist_stats]
 

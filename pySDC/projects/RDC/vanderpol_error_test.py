@@ -80,7 +80,7 @@ def compute_RDC_errors():
         # call main function to get things done...
         uend_rdc, stats_rdc = controller_rdc.run(u0=uinit, t0=t0, Tend=Tend)
 
-        err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+        err = np.linalg.norm(uend_rdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
         print('Maxiter = %2i -- Error: %8.4e' % (controller_rdc.MS[0].params.maxiter, err))
         results[maxiter] = err
 

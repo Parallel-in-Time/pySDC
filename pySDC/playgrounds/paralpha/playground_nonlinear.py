@@ -55,7 +55,7 @@ def run():
     H[:, -1] = 1
 
     uinit = np.zeros(N + 2)
-    uinit[1:-1] = prob.u_exact(t=t0).values
+    uinit[1:-1] = prob.u_exact(t=t0)
     uinit[0] = 0.5 * (1 + np.tanh((prob.params.interval[0]) / (np.sqrt(2) * prob.params.eps)))
     uinit[-1] = 0.5 * (1 + np.tanh((prob.params.interval[1]) / (np.sqrt(2) * prob.params.eps)))
 
@@ -117,7 +117,7 @@ def run():
 
         uex = np.zeros(N + 2)
         t = t0 + (nb + 1) * L * dt
-        uex[1:-1] = prob.u_exact(t=t).values
+        uex[1:-1] = prob.u_exact(t=t)
         v = 3.0 * np.sqrt(2) * prob.params.eps * prob.params.dw
         uex[0] = 0.5 * (1 + np.tanh((prob.params.interval[0] - v * t) / (np.sqrt(2) * prob.params.eps)))
         uex[-1] = 0.5 * (1 + np.tanh((prob.params.interval[1] - v * t) / (np.sqrt(2) * prob.params.eps)))
@@ -125,7 +125,7 @@ def run():
         err = np.linalg.norm(uex[:, None] - ures[:, None], np.inf)
         print(outer_k, inner_iter, np.linalg.norm(outer_res, np.inf), err)
 
-    uinit = prob.u_exact(t=t0).values
+    uinit = prob.u_exact(t=t0)
     # plt.plot(uex)
     plt.plot(uex[:, None]-ures[:, None])
     # plt.plot(uinit)
