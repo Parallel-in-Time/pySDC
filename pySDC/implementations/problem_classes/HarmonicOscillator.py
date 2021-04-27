@@ -30,7 +30,7 @@ class harmonic_oscillator(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(harmonic_oscillator, self).__init__(1, dtype_u, dtype_f, problem_params)
+        super(harmonic_oscillator, self).__init__((1, None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
 
         if self.params.phase != 0.0:
             raise ProblemError('Phase != 0 not implemented yet')
@@ -47,8 +47,8 @@ class harmonic_oscillator(ptype):
         Returns:
             dtype_f: RHS
         """
-        me = self.dtype_f(1)
-        me.values[:] = -self.params.k * u.pos.values
+        me = self.dtype_f(self.init)
+        me[:] = -self.params.k * u.pos
         return me
 
     def u_exact(self, t):
@@ -61,10 +61,9 @@ class harmonic_oscillator(ptype):
             dtype_u: exact position and velocity
         """
 
-        me = self.dtype_u(1)
-        me.pos.values[:] = self.params.amp * np.cos(np.sqrt(self.params.k) * t + self.params.phase)
-        me.vel.values[:] = -self.params.amp * np.sqrt(self.params.k) * np.sin(np.sqrt(self.params.k) * t +
-                                                                              self.params.phase)
+        me = self.dtype_u(self.init)
+        me.pos[:] = self.params.amp * np.cos(np.sqrt(self.params.k) * t + self.params.phase)
+        me.vel[:] = -self.params.amp * np.sqrt(self.params.k) * np.sin(np.sqrt(self.params.k) * t + self.params.phase)
         return me
 
     def eval_hamiltonian(self, u):
@@ -77,5 +76,5 @@ class harmonic_oscillator(ptype):
             float: hamiltonian
         """
 
-        ham = 0.5 * self.params.k * u.pos.values[0] ** 2 + 0.5 * u.vel.values[0] ** 2
+        ham = 0.5 * self.params.k * u.pos[0] ** 2 + 0.5 * u.vel[0] ** 2
         return ham

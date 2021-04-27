@@ -33,7 +33,7 @@ class outer_solar_system(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(outer_solar_system, self).__init__((3, 6), dtype_u, dtype_f, problem_params)
+        super(outer_solar_system, self).__init__(((3, 6), None, np.dtype('float64')), dtype_u, dtype_f, problem_params)
 
         # gravitational constant
         self.G = 2.95912208286E-4
@@ -54,22 +54,22 @@ class outer_solar_system(ptype):
         # ... only with respect to the sun
         if self.params.sun_only:
 
-            for i in range(1, self.init[-1]):
-                dx = u.pos.values[:, i] - u.pos.values[:, 0]
+            for i in range(1, self.init[0][-1]):
+                dx = u.pos[:, i] - u.pos[:, 0]
                 r = np.sqrt(np.dot(dx, dx))
                 df = self.G * dx / (r ** 3)
-                me.values[:, i] -= u.m[0] * df
+                me[:, i] -= u.m[0] * df
 
         # ... or with all planets involved
         else:
 
-            for i in range(self.init[-1]):
+            for i in range(self.init[0][-1]):
                 for j in range(i):
-                    dx = u.pos.values[:, i] - u.pos.values[:, j]
+                    dx = u.pos[:, i] - u.pos[:, j]
                     r = np.sqrt(np.dot(dx, dx))
                     df = self.G * dx / (r ** 3)
-                    me.values[:, i] -= u.m[j] * df
-                    me.values[:, j] += u.m[i] * df
+                    me[:, i] -= u.m[j] * df
+                    me[:, j] += u.m[i] * df
 
         return me
 
@@ -85,19 +85,19 @@ class outer_solar_system(ptype):
         assert t == 0.0, 'error, u_exact only works for the initial time t0=0'
         me = self.dtype_u(self.init)
 
-        me.pos.values[:, 0] = [0.0, 0.0, 0.0]
-        me.pos.values[:, 1] = [-3.5025653, -3.8169847, -1.5507963]
-        me.pos.values[:, 2] = [9.0755314, -3.0458353, -1.6483708]
-        me.pos.values[:, 3] = [8.3101420, -16.2901086, -7.2521278]
-        me.pos.values[:, 4] = [11.4707666, -25.7294829, -10.8169456]
-        me.pos.values[:, 5] = [-15.5387357, -25.2225594, -3.1902382]
+        me.pos[:, 0] = [0.0, 0.0, 0.0]
+        me.pos[:, 1] = [-3.5025653, -3.8169847, -1.5507963]
+        me.pos[:, 2] = [9.0755314, -3.0458353, -1.6483708]
+        me.pos[:, 3] = [8.3101420, -16.2901086, -7.2521278]
+        me.pos[:, 4] = [11.4707666, -25.7294829, -10.8169456]
+        me.pos[:, 5] = [-15.5387357, -25.2225594, -3.1902382]
 
-        me.vel.values[:, 0] = [0.0, 0.0, 0.0]
-        me.vel.values[:, 1] = [0.00565429, -0.00412490, -0.00190589]
-        me.vel.values[:, 2] = [0.00168318, 0.00483525, 0.00192462]
-        me.vel.values[:, 3] = [0.00354178, 0.00137102, 0.00055029]
-        me.vel.values[:, 4] = [0.00288930, 0.00114527, 0.00039677]
-        me.vel.values[:, 5] = [0.00276725, -0.0017072, -0.00136504]
+        me.vel[:, 0] = [0.0, 0.0, 0.0]
+        me.vel[:, 1] = [0.00565429, -0.00412490, -0.00190589]
+        me.vel[:, 2] = [0.00168318, 0.00483525, 0.00192462]
+        me.vel[:, 3] = [0.00354178, 0.00137102, 0.00055029]
+        me.vel[:, 4] = [0.00288930, 0.00114527, 0.00039677]
+        me.vel[:, 5] = [0.00276725, -0.0017072, -0.00136504]
 
         me.m[0] = 1.00000597682         # Sun
         me.m[1] = 0.000954786104043     # Jupiter
@@ -120,12 +120,12 @@ class outer_solar_system(ptype):
 
         ham = 0
 
-        for i in range(self.init[-1]):
-            ham += 0.5 * u.m[i] * np.dot(u.vel.values[:, i], u.vel.values[:, i])
+        for i in range(self.init[0][-1]):
+            ham += 0.5 * u.m[i] * np.dot(u.vel[:, i], u.vel[:, i])
 
-        for i in range(self.init[-1]):
+        for i in range(self.init[0][-1]):
             for j in range(i):
-                dx = u.pos.values[:, i] - u.pos.values[:, j]
+                dx = u.pos[:, i] - u.pos[:, j]
                 r = np.sqrt(np.dot(dx, dx))
                 ham -= self.G * u.m[i] * u.m[j] / r
 

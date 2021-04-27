@@ -14,7 +14,6 @@ def check_error(subclass):
 
     try:
         raise err('bla')
-        assert False
     except err:
         assert True
 
@@ -29,15 +28,15 @@ def test_datatypes_mesh():
 
 
 def check_datatypes_mesh(init):
-    import pySDC.implementations.datatype_classes.mesh as m
+    import pySDC.implementations.datatype_classes.parallel_mesh as m
 
 
-    m1 = m.mesh(init)
-    m2 = m.mesh(m1)
+    m1 = m.parallel_mesh(init)
+    m2 = m.parallel_mesh(m1)
 
 
-    m1.values[:] = 1.0
-    m2.values[:] = 2.0
+    m1[:] = 1.0
+    m2[:] = 2.0
 
     m3 = m1 + m2
     m4 = m1 - m2
@@ -46,7 +45,7 @@ def check_datatypes_mesh(init):
 
     m7 = abs(m1)
 
-    m8 = m.mesh(m1)
+    m8 = m.parallel_mesh(m1)
 
     assert isinstance(m3,type(m1))
     assert isinstance(m4,type(m1))
@@ -60,16 +59,16 @@ def check_datatypes_mesh(init):
     assert m5 is not m1
     assert m6 is m1
 
-    assert np.shape(m3.values) == np.shape(m1.values)
-    assert np.shape(m4.values) == np.shape(m1.values)
-    assert np.shape(m5.values) == np.shape(m1.values)
+    assert np.shape(m3) == np.shape(m1)
+    assert np.shape(m4) == np.shape(m1)
+    assert np.shape(m5) == np.shape(m1)
 
-    assert np.all(m1.values==1.0)
-    assert np.all(m2.values==2.0)
-    assert np.all(m3.values==3.0)
-    assert np.all(m4.values==-1.0)
-    assert np.all(m5.values==0.1)
-    assert np.all(m8.values==1.0)
+    assert np.all(m1==1.0)
+    assert np.all(m2==2.0)
+    assert np.all(m3==3.0)
+    assert np.all(m4==-1.0)
+    assert np.all(m5==0.1)
+    assert np.all(m8==1.0)
     assert m7 >= 0
 
 def test_datatypes_particles():
@@ -84,34 +83,34 @@ def check_datatypes_particles(init):
     from pySDC.implementations.datatype_classes.particles import acceleration
 
 
-    p1 = particles(init)
+    p1 = particles((init, None, np.dtype('float64')))
     p2 = particles(p1)
-    p5 = particles(init)
+    p5 = particles((init, None, np.dtype('float64')))
 
-    p1.pos.values[:] = 1.0
-    p2.pos.values[:] = 2.0
-    p1.vel.values[:] = 10.0
-    p2.vel.values[:] = 20.0
+    p1.pos[:] = 1.0
+    p2.pos[:] = 2.0
+    p1.vel[:] = 10.0
+    p2.vel[:] = 20.0
 
     p3 = p1 + p2
     p4 = p1 - p2
 
-    p5.pos = 0.1*p1.vel
+    p5.pos[:] = 0.1*p1.vel
     p6 = p1
 
     p7 = abs(p1)
 
-    a1 = acceleration(init)
+    a1 = acceleration((init, None, np.dtype('float64')))
     a2 = acceleration(a1)
     p8 = particles(p1)
 
-    a1.values[:] = 100.0
-    a2.values[:] = 200.0
+    a1[:] = 100.0
+    a2[:] = 200.0
 
     a3 = a1 + a2
 
-    p8.vel = 0.1*a1
-    p8.pos = 0.1*(0.1*a1)
+    p8.vel[:] = 0.1*a1
+    p8.pos[:] = 0.1*(0.1*a1)
 
     assert isinstance(p3,type(p1))
     assert isinstance(p4,type(p1))
@@ -121,7 +120,6 @@ def check_datatypes_particles(init):
     assert isinstance(a2,type(a1))
     assert isinstance(p8.pos,type(p1.pos))
     assert isinstance(p8.vel,type(p1.vel))
-    assert isinstance(0.1*0.1*a1,type(p1.vel))
 
     assert p2 is not p1
     assert p3 is not p1
@@ -131,18 +129,18 @@ def check_datatypes_particles(init):
     assert a2 is not a1
     assert a3 is not a1
 
-    assert np.shape(p3.pos.values) == np.shape(p1.pos.values)
-    assert np.shape(p4.pos.values) == np.shape(p1.pos.values)
-    assert np.shape(p3.vel.values) == np.shape(p1.vel.values)
-    assert np.shape(p4.vel.values) == np.shape(p1.vel.values)
-    assert np.shape(a2.values) == np.shape(a1.values)
+    assert np.shape(p3.pos) == np.shape(p1.pos)
+    assert np.shape(p4.pos) == np.shape(p1.pos)
+    assert np.shape(p3.vel) == np.shape(p1.vel)
+    assert np.shape(p4.vel) == np.shape(p1.vel)
+    assert np.shape(a2) == np.shape(a1)
 
-    assert np.all(p3.pos.values==3.0)
-    assert np.all(p4.pos.values==-1.0)
-    assert np.all(p3.vel.values==30.0)
-    assert np.all(p4.vel.values==-10.0)
-    assert np.all(p5.pos.values==1.0)
+    assert np.all(p3.pos==3.0)
+    assert np.all(p4.pos==-1.0)
+    assert np.all(p3.vel==30.0)
+    assert np.all(p4.vel==-10.0)
+    assert np.all(p5.pos==1.0)
     assert p7 >= 0
-    assert np.all(p8.pos.values==1.0)
-    assert np.all(p8.vel.values==10.0)
-    assert np.all(a3.values==300.0)
+    assert np.all(p8.pos==1.0)
+    assert np.all(p8.vel==10.0)
+    assert np.all(a3==300.0)

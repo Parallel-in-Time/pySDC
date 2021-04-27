@@ -226,7 +226,7 @@ def show_results(cwd=''):
         for n in range(nparts):
             pos[n, idx] = item[1][n]
 
-    for n in range(nparts):
+    for n in range(min(nparts, 16)):
         plt_helper.plt.plot(time, pos[n, :])
 
     fname = 'data/fput_positions'

@@ -57,7 +57,8 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
-    problem_params['nvars'] = [(127, 127)]  # number of degrees of freedom for each level
+    problem_params['cnvars'] = [(127, 127)]  # number of degrees of freedom for each level
+    problem_params['refine'] = 1  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
     problem_params['sol_tol'] = 1E-12
 

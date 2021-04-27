@@ -3,8 +3,6 @@ import scipy.sparse as sp
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.complex_mesh import mesh as cmesh
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
 from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
 
 
@@ -39,13 +37,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, mesh):
-            G = mesh(F)
-        elif isinstance(F, cmesh):
-            G = cmesh(F)
-        elif isinstance(F, rhs_imex_mesh):
-            G = rhs_imex_mesh(F)
-        elif isinstance(F, parallel_mesh):
+        if isinstance(F, parallel_mesh):
             G = parallel_mesh(F)
         elif isinstance(F, parallel_imex_mesh):
             G = parallel_imex_mesh(F)
@@ -60,13 +52,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, mesh):
-            F = mesh(G)
-        elif isinstance(G, cmesh):
-            F = cmesh(G)
-        elif isinstance(G, rhs_imex_mesh):
-            F = rhs_imex_mesh(G)
-        elif isinstance(G, parallel_mesh):
+        if isinstance(G, parallel_mesh):
             F = parallel_mesh(G)
         elif isinstance(G, parallel_imex_mesh):
             F = parallel_imex_mesh(G)

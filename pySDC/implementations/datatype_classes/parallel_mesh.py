@@ -1,7 +1,11 @@
-from mpi4py import MPI
 import numpy as np
 
 from pySDC.core.Errors import DataError
+
+try:
+    from mpi4py import MPI
+except ImportError:
+    MPI = None
 
 
 class parallel_mesh(np.ndarray):
@@ -200,4 +204,3 @@ class parallel_comp2_mesh(object):
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
-
