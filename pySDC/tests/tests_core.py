@@ -31,7 +31,7 @@ def check_datatypes_mesh(init):
     import pySDC.implementations.datatype_classes.parallel_mesh as m
 
 
-    m1 = m.parallel_mesh(init)
+    m1 = m.parallel_mesh((init, None, np.dtype('float64')))
     m2 = m.parallel_mesh(m1)
 
 
