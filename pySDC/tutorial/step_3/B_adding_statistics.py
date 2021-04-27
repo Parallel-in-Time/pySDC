@@ -92,7 +92,7 @@ def run_penning_trap_simulation():
 
     # compute error compared to know exact solution for one particle
     uex = P.u_exact(Tend)
-    err = np.linalg.norm(uex.pos.values - uend.pos.values, np.inf) / np.linalg.norm(uex.pos.values, np.inf)
+    err = np.linalg.norm(uex.pos - uend.pos, np.inf) / np.linalg.norm(uex.pos, np.inf)
 
     return err, stats
 
