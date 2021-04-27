@@ -139,7 +139,7 @@ def run_variant(nlevels=None):
     loaded = np.load(fname)
     uref = loaded['uend']
 
-    err = np.linalg.norm(uref - uend.values, np.inf)
+    err = np.linalg.norm(uref - uend, np.inf)
     print('Error vs. reference solution: %6.4e' % err)
     print()
 

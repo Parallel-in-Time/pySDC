@@ -180,7 +180,7 @@ def run_reference(Tend):
     print(len(computed_radii_tmp), len(computed_radii))
 
     fname = 'data/AC_reference_FFT_Tend{:.1e}'.format(Tend)
-    np.savez_compressed(file=fname, uend=uend.values, radius=computed_radii)
+    np.savez_compressed(file=fname, uend=uend, radius=computed_radii)
 
 
 def main(cwd=''):

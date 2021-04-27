@@ -154,7 +154,7 @@ def run_variant(nsweeps):
     #     loaded = np.load(fname)
     #     uref = loaded['uend']
     #
-    #     err = np.linalg.norm(uref - uend.values, np.inf)
+    #     err = np.linalg.norm(uref - uend, np.inf)
     #     print('Error vs. reference solution: %6.4e' % err)
     #     print()
 
@@ -168,7 +168,7 @@ def main(cwd=''):
     Args:
         cwd (str): current working directory (need this for testing)
     """
-
+    nsweeps = 3
     if len(sys.argv) >= 2:
         nsweeps = int(sys.argv[1])
     else:

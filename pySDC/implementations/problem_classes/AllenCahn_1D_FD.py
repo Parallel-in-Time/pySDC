@@ -647,7 +647,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_periodic_multiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
 
-        self.A -= sp.eye(self.init) * 0.0 / self.params.eps ** 2
+        self.A -= sp.eye(self.init[0]) * 0.0 / self.params.eps ** 2
 
     def solve_system_1(self, rhs, factor, u0, t):
         """

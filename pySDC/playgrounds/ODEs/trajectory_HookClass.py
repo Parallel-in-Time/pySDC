@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import progressbar
+# import progressbar
 
 from pySDC.core.Hooks import hooks
 
@@ -15,7 +15,7 @@ class trajectories(hooks):
         fig = plt.figure()
         self.ax = fig.add_subplot(111)
         self.sframe = None
-        self.bar_run = None
+        # self.bar_run = None
 
     def pre_run(self, step, level_number):
         """
@@ -29,10 +29,10 @@ class trajectories(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        if hasattr(L.prob.params, 'Tend'):
-            self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
-        else:
-            self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
+        # if hasattr(L.prob.params, 'Tend'):
+        #     self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
+        # else:
+        #     self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
     def post_step(self, step, level_number):
         """
@@ -47,13 +47,13 @@ class trajectories(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        self.bar_run.update(L.time)
+        # self.bar_run.update(L.time)
 
         L.sweep.compute_end_point()
 
         # oldcol = self.sframe
 
-        self.sframe = self.ax.scatter(L.uend.values[0], L.uend.values[1])
+        self.sframe = self.ax.scatter(L.uend[0], L.uend[1])
         # Remove old line collection before drawing
         # if oldcol is not None:
         #     self.ax.collections.remove(oldcol)

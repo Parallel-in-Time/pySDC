@@ -50,7 +50,7 @@ class advectiondiffusion1d_imex(ptype):
         self.xvalues = np.array([i * self.params.L / self.params.nvars - self.params.L / 2.0
                                  for i in range(self.params.nvars)])
 
-        kx = np.zeros(self.init // 2 + 1)
+        kx = np.zeros(self.init[0] // 2 + 1)
         for i in range(0, len(kx)):
             kx[i] = 2 * np.pi / self.params.L * i
 
@@ -121,7 +121,7 @@ class advectiondiffusion1d_imex(ptype):
             if self.params.nu > 0:
                 nbox = int(np.ceil(np.sqrt(4.0 * self.params.nu * (t00 + t) * 37.0 / (self.params.L ** 2))))
                 for k in range(-nbox, nbox + 1):
-                    for i in range(self.init):
+                    for i in range(self.init[0]):
                         x = self.xvalues[i] - self.params.c * t + k * self.params.L
                         me[i] += np.sqrt(t00) / np.sqrt(t00 + t) * \
                             np.exp(-x ** 2 / (4.0 * self.params.nu * (t00 + t)))
@@ -134,7 +134,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     fully-implicit time-stepping
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
         """
         Initialization routine
 

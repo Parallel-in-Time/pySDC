@@ -56,7 +56,7 @@ def run():
     Calpha = np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A) - np.kron(np.kron(Ealpha, H), IN)
     Calpha_inv = np.linalg.inv(Calpha)
 
-    uinit = prob.u_exact(t=t0).values
+    uinit = prob.u_exact(t=t0)
     u0_M = np.kron(np.ones(M), uinit)
     u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
 
@@ -74,7 +74,7 @@ def run():
             k += 1
             u += Calpha_inv @ res
             res = u0 - C @ u
-            uex = prob.u_exact(t=t0 + (nb + 1) * L * dt).values[:, None]
+            uex = prob.u_exact(t=t0 + (nb + 1) * L * dt)[:, None]
             err = np.linalg.norm(uex - u[-N:], np.inf)
             print(k, np.linalg.norm(res, np.inf), err)
 

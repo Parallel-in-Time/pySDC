@@ -35,7 +35,7 @@ class output(hooks):
         if self.counter % self.output_ratio == 0:
             self.fig, self.ax = plt_helper.newfig(textwidth=238, scale=1.0, ratio=1.0)
 
-            self.ax.imshow(L.uend.values)
+            self.ax.imshow(L.uend)
             fname = 'data/AC_' + L.prob.params.init_type + '_output_' + str(self.counter).zfill(8)
             plt_helper.savefig(fname, save_pgf=False, save_pdf=False, save_png=False)
 
