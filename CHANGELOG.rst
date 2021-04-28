@@ -1,5 +1,13 @@
 Changelog
 ---------
+- May 1, 2021: Long time, no see, but this major release 4.0 marks some improvements under the hood:
+
+  - **Rewrote ``mesh`` and ``particle`` data type**: Creation of new arrays for each operation is now avoided by
+    directly subclassing Numpy's ``ndarray``. Faster, better, future-proof, but also breaking the API. If you use `pySDC`
+    for your project, make sure you adapt to the new data types (or don't upgrade).
+  - **Faster quadrature**: Thanks to `tlunet <https://github.com/tlunet>`_ the computation of the weights is now faster and
+    (even) more reliable. Not breaking of any API here...
+
 
 - August 30, 2019: Version 3.1 adds many more examples like the nonlinear Schrödinger equation, more on Gray-Scott and in particular Allen-Cahn.
   Those are many implemented using the parallel FFT library `mpi4pi-fft <https://bitbucket.org/mpi4py/mpi4py-fft/src/master/>`_, which can now be used with `pySDC`.
