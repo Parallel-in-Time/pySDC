@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
@@ -83,11 +83,11 @@ def test_mesh_to_mesh_1d_dirichlet():
 
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
-            Pcoarse = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
@@ -143,11 +143,11 @@ def test_mesh_to_mesh_1d_periodic():
 
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = advection1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pfine = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = int(nvars_fine / 2)
-            Pcoarse = advection1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pcoarse = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
@@ -207,11 +207,11 @@ def test_mesh_to_mesh_2d_periodic():
         for nvars_fine in nvars_fine_list:
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = heat2d_periodic(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pfine = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = (int(nvars_fine[0] / 2), int(nvars_fine[1] / 2))
-            Pcoarse = heat2d_periodic(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+            Pcoarse = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)

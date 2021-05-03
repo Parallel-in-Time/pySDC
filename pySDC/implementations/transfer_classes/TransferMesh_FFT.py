@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
 
 
 class mesh_to_mesh_fft(space_transfer):
@@ -38,8 +38,8 @@ class mesh_to_mesh_fft(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, parallel_mesh):
-            G = parallel_mesh(self.coarse_prob.init, val=0.0)
+        if isinstance(F, mesh):
+            G = mesh(self.coarse_prob.init, val=0.0)
             G[:] = F[::self.ratio]
         elif isinstance(F, parallel_imex_mesh):
             G = parallel_imex_mesh(self.coarse_prob.init, val=0.0)
@@ -56,8 +56,8 @@ class mesh_to_mesh_fft(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, parallel_mesh):
-            F = parallel_mesh(self.fine_prob.init, val=0.0)
+        if isinstance(G, mesh):
+            F = mesh(self.fine_prob.init, val=0.0)
             tmpG = np.fft.rfft(G)
             tmpF = np.zeros(self.fine_prob.init[0] // 2 + 1, dtype=np.complex128)
             halfG = int(self.coarse_prob.init[0] / 2)

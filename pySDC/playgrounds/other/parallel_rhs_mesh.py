@@ -5,14 +5,14 @@ class mymesh(np.ndarray):
 
     def __new__(cls, init, val=0.0):
         """
-        Instantiates new datatype. This ensures that even when manipulating data, the result is still a parallel_mesh.
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
 
         Args:
-            init: either another parallel_mesh or a tuple containing the dimensions, the communicator and the dtype
+            init: either another mesh or a tuple containing the dimensions, the communicator and the dtype
             val: value to initialize
 
         Returns:
-            obj of type parallel_mesh
+            obj of type mesh
 
         """
         if isinstance(init, mymesh):

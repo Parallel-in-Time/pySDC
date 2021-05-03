@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 
 # setup id for gathering the results (will sort by nvars)
@@ -49,7 +49,7 @@ def run_accuracy_check(nvars_list,problem_params):
 
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heat2d_periodic(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+        prob = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
         xvalues = np.array([i * prob.dx for i in range(prob.params.nvars[0])])

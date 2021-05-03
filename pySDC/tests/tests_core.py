@@ -28,11 +28,11 @@ def test_datatypes_mesh():
 
 
 def check_datatypes_mesh(init):
-    import pySDC.implementations.datatype_classes.parallel_mesh as m
+    import pySDC.implementations.datatype_classes.mesh as m
 
 
-    m1 = m.parallel_mesh((init, None, np.dtype('float64')))
-    m2 = m.parallel_mesh(m1)
+    m1 = m.mesh((init, None, np.dtype('float64')))
+    m2 = m.mesh(m1)
 
 
     m1[:] = 1.0
@@ -45,7 +45,7 @@ def check_datatypes_mesh(init):
 
     m7 = abs(m1)
 
-    m8 = m.parallel_mesh(m1)
+    m8 = m.mesh(m1)
 
     assert isinstance(m3,type(m1))
     assert isinstance(m4,type(m1))

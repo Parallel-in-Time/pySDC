@@ -8,7 +8,7 @@ except ImportError:
     MPI = None
 
 
-class parallel_mesh(np.ndarray):
+class mesh(np.ndarray):
     """
     Numpy-based datatype for serial or parallel meshes.
     Can include a communicator and expects a dtype to allow complex data.
@@ -19,17 +19,17 @@ class parallel_mesh(np.ndarray):
 
     def __new__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
         """
-        Instantiates new datatype. This ensures that even when manipulating data, the result is still a parallel_mesh.
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
 
         Args:
-            init: either another parallel_mesh or a tuple containing the dimensions, the communicator and the dtype
+            init: either another mesh or a tuple containing the dimensions, the communicator and the dtype
             val: value to initialize
 
         Returns:
-            obj of type parallel_mesh
+            obj of type mesh
 
         """
-        if isinstance(init, parallel_mesh):
+        if isinstance(init, mesh):
             obj = np.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, buffer=buffer, offset=offset,
                                      strides=strides, order=order)
             obj[:] = init[:]
@@ -66,12 +66,12 @@ class parallel_mesh(np.ndarray):
         args = []
         comm = None
         for i, input_ in enumerate(inputs):
-            if isinstance(input_, parallel_mesh):
+            if isinstance(input_, mesh):
                 args.append(input_.view(np.ndarray))
                 comm = input_.comm
             else:
                 args.append(input_)
-        results = super(parallel_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(parallel_mesh)
+        results = super(mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(mesh)
         if not method == 'reduce':
             results._comm = comm
         return results
@@ -147,8 +147,8 @@ class parallel_imex_mesh(object):
     This data type can be used to have RHS with 2 components (here implicit and explicit)
 
     Attributes:
-        impl (parallel_mesh.parallel_mesh): implicit part
-        expl (parallel_mesh.parallel_mesh): explicit part
+        impl (mesh.mesh): implicit part
+        expl (mesh.mesh): explicit part
     """
 
     def __init__(self, init, val=0.0):
@@ -164,12 +164,12 @@ class parallel_imex_mesh(object):
         """
 
         if isinstance(init, type(self)):
-            self.impl = parallel_mesh(init.impl)
-            self.expl = parallel_mesh(init.expl)
+            self.impl = mesh(init.impl)
+            self.expl = mesh(init.expl)
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], np.dtype):
-            self.impl = parallel_mesh(init, val=val)
-            self.expl = parallel_mesh(init, val=val)
+            self.impl = mesh(init, val=val)
+            self.expl = mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
@@ -180,8 +180,8 @@ class parallel_comp2_mesh(object):
     RHS data type for meshes with 2 components
 
     Attributes:
-        comp1 (parallel_mesh.parallel_mesh): first part
-        comp2 (parallel_mesh.parallel_mesh): second part
+        comp1 (mesh.mesh): first part
+        comp2 (mesh.mesh): second part
     """
 
     def __init__(self, init, val=0.0):
@@ -196,12 +196,12 @@ class parallel_comp2_mesh(object):
         """
 
         if isinstance(init, type(self)):
-            self.comp1 = parallel_mesh(init.comp1)
-            self.comp2 = parallel_mesh(init.comp2)
+            self.comp1 = mesh(init.comp1)
+            self.comp2 = mesh(init.comp2)
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], np.dtype):
-            self.comp1 = parallel_mesh(init, val=val)
-            self.comp2 = parallel_mesh(init, val=val)
+            self.comp1 = mesh(init, val=val)
+            self.comp2 = mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))

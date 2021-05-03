@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.core.Errors import DataError
 
 try:
@@ -20,10 +20,10 @@ class particles(object):
         vel: contains the velocities of all particles
     """
 
-    class position(parallel_mesh):
+    class position(mesh):
         pass
 
-    class velocity(parallel_mesh):
+    class velocity(mesh):
         pass
 
     def __init__(self, init=None, val=None):
@@ -204,7 +204,7 @@ class particles(object):
         return None
 
 
-class acceleration(parallel_mesh):
+class acceleration(mesh):
     pass
 
 
@@ -219,10 +219,10 @@ class fields(object):
         magn: contains the magnetic field
     """
 
-    class electric(parallel_mesh):
+    class electric(mesh):
         pass
 
-    class magnetic(parallel_mesh):
+    class magnetic(mesh):
         pass
 
     def __init__(self, init=None, val=None):
