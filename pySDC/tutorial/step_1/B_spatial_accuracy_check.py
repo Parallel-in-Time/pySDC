@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 import numpy as np
 import os.path
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 # setup id for gathering the results (will sort by nvars)
@@ -64,7 +64,7 @@ def run_accuracy_check(nvars_list, problem_params):
     for nvars in nvars_list:
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+        prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
         xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])

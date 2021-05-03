@@ -3,7 +3,7 @@ import numpy as np
 from dedalus import public as de
 
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field
 from pySDC.playgrounds.Dedalus.dedalus_field_fast import dedalus_field_fast
 
@@ -51,9 +51,9 @@ def parallelmesh_test(oloops, iloops, N):
     for i in range(oloops):
 
         t0 = time.time()
-        a = parallel_mesh(init=(N, None, np.zeros(1).dtype), val=1.0 * i)
-        b = parallel_mesh(a)
-        maxb = inner_loop(iloops, parallel_mesh, maxb, a, b)
+        a = mesh(init=(N, None, np.zeros(1).dtype), val=1.0 * i)
+        b = mesh(a)
+        maxb = inner_loop(iloops, mesh, maxb, a, b)
         t1 = time.time()
 
         maxtime = max(maxtime, t1 - t0)

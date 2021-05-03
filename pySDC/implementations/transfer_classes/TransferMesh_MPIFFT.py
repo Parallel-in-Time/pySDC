@@ -1,6 +1,6 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
 from mpi4py_fft import PFFT, newDistArray
 import numpy as np
 
@@ -45,7 +45,7 @@ class fft_to_fft(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, parallel_mesh):
+        if isinstance(F, mesh):
             if self.spectral:
                 G = self.coarse_prob.dtype_u(self.coarse_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):
@@ -73,7 +73,7 @@ class fft_to_fft(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, parallel_mesh):
+        if isinstance(G, mesh):
             if self.spectral:
                 F = self.fine_prob.dtype_u(self.fine_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):

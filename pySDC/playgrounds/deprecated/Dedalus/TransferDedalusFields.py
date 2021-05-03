@@ -4,7 +4,7 @@ import numpy as np
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
 
 
 class dedalus_field_transfer(space_transfer):
@@ -40,7 +40,7 @@ class dedalus_field_transfer(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, parallel_mesh):
+        if isinstance(F, mesh):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
             for l in range(self.coarse_prob.init[0][-1]):
                 FG = self.fine_prob.domain.new_field()
@@ -69,7 +69,7 @@ class dedalus_field_transfer(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, parallel_mesh):
+        if isinstance(G, mesh):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
             for l in range(self.fine_prob.init[0][-1]):
                 GF = self.coarse_prob.domain.new_field()

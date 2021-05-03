@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 
@@ -18,7 +18,7 @@ def main():
     problem_params['nvars'] = 1023  # number of degrees of freedom
 
     # instantiate problem
-    prob = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
     # instantiate collocation class, relative to the time interval [0,1]
     coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)

@@ -4,7 +4,7 @@ from scipy.sparse.linalg import gmres, spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
@@ -17,7 +17,7 @@ class advectionNd_periodic(ptype):
         A: FD discretization of the ND grad operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

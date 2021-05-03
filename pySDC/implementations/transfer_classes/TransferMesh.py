@@ -5,7 +5,7 @@ import scipy.sparse as sp
 import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh, parallel_comp2_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh, parallel_comp2_mesh
 
 
 class mesh_to_mesh(space_transfer):
@@ -145,7 +145,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        if isinstance(F, parallel_mesh):
+        if isinstance(F, mesh):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -200,7 +200,7 @@ class mesh_to_mesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        if isinstance(G, parallel_mesh):
+        if isinstance(G, mesh):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):

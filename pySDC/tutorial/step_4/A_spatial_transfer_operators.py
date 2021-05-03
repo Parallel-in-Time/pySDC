@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.tutorial.step_1.B_spatial_accuracy_check import get_accuracy_order
@@ -37,11 +37,11 @@ def main():
 
         # instantiate fine problem
         problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-        Pfine = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+        Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # instantiate coarse problem using half of the DOFs
         problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
-        Pcoarse = heat1d(problem_params=problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh)
+        Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # instantiate spatial interpolation
         T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)

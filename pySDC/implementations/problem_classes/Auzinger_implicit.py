@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 # noinspection PyUnusedLocal
@@ -12,7 +12,7 @@ class auzinger(ptype):
     Example implementing the Auzinger initial value problem
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

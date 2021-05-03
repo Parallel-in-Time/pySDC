@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -19,7 +19,7 @@ class advectiondiffusion1d_imex(ptype):
         irfft_object: planned IFFT for backward transformation, real-valued output
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -134,7 +134,7 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
     fully-implicit time-stepping
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 

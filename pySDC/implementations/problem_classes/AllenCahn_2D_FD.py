@@ -5,7 +5,7 @@ from scipy.sparse.linalg import cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh, parallel_comp2_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh, parallel_comp2_mesh
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -21,7 +21,7 @@ class allencahn_fullyimplicit(ptype):
         dx: distance between two spatial nodes (same for both directions)
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
 
@@ -187,7 +187,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -258,7 +258,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
@@ -352,7 +352,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_comp2_mesh):
         """
         Initialization routine
 
@@ -479,7 +479,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_comp2_mesh):
         """
         Initialization routine
 

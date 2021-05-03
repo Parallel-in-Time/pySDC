@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
 
@@ -10,7 +10,7 @@ class heat1d_forced(heat1d):
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1],
     discretized using central finite differences
     """
-    def __init__(self, problem_params, dtype_u=parallel_mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
         """
         Initialization routine
 
