@@ -7,6 +7,8 @@ Changelog
     for your project, make sure you adapt to the new data types (or don't upgrade).
   - **Faster quadrature**: Thanks to `tlunet <https://github.com/tlunet>`_ the computation of the weights is now faster and
     (even) more reliable. No breaking of any API here...
+  - **Bugfixing and version pushes**: The code should run without (many) complaints with Python 3.6, 3.7 and potentially above.
+    Also, the plotting routines have been adapted to work with recent versions of `matplotlib`.
 
   This is not much (yet) and if it were not for the API changes, this would have been a minor release.
 
