@@ -108,7 +108,7 @@ def compute_convergence_data(cwd=''):
             # compute exact solution and compare
             uex = P.u_exact(Tend)
 
-            error[ii] = np.linalg.norm(uex.values - uend.values, np.inf) / np.linalg.norm(uex.values, np.inf)
+            error[ii] = np.linalg.norm(uex - uend, np.inf) / np.linalg.norm(uex, np.inf)
             file.write(str(order) + "    " + str(ns) + "    " + str(error[ii]) + "\n")
 
         file.close()

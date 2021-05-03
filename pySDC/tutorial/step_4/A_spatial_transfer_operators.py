@@ -48,13 +48,13 @@ def main():
 
         # set exact fine solution to compare with
         xvalues_fine = np.array([(i + 1) * Pfine.dx for i in range(Pfine.params.nvars)])
-        uexact_fine = Pfine.dtype_u(0)
-        uexact_fine.values = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
+        uexact_fine = Pfine.dtype_u(Pfine.init)
+        uexact_fine[:] = np.sin(np.pi * Pfine.params.freq * xvalues_fine)
 
         # set exact coarse solution as source
         xvalues_coarse = np.array([(i + 1) * Pcoarse.dx for i in range(Pcoarse.params.nvars)])
-        uexact_coarse = Pfine.dtype_u(0)
-        uexact_coarse.values = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
+        uexact_coarse = Pfine.dtype_u(Pcoarse.init)
+        uexact_coarse[:] = np.sin(np.pi * Pcoarse.params.freq * xvalues_coarse)
 
         # do the interpolation/prolongation
         uinter = T.prolong(uexact_coarse)

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh, rhs_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit
 
 
@@ -50,7 +50,7 @@ def run_implicit_Euler(t0, dt, Tend):
         u = u_new
         t += dt
 
-        r, re = compute_radius(u.values, problem.dx, t, problem.params.radius)
+        r, re = compute_radius(u, problem.dx, t, problem.params.radius)
         radius.append(r)
         exact_radius.append(re)
 
@@ -62,7 +62,7 @@ def run_implicit_Euler(t0, dt, Tend):
     loaded = np.load(fname)
     uref = loaded['uend']
 
-    err = np.linalg.norm(uref - u.values, np.inf)
+    err = np.linalg.norm(uref - u, np.inf)
     print('Error vs. reference solution: %6.4e' % err)
 
     return err, radius, exact_radius
@@ -76,7 +76,7 @@ def run_imex_Euler(t0, dt, Tend):
         Tend (float): end time for dumping
     """
 
-    problem = allencahn_semiimplicit(problem_params=setup_problem(), dtype_u=mesh, dtype_f=rhs_imex_mesh)
+    problem = allencahn_semiimplicit(problem_params=setup_problem(), dtype_u=mesh, dtype_f=imex_mesh)
 
     u = problem.u_exact(t0)
 
@@ -94,7 +94,7 @@ def run_imex_Euler(t0, dt, Tend):
         u = u_new
         t += dt
 
-        r, re = compute_radius(u.values, problem.dx, t, problem.params.radius)
+        r, re = compute_radius(u, problem.dx, t, problem.params.radius)
         radius.append(r)
         exact_radius.append(re)
 
@@ -106,7 +106,7 @@ def run_imex_Euler(t0, dt, Tend):
     loaded = np.load(fname)
     uref = loaded['uend']
 
-    err = np.linalg.norm(uref - u.values, np.inf)
+    err = np.linalg.norm(uref - u, np.inf)
     print('Error vs. reference solution: %6.4e' % err)
 
     return err, radius, exact_radius
@@ -137,7 +137,7 @@ def run_CrankNicholson(t0, dt, Tend):
         u = u_new
         t += dt
 
-        r, re = compute_radius(u.values, problem.dx, t, problem.params.radius)
+        r, re = compute_radius(u, problem.dx, t, problem.params.radius)
         radius.append(r)
         exact_radius.append(re)
 
@@ -149,7 +149,7 @@ def run_CrankNicholson(t0, dt, Tend):
     loaded = np.load(fname)
     uref = loaded['uend']
 
-    err = np.linalg.norm(uref - u.values, np.inf)
+    err = np.linalg.norm(uref - u, np.inf)
     print('Error vs. reference solution: %6.4e' % err)
 
     return err, radius, exact_radius
@@ -179,7 +179,7 @@ def plot_radius(xcoords, exact_radius, radii):
     ax.grid()
     ax.legend(loc=3)
     fname = 'data/AC_contracting_circle_standard_integrators'
-    plt.savefig('{}.pdf'.format(fname), rasterized=True, bbox_inches='tight')
+    plt.savefig('{}.pdf'.format(fname),  bbox_inches='tight')
 
     # plt.show()
 

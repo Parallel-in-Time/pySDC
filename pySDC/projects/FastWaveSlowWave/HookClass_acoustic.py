@@ -26,6 +26,6 @@ class dump_energy(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        xx = L.uend.values
+        xx = L.uend
         E = np.sum(np.square(xx[0, :]) + np.square(xx[1, :]))
         self.file.write('%30.20f\n' % E)

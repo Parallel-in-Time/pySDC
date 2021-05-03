@@ -74,7 +74,7 @@ def run_accuracy_check(nvars_list, problem_params):
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap.values = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
+        u_lap[:] = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
 
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
@@ -175,7 +175,7 @@ def plot_accuracy(results):
 
     # save plot as PDF, beautify
     fname = 'step_1_accuracy_test_space.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
     return None
 

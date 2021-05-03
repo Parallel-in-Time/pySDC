@@ -45,10 +45,10 @@ class generic_implicit_MPI(sweeper):
         me = P.dtype_u(P.init, val=0.0)
         for m in range(self.coll.num_nodes):
             if m == self.rank:
-                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1].values,
-                                        me.values, root=m, op=MPI.SUM)
+                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1],
+                                        me, root=m, op=MPI.SUM)
             else:
-                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1].values,
+                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1],
                                         None, root=m, op=MPI.SUM)
 
         return me

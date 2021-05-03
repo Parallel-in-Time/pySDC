@@ -80,7 +80,7 @@ def compute_RDC_errors():
         # call main function to get things done...
         uend_rdc, stats_rdc = controller_rdc.run(u0=uinit, t0=t0, Tend=Tend)
 
-        err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+        err = np.linalg.norm(uend_rdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
         print('Maxiter = %2i -- Error: %8.4e' % (controller_rdc.MS[0].params.maxiter, err))
         results[maxiter] = err
 
@@ -146,7 +146,7 @@ def plot_RDC_results(cwd=''):
 
     # save plot as PNG, beautify
     fname = 'data/RDC_errors_vdp.png'
-    plt.savefig(fname, rasterized=True, bbox_inches='tight')
+    plt.savefig(fname,  bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plot was not created'
 

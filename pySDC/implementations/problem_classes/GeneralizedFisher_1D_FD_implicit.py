@@ -43,7 +43,8 @@ class generalized_fisher(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(generalized_fisher, self).__init__(problem_params['nvars'], dtype_u, dtype_f, problem_params)
+        super(generalized_fisher, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+                                                 dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
@@ -102,9 +103,9 @@ class generalized_fisher(ptype):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            uext = np.concatenate(([ul], u.values, [ur]))
-            g = u.values - \
-                factor * (self.A.dot(uext)[1:-1] + lambda0 ** 2 * u.values * (1 - u.values ** nu)) - rhs.values
+            uext = np.concatenate(([ul], u, [ur]))
+            g = u - \
+                factor * (self.A.dot(uext)[1:-1] + lambda0 ** 2 * u * (1 - u ** nu)) - rhs
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -114,10 +115,10 @@ class generalized_fisher(ptype):
 
             # assemble dg
             dg = sp.eye(self.params.nvars) - factor * \
-                (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u.values ** nu, offsets=0))
+                (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u ** nu, offsets=0))
 
             # newton update: u1 = u0 - g/dg
-            u.values -= spsolve(dg, g)
+            u -= spsolve(dg, g)
 
             # increase iteration count
             n += 1
@@ -151,10 +152,10 @@ class generalized_fisher(ptype):
         ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
               np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
 
-        uext = np.concatenate(([ul], u.values, [ur]))
+        uext = np.concatenate(([ul], u, [ur]))
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u.values * (1 - u.values ** self.params.nu)
+        f[:] = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u * (1 - u ** self.params.nu)
         return f
 
     def u_exact(self, t):
@@ -173,6 +174,6 @@ class generalized_fisher(ptype):
 
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        me.values = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-                     np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+        me[:] = (1 + (2 ** (self.params.nu / 2.0) - 1) *
+                 np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
         return me

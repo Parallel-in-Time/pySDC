@@ -108,13 +108,13 @@ def run_SDC_variant(variant=None):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    # plt_helper.plt.imshow(uinit.values)
+    # plt_helper.plt.imshow(uinit)
     # plt_helper.plt.show()
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # plt_helper.plt.imshow(uend.values)
+    # plt_helper.plt.imshow(uend)
     # plt_helper.plt.show()
 
     # filter statistics by variant (number of iterations)

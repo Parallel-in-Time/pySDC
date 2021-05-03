@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import progressbar
+# import progressbar
 
 from pySDC.core.Hooks import hooks
 
@@ -35,10 +35,10 @@ class particles_output(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        if hasattr(L.prob.params, 'Tend'):
-            self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
-        else:
-            self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
+        # if hasattr(L.prob.params, 'Tend'):
+        #     self.bar_run = progressbar.ProgressBar(max_value=L.prob.params.Tend)
+        # else:
+        #     self.bar_run = progressbar.ProgressBar(max_value=progressbar.UnknownLength)
 
         part = L.u[0]
         N = L.prob.params.nparts
@@ -49,20 +49,20 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos.values[:, i] - part.pos.values[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos.values[:, i] - part.pos.values[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos.values[:, i] * part.pos.values[:, i])
+                np.dot(w, part.pos[:, i] * part.pos[:, i])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
         ekin = 0
         for n in range(N):
             epot += part.q[n] * fpot[n]
-            ekin += part.m[n] / 2.0 * np.dot(part.vel.values[:, n], part.vel.values[:, n])
+            ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='etot', value=epot + ekin)
@@ -80,7 +80,7 @@ class particles_output(hooks):
         # some abbreviations
         L = step.levels[level_number]
 
-        self.bar_run.update(L.time)
+        # self.bar_run.update(L.time)
 
         L.sweep.compute_end_point()
         part = L.uend
@@ -92,27 +92,27 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos.values[:, i] - part.pos.values[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos.values[:, i] - part.pos.values[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos.values[:, i] * part.pos.values[:, i])
+                np.dot(w, part.pos[:, i] * part.pos[:, i])
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
         ekin = 0
         for n in range(N):
             epot += part.q[n] * fpot[n]
-            ekin += part.m[n] / 2.0 * np.dot(part.vel.values[:, n], part.vel.values[:, n])
+            ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           sweep=L.status.sweep, type='etot', value=epot + ekin)
 
         oldcol = self.sframe
-        # # self.sframe = self.ax.scatter(L.uend.pos.values[0],L.uend.pos.values[1],L.uend.pos.values[2])
-        self.sframe = self.ax.scatter(L.uend.pos.values[0::3], L.uend.pos.values[1::3], L.uend.pos.values[2::3])
+        # # self.sframe = self.ax.scatter(L.uend.pos[0],L.uend.pos[1],L.uend.pos[2])
+        self.sframe = self.ax.scatter(L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3])
         # Remove old line collection before drawing
         if oldcol is not None:
             self.ax.collections.remove(oldcol)

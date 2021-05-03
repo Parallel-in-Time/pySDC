@@ -142,18 +142,18 @@ def run_SDC_variant(variant=None, inexact=False):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    # plt_helper.plt.plot(uinit.values)
+    # plt_helper.plt.plot(uinit)
     # plt_helper.savefig('uinit', save_pdf=False, save_pgf=False, save_png=True)
     #
     # uex = P.u_exact(Tend)
-    # plt_helper.plt.plot(uex.values)
+    # plt_helper.plt.plot(uex)
     # plt_helper.savefig('uex', save_pdf=False, save_pgf=False, save_png=True)
     # exit()
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    plt_helper.plt.plot(uend.values)
+    plt_helper.plt.plot(uend)
     plt_helper.savefig('uend', save_pdf=False, save_pgf=False, save_png=True)
     # exit()
 

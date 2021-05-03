@@ -2,7 +2,7 @@ import numpy as np
 import time
 from mpi4py import MPI
 from mpi4py_fft import PFFT
-from pySDC.implementations.datatype_classes.parallel_mesh import parallel_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 

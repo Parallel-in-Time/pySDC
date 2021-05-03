@@ -9,12 +9,12 @@ from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic impo
 def run():
 
     nsteps = 8
-    L = 32
+    L = 4
     M = 3
-    N = 8
+    N = 16
 
-    alpha = 1E-01
-    dt = 0.02
+    alpha = 0.001
+    dt = 0.2
     t0 = 0.0
     nblocks = nsteps // L
 
@@ -42,31 +42,21 @@ def run():
     Q = coll.Qmat[1:, 1:]
     A = prob.A.todense()
 
-    print(max(abs(np.linalg.eigvals(Q))))
-
     E = np.zeros((L, L))
     np.fill_diagonal(E[1:, :], 1)
     Ealpha = np.zeros((L, L))
     np.fill_diagonal(Ealpha[1:, :], 1)
     if L > 1:
         Ealpha[0, -1] = alpha
-    d, S = np.linalg.eig(Ealpha)
 
     H = np.zeros((M, M))
     H[:, -1] = 1
 
-    # print(np.linalg.norm(np.linalg.inv(np.kron(IL, LM) - np.kron(Ealpha, H)), np.inf))
-
     C = np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A) - np.kron(np.kron(E, H), IN)
-    Calpha = np.kron(np.kron(IL, LM), IN) - np.kron(np.kron(Ealpha, H), IN)
+    Calpha = np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A) - np.kron(np.kron(Ealpha, H), IN)
     Calpha_inv = np.linalg.inv(Calpha)
 
-    print(min(np.linalg.svd(Calpha, compute_uv=False)))
-    print(np.linalg.norm(Calpha_inv.dot(Calpha - C), 2))
-    print(max(abs(np.linalg.eigvals(Calpha_inv.dot(Calpha - C)))))
-    exit()
-
-    uinit = prob.u_exact(t=t0).values
+    uinit = prob.u_exact(t=t0)
     u0_M = np.kron(np.ones(M), uinit)
     u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
 
@@ -84,7 +74,7 @@ def run():
             k += 1
             u += Calpha_inv @ res
             res = u0 - C @ u
-            uex = prob.u_exact(t=t0 + (nb + 1) * L * dt).values[:, None]
+            uex = prob.u_exact(t=t0 + (nb + 1) * L * dt)[:, None]
             err = np.linalg.norm(uex - u[-N:], np.inf)
             print(k, np.linalg.norm(res, np.inf), err)
 

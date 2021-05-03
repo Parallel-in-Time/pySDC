@@ -121,9 +121,9 @@ def main():
     results = dict()
     results['interval'] = problem_params['interval']
     results['xvalues'] = np.array([(i + 1 - (P.params.nvars + 1) / 2) * P.dx for i in range(P.params.nvars)])
-    results['uinit'] = uinit.values
-    results['uend'] = uend.values
-    results['uex'] = uex.values
+    results['uinit'] = uinit
+    results['uend'] = uend
+    results['uex'] = uex
 
     # write out for later visualization
     file = open('data/parallelSDC_results_graphs.pkl', 'wb')

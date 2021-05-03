@@ -39,12 +39,10 @@ def setup_mpl(font_size=8):
         "grid.alpha": 0.25,
         "figure.subplot.hspace": 0.0,
         "savefig.pad_inches": 0.01,
-        "pgf.preamble": [
-            r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
-            r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
-            r"\usepackage{underscore}",
-            r"\usepackage{amsmath,amssymb,marvosym}"
-        ]
+        "pgf.preamble": r"\usepackage[utf8x]{inputenc}"
+                        r"\usepackage[T1]{fontenc}"
+                        r"\usepackage{underscore}"
+                        r"\usepackage{amsmath,amssymb,marvosym}"
     }
     mpl.rcParams.update(pgf_with_latex)
 
@@ -57,9 +55,9 @@ def newfig(textwidth, scale, ratio=0.6180339887):
 
 def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
     if save_pgf:
-        plt.savefig('{}.pgf'.format(filename), rasterized=True, bbox_inches='tight')
+        plt.savefig('{}.pgf'.format(filename), bbox_inches='tight')
     if save_pdf:
-        plt.savefig('{}.pdf'.format(filename), rasterized=True, bbox_inches='tight')
+        plt.savefig('{}.pdf'.format(filename), bbox_inches='tight')
     if save_png:
-        plt.savefig('{}.png'.format(filename), rasterized=True, bbox_inches='tight')
+        plt.savefig('{}.png'.format(filename), bbox_inches='tight')
     plt.close()

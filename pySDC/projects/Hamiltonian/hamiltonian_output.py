@@ -56,6 +56,6 @@ class hamiltonian_output(hooks):
         L = step.levels[0]
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='position', value=L.uend.pos.values)
+                          sweep=L.status.sweep, type='position', value=L.uend.pos)
 
         return None

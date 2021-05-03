@@ -59,7 +59,7 @@ def main():
 
     uend_ref, stats_ref = controller_ref.run(u0=uinit, t0=t0, Tend=Tend)
 
-    np.save('data/vdp_ref.npy', uend_ref.values)
+    np.save('data/vdp_ref.npy', uend_ref)
 
 
 if __name__ == "__main__":
