@@ -5,7 +5,7 @@ from mpi4py_fft import PFFT
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh, parallel_comp2_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 from mpi4py_fft import newDistArray
 
@@ -25,7 +25,7 @@ class grayscott_imex_diffusion(ptype):
         Kv: Laplace operator in spectral space (v component)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 
@@ -205,7 +205,7 @@ class grayscott_imex_diffusion(ptype):
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Init routine for the IMEX problem class with linear splitting
         """
@@ -258,7 +258,7 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
         """
         Init routine for the multi-implicit problem class with diffusion splitting
         """
@@ -424,7 +424,7 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 class grayscott_mi_linear(grayscott_imex_linear):
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
         """
         Init routine for the multi-implicit problem class with linear splitting
         """

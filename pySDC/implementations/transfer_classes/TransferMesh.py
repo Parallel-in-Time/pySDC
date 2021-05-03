@@ -5,7 +5,7 @@ import scipy.sparse as sp
 import pySDC.helpers.transfer_helper as th
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh, parallel_comp2_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
 class mesh_to_mesh(space_transfer):
@@ -156,7 +156,7 @@ class mesh_to_mesh(space_transfer):
                 tmpF = F.flatten()
                 tmpG = self.Rspace.dot(tmpF)
                 G[:] = tmpG.reshape(self.coarse_prob.params.nvars)
-        elif isinstance(F, parallel_imex_mesh):
+        elif isinstance(F, imex_mesh):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -173,7 +173,7 @@ class mesh_to_mesh(space_transfer):
                 tmpF = F.expl.flatten()
                 tmpG = self.Rspace.dot(tmpF)
                 G.expl[:] = tmpG.reshape(self.coarse_prob.params.nvars)
-        elif isinstance(F, parallel_comp2_mesh):
+        elif isinstance(F, comp2_mesh):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -211,7 +211,7 @@ class mesh_to_mesh(space_transfer):
                 tmpG = G.flatten()
                 tmpF = self.Pspace.dot(tmpG)
                 F[:] = tmpF.reshape(self.fine_prob.params.nvars)
-        elif isinstance(G, parallel_imex_mesh):
+        elif isinstance(G, imex_mesh):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):
@@ -228,7 +228,7 @@ class mesh_to_mesh(space_transfer):
                 tmpG = G.expl.flatten()
                 tmpF = self.Pspace.dot(tmpG)
                 F.expl[:] = tmpF.reshape(self.fine_prob.params.nvars)
-        elif isinstance(G, parallel_comp2_mesh):
+        elif isinstance(G, comp2_mesh):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             if hasattr(self.fine_prob, 'ncomp'):
                 for i in range(self.fine_prob.ncomp):

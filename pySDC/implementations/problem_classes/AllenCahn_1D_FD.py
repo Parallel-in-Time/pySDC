@@ -5,7 +5,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh, parallel_comp2_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
 class allencahn_front_fullyimplicit(ptype):
@@ -197,7 +197,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
         dx: distance between two spatial nodes
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 
@@ -549,7 +549,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 
@@ -620,7 +620,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
     with driving force, 0-1 formulation (Bayreuth example)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_comp2_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
         """
         Initialization routine
 

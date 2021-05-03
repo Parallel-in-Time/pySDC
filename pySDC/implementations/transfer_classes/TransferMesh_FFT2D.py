@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class mesh_to_mesh_fft2d(space_transfer):
@@ -47,8 +47,8 @@ class mesh_to_mesh_fft2d(space_transfer):
         if isinstance(F, mesh):
             G = mesh(self.coarse_prob.init, val=0.0)
             G[:] = F[::self.ratio, ::self.ratio]
-        elif isinstance(F, parallel_imex_mesh):
-            G = parallel_imex_mesh(self.coarse_prob.init, val=0.0)
+        elif isinstance(F, imex_mesh):
+            G = imex_mesh(self.coarse_prob.init, val=0.0)
             G.impl[:] = F.impl[::self.ratio, ::self.ratio]
             G.expl[:] = F.expl[::self.ratio, ::self.ratio]
         else:
@@ -72,8 +72,8 @@ class mesh_to_mesh_fft2d(space_transfer):
             tmpF[0:halfG, self.fine_prob.init[0][0] - halfG:] = tmpG[0:halfG, halfG:]
             tmpF[self.fine_prob.init[0][0] - halfG:, self.fine_prob.init[0][0] - halfG:] = tmpG[halfG:, halfG:]
             F[:] = np.real(np.fft.ifft2(tmpF)) * self.ratio * 2
-        elif isinstance(G, parallel_imex_mesh):
-            F = parallel_imex_mesh(G)
+        elif isinstance(G, imex_mesh):
+            F = imex_mesh(G)
             tmpG_impl = np.fft.fft2(G.impl)
             tmpF_impl = np.zeros(self.fine_prob.init, dtype=np.complex128)
             halfG = int(self.coarse_prob.init[0][0] / 2)

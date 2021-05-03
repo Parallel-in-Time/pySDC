@@ -1,6 +1,6 @@
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from mpi4py_fft import PFFT, newDistArray
 import numpy as np
 
@@ -92,7 +92,7 @@ class fft_to_fft(space_transfer):
                 else:
                     G_hat = self.coarse_prob.fft.forward(G)
                     F[:] = self.fft_pad.backward(G_hat, F)
-        elif isinstance(G, parallel_imex_mesh):
+        elif isinstance(G, imex_mesh):
             if self.spectral:
                 F = self.fine_prob.dtype_f(self.fine_prob.init)
                 if hasattr(self.fine_prob, 'ncomp'):
