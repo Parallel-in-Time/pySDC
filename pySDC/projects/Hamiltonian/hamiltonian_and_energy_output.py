@@ -65,7 +65,7 @@ class hamiltonian_and_energy_output(hooks):
         E = P.eval_mode_energy(L.uend)
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='position', value=L.uend.pos.values)
+                          sweep=L.status.sweep, type='position', value=L.uend.pos)
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
                           sweep=L.status.sweep, type='energy_step', value=E)

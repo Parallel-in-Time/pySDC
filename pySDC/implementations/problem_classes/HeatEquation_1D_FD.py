@@ -40,8 +40,8 @@ class heat1d(ptype):
             raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                     params=problem_params)
+        super(heat1d, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
+                                     dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / (self.params.nvars + 1)
@@ -79,7 +79,7 @@ class heat1d(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = self.A.dot(u.values)
+        f[:] = self.A.dot(u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -97,7 +97,7 @@ class heat1d(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me.values = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs.values)
+        me[:] = spsolve(sp.eye(self.params.nvars, format='csc') - factor * self.A, rhs)
         return me
 
     def u_exact(self, t):
@@ -115,9 +115,9 @@ class heat1d(ptype):
         if self.params.freq >= 0:
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
             rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx ** 2
-            me.values = np.sin(np.pi * self.params.freq * xvalues) * \
+            me[:] = np.sin(np.pi * self.params.freq * xvalues) * \
                 np.exp(-t * self.params.nu * rho)
         else:
             np.random.seed(1)
-            me.values = np.random.rand(self.params.nvars)
+            me[:] = np.random.rand(self.params.nvars)
         return me

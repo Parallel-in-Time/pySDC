@@ -104,7 +104,7 @@ class TestImexSweeper(unittest.TestCase):
       self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Perform node-to-node SDC sweep
       level.sweep.update_nodes()
@@ -113,7 +113,7 @@ class TestImexSweeper(unittest.TestCase):
       LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
 
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(u0full) )
-      usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      usweep = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
       assert np.linalg.norm(unew - usweep, np.infty)<1e-14, "Single SDC sweeps in matrix and node-to-node formulation yield different results"
 
   #
@@ -124,14 +124,14 @@ class TestImexSweeper(unittest.TestCase):
       self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Perform update step in sweeper
       level.sweep.update_nodes()
-      ustages = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      ustages = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
       # Compute end value through provided function
       level.sweep.compute_end_point()
-      uend_sweep = level.uend.values
+      uend_sweep = level.uend
       # Compute end value from matrix formulation
       if level.sweep.params.do_coll_update:
         uend_mat   = self.pparams['u0'] + step.dt*level.sweep.coll.weights.dot(ustages*(problem.params.lambda_s[0] + problem.params.lambda_f[0]))
@@ -148,7 +148,7 @@ class TestImexSweeper(unittest.TestCase):
       self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       level.sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       QE, QI, Q = level.sweep.get_sweeper_mats()
 
@@ -160,9 +160,9 @@ class TestImexSweeper(unittest.TestCase):
 
       # Put stages of collocation solution into level
       for l in range(0,nnodes):
-        level.u[l+1].values = ucoll[l]
-        level.f[l+1].impl.values = problem.params.lambda_f[0]*ucoll[l]
-        level.f[l+1].expl.values = problem.params.lambda_s[0]*ucoll[l]
+        level.u[l+1][:] = ucoll[l]
+        level.f[l+1].impl[:] = problem.params.lambda_f[0]*ucoll[l]
+        level.f[l+1].expl[:] = problem.params.lambda_s[0]*ucoll[l]
 
       # Perform node-to-node SDC sweep
       level.sweep.update_nodes()
@@ -173,7 +173,7 @@ class TestImexSweeper(unittest.TestCase):
       # Make sure both matrix and node-to-node sweep leave collocation unaltered
       unew = np.linalg.inv(LHS).dot( u0full + RHS.dot(ucoll) )
       assert np.linalg.norm( unew - ucoll, np.infty )<1e-14, "Collocation solution not invariant under matrix SDC sweep"
-      unew_sweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      unew_sweep = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
       print(np.linalg.norm( unew_sweep - ucoll, np.infty ))
       assert np.linalg.norm( unew_sweep - ucoll, np.infty )<1e-14, "Collocation solution not invariant under node-to-node sweep"
 
@@ -186,13 +186,13 @@ class TestImexSweeper(unittest.TestCase):
       self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Perform K node-to-node SDC sweep
       K = 1 + np.random.randint(6)
       for i in range(0,K):
         level.sweep.update_nodes()
-      usweep = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      usweep = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       lambdas = [ problem.params.lambda_f[0] , problem.params.lambda_s[0] ]
       LHS, RHS = level.sweep.get_scalar_problems_sweeper_mats( lambdas = lambdas )
@@ -215,7 +215,7 @@ class TestImexSweeper(unittest.TestCase):
       self.swparams['collocation_class'] = type
       step, level, problem, nnodes = self.setupLevelStepProblem()
       step.levels[0].sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Perform K node-to-node SDC sweep
       K = 1 + np.random.randint(6)
@@ -223,7 +223,7 @@ class TestImexSweeper(unittest.TestCase):
         level.sweep.update_nodes()
       # Fetch final value
       level.sweep.compute_end_point()
-      uend_sweep = level.uend.values
+      uend_sweep = level.uend
 
       lambdas = [ problem.params.lambda_f[0] , problem.params.lambda_s[0] ]
 
@@ -252,9 +252,9 @@ class TestImexSweeper(unittest.TestCase):
       if not level.sweep.coll.right_is_node: break
       level.sweep.predict()
       ulaststage = np.random.rand()
-      level.u[nnodes].values = ulaststage
+      level.u[nnodes][:] = ulaststage
       level.sweep.compute_end_point()
-      uend = level.uend.values
+      uend = level.uend
       assert abs(uend-ulaststage)<1e-14, "compute_end_point with do_coll_update=False did not reproduce last stage value"
 
   #
@@ -268,15 +268,15 @@ class TestImexSweeper(unittest.TestCase):
       # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
       if not level.sweep.coll.right_is_node: break
       level.sweep.predict()
-      u0full = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      u0full = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Perform update step in sweeper
       level.sweep.update_nodes()
-      ustages = np.array([ level.u[l].values.flatten() for l in range(1,nnodes+1) ])
+      ustages = np.array([ level.u[l].flatten() for l in range(1,nnodes+1) ])
 
       # Compute end value through provided function
       level.sweep.compute_end_point()
-      uend_sweep = level.uend.values
+      uend_sweep = level.uend
       # Compute end value from matrix formulation
       q = np.zeros(nnodes)
       q[nnodes-1] = 1.0

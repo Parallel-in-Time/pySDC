@@ -46,11 +46,11 @@ def run_accuracy_check(prob):
 
     # create a mesh instance and fill it with a sine wave
     u = prob.dtype_u(init=prob.init)
-    u.values = np.sin(np.pi * prob.params.freq * xvalues)
+    u[:] = np.sin(np.pi * prob.params.freq * xvalues)
 
     # create a mesh instance and fill it with the Laplacian of the sine wave
     u_lap = prob.dtype_u(init=prob.init)
-    u_lap.values = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
+    u_lap[:] = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
 
     # compare analytic and computed solution using the eval_f routine of the problem class
     err = abs(prob.eval_f(u, 0) - u_lap)

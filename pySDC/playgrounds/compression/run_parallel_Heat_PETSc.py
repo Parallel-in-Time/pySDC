@@ -1,4 +1,5 @@
 import sys
+from argparse import ArgumentParser
 
 import numpy as np
 from mpi4py import MPI
@@ -11,7 +12,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferPETScDMDA import mesh_to_mesh_petsc_dmda
 
 
-def main():
+def main(nprocs_space=None):
 
     # set MPI communicator
     comm = MPI.COMM_WORLD
@@ -19,20 +20,20 @@ def main():
     world_rank = comm.Get_rank()
     world_size = comm.Get_size()
 
-    if len(sys.argv) == 2:
-        color = int(world_rank / int(sys.argv[1]))
+    # split world communicator to create space-communicators
+    if nprocs_space is not None:
+        color = int(world_rank / nprocs_space)
     else:
         color = int(world_rank / 1)
-
     space_comm = comm.Split(color=color)
     space_rank = space_comm.Get_rank()
     space_size = space_comm.Get_size()
 
-    if len(sys.argv) == 2:
-        color = int(world_rank % int(sys.argv[1]))
+    # split world communicator to create time-communicators
+    if nprocs_space is not None:
+        color = int(world_rank % nprocs_space)
     else:
         color = int(world_rank / world_size)
-
     time_comm = comm.Split(color=color)
     time_rank = time_comm.Get_rank()
     time_size = time_comm.Get_size()
@@ -74,7 +75,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 20 if space_rank == 0 else 99  # set level depending on rank
     # controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -90,11 +91,10 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 0.5
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
-    # controller = controller_nonMPI(num_procs=2, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.S.levels[0].prob
@@ -107,34 +107,44 @@ def main():
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
-    print(err)
+    if time_rank == time_size - 1 and space_rank == 0:
 
-    # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
+        print(f'Error vs. exact solution: {err}')
 
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    if space_rank == 0:
+        # filter statistics by type (number of iterations)
+        filtered_stats = filter_stats(stats, type='niter')
 
-    # compute and print statistics
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %2i' % item
+        # convert filtered statistics to list of iterations count, sorted by process
+        iter_counts = sort_stats(filtered_stats, sortby='time')
+
+        # compute and print statistics
+        for item in iter_counts:
+            out = 'Number of iterations for time %4.2f: %2i' % item
+            print(out)
+
+        niters = np.array([item[1] for item in iter_counts])
+        out = f'   Time-rank {time_rank} -- Mean number of iterations: %4.2f' % np.mean(niters)
+        print(out)
+        out = f'   Time-rank {time_rank} -- Range of values for number of iterations: %2i ' % np.ptp(niters)
+        print(out)
+        out = f'   Time-rank {time_rank} -- Position of max/min number of iterations: %2i -- %2i' % \
+              (int(np.argmax(niters)), int(np.argmin(niters)))
+        print(out)
+        out = f'   Time-rank {time_rank} -- Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
 
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    print(out)
-    out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
-    print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
-    print(out)
-    out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
-    print(out)
+        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-
-    print(timing)
+        print(f'   Time-rank {time_rank} -- Time to solution: {timing[0][1]}')
 
 
 if __name__ == "__main__":
-    main()
+    # Add parser to get number of processors in space
+    # Run this file via `mpirun -np N python run_parallel_Heat_PETSc.py -n P`,
+    # where N is the overall number of processors and P is the number of processors used for spatial parallelization.
+    parser = ArgumentParser()
+    parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
+    args = parser.parse_args()
+
+    main(nprocs_space=args.nprocs_space)

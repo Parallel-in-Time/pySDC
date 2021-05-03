@@ -45,8 +45,8 @@ class advection1d_dirichlet(ptype):
             problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection1d_dirichlet, self).__init__(init=problem_params['nvars'], dtype_u=dtype_u, dtype_f=dtype_f,
-                                                    params=problem_params)
+        super(advection1d_dirichlet, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
+                                                    dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / (self.params.nvars + 1)
@@ -110,7 +110,7 @@ class advection1d_dirichlet(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.values = -1.0 * self.A.dot(u.values)
+        f[:] = -1.0 * self.A.dot(u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -129,7 +129,7 @@ class advection1d_dirichlet(ptype):
 
         me = self.dtype_u(self.init)
         L = splu(sp.eye(self.params.nvars, format='csc') + factor * self.A)
-        me.values = L.solve(rhs.values)
+        me[:] = L.solve(rhs)
         return me
 
     def u_exact(self, t):
@@ -146,8 +146,8 @@ class advection1d_dirichlet(ptype):
         me = self.dtype_u(self.init)
         if self.params.freq >= 0:
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-            me.values = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
+            me[:] = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
         else:
             np.random.seed(1)
-            me.values = np.random.rand(self.params.nvars)
+            me[:] = np.random.rand(self.params.nvars)
         return me

@@ -60,7 +60,7 @@ def solve_collocation_problem(prob, coll, dt):
     # get initial value at t0 = 0
     u0 = prob.u_exact(t=0)
     # fill in u0-vector as right-hand side for the collocation problem
-    u0_coll = np.kron(np.ones(coll.num_nodes), u0.values)
+    u0_coll = np.kron(np.ones(coll.num_nodes), u0)
     # get exact solution at Tend = dt
     uend = prob.u_exact(t=dt)
 
@@ -68,7 +68,7 @@ def solve_collocation_problem(prob, coll, dt):
     u_coll = sp.linalg.spsolve(M, u0_coll)
 
     # compute error
-    err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend.values, np.inf)
+    err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend, np.inf)
 
     return err
 

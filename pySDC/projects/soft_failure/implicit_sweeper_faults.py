@@ -134,11 +134,11 @@ class implicit_sweeper_faults(generic_implicit):
 
             # do something to target = u here!
             # do a bitflip at random vector entry of u at random position in bit representation
-            ulen = len(target.values)
+            ulen = len(target)
             bitflip_entry = np.random.randint(ulen)
             pos = np.random.randint(64)
-            tmp = target.values[bitflip_entry]
-            target.values[bitflip_entry] = self.do_bitflip(target.values[bitflip_entry], pos)
+            tmp = target[bitflip_entry]
+            target[bitflip_entry] = self.do_bitflip(target[bitflip_entry], pos)
             # print('     fault in u injected')
 
             self.fault_stats.nfaults_injected_u += 1
@@ -148,11 +148,11 @@ class implicit_sweeper_faults(generic_implicit):
 
             # do something to target = f here!
             # do a bitflip at random vector entry of f at random position in bit representation
-            flen = len(target.values)
+            flen = len(target)
             bitflip_entry = np.random.randint(flen)
             pos = np.random.randint(64)
-            tmp = target.values[bitflip_entry]
-            target.values[bitflip_entry] = self.do_bitflip(target.values[bitflip_entry], pos)
+            tmp = target[bitflip_entry]
+            target[bitflip_entry] = self.do_bitflip(target[bitflip_entry], pos)
             # print('     fault in f injected')
 
             self.fault_stats.nfaults_injected_f += 1
@@ -170,8 +170,8 @@ class implicit_sweeper_faults(generic_implicit):
             out += ' --- '
             out += type + ' ' + str(bitflip_entry) + ' ' + str(pos)
             out += ' --- '
-            out += str(tmp) + ' ' + str(target.values[bitflip_entry]) + ' ' + \
-                str(np.abs(tmp - target.values[bitflip_entry]))
+            out += str(tmp) + ' ' + str(target[bitflip_entry]) + ' ' + \
+                str(np.abs(tmp - target[bitflip_entry]))
             out += '\n'
             self.params.dump_injections_filehandle.write(out)
 
@@ -188,8 +188,7 @@ class implicit_sweeper_faults(generic_implicit):
         L = self.level
 
         # calculate solver residual
-        res = L.u[current_node].values - L.dt * self.QI[current_node, current_node] * L.f[current_node].values \
-            - rhs.values
+        res = L.u[current_node] - L.dt * self.QI[current_node, current_node] * L.f[current_node] - rhs
         res_norm = np.linalg.norm(res, np.inf)
         if np.isnan(res_norm) or res_norm > self.params.detector_threshold:
             # print('     FAULT DETECTED!')

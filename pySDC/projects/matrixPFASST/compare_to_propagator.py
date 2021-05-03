@@ -239,12 +239,12 @@ def compare_controllers(type=None, par=0.0, f=None):
     # build propagation matrix using the prescribed number of iterations (or any other, if needed)
     prop = controller.build_propagation_matrix(niter=niter)
 
-    err_prop_ex = np.linalg.norm(prop.dot(uinit.values) - uex.values)
-    err_mat_ex = np.linalg.norm(uend_mat.values - uex.values)
+    err_prop_ex = np.linalg.norm(prop.dot(uinit) - uex)
+    err_mat_ex = np.linalg.norm(uend_mat - uex)
     out = '  Error (mat/prop) vs. exact solution: %6.4e -- %6.4e' % (err_mat_ex, err_prop_ex)
     f.write(out + '\n')
     print(out)
-    err_mat_prop = np.linalg.norm(prop.dot(uinit.values) - uend_mat.values)
+    err_mat_prop = np.linalg.norm(prop.dot(uinit) - uend_mat)
     out = '  Difference between matrix-PFASST and propagator: %6.4e' % err_mat_prop
     f.write(out + '\n')
     print(out)

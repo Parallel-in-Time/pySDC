@@ -84,7 +84,7 @@ def run_RDC(cwd=''):
     iter_counts = sort_stats(filtered_stats, sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
-    err = np.linalg.norm(uend_rdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+    err = np.linalg.norm(uend_rdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
     print('RDC       : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
@@ -99,7 +99,7 @@ def run_RDC(cwd=''):
     iter_counts = sort_stats(filtered_stats, sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
-    err = np.linalg.norm(uend_mlrdc.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+    err = np.linalg.norm(uend_mlrdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
     print('MLRDC     : Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
@@ -113,7 +113,7 @@ def run_RDC(cwd=''):
     iter_counts = sort_stats(filtered_stats, sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
-    err = np.linalg.norm(uend_pfasst.values - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
+    err = np.linalg.norm(uend_pfasst - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
     print('PFASST(10): Mean number of iterations: %6.3f -- Error: %8.4e' % (mean_niter, err))
     results.append((err, mean_niter))
 
