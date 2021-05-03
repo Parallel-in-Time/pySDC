@@ -3,7 +3,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -14,7 +14,7 @@ class swfw_scalar(ptype):
     Attributes:
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 

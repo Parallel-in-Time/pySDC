@@ -140,7 +140,7 @@ class mesh(np.ndarray):
         return self
 
 
-class parallel_imex_mesh(object):
+class imex_mesh(object):
     """
     RHS data type for meshes with implicit and explicit components
 
@@ -157,7 +157,7 @@ class parallel_imex_mesh(object):
 
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another parallel_imex_mesh object
+                  or another imex_mesh object
             val (float): an initial number (default: 0.0)
         Raises:
             DataError: if init is none of the types above
@@ -175,7 +175,7 @@ class parallel_imex_mesh(object):
             raise DataError('something went wrong during %s initialization' % type(self))
 
 
-class parallel_comp2_mesh(object):
+class comp2_mesh(object):
     """
     RHS data type for meshes with 2 components
 
@@ -190,7 +190,7 @@ class parallel_comp2_mesh(object):
 
         Args:
             init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
-                  or another parallel_comp2_mesh object
+                  or another comp2_mesh object
         Raises:
             DataError: if init is none of the types above
         """

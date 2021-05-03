@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 # noinspection PyUnusedLocal
@@ -18,7 +18,7 @@ class allencahn2d_imex(ptype):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 
@@ -147,7 +147,7 @@ class allencahn2d_imex_stab(allencahn2d_imex):
         irfft_object: planned IFFT for backward transformation
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=parallel_imex_mesh):
+    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
 

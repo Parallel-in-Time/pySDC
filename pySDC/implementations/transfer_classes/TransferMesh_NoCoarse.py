@@ -3,7 +3,7 @@ import scipy.sparse as sp
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class mesh_to_mesh(space_transfer):
@@ -39,8 +39,8 @@ class mesh_to_mesh(space_transfer):
         """
         if isinstance(F, mesh):
             G = mesh(F)
-        elif isinstance(F, parallel_imex_mesh):
-            G = parallel_imex_mesh(F)
+        elif isinstance(F, imex_mesh):
+            G = imex_mesh(F)
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
         return G
@@ -54,8 +54,8 @@ class mesh_to_mesh(space_transfer):
         """
         if isinstance(G, mesh):
             F = mesh(G)
-        elif isinstance(G, parallel_imex_mesh):
-            F = parallel_imex_mesh(G)
+        elif isinstance(G, imex_mesh):
+            F = imex_mesh(G)
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
         return F

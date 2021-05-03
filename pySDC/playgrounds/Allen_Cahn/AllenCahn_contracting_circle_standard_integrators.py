@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit
 
 
@@ -76,7 +76,7 @@ def run_imex_Euler(t0, dt, Tend):
         Tend (float): end time for dumping
     """
 
-    problem = allencahn_semiimplicit(problem_params=setup_problem(), dtype_u=mesh, dtype_f=parallel_imex_mesh)
+    problem = allencahn_semiimplicit(problem_params=setup_problem(), dtype_u=mesh, dtype_f=imex_mesh)
 
     u = problem.u_exact(t0)
 

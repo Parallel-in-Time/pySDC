@@ -4,7 +4,7 @@ import numpy as np
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 
-from pySDC.implementations.datatype_classes.mesh import mesh, parallel_imex_mesh
+from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class dedalus_field_transfer(space_transfer):
@@ -47,7 +47,7 @@ class dedalus_field_transfer(space_transfer):
                 FG['g'] = F[..., l]
                 FG.set_scales(scales=1.0 / self.ratio[0])
                 G[..., l] = FG['g']
-        elif isinstance(F, parallel_imex_mesh):
+        elif isinstance(F, imex_mesh):
             G = self.coarse_prob.dtype_f(self.coarse_prob.init)
             for l in range(self.fine_prob.init[0][-1]):
                 FG = self.fine_prob.domain.new_field()
@@ -76,7 +76,7 @@ class dedalus_field_transfer(space_transfer):
                 GF['g'] = G[..., l]
                 GF.set_scales(scales=self.ratio[0])
                 F[..., l] = GF['g']
-        elif isinstance(G, parallel_imex_mesh):
+        elif isinstance(G, imex_mesh):
             F = self.fine_prob.dtype_f(self.fine_prob.init)
             for l in range(self.coarse_prob.init[0][-1]):
                 GF = self.coarse_prob.domain.new_field()
