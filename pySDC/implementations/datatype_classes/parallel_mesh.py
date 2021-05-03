@@ -10,7 +10,8 @@ except ImportError:
 
 class parallel_mesh(np.ndarray):
     """
-    Numpy-based datatype for parallel meshes. Includes a communicator and expects a dtype to allow complex data.
+    Numpy-based datatype for serial or parallel meshes.
+    Can include a communicator and expects a dtype to allow complex data.
 
     Attributes:
         _comm: MPI communicator or None
