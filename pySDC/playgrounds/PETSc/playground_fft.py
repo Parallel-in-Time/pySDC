@@ -4,17 +4,6 @@ from petsc4py import PETSc
 def main():
 
     n = 4
-
-    v = PETSc.Vec()
-    print(type(v))
-    v.createMPI(n, comm=PETSc.COMM_WORLD)
-    print(type(v))
-    # v.setSizes(n)
-    # v.assemble()
-    print(v.getLocalSize())
-    exit()
-
-
     da = PETSc.DMDA().create([n, n], stencil_width=1)
 
     rank = PETSc.COMM_WORLD.getRank()
@@ -29,12 +18,12 @@ def main():
     print('x=', rank, x.getArray(), xs, xe, ys, ye)
 
     A = da.createMatrix()
-    A.setType('aij')  # sparse
+    A.setType(PETSc.Mat.Type.FFTW)  # sparse
     A.setFromOptions()
 
-    Istart, Iend = A.getOwnershipRange()
-    for I in range(Istart, Iend):
-        A[I, I] = 1.0
+    # Istart, Iend = A.getOwnershipRange()
+    # for I in range(Istart, Iend):
+    #     A[I, I] = 1.0
 
     # communicate off-processor values
     # and setup internal data structures
