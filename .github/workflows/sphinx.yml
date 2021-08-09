@@ -10,45 +10,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+        
+      - name: Add packages
+        run: |
+          sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
           
       - name: Cache conda
         uses: actions/cache@v2
         env:
           # Increase this value to reset cache if etc/example-environment.yml has not changed
-          CACHE_NUMBER: 0
+          CACHE_NUMBER: 1
         with:
           path: ~/conda_pkgs_dir
           key:
             ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
             
-      - name: Install everything
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: 3.7
+          use-only-tar-bz2: true
+          
+      - name: Install dependencies
+        shell: bash -l {0}
         run: |
-          sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
-          wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3.sh
-          chmod +x ~/miniconda3.sh
-          ~/miniconda3.sh -b;
-          export PATH=/usr/share/miniconda/bin/:$PATH
-          conda init bash
-          source ~/.bashrc
-          conda create -n test -y python=3.7
-          conda activate test
           conda install --yes -c conda-forge --file requirements.txt
           pip install nose-timer
-            
-#       - uses: conda-incubator/setup-miniconda@v2
-#         with:
-#           auto-update-conda: true
-#           python-version: 3.7
-#           use-only-tar-bz2: true
-          
-#       - name: Install dependencies
-#         shell: bash -l {0}
-#         run: |
-#           conda install --yes -c conda-forge --file requirements.txt
-#           pip install nose-timer
           
       - name: Run nosetest
         run: |
+          export PATH=/usr/share/miniconda/envs/test/bin/:$PATH
           nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
       
       - name: Build
