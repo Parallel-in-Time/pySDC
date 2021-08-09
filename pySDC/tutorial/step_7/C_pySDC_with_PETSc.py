@@ -56,7 +56,7 @@ def main():
     problem_params['nu'] = 1.0  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
     problem_params['cnvars'] = [(65, 65)]  # number of degrees of freedom for the coarsest level
-    problem_params['refine'] = [1, 0]  # number of refinements
+    problem_params['refine'] = [1]  # number of refinements
     problem_params['comm'] = space_comm  # pass space-communicator to problem class
     problem_params['sol_tol'] = 1E-12  # set tolerance to PETSc' linear solver
 
