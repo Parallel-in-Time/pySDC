@@ -36,6 +36,8 @@ jobs:
         run: |
           conda install --yes -c conda-forge --file requirements.txt
           pip install nose-timer
+          which python
+          which nosetests
           
       - name: Run nosetest
         run: |
