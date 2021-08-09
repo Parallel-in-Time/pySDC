@@ -15,8 +15,8 @@ jobs:
       - name: Test
         run: | 
           ls -artl .
-          ls -artl build
-          ls -artl ..
+          ls -artl pySDC
+          ls -artl docs
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
