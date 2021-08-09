@@ -1,7 +1,7 @@
 
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data, rhs_2comp_petsc_data
+from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class mesh_to_mesh_petsc_dmda(space_transfer):
@@ -36,17 +36,17 @@ class mesh_to_mesh_petsc_dmda(space_transfer):
         Args:
             F: the fine level data
         """
-        if isinstance(F, petsc_data):
+        if isinstance(F, petsc_vec):
             u_coarse = self.coarse_prob.dtype_u(self.coarse_prob.init)
-            self.inject.mult(F.values, u_coarse.values)
-        elif isinstance(F, rhs_imex_petsc_data):
+            self.inject.mult(F, u_coarse)
+        elif isinstance(F, petsc_vec_imex):
             u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            self.inject.mult(F.impl.values, u_coarse.impl.values)
-            self.inject.mult(F.expl.values, u_coarse.expl.values)
-        elif isinstance(F, rhs_2comp_petsc_data):
+            self.inject.mult(F.impl, u_coarse.impl)
+            self.inject.mult(F.expl, u_coarse.expl)
+        elif isinstance(F, petsc_vec_comp2):
             u_coarse = self.coarse_prob.dtype_f(self.coarse_prob.init)
-            self.inject.mult(F.comp1.values, u_coarse.comp1.values)
-            self.inject.mult(F.comp2.values, u_coarse.comp2.values)
+            self.inject.mult(F.comp1, u_coarse.comp1)
+            self.inject.mult(F.comp2, u_coarse.comp2)
         else:
             raise TransferError('Unknown type of fine data, got %s' % type(F))
 
@@ -59,17 +59,17 @@ class mesh_to_mesh_petsc_dmda(space_transfer):
         Args:
             G: the coarse level data
         """
-        if isinstance(G, petsc_data):
+        if isinstance(G, petsc_vec):
             u_fine = self.fine_prob.dtype_u(self.fine_prob.init)
-            self.interp.mult(G.values, u_fine.values)
-        elif isinstance(G, rhs_imex_petsc_data):
+            self.interp.mult(G, u_fine)
+        elif isinstance(G, petsc_vec_imex):
             u_fine = self.fine_prob.dtype_f(self.fine_prob.init)
-            self.interp.mult(G.impl.values, u_fine.impl.values)
-            self.interp.mult(G.expl.values, u_fine.expl.values)
-        elif isinstance(G, rhs_2comp_petsc_data):
+            self.interp.mult(G.impl, u_fine.impl)
+            self.interp.mult(G.expl, u_fine.expl)
+        elif isinstance(G, petsc_vec_comp2):
             u_fine = self.fine_prob.dtype_f(self.fine_prob.init)
-            self.interp.mult(G.comp1.values, u_fine.comp1.values)
-            self.interp.mult(G.comp2.values, u_fine.comp2.values)
+            self.interp.mult(G.comp1, u_fine.comp1)
+            self.interp.mult(G.comp2, u_fine.comp2)
         else:
             raise TransferError('Unknown type of coarse data, got %s' % type(G))
 
