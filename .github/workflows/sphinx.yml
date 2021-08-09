@@ -39,7 +39,8 @@ jobs:
           
       - name: Run nosetest
         run: |
-          /usr/share/miniconda/envs/test/bin/nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
+          export PATH=$PATH:/usr/share/miniconda/envs/test/bin/
+          nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
       
       - name: Build
         uses: ammaraskar/sphinx-action@master
