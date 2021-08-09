@@ -135,7 +135,7 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
     fname = cwd + 'data/GS_reference.dat'
     viewer = PETSc.Viewer().createBinary(fname, 'r')
     uex = P.u_exact(t0)
-    uex.values = PETSc.Vec().load(viewer)
+    uex[:] = PETSc.Vec().load(viewer)
     err = abs(uex - uend)
 
     # filter statistics by variant (number of iterations)
@@ -263,7 +263,7 @@ def run_reference():
 
     fname = 'data/GS_reference.dat'
     viewer = PETSc.Viewer().createBinary(fname, 'w')
-    viewer.view(uend.values)
+    viewer.view(uend)
 
     assert os.path.isfile(fname), 'ERROR: PETSc did not create file'
 
