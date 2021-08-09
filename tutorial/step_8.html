@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Step-8: Advanced topics &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -27,9 +25,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="../projects/parallelSDC.html" title="Attempts to parallelize SDC"
              accesskey="N">next</a> |</li>
@@ -55,8 +50,8 @@ However, we gather here further interesting cases, e.g. special flags or more al
 The application is (supposed) to be simple: merely put the <code class="docutils literal notranslate"><span class="pre">stats</span></code> object into the function <code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation</span></code> and look at the resulting figure.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>The function visualizes simply the residuals over all processes and all iterations, but only for a single block.</li>
-<li>The function itself is pretty straightforward and does not require passing the number of processes or iterations.</li>
+<li><p>The function visualizes simply the residuals over all processes and all iterations, but only for a single block.</p></li>
+<li><p>The function itself is pretty straightforward and does not require passing the number of processes or iterations.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/A_visualize_residuals.py">pySDC/tutorial/step_8/A_visualize_residuals.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -126,17 +121,7 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">8</span>
-</pre></div>
-</div>
-<a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 603.5px; height: 434.5px;" /></a>
+<a class="reference internal image-reference" href="tutorial/../../../step_8_residuals.png"><img alt="tutorial/../../../step_8_residuals.png" src="tutorial/../../../step_8_residuals.png" /></a>
 </div>
 <div class="section" id="part-b-multi-step-sdc">
 <h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Permalink to this headline">¶</a></h2>
@@ -148,8 +133,8 @@ Yet, the missing stabilization of the coarse level leads to a significant increa
 To prevent this, information can be sent forward immediately, but then this is not a parallel algorithm anymore..</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>Use the controller parameter <code class="docutils literal notranslate"><span class="pre">mssdc_jac</span></code> to controll whether the method should be “parallel” (Jacobi-like) or “serial” (Gauss-like).</li>
-<li>We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.</li>
+<li><p>Use the controller parameter <code class="docutils literal notranslate"><span class="pre">mssdc_jac</span></code> to controll whether the method should be “parallel” (Jacobi-like) or “serial” (Gauss-like).</p></li>
+<li><p>We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/B_multistep_SDC.py">pySDC/tutorial/step_8/B_multistep_SDC.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -314,24 +299,8 @@ To prevent this, information can be sent forward immediately, but then this is n
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">PFASST</span><span class="p">:</span> <span class="mf">2.87344391e-07</span>
-<span class="n">Error</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87650037e-07</span>
-<span class="n">Error</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87540078e-07</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646446e-10</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687310e-10</span>
-<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959191e-10</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span>  <span class="mi">8</span> <span class="o">/</span>  <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">/</span>  <span class="mi">9</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">6</span> <span class="o">/</span> <span class="mi">11</span> <span class="o">/</span>  <span class="mi">9</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">6</span> <span class="o">/</span> <span class="mi">13</span> <span class="o">/</span> <span class="mi">10</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">7</span> <span class="o">/</span> <span class="mi">14</span> <span class="o">/</span> <span class="mi">10</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">7</span> <span class="o">/</span> <span class="mi">15</span> <span class="o">/</span> <span class="mi">11</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">8</span> <span class="o">/</span> <span class="mi">16</span> <span class="o">/</span> <span class="mi">11</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">8</span> <span class="o">/</span> <span class="mi">18</span> <span class="o">/</span> <span class="mi">11</span>
-</pre></div>
-</div>
-<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_jac.png"><img alt="../_images/step_8_residuals_mssdc_jac.png" src="../_images/step_8_residuals_mssdc_jac.png" style="width: 595.5px; height: 434.5px;" /></a>
-<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_gs.png"><img alt="../_images/step_8_residuals_mssdc_gs.png" src="../_images/step_8_residuals_mssdc_gs.png" style="width: 590.5px; height: 434.5px;" /></a>
+<a class="reference internal image-reference" href="tutorial/../../../step_8_residuals_mssdc_jac.png"><img alt="tutorial/../../../step_8_residuals_mssdc_jac.png" src="tutorial/../../../step_8_residuals_mssdc_jac.png" /></a>
+<a class="reference internal image-reference" href="tutorial/../../../step_8_residuals_mssdc_gs.png"><img alt="tutorial/../../../step_8_residuals_mssdc_gs.png" src="tutorial/../../../step_8_residuals_mssdc_gs.png" /></a>
 </div>
 <div class="section" id="part-c-iteration-estimator">
 <h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Permalink to this headline">¶</a></h2>
@@ -342,8 +311,8 @@ Adding a few magic/safety constants here and there and you can guess when to sto
 This example takes three different test cases and checks how well the iteration estimator drives the iterates below the threshold.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>The estimator also works for PFASST, where is ensures that up to each step (!) the tolerance is met.</li>
-<li>The method also works for the parallel <cite>controller_MPI</cite> controller by using interrupts for checking when to stop (not tested here).</li>
+<li><p>The estimator also works for PFASST, where is ensures that up to each step (!) the tolerance is met.</p></li>
+<li><p>The method also works for the parallel <cite>controller_MPI</cite> controller by using interrupts for checking when to stop (not tested here).</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/C_iteration_estimator.py">pySDC/tutorial/step_8/C_iteration_estimator.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -562,7 +531,7 @@ This example takes three different test cases and checks how well the iteration 
                 <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nsteps</span>
                 <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup_auzinger</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">ml</span><span class="p">)</span>
 
-            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Running </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions with time-step size </span><span class="si">{</span><span class="n">dt</span><span class="si">}</span><span class="s1">...</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Running </span><span class="si">{type}</span><span class="s1"> in </span><span class="si">{ndim}</span><span class="s1"> dimensions with time-step size </span><span class="si">{dt}</span><span class="s1">...</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
@@ -585,7 +554,7 @@ This example takes three different test cases and checks how well the iteration 
             <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
             <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Mean number of iterations: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">4.2f</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Mean number of iterations: {np.mean(niters):4.2f}&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
@@ -593,9 +562,9 @@ This example takes three different test cases and checks how well the iteration 
             <span class="n">PDE_errors</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PDE_error_after_step&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="n">coll_errors</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;coll_error_after_step&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">iters</span><span class="p">,</span> <span class="n">PDE_err</span><span class="p">,</span> <span class="n">coll_err</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_counts</span><span class="p">,</span> <span class="n">PDE_errors</span><span class="p">,</span> <span class="n">coll_errors</span><span class="p">):</span>
-                <span class="k">assert</span> <span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;errtol&#39;</span><span class="p">],</span> <span class="sa">f</span><span class="s1">&#39;Error too high, got </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Errors after step </span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">iters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> iterations: &#39;</span> \
-                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">assert</span> <span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;errtol&#39;</span><span class="p">],</span> <span class="sa">f</span><span class="s1">&#39;Error too high, got </span><span class="si">{coll_err[1]:8.4e}</span><span class="s1">&#39;</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Errors after step </span><span class="si">{PDE_err[0]:8.4f}</span><span class="s1"> with </span><span class="si">{iters[1]}</span><span class="s1"> iterations: &#39;</span> \
+                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{PDE_err[1]:8.4e}</span><span class="s1"> / </span><span class="si">{coll_err[1]:8.4e}</span><span class="s1">&#39;</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -603,7 +572,7 @@ This example takes three different test cases and checks how well the iteration 
 
             <span class="c1"># filter statistics by type (error after time-step)</span>
             <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;...done, took </span><span class="si">{</span><span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> seconds!&#39;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;...done, took </span><span class="si">{timing[0][1]}</span><span class="s1"> seconds!&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
@@ -631,92 +600,6 @@ This example takes three different test cases and checks how well the iteration 
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Running diffusion in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 5.75
-   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 8.6496e-09
-   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 2.9864e-08
-   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 3.5299e-09
-   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 4.9220e-09
-   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 6.2372e-09
-   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 7.4551e-09
-   Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 8.5566e-09
-   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5246e-09
-
-...done, took 1.981518268585205 seconds!
------------------------------------------------------------------------------
-Running diffusion in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 3.00
-   Errors after step   0.1250 with 3 iterations: 9.8193e-09 / 6.6457e-10
-   Errors after step   0.2500 with 3 iterations: 1.7173e-08 / 2.2933e-09
-   Errors after step   0.3750 with 3 iterations: 2.2850e-08 / 3.8872e-09
-   Errors after step   0.5000 with 3 iterations: 2.7308e-08 / 5.4199e-09
-   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 6.8678e-09
-   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 8.2091e-09
-   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 9.4215e-09
-   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.0487e-08
-
-...done, took 4.153855323791504 seconds!
------------------------------------------------------------------------------
-Running advection in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 4.00
-   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 3.1514e-09
-   Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 3.1527e-09
-   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 3.1529e-09
-   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 3.1519e-09
-   Errors after step   0.6250 with 4 iterations: 1.8225e-08 / 3.1496e-09
-   Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 3.1514e-09
-   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
-   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
-
-...done, took 0.6809520721435547 seconds!
------------------------------------------------------------------------------
-Running advection in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 2.00
-   Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.2776e-09
-   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.2768e-09
-   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.2704e-09
-   Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.2797e-09
-   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.2688e-09
-   Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.2776e-09
-   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
-   Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
-
-...done, took 1.2396082878112793 seconds!
------------------------------------------------------------------------------
-Running auzinger in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 5.62
-   Errors after step   0.1250 with 5 iterations: 4.6598e-09 / 4.0224e-09
-   Errors after step   0.2500 with 5 iterations: 8.0010e-09 / 7.0014e-09
-   Errors after step   0.3750 with 5 iterations: 1.4700e-08 / 1.0859e-08
-   Errors after step   0.5000 with 6 iterations: 1.5583e-08 / 8.8100e-10
-   Errors after step   0.6250 with 6 iterations: 2.1829e-08 / 1.4698e-09
-   Errors after step   0.7500 with 6 iterations: 2.6153e-08 / 2.5605e-09
-   Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
-   Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
-
-...done, took 1.321434736251831 seconds!
------------------------------------------------------------------------------
-Running auzinger in 1 dimensions with time-step size 0.125...
-
-   Mean number of iterations: 3.62
-   Errors after step   0.1250 with 3 iterations: 4.2389e-09 / 1.7594e-09
-   Errors after step   0.2500 with 3 iterations: 8.4469e-09 / 2.8400e-09
-   Errors after step   0.3750 with 3 iterations: 1.1763e-08 / 4.2048e-09
-   Errors after step   0.5000 with 4 iterations: 1.7832e-08 / 5.1321e-11
-   Errors after step   0.6250 with 4 iterations: 2.3399e-08 / 8.4754e-11
-   Errors after step   0.7500 with 4 iterations: 2.8017e-08 / 1.5106e-10
-   Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
-   Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
-
-...done, took 1.9489550590515137 seconds!
------------------------------------------------------------------------------
-</pre></div>
-</div>
 </div>
 <div class="section" id="part-x-to-be-continued">
 <h2>Part X: To be continued…<a class="headerlink" href="#part-x-to-be-continued" title="Permalink to this headline">¶</a></h2>
@@ -755,17 +638,15 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -777,9 +658,6 @@ Running auzinger in 1 dimensions with time-step size 0.125...
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="../projects/parallelSDC.html" title="Attempts to parallelize SDC"
              >next</a> |</li>
         <li class="right" >
@@ -790,7 +668,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

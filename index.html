@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Welcome to pySDC! &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -26,9 +24,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="tutorial/step_1.html" title="Step-1: A first spatial problem"
              accesskey="N">next</a> |</li>
@@ -49,14 +44,14 @@ New ideas like e.g. sweepers or predictors can be tested and first toy problems 
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet, multi-level, diagonal, multi-step</li>
-<li>Variants of PFASST: virtual parallel or MPI-based parallel, classical of multigrid perspective</li>
-<li>8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics</li>
-<li>Projects: many documented projects with defined and tested outcomes</li>
-<li>Many different examples, collocation types, data types already implemented</li>
-<li>Works with <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> through <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a> , <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> and <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a></li>
-<li>Continuous integration via <a class="reference external" href="https://travis-ci.org/Parallel-in-Time/pySDC">Travis-CI</a></li>
-<li>Fully compatible with 3.6 (or higher)</li>
+<li><p>Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet, multi-level, diagonal, multi-step</p></li>
+<li><p>Variants of PFASST: virtual parallel or MPI-based parallel, classical of multigrid perspective</p></li>
+<li><p>8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics</p></li>
+<li><p>Projects: many documented projects with defined and tested outcomes</p></li>
+<li><p>Many different examples, collocation types, data types already implemented</p></li>
+<li><p>Works with <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> through <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a> , <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> and <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a></p></li>
+<li><p>Continuous integration via <a class="reference external" href="https://travis-ci.org/Parallel-in-Time/pySDC">Travis-CI</a></p></li>
+<li><p>Fully compatible with 3.6 (or higher)</p></li>
 </ul>
 </div>
 <div class="section" id="getting-started">
@@ -97,103 +92,100 @@ When using <cite>fenics</cite> or <cite>petsc4py</cite>, a C++ compiler is requi
 <h2>How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this headline">¶</a></h2>
 <p>If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using <a class="reference external" href="https://doi.org/10.1145/3310410">this paper</a>:</p>
 <blockquote>
-<div>Robert Speck, <strong>Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections</strong>,
+<div><p>Robert Speck, <strong>Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections</strong>,
 ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019,
-<a class="reference external" href="https://doi.org/10.1145/3310410">https://doi.org/10.1145/3310410</a></div></blockquote>
+<a class="reference external" href="https://doi.org/10.1145/3310410">https://doi.org/10.1145/3310410</a></p>
+</div></blockquote>
 </div>
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <ul>
-<li><p class="first">May 4, 2021: Long time, no see, but this major release 4.0 marks some improvements under the hood:</p>
+<li><p>May 4, 2021: Long time, no see, but this major release 4.0 marks some improvements under the hood:</p>
 <ul class="simple">
-<li><strong>Rewrote ``mesh`` and ``particle`` data type</strong>: Creation of new arrays for each operation is now avoided by
+<li><p><strong>Rewrote ``mesh`` and ``particle`` data type</strong>: Creation of new arrays for each operation is now avoided by
 directly subclassing Numpy’s <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>. Somewhat faster, definitively better, less code, future-proof, but also breaking the API. If you use <cite>pySDC</cite>
-for your project, make sure you adapt to the new data types (or don’t upgrade).</li>
-<li><strong>Faster quadrature</strong>: Thanks to <a class="reference external" href="https://github.com/tlunet">tlunet</a> the computation of the weights is now faster and
-(even) more reliable. No breaking of any API here…</li>
-<li><strong>Bugfixing and version pushes</strong>: The code should run without (many) complaints with Python 3.6, 3.7 and potentially above.
-Also, the plotting routines have been adapted to work with recent versions of <cite>matplotlib</cite>.</li>
+for your project, make sure you adapt to the new data types (or don’t upgrade).</p></li>
+<li><p><strong>Faster quadrature</strong>: Thanks to <a class="reference external" href="https://github.com/tlunet">tlunet</a> the computation of the weights is now faster and
+(even) more reliable. No breaking of any API here…</p></li>
+<li><p><strong>Bugfixing and version pushes</strong>: The code should run without (many) complaints with Python 3.6, 3.7 and potentially above.
+Also, the plotting routines have been adapted to work with recent versions of <cite>matplotlib</cite>.</p></li>
 </ul>
 <p>This is not much (yet) and if it were not for the API changes, this would have been a minor release.</p>
 </li>
-<li><p class="first">August 30, 2019: Version 3.1 adds many more examples like the nonlinear Schrödinger equation, more on Gray-Scott and in particular Allen-Cahn.
+<li><p>August 30, 2019: Version 3.1 adds many more examples like the nonlinear Schrödinger equation, more on Gray-Scott and in particular Allen-Cahn.
 Those are many implemented using the parallel FFT library <a class="reference external" href="https://bitbucket.org/mpi4py/mpi4py-fft/src/master/">mpi4pi-fft</a>, which can now be used with <cite>pySDC</cite>.
 There are now 8 tutorials, where step 7 shows the usage of three external libraries with <cite>pySDC</cite>: mpi4py, FEniCS and petsc4py.
 The MPI controller has been improved after performaning a detailed performance analysis using <a class="reference external" href="https://www.vi-hps.org/projects/score-p/">Score-P</a> and <a class="reference external" href="https://www.vi-hps.org/Tools/Extrae.html">Extrae</a>.
-Finally: first steps towards error/iteration estimators are taken, too.</p>
-</li>
-<li><p class="first">February 14, 2019: Released version 3 of <cite>pySDC</cite>. This release is accompanied by the <strong>ACM TOMS paper</strong>
+Finally: first steps towards error/iteration estimators are taken, too.</p></li>
+<li><p>February 14, 2019: Released version 3 of <cite>pySDC</cite>. This release is accompanied by the <strong>ACM TOMS paper</strong>
 <a class="reference external" href="https://doi.org/10.1145/3310410">“pySDC –  Prototyping spectral deferred corrections”</a>.
 It release contains some breaking changes to the API. In detail:</p>
 <ul class="simple">
-<li><strong>Dropped Python 2 support</strong>: Starting with this version, <cite>pySDC</cite> relies on Python 3. Various incompabilities led
+<li><p><strong>Dropped Python 2 support</strong>: Starting with this version, <cite>pySDC</cite> relies on Python 3. Various incompabilities led
 to inconsistent treatment of dependencies, so that parts of the code had to use Python 2 while other relied on
 Python 3 or could do both. We follow <a class="reference external" href="https://python3statement.org/">A pledge to migrate to Python 3</a> with this decision,
-as most prominent dependencies of <cite>pySDC</cite> already do.</li>
-<li><strong>Unified controllers</strong>: Instead of providing (and maintaining) four different controllers, this release only has
+as most prominent dependencies of <cite>pySDC</cite> already do.</p></li>
+<li><p><strong>Unified controllers</strong>: Instead of providing (and maintaining) four different controllers, this release only has
 one for emulated and one for MPI-based time-parallelization (<code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code> and <code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code>).
 This should avoid further confusion and makes the code easier to maintain. Both controllers use the multigrid
 perspective for the algorithm (first exchange data, than compute updates), but the classical way of determining
 when to stop locally (each time-step is stopped when ready, if the previous one is ready, too). The complete multigrid
-behavior can be restored using a flag. All included projects and tutorials have been adapted to this.</li>
-<li><strong>No more data types in the front-ends</strong>: The redundant use of data type specifications in the description dictionaries
+behavior can be restored using a flag. All included projects and tutorials have been adapted to this.</p></li>
+<li><p><strong>No more data types in the front-ends</strong>: The redundant use of data type specifications in the description dictionaries
 has been removed. Data types are now declared within each problem class (more precisely, in the header of the
-<code class="docutils literal notranslate"><span class="pre">__init__</span></code>-method to allow inhertiance). All included projects and tutorials have been adapted to this.</li>
-<li><strong>Renewed FEniCS support</strong>: This release revives the deprecated <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> support, now requiring at least FEniCS 2018.1.
-The integration is tested using Travis-CI.</li>
-<li><strong>More consistent handling of local initial conditions</strong>: The treatment of <code class="docutils literal notranslate"><span class="pre">u[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">f[0]</span></code> has been fixed and
-made consistent throughout the code.</li>
-<li>As usual, many bugs have been discovered and fixed.</li>
+<code class="docutils literal notranslate"><span class="pre">__init__</span></code>-method to allow inhertiance). All included projects and tutorials have been adapted to this.</p></li>
+<li><p><strong>Renewed FEniCS support</strong>: This release revives the deprecated <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> support, now requiring at least FEniCS 2018.1.
+The integration is tested using Travis-CI.</p></li>
+<li><p><strong>More consistent handling of local initial conditions</strong>: The treatment of <code class="docutils literal notranslate"><span class="pre">u[0]</span></code> and <code class="docutils literal notranslate"><span class="pre">f[0]</span></code> has been fixed and
+made consistent throughout the code.</p></li>
+<li><p>As usual, many bugs have been discovered and fixed.</p></li>
 </ul>
 </li>
-<li><p class="first">May 23, 3018: Version 2.4 adds support for <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>!
+<li><p>May 23, 3018: Version 2.4 adds support for <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>!
 You can now use <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> data types (<cite>pySDC</cite> ships with DMDA for distributed structured grids) and parallel solvers right from your examples and problem classes.
 There is also a new tutorial (7.C) showing this in a bit more detail, including communicator splitting for parallelization in space and time.
 Warning: in order to get this to work you need to install petsc4py and mpi4py first! Make sure both use MPICH3 bindings.
-Downloading <cite>pySDC</cite> from PyPI does not include these packages.</p>
-</li>
-<li><p class="first">February 8, 2018: Ever got annoyed at <cite>pySDC</cite>’s incredibly slow setup phase when multiple time-steps are used? Version 2.3
+Downloading <cite>pySDC</cite> from PyPI does not include these packages.</p></li>
+<li><p>February 8, 2018: Ever got annoyed at <cite>pySDC</cite>’s incredibly slow setup phase when multiple time-steps are used? Version 2.3
 changes this by copying the data structure of the first step to all other steps using the <a class="reference external" href="https://pypi.python.org/pypi/dill">dill Package</a>.
 Setup times could be reduced by 90% and more for certain problems. We also increase the speed for certain calculations,
-in particular for the Penning trap example.</p>
-</li>
-<li><p class="first">November 7, 2017: Version 2.2 contains matrix-based versions of PFASST within the project <code class="docutils literal notranslate"><span class="pre">matrixPFASST</span></code>. This involved quite a few
+in particular for the Penning trap example.</p></li>
+<li><p>November 7, 2017: Version 2.2 contains matrix-based versions of PFASST within the project <code class="docutils literal notranslate"><span class="pre">matrixPFASST</span></code>. This involved quite a few
 changes in more or less unexpected places, e.g. in the multigrid controller and the transfer base class. The impact
-of these changes on other projects should be negligible, though.</p>
-</li>
-<li><p class="first">October 25, 2017: For the <a class="reference external" href="https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods">6th Workshop on Parallel-in-Time Integration</a>
+of these changes on other projects should be negligible, though.</p></li>
+<li><p>October 25, 2017: For the <a class="reference external" href="https://www.ics.usi.ch/index.php/6th-workshop-on-parallel-in-time-methods">6th Workshop on Parallel-in-Time Integration</a>
 <cite>pySDC</cite> has been updated to version 2.1. It is now available on PyPI - the Python Package Index, see <a class="reference external" href="https://pypi.python.org/pypi/pySDC">https://pypi.python.org/pypi/pySDC</a>
 and can be installed simply by using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pySDC</span></code>. Naturally, this release contains a lot of bugfixes and minor improvements.
-Most notably, the file structure has been changed again to meet the standards for Python packaging (at least a bit).</p>
-</li>
-<li><p class="first">November 24, 2016: Released version 2 of <cite>pySDC</cite>. This release contains major changes to the code and its structure:</p>
+Most notably, the file structure has been changed again to meet the standards for Python packaging (at least a bit).</p></li>
+<li><p>November 24, 2016: Released version 2 of <cite>pySDC</cite>. This release contains major changes to the code and its structure:</p>
 <ul class="simple">
-<li><strong>Complete redesign of code structure</strong>: The <code class="docutils literal notranslate"><span class="pre">core</span></code> part of <cite>pySDC</cite> only contains the core modules and classes,
+<li><p><strong>Complete redesign of code structure</strong>: The <code class="docutils literal notranslate"><span class="pre">core</span></code> part of <cite>pySDC</cite> only contains the core modules and classes,
 while <code class="docutils literal notranslate"><span class="pre">implementations</span></code> contains the actual implementations necessary to run something.
 This now includes separate files for all collocation classes, as well as a collection of problems, transfer classes and so on.
-Most examples have been ported to either <code class="docutils literal notranslate"><span class="pre">tutorials</span></code>, <code class="docutils literal notranslate"><span class="pre">playgrounds</span></code> or <code class="docutils literal notranslate"><span class="pre">projects</span></code>.</li>
-<li><strong>Introduction of tutorials</strong>: We added a tutorial (see below) to explain many
+Most examples have been ported to either <code class="docutils literal notranslate"><span class="pre">tutorials</span></code>, <code class="docutils literal notranslate"><span class="pre">playgrounds</span></code> or <code class="docutils literal notranslate"><span class="pre">projects</span></code>.</p></li>
+<li><p><strong>Introduction of tutorials</strong>: We added a tutorial (see below) to explain many
 of pySDC’s features in a step-by-step fashion. We start with a simple spatial
 discretization and collocation formulations and move step by step to SDC, MLSDC and PFASST.
-All tutorials are accompanied by tests.</li>
-<li><strong>New all-inclusive controllers</strong>: Instead of having two PFASST controllers
+All tutorials are accompanied by tests.</p></li>
+<li><p><strong>New all-inclusive controllers</strong>: Instead of having two PFASST controllers
 which could also do SDC and MLSDC (and more), we now have four generic controllers
 which can do all these methods, depending on the input. They are split into
 two by two class: <cite>MPI</cite> and <cite>NonMPI</cite> for real or virtual parallelisim as well
 as <cite>classic</cite> and <cite>multigrid</cite> for the standard and multigrid-like implementation
-of PFASST and the likes. Initialization has been simplified a lot, too.</li>
-<li><strong>Collocation-based coarsening</strong> As the standard PFASST libraries <a class="reference external" href="https://bitbucket.org/memmett/libpfasst">libpfasst</a> and <a class="reference external" href="https://github.com/Parallel-in-Time/PFASST">PFASST++</a>
+of PFASST and the likes. Initialization has been simplified a lot, too.</p></li>
+<li><p><strong>Collocation-based coarsening</strong> As the standard PFASST libraries <a class="reference external" href="https://bitbucket.org/memmett/libpfasst">libpfasst</a> and <a class="reference external" href="https://github.com/Parallel-in-Time/PFASST">PFASST++</a>
 <cite>pySDC</cite> now offers collocation-based coarsening, i.e. the number of collocation nodes can be reduced during coarsening.
-Also, time-step coarsening is in preparation, but not implemented yet.</li>
-<li><strong>Testing and documentation</strong> The core, implementations and plugin packages and their subpackages are fully documented using sphinx-apidoc, see below.
+Also, time-step coarsening is in preparation, but not implemented yet.</p></li>
+<li><p><strong>Testing and documentation</strong> The core, implementations and plugin packages and their subpackages are fully documented using sphinx-apidoc, see below.
 This documentation as well as this website are generated automatically using <a class="reference external" href="https://travis-ci.org/Parallel-in-Time/pySDC">Travis-CI</a>.
-Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.</li>
-<li>Further, minor changes:<ul>
-<li>Switched to more stable barycentric interpolation for the quadrature weights</li>
-<li>New collocation class: <cite>EquidistantSpline_Right</cite> for spline-based quadrature</li>
-<li>Collocation tests are realized by generators and not by classes</li>
-<li>Multi-step SDC (aka single-level PFASST) now works as expected</li>
-<li>Reworked many of the internal structures for consistency and simplicity</li>
+Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.</p></li>
+<li><p>Further, minor changes:</p>
+<ul>
+<li><p>Switched to more stable barycentric interpolation for the quadrature weights</p></li>
+<li><p>New collocation class: <cite>EquidistantSpline_Right</cite> for spline-based quadrature</p></li>
+<li><p>Collocation tests are realized by generators and not by classes</p></li>
+<li><p>Multi-step SDC (aka single-level PFASST) now works as expected</p></li>
+<li><p>Reworked many of the internal structures for consistency and simplicity</p></li>
 </ul>
 </li>
 </ul>
@@ -264,19 +256,14 @@ The API (as well as the tutorial pages) can also be generated manually and local
 </div>
 <p>in the root directory. Then, the main index can be found in <code class="docutils literal notranslate"><span class="pre">target/doc/build/index.html</span></code>. Anyway, here is the online version:</p>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="pySDC/core.html">core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pySDC/implementations.html">implementations package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pySDC/helpers.html">helpers package</a></li>
-</ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -315,17 +302,15 @@ The API (as well as the tutorial pages) can also be generated manually and local
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -337,9 +322,6 @@ The API (as well as the tutorial pages) can also be generated manually and local
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="tutorial/step_1.html" title="Step-1: A first spatial problem"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">pySDC 4.0 documentation</a> &#187;</li> 
@@ -347,7 +329,7 @@ The API (as well as the tutorial pages) can also be generated manually and local
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

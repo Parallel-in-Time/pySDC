@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Step-5: PFASST &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -27,9 +25,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="step_6.html" title="Step-6: Advanced PFASST controllers"
              accesskey="N">next</a> |</li>
@@ -56,10 +51,10 @@ The nice thing about going form MLSDC to PFASST is that only the number of proce
 This way the controller knows that multiple steps have to be computed in parallel.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>To avoid the tedious installation of mpi4py and to have full access to all data at all times, the controllers with the <code class="docutils literal notranslate"><span class="pre">_nonMPI</span></code> suffix only emulate parallelism.
-The algorithm is the same, but the steps are performed serially. Using <code class="docutils literal notranslate"><span class="pre">MPI</span></code> controllers allow for real parallelism and should yield the same results (see next tutorial step).</li>
-<li>While in principle all steps can have a different number of levels, the controllers implemented so far assume that the number of levels is constant.
-Also, the instantiation of (the list of) steps via the controllers is implemented only for this case. Yet, pySDC’s data structures in principle allow for different approaches.</li>
+<li><p>To avoid the tedious installation of mpi4py and to have full access to all data at all times, the controllers with the <code class="docutils literal notranslate"><span class="pre">_nonMPI</span></code> suffix only emulate parallelism.
+The algorithm is the same, but the steps are performed serially. Using <code class="docutils literal notranslate"><span class="pre">MPI</span></code> controllers allow for real parallelism and should yield the same results (see next tutorial step).</p></li>
+<li><p>While in principle all steps can have a different number of levels, the controllers implemented so far assume that the number of levels is constant.
+Also, the instantiation of (the list of) steps via the controllers is implemented only for this case. Yet, pySDC’s data structures in principle allow for different approaches.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_5/A_multistep_multilevel_hierarchy.py">pySDC/tutorial/step_5/A_multistep_multilevel_hierarchy.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
@@ -129,18 +124,6 @@ Also, the instantiation of (the list of) steps via the controllers is implemente
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Process</span>  <span class="mi">0</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">1</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">2</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">3</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">4</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">5</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">6</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">7</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">8</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-<span class="n">Process</span>  <span class="mi">9</span> <span class="n">has</span>  <span class="mi">3</span> <span class="n">levels</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="part-b-my-first-pfasst-run">
 <h2>Part B: My first PFASST run<a class="headerlink" href="#part-b-my-first-pfasst-run" title="Permalink to this headline">¶</a></h2>
@@ -152,9 +135,9 @@ We compute and check the error as well as multiple statistical quantaties, e.g. 
 We see that PFASST performs very well in this case, the iteration counts do not increase significantly.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>In the IMEX sweeper, we can activate the LU-trick for the implicit part by specifying <code class="docutils literal notranslate"><span class="pre">QI</span></code> as <code class="docutils literal notranslate"><span class="pre">LU</span></code>. For stiff parabolic problems with Gauss-Radau nodes, this is usually a very good idea!</li>
-<li>As usual for MLSDC and PFASST, the success depends heavily on the choice of parameters.
-Making the problem more complicated, less/more stiff, changing the order of the spatial interpolation etc. can give completely different results.</li>
+<li><p>In the IMEX sweeper, we can activate the LU-trick for the implicit part by specifying <code class="docutils literal notranslate"><span class="pre">QI</span></code> as <code class="docutils literal notranslate"><span class="pre">LU</span></code>. For stiff parabolic problems with Gauss-Radau nodes, this is usually a very good idea!</p></li>
+<li><p>As usual for MLSDC and PFASST, the success depends heavily on the choice of parameters.
+Making the problem more complicated, less/more stiff, changing the order of the spatial interpolation etc. can give completely different results.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_5/B_my_first_PFASST_run.py">pySDC/tutorial/step_5/B_my_first_PFASST_run.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -285,128 +268,6 @@ Making the problem more complicated, less/more stiff, changing the order of the 
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Working</span> <span class="k">with</span>  <span class="mi">1</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
-
-
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">2</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
-
-
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">4</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
-
-
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">8</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.12</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span>  <span class="mi">0</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.33</span> <span class="o">--</span> <span class="mf">0.11</span>
-
-
-<span class="n">Working</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">7</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.62</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span>  <span class="mi">0</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.48</span> <span class="o">--</span> <span class="mf">0.23</span>
-
-
-</pre></div>
-</div>
 </div>
 <div class="section" id="part-c-advection-and-pfasst">
 <h2>Part C: Advection and PFASST<a class="headerlink" href="#part-c-advection-and-pfasst" title="Permalink to this headline">¶</a></h2>
@@ -417,10 +278,10 @@ We see that in contrast to the parabolic problem, the iteration counts actually 
 Again, this heavily depends on the actual problem under consideration, but it is a typical behavior of parallel-in-time algorithms of this type.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>The setup is actually periodic in time as well! At <code class="docutils literal notranslate"><span class="pre">Tend</span> <span class="pre">=</span> <span class="pre">1</span></code> the exact solution looks exactly like the initial condition.</li>
-<li>Like the standard IME sweeper, the <code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code> sweeper allows the user to change the preconditioner, named <code class="docutils literal notranslate"><span class="pre">QI</span></code>.
+<li><p>The setup is actually periodic in time as well! At <code class="docutils literal notranslate"><span class="pre">Tend</span> <span class="pre">=</span> <span class="pre">1</span></code> the exact solution looks exactly like the initial condition.</p></li>
+<li><p>Like the standard IME sweeper, the <code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code> sweeper allows the user to change the preconditioner, named <code class="docutils literal notranslate"><span class="pre">QI</span></code>.
 To get the standard implicit Euler scheme, choose <code class="docutils literal notranslate"><span class="pre">IE</span></code>, while for the LU-trick, choose <code class="docutils literal notranslate"><span class="pre">LU</span></code>.
-More choices have been implemented in <code class="docutils literal notranslate"><span class="pre">pySDC.plugins.sweeper_helper.get_Qd</span></code>.</li>
+More choices have been implemented in <code class="docutils literal notranslate"><span class="pre">pySDC.plugins.sweeper_helper.get_Qd</span></code>.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_5/C_advection_and_PFASST.py">pySDC/tutorial/step_5/C_advection_and_PFASST.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -573,84 +434,6 @@ More choices have been implemented in <code class="docutils literal notranslate"
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Working with QI = LU on  1 processes...
-   Mean number of iterations: 6.00
-   Range of values for number of iterations:  0 
-   Position of max/min number of iterations:  0 --  0
-   Std and var for number of iterations: 0.00 -- 0.00
-   Std and var for number of iterations: 0.00 -- 0.00
-
-Working with QI = LU on  2 processes...
-   Mean number of iterations: 6.50
-   Range of values for number of iterations:  1 
-   Position of max/min number of iterations:  1 --  0
-   Std and var for number of iterations: 0.50 -- 0.25
-   Std and var for number of iterations: 0.50 -- 0.25
-
-Working with QI = LU on  4 processes...
-   Mean number of iterations: 7.25
-   Range of values for number of iterations:  2 
-   Position of max/min number of iterations:  2 --  0
-   Std and var for number of iterations: 0.83 -- 0.69
-   Std and var for number of iterations: 0.83 -- 0.69
-
-Working with QI = LU on  8 processes...
-   Mean number of iterations: 8.62
-   Range of values for number of iterations:  5 
-   Position of max/min number of iterations:  7 --  0
-   Std and var for number of iterations: 1.58 -- 2.48
-   Std and var for number of iterations: 1.58 -- 2.48
-
-Working with QI = LU on 16 processes...
-   Mean number of iterations: 11.00
-   Range of values for number of iterations:  9 
-   Position of max/min number of iterations: 14 --  0
-   Std and var for number of iterations: 2.78 -- 7.75
-   Std and var for number of iterations: 2.78 -- 7.75
-
-Mean number of iterations went up from 6.00 to 11.00 for QI = LU!
-
-
-Working with QI = IE on  1 processes...
-   Mean number of iterations: 7.00
-   Range of values for number of iterations:  0 
-   Position of max/min number of iterations:  0 --  0
-   Std and var for number of iterations: 0.00 -- 0.00
-   Std and var for number of iterations: 0.00 -- 0.00
-
-Working with QI = IE on  2 processes...
-   Mean number of iterations: 7.50
-   Range of values for number of iterations:  1 
-   Position of max/min number of iterations:  1 --  0
-   Std and var for number of iterations: 0.50 -- 0.25
-   Std and var for number of iterations: 0.50 -- 0.25
-
-Working with QI = IE on  4 processes...
-   Mean number of iterations: 8.00
-   Range of values for number of iterations:  2 
-   Position of max/min number of iterations:  3 --  0
-   Std and var for number of iterations: 0.71 -- 0.50
-   Std and var for number of iterations: 0.71 -- 0.50
-
-Working with QI = IE on  8 processes...
-   Mean number of iterations: 8.88
-   Range of values for number of iterations:  3 
-   Position of max/min number of iterations:  5 --  0
-   Std and var for number of iterations: 1.05 -- 1.11
-   Std and var for number of iterations: 1.05 -- 1.11
-
-Working with QI = IE on 16 processes...
-   Mean number of iterations: 10.38
-   Range of values for number of iterations:  6 
-   Position of max/min number of iterations: 14 --  0
-   Std and var for number of iterations: 1.76 -- 3.11
-   Std and var for number of iterations: 1.76 -- 3.11
-
-Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
-
-
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -684,17 +467,15 @@ Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -706,9 +487,6 @@ Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="step_6.html" title="Step-6: Advanced PFASST controllers"
              >next</a> |</li>
         <li class="right" >
@@ -719,7 +497,7 @@ Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

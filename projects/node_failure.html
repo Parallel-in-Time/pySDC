@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Fault-tolerance with PFASST: node failures &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -27,9 +25,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
              accesskey="N">next</a> |</li>
@@ -60,10 +55,10 @@ Note that due to the long runtime, the results are not generated via Travis. Onl
 We do this for the heat and advection equation, both in 1D.
 Four different strategies are tested:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">SPREAD</span></code>: a simple restart from scratch, i.e. the node/time-step is restarted by copying u0 to all quadrature nodes</li>
-<li><code class="docutils literal notranslate"><span class="pre">SPREAD_PREDICT</span></code>: in addition to copying u0, we also do multiple SDC sweeps on the coarse level</li>
-<li><code class="docutils literal notranslate"><span class="pre">INTERP</span></code>: instead of copying u0, we interpolate the values at the quadrature nodes by taking the next and the following time-step into account</li>
-<li><code class="docutils literal notranslate"><span class="pre">INTERP_PREDICT</span></code>: in addition to interpolation, we also do coarse SDC sweeps</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SPREAD</span></code>: a simple restart from scratch, i.e. the node/time-step is restarted by copying u0 to all quadrature nodes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SPREAD_PREDICT</span></code>: in addition to copying u0, we also do multiple SDC sweeps on the coarse level</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INTERP</span></code>: instead of copying u0, we interpolate the values at the quadrature nodes by taking the next and the following time-step into account</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INTERP_PREDICT</span></code>: in addition to interpolation, we also do coarse SDC sweeps</p></li>
 </ul>
 <p>The results are plotted using <code class="docutils literal notranslate"><span class="pre">postproc_hard_faults_detail</span></code>.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/node_failure/hard_faults_detail.py">pySDC/projects/node_failure/hard_faults_detail.py</a></p>
@@ -229,19 +224,19 @@ Four different strategies are tested:</p>
 </div>
 <p>Results (visualized by <code class="docutils literal notranslate"><span class="pre">postproc_hard_faults_detail</span></code>):</p>
 <p>Heat equation:</p>
-<a class="reference internal image-reference" href="../_images/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png"><img alt="../_images/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png" src="../_images/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png"><img alt="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png" src="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png"><img alt="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" src="../_images/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP.png"><img alt="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP.png" src="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png"><img alt="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" src="../_images/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_residuals_allstrategies.png"><img alt="../_images/HEAT_residuals_allstrategies.png" src="../_images/HEAT_residuals_allstrategies.png" style="width: 33%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png"><img alt="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png" src="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_NOFAULT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png"><img alt="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png" src="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png"><img alt="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" src="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP.png"><img alt="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP.png" src="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png"><img alt="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" src="projects/../../../data/HEAT_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_residuals_allstrategies.png"><img alt="projects/../../../data/HEAT_residuals_allstrategies.png" src="projects/../../../data/HEAT_residuals_allstrategies.png" style="width: 33%;" /></a>
 <p>Advection equation:</p>
-<a class="reference internal image-reference" href="../_images/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png"><img alt="../_images/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png" src="../_images/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png"><img alt="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png" src="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png"><img alt="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" src="../_images/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png"><img alt="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png" src="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png"><img alt="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" src="../_images/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_residuals_allstrategies.png"><img alt="../_images/ADVECTION_residuals_allstrategies.png" src="../_images/ADVECTION_residuals_allstrategies.png" style="width: 33%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png"><img alt="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png" src="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_NOFAULT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png"><img alt="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png" src="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png"><img alt="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" src="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png"><img alt="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png" src="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png"><img alt="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" src="projects/../../../data/ADVECTION_steps_vs_iteration_hf_7x7_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_residuals_allstrategies.png"><img alt="projects/../../../data/ADVECTION_residuals_allstrategies.png" src="projects/../../../data/ADVECTION_residuals_allstrategies.png" style="width: 33%;" /></a>
 </div>
 <div class="section" id="node-failures-at-different-steps-and-iterations">
 <h2>Node failures at different steps and iterations<a class="headerlink" href="#node-failures-at-different-steps-and-iterations" title="Permalink to this headline">¶</a></h2>
@@ -427,15 +422,15 @@ Heat maps generated by <code class="docutils literal notranslate"><span class="p
 </div>
 <p>Results (visualized by <code class="docutils literal notranslate"><span class="pre">postproc_hard_faults_test</span></code>):</p>
 <p>Heat equation:</p>
-<a class="reference internal image-reference" href="../_images/HEAT_iteration_counts_hf_SPREAD.png"><img alt="../_images/HEAT_iteration_counts_hf_SPREAD.png" src="../_images/HEAT_iteration_counts_hf_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_iteration_counts_hf_SPREAD_PREDICT.png"><img alt="../_images/HEAT_iteration_counts_hf_SPREAD_PREDICT.png" src="../_images/HEAT_iteration_counts_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_iteration_counts_hf_INTERP.png"><img alt="../_images/HEAT_iteration_counts_hf_INTERP.png" src="../_images/HEAT_iteration_counts_hf_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/HEAT_iteration_counts_hf_INTERP_PREDICT.png"><img alt="../_images/HEAT_iteration_counts_hf_INTERP_PREDICT.png" src="../_images/HEAT_iteration_counts_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_iteration_counts_hf_SPREAD.png"><img alt="projects/../../../data/HEAT_iteration_counts_hf_SPREAD.png" src="projects/../../../data/HEAT_iteration_counts_hf_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_iteration_counts_hf_SPREAD_PREDICT.png"><img alt="projects/../../../data/HEAT_iteration_counts_hf_SPREAD_PREDICT.png" src="projects/../../../data/HEAT_iteration_counts_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_iteration_counts_hf_INTERP.png"><img alt="projects/../../../data/HEAT_iteration_counts_hf_INTERP.png" src="projects/../../../data/HEAT_iteration_counts_hf_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/HEAT_iteration_counts_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/HEAT_iteration_counts_hf_INTERP_PREDICT.png" src="projects/../../../data/HEAT_iteration_counts_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
 <p>Advection equation:</p>
-<a class="reference internal image-reference" href="../_images/ADVECTION_iteration_counts_hf_SPREAD.png"><img alt="../_images/ADVECTION_iteration_counts_hf_SPREAD.png" src="../_images/ADVECTION_iteration_counts_hf_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png"><img alt="../_images/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png" src="../_images/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_iteration_counts_hf_INTERP.png"><img alt="../_images/ADVECTION_iteration_counts_hf_INTERP.png" src="../_images/ADVECTION_iteration_counts_hf_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png"><img alt="../_images/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png" src="../_images/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD.png"><img alt="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD.png" src="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png"><img alt="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png" src="projects/../../../data/ADVECTION_iteration_counts_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP.png"><img alt="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP.png" src="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png" src="projects/../../../data/ADVECTION_iteration_counts_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
 </div>
 <div class="section" id="the-boussinesq-test-case">
 <h2>The Boussinesq test case<a class="headerlink" href="#the-boussinesq-test-case" title="Permalink to this headline">¶</a></h2>
@@ -594,12 +589,12 @@ The <code class="docutils literal notranslate"><span class="pre">postproc_boussi
 </pre></div>
 </div>
 <p>Results (visualized by <code class="docutils literal notranslate"><span class="pre">postproc_boussines</span></code>):</p>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png"><img alt="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png" src="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png"><img alt="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png" src="../_images/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png"><img alt="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png" src="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" src="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" src="../_images/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png"><img alt="../_images/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png" src="../_images/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png" style="width: 33%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png"><img alt="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png" src="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png"><img alt="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png" src="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png"><img alt="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png" src="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" src="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" src="projects/../../../data/BOUSSINESQ_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png"><img alt="projects/../../../data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png" src="projects/../../../data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png" style="width: 33%;" /></a>
 </div>
 <div class="section" id="the-gray-scott-test-case">
 <h2>The Gray-Scott test case<a class="headerlink" href="#the-gray-scott-test-case" title="Permalink to this headline">¶</a></h2>
@@ -755,12 +750,12 @@ The <code class="docutils literal notranslate"><span class="pre">postproc_graysc
 </pre></div>
 </div>
 <p>Results (visualized by <code class="docutils literal notranslate"><span class="pre">postproc_grayscott</span></code>):</p>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png"><img alt="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png" src="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png"><img alt="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png" src="../_images/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png"><img alt="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png" src="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" src="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" src="../_images/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="../_images/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png"><img alt="../_images/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png" src="../_images/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png" style="width: 33%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png"><img alt="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png" src="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png"><img alt="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png" src="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_SPREAD_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png"><img alt="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png" src="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" src="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png"><img alt="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" src="projects/../../../data/GRAYSCOTT_steps_vs_iteration_hf_INTERP_PREDICT.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png"><img alt="projects/../../../data/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png" src="projects/../../../data/GRAYSCOTT_Kadd_vs_NOFAULT_hf.png" style="width: 33%;" /></a>
 </div>
 </div>
 
@@ -795,17 +790,15 @@ The <code class="docutils literal notranslate"><span class="pre">postproc_graysc
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -817,9 +810,6 @@ The <code class="docutils literal notranslate"><span class="pre">postproc_graysc
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
              >next</a> |</li>
         <li class="right" >
@@ -830,7 +820,7 @@ The <code class="docutils literal notranslate"><span class="pre">postproc_graysc
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

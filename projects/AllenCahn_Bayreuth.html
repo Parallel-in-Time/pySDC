@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Allen-Cahn problems from Bayreuth &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -27,9 +25,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="performance.html" title="Performance analysis of pySDC"
              accesskey="N">next</a> |</li>
@@ -56,9 +51,9 @@ Many (possibly all) codes in this project need <a class="reference external" hre
 This is done by setting up a circle of value 1, which then shrinks. The speed of this process is known for different setups.
 In detail, the code checks:</p>
 <ul class="simple">
-<li>no driving force: circle vanishes after a certain number of steps, numerical scheme should not be too “slow”</li>
-<li>constant driving force: for a particular value of the driving force <code class="docutils literal notranslate"><span class="pre">dw</span></code>, the circle’s radius stays constant (more or less)</li>
-<li>time-dependent driving force: weighting the RHS and the driving force allows to determine a force to keep the radius constant, too</li>
+<li><p>no driving force: circle vanishes after a certain number of steps, numerical scheme should not be too “slow”</p></li>
+<li><p>constant driving force: for a particular value of the driving force <code class="docutils literal notranslate"><span class="pre">dw</span></code>, the circle’s radius stays constant (more or less)</p></li>
+<li><p>time-dependent driving force: weighting the RHS and the driving force allows to determine a force to keep the radius constant, too</p></li>
 </ul>
 <p>The script <code class="docutils literal notranslate"><span class="pre">run_temp_forcing_verification.py</span></code> runs a specific setup with temperature-based forcing. The datatype now has two components.
 Verification is done using a numerical simulation created with <code class="docutils literal notranslate"><span class="pre">run_temp_forcing_reference.py</span></code>. Errors and order of accuracy is tested.</p>
@@ -80,18 +75,18 @@ It can be run serial/parallel in space and/or time.</p>
 <h2>Further/related files<a class="headerlink" href="#further-related-files" title="Permalink to this headline">¶</a></h2>
 <p>The following files are also listed under this project:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor_and_dump.py</span></code>: computes the radii for the verification problems and dumps the solution via MPI I/O</li>
-<li><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor.py</span></code>: computes the radii for the verification problems</li>
-<li><code class="docutils literal notranslate"><span class="pre">AllenCahn_dump.py</span></code>: dumps the solution via MPI I/O</li>
-<li><code class="docutils literal notranslate"><span class="pre">visualize.py</span></code>: simple script to turn field data from the dump routines into pngs</li>
-<li><code class="docutils literal notranslate"><span class="pre">visualize_temp.py</span></code>: simple script to turn field and temperature data from the dump routines into pngs and movies</li>
-<li><code class="docutils literal notranslate"><span class="pre">run_pySC_AC.exe</span></code>: jobscript for JURECA</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor_and_dump.py</span></code>: computes the radii for the verification problems and dumps the solution via MPI I/O</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor.py</span></code>: computes the radii for the verification problems</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_dump.py</span></code>: dumps the solution via MPI I/O</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visualize.py</span></code>: simple script to turn field data from the dump routines into pngs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visualize_temp.py</span></code>: simple script to turn field and temperature data from the dump routines into pngs and movies</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_pySC_AC.exe</span></code>: jobscript for JURECA</p></li>
 </ul>
 <p>The project uses in particular these implementations from the <code class="docutils literal notranslate"><span class="pre">implementations</span></code> folder:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">mesh.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">datatype_classes</span></code>: contains numpy-based data with a communicator</li>
-<li><code class="docutils literal notranslate"><span class="pre">AllenCahn_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for simple forcing terms</li>
-<li><code class="docutils literal notranslate"><span class="pre">AllenCahn_Temp_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for temperature-based forcing</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mesh.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">datatype_classes</span></code>: contains numpy-based data with a communicator</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for simple forcing terms</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_Temp_MPIFFT.py</span></code> in the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>: contains the implementation of the problem for temperature-based forcing</p></li>
 </ul>
 </div>
 </div>
@@ -127,17 +122,15 @@ It can be run serial/parallel in space and/or time.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -149,9 +142,6 @@ It can be run serial/parallel in space and/or time.</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="performance.html" title="Performance analysis of pySDC"
              >next</a> |</li>
         <li class="right" >
@@ -162,7 +152,7 @@ It can be run serial/parallel in space and/or time.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>

@@ -1,20 +1,18 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>&lt;no title&gt; &#8212; pySDC 4.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -25,9 +23,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -142,60 +137,6 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-08-09 12:06:45,553 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2021-08-09 12:06:45,553 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
-
-Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
-    mssdc_jac = True
-    predict_type = None
-    all_to_done = False
-    logger_level = 20
---&gt; log_to_file = True
-    dump_setup = True
---&gt; fname = step_3_B_out.txt
-    use_iteration_estimator = False
---&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
-
-Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
---&gt; maxiter = 20
-    Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
-        Level  0
---&gt;         dt = 0.0625
---&gt;         restol = 1e-08
-            nsweeps = 1
-            residual_type = full_abs
---&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap&#39;&gt;
---&gt;             omega_E = 4.9
---&gt;             omega_B = 25.0
---&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
---&gt;             nparts = 1
---&gt;             sig = 0.1
---&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.particles.particles&#39;&gt;
---&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.particles.fields&#39;&gt;
---&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
-                    do_coll_update = False
-                    initial_guess = spread
---&gt;                 num_nodes = 3
---&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
-
-2021-08-09 12:06:45,554 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
-2021-08-09 12:06:45,554 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
-
-2021-08-09 12:06:46,476 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2021-08-09 12:06:46,484 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2021-08-09 12:06:46,492 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2021-08-09 12:06:46,500 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2021-08-09 12:06:46,509 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2021-08-09 12:06:46,517 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2021-08-09 12:06:46,525 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2021-08-09 12:06:46,533 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534544e-06
-2021-08-09 12:06:46,541 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2021-08-09 12:06:46,549 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407602e-08
-2021-08-09 12:06:46,556 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17124807e-09
-Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
-Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
-</pre></div>
-</div>
 
 
           </div>
@@ -211,17 +152,15 @@ Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -232,15 +171,12 @@ Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
     </div>
   </body>
 </html>
