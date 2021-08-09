@@ -1,5 +1,5 @@
 import math
-from decimal import *
+from decimal import Decimal
 
 import numpy as np
 import scipy.sparse as sp

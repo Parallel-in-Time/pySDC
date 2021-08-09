@@ -1,14 +1,17 @@
 # coding=utf-8
 import os
 import os.path
+import pytest
 
 import nose.tools
 import pep8
 
-BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', '..'))
+dir = ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'pySDC/tutorial', 'pySDC/projects']
 
+@pytest.mark.parametrize("dir", dir)
+def test_files(dir):
+    BASE_PATH = os.path.abspath(os.path.join(__file__, '..', '..', '..'))
 
-def check_files(dir):
     style = pep8.StyleGuide()
     style.options.max_line_length = 120
     style.options.ignore = 'E402'
@@ -21,7 +24,3 @@ def check_files(dir):
         report.print_statistics()
         nose.tools.assert_equal(report.total_errors, 0, "File %s has some PEP8 errors: %d" % (file, report.total_errors))
 
-
-def test_pep8():
-    for dir in ['pySDC/core', 'pySDC/implementations', 'pySDC/helpers', 'pySDC/tutorial', 'pySDC/projects']:
-        yield check_files, dir

@@ -6,7 +6,7 @@ dill>=0.2.6
 matplotlib>=1.5.3
 numba>=0.35
 sympy>=1.0
-nose>=1.3.7
+pytest
 pep8
 # These packages are required for some of the more involved examples (and data types etc.), can be omitted
 petsc4py>=3.10.0
