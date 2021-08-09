@@ -20,6 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           conda init bash
+          source ~/.bashrc
           conda create python=3.7 -n pySDC
           conda activate pySDC
           conda install --yes -c conda-forge --file requirements.txt
