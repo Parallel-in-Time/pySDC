@@ -3,7 +3,7 @@ from petsc4py import PETSc
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
+from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class GS_full(object):
@@ -235,7 +235,7 @@ class petsc_grayscott_multiimplicit(ptype):
     Problem class implementing the multi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_2comp_petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_comp2):
         """
         Initialization routine
 
@@ -404,10 +404,10 @@ class petsc_grayscott_multiimplicit(ptype):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.comp1.values)
+        self.A.mult(u, f.comp1)
 
-        fa = self.init.getVecArray(f.comp2.values)
-        xa = self.init.getVecArray(u.values)
+        fa = self.init.getVecArray(f.comp2)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
@@ -431,7 +431,7 @@ class petsc_grayscott_multiimplicit(ptype):
 
         me = self.dtype_u(u0)
         self.ksp.setOperators(self.Id - factor * self.A)
-        self.ksp.solve(rhs.values, me.values)
+        self.ksp.solve(rhs, me)
 
         self.ksp_ncalls += 1
         self.ksp_itercount += self.ksp.getIterationNumber()
@@ -460,7 +460,7 @@ class petsc_grayscott_multiimplicit(ptype):
         J = self.init.createMatrix()
         self.snes.setJacobian(target.formJacobian, J)
 
-        self.snes.solve(rhs.values, me.values)
+        self.snes.solve(rhs, me)
 
         self.snes_ncalls += 1
         self.snes_itercount += self.snes.getIterationNumber()
@@ -481,7 +481,7 @@ class petsc_grayscott_multiimplicit(ptype):
         assert t == 0, 'ERROR: u_exact is only valid for the initial solution'
 
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me.values)
+        xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * self.dx / 100) *
@@ -497,7 +497,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec):
         """
         Initialization routine
 
@@ -524,10 +524,10 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.values)
+        self.A.mult(u, f)
 
-        fa = self.init.getVecArray(f.values)
-        xa = self.init.getVecArray(u.values)
+        fa = self.init.getVecArray(f)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] += -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
@@ -558,7 +558,7 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         J = self.init.createMatrix()
         self.snes.setJacobian(target.formJacobian, J)
 
-        self.snes.solve(rhs.values, me.values)
+        self.snes.solve(rhs, me)
 
         self.snes_ncalls += 1
         self.snes_itercount += self.snes.getIterationNumber()
@@ -571,7 +571,7 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_imex_petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_imex):
         """
         Initialization routine
 
@@ -598,10 +598,10 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.impl.values)
+        self.A.mult(u, f.impl)
 
-        fa = self.init.getVecArray(f.expl.values)
-        xa = self.init.getVecArray(u.values)
+        fa = self.init.getVecArray(f.expl)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 fa[i, j, 0] = -xa[i, j, 0] * xa[i, j, 1] ** 2 + self.params.A * (1 - xa[i, j, 0])
@@ -625,7 +625,7 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
 
         me = self.dtype_u(u0)
         self.ksp.setOperators(self.Id - factor * self.A)
-        self.ksp.solve(rhs.values, me.values)
+        self.ksp.solve(rhs, me)
 
         self.ksp_ncalls += 1
         self.ksp_itercount += self.ksp.getIterationNumber()
