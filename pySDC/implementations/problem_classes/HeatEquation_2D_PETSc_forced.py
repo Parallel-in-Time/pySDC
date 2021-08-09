@@ -3,7 +3,7 @@ from petsc4py import PETSc
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_imex_petsc_data
+from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex
 
 
 # noinspection PyUnusedLocal
@@ -20,7 +20,7 @@ class heat2d_petsc_forced(ptype):
         ksp: PETSc linear solver object
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_imex_petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_imex):
         """
         Initialization routine
 
@@ -165,10 +165,10 @@ class heat2d_petsc_forced(ptype):
 
         f = self.dtype_f(self.init)
         # evaluate Au for implicit part
-        self.A.mult(u.values, f.impl.values)
+        self.A.mult(u, f.impl)
 
         # evaluate forcing term for explicit part
-        fa = self.init.getVecArray(f.expl.values)
+        fa = self.init.getVecArray(f.expl)
         xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye), indexing='ij')
         fa[self.xs:self.xe, self.ys:self.ye] = -np.sin(np.pi * self.params.freq * xv * self.dx) * \
             np.sin(np.pi * self.params.freq * yv * self.dy) * \
@@ -192,10 +192,9 @@ class heat2d_petsc_forced(ptype):
 
         me = self.dtype_u(u0)
         self.ksp.setOperators(self.Id - factor * self.A)
-        self.ksp.solve(rhs.values, me.values)
+        self.ksp.solve(rhs, me)
         self.ksp_ncalls += 1
         self.ksp_itercount += int(self.ksp.getIterationNumber())
-
         return me
 
     def u_exact(self, t):
@@ -210,7 +209,7 @@ class heat2d_petsc_forced(ptype):
         """
 
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me.values)
+        xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
                 xa[i, j] = np.sin(np.pi * self.params.freq * i * self.dx) * \
