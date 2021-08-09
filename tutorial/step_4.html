@@ -1,0 +1,670 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Step-4: Multilevel SDC &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Step-5: PFASST" href="step_5.html" />
+    <link rel="prev" title="Step-3: Statistics and a new sweeper" href="step_3.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_5.html" title="Step-5: PFASST"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="step-4-multilevel-sdc">
+<h1>Step-4: Multilevel SDC<a class="headerlink" href="#step-4-multilevel-sdc" title="Permalink to this headline">¶</a></h1>
+<p>In this step, we will show how pySDC creates a multilevel hierarchy and
+how MLSDC can be run and tested.</p>
+<div class="section" id="part-a-spatial-transfer-operators">
+<h2>Part A: Spatial transfer operators<a class="headerlink" href="#part-a-spatial-transfer-operators" title="Permalink to this headline">¶</a></h2>
+<p>For a mjltilevel hierarchy, we need transfer operators. The user, having
+knowledge of the data types, will have to provide a
+<code class="docutils literal notranslate"><span class="pre">space_transfer_class</span></code> which deals with restriciton and interpolation
+in the spatial dimension. In this part, we simply set up two problems
+with two different resolutions and check the order of interpolation (4
+in this case).</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>As for the sweeper and many other things, the user does not have to
+deal with the instantiation of the transfer class, when one of the
+controllers is used. This is for demonstrational purpose only.</li>
+<li>MLSDC (and PFASST) rely on high-order interpolation in space. When
+using Lagrange-based interpolation, orders above 4-6 are recommended.
+Restriction, however, can be of order 2 and is thus not tested here.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/A_spatial_transfer_operators.py">pySDC/tutorial/step_4/A_spatial_transfer_operators.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_1.B_spatial_accuracy_check</span> <span class="kn">import</span> <span class="n">get_accuracy_order</span>
+
+<span class="c1"># setup id for gathering the results (will sort by nvars)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;nvars_fine&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to test interpolation order in space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># frequency for the test value</span>
+
+    <span class="c1"># initialize transfer parameters</span>
+    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">nvars_fine_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+
+    <span class="c1"># set up dictionary to store results (plus lists)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_fine_list</span>
+
+    <span class="k">for</span> <span class="n">nvars_fine</span> <span class="ow">in</span> <span class="n">nvars_fine_list</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Working on nvars_fine = </span><span class="si">%4i</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">nvars_fine</span><span class="p">)</span>
+
+        <span class="c1"># instantiate fine problem</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_fine</span>  <span class="c1"># number of degrees of freedom</span>
+        <span class="n">Pfine</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># instantiate coarse problem using half of the DOFs</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">nvars_fine</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Pcoarse</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># instantiate spatial interpolation</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span><span class="p">(</span><span class="n">fine_prob</span><span class="o">=</span><span class="n">Pfine</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="n">Pcoarse</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span><span class="p">)</span>
+
+        <span class="c1"># set exact fine solution to compare with</span>
+        <span class="n">xvalues_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="n">uexact_fine</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">uexact_fine</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues_fine</span><span class="p">)</span>
+
+        <span class="c1"># set exact coarse solution as source</span>
+        <span class="n">xvalues_coarse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="n">uexact_coarse</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">uexact_coarse</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues_coarse</span><span class="p">)</span>
+
+        <span class="c1"># do the interpolation/prolongation</span>
+        <span class="n">uinter</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">prolong</span><span class="p">(</span><span class="n">uexact_coarse</span><span class="p">)</span>
+
+        <span class="c1"># compute error and store</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars_fine</span><span class="o">=</span><span class="n">nvars_fine</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uinter</span> <span class="o">-</span> <span class="n">uexact_fine</span><span class="p">)</span>
+
+    <span class="c1"># print out and check</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running order checks...&#39;</span><span class="p">)</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_4_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">orders</span><span class="p">)):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order </span><span class="si">%2i</span><span class="s1">, got order </span><span class="si">%5.2f</span><span class="s1">, deviation of </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> \
+              <span class="o">%</span> <span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">],</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">],</span>
+                 <span class="mi">100</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">/</span> <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">/</span> <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> \
+            <span class="s1">&#39;ERROR: did not get expected orders for interpolation, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...got what we expected!&#39;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">4.08</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">1.91</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.95</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">1.35</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.98</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">0.62</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.99</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">0.30</span><span class="o">%</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-b-multilevel-hierarchy">
+<h2>Part B: Multilevel hierarchy<a class="headerlink" href="#part-b-multilevel-hierarchy" title="Permalink to this headline">¶</a></h2>
+<p>In this example, we demonstrate how the step class creates the
+space-time hierarchy dynamically, depending on the description and its
+parameters. pySDC supports two different generic coarsening strategies:
+coarsening in space and coarsening in the collocation order. To enable
+collocation-based coarsening, we simply replace the <code class="docutils literal notranslate"><span class="pre">num_nodes</span></code>
+parameter by a list, where the first entry corresponds to the finest
+level. For spatial coarsening, the problem parameter <code class="docutils literal notranslate"><span class="pre">nvars</span></code> is
+replaced by a list, too. During the step setup, these dictionaries with
+lists entries are transformed into lists of dictionaries corresponding
+to the levels (3 in this case). A third generic way of creating multiple
+levels is to replace an entry in the dscription by a list, e.g. a list
+of problem classes. The first entry of each list will always belong to
+the finest level.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Not all lists must habe the same length: The longest list defines the
+number of levels and if other lists are shorter, the levels get the
+last entry in these lists (3 nodes on level 1 and 2 in this example).</li>
+<li>As for most other parameters, <code class="docutils literal notranslate"><span class="pre">space_transfer_class</span></code> and
+<code class="docutils literal notranslate"><span class="pre">space_transfer_params</span></code> are part of the description of the problem.</li>
+<li>For advanced users: it is also possible to pass parameters to the
+<code class="docutils literal notranslate"><span class="pre">base_transfer</span></code> by specifying <code class="docutils literal notranslate"><span class="pre">base_transfer_params</span></code> or even
+replace this by defining <code class="docutils literal notranslate"><span class="pre">base_transfer_class</span></code> in the description.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/B_multilevel_hierarchy.py">pySDC/tutorial/step_4/B_multilevel_hierarchy.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.core.Step</span> <span class="kn">import</span> <span class="n">step</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to setup a full step hierarchy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize space transfer parameters</span>
+    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># fill description dictionary for easy step instantiation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+
+    <span class="c1"># now the description contains more or less everything we need to create a step with multiple levels</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># print out and check</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_4_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Level </span><span class="si">%2i</span><span class="s1">: nvars = </span><span class="si">%4i</span><span class="s1"> -- nnodes = </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">==</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="nb">min</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span> \
+            <span class="s2">&quot;ERROR: number of DOFs is not correct on this level, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span>
+        <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">==</span> <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">][</span><span class="nb">min</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span> \
+            <span class="s2">&quot;ERROR: number of nodes is not correct on this level, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Level</span>  <span class="mi">0</span><span class="p">:</span> <span class="n">nvars</span> <span class="o">=</span>   <span class="mi">31</span> <span class="o">--</span> <span class="n">nnodes</span> <span class="o">=</span>  <span class="mi">5</span>
+<span class="n">Level</span>  <span class="mi">1</span><span class="p">:</span> <span class="n">nvars</span> <span class="o">=</span>   <span class="mi">15</span> <span class="o">--</span> <span class="n">nnodes</span> <span class="o">=</span>  <span class="mi">3</span>
+<span class="n">Level</span>  <span class="mi">2</span><span class="p">:</span> <span class="n">nvars</span> <span class="o">=</span>    <span class="mi">7</span> <span class="o">--</span> <span class="n">nnodes</span> <span class="o">=</span>  <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-c-sdc-vs-mlsdc">
+<h2>Part C: SDC vs. MLSDC<a class="headerlink" href="#part-c-sdc-vs-mlsdc" title="Permalink to this headline">¶</a></h2>
+<p>After we have seen how a hierarchy is created, we now run MLSDC and
+compare the results with SDC. We create two different descriptions and
+controllers and run first SDC and then MLSDC for the simple unforced
+heat equation. We see that the results are pretty much the same, while
+MLSDC only takes about half as many iterations.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>In this case, the number of iterations is halved when using MLSDC.
+This is the best case and in many situations, this cannot be
+achieved. In particular, the interpolation order is crucial.</li>
+<li>Using the controller parameter <code class="docutils literal notranslate"><span class="pre">predict</span></code>, we can turn the coarse level predictor on (default) or off in the case of MLSDC or PFASST.</li>
+<li>While MLSDC looks less expensive, the number of evaluations of the
+right-hand side of the ODE is basically the same: This is due to the
+fact that after each coarse grid correction (i.e. after the
+interpolation), the right-hand side needs to be re-evaluated on the
+finer level to be prepared for the next sweep. One way of improving
+this is to do the interpolation also in the right-hand side itself.
+This can be achieved by specifying
+<code class="docutils literal notranslate"><span class="pre">base_transfer_params['finter]</span> <span class="pre">=</span> <span class="pre">True</span></code> and by passing it to the
+description. See also Part D.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py">pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to compare SDC and MLSDC</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params_sdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params_sdc</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="n">sweeper_params_mlsdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params_sdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params_sdc</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params_sdc</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params_sdc</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+    <span class="n">problem_params_mlsdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params_mlsdc</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1023</span><span class="p">,</span> <span class="mi">511</span><span class="p">,</span> <span class="mi">255</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize space transfer parameters</span>
+    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="c1"># fill description dictionary for SDC</span>
+    <span class="n">description_sdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_sdc</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_sdc</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description_sdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+
+    <span class="c1"># fill description dictionary for MLSDC</span>
+    <span class="n">description_mlsdc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params_mlsdc</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params_mlsdc</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
+    <span class="n">description_mlsdc</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
+
+    <span class="c1"># instantiate the controller (no controller parameters used here)</span>
+    <span class="n">controller_sdc</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description_sdc</span><span class="p">)</span>
+    <span class="n">controller_mlsdc</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
+                                         <span class="n">description</span><span class="o">=</span><span class="n">description_mlsdc</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller_sdc</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main functions to get things done...</span>
+    <span class="n">uend_sdc</span><span class="p">,</span> <span class="n">stats_sdc</span> <span class="o">=</span> <span class="n">controller_sdc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">uend_mlsdc</span><span class="p">,</span> <span class="n">stats_mlsdc</span> <span class="o">=</span> <span class="n">controller_mlsdc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># get number of iterations for both</span>
+    <span class="n">filtered_stats_sdc</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_sdc</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+    <span class="n">filtered_stats_mlsdc</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_mlsdc</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+    <span class="n">niter_sdc</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats_sdc</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">niter_mlsdc</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats_mlsdc</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># compute exact solution and compare both</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">err_sdc</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend_sdc</span><span class="p">)</span>
+    <span class="n">err_mlsdc</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend_mlsdc</span><span class="p">)</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uend_mlsdc</span> <span class="o">-</span> <span class="n">uend_sdc</span><span class="p">)</span>
+
+    <span class="c1"># print out and check</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_4_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error SDC and MLSDC: </span><span class="si">%12.8e</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err_sdc</span><span class="p">,</span> <span class="n">err_mlsdc</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Difference SDC vs. MLSDC: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">diff</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations SDC and MLSDC: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">niter_sdc</span><span class="p">,</span> <span class="n">niter_mlsdc</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">diff</span> <span class="o">&lt;</span> <span class="mf">6E-10</span><span class="p">,</span> <span class="s2">&quot;ERROR: difference between MLSDC and SDC is higher than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">diff</span>
+    <span class="k">assert</span> <span class="n">niter_sdc</span> <span class="o">-</span> <span class="n">niter_mlsdc</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;ERROR: MLSDC required more iterations than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">niter_mlsdc</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">SDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">3.96231961e-08</span> <span class="o">--</span> <span class="mf">3.95409268e-08</span>
+<span class="n">Difference</span> <span class="n">SDC</span> <span class="n">vs</span><span class="o">.</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mf">8.22700796e-11</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">SDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="p">:</span> <span class="mi">12</span> <span class="o">--</span>  <span class="mi">6</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-d-mlsdc-with-particles">
+<h2>Part D: MLSDC with particles<a class="headerlink" href="#part-d-mlsdc-with-particles" title="Permalink to this headline">¶</a></h2>
+<p>For this example, we return to the Boris solver and show how coarsening
+can be done beyond degrees of freedom in space or collocation nodes.
+Here, we use the setup from <code class="docutils literal notranslate"><span class="pre">step_3</span></code>, Parts B and C. We run three
+different versions of SDC or MLSDC: the standard SDC, the standard MLSDC
+and MSDC with interpolation of the right-hand side. For coarsening, we
+replace the problem class by a simpler version: the coarse evaluation of
+the forces omits the particle-particle interaction and only takes
+external forces into account. This is done simply by replacing the
+problem class by a list of two problem classes in the description. In
+the rsults, we can see that all versions produce more or less the same
+energies, where MLSDC without f-interpolation takes about half as many
+iterations and with f-interpolation slightly more. We also check the
+timings of the three runs: although MLSDC requires much less iterations,
+it takes longer to run. This is due to the fact that the right-hand side
+of the ODE (i.e. the costly force evaluation) is required after each
+interpolation! To this end, we also use f-interpolation, which increases
+the iteration counts a bit but leads to a slightly reduced runtime.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Again, the number of MLSDC iterations is highly sensitive to the
+interplay of all the different parameters (number of particles,
+smoothing parameter, number of nodes, residual tolerance etc.). It is
+by far not trivial to get a speedup at all (although a reasonable
+setup has been chosen here).</li>
+<li>Of course, this type of coarsening can be combined with the generic
+coarsening strategies. Yet, using a reduced number of collocation
+nodes leads to increased iteration counts here.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/D_MLSDC_with_particles.py">pySDC/tutorial/step_4/D_MLSDC_with_particles.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferParticles_NoCoarse</span> <span class="kn">import</span> <span class="n">particles_to_particles</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_4.PenningTrap_3D_coarse</span> <span class="kn">import</span> <span class="n">penningtrap_coarse</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to compare SDC with two flavors of MLSDC for particle dynamics</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># run SDC, MLSDC and MLSDC plus f-interpolation and compare</span>
+    <span class="n">stats_sdc</span><span class="p">,</span> <span class="n">time_sdc</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">stats_mlsdc</span><span class="p">,</span> <span class="n">time_mlsdc</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">stats_mlsdc_finter</span><span class="p">,</span> <span class="n">time_mlsdc_finter</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">finter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_4_D_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Timings for SDC, MLSDC and MLSDC+finter: </span><span class="si">%12.8f</span><span class="s1"> -- </span><span class="si">%12.8f</span><span class="s1"> -- </span><span class="si">%12.8f</span><span class="s1">&#39;</span> <span class="o">%</span> \
+          <span class="p">(</span><span class="n">time_sdc</span><span class="p">,</span> <span class="n">time_mlsdc</span><span class="p">,</span> <span class="n">time_mlsdc_finter</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="c1"># filter statistics type (etot)</span>
+    <span class="n">filtered_stats_sdc</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_sdc</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
+    <span class="n">filtered_stats_mlsdc</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_mlsdc</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
+    <span class="n">filtered_stats_mlsdc_finter</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats_mlsdc_finter</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
+
+    <span class="c1"># sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)</span>
+    <span class="n">energy_sdc</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats_sdc</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">energy_mlsdc</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats_mlsdc</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">energy_mlsdc_finter</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats_mlsdc_finter</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get base energy and show differences</span>
+    <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy_sdc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy_sdc</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and relative deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy_mlsdc</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and relative deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy_mlsdc_finter</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and relative deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">energy_sdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">energy_mlsdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span> <span class="o">&lt;</span> <span class="mf">6E-10</span><span class="p">,</span> \
+        <span class="s1">&#39;ERROR: energy deviated too much between SDC and MLSDC, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">energy_sdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">energy_mlsdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">energy_mlsdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">energy_mlsdc_finter</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span> <span class="o">&lt;</span> <span class="mf">8E-10</span><span class="p">,</span> \
+        <span class="s1">&#39;ERROR: energy deviated too much after using finter, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="nb">abs</span><span class="p">(</span><span class="n">energy_mlsdc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">energy_mlsdc_finter</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">base_energy</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">(</span><span class="n">mlsdc</span><span class="p">,</span> <span class="n">finter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-07</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">8</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c1"># initialize problem parameters for the Penning trap</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.9</span>  <span class="c1"># E-field frequency</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">25.0</span>  <span class="c1"># B-field frequency</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># initial center of positions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nparts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># number of particles in the trap</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># smoothing parameter for the forces</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_hook</span>  <span class="c1"># specialized hook class for more statistics and output</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="n">transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">transfer_params</span><span class="p">[</span><span class="s1">&#39;finter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">finter</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mlsdc</span><span class="p">:</span>
+        <span class="c1"># MLSDC: provide list of two problem classes: one for the fine, one for the coarse level</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">penningtrap</span><span class="p">,</span> <span class="n">penningtrap_coarse</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># SDC: provide only one problem class</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">penningtrap</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">boris_2nd_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particles_to_particles</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;base_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transfer_params</span>
+
+    <span class="c1"># instantiate the controller (no controller parameters used here)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_init</span><span class="p">()</span>
+
+    <span class="c1"># call and time main function to get things done...</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+
+    <span class="k">return</span> <span class="n">stats</span><span class="p">,</span> <span class="n">end_time</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">5.16268802</span> <span class="o">--</span>   <span class="mf">5.75852966</span> <span class="o">--</span>   <span class="mf">6.63877392</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">406977.9425667251</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">406977.9425660007</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
+<span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">7</span><span class="p">:</span> <span class="mf">406977.9428639800</span> <span class="o">--</span> <span class="mf">2.35039579e-03</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Step-4: Multilevel SDC</a><ul>
+<li><a class="reference internal" href="#part-a-spatial-transfer-operators">Part A: Spatial transfer operators</a></li>
+<li><a class="reference internal" href="#part-b-multilevel-hierarchy">Part B: Multilevel hierarchy</a></li>
+<li><a class="reference internal" href="#part-c-sdc-vs-mlsdc">Part C: SDC vs. MLSDC</a></li>
+<li><a class="reference internal" href="#part-d-mlsdc-with-particles">Part D: MLSDC with particles</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="step_3.html"
+                        title="previous chapter">Step-3: Statistics and a new sweeper</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="step_5.html"
+                        title="next chapter">Step-5: PFASST</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/step_4.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_5.html" title="Step-5: PFASST"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/AllenCahn_Bayreuth/README.rst

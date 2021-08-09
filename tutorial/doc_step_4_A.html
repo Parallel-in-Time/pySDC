@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>&lt;no title&gt; &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/A_spatial_transfer_operators.py">pySDC/tutorial/step_4/A_spatial_transfer_operators.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_1.B_spatial_accuracy_check</span> <span class="kn">import</span> <span class="n">get_accuracy_order</span>
+
+<span class="c1"># setup id for gathering the results (will sort by nvars)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;nvars_fine&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to test interpolation order in space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># frequency for the test value</span>
+
+    <span class="c1"># initialize transfer parameters</span>
+    <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;rorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">nvars_fine_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+
+    <span class="c1"># set up dictionary to store results (plus lists)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_fine_list</span>
+
+    <span class="k">for</span> <span class="n">nvars_fine</span> <span class="ow">in</span> <span class="n">nvars_fine_list</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Working on nvars_fine = </span><span class="si">%4i</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">nvars_fine</span><span class="p">)</span>
+
+        <span class="c1"># instantiate fine problem</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_fine</span>  <span class="c1"># number of degrees of freedom</span>
+        <span class="n">Pfine</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># instantiate coarse problem using half of the DOFs</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">nvars_fine</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Pcoarse</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># instantiate spatial interpolation</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span><span class="p">(</span><span class="n">fine_prob</span><span class="o">=</span><span class="n">Pfine</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="n">Pcoarse</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span><span class="p">)</span>
+
+        <span class="c1"># set exact fine solution to compare with</span>
+        <span class="n">xvalues_fine</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="n">uexact_fine</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pfine</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">uexact_fine</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues_fine</span><span class="p">)</span>
+
+        <span class="c1"># set exact coarse solution as source</span>
+        <span class="n">xvalues_coarse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+        <span class="n">uexact_coarse</span> <span class="o">=</span> <span class="n">Pfine</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">Pcoarse</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">uexact_coarse</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">Pcoarse</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues_coarse</span><span class="p">)</span>
+
+        <span class="c1"># do the interpolation/prolongation</span>
+        <span class="n">uinter</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">prolong</span><span class="p">(</span><span class="n">uexact_coarse</span><span class="p">)</span>
+
+        <span class="c1"># compute error and store</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars_fine</span><span class="o">=</span><span class="n">nvars_fine</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uinter</span> <span class="o">-</span> <span class="n">uexact_fine</span><span class="p">)</span>
+
+    <span class="c1"># print out and check</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running order checks...&#39;</span><span class="p">)</span>
+    <span class="n">orders</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_4_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">orders</span><span class="p">)):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order </span><span class="si">%2i</span><span class="s1">, got order </span><span class="si">%5.2f</span><span class="s1">, deviation of </span><span class="si">%5.2f%%</span><span class="s1">&#39;</span> \
+              <span class="o">%</span> <span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">],</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">],</span>
+                 <span class="mi">100</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">/</span> <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">/</span> <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> \
+            <span class="s1">&#39;ERROR: did not get expected orders for interpolation, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">orders</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;...got what we expected!&#39;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">4.08</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">1.91</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.95</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">1.35</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.98</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">0.62</span><span class="o">%</span>
+<span class="n">Expected</span> <span class="n">order</span>  <span class="mi">4</span><span class="p">,</span> <span class="n">got</span> <span class="n">order</span>  <span class="mf">3.99</span><span class="p">,</span> <span class="n">deviation</span> <span class="n">of</span>  <span class="mf">0.30</span><span class="o">%</span>
+</pre></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/doc_step_4_A.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

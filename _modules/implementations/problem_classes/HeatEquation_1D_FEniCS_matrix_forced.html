@@ -1,0 +1,344 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.fenics_mesh</span> <span class="kn">import</span> <span class="n">fenics_mesh</span><span class="p">,</span> <span class="n">rhs_fenics_mesh</span>
+
+
+<span class="c1"># noinspection PyUnusedLocal</span>
+<div class="viewcode-block" id="fenics_heat"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat">[docs]</a><span class="k">class</span> <span class="nc">fenics_heat</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        V: function space</span>
+<span class="sd">        M: mass matrix for FEM</span>
+<span class="sd">        K: stiffness matrix incl. diffusion coefficient (and correct sign)</span>
+<span class="sd">        g: forcing term</span>
+<span class="sd">        bc: boundary conditions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">fenics_mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">rhs_fenics_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            problem_params (dict): custom parameters for the example</span>
+<span class="sd">            dtype_u: FEniCS mesh data type (will be passed to parent class)</span>
+<span class="sd">            dtype_f: FEniCS mesh data data type with implicit and explicit parts (will be passed to parent class)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># define the Dirichlet boundary</span>
+        <span class="c1"># def Boundary(x, on_boundary):</span>
+        <span class="c1">#     return on_boundary</span>
+
+        <span class="c1"># these parameters will be used later, so assert their existence</span>
+        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c_nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="s1">&#39;family&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;refinements&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># set logger level for FFC and dolfin</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;FFC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;UFL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+        <span class="c1"># set solver and form parameters</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;form_compiler&quot;</span><span class="p">][</span><span class="s2">&quot;optimize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;form_compiler&quot;</span><span class="p">][</span><span class="s2">&quot;cpp_optimize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;allow_extrapolation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># set mesh and refinement (for multilevel)</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">UnitIntervalMesh</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c_nvars&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;refinements&#39;</span><span class="p">]):</span>
+            <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># define function space for future reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;family&#39;</span><span class="p">],</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">])</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;DoFs on this level:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">vector</span><span class="p">()[:]))</span>
+
+        <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">fenics_heat</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">,</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">)</span>
+
+        <span class="c1"># Stiffness term (Laplace)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">a_K</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+
+        <span class="c1"># Mass term</span>
+        <span class="n">a_M</span> <span class="o">=</span> <span class="n">u</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_M</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">a_K</span><span class="p">)</span>
+
+        <span class="c1"># set forcing term as expression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">t0</span><span class="p">,</span>
+                               <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="c1"># self.g = df.Expression(&#39;0&#39;, a=np.pi, b=self.params.nu, t=self.params.t0,</span>
+        <span class="c1">#                        degree=self.params.order)</span>
+        <span class="c1"># set boundary values</span>
+        <span class="c1"># bc = df.DirichletBC(self.V, df.Constant(0.0), Boundary)</span>
+        <span class="c1">#</span>
+        <span class="c1"># bc.apply(self.M)</span>
+        <span class="c1"># bc.apply(self.K)</span>
+
+<div class="viewcode-block" id="fenics_heat.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dolfin&#39;s linear solver for (M-dtA)u = rhs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the nonlinear system</span>
+<span class="sd">            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+
+    <span class="k">def</span> <span class="nf">__eval_fexpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper routine to evaluate the explicit part of the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values (not used here)</span>
+<span class="sd">            t (fliat): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            explicit part of RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="n">fexpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">fexpl</span>
+
+    <span class="k">def</span> <span class="nf">__eval_fimpl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper routine to evaluate the implicit part of the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time (not used here)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            implicit part of RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">tmp</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+        <span class="n">fimpl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__invert_mass_matrix</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fimpl</span>
+
+<div class="viewcode-block" id="fenics_heat.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate both parts of the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS divided into two parts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_fimpl</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_fexpl</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="fenics_heat.apply_mass_matrix"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">apply_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to apply mass matrix</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: M*u</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+    <span class="k">def</span> <span class="nf">__invert_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper routine to invert mass matrix</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: inv(M)*u</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">me</span>
+
+<div class="viewcode-block" id="fenics_heat.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="s1">&#39;cos(a*x[0]) * cos(t)&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">u0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">me</span></div></div>
+
+
+<span class="c1"># noinspection PyUnusedLocal</span>
+<div class="viewcode-block" id="fenics_heat_mass"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass">[docs]</a><span class="k">class</span> <span class="nc">fenics_heat_mass</span><span class="p">(</span><span class="n">fenics_heat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="fenics_heat_mass.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Dolfin&#39;s linear solver for (M-dtA)u = rhs</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the nonlinear system</span>
+<span class="sd">            factor (float): abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u_: initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">rhs</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+
+<div class="viewcode-block" id="fenics_heat_mass.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate both parts of the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS divided into two parts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">mult</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">vector</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">expl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_mass_matrix</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">f</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

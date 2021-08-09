@@ -1,0 +1,1299 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Attempts to parallelize SDC &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fault-tolerance with PFASST: node failures" href="node_failure.html" />
+    <link rel="prev" title="Step-8: Advanced topics" href="../tutorial/step_8.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../tutorial/step_8.html" title="Step-8: Advanced topics"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="attempts-to-parallelize-sdc">
+<h1>Attempts to parallelize SDC<a class="headerlink" href="#attempts-to-parallelize-sdc" title="Permalink to this headline">¶</a></h1>
+<p>In this project, we test different strategies to parallelize SDC beyond PFASST.
+More precisely, the goal is to find a robust parallelization strategy <em>within</em> each iteration, i.e. parallelization across the collocation nodes.
+This code is used for the publication “Parallelizing SDC across the method”.</p>
+<div class="section" id="different-preconditioners-for-sdc">
+<h2>Different preconditioners for SDC<a class="headerlink" href="#different-preconditioners-for-sdc" title="Permalink to this headline">¶</a></h2>
+<p>The easiest approach for a parallel SDC run is to parallelize the preconditioner, i.e. to find a diagonal Q-delta matrix.
+So far, this matrix is a lower triangular matrix, containing e.g. the Euler scheme or parts of the LU-decomposition of Q.
+Here, we study different ideas to work with a diagonal matrix and compare them to the standard schemes:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">IE</span></code> and <code class="docutils literal notranslate"><span class="pre">LU</span></code>: the standard scheme using implicit Euler or the LU trick</li>
+<li><code class="docutils literal notranslate"><span class="pre">IEpar</span></code>: one Euler step from t0 to the current node</li>
+<li><code class="docutils literal notranslate"><span class="pre">Qpar</span></code>: Jacobi-like diagonal part of Q</li>
+<li><code class="docutils literal notranslate"><span class="pre">MIN</span></code>: A simple minimzation-based preconditioner</li>
+</ul>
+<p>This part also contains <code class="docutils literal notranslate"><span class="pre">minimization.py</span></code>, producing the heat maps for the spectral radius of the stiff limit matrix.</p>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground.py">pySDC/projects/parallelSDC/preconditioner_playground.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># initialize level parameters (part I)</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+
+    <span class="c1"># initialize sweeper parameters (part I)</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="c1"># set up list of Q-delta types and setups</span>
+    <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">,</span> <span class="s1">&#39;IE&#39;</span><span class="p">,</span> <span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
+
+    <span class="c1"># pre-fill results with lists of  setups</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span><span class="p">)</span>
+
+    <span class="c1"># loop over all Q-delta matrix types</span>
+    <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
+
+        <span class="c1"># assign implicit Q-delta matrix</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
+
+        <span class="c1"># loop over all setups</span>
+        <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+            <span class="c1"># initialize problem parameters (part I)</span>
+            <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+            <span class="c1"># loop over all parameters</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
+
+                <span class="c1"># fill description for the controller</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>  <span class="c1"># pass sweeper</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;working on: </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+
+                <span class="c1"># decide which setup to take</span>
+                <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vanderpol</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generalized_fisher</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+                    <span class="n">exit</span><span class="p">()</span>
+
+                <span class="c1"># instantiate controller</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
+                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+                <span class="c1"># get initial values on finest level</span>
+                <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+                <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="c1"># call main function to get things done...</span>
+                <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
+
+                <span class="c1"># filter statistics by type (number of iterations)</span>
+                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+
+                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
+                <span class="c1"># just one time-step, grep number of iteration and store</span>
+                <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">niter</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get all results, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="c1"># write out for later visualization</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper routine to plot iteration counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># find the lists/header required for plotting</span>
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qd_type_list</span><span class="p">:</span>
+                <span class="n">qd_type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">setup_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these type of preconditioners:&#39;</span><span class="p">,</span> <span class="n">qd_type_list</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these setups:&#39;</span><span class="p">,</span> <span class="n">setup_list</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;ERROR did not find five preconditioners, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">qd_type_list</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">setup_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not find three setup, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">setup_list</span>
+
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">,</span> <span class="s1">&#39;IE&#39;</span><span class="p">,</span> <span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">]</span>
+    <span class="n">marker_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">]</span>
+    <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
+
+    <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
+    <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
+            <span class="n">niter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">setup</span> <span class="o">==</span> <span class="n">setup</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="o">==</span> <span class="n">qd_type</span><span class="p">:</span>
+                        <span class="n">xvalue</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+                        <span class="n">niter</span><span class="p">[</span><span class="n">xvalue</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">qd_type</span> <span class="o">==</span> <span class="s1">&#39;LU&#39;</span><span class="p">:</span>
+                <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span>
+                <span class="n">lw</span> <span class="o">=</span> <span class="mf">0.5</span>
+            <span class="k">elif</span> <span class="n">qd_type</span> <span class="o">==</span> <span class="s1">&#39;IE&#39;</span><span class="p">:</span>
+                <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-.&#39;</span>
+                <span class="n">lw</span> <span class="o">=</span> <span class="mf">0.5</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+                <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$c$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\lambda_0$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\mu$&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+        <span class="c1"># save plot as PDF and PGF</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_preconditioner_&#39;</span> <span class="o">+</span> <span class="n">setup</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PDF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pgf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PGF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+    <span class="n">plot_iterations</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_heat.png"><img alt="../_images/parallelSDC_preconditioner_heat.png" src="../_images/parallelSDC_preconditioner_heat.png" style="width: 272.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_advection.png"><img alt="../_images/parallelSDC_preconditioner_advection.png" src="../_images/parallelSDC_preconditioner_advection.png" style="width: 272.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_vanderpol.png" src="../_images/parallelSDC_preconditioner_vanderpol.png" style="width: 272.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_fisher.png"><img alt="../_images/parallelSDC_preconditioner_fisher.png" src="../_images/parallelSDC_preconditioner_fisher.png" style="width: 272.0px; height: 184.0px;" /></a>
+</div>
+<div class="section" id="node-parallel-sdc-with-mpi">
+<h2>Node-parallel SDC with MPI<a class="headerlink" href="#node-parallel-sdc-with-mpi" title="Permalink to this headline">¶</a></h2>
+<p>The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
+We test again the aforementioned ideas, but now add the <code class="docutils literal notranslate"><span class="pre">MIN3</span></code> approach: These values have been obtained using Indie Solver,
+a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
+The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!</p>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground_MPI.py">pySDC/projects/parallelSDC/preconditioner_playground_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
+
+<span class="c1"># from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi</span>
+
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="c1"># initialize level parameters (part I)</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+
+    <span class="c1"># initialize sweeper parameters (part I)</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="c1"># set up list of Q-delta types and setups</span>
+    <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
+
+    <span class="c1"># pre-fill results with lists of  setups</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span><span class="p">)</span>
+
+    <span class="c1"># loop over all Q-delta matrix types</span>
+    <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
+
+        <span class="c1"># assign implicit Q-delta matrix</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
+
+        <span class="c1"># loop over all setups</span>
+        <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+            <span class="c1"># initialize problem parameters (part I)</span>
+            <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+            <span class="c1"># loop over all parameters</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
+
+                <span class="c1"># fill description for the controller</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit_MPI</span>  <span class="c1"># pass sweeper</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+                <span class="c1"># description[&#39;base_transfer_class&#39;] = base_transfer_mpi</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;working on: </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+
+                <span class="c1"># decide which setup to take</span>
+                <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vanderpol</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generalized_fisher</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+                    <span class="n">exit</span><span class="p">()</span>
+
+                <span class="c1"># instantiate controller</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
+                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+                <span class="c1"># get initial values on finest level</span>
+                <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+                <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="c1"># call main function to get things done...</span>
+                <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
+
+                <span class="c1"># filter statistics by type (number of iterations)</span>
+                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+
+                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
+                <span class="c1"># just one time-step, grep number of iteration and store</span>
+                <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">niter</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get all results, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># write out for later visualization</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper routine to plot iteration counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># find the lists/header required for plotting</span>
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qd_type_list</span><span class="p">:</span>
+                <span class="n">qd_type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">setup_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these type of preconditioners:&#39;</span><span class="p">,</span> <span class="n">qd_type_list</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these setups:&#39;</span><span class="p">,</span> <span class="n">setup_list</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR did not find four preconditioners, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">qd_type_list</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">setup_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not find three setup, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">setup_list</span>
+
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
+    <span class="n">marker_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">]</span>
+    <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
+
+    <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
+    <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
+            <span class="n">niter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">setup</span> <span class="o">==</span> <span class="n">setup</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="o">==</span> <span class="n">qd_type</span><span class="p">:</span>
+                        <span class="n">xvalue</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+                        <span class="n">niter</span><span class="p">[</span><span class="n">xvalue</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+            <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$c$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\lambda_0$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\mu$&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+        <span class="c1"># save plot as PDF and PGF</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_preconditioner_MPI_&#39;</span> <span class="o">+</span> <span class="n">setup</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PDF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pgf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PGF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">plot_iterations</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 267.0px; height: 181.0px;" /></a>
+</div>
+<div class="section" id="simplified-newton-for-nonlinear-problems">
+<h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Permalink to this headline">¶</a></h2>
+<p>The main idea here is to work with a diagonalization of the Q matrix.
+While this works well for non-equidistant and non-symmetri nodes like Gauss-Radau, this can only be applied for linear problem, where space and time is separated via Kronecker products.
+In order to apply this also for nonlinear problems, we apply an outer Newton iteration to the nonlinear collocation problem and use the diagonalized SDC approach for the linear problem.
+Yet, the naive implementation still does not decouple space and time, so that we need to fix the Jacobian at e.g. node 0.
+This example compares the iteration counts and errors for this idea (incl. a modified Newton where the Jacobian is not fixed but the approach is applied nonetheless).
+Three new sweepers are used here: <code class="docutils literal notranslate"><span class="pre">linearized_implicit_parallel</span></code>, <code class="docutils literal notranslate"><span class="pre">linearized_implicit_fixed_parallel</span></code> and <code class="docutils literal notranslate"><span class="pre">linearized_implicit_fixed_parallel_prec</span></code>.
+This part also contains the code <code class="docutils literal notranslate"><span class="pre">newton_vs_sdc.py</span></code> where simplified and inexact Newton are compared to standard SDC for the generalized Fisher’s equation.</p>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/nonlinear_playground.py">pySDC/projects/parallelSDC/nonlinear_playground.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span> <span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_parallel</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+    <span class="c1"># This comes as read-in for the step class (this is optional!)</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="c1"># This comes as read-in for the problem class</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="c1"># This comes as read-in for the sweeper class</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;fixed_time_in_jacobian&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generalized_fisher_jac</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="n">sweeper_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic_implicit</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel_prec</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel</span><span class="p">,</span>
+                    <span class="n">linearized_implicit_parallel</span><span class="p">]</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;parallelSDC_nonlinear_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">uend</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># loop over the different sweepers and check results</span>
+    <span class="k">for</span> <span class="n">sweeper</span> <span class="ow">in</span> <span class="n">sweeper_list</span><span class="p">:</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper</span>
+
+        <span class="c1"># instantiate the controller</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="c1"># setup parameters &quot;in time&quot;</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># get initial values on finest level</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+        <span class="c1"># call main function to get things done...</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+        <span class="c1"># compute exact solution and compare</span>
+        <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error at time </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Tend</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+
+        <span class="c1"># filter statistics by type (number of iterations)</span>
+        <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+
+        <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
+        <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
+        <span class="c1"># compute and print statistics</span>
+        <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Mean number of iterations: </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">3.686e-05</span><span class="p">,</span> <span class="s1">&#39;ERROR: error is too high for sweeper </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">7.5</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">4.0</span><span class="p">,</span> \
+            <span class="s1">&#39;ERROR: mean number of iterations not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;xvalues&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">P</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uinit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uinit</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uend&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uend</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uex</span>
+
+    <span class="c1"># write out for later visualization</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_results_graphs.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_results_graphs.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">plot_graphs</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to plot graphs of initial and final values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_results_graphs.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">interval</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span>
+    <span class="n">xvalues</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;xvalues&#39;</span><span class="p">]</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uinit&#39;</span><span class="p">]</span>
+    <span class="n">uend</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uend&#39;</span><span class="p">]</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;uex&#39;</span><span class="p">]</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
+
+    <span class="c1"># set up figure</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">338.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;f(x)&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">((</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">))</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">))</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+    <span class="c1"># plot</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvalues</span><span class="p">,</span> <span class="n">uinit</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;initial&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvalues</span><span class="p">,</span> <span class="n">uend</span><span class="p">,</span> <span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;computed&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xvalues</span><span class="p">,</span> <span class="n">uex</span><span class="p">,</span> <span class="s1">&#39;g-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;exact&#39;</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># save plot as PDF, beautify</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_fisher&#39;</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PDF file&#39;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pgf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PGF file&#39;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># main()</span>
+    <span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">4.00</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
+
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
+
+</pre></div>
+</div>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 403.0px; height: 265.0px;" /></a>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py">pySDC/projects/parallelSDC/newton_vs_sdc.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.ErrReductionHook</span> <span class="kn">import</span> <span class="n">err_reduction_hook</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span> <span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec</span> <span class="kn">import</span> <span class="n">linearized_implicit_fixed_parallel_prec</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+
+    <span class="c1"># This comes as read-in for the step class (this is optional!)</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># This comes as read-in for the problem class</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2047</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+    <span class="c1"># This comes as read-in for the sweeper class</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;fixed_time_in_jacobian&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">err_reduction_hook</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generalized_fisher_jac</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># setup parameters &quot;in time&quot;</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="n">sweeper_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic_implicit</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel_prec</span><span class="p">]</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tend</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;sweeper_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">sweeper</span> <span class="ow">in</span> <span class="n">sweeper_list</span><span class="p">]</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt_list</span>
+
+    <span class="c1"># loop over the different sweepers and check results</span>
+    <span class="k">for</span> <span class="n">sweeper</span> <span class="ow">in</span> <span class="n">sweeper_list</span><span class="p">:</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper</span>
+        <span class="n">error_reduction</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Working with sweeper </span><span class="si">%s</span><span class="s1"> and dt = </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">dt</span><span class="p">))</span>
+
+            <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>
+            <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+            <span class="c1"># instantiate the controller</span>
+            <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+            <span class="c1"># get initial values on finest level</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+            <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+            <span class="c1"># call main function to get things done...</span>
+            <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+            <span class="c1"># filter statistics</span>
+            <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_pre_iteration&#39;</span><span class="p">)</span>
+            <span class="n">error_pre</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_post_iteration&#39;</span><span class="p">)</span>
+            <span class="n">error_post</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">error_reduction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_post</span> <span class="o">/</span> <span class="n">error_pre</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error and reduction rate at time </span><span class="si">%s</span><span class="s1">: </span><span class="si">%6.4e</span><span class="s1"> -- </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Tend</span><span class="p">,</span> <span class="n">error_post</span><span class="p">,</span> <span class="n">error_reduction</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">results</span><span class="p">[</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_reduction</span>
+        <span class="nb">print</span><span class="p">()</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/error_reduction_data.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">plot_graphs</span><span class="p">(</span><span class="n">cwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function to plot graphs of initial and final values</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cwd (str): current working directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;classic&#39;</span><span class="p">)</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">&#39;data/error_reduction_data.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">sweeper_list</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;sweeper_list&#39;</span><span class="p">]</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">]</span>
+
+    <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">]</span>
+    <span class="n">marker_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">]</span>
+    <span class="n">label_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sweeper</span> <span class="ow">in</span> <span class="n">sweeper_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sweeper</span> <span class="o">==</span> <span class="s1">&#39;generic_implicit&#39;</span><span class="p">:</span>
+            <span class="n">label_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;SDC&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sweeper</span> <span class="o">==</span> <span class="s1">&#39;linearized_implicit_fixed_parallel&#39;</span><span class="p">:</span>
+            <span class="n">label_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Simplified Newton&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sweeper</span> <span class="o">==</span> <span class="s1">&#39;linearized_implicit_fixed_parallel_prec&#39;</span><span class="p">:</span>
+            <span class="n">label_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Inexact Newton&#39;</span><span class="p">)</span>
+
+    <span class="n">setups</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sweeper_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">label_list</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">sweeper</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">setups</span><span class="p">:</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="n">sweeper</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+                              <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="p">[</span><span class="n">dt</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="p">[</span><span class="n">dt</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+                          <span class="n">label</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;error reduction&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+    <span class="c1"># ax.set_xticks(dt_list, dt_list)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">dt_list</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">dt_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.1</span><span class="p">])</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">4E-03</span><span class="p">,</span> <span class="mf">1E0</span><span class="p">])</span>
+
+    <span class="c1"># save plot, beautify</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_fisher_newton&#39;</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PDF file&#39;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pgf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PGF file&#39;</span>
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># main()</span>
+    <span class="n">plot_graphs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 286.0px; height: 184.0px;" /></a>
+</div>
+<div class="section" id="id1">
+<h2>Node-parallel SDC with MPI<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
+We test again the aforementioned ideas, but now add the <code class="docutils literal notranslate"><span class="pre">MIN3</span></code> approach: These values have been obtained using Indie Solver,
+a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
+The objective function in this case is the sum over 17^2 values of lamdt, real and imaginary. This works surprisingly well!</p>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground_MPI.py">pySDC/projects/parallelSDC/preconditioner_playground_MPI.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+
+<span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
+<span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
+
+<span class="c1"># from pySDC.projects.parallelSDC.BaseTransfer_MPI import base_transfer_mpi</span>
+
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;qd_type&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="c1"># initialize level parameters (part I)</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+
+    <span class="c1"># initialize sweeper parameters (part I)</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+
+    <span class="c1"># set up list of Q-delta types and setups</span>
+    <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
+
+    <span class="c1"># pre-fill results with lists of  setups</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span><span class="p">)</span>
+
+    <span class="c1"># loop over all Q-delta matrix types</span>
+    <span class="k">for</span> <span class="n">qd_type</span> <span class="ow">in</span> <span class="n">qd_list</span><span class="p">:</span>
+
+        <span class="c1"># assign implicit Q-delta matrix</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qd_type</span>
+
+        <span class="c1"># loop over all setups</span>
+        <span class="k">for</span> <span class="n">setup</span><span class="p">,</span> <span class="n">nvars</span><span class="p">,</span> <span class="n">param_list</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+            <span class="c1"># initialize problem parameters (part I)</span>
+            <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>  <span class="c1"># number of degrees of freedom for each level</span>
+
+            <span class="c1"># loop over all parameters</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_list</span><span class="p">:</span>
+
+                <span class="c1"># fill description for the controller</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit_MPI</span>  <span class="c1"># pass sweeper</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+                <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+                <span class="c1"># description[&#39;base_transfer_class&#39;] = base_transfer_mpi</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;working on: </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">setup</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+
+                <span class="c1"># decide which setup to take</span>
+                <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vanderpol</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+                    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generalized_fisher</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+                    <span class="n">exit</span><span class="p">()</span>
+
+                <span class="c1"># instantiate controller</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
+                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+                <span class="c1"># get initial values on finest level</span>
+                <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+                <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="c1"># call main function to get things done...</span>
+                <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
+
+                <span class="c1"># filter statistics by type (number of iterations)</span>
+                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+
+                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
+                <span class="c1"># just one time-step, grep number of iteration and store</span>
+                <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">setup</span><span class="o">=</span><span class="n">setup</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">niter</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get all results, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># write out for later visualization</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: pickle did not create file&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">plot_iterations</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper routine to plot iteration counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_iterations_precond_MPI.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># find the lists/header required for plotting</span>
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qd_type_list</span><span class="p">:</span>
+                <span class="n">qd_type_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">qd_type</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">setup_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these type of preconditioners:&#39;</span><span class="p">,</span> <span class="n">qd_type_list</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found these setups:&#39;</span><span class="p">,</span> <span class="n">setup_list</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR did not find four preconditioners, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">qd_type_list</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">setup_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not find three setup, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">setup_list</span>
+
+    <span class="n">qd_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
+    <span class="n">marker_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">]</span>
+    <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span>
+
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">setup_mpl</span><span class="p">()</span>
+
+    <span class="c1"># loop over setups and Q-delta types: one figure per setup, all Qds in one plot</span>
+    <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">setup_list</span><span class="p">:</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">qd_type</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">qd_type_list</span><span class="p">,</span> <span class="n">marker_list</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
+            <span class="n">niter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">setup</span> <span class="o">==</span> <span class="n">setup</span> <span class="ow">and</span> <span class="n">key</span><span class="o">.</span><span class="n">qd_type</span> <span class="o">==</span> <span class="n">qd_type</span><span class="p">:</span>
+                        <span class="n">xvalue</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+                        <span class="n">niter</span><span class="p">[</span><span class="n">xvalue</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+            <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$c$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;fisher&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\lambda_0$&#39;</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
+            <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\mu$&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setup not implemented..&#39;</span><span class="p">,</span> <span class="n">setup</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span>
+
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">])</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;number of iterations&#39;</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+        <span class="c1"># save plot as PDF and PGF</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_preconditioner_MPI_&#39;</span> <span class="o">+</span> <span class="n">setup</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PDF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pgf&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PGF file&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">plot_iterations</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 267.0px; height: 181.0px;" /></a>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Attempts to parallelize SDC</a><ul>
+<li><a class="reference internal" href="#different-preconditioners-for-sdc">Different preconditioners for SDC</a></li>
+<li><a class="reference internal" href="#node-parallel-sdc-with-mpi">Node-parallel SDC with MPI</a></li>
+<li><a class="reference internal" href="#simplified-newton-for-nonlinear-problems">Simplified Newton for nonlinear problems</a></li>
+<li><a class="reference internal" href="#id1">Node-parallel SDC with MPI</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../tutorial/step_8.html"
+                        title="previous chapter">Step-8: Advanced topics</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="node_failure.html"
+                        title="next chapter">Fault-tolerance with PFASST: node failures</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/parallelSDC.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../tutorial/step_8.html" title="Step-8: Advanced topics"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

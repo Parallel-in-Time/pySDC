@@ -1,0 +1,1 @@
+.. include:: /../../pySDC/projects/node_failure/README.rst

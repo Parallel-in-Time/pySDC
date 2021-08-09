@@ -1,0 +1,146 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>helpers.plot_helper &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for helpers.plot_helper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;pgf&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="figsize"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.figsize">[docs]</a><span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
+    <span class="n">fig_width_pt</span> <span class="o">=</span> <span class="n">textwidth</span>                            <span class="c1"># Get this from LaTeX using \the\textwidth</span>
+    <span class="n">inches_per_pt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">72.27</span>                         <span class="c1"># Convert pt to inch</span>
+    <span class="n">fig_width</span> <span class="o">=</span> <span class="n">fig_width_pt</span> <span class="o">*</span> <span class="n">inches_per_pt</span> <span class="o">*</span> <span class="n">scale</span>    <span class="c1"># width in inches</span>
+    <span class="n">fig_height</span> <span class="o">=</span> <span class="n">fig_width</span> <span class="o">*</span> <span class="n">ratio</span>                <span class="c1"># height in inches</span>
+    <span class="n">fig_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">fig_width</span><span class="p">,</span> <span class="n">fig_height</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">fig_size</span></div>
+
+
+<div class="viewcode-block" id="setup_mpl"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.setup_mpl">[docs]</a><span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="c1"># Set up plotting parameters</span>
+    <span class="n">pgf_with_latex</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># setup matplotlib to use latex for output</span>
+        <span class="s2">&quot;pgf.texsystem&quot;</span><span class="p">:</span> <span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span>  <span class="c1"># change this if using xetex or lautex</span>
+        <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># use LaTeX to write all text</span>
+        <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;serif&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;font.serif&quot;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># blank entries should cause plots to inherit fonts from the document</span>
+        <span class="s2">&quot;font.sans-serif&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;font.monospace&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="c1"># &quot;axes.labelsize&quot;: 8,  # LaTeX default is 10pt font.</span>
+        <span class="s2">&quot;axes.linewidth&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;font.size&quot;</span><span class="p">:</span> <span class="n">font_size</span><span class="p">,</span>
+        <span class="c1"># &quot;legend.fontsize&quot;: 6,  # Make the legend/label fonts a little smaller</span>
+        <span class="s2">&quot;legend.numpoints&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="c1"># &quot;xtick.labelsize&quot;: 6,</span>
+        <span class="s2">&quot;xtick.major.width&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># major tick width in points</span>
+        <span class="s2">&quot;xtick.minor.width&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+        <span class="c1"># &quot;ytick.labelsize&quot;: 6,</span>
+        <span class="s2">&quot;ytick.major.width&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># major tick width in points</span>
+        <span class="s2">&quot;ytick.minor.width&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+        <span class="s2">&quot;lines.markersize&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;lines.markeredgewidth&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;grid.linewidth&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="s2">&quot;grid.linestyle&quot;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;grid.alpha&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+        <span class="s2">&quot;figure.subplot.hspace&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s2">&quot;savefig.pad_inches&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="s2">&quot;pgf.preamble&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\usepackage[utf8x]</span><span class="si">{inputenc}</span><span class="s2">&quot;</span>
+                        <span class="sa">r</span><span class="s2">&quot;\usepackage[T1]</span><span class="si">{fontenc}</span><span class="s2">&quot;</span>
+                        <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{underscore}</span><span class="s2">&quot;</span>
+                        <span class="sa">r</span><span class="s2">&quot;\usepackage{amsmath,amssymb,marvosym}&quot;</span>
+    <span class="p">}</span>
+    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pgf_with_latex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="newfig"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.newfig">[docs]</a><span class="k">def</span> <span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="savefig"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.savefig">[docs]</a><span class="k">def</span> <span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">save_pgf</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pgf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save_pdf</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">save_png</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

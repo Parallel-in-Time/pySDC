@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Fast-Wave-Slow-Wave SDC &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RDC: Rational Deferred Corrections" href="RDC.html" />
+    <link rel="prev" title="Fault-tolerance with PFASST: node failures" href="node_failure.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="RDC.html" title="RDC: Rational Deferred Corrections"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fast-wave-slow-wave-sdc">
+<h1>Fast-Wave-Slow-Wave SDC<a class="headerlink" href="#fast-wave-slow-wave-sdc" title="Permalink to this headline">¶</a></h1>
+<p>In this project, we explore semi-implicit spectral deferred corrections (SISDC) in which the stiff, fast dynamics correspond to fast propagating waves.
+We study the performance of the method compared to standard integrators like RK-IMEX or DIRK schemes and analyze the convergence properties for scalar test problems.
+This project contains the code for the publication <a class="reference external" href="http://dx.doi.org/10.1137/16M1060078">Spectral deferred corrections with fast-wave-slow-wave splitting</a> of pySDC v2,
+while the original code can be found under <a class="reference external" href="https://doi.org/10.5281/zenodo.53849">The fast-wave-slow-wave release, v2</a>.
+Note that due to the long runtime, not all results are generated via Travis.
+For the Boussinesq example and the convergence test of the acoustic-advection equation, only the visualization (and therefore the existence of the data files) is tested.
+We omit the codes in this documentation, since they are rather long and slightly complex.</p>
+<div class="section" id="theoretical-results">
+<h2>Theoretical results<a class="headerlink" href="#theoretical-results" title="Permalink to this headline">¶</a></h2>
+<p>Here, we review FWSW-SDC from two different viewpoints: as a split method with a fixed order set by a fixed number of iterations K for a sufficiently large number of nodes M,
+or as an iterative solver for the collocation problem where iterations are performed until the norm of the residual reaches a prescribed tolerance.
+We investigate fwsw-SDC from both viewpoints for the scalar test problem and analyze:</p>
+<ul class="simple">
+<li>the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plot_stifflimit_specrad.py">spectral radius</a> of the iteration matrix (Fig. 1 in the above mentioned publication)</li>
+<li>the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plot_stability.py">stability domains</a> of different configurations (Fig. 2)</li>
+<li><a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plot_stab_vs_k.py">stability</a> with respect to the iteration number k (Fig. 3)</li>
+<li>the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plot_dispersion.py">dispersion relation</a> (Fig. 4)</li>
+</ul>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/stifflimit-specrad.png"><img alt="../_images/stifflimit-specrad.png" src="../_images/stifflimit-specrad.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/stifflimit-norm.png"><img alt="../_images/stifflimit-norm.png" src="../_images/stifflimit-norm.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/stability-K3-M3.png"><img alt="../_images/stability-K3-M3.png" src="../_images/stability-K3-M3.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/stab_vs_k_resolved.png"><img alt="../_images/stab_vs_k_resolved.png" src="../_images/stab_vs_k_resolved.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/stab_vs_k_unresolved.png"><img alt="../_images/stab_vs_k_unresolved.png" src="../_images/stab_vs_k_unresolved.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/phase-K3-M3.png"><img alt="../_images/phase-K3-M3.png" src="../_images/phase-K3-M3.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/ampfactor-K3-M3.png"><img alt="../_images/ampfactor-K3-M3.png" src="../_images/ampfactor-K3-M3.png" style="width: 19%;" /></a>
+</div>
+<div class="section" id="acoustic-advection-example">
+<h2>Acoustic-advection example<a class="headerlink" href="#acoustic-advection-example" title="Permalink to this headline">¶</a></h2>
+<p>In a first more complex example, we consider the 1D acoustic-advection example. We show:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/runconvergence_acoustic.py">convergence</a> of FWSW-SDC with orders 3, 4, and 5 versus number of time steps (Fig. 5, left)</li>
+<li><a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/runitererror_acoustic.py">convergence rate</a> of the FWSW-SDC iteration (Fig. 5, right)</li>
+<li>the numerical solution of the acoustic-advection equation with <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/runmultiscale_acoustic.py">multiscale initial data</a> (Fig. 6)</li>
+</ul>
+<p>Results:</p>
+<a class="reference internal image-reference" href="../_images/convergence.png"><img alt="../_images/convergence.png" src="../_images/convergence.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/iteration.png"><img alt="../_images/iteration.png" src="../_images/iteration.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../_images/multiscale-K2-M2.png"><img alt="../_images/multiscale-K2-M2.png" src="../_images/multiscale-K2-M2.png" style="width: 19%;" /></a>
+</div>
+<div class="section" id="boussinesq-example">
+<h2>Boussinesq example<a class="headerlink" href="#boussinesq-example" title="Permalink to this headline">¶</a></h2>
+<p>In a second, even more complex example, we test FWSW-SDC for the 2D Boussinesq equation.
+In particular, we are interested in the number of <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/rungmrescounter_boussinesq.py">GMRES iterations</a> each time integrator needs to achieve a certain error.</p>
+<p>Results (generated with <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plotgmrescounter_boussinesq.py">plotgmrescounter_boussinesq.py</a>):</p>
+<a class="reference internal image-reference" href="../_images/boussinesq.png"><img alt="../_images/boussinesq.png" src="../_images/boussinesq.png" style="width: 19%;" /></a>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fast-Wave-Slow-Wave SDC</a><ul>
+<li><a class="reference internal" href="#theoretical-results">Theoretical results</a></li>
+<li><a class="reference internal" href="#acoustic-advection-example">Acoustic-advection example</a></li>
+<li><a class="reference internal" href="#boussinesq-example">Boussinesq example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="node_failure.html"
+                        title="previous chapter">Fault-tolerance with PFASST: node failures</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="RDC.html"
+                        title="next chapter">RDC: Rational Deferred Corrections</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/projects/fwsw.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="RDC.html" title="RDC: Rational Deferred Corrections"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,671 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>implementations.problem_classes.GrayScott_MPIFFT &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.GrayScott_MPIFFT</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">PFFT</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span><span class="p">,</span> <span class="n">comp2_mesh</span>
+
+<span class="kn">from</span> <span class="nn">mpi4py_fft</span> <span class="kn">import</span> <span class="n">newDistArray</span>
+
+
+<div class="viewcode-block" id="grayscott_imex_diffusion"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion">[docs]</a><span class="k">class</span> <span class="nc">grayscott_imex_diffusion</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing the Gray-Scott equation in 2-3D using mpi4py-fft for solving linear parts,</span>
+<span class="sd">    IMEX time-stepping (implicit diffusion, explicit reaction)</span>
+
+<span class="sd">    mpi4py-fft: https://mpi4py-fft.readthedocs.io/en/latest/</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        fft: fft object</span>
+<span class="sd">        X: grid coordinates in real space</span>
+<span class="sd">        ndim: number of spatial dimensions</span>
+<span class="sd">        Ku: Laplace operator in spectral space (u component)</span>
+<span class="sd">        Kv: Laplace operator in spectral space (v component)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            problem_params (dict): custom parameters for the example</span>
+<span class="sd">            dtype_u: fft data type (will be passed to parent class)</span>
+<span class="sd">            dtype_f: fft data type wuth implicit and explicit parts (will be passed to parent class)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;L&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="c1"># if &#39;init_type&#39; not in problem_params:</span>
+        <span class="c1">#     problem_params[&#39;init_type&#39;] = &#39;circle&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;comm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+
+        <span class="c1"># these parameters will be used later, so assert their existence</span>
+        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;Du&#39;</span><span class="p">,</span> <span class="s1">&#39;Dv&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;spectral&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Need at least two dimensions&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Creating FFT structure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">])</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fft</span> <span class="o">=</span> <span class="n">PFFT</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]),</span> <span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                        <span class="n">collapse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;fftw&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get test data to figure out type and dimensions</span>
+        <span class="n">tmp_u</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;spectral&#39;</span><span class="p">])</span>
+
+        <span class="c1"># add two components to contain field and temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ncomp</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">sizes</span> <span class="o">=</span> <span class="n">tmp_u</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomp</span><span class="p">,)</span>
+
+        <span class="c1"># invoke super init, passing the communicator and the local dimensions as init</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="p">(</span><span class="n">sizes</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">],</span> <span class="n">tmp_u</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                                                       <span class="n">dtype_u</span><span class="o">=</span><span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">dtype_f</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="c1"># get local mesh</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">(</span><span class="kc">False</span><span class="p">)]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">global_shape</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">N</span><span class="p">)):</span>
+            <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">N</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
+
+        <span class="c1"># get local wavenumbers and Laplace operator</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">local_slice</span><span class="p">()</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">global_shape</span><span class="p">()</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">N</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">k</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">N</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="p">[</span><span class="n">ki</span><span class="p">[</span><span class="n">si</span><span class="p">]</span> <span class="k">for</span> <span class="n">ki</span><span class="p">,</span> <span class="n">si</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">)]</span>
+        <span class="n">Ks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">K</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Lp</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">L</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
+            <span class="n">Ks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Lp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Ks</span><span class="p">]</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">K</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">K</span> <span class="o">*</span> <span class="n">K</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Du</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">K2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Dv</span>
+
+        <span class="c1"># Need this for diagnostics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="grayscott_imex_diffusion.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmpfu</span> <span class="o">=</span> <span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpfv</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">tmpv</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfu</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="grayscott_imex_diffusion.solve_system"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.solve_system">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simple FFT solver for the diffusion part</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">rhs_hat</span> <span class="o">/=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs_hat</span><span class="p">,</span> <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">rhs_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">rhs_hat</span> <span class="o">/=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs_hat</span><span class="p">,</span> <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="grayscott_imex_diffusion.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact solution at time t=0, see https://www.chebfun.org/examples/pde/GrayScott.html</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: exact solution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;Exact solution only valid as initial condition&#39;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;The initial conditions are 2D for now..&#39;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="c1"># This assumes that the box is [-L/2, L/2]^2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">80.0</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">80.0</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">80.0</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">80.0</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># tmpu = np.load(&#39;data/u_0001.npy&#39;)</span>
+        <span class="c1"># tmpv = np.load(&#39;data/v_0001.npy&#39;)</span>
+        <span class="c1">#</span>
+        <span class="c1"># me[..., 0] = self.fft.forward(tmpu)</span>
+        <span class="c1"># me[..., 1] = self.fft.forward(tmpv)</span>
+
+        <span class="k">return</span> <span class="n">me</span></div></div>
+
+
+<div class="viewcode-block" id="grayscott_imex_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear">[docs]</a><span class="k">class</span> <span class="nc">grayscott_imex_linear</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">imex_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init routine for the IMEX problem class with linear splitting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">dtype_f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span>
+
+<div class="viewcode-block" id="grayscott_imex_linear.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_linear.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmpfu</span> <span class="o">=</span> <span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">tmpfv</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfu</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">expl</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="k">return</span> <span class="n">f</span></div></div>
+
+
+<div class="viewcode-block" id="grayscott_mi_diffusion"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion">[docs]</a><span class="k">class</span> <span class="nc">grayscott_mi_diffusion</span><span class="p">(</span><span class="n">grayscott_imex_diffusion</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">comp2_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init routine for the multi-implicit problem class with diffusion splitting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;newton_maxiter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;need newton_maxiter as parameter for the problem class&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;newton_tol&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;need newton_tol as parameter for the problem class&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_diffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">dtype_f</span><span class="p">)</span>
+
+        <span class="c1"># This may not run in parallel yet..</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmpfu</span> <span class="o">=</span> <span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpfv</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">tmpv</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfu</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solver for the first component, can just call the super function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_diffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="grayscott_mi_diffusion.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_diffusion.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Newton-Solver for the second component</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmprhsu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmprhsv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmprhsu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmprhsu</span><span class="p">)</span>
+            <span class="n">tmprhsv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmprhsv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmprhsu</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmprhsv</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># print(n, res)</span>
+            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="n">tmpgu</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">-</span> <span class="n">tmprhsu</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tmpu</span><span class="p">))</span>
+            <span class="n">tmpgv</span> <span class="o">=</span> <span class="n">tmpv</span> <span class="o">-</span> <span class="n">tmprhsv</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="n">tmpv</span><span class="p">)</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tmpgu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tmpgv</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dg00</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">dg01</span> <span class="o">=</span> <span class="o">-</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">dg10</span> <span class="o">=</span> <span class="o">-</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">dg11</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span><span class="p">)</span>
+
+            <span class="c1"># interleave and unravel to put into sparse matrix</span>
+            <span class="n">dg00I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg00</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg01I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg01</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg10I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg10</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg11I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg11</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])))</span>
+
+            <span class="c1"># put into sparse matrix</span>
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg00I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg11I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dg</span> <span class="o">+=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg01I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">dg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg10I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">dg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># interleave g terms to apply inverse to it</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">tmpgu</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">tmpgv</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+            <span class="c1"># invert dg matrix</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># update real space vectors</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">-=</span> <span class="n">b</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">-=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="c1"># self.newton_ncalls += 1</span>
+        <span class="c1"># self.newton_itercount += n</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpv</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpu</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpv</span>
+        <span class="k">return</span> <span class="n">me</span></div></div>
+
+
+<div class="viewcode-block" id="grayscott_mi_linear"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear">[docs]</a><span class="k">class</span> <span class="nc">grayscott_mi_linear</span><span class="p">(</span><span class="n">grayscott_imex_linear</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">comp2_mesh</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init routine for the multi-implicit problem class with linear splitting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;newton_maxiter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;need newton_maxiter as parameter for the problem class&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;newton_tol&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;need newton_tol as parameter for the problem class&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_linear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">dtype_f</span><span class="p">)</span>
+
+        <span class="c1"># This may not run in parallel yet..</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="grayscott_mi_linear.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to evaluate the RHS</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            u (dtype_u): current values</span>
+<span class="sd">            t (float): current time</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: the RHS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmpfu</span> <span class="o">=</span> <span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">tmpfv</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfu</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpfv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ku</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">lap_u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">*</span> <span class="n">u_hat</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">lap_u_hat</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">comp1</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">comp2</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="grayscott_mi_linear.solve_system_1"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_1">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solver for the first component, can just call the super function</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">me</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">grayscott_mi_linear</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">solve_system</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">me</span></div>
+
+<div class="viewcode-block" id="grayscott_mi_linear.solve_system_2"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_mi_linear.solve_system_2">[docs]</a>    <span class="k">def</span> <span class="nf">solve_system_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Newton-Solver for the second component</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rhs (dtype_f): right-hand side for the linear system</span>
+<span class="sd">            factor (float) : abbrev. for the node-to-node stepsize (or any other factor required)</span>
+<span class="sd">            u0 (dtype_u): initial guess for the iterative solver (not used here so far)</span>
+<span class="sd">            t (float): current time (e.g. for time-dependent BCs)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: solution as mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">u0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">tmprhsu</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmprhsv</span> <span class="o">=</span> <span class="n">newDistArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmprhsu</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tmprhsu</span><span class="p">)</span>
+            <span class="n">tmprhsv</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tmprhsv</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmpu</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmpv</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmprhsu</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="n">tmprhsv</span> <span class="o">=</span> <span class="n">rhs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># start newton iteration</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mi">99</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="c1"># print(n, res)</span>
+            <span class="c1"># form the function g with g(u) = 0</span>
+            <span class="n">tmpgu</span> <span class="o">=</span> <span class="n">tmpu</span> <span class="o">-</span> <span class="n">tmprhsu</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">tmpgv</span> <span class="o">=</span> <span class="n">tmpv</span> <span class="o">-</span> <span class="n">tmprhsv</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># if g is close to 0, then we are done</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tmpgu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tmpgv</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_tol</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="c1"># assemble dg</span>
+            <span class="n">dg00</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">dg01</span> <span class="o">=</span> <span class="o">-</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span><span class="p">)</span>
+            <span class="n">dg10</span> <span class="o">=</span> <span class="o">-</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmpv</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">dg11</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">tmpu</span> <span class="o">*</span> <span class="n">tmpv</span><span class="p">)</span>
+
+            <span class="c1"># interleave and unravel to put into sparse matrix</span>
+            <span class="n">dg00I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg00</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg01I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg01</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg10I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg10</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])))</span>
+            <span class="n">dg11I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">dg11</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])))</span>
+
+            <span class="c1"># put into sparse matrix</span>
+            <span class="n">dg</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg00I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg11I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dg</span> <span class="o">+=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg01I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">dg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">sp</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">dg10I</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">dg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+            <span class="c1"># interleave g terms to apply inverse to it</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">tmpgu</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">tmpgv</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+            <span class="c1"># invert dg matrix</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+            <span class="c1"># update real-space vectors</span>
+            <span class="n">tmpu</span><span class="p">[:]</span> <span class="o">-=</span> <span class="n">b</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+            <span class="n">tmpv</span><span class="p">[:]</span> <span class="o">-=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span>
+
+            <span class="c1"># increase iteration count</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">stop_at_nan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations, aborting...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton got nan after </span><span class="si">%i</span><span class="s1"> iterations...&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">newton_maxiter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Newton did not converge after </span><span class="si">%i</span><span class="s1"> iterations, error is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+        <span class="c1"># self.newton_ncalls += 1</span>
+        <span class="c1"># self.newton_itercount += n</span>
+        <span class="n">me</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">spectral</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpu</span><span class="p">)</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">tmpv</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpu</span>
+            <span class="n">me</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmpv</span>
+        <span class="k">return</span> <span class="n">me</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

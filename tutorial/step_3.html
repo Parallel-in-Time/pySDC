@@ -1,0 +1,613 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Step-3: Statistics and a new sweeper &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Step-4: Multilevel SDC" href="step_4.html" />
+    <link rel="prev" title="Step-2: Data structures and my first sweeper" href="step_2.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_4.html" title="Step-4: Multilevel SDC"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="step-3-statistics-and-a-new-sweeper">
+<h1>Step-3: Statistics and a new sweeper<a class="headerlink" href="#step-3-statistics-and-a-new-sweeper" title="Permalink to this headline">¶</a></h1>
+<p>In this step, we will show how to work with the statistics pySDC
+generates. We will also introduce a new problem as well as a new
+sweeper.</p>
+<div class="section" id="part-a-getting-statistics">
+<h2>Part A: Getting statistics<a class="headerlink" href="#part-a-getting-statistics" title="Permalink to this headline">¶</a></h2>
+<p>In the first part, we run our standard heat equation problem again, but
+focus on the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary the controller returns in addition to
+the final solution. This <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary is a little bit complex,
+as its keys are tuples which contain the process, time, level, iteration
+and type of entry for the values. This way, each value has some sort of
+time stamp attached to it, so that it is clear when this value was
+added. To help dealing with the statistics, we make use of the
+<code class="docutils literal notranslate"><span class="pre">filter_stats</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_stats</span></code> routines. The first one filters the
+dictionary, following the keys we provide. Here, we would like to have
+all residuals logged during time 0.1 (i.e. for all iterations in the
+first time step). Analogously, we could ask for all residuals at the
+final iteration of each step by calling
+<code class="docutils literal notranslate"><span class="pre">filter_stats(stats,</span> <span class="pre">iter=-1,</span> <span class="pre">type='residual')</span></code>. The second helper
+routine converts the filtered or non-filtered dictionary to a listof
+tuples, where the first part is the item defined by the parameter
+<code class="docutils literal notranslate"><span class="pre">sortby</span></code> and the second part is the value. Here, we would like to have
+a list of iterations and residuals to see how SDC converged over the
+iterations.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Here, we use the <code class="docutils literal notranslate"><span class="pre">controller_params</span></code> to control the logging verbosity, see <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging-levels">here</a> for more details.</li>
+<li>Admittedly, the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary is a complex thing, but it
+allows users to add other details to it without changing its
+definition (see next part).</li>
+<li>For more details on how the entries of <code class="docutils literal notranslate"><span class="pre">stats</span></code> are created, please
+check the <code class="docutils literal notranslate"><span class="pre">Hooks</span></code> class.</li>
+<li>We also use the <code class="docutils literal notranslate"><span class="pre">get_list_of_type</span></code> function to show what kind of
+values are registered in the statistics. This can be helpful, if
+users register their own types, see below.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to describe how to get statistics of a run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># run simulation</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">run_simulation</span><span class="p">()</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;List of registered statistic types: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="c1"># filter statistics by first time intervall and type (residual)</span>
+    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">)</span>
+
+    <span class="c1"># sort and convert stats to list, sorted by iteration numbers</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">residuals</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Residual in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%8.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="c1"># filter statistics by type (number of iterations)</span>
+    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># convert filtered statistics to list of iterations count, sorted by time</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations at time </span><span class="si">%4.2f</span><span class="s1">: </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">]),</span> \
+        <span class="s1">&#39;ERROR: number of iterations are not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts</span>
+
+
+<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters (&lt;-- this is new!)</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># reduce verbosity of each run</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># instantiate the controller (no controller parameters used here)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.9</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stats</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">List</span> <span class="n">of</span> <span class="n">registered</span> <span class="n">statistic</span> <span class="n">types</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;timing_setup&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_step&#39;</span><span class="p">,</span> <span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_step&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_run&#39;</span><span class="p">]</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">1</span><span class="p">:</span> <span class="mf">4.1119e-03</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">2</span><span class="p">:</span> <span class="mf">6.6844e-04</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">3</span><span class="p">:</span> <span class="mf">8.8038e-05</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">4</span><span class="p">:</span> <span class="mf">1.2171e-05</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">5</span><span class="p">:</span> <span class="mf">1.3827e-06</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">6.3645e-07</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">7</span><span class="p">:</span> <span class="mf">1.6895e-07</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">8</span><span class="p">:</span> <span class="mf">3.5260e-08</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">9</span><span class="p">:</span> <span class="mf">6.0728e-09</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">8.2750e-10</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">11</span><span class="p">:</span> <span class="mf">1.1983e-10</span>
+<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">1.4858e-11</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.10</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.20</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.30</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.40</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.60</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.70</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.80</span><span class="p">:</span> <span class="mi">12</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-b-adding-statistics">
+<h2>Part B: Adding statistics<a class="headerlink" href="#part-b-adding-statistics" title="Permalink to this headline">¶</a></h2>
+<p>We now extend the statistics of pySDC by user-defined entries. To make
+things much more interesting (and complicated), we introduce a new
+problem class (<code class="docutils literal notranslate"><span class="pre">PenningTrap_3D</span></code>) as well a new sweeper
+(<code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code>). This is accompanied by new data types, namely
+<code class="docutils literal notranslate"><span class="pre">particles</span></code> and <code class="docutils literal notranslate"><span class="pre">fields</span></code>. Details on the idea of the Boris solver
+for particles moving in electromagnetic fields can be found in <a class="reference external" href="http://dx.doi.org/10.1016/j.jcp.2015.04.022">this
+paper</a>. Yet, one
+important measure for this kind of problem is the total energy of the
+system. We would like to compute this after each time step and
+therefore, we define a new hook class called <code class="docutils literal notranslate"><span class="pre">particle_hooks</span></code>. Here,
+all necessary computations are done and the value is added to the
+statistics for later processing.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>In order to extend (and not replace) pySDC’s statistics, make sure
+that your custom hook class calls <code class="docutils literal notranslate"><span class="pre">super</span></code> each time a function is
+called.</li>
+<li>User-defined statistics can also be used from within the problem
+class: simply define a problem attribute (e.g. the number of GMRES
+iterations in the spatial solver) and access it during the hook call
+using the level.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/B_adding_statistics.py">pySDC/tutorial/step_3/B_adding_statistics.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple tets program to retrieve user-defined statistics from a run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">err</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">()</span>
+
+    <span class="c1"># filter statistics type (etot)</span>
+    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
+
+    <span class="c1"># sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get base energy and show difference</span>
+    <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
+              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
+                                                  <span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step of the penning trap example</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters for the Penning trap</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.9</span>  <span class="c1"># E-field frequency</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">25.0</span>  <span class="c1"># B-field frequency</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># initial center of positions</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nparts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># number of particles in the trap</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># smoothing parameter for the forces</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_hook</span>  <span class="c1"># specialized hook class for more statistics and output</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;log_to_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;step_3_B_out.txt&#39;</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">penningtrap</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">boris_2nd_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># instantiate the controller (no controller parameters used here)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_init</span><span class="p">()</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># compute error compared to know exact solution for one particle</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">uex</span><span class="o">.</span><span class="n">pos</span> <span class="o">-</span> <span class="n">uend</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">uex</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">err</span><span class="p">,</span> <span class="n">stats</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-08-09 12:06:45,553 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2021-08-09 12:06:45,553 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
+
+Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
+    mssdc_jac = True
+    predict_type = None
+    all_to_done = False
+    logger_level = 20
+--&gt; log_to_file = True
+    dump_setup = True
+--&gt; fname = step_3_B_out.txt
+    use_iteration_estimator = False
+--&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
+
+Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
+--&gt; maxiter = 20
+    Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
+        Level  0
+--&gt;         dt = 0.0625
+--&gt;         restol = 1e-08
+            nsweeps = 1
+            residual_type = full_abs
+--&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap&#39;&gt;
+--&gt;             omega_E = 4.9
+--&gt;             omega_B = 25.0
+--&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
+--&gt;             nparts = 1
+--&gt;             sig = 0.1
+--&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.particles.particles&#39;&gt;
+--&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.particles.fields&#39;&gt;
+--&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
+                    do_coll_update = False
+                    initial_guess = spread
+--&gt;                 num_nodes = 3
+--&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
+
+2021-08-09 12:06:45,554 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
+2021-08-09 12:06:45,554 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
+
+2021-08-09 12:06:46,476 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2021-08-09 12:06:46,484 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2021-08-09 12:06:46,492 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2021-08-09 12:06:46,500 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2021-08-09 12:06:46,509 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2021-08-09 12:06:46,517 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2021-08-09 12:06:46,525 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2021-08-09 12:06:46,533 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534544e-06
+2021-08-09 12:06:46,541 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2021-08-09 12:06:46,549 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407602e-08
+2021-08-09 12:06:46,556 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17124807e-09
+Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
+Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-c-studying-collocation-node-types">
+<h2>Part C: Studying collocation node types<a class="headerlink" href="#part-c-studying-collocation-node-types" title="Permalink to this headline">¶</a></h2>
+<p>Having first experience with the Boris-SDC solver, we see that the
+energy deviates quite a bit already for this simple setup. We now test
+this for three different collocation classes to demonstrate how a
+parameter study can be done with pySDC. To this end, we describe the
+whole setup up to the parameter we would like to vary. Using a simple
+list of parameters, we construct the controller each time using a
+different collocation class. While slightly inefficient, this makes sure
+that the variables and statistics are reset each time.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Interestingly, the energy does not deviate a lot for Gauss-Lobatto
+and Gauss-Legendre nodes. This is related to their symmetric nature
+(in contrast to Gauss-Radau).</li>
+<li>Using a lower residual tolerance actually improves the energy
+conservation even further, at least for symmetric collocation nodes.
+Rule of thumb: conservation up to residual tolerance is achieved.</li>
+<li>Working with multiple <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionaries is not straightforward.
+Yet, putting them into a meta-dictionary is useful (as done here).
+Alternatively, each <code class="docutils literal notranslate"><span class="pre">stats</span></code> can be processed on the fly and only
+the relevant information can be stored.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/C_study_collocations.py">pySDC/tutorial/step_3/C_study_collocations.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_legendre</span> <span class="kn">import</span> <span class="n">CollGaussLegendre</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_lobatto</span> <span class="kn">import</span> <span class="n">CollGaussLobatto</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_3.HookClass_Particles</span> <span class="kn">import</span> <span class="n">particle_hook</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to show th eenergy deviation for different quadrature nodes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stats_dict</span> <span class="o">=</span> <span class="n">run_simulation</span><span class="p">()</span>
+
+    <span class="n">ediff</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">cclass</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">stats_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># filter and convert/sort statistics by etot and iterations</span>
+        <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+        <span class="c1"># compare base and final energy</span>
+        <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">final_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ediff</span><span class="p">[</span><span class="n">cclass</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">final_energy</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;Energy deviation for </span><span class="si">%s</span><span class="s2">: </span><span class="si">%12.8e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cclass</span><span class="p">,</span> <span class="n">ediff</span><span class="p">[</span><span class="n">cclass</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># set expected differences and check</span>
+    <span class="n">ediff_expect</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussRadau_Right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussLobatto&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-05</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussLegendre&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3E-05</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ediff</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">ediff_expect</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="s2">&quot;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ediff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-06</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.9</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;omega_B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">25.0</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nparts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_hook</span>  <span class="c1"># specialized hook class for more statistics and output</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># reduce verbosity of each run</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">penningtrap</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">boris_2nd_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># assemble and loop over list of collocation classes</span>
+    <span class="n">coll_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">CollGaussRadau_Right</span><span class="p">,</span> <span class="n">CollGaussLegendre</span><span class="p">,</span> <span class="n">CollGaussLobatto</span><span class="p">]</span>
+    <span class="n">stats_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">cclass</span> <span class="ow">in</span> <span class="n">coll_list</span><span class="p">:</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cclass</span>
+        <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+
+        <span class="c1"># instantiate the controller (no controller parameters used here)</span>
+        <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+        <span class="c1"># set time parameters</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">Tend</span> <span class="o">=</span> <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+
+        <span class="c1"># get initial values on finest level</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+        <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_init</span><span class="p">()</span>
+
+        <span class="c1"># call main function to get things done...</span>
+        <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+        <span class="c1"># gather stats in dictionary, collocation classes being the keys</span>
+        <span class="n">stats_dict</span><span class="p">[</span><span class="n">cclass</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
+
+    <span class="k">return</span> <span class="n">stats_dict</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussRadau_Right</span><span class="p">:</span> <span class="mf">1.44960920e+01</span>
+<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLegendre</span><span class="p">:</span> <span class="mf">2.33862993e-05</span>
+<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLobatto</span><span class="p">:</span> <span class="mf">9.32710282e-06</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Step-3: Statistics and a new sweeper</a><ul>
+<li><a class="reference internal" href="#part-a-getting-statistics">Part A: Getting statistics</a></li>
+<li><a class="reference internal" href="#part-b-adding-statistics">Part B: Adding statistics</a></li>
+<li><a class="reference internal" href="#part-c-studying-collocation-node-types">Part C: Studying collocation node types</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="step_2.html"
+                        title="previous chapter">Step-2: Data structures and my first sweeper</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="step_4.html"
+                        title="next chapter">Step-4: Multilevel SDC</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/step_3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_4.html" title="Step-4: Multilevel SDC"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

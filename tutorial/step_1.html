@@ -1,0 +1,762 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Step-1: A first spatial problem &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Step-2: Data structures and my first sweeper" href="step_2.html" />
+    <link rel="prev" title="Welcome to pySDC!" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to pySDC!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="step-1-a-first-spatial-problem">
+<h1>Step-1: A first spatial problem<a class="headerlink" href="#step-1-a-first-spatial-problem" title="Permalink to this headline">¶</a></h1>
+<p>In this step, we create a spatial problem and play with it a little bit.
+No SDC, no multi-level here so far.</p>
+<div class="section" id="part-a-spatial-problem-setup">
+<h2>Part A: Spatial problem setup<a class="headerlink" href="#part-a-spatial-problem-setup" title="Permalink to this headline">¶</a></h2>
+<p>We start as simple as possible by creating a first, very simple problem
+using one of the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code>.
+This basically consists only of the matrix <code class="docutils literal notranslate"><span class="pre">A</span></code>, which represents a
+finite difference discretization of the 1D Laplacian. This is tested for
+one particular example.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Many (most) parameters for pySDC are passed using dictionaries</li>
+<li>Data types are encapsulated: the real values are stored in
+<code class="docutils literal notranslate"><span class="pre">values</span></code>, meta-information can be stored separately in the data
+structure</li>
+<li>A quick peak into <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code> reveals that the <code class="docutils literal notranslate"><span class="pre">init</span></code>
+and the <code class="docutils literal notranslate"><span class="pre">params.nvars</span></code> attribute contain the same values (namely
+<code class="docutils literal notranslate"><span class="pre">nvars</span></code>). Yet, sometime the one or the other is used here (and
+throughout the code). The reason is this: the data structure
+(<code class="docutils literal notranslate"><span class="pre">mesh</span></code> in this case) needs some form of standard initialization.
+For this, pySDC uses the <code class="docutils literal notranslate"><span class="pre">init</span></code> attribute each problem class has.
+In our simple example, this is he same as <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, but e.g. for
+Finite Elements, the function space is stored in the <code class="docutils literal notranslate"><span class="pre">init</span></code>
+attribute. Thus, whenever a data type is created, use <code class="docutils literal notranslate"><span class="pre">init</span></code>,
+otherwise do whatever looks nice.</li>
+<li>We happily pass classes around so that they can be used to
+instantiate things within subroutines</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/A_spatial_problem_setup.py">pySDC/tutorial/step_1/A_spatial_problem_setup.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to set up a spatial problem and play with it</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># instantiate problem</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="c1"># run accuracy test, get error back</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_1_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">def</span> <span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to check the error of the Laplacian vs. its FD discretization</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prob: a problem instance</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the error between the analytic Laplacian and the computed one of a given function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># create x values, use only inner points</span>
+    <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+
+    <span class="c1"># create a mesh instance and fill it with a sine wave</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
+
+    <span class="c1"># create a mesh instance and fill it with the Laplacian of the sine wave</span>
+    <span class="n">u_lap</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+    <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
+
+    <span class="c1"># compare analytic and computed solution using the eval_f routine of the problem class</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">u_lap</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">err</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">of</span> <span class="n">the</span> <span class="n">spatial</span> <span class="n">accuracy</span> <span class="n">test</span><span class="p">:</span> <span class="mf">1.981783e-04</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-b-spatial-accuracy-check">
+<h2>Part B: Spatial accuracy check<a class="headerlink" href="#part-b-spatial-accuracy-check" title="Permalink to this headline">¶</a></h2>
+<p>We now do a more thorough test of the accuracy of the spatial
+discretization. We loop over a set of <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, compute the Laplacian
+of our test vector and look at the error. Then, the order of accuracy in
+space is checked by looking at the numbers and by looking at “points on a line”.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>You better test your operators.. use nvars &gt; 2**16 and things will
+break!</li>
+<li>Add your results into a dictionary for later usage. Use IDs to find
+the data! Also, use headers to store meta-information.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/B_spatial_accuracy_check.py">pySDC/tutorial/step_1/B_spatial_accuracy_check.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+
+<span class="c1"># setup id for gathering the results (will sort by nvars)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;nvars&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to check order of accuracy in space for a simple test problem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+
+    <span class="c1"># create list of nvars to do the accuracy test with</span>
+    <span class="n">nvars_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">15</span><span class="p">)]</span>
+
+    <span class="c1"># run accuracy test for all nvars</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">nvars_list</span><span class="o">=</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">)</span>
+
+    <span class="c1"># compute order of accuracy</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_1_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># visualize results</span>
+    <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;step_1_accuracy_test_space.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create file&#39;</span>
+
+    <span class="k">assert</span> <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.06</span><span class="p">))),</span> <span class="s2">&quot;ERROR: spatial order of accuracy is not as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">order</span>
+
+
+<span class="k">def</span> <span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to check the error of the Laplacian vs. its FD discretization</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nvars_list: list of nvars to do the testing with</span>
+<span class="sd">        problem_params: dictionary containing the problem-dependent parameters</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a dictionary containing the errors and a header (with nvars_list)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># loop over all nvars</span>
+    <span class="k">for</span> <span class="n">nvars</span> <span class="ow">in</span> <span class="n">nvars_list</span><span class="p">:</span>
+        <span class="c1"># setup problem</span>
+        <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars</span>
+        <span class="n">prob</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># create x values, use only inner points</span>
+        <span class="n">xvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)])</span>
+
+        <span class="c1"># create a mesh instance and fill it with a sine wave</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># create a mesh instance and fill it with the Laplacian of the sine wave</span>
+        <span class="n">u_lap</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="n">prob</span><span class="o">.</span><span class="n">init</span><span class="p">)</span>
+        <span class="n">u_lap</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nu</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">freq</span> <span class="o">*</span> <span class="n">xvalues</span><span class="p">)</span>
+
+        <span class="c1"># compare analytic and computed solution using the eval_f routine of the problem class</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">u_lap</span><span class="p">)</span>
+
+        <span class="c1"># get id for this nvars and put error into dictionary</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
+
+    <span class="c1"># add nvars_list to dictionary for easier access later on</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvars_list</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">def</span> <span class="nf">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to compute the order of accuracy in space</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        results: the dictionary containing the errors</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the list of orders</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># retrieve the list of nvars from results</span>
+    <span class="k">assert</span> <span class="s1">&#39;nvars_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of nvars in the results dictionary&#39;</span>
+    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">])</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># loop over two consecutive errors/nvars pairs</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)):</span>
+        <span class="c1"># get ids</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="n">nvars_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">id_prev</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="n">nvars_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) &lt;-- depends on the sorting of the list!</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">id_prev</span><span class="p">]</span> <span class="o">/</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">nvars_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">order</span>
+
+
+<span class="k">def</span> <span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to visualize the errors as well as the expected errors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        results: the dictionary containing the errors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># retrieve the list of nvars from results</span>
+    <span class="k">assert</span> <span class="s1">&#39;nvars_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of nvars in the results dictionary&#39;</span>
+    <span class="n">nvars_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;nvars_list&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Set up plotting parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;figure.figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+              <span class="s1">&#39;axes.labelsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;axes.titlesize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;xtick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+              <span class="s1">&#39;ytick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+              <span class="s1">&#39;lines.linewidth&#39;</span><span class="p">:</span> <span class="mi">3</span>
+              <span class="p">}</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># create new figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="c1"># take x-axis limits from nvars_list + some spacning left and right</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;nvars&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;abs. error&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+    <span class="c1"># get guide for the order of accuracy, i.e. the errors to expect</span>
+    <span class="c1"># get error for first entry in nvars_list</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="n">nvars_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">base_error</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+    <span class="c1"># assemble optimal errors for 2nd order method and plot</span>
+    <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">))]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;2nd order&#39;</span><span class="p">)</span>
+
+    <span class="n">min_err</span> <span class="o">=</span> <span class="mf">1E99</span>
+    <span class="n">max_err</span> <span class="o">=</span> <span class="mf">0E00</span>
+    <span class="n">err_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># loop over nvars, get errors and find min/max error for y-axis limits</span>
+    <span class="k">for</span> <span class="n">nvars</span> <span class="ow">in</span> <span class="n">nvars_list</span><span class="p">:</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">nvars</span><span class="o">=</span><span class="n">nvars</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="n">min_err</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">min_err</span><span class="p">)</span>
+        <span class="n">max_err</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">max_err</span><span class="p">)</span>
+        <span class="n">err_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">nvars_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;experiment&#39;</span><span class="p">)</span>
+
+    <span class="c1"># adjust y-axis limits, add legend</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="n">min_err</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="n">max_err</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># save plot as PDF, beautify</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;step_1_accuracy_test_space.png&#39;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>  <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.888</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.949</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.976</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.988</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.994</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.997</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.999</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.999</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.999</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">1.982</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/step_1_accuracy_test_space.png"><img alt="../_images/step_1_accuracy_test_space.png" src="../_images/step_1_accuracy_test_space.png" style="width: 505.0px; height: 349.0px;" /></a>
+</div>
+<div class="section" id="part-c-collocation-problem-setup">
+<h2>Part C: Collocation problem setup<a class="headerlink" href="#part-c-collocation-problem-setup" title="Permalink to this headline">¶</a></h2>
+<p>Here, we set up our first collocation problem using one of the
+<code class="docutils literal notranslate"><span class="pre">collocation_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">GaussRadau_Right</span></code>. Using the spatial
+operator, we can build the <strong>collocation problem</strong> which in this case is
+linear. This fully coupled system is then solved directly and the error
+is compared to the exact solution.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>The collocation matrix <code class="docutils literal notranslate"><span class="pre">Q</span></code> is and will be always relative to the
+temporal domain [0,1]. Use <code class="docutils literal notranslate"><span class="pre">dt</span></code> to scale it appropriately.</li>
+<li>Although convenient to analyze, the matrix formulation is not suited
+for larger (in space or time) computations. All remaining
+computations in pySDC are thus based on decoupling space and time
+operators (i.e. no Kronecker product).</li>
+<li>We can use the <code class="docutils literal notranslate"><span class="pre">u_exact</span></code> routine here to return the values at any
+given point in time. It is recommended to include either an
+initialization routine or the exact solution (if applicable) into the
+problem class.</li>
+<li>This is where the fun with parameters comes in: How many DOFs do we
+need in space? How large/small does dt have to be? What frequency in
+space is fine? …</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/C_collocation_problem_setup.py">pySDC/tutorial/step_1/C_collocation_problem_setup.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to create and solve a collocation problem directly</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># instantiate problem</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
+    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># set time-step size (warning: the collocation matrices are relative to [0,1], see above)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># solve collocation problem</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_1_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the collocation problem: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: did not get collocation error as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">def</span> <span class="nf">solve_collocation_problem</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to build and solve the linear collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prob: a problem instance</span>
+<span class="sd">        coll: a collocation instance</span>
+<span class="sd">        dt: time-step size</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        the analytic error of the solved collocation problem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># shrink collocation matrix: first line and column deals with initial value, not needed here</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># build system matrix M of collocation problem</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="c1"># get initial value at t0 = 0</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># fill in u0-vector as right-hand side for the collocation problem</span>
+    <span class="n">u0_coll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">),</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="c1"># get exact solution at Tend = dt</span>
+    <span class="n">uend</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># solve collocation problem directly</span>
+    <span class="n">u_coll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">u0_coll</span><span class="p">)</span>
+
+    <span class="c1"># compute error</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">err</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">of</span> <span class="n">the</span> <span class="n">collocation</span> <span class="n">problem</span><span class="p">:</span> <span class="mf">3.803471e-04</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-d-collocation-accuracy-test">
+<h2>Part D: Collocation accuracy test<a class="headerlink" href="#part-d-collocation-accuracy-test" title="Permalink to this headline">¶</a></h2>
+<p>As for the spatial operator, we now test the accuracy in time. This
+time, we loop over a set of <code class="docutils literal notranslate"><span class="pre">dt</span></code>, compute the solution to the
+collocation problem and look at the error.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>We take a large number of DOFs in space, since we need to beat 5th
+order in time with a 2nd order stencil in space.</li>
+<li>Orders of convergence are not as stable as for the space-only test.
+One of the problems of this example is that we are actually trying to
+compute 0 very, very thorougly…</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/D_collocation_accuracy_check.py">pySDC/tutorial/step_1/D_collocation_accuracy_check.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
+
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+
+<span class="c1"># setup id for gathering the results (will sort by dt)</span>
+<span class="n">ID</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to compute the order of accuracy in time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16383</span>  <span class="c1"># number of DOFs in space</span>
+
+    <span class="c1"># instantiate problem</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">heat1d</span><span class="p">(</span><span class="n">problem_params</span><span class="o">=</span><span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+
+    <span class="c1"># instantiate collocation class, relative to the time interval [0,1]</span>
+    <span class="n">coll</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span><span class="p">(</span><span class="n">num_nodes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tleft</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tright</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># assemble list of dt</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+
+    <span class="c1"># run accuracy test for all dt</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="o">=</span><span class="n">coll</span><span class="p">,</span> <span class="n">dt_list</span><span class="o">=</span><span class="n">dt_list</span><span class="p">)</span>
+
+    <span class="c1"># get order of accuracy</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_1_D_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Expected order: </span><span class="si">%2i</span><span class="s1"> -- Computed order </span><span class="si">%4.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># visualize results</span>
+    <span class="n">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;step_1_accuracy_test_coll.png&#39;</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                          <span class="n">rtol</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)),</span> <span class="s2">&quot;ERROR: did not get order of accuracy as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">order</span>
+
+
+<span class="k">def</span> <span class="nf">run_accuracy_check</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">coll</span><span class="p">,</span> <span class="n">dt_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to build and solve the linear collocation problem</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prob: a problem instance</span>
+<span class="sd">        coll: a collocation instance</span>
+<span class="sd">        dt_list: list of time-step sizes</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        the analytic error of the solved collocation problem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># loop over all nvars</span>
+    <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">:</span>
+        <span class="c1"># shrink collocation matrix: first line and column deals with initial value, not needed here</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="n">Qmat</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># build system matrix M of collocation problem</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span> <span class="o">*</span> <span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">sp</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">prob</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+        <span class="c1"># get initial value at t0 = 0</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># fill in u0-vector as right-hand side for the collocation problem</span>
+        <span class="n">u0_coll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">),</span> <span class="n">u0</span><span class="p">)</span>
+        <span class="c1"># get exact solution at Tend = dt</span>
+        <span class="n">uend</span> <span class="o">=</span> <span class="n">prob</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+
+        <span class="c1"># solve collocation problem directly</span>
+        <span class="n">u_coll</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">spsolve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">u0_coll</span><span class="p">)</span>
+
+        <span class="c1"># compute error</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_coll</span><span class="p">[</span><span class="o">-</span><span class="n">prob</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">:]</span> <span class="o">-</span> <span class="n">uend</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="c1"># get id for this dt and store error in results</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">err</span>
+
+    <span class="c1"># add list of dt to results for easier access</span>
+    <span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt_list</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<span class="k">def</span> <span class="nf">get_accuracy_order</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to compute the order of accuracy in time</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        results: the dictionary containing the errors</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the list of orders</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># retrieve the list of dt from results</span>
+    <span class="k">assert</span> <span class="s1">&#39;dt_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of dt in the results dictionary&#39;</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># loop over two consecutive errors/dt pairs</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)):</span>
+        <span class="c1"># get ids</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">id_prev</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># compute order as log(prev_error/this_error)/log(this_dt/old_dt) &lt;-- depends on the sorting of the list!</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">/</span> <span class="n">results</span><span class="p">[</span><span class="n">id_prev</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dt_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">dt_list</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">order</span>
+
+
+<span class="k">def</span> <span class="nf">plot_accuracy</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to visualize the errors as well as the expected errors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        results: the dictionary containing the errors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># retrieve the list of nvars from results</span>
+    <span class="k">assert</span> <span class="s1">&#39;dt_list&#39;</span> <span class="ow">in</span> <span class="n">results</span><span class="p">,</span> <span class="s1">&#39;ERROR: expecting the list of dts in the results dictionary&#39;</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;dt_list&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Set up plotting parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;figure.figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+              <span class="s1">&#39;axes.labelsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;axes.titlesize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+              <span class="s1">&#39;xtick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+              <span class="s1">&#39;ytick.labelsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+              <span class="s1">&#39;lines.linewidth&#39;</span><span class="p">:</span> <span class="mi">3</span>
+              <span class="p">}</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># create new figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="c1"># take x-axis limits from nvars_list + some spacning left and right</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;abs. error&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+    <span class="c1"># get guide for the order of accuracy, i.e. the errors to expect</span>
+    <span class="c1"># get error for first entry in nvars_list</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">base_error</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+    <span class="c1"># assemble optimal errors for 5th order method and plot</span>
+    <span class="n">order_guide_space</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_error</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">))]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">order_guide_space</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;5th order&#39;</span><span class="p">)</span>
+
+    <span class="n">min_err</span> <span class="o">=</span> <span class="mf">1E99</span>
+    <span class="n">max_err</span> <span class="o">=</span> <span class="mf">0E00</span>
+    <span class="n">err_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># loop over nvars, get errors and find min/max error for y-axis limits</span>
+    <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">:</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">ID</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="n">min_err</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">min_err</span><span class="p">)</span>
+        <span class="n">max_err</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">max_err</span><span class="p">)</span>
+        <span class="n">err_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">err_list</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;experiment&#39;</span><span class="p">)</span>
+
+    <span class="c1"># adjust y-axis limits, add legend</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="n">min_err</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span> <span class="n">max_err</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># save plot as PDF, beautify</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;step_1_accuracy_test_coll.png&#39;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>  <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">4.791</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.364</span>
+<span class="n">Expected</span> <span class="n">order</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Computed</span> <span class="n">order</span> <span class="mf">5.671</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="../_images/step_1_accuracy_test_coll.png"><img alt="../_images/step_1_accuracy_test_coll.png" src="../_images/step_1_accuracy_test_coll.png" style="width: 505.0px; height: 349.0px;" /></a>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Step-1: A first spatial problem</a><ul>
+<li><a class="reference internal" href="#part-a-spatial-problem-setup">Part A: Spatial problem setup</a></li>
+<li><a class="reference internal" href="#part-b-spatial-accuracy-check">Part B: Spatial accuracy check</a></li>
+<li><a class="reference internal" href="#part-c-collocation-problem-setup">Part C: Collocation problem setup</a></li>
+<li><a class="reference internal" href="#part-d-collocation-accuracy-test">Part D: Collocation accuracy test</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Welcome to pySDC!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="step_2.html"
+                        title="next chapter">Step-2: Data structures and my first sweeper</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/step_1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Welcome to pySDC!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,348 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>implementations.problem_classes.PenningTrap_3D &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.problem_classes.PenningTrap_3D</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ParameterError</span><span class="p">,</span> <span class="n">ProblemError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Problem</span> <span class="kn">import</span> <span class="n">ptype</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.particles</span> <span class="kn">import</span> <span class="n">particles</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">acceleration</span>
+
+
+<span class="c1"># noinspection PyUnusedLocal</span>
+<div class="viewcode-block" id="penningtrap"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap">[docs]</a><span class="k">class</span> <span class="nc">penningtrap</span><span class="p">(</span><span class="n">ptype</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example implementing particles in a penning trap</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">,</span> <span class="n">dtype_u</span><span class="o">=</span><span class="n">particles</span><span class="p">,</span> <span class="n">dtype_f</span><span class="o">=</span><span class="n">fields</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization routine</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            problem_params (dict): custom parameters for the example</span>
+<span class="sd">            dtype_u: particle data type (will be passed parent class)</span>
+<span class="sd">            dtype_f: fields data type (will be passed parent class)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># these parameters will be used later, so assert their existence</span>
+        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;omega_B&#39;</span><span class="p">,</span> <span class="s1">&#39;omega_E&#39;</span><span class="p">,</span> <span class="s1">&#39;u0&#39;</span><span class="p">,</span> <span class="s1">&#39;nparts&#39;</span><span class="p">,</span> <span class="s1">&#39;sig&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># invoke super init, passing nparts, dtype_u and dtype_f</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">penningtrap</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nparts&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
+                                          <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="penningtrap.fast_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.fast_interactions">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nogil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fast_interactions</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+
+        <span class="n">Efield</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+        <span class="n">contrib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+
+            <span class="n">contrib</span><span class="p">[:]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+
+                <span class="n">dist2</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> \
+                        <span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">sig</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="n">contrib</span> <span class="o">+=</span> <span class="n">q</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span> <span class="o">/</span> <span class="n">dist2</span> <span class="o">**</span> <span class="mf">1.5</span>
+
+            <span class="n">Efield</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">contrib</span><span class="p">[:]</span>
+
+        <span class="k">return</span> <span class="n">Efield</span></div>
+
+<div class="viewcode-block" id="penningtrap.get_interactions"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">[docs]</a>    <span class="k">def</span> <span class="nf">get_interactions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the particle-particle interaction, assuming q = 1 for all particles</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            part (dtype_u): the particles</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: the internal E field for each particle</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+
+        <span class="n">Efield</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fast_interactions</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">sig</span><span class="p">,</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Efield</span></div>
+
+<div class="viewcode-block" id="penningtrap.eval_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.eval_f">[docs]</a>    <span class="k">def</span> <span class="nf">eval_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the E and B fields (named f for consistency with the original PEPC version)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            part (dtype_u): the particles</span>
+<span class="sd">            t (float): current time (not used here)</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_f: Fields for the particles (internal and external)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+
+        <span class="n">Emat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_f</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">elec</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_interactions</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">elec</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">omega_E</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">part</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Emat</span><span class="p">,</span> <span class="n">part</span><span class="o">.</span><span class="n">pos</span><span class="p">[:,</span> <span class="n">n</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">magn</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">omega_B</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="penningtrap.u_init"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_init">[docs]</a>    <span class="k">def</span> <span class="nf">u_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the starting values for the particles</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: particle set filled with initial data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u0</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">u0</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">u0</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;so far only q = m = 1 is implemented&#39;</span><span class="p">)</span>
+
+        <span class="c1"># set first particle to u0</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">u</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># initialize random seed</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="n">comx</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">comy</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">comz</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+            <span class="c1"># draw 3 random variables in [-1,1] to shift positions</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="c1"># draw 3 random variables in [-5,5] to shift velocities</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="n">u</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">u</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># gather positions to check center</span>
+            <span class="n">comx</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
+            <span class="n">comy</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
+            <span class="n">comz</span> <span class="o">+=</span> <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
+
+        <span class="c1"># print(&#39;Center of positions:&#39;,comx/N,comy/N,comz/N)</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+
+<div class="viewcode-block" id="penningtrap.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to compute the exact trajectory at time t (only for single-particle setup)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            t (float): current time</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dtype_u: particle type containing the exact position and velocity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># some abbreviations</span>
+        <span class="n">wE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">omega_E</span>
+        <span class="n">wB</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">omega_B</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u0</span>
+
+        <span class="k">if</span> <span class="n">N</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;u_exact is only valid for a single particle&#39;</span><span class="p">)</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype_u</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="n">wbar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">wE</span>
+
+        <span class="c1"># position and velocity in z direction is easy to compute</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">wbar</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">wbar</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">wbar</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">wbar</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">wbar</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">wbar</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="c1"># define temp. variables to compute complex position</span>
+        <span class="n">Op</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">wB</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">wB</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">wE</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">Om</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">wB</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">wB</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">wE</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">Rm</span> <span class="o">=</span> <span class="p">(</span><span class="n">Op</span> <span class="o">*</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">Op</span> <span class="o">-</span> <span class="n">Om</span><span class="p">)</span>
+        <span class="n">Rp</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">Rm</span>
+        <span class="n">Im</span> <span class="o">=</span> <span class="p">(</span><span class="n">Op</span> <span class="o">*</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">u0</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">Op</span> <span class="o">-</span> <span class="n">Om</span><span class="p">)</span>
+        <span class="n">Ip</span> <span class="o">=</span> <span class="n">u0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">Im</span>
+
+        <span class="c1"># compute position in complex notation</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">Rp</span><span class="p">,</span> <span class="n">Ip</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Op</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">Rm</span><span class="p">,</span> <span class="n">Im</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Om</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span>
+        <span class="c1"># compute velocity as time derivative of the position</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">Op</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">Rp</span><span class="p">,</span> <span class="n">Ip</span><span class="p">)</span> <span class="o">*</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Op</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">Om</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">Rm</span><span class="p">,</span> <span class="n">Im</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Om</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span>
+
+        <span class="c1"># get the appropriate real and imaginary parts</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dw</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">imag</span>
+        <span class="n">u</span><span class="o">.</span><span class="n">vel</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">dw</span><span class="o">.</span><span class="n">imag</span>
+
+        <span class="k">return</span> <span class="n">u</span></div>
+
+<div class="viewcode-block" id="penningtrap.build_f"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.build_f">[docs]</a>    <span class="k">def</span> <span class="nf">build_f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">part</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to assemble the correct right-hand side out of B and E field</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            f (dtype_f): the field values</span>
+<span class="sd">            part (dtype_u): the current particles data</span>
+<span class="sd">            t (float): the current time</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            acceleration: correct RHS of type acceleration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">particles</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ProblemError</span><span class="p">(</span><span class="s1">&#39;something is wrong during build_f, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+
+        <span class="n">rhs</span> <span class="o">=</span> <span class="n">acceleration</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">rhs</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">part</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">elec</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">],</span> <span class="n">f</span><span class="o">.</span><span class="n">magn</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">rhs</span></div>
+
+    <span class="c1"># noinspection PyTypeChecker</span>
+<div class="viewcode-block" id="penningtrap.boris_solver"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.boris_solver">[docs]</a>    <span class="k">def</span> <span class="nf">boris_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">old_fields</span><span class="p">,</span> <span class="n">new_fields</span><span class="p">,</span> <span class="n">old_parts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The actual Boris solver for static (!) B fields, extended by the c-term</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            c (dtype_u): the c term gathering the known values from the previous iteration</span>
+<span class="sd">            dt (float): the (probably scaled) time step size</span>
+<span class="sd">            old_fields (dtype_f): the field values at the previous node m</span>
+<span class="sd">            new_fields (dtype_f): the field values at the current node m+1</span>
+<span class="sd">            old_parts (dtype_u): the particles at the previous node m</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            the velocities at the (m+1)th node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nparts</span>
+        <span class="n">vel</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">velocity</span><span class="p">(((</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="n">Emean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">old_fields</span><span class="o">.</span><span class="n">elec</span> <span class="o">+</span> <span class="n">new_fields</span><span class="o">.</span><span class="n">elec</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">old_parts</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="n">old_parts</span><span class="o">.</span><span class="n">m</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+
+            <span class="n">c</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">old_parts</span><span class="o">.</span><span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">],</span> <span class="n">old_fields</span><span class="o">.</span><span class="n">magn</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">-</span> <span class="n">new_fields</span><span class="o">.</span><span class="n">magn</span><span class="p">[:,</span> <span class="n">n</span><span class="p">])</span>
+
+            <span class="c1"># pre-velocity, separated by the electric forces (and the c term)</span>
+            <span class="n">vm</span> <span class="o">=</span> <span class="n">old_parts</span><span class="o">.</span><span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">Emean</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="c1"># rotation</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">new_fields</span><span class="o">.</span><span class="n">magn</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">vp</span> <span class="o">=</span> <span class="n">vm</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">vm</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">vm</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>
+            <span class="c1"># post-velocity</span>
+            <span class="n">vel</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">vp</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">Emean</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[:,</span> <span class="n">n</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="k">return</span> <span class="n">vel</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

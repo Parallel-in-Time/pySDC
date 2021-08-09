@@ -1,0 +1,537 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Step-2: Data structures and my first sweeper &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Step-3: Statistics and a new sweeper" href="step_3.html" />
+    <link rel="prev" title="Step-1: A first spatial problem" href="step_1.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="step_1.html" title="Step-1: A first spatial problem"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="step-2-data-structures-and-my-first-sweeper">
+<h1>Step-2: Data structures and my first sweeper<a class="headerlink" href="#step-2-data-structures-and-my-first-sweeper" title="Permalink to this headline">¶</a></h1>
+<p>In this step, we will dig a bit deeper into the data structures of
+<code class="docutils literal notranslate"><span class="pre">pySDC</span></code> and work with our first SDC sweeper.</p>
+<div class="section" id="part-a-step-data-structure">
+<h2>Part A: Step data structure<a class="headerlink" href="#part-a-step-data-structure" title="Permalink to this headline">¶</a></h2>
+<p>We start with creating the basic data structure <code class="docutils literal notranslate"><span class="pre">pySDC</span></code> is built from:
+the <code class="docutils literal notranslate"><span class="pre">step</span></code>. It represents a single time step with whatever hierarchy
+we prescribe (more on that later). The relevant data (e.g. the solution
+and right-hand side vectors as well as the problem instances and so on)
+are all part of a <code class="docutils literal notranslate"><span class="pre">level</span></code> and a set of levels make a <code class="docutils literal notranslate"><span class="pre">step</span></code>
+(together with transfer operators, see teh following tutorials). In this
+first example, we simply create a step and test the problem instance of
+its only level. This is the same test we ran
+<a class="reference external" href="../step_1/A_spatial_problem_setup.py">here</a>.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>This part is for demonstration purpose only. Normally, users do not
+have to deal with the internal data structures, see Part C below.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">description</span></code> dictionary is the central steering tool for
+<code class="docutils literal notranslate"><span class="pre">pySDC</span></code>.</li>
+<li>Happily passing around classes instead of instances make life much
+easier, although it is not the best way in terms of programming…</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/A_step_data_structure.py">pySDC/tutorial/step_2/A_step_data_structure.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.core.Step</span> <span class="kn">import</span> <span class="n">step</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_1.A_spatial_problem_setup</span> <span class="kn">import</span> <span class="n">run_accuracy_check</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to setup a full step instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># fill description dictionary for easy step instantiation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper (see part B)</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+
+    <span class="c1"># now the description contains more or less everything we need to create a step</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># we only have a single level, make a shortcut</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># one of the integral parts of each level is the problem class, make a shortcut</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+
+    <span class="c1"># now we can do e.g. what we did before with the problem</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="n">run_accuracy_check</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_2_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error of the spatial accuracy test: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: the spatial accuracy is higher than expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">of</span> <span class="n">the</span> <span class="n">spatial</span> <span class="n">accuracy</span> <span class="n">test</span><span class="p">:</span> <span class="mf">1.981783e-04</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-b-my-first-sweeper">
+<h2>Part B: My first sweeper<a class="headerlink" href="#part-b-my-first-sweeper" title="Permalink to this headline">¶</a></h2>
+<p>Since we know how to create a step, we now create our first SDC
+iteration (by hand, this time). The make use of the IMEX SDC sweeper
+<code class="docutils literal notranslate"><span class="pre">imex_1st_order</span></code> and of the problem class
+<code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD_forced</span></code>. Also, the data structure for the
+right-hand side is now <code class="docutils literal notranslate"><span class="pre">rhs_imex_mesh</span></code>, since we need implicit and
+explicit parts of the right-hand side. The rest is rather
+straightforward: we set initial values and times, start by spreading the
+data and tehn do the iteration until the maximum number of iterastions
+is reached or until the residual is small enough. Yet, this example
+sheds light on the key functionalities of the sweeper:
+<code class="docutils literal notranslate"><span class="pre">compute_residual</span></code>, <code class="docutils literal notranslate"><span class="pre">update_nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">compute_end_point</span></code>. Also,
+the <code class="docutils literal notranslate"><span class="pre">step</span></code> and <code class="docutils literal notranslate"><span class="pre">level</span></code> structures are explores a bit more deeply,
+since we make use of parameters and status objects here.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>Again, this part is for demonstration purpose only. Normally, users
+do not have to deal with the internal data structures, see Part C
+below.</li>
+<li>Note the difference between status and parameter objects: parameters
+are user-defined flags created using the dicitionaries (e.g.
+<code class="docutils literal notranslate"><span class="pre">maxiter</span></code> as part of the <code class="docutils literal notranslate"><span class="pre">step_params</span></code> in this example), while
+status objects are internal control objects which reflects the
+current status of a level or a step (e.g. <code class="docutils literal notranslate"><span class="pre">iter</span></code> or <code class="docutils literal notranslate"><span class="pre">time</span></code>).</li>
+<li>The logic required to implement an SDC iteration is simple but also
+rather tedious. This will get worse if you want to deal with more
+than one step or, behold, multiple parallel steps each with a
+space-time hierarchy. Therefore, please proceed quickly to part C!</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/B_my_first_sweeper.py">pySDC/tutorial/step_2/B_my_first_sweeper.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.core.Step</span> <span class="kn">import</span> <span class="n">step</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># instantiate the step we are going to work on</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># run IMEX SDC test and check error, residual and number of iterations</span>
+    <span class="n">err</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">niter</span> <span class="o">=</span> <span class="n">run_imex_sdc</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error and residual: </span><span class="si">%12.8e</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">res</span><span class="p">))</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">1E-5</span><span class="p">,</span> <span class="s2">&quot;ERROR: IMEX SDC iteration did not reduce the error enough, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">],</span> <span class="s2">&quot;ERROR: IMEX SDC iteration did not reduce the residual enough, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">res</span>
+    <span class="k">assert</span> <span class="n">niter</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;ERROR: IMEX SDC took too many iterations, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">niter</span>
+
+
+<span class="k">def</span> <span class="nf">run_imex_sdc</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routine to run IMEX SDC on a single time step</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        S: an instance of a step representing the time step</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        the error of SDC vs. exact solution</span>
+<span class="sd">        the residual after the SDC sweeps</span>
+<span class="sd">        the number of iterations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># make shortcuts for the level and the problem</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">prob</span>
+
+    <span class="c1"># set initial time in the status of the level</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="c1"># compute initial value (using the exact function here)</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="c1"># access the sweeper&#39;s predict routine to get things started</span>
+    <span class="c1"># if we don&#39;t do this, the values at the nodes are not initialized</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+    <span class="c1"># compute the residual (we may be done already!)</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
+
+    <span class="c1"># reset iteration counter</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_2_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&lt;</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="ow">and</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span> <span class="o">&gt;</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span><span class="p">:</span>
+        <span class="c1"># this is where the nodes are actually updated according to the SDC formulas</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
+        <span class="c1"># compute/update the residual</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
+        <span class="c1"># increment the iteration counter</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Time </span><span class="si">%4.2f</span><span class="s1"> of </span><span class="si">%s</span><span class="s1"> -- Iteration: </span><span class="si">%2i</span><span class="s1"> -- Residual: </span><span class="si">%12.8e</span><span class="s1">&#39;</span> \
+              <span class="o">%</span> <span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">level_index</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># compute the interval&#39;s endpoint: this (and only this) will set uend, depending on the collocation nodes</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_end_point</span><span class="p">()</span>
+    <span class="c1"># update the simulation time</span>
+    <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time</span> <span class="o">+=</span> <span class="n">L</span><span class="o">.</span><span class="n">dt</span>
+
+    <span class="c1"># compute exact solution and compare</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">uend</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">err</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">residual</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">1</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">4.11190756e-03</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">2</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">6.68442665e-04</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">3</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">8.80377584e-05</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">4</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">1.21707912e-05</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">5</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">1.38272028e-06</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">6.36446132e-07</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">7</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">1.68953993e-07</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">8</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">3.52601669e-08</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span>  <span class="mi">9</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">6.07284264e-09</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span> <span class="mi">10</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">8.27497827e-10</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span> <span class="mi">11</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">1.19825991e-10</span>
+<span class="n">Time</span> <span class="mf">0.10</span> <span class="n">of</span> <span class="mi">0</span> <span class="o">--</span> <span class="n">Iteration</span><span class="p">:</span> <span class="mi">12</span> <span class="o">--</span> <span class="n">Residual</span><span class="p">:</span> <span class="mf">1.48577713e-11</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="part-c-using-pysdc-s-frontend">
+<h2>Part C: Using pySDC’s frontend<a class="headerlink" href="#part-c-using-pysdc-s-frontend" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we arrive at the user-friendliest interface pySDC has to offer.
+We use one of the <code class="docutils literal notranslate"><span class="pre">controller</span></code> implementations to do the whole
+iteration logic for us, namely <code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code>. It can
+do SDC, multi-level SDC, multi-step SDC and PFASST, depending on the
+input dictionary (more on this in later tutorials). This is the default
+controller and does not require <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> to work.</p>
+<p>Important things to note:</p>
+<ul class="simple">
+<li>By using one of the controllers, the whole code relevant for the user
+is reduced to setting up the <code class="docutils literal notranslate"><span class="pre">description</span></code> dictionary, some pre-
+and some post-processing.</li>
+<li>During initializtion, the parameters used for the run are printed out. Also, user-defined/-changed parameters are indicated. This can be surpressed by setting the controller parameter <code class="docutils literal notranslate"><span class="pre">dump_setup</span></code> to False.</li>
+<li>We make use of <code class="docutils literal notranslate"><span class="pre">controller_parameters</span></code> in order to provide logging to file capabilities.</li>
+<li>In contrast to Part B, we do not have direct access to residuals or
+iteration counts for now. We will deal with these later.</li>
+<li>This example is the prototype for a user to work with pySDC. Most of
+the logic and most of the data structures are hidden, but all
+relevant parameters are accessable using the <code class="docutils literal notranslate"><span class="pre">description</span></code>.</li>
+</ul>
+<p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_2/C_using_pySDCs_frontend.py">pySDC/tutorial/step_2/C_using_pySDCs_frontend.py</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple test program to run IMEX SDC for a single time step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize level parameters</span>
+    <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+    <span class="c1"># initialize sweeper parameters</span>
+    <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1"># initialize problem parameters</span>
+    <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+
+    <span class="c1"># initialize step parameters</span>
+    <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="c1"># initialize controller parameters</span>
+    <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;log_to_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;step_2_C_out.txt&#39;</span>
+
+    <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
+
+    <span class="c1"># instantiate the controller</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+
+    <span class="c1"># set time parameters</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># note that we are requesting 2 time steps here (dt is 0.1)</span>
+
+    <span class="c1"># get initial values on finest level</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
+    <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+
+    <span class="c1"># call main function to get things done...</span>
+    <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
+
+    <span class="c1"># compute exact solution and compare</span>
+    <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_2_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Error after SDC iterations: </span><span class="si">%8.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">2E-5</span><span class="p">,</span> <span class="s2">&quot;ERROR: controller doing IMEX SDC iteration did not reduce the error enough, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-08-09 12:06:44,959 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2021-08-09 12:06:44,960 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
+
+Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
+    mssdc_jac = True
+    predict_type = None
+    all_to_done = False
+    logger_level = 20
+--&gt; log_to_file = True
+    dump_setup = True
+--&gt; fname = step_2_C_out.txt
+    use_iteration_estimator = False
+--&gt; hook_class = &lt;class &#39;pySDC.core.Hooks.hooks&#39;&gt;
+
+Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
+--&gt; maxiter = 20
+    Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
+        Level  0
+--&gt;         dt = 0.1
+--&gt;         restol = 1e-10
+            nsweeps = 1
+            residual_type = full_abs
+--&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced.heat1d_forced&#39;&gt;
+--&gt;             nu = 0.1
+--&gt;             freq = 4
+--&gt;             nvars = 1023
+--&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.mesh&#39;&gt;
+--&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.imex_mesh&#39;&gt;
+--&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order&#39;&gt;
+                    do_coll_update = False
+                    initial_guess = spread
+--&gt;                 num_nodes = 3
+                    QI = IE
+                    QE = EE
+--&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
+
+2021-08-09 12:06:44,960 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
+2021-08-09 12:06:44,960 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
+
+2021-08-09 12:06:44,966 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
+2021-08-09 12:06:44,971 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442665e-04
+2021-08-09 12:06:44,975 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377584e-05
+2021-08-09 12:06:44,980 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707912e-05
+2021-08-09 12:06:44,985 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272028e-06
+2021-08-09 12:06:44,990 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36446132e-07
+2021-08-09 12:06:44,994 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953993e-07
+2021-08-09 12:06:45,000 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601669e-08
+2021-08-09 12:06:45,005 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07284264e-09
+2021-08-09 12:06:45,010 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27497827e-10
+2021-08-09 12:06:45,015 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.19825991e-10
+2021-08-09 12:06:45,020 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48577713e-11
+2021-08-09 12:06:45,026 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
+2021-08-09 12:06:45,031 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
+2021-08-09 12:06:45,036 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642622e-04
+2021-08-09 12:06:45,041 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982057e-05
+2021-08-09 12:06:45,046 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216754e-06
+2021-08-09 12:06:45,051 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278800e-06
+2021-08-09 12:06:45,056 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85496171e-07
+2021-08-09 12:06:45,061 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78948556e-08
+2021-08-09 12:06:45,065 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68232042e-09
+2021-08-09 12:06:45,070 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26304034e-09
+2021-08-09 12:06:45,075 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.83448663e-10
+2021-08-09 12:06:45,080 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.96573122e-11
+Error after SDC iterations: 1.166689e-05
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Step-2: Data structures and my first sweeper</a><ul>
+<li><a class="reference internal" href="#part-a-step-data-structure">Part A: Step data structure</a></li>
+<li><a class="reference internal" href="#part-b-my-first-sweeper">Part B: My first sweeper</a></li>
+<li><a class="reference internal" href="#part-c-using-pysdc-s-frontend">Part C: Using pySDC’s frontend</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="step_1.html"
+                        title="previous chapter">Step-1: A first spatial problem</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="step_3.html"
+                        title="next chapter">Step-3: Statistics and a new sweeper</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/step_2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="step_1.html" title="Step-1: A first spatial problem"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
