@@ -14,11 +14,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
+      - uses: s-weigand/setup-conda@v1
+        with:
+          activate-conda: true
       - name: Install dependencies
         run: |
-          which python
-          python --version
-          pip install -r requirements.txt    
+          conda create python=3.7 -n pySDC
+          conda activate pySDC
+          conda install --yes -c conda-forge --file requirements.txt
 
       - name: Build
         uses: ammaraskar/sphinx-action@master
