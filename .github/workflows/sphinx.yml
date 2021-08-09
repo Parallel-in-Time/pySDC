@@ -28,6 +28,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install --yes -c conda-forge --file requirements.txt
+          pip install nose-timer
       - name: Build
         uses: ammaraskar/sphinx-action@master
         with:
