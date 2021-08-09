@@ -264,7 +264,6 @@ class sweeper(object):
 
         # get current level and problem description
         L = self.level
-        P = L.prob
 
         # check if there are new values (e.g. from a sweep)
         # assert L.status.updated

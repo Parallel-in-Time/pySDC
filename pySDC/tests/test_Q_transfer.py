@@ -1,4 +1,4 @@
-import nose
+import pytest
 import numpy as np
 from numpy.polynomial.polynomial import polyval
 
@@ -6,22 +6,12 @@ import pySDC.helpers.transfer_helper as th
 from pySDC.core.Collocation import CollBase
 from pySDC.tests.test_helpers import get_derived_from_in_package
 
-classes = []
+classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
+t_start = np.random.rand(1) * 0.2
+t_end = 0.8 + np.random.rand(1) * 0.2
 
-def setup():
-    global classes, t_start, t_end
-
-    # generate random boundaries for the time slice with 0.0 <= t_start < 0.2 and 0.8 <= t_end < 1.0
-    t_start = np.random.rand(1) * 0.2
-    t_end = 0.8 + np.random.rand(1) * 0.2
-    classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
-
-@nose.tools.with_setup(setup)
-def test_Q_transfer():
-    for collclass in classes:
-        yield check_Q_transfer, collclass
-
-def check_Q_transfer(collclass):
+@pytest.mark.parametrize("collclass", classes)
+def test_Q_transfer(collclass):
     """
     A simple test program to check the order of the Q interpolation/restriction
     """
@@ -61,13 +51,8 @@ def check_Q_transfer(collclass):
                 else:
                     assert err_inter > 2E-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
 
-
-@nose.tools.with_setup(setup)
-def test_Q_transfer_minimal():
-    for collclass in classes:
-        yield check_Q_transfer_minimal, collclass
-
-def check_Q_transfer_minimal(collclass):
+@pytest.mark.parametrize("collclass", classes)
+def test_Q_transfer_minimal(collclass):
     """
     A simple test program to check the order of the Q interpolation/restriction for only 2 coarse nodes
     """
