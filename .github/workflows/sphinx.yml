@@ -16,6 +16,8 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
+          which python
+          python --version
           pip install -r requirements.txt    
 
       - name: Build
