@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Add packages
+        run: |
+          sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
       - name: Cache conda
         uses: actions/cache@v2
         env:
@@ -33,10 +36,6 @@ jobs:
         uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "docs/"
-#       - name: Test
-#         run: | 
-#           pwd
-#           ls -artl docs/build/html
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         if: ${{ github.event_name == 'push' }}
