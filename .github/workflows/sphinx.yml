@@ -2,11 +2,7 @@ name: "Pull Request Docs Check"
 
 on:
   push:
-    branches: 
-      - source
   pull_request:
-    branches:
-      - source
 
 jobs:
   docs:
