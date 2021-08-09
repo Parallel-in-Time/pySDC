@@ -3,7 +3,7 @@ from petsc4py import PETSc
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.petsc_dmda_grid import petsc_data, rhs_2comp_petsc_data, rhs_imex_petsc_data
+from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2
 
 
 class Fisher_full(object):
@@ -182,7 +182,7 @@ class petsc_fisher_multiimplicit(ptype):
     """
     Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
     """
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_2comp_petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_comp2):
         """
         Initialization routine
 
@@ -345,13 +345,13 @@ class petsc_fisher_multiimplicit(ptype):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.comp1.values)
-        fa1 = self.init.getVecArray(f.comp1.values)
+        self.A.mult(u, f.comp1)
+        fa1 = self.init.getVecArray(f.comp1)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.comp2.values)
-        xa = self.init.getVecArray(u.values)
+        fa2 = self.init.getVecArray(f.comp2)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             fa2[i] = self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
@@ -376,7 +376,7 @@ class petsc_fisher_multiimplicit(ptype):
         me = self.dtype_u(u0)
 
         self.ksp.setOperators(self.get_sys_mat(factor))
-        self.ksp.solve(rhs.values, me.values)
+        self.ksp.solve(rhs, me)
 
         self.ksp_itercount += self.ksp.getIterationNumber()
         self.ksp_ncalls += 1
@@ -406,7 +406,7 @@ class petsc_fisher_multiimplicit(ptype):
         J = self.init.createMatrix()
         self.snes.setJacobian(target.formJacobian, J)
 
-        self.snes.solve(rhs.values, me.values)
+        self.snes.solve(rhs, me)
 
         self.snes_itercount += self.snes.getIterationNumber()
         self.snes_ncalls += 1
@@ -427,7 +427,7 @@ class petsc_fisher_multiimplicit(ptype):
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
         sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
         me = self.dtype_u(self.init)
-        xa = self.init.getVecArray(me.values)
+        xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             xa[i] = (1 + (2 ** (self.params.nu / 2.0) - 1) *
                      np.exp(-self.params.nu / 2.0 * sig1 *
@@ -441,7 +441,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
     Problem class implementing the fully-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec):
         """
         Initialization routine
 
@@ -468,10 +468,10 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.values)
+        self.A.mult(u, f)
 
-        fa2 = self.init.getVecArray(f.values)
-        xa = self.init.getVecArray(u.values)
+        fa2 = self.init.getVecArray(f)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             fa2[i] += self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
@@ -501,7 +501,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         self.snes.setFunction(target.formFunction, self.F)
         self.snes.setJacobian(target.formJacobian, self.J)
 
-        self.snes.solve(rhs.values, me.values)
+        self.snes.solve(rhs, me)
 
         self.snes_itercount += self.snes.getIterationNumber()
         self.snes_ncalls += 1
@@ -514,7 +514,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
     Problem class implementing the semi-implicit 2D Gray-Scott reaction-diffusion equation with periodic BC and PETSc
     """
 
-    def __init__(self, problem_params, dtype_u=petsc_data, dtype_f=rhs_imex_petsc_data):
+    def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_imex):
         """
         Initialization routine
 
@@ -541,13 +541,13 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         """
 
         f = self.dtype_f(self.init)
-        self.A.mult(u.values, f.impl.values)
-        fa1 = self.init.getVecArray(f.impl.values)
+        self.A.mult(u, f.impl)
+        fa1 = self.init.getVecArray(f.impl)
         fa1[0] = 0
         fa1[-1] = 0
 
-        fa2 = self.init.getVecArray(f.expl.values)
-        xa = self.init.getVecArray(u.values)
+        fa2 = self.init.getVecArray(f.expl)
+        xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
             fa2[i] = self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
@@ -572,7 +572,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         me = self.dtype_u(u0)
 
         self.ksp.setOperators(self.get_sys_mat(factor))
-        self.ksp.solve(rhs.values, me.values)
+        self.ksp.solve(rhs, me)
 
         self.ksp_itercount += self.ksp.getIterationNumber()
         self.ksp_ncalls += 1
