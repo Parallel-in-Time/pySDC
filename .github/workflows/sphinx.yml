@@ -1,6 +1,12 @@
 name: "Pull Request Docs Check"
-on: 
-- push
+
+on:
+  push:
+    branches: 
+      - source
+  pull_request:
+    branches:
+      - source
 
 jobs:
   docs:
@@ -12,12 +18,13 @@ jobs:
         uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "docs/"
-      - name: Test
-        run: | 
-          pwd
-          ls -artl docs/build/html
+#       - name: Test
+#         run: | 
+#           pwd
+#           ls -artl docs/build/html
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
+        if: ${{ github.event_name == 'push' }}
         with:
           branch: gh-pages # The branch the action should deploy to.
-          folder: build/html # The folder the action should deploy.
+          folder: docs/build/html # The folder the action should deploy.
