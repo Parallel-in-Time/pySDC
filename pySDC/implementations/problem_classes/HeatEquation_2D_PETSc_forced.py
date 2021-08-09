@@ -73,6 +73,7 @@ class heat2d_petsc_forced(ptype):
         self.ksp.setType('gmres')
         pc = self.ksp.getPC()
         pc.setType('none')
+        # pc.setType('hypre')
         # self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
         self.ksp.setTolerances(rtol=self.params.sol_tol, atol=self.params.sol_tol, max_it=self.params.sol_maxiter)
