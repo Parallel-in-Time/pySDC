@@ -24,9 +24,9 @@ jobs:
       - name: Install everything
         run: |
           sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
-          wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda3.sh
-          chmod +x $HOME/miniconda3.sh
-          "$HOME/miniconda3.sh -b;"
+          wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3.sh
+          chmod +x ~/miniconda3.sh
+          ~/miniconda3.sh -b;
           export PATH=/home/travis/miniconda3/bin:$PATH
           conda init bash
           source ~/.bashrc
