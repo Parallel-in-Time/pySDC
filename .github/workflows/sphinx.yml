@@ -16,8 +16,7 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda install --yes -c conda-forge --file requirements.txt    
+          pip install -r requirements.txt    
 
       - name: Build
         uses: ammaraskar/sphinx-action@master
