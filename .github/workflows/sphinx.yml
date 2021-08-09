@@ -36,12 +36,10 @@ jobs:
         run: |
           conda install --yes -c conda-forge --file requirements.txt
           pip install nose-timer
-          which python
-          which nosetests
           
       - name: Run nosetest
         run: |
-          nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
+          /usr/share/miniconda/envs/test/bin/nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
       
       - name: Build
         uses: ammaraskar/sphinx-action@master
