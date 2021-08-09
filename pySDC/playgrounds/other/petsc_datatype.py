@@ -64,15 +64,16 @@ class mymesh(PETSc.Vec):
 da = PETSc.DMDA().create([4, 4], stencil_width=1)
 
 u = mymesh(da, val=9.0)
-uarr = da.getVecArray(u)
+uarr = u.getArray()
 
 v = mymesh(u)
-varr = da.getVecArray(v)
+varr = v.getArray()
 if v.comm.getRank() == 0:
-    uarr[0, 0] = 7
+    uarr[0] = 7
+uarr = da.getVecArray(u)
 print(uarr[:], uarr.shape, type(u))
 print(varr[:], v.getOwnershipRange(), type(v))
-
+exit()
 w = np.float(1.0) * (u + v)
 warr = da.getVecArray(w)
 print(warr[:], da.getRanges(), type(w))

@@ -41,7 +41,7 @@ class petsc_vec(PETSc.Vec):
         Returns:
             request handle
         """
-        return comm.Issend(self[:], dest=dest, tag=tag)
+        return comm.Issend(self.getArray(), dest=dest, tag=tag)
 
     def irecv(self, source=None, tag=None, comm=None):
         """
@@ -55,7 +55,7 @@ class petsc_vec(PETSc.Vec):
         Returns:
             None
         """
-        return comm.Irecv(self[:], source=source, tag=tag)
+        return comm.Irecv(self.getArray(), source=source, tag=tag)
 
     def bcast(self, root=None, comm=None):
         """
@@ -68,7 +68,7 @@ class petsc_vec(PETSc.Vec):
         Returns:
             broadcasted values
         """
-        comm.Bcast(self[:], root=root)
+        comm.Bcast(self.getArray(), root=root)
         return self
 
 
@@ -101,6 +101,40 @@ class petsc_vec_imex(object):
         elif isinstance(init, PETSc.DMDA):
             self.impl = petsc_vec(init, val=val)
             self.expl = petsc_vec(init, val=val)
+        # something is wrong, if none of the ones above hit
+        else:
+            raise DataError('something went wrong during %s initialization' % type(self))
+
+
+class petsc_vec_comp2(object):
+    """
+    RHS data type for Vec with implicit and explicit components
+
+    This data type can be used to have RHS with 2 components (here implicit and explicit)
+
+    Attributes:
+        impl (petsc_vec): implicit part
+        expl (petsc_vec): explicit part
+    """
+
+    def __init__(self, init, val=0.0):
+        """
+        Initialization routine
+
+        Args:
+            init: can either be a tuple (one int per dimension) or a number (if only one dimension is requested)
+                  or another imex_mesh object
+            val (float): an initial number (default: 0.0)
+        Raises:
+            DataError: if init is none of the types above
+        """
+
+        if isinstance(init, type(self)):
+            self.comp1 = petsc_vec(init.comp1)
+            self.comp2 = petsc_vec(init.comp2)
+        elif isinstance(init, PETSc.DMDA):
+            self.comp1 = petsc_vec(init, val=val)
+            self.comp2 = petsc_vec(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
