@@ -6,8 +6,6 @@ dill>=0.2.6
 matplotlib>=1.5.3
 numba>=0.35
 sympy>=1.0
-pytest
-pep8
 # These packages are required for some of the more involved examples (and data types etc.), can be omitted
 petsc4py>=3.10.0
 mpi4py>=3.0.0
@@ -15,5 +13,6 @@ fenics==2018.1.0
 mpi4py-fft>=2.0.2
 # These packages are used for CI/CD and can be ignored
 pip
-coverage
+pytest
+pytest-cov
 sphinx==1.8.5

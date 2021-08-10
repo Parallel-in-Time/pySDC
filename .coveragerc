@@ -1,4 +1,11 @@
+[run]
+omit =
+    pySDC/tests/*
+    */data/*
+    pySDC/playgrounds/*
+
 [report]
+skip_empty = True
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
@@ -16,3 +23,7 @@ exclude_lines =
     if __name__ == .__main__.:
     pass
     @abc.abstractmethod
+    __author__*
+
+[html]
+directory = docs/build/test_coverage
