@@ -189,7 +189,7 @@ def show_results(fname):
 
     plt_helper.newfig(textwidth=238.96, scale=1.0)
 
-    xcoords = [i for i in range(len(results))]
+    xcoords = list(range(len(results)))
     sorted_data = sorted([(key, results[key][0]) for key in results], reverse=True, key=lambda tup: tup[1])
     heights = [item[1] for item in sorted_data]
     keys = [(item[0][1] + ' ' + item[0][0]).replace('-', '\n') for item in sorted_data]

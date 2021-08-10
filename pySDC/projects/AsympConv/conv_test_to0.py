@@ -62,7 +62,7 @@ def compute_and_plot_specrad(Nnodes, lam):
 
         plt.loglog(xlist, Prho_list, linestyle='-', linewidth=3, color=color, marker=marker, markersize=10,
                    label='spectral radius, L=' + str(Nsteps))
-        plt.loglog(xlist, [item for item in predict_list], linestyle='--', linewidth=2, color=color, marker=marker,
+        plt.loglog(xlist, predict_list, linestyle='--', linewidth=2, color=color, marker=marker,
                    markersize=10, label='estimate, L=' + str(Nsteps))
 
     ax = plt.gca()

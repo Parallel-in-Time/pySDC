@@ -200,7 +200,7 @@ def show_results(fname, cwd=''):
         iter_counts = sort_stats(filter_stats(item, type='niter'), sortby='time')
         niters[key] = np.mean(np.array([item[1] for item in iter_counts]))
 
-    xcoords = [i for i in range(len(timings))]
+    xcoords = list(range(len(timings)))
     sorted_timings = sorted([(key, timings[key]) for key in timings], reverse=True, key=lambda tup: tup[1])
     sorted_niters = [(k, niters[k]) for k in [key[0] for key in sorted_timings]]
     heights_timings = [item[1] for item in sorted_timings]
