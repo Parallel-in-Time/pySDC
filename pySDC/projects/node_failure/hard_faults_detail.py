@@ -138,8 +138,8 @@ def main(ft_setups, ft_strategies):
             # stats magic: extract all residuals (steps vs. iterations)
             extract_stats = filter_stats(stats, type='residual_post_iteration')
             for k, v in extract_stats.items():
-                step = getattr(k, 'process')
-                iter = getattr(k, 'iter')
+                step = k.process
+                iter = k.iter
                 if iter is not -1:
                     residual[iter - 1, step] = np.log10(v)
             print('')

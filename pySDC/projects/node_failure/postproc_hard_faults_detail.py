@@ -35,14 +35,14 @@ def create_plots(setup, cwd=''):
     maxsteps = 0
 
     # find axis limits
-    for file, strategy, label, color, marker in setup_list:
+    for file, _, _, _, _ in setup_list:
         infile = np.load(cwd + 'data/' + file)
         residual = infile['residual']
         maxiter = max(maxiter, len(residual[:, 0]))
         maxsteps = max(maxsteps, len(residual[0, :]))
 
     # create heatmaps
-    for file, strategy, label, color, marker in setup_list:
+    for file, strategy, _, _, _ in setup_list:
 
         residual = np.zeros((maxiter, maxsteps))
         residual[:] = -99
@@ -102,7 +102,7 @@ def create_plots(setup, cwd=''):
     ms = 8
 
     # create iteration vs. residual plot
-    for file, strategy, label, color, marker in setup_list:
+    for file, _, label, color, marker in setup_list:
         infile = np.load(cwd + 'data/' + file)
         residual = infile['residual']
         step = infile['ft_step']

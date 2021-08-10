@@ -56,7 +56,7 @@ class fenics_grayscott(ptype):
 
         # set mesh and refinement (for multilevel)
         mesh = df.IntervalMesh(problem_params['c_nvars'], 0, 100)
-        for i in range(problem_params['refinements']):
+        for _ in range(problem_params['refinements']):
             mesh = df.refine(mesh)
 
         # define function space for future reference

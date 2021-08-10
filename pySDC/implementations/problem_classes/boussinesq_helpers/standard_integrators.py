@@ -388,7 +388,7 @@ class SplitExplicit:
         return u0
 
     def VerletLin(self, u0, FSlow, ns, dTau):
-        for i in range(0, ns):
+        for _ in range(0, ns):
             u0[0:self.NdofMom] += dTau * (self.f_fastMom(u0) + FSlow[0:self.NdofMom])
             u0[self.NdofMom:self.Ndof] += dTau * (self.f_fastTher(u0) + FSlow[self.NdofMom:self.Ndof])
 
@@ -397,7 +397,7 @@ class SplitExplicit:
     def RK3Lin(self, u0, FSlow, ns, dTau):
 
         u = u0
-        for i in range(0, ns):
+        for _ in range(0, ns):
             u = u0 + dTau / 3. * (self.f_fast(u) + FSlow)
             u = u0 + dTau / 2. * (self.f_fast(u) + FSlow)
             u = u0 + dTau * (self.f_fast(u) + FSlow)

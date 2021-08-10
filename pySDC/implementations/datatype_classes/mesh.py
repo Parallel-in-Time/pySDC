@@ -65,7 +65,7 @@ class mesh(np.ndarray):
         """
         args = []
         comm = None
-        for i, input_ in enumerate(inputs):
+        for _, input_ in enumerate(inputs):
             if isinstance(input_, mesh):
                 args.append(input_.view(np.ndarray))
                 comm = input_.comm

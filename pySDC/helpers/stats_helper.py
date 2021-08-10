@@ -62,7 +62,7 @@ def get_list_of_types(stats):
     """
 
     type_list = []
-    for k, v in stats.items():
+    for k, _ in stats.items():
         if k.type not in type_list:
             type_list.append(k.type)
     return type_list

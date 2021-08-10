@@ -94,7 +94,7 @@ def main(cwd=''):
     u0 = uinit.flatten()
     usplit = np.copy(u0)
     print(np.linalg.norm(usplit))
-    for i in range(0, 2 * Nsteps):
+    for _ in range(0, 2 * Nsteps):
         usplit = splitp.timestep(usplit, dt / 2)
     print(np.linalg.norm(usplit))
 
@@ -102,7 +102,7 @@ def main(cwd=''):
     dirkp = dirk(P, dirk_order)
     udirk = np.copy(u0)
     print(np.linalg.norm(udirk))
-    for i in range(0, Nsteps):
+    for _ in range(0, Nsteps):
         udirk = dirkp.timestep(udirk, dt)
     print(np.linalg.norm(udirk))
 
@@ -110,7 +110,7 @@ def main(cwd=''):
     rkimex = rk_imex(P, dirk_order)
     uimex = np.copy(u0)
     dt_imex = dt
-    for i in range(0, Nsteps):
+    for _ in range(0, Nsteps):
         uimex = rkimex.timestep(uimex, dt_imex)
     print(np.linalg.norm(uimex))
 
@@ -123,7 +123,7 @@ def main(cwd=''):
     uref = np.copy(u0)
     dt_ref = dt / 10.0
     print("Running RK-IMEX reference....")
-    for i in range(0, 10 * Nsteps):
+    for _ in range(0, 10 * Nsteps):
         uref = rkimexref.timestep(uref, dt_ref)
 
     usplit = unflatten(usplit, 4, P.N[0], P.N[1])

@@ -159,7 +159,7 @@ def show_results(cwd=''):
     result = defaultdict(list)
     for k, v in extract_stats.items():
         result[k.iter].append((k.time, v))
-    for k, v in result.items():
+    for k, _ in result.items():
         result[k] = sorted(result[k], key=lambda x: x[0])
 
     plt_helper.newfig(textwidth=238.96, scale=0.89)

@@ -144,7 +144,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         nblocks = int((Tend - t0) / self.dt / num_procs)
 
-        for i in range(nblocks):
+        for _ in range(nblocks):
 
             self.MS = self.pfasst(self.MS)
 

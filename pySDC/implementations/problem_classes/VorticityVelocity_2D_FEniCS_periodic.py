@@ -68,7 +68,7 @@ class fenics_vortex_2d(ptype):
 
         # set mesh and refinement (for multilevel)
         mesh = df.UnitSquareMesh(problem_params['c_nvars'][0], problem_params['c_nvars'][1])
-        for i in range(problem_params['refinements']):
+        for _ in range(problem_params['refinements']):
             mesh = df.refine(mesh)
 
         self.mesh = df.Mesh(mesh)
