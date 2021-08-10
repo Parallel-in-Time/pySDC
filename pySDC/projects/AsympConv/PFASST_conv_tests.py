@@ -264,12 +264,12 @@ def plot_results(nsweeps):
     results_adv = pickle.load(file)
     file.close()
 
-    xvalues_diff = sorted(list(results_diff.keys()))
+    xvalues_diff = sorted(results_diff.keys())
     niter_diff = []
     for x in xvalues_diff:
         niter_diff.append(results_diff[x])
 
-    xvalues_adv = sorted(list(results_adv.keys()))
+    xvalues_adv = sorted(results_adv.keys())
     niter_adv = []
     for x in xvalues_adv:
         niter_adv.append(results_adv[x])

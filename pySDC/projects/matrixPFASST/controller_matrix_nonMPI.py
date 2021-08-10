@@ -130,7 +130,7 @@ class controller_matrix_nonMPI(controller_nonMPI):
         assert int((Tend - t0) / self.dt) % num_procs == 0, 'ERROR: num_procs not chosen correctly'
 
         # initial ordering of the steps: 0,1,...,Np-1
-        slots = [p for p in range(num_procs)]
+        slots = list(range(num_procs))
 
         # initialize time variables of each step
         time = [t0 + sum(self.dt for _ in range(p)) for p in slots]

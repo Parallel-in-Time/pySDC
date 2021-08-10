@@ -201,12 +201,12 @@ class step(FrozenClass):
         self.base_transfer = base_transfer_class(fine_level, coarse_level, base_transfer_params,
                                                  space_transfer_class, space_transfer_params)
         # use base_transfer dictionary twice to set restrict and prolong operator
-        self.__transfer_dict[tuple([fine_level, coarse_level])] = self.base_transfer.restrict
+        self.__transfer_dict[(fine_level, coarse_level)] = self.base_transfer.restrict
 
         if self.base_transfer.params.finter:
-            self.__transfer_dict[tuple([coarse_level, fine_level])] = self.base_transfer.prolong_f
+            self.__transfer_dict[(coarse_level, fine_level)] = self.base_transfer.prolong_f
         else:
-            self.__transfer_dict[tuple([coarse_level, fine_level])] = self.base_transfer.prolong
+            self.__transfer_dict[(coarse_level, fine_level)] = self.base_transfer.prolong
 
     def transfer(self, source, target):
         """
@@ -220,7 +220,7 @@ class step(FrozenClass):
             source (pySDC.Level.level): source level
             target (pySDC.Level.level): target level
         """
-        self.__transfer_dict[tuple([source, target])]()
+        self.__transfer_dict[(source, target)]()
 
     def reset_step(self):
         """

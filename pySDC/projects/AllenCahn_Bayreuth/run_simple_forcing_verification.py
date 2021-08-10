@@ -217,7 +217,7 @@ def visualize_radii():
         print(f'Working on {file}...')
 
         # get times and radii
-        xcoords = [k for k in results]
+        xcoords = list(results)
         computed_radii = [v[0] for k, v in results.items()]
         exact_radii = [v[1] for k, v in results.items()]
         computed_vol = [v[3] for k, v in results.items()]

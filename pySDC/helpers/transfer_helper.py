@@ -31,7 +31,7 @@ def next_neighbors_periodic(p, ps, k):
     # sort by distance
     value_index_sorted = sorted(value_index, key=lambda s: s[0])
     # take first k indices with least distance and sort them
-    return sorted(list(map(lambda s: s[1], value_index_sorted[0:k])))
+    return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
 
 def next_neighbors(p, ps, k):
@@ -57,7 +57,7 @@ def next_neighbors(p, ps, k):
     # sort by distance
     value_index_sorted = sorted(value_index, key=lambda s: s[0])
     # take first k indices with least distance and sort them
-    return sorted(list(map(lambda s: s[1], value_index_sorted[0:k])))
+    return sorted(map(lambda s: s[1], value_index_sorted[0:k]))
 
 
 def continue_periodic_array(arr, nn):
