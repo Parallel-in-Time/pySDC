@@ -35,10 +35,15 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install --yes -c conda-forge --file requirements.txt
-          pip install nose-timer
+          
+      - name: Lint with flake8
+        run: |
+          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+          flake8 pySDC
           
       - name: Run nosetest
         run: |
+          pip install nose-timer
           export PATH=/usr/share/miniconda/envs/test/bin/:$PATH
           nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
       
