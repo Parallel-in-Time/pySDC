@@ -26,4 +26,4 @@ exclude_lines =
     __author__*
 
 [html]
-directory = docs/build/test_coverage
+directory = docs/build/html/test_coverage
