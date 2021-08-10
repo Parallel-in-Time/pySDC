@@ -79,7 +79,7 @@
 
     <span class="k">for</span> <span class="n">setup</span> <span class="ow">in</span> <span class="n">ft_setups</span><span class="p">:</span>
 
-        <span class="k">if</span> <span class="n">setup</span> <span class="ow">is</span> <span class="s1">&#39;HEAT&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;HEAT&#39;</span><span class="p">:</span>
 
             <span class="c1"># initialize problem parameters</span>
             <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -106,7 +106,7 @@
             <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
             <span class="n">Tend</span> <span class="o">=</span> <span class="mf">8.0</span>
 
-        <span class="k">elif</span> <span class="n">setup</span> <span class="ow">is</span> <span class="s1">&#39;ADVECTION&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;ADVECTION&#39;</span><span class="p">:</span>
 
             <span class="c1"># initialize problem parameters</span>
             <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>

@@ -131,7 +131,7 @@
         <span class="n">ft</span><span class="o">.</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span>
 
         <span class="c1"># read in reference data from clean run, will provide reproducable locations for faults</span>
-        <span class="k">if</span> <span class="n">strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;NOFAULT&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">!=</span> <span class="s1">&#39;NOFAULT&#39;</span><span class="p">:</span>
             <span class="n">reffile</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;data/PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz&#39;</span><span class="p">)</span>
             <span class="n">ft</span><span class="o">.</span><span class="n">refdata</span> <span class="o">=</span> <span class="n">reffile</span><span class="p">[</span><span class="s1">&#39;hard_stats&#39;</span><span class="p">]</span>
 
@@ -149,8 +149,8 @@
         <span class="n">minres</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">maxres</span> <span class="o">=</span> <span class="o">-</span><span class="mi">99</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extract_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">maxprocs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxprocs</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;process&#39;</span><span class="p">))</span>
-            <span class="n">maxiter</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxiter</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;iter&#39;</span><span class="p">))</span>
+            <span class="n">maxprocs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxprocs</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
+            <span class="n">maxiter</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">iter</span><span class="p">)</span>
             <span class="n">minres</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">minres</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
             <span class="n">maxres</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxres</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
@@ -158,8 +158,8 @@
         <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">maxprocs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">residual</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">99</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extract_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">step</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;process&#39;</span><span class="p">)</span>
-            <span class="nb">iter</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">process</span>
+            <span class="nb">iter</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">iter</span>
             <span class="k">if</span> <span class="nb">iter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">residual</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
