@@ -278,8 +278,6 @@ def process_statistics(type=None, cwd=''):
         residuals_iter = sort_stats(filter_stats(stats, type='residual_post_iteration'), sortby='iter')
         # extract residuals ouf of residuals_iter
         residuals = np.array([item[1] for item in residuals_iter])
-        # extract number of iterations ouf of residuals_iter
-        iters = np.array([item[0] for item in residuals_iter])
 
         # calculate minimal, maximal, mean residual vectors
         for i in range(minlen):

@@ -48,7 +48,7 @@ def main(ft_setups, ft_strategies):
 
     for setup in ft_setups:
 
-        if setup is 'HEAT':
+        if setup == 'HEAT':
 
             # initialize problem parameters
             problem_params = dict()
@@ -75,7 +75,7 @@ def main(ft_setups, ft_strategies):
             t0 = 0.0
             Tend = 8.0
 
-        elif setup is 'ADVECTION':
+        elif setup == 'ADVECTION':
 
             # initialize problem parameters
             problem_params = dict()

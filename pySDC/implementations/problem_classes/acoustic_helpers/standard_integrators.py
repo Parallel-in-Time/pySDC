@@ -1,5 +1,5 @@
 import math
-from decimal import Decimal
+from decimal import Decimal, getcontext
 
 import numpy as np
 import scipy.sparse as sp

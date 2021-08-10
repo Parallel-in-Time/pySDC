@@ -86,13 +86,13 @@ def create_plots(setup, cwd=''):
         ax.tick_params(pad=2)
         # plt.tight_layout()
 
-        if strategy is not 'NOFAULT':
+        if strategy != 'NOFAULT':
             plt.text(step - 1 + 0.5, iter + 0.5, 'x', horizontalalignment='center', verticalalignment='center')
 
         plt.title(strategy.replace('_', '-'), **axis_font)
 
         fname = 'data/' + setup + '_steps_vs_iteration_hf_' + str(step) + 'x' + str(iter) + '_' + strategy + '.png'
-        plt.savefig(fname, bbox_inches='tight', rasterize=True)
+        plt.savefig(fname, bbox_inches='tight')
         # os.system('pdfcrop ' + fname + ' ' + fname)
 
     rcParams['figure.figsize'] = 6.0, 3.0
@@ -153,7 +153,7 @@ def create_plots(setup, cwd=''):
     # plt.tight_layout()
 
     fname = 'data/' + setup + '_residuals_allstrategies.png'
-    plt.savefig(fname, bbox_inches='tight', rasterize=True)
+    plt.savefig(fname, bbox_inches='tight')
     # os.system('pdfcrop ' + fname + ' ' + fname)
 
     plt.close('all')

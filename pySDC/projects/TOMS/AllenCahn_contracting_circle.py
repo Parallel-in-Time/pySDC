@@ -122,7 +122,7 @@ def run_SDC_variant(variant=None, inexact=False):
         if inexact:
             description['problem_params']['newton_maxiter'] = 1
     else:
-        raise NotImplemented('Wrong variant specified, got %s' % variant)
+        raise NotImplementedError('Wrong variant specified, got %s' % variant)
 
     if inexact:
         out = 'Working on inexact %s variant...' % variant

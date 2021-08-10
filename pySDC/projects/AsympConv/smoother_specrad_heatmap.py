@@ -147,7 +147,7 @@ def compute_and_plot_specrad():
 
         fname = 'data/heatmap_smoother_' + conv_type + '_Nsteps' + str(Nsteps) + '_M' + \
                 str(Nnodes) + '_' + qd_type + '.png'
-        plt.savefig(fname,  transparent=True, bbox_inches='tight')
+        plt.savefig(fname, transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":

@@ -266,7 +266,7 @@ def border_padding(grid, l, r, pad_type='mirror'):
 
     assert l < grid.size and r < grid.size
     padded_arr = np.zeros(grid.size + l + r)
-    if pad_type is 'mirror':
+    if pad_type == 'mirror':
         for i in range(l):
             padded_arr[i] = 2 * grid[0] - grid[l - i]
         for j in range(r):

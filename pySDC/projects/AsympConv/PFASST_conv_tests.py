@@ -302,7 +302,7 @@ def plot_results(nsweeps):
     # plt.show()
     # save plot, beautify
     fname = 'data/conv_test_niter_NS' + str(nsweeps) + '.png'
-    plt.savefig(fname,  bbox_inches='tight')
+    plt.savefig(fname, bbox_inches='tight')
 
     assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 

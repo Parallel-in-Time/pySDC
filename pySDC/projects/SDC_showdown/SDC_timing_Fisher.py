@@ -104,7 +104,7 @@ def run_SDC_variant(variant=None, inexact=False):
         description['problem_class'] = petsc_fisher_multiimplicit
         description['sweeper_class'] = multi_implicit
     else:
-        raise NotImplemented('Wrong variant specified, got %s' % variant)
+        raise NotImplementedError('Wrong variant specified, got %s' % variant)
 
     if inexact:
         description['problem_params']['nlsol_maxiter'] = 1

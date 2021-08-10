@@ -132,7 +132,7 @@ def run_simulation(prob=None):
         num_procs = 100
         maxmeaniter = 19.0
     else:
-        raise NotImplemented('Problem type not implemented, got %s' % prob)
+        raise NotImplementedError('Problem type not implemented, got %s' % prob)
 
     f = open(prob + '_out.txt', 'w')
     out = 'Running ' + prob + ' problem with %s processors...' % num_procs
@@ -259,7 +259,7 @@ def show_results(prob=None, cwd=''):
         elif ndim == 3:
             ax.plot(pos[n, 0, :], pos[n, 1, :], pos[n, 2, :])
         else:
-            raise NotImplemented('Wrong number of dimensions for plotting, got %s' % ndim)
+            raise NotImplementedError('Wrong number of dimensions for plotting, got %s' % ndim)
 
     fname = 'data/' + prob + '_positions'
     plt_helper.savefig(fname)

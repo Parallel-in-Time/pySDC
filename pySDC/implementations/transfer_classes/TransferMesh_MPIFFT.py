@@ -2,7 +2,6 @@ from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from mpi4py_fft import PFFT, newDistArray
-import numpy as np
 
 
 class fft_to_fft(space_transfer):

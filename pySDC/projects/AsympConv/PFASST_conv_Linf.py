@@ -297,7 +297,7 @@ def plot_results(cwd=''):
 
         # save plot, beautify
         fname = 'data/conv_test_niter_Linf_' + type + '.png'
-        plt.savefig(fname,  bbox_inches='tight')
+        plt.savefig(fname, bbox_inches='tight')
 
         assert os.path.isfile(fname), 'ERROR: plotting did not create file'
 

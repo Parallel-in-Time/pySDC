@@ -93,7 +93,7 @@ def create_plots(cwd=''):
     # plt.tight_layout()
 
     fname = 'data/BOUSSINESQ_Kadd_vs_NOFAULT_hf.png'
-    plt.savefig(fname,  bbox_inches='tight')
+    plt.savefig(fname, bbox_inches='tight')
     # os.system('pdfcrop ' + fname + ' ' + fname)
 
     for file, strategy, label, color, marker in list:
@@ -145,10 +145,11 @@ def create_plots(cwd=''):
         # plt.tight_layout()
 
         fname = 'data/BOUSSINESQ_steps_vs_iteration_hf_' + strategy + '.png'
-        plt.savefig(fname,  bbox_inches='tight')
+        plt.savefig(fname, bbox_inches='tight')
         # os.system('pdfcrop ' + fname + ' ' + fname)
 
         plt.close('all')
+
 
 if __name__ == "__main__":
 

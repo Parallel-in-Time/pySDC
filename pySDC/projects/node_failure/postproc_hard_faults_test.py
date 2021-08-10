@@ -83,7 +83,7 @@ def create_plots(setup, cwd=''):
         # fname = setup+'_iteration_counts_hf_'+strategy+'.png'
         fname = 'data/' + setup + '_iteration_counts_hf_' + strategy + '.png'
 
-        plt.savefig(fname,  transparent=True, bbox_inches='tight')
+        plt.savefig(fname, transparent=True, bbox_inches='tight')
         # plt.savefig(fname, bbox_inches='tight')
         # os.system('pdfcrop ' + fname + ' ' + fname)
 
