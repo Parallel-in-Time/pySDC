@@ -47,7 +47,7 @@ jobs:
           
       - name: Run pytest
         run: |
-          conda install --yes -c conda-forge install pytest-cov
+          conda install --yes -c conda-forge pytest-cov
           pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
           
       - name: Build
