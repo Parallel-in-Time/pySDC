@@ -1,5 +1,4 @@
-name: "Pull Request Docs Check"
-
+name: CI pipeline for pySDC
 on:
   push:
   pull_request:
