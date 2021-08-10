@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>implementations.datatype_classes package &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations.problem_classes package" href="implementations.problem_classes.html" />
+    <link rel="prev" title="implementations.controller_classes package" href="implementations.controller_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="implementations-datatype-classes-package">
+<h1>implementations.datatype_classes package<a class="headerlink" href="#implementations-datatype-classes-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-implementations.datatype_classes.fenics_mesh">
+<span id="implementations-datatype-classes-fenics-mesh-module"></span><h2>implementations.datatype_classes.fenics_mesh module<a class="headerlink" href="#module-implementations.datatype_classes.fenics_mesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.datatype_classes.fenics_mesh.fenics_mesh">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.fenics_mesh.</code><code class="sig-name descname">fenics_mesh</code><span class="sig-paren">(</span><em class="sig-param">init=None</em>, <em class="sig-param">val=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/fenics_mesh.html#fenics_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>FEniCS Function data type with arbitrary dimensions</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.fenics_mesh.fenics_mesh.values">
+<code class="sig-name descname">values</code><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the ndarray of the values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.fenics_mesh.</code><code class="sig-name descname">rhs_fenics_mesh</code><span class="sig-paren">(</span><em class="sig-param">init</em>, <em class="sig-param">val=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/fenics_mesh.html#rhs_fenics_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RHS data type for fenics_meshes with implicit and explicit components</p>
+<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl">
+<code class="sig-name descname">impl</code><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.impl" title="Permalink to this definition">¶</a></dt>
+<dd><p>implicit part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="implementations.datatype_classes.fenics_mesh.fenics_mesh">fenics_mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl">
+<code class="sig-name descname">expl</code><a class="headerlink" href="#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl" title="Permalink to this definition">¶</a></dt>
+<dd><p>explicit part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.fenics_mesh.fenics_mesh" title="implementations.datatype_classes.fenics_mesh.fenics_mesh">fenics_mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="implementations-datatype-classes-mesh-module">
+<h2>implementations.datatype_classes.mesh module<a class="headerlink" href="#implementations-datatype-classes-mesh-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-datatype-classes-particles-module">
+<h2>implementations.datatype_classes.particles module<a class="headerlink" href="#implementations-datatype-classes-particles-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-datatype-classes-petsc-dmda-grid-module">
+<h2>implementations.datatype_classes.petsc_dmda_grid module<a class="headerlink" href="#implementations-datatype-classes-petsc-dmda-grid-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-implementations.datatype_classes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.datatype_classes" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">implementations.datatype_classes package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-implementations.datatype_classes.fenics_mesh">implementations.datatype_classes.fenics_mesh module</a></li>
+<li><a class="reference internal" href="#implementations-datatype-classes-mesh-module">implementations.datatype_classes.mesh module</a></li>
+<li><a class="reference internal" href="#implementations-datatype-classes-particles-module">implementations.datatype_classes.particles module</a></li>
+<li><a class="reference internal" href="#implementations-datatype-classes-petsc-dmda-grid-module">implementations.datatype_classes.petsc_dmda_grid module</a></li>
+<li><a class="reference internal" href="#module-implementations.datatype_classes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="implementations.controller_classes.html"
+                        title="previous chapter">implementations.controller_classes package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="implementations.problem_classes.html"
+                        title="next chapter">implementations.problem_classes package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.datatype_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.problem_classes.html" title="implementations.problem_classes package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.controller_classes.html" title="implementations.controller_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

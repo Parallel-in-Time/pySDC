@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>helpers package &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="implementations.transfer_classes package" href="implementations.transfer_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="helpers-package">
+<h1>helpers package<a class="headerlink" href="#helpers-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="helpers-plot-helper-module">
+<h2>helpers.plot_helper module<a class="headerlink" href="#helpers-plot-helper-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-helpers.pysdc_helper">
+<span id="helpers-pysdc-helper-module"></span><h2>helpers.pysdc_helper module<a class="headerlink" href="#module-helpers.pysdc_helper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="helpers.pysdc_helper.FrozenClass">
+<em class="property">class </em><code class="sig-prename descclassname">helpers.pysdc_helper.</code><code class="sig-name descname">FrozenClass</code><a class="reference internal" href="../_modules/helpers/pysdc_helper.html#FrozenClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Helper class to freeze a class, i.e. to avoid adding more attributes</p>
+<dl class="attribute">
+<dt id="helpers.pysdc_helper.FrozenClass.__isfrozen">
+<code class="sig-name descname">__isfrozen</code><a class="headerlink" href="#helpers.pysdc_helper.FrozenClass.__isfrozen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to freeze a class</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-helpers.stats_helper">
+<span id="helpers-stats-helper-module"></span><h2>helpers.stats_helper module<a class="headerlink" href="#module-helpers.stats_helper" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="helpers.stats_helper.filter_stats">
+<code class="sig-prename descclassname">helpers.stats_helper.</code><code class="sig-name descname">filter_stats</code><span class="sig-paren">(</span><em class="sig-param">stats</em>, <em class="sig-param">process=None</em>, <em class="sig-param">time=None</em>, <em class="sig-param">level=None</em>, <em class="sig-param">iter=None</em>, <em class="sig-param">type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#filter_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helpers.stats_helper.filter_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to extract data from the dictrionary of statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stats</strong> (<em>dict</em>) – raw statistics from a controller run</p></li>
+<li><p><strong>process</strong> (<em>int</em>) – process number</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – the requested simulation time</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – the requested level index</p></li>
+<li><p><strong>iter</strong> (<em>int</em>) – the requested iteration count</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – string to describe the requested type of value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary containing only the entries corresponding to the filter</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="helpers.stats_helper.get_list_of_types">
+<code class="sig-prename descclassname">helpers.stats_helper.</code><code class="sig-name descname">get_list_of_types</code><span class="sig-paren">(</span><em class="sig-param">stats</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#get_list_of_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helpers.stats_helper.get_list_of_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to get list of types registered in stats</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stats</strong> (<em>dict</em>) – dictionary with statistics</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of types registered</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="helpers.stats_helper.sort_stats">
+<code class="sig-prename descclassname">helpers.stats_helper.</code><code class="sig-name descname">sort_stats</code><span class="sig-paren">(</span><em class="sig-param">stats</em>, <em class="sig-param">sortby</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/stats_helper.html#sort_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helpers.stats_helper.sort_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to transform stats dictionary to sorted list of tuples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stats</strong> (<em>dict</em>) – dictionary of statistics</p></li>
+<li><p><strong>sortby</strong> (<em>str</em>) – string to specify which key to use for sorting</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of tuples containing the sortby item and the value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="helpers-transfer-helper-module">
+<h2>helpers.transfer_helper module<a class="headerlink" href="#helpers-transfer-helper-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="helpers-visualization-tools-module">
+<h2>helpers.visualization_tools module<a class="headerlink" href="#helpers-visualization-tools-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-helpers">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-helpers" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">helpers package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#helpers-plot-helper-module">helpers.plot_helper module</a></li>
+<li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a></li>
+<li><a class="reference internal" href="#module-helpers.stats_helper">helpers.stats_helper module</a></li>
+<li><a class="reference internal" href="#helpers-transfer-helper-module">helpers.transfer_helper module</a></li>
+<li><a class="reference internal" href="#helpers-visualization-tools-module">helpers.visualization_tools module</a></li>
+<li><a class="reference internal" href="#module-helpers">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="implementations.transfer_classes.html"
+                        title="previous chapter">implementations.transfer_classes package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/helpers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

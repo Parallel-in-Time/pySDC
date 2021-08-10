@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>implementations.transfer_classes package &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helpers package" href="helpers.html" />
+    <link rel="prev" title="implementations.sweeper_classes package" href="implementations.sweeper_classes.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="helpers package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="implementations-transfer-classes-package">
+<h1>implementations.transfer_classes package<a class="headerlink" href="#implementations-transfer-classes-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-basetransfer-mass-module">
+<h2>implementations.transfer_classes.BaseTransfer_mass module<a class="headerlink" href="#implementations-transfer-classes-basetransfer-mass-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-implementations.transfer_classes.TransferFenicsMesh">
+<span id="implementations-transfer-classes-transferfenicsmesh-module"></span><h2>implementations.transfer_classes.TransferFenicsMesh module<a class="headerlink" href="#module-implementations.transfer_classes.TransferFenicsMesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.transfer_classes.TransferFenicsMesh.</code><code class="sig-name descname">mesh_to_mesh_fenics</code><span class="sig-paren">(</span><em class="sig-param">fine_prob</em>, <em class="sig-param">coarse_prob</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>This implementation can restrict and prolong between fenics meshes</p>
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project">
+<code class="sig-name descname">project</code><span class="sig-paren">(</span><em class="sig-param">F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation via projection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>F</strong> – the fine level data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong">
+<code class="sig-name descname">prolong</code><span class="sig-paren">(</span><em class="sig-param">G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>G</strong> – the coarse level data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict">
+<code class="sig-name descname">restrict</code><span class="sig-paren">(</span><em class="sig-param">F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>F</strong> – the fine level data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="implementations-transfer-classes-transfermesh-module">
+<h2>implementations.transfer_classes.TransferMesh module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transfermesh-fft-module">
+<h2>implementations.transfer_classes.TransferMesh_FFT module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-fft-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transfermesh-fft2d-module">
+<h2>implementations.transfer_classes.TransferMesh_FFT2D module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-fft2d-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transfermesh-mpifft-module">
+<h2>implementations.transfer_classes.TransferMesh_MPIFFT module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-mpifft-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transfermesh-nocoarse-module">
+<h2>implementations.transfer_classes.TransferMesh_NoCoarse module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-nocoarse-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transferpetscdmda-module">
+<h2>implementations.transfer_classes.TransferPETScDMDA module<a class="headerlink" href="#implementations-transfer-classes-transferpetscdmda-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="implementations-transfer-classes-transferparticles-nocoarse-module">
+<h2>implementations.transfer_classes.TransferParticles_NoCoarse module<a class="headerlink" href="#implementations-transfer-classes-transferparticles-nocoarse-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-implementations.transfer_classes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.transfer_classes" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">implementations.transfer_classes package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-basetransfer-mass-module">implementations.transfer_classes.BaseTransfer_mass module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferFenicsMesh">implementations.transfer_classes.TransferFenicsMesh module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-module">implementations.transfer_classes.TransferMesh module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-fft-module">implementations.transfer_classes.TransferMesh_FFT module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-fft2d-module">implementations.transfer_classes.TransferMesh_FFT2D module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-mpifft-module">implementations.transfer_classes.TransferMesh_MPIFFT module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-nocoarse-module">implementations.transfer_classes.TransferMesh_NoCoarse module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transferpetscdmda-module">implementations.transfer_classes.TransferPETScDMDA module</a></li>
+<li><a class="reference internal" href="#implementations-transfer-classes-transferparticles-nocoarse-module">implementations.transfer_classes.TransferParticles_NoCoarse module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="implementations.sweeper_classes.html"
+                        title="previous chapter">implementations.sweeper_classes package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="helpers.html"
+                        title="next chapter">helpers package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/implementations.transfer_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="helpers.html" title="helpers package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="implementations.sweeper_classes.html" title="implementations.sweeper_classes package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

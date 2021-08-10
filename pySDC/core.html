@@ -1,0 +1,940 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>core package &#8212; pySDC 4.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="implementations package" href="implementations.html" />
+    <link rel="prev" title="Performance analysis of pySDC" href="../projects/performance.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.html" title="implementations package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../projects/performance.html" title="Performance analysis of pySDC"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="core-package">
+<h1>core package<a class="headerlink" href="#core-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="core-basetransfer-module">
+<h2>core.BaseTransfer module<a class="headerlink" href="#core-basetransfer-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="core-collocation-module">
+<h2>core.Collocation module<a class="headerlink" href="#core-collocation-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="core-controller-module">
+<h2>core.Controller module<a class="headerlink" href="#core-controller-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-core.Errors">
+<span id="core-errors-module"></span><h2>core.Errors module<a class="headerlink" href="#module-core.Errors" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="core.Errors.CollocationError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">CollocationError</code><a class="reference internal" href="../_modules/core/Errors.html#CollocationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.CollocationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating problems with the collocation</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.CommunicationError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">CommunicationError</code><a class="reference internal" href="../_modules/core/Errors.html#CommunicationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.CommunicationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating problems with the communication</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.ControllerError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">ControllerError</code><a class="reference internal" href="../_modules/core/Errors.html#ControllerError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.ControllerError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating problems with the controller</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.DataError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">DataError</code><a class="reference internal" href="../_modules/core/Errors.html#DataError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.DataError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error Class handling/indicating problems with data types</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.ParameterError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">ParameterError</code><a class="reference internal" href="../_modules/core/Errors.html#ParameterError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.ParameterError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error Class handling/indicating problems with parameters (mostly within dictionaries)</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.ProblemError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">ProblemError</code><a class="reference internal" href="../_modules/core/Errors.html#ProblemError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.ProblemError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating problems with the problem classes</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.TransferError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">TransferError</code><a class="reference internal" href="../_modules/core/Errors.html#TransferError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.TransferError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating problems with the transfer processes</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="core.Errors.UnlockError">
+<em class="property">exception </em><code class="sig-prename descclassname">core.Errors.</code><code class="sig-name descname">UnlockError</code><a class="reference internal" href="../_modules/core/Errors.html#UnlockError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Errors.UnlockError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error class handling/indicating unlocked levels</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-core.Hooks">
+<span id="core-hooks-module"></span><h2>core.Hooks module<a class="headerlink" href="#module-core.Hooks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.Hooks.hooks">
+<em class="property">class </em><code class="sig-prename descclassname">core.Hooks.</code><code class="sig-name descname">hooks</code><a class="reference internal" href="../_modules/core/Hooks.html#hooks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Hook class to contain the functions called during the controller runs (e.g. for calling user-routines)</p>
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_setup">
+<code class="sig-name descname">__t0_setup</code><a class="headerlink" href="#core.Hooks.hooks.__t0_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_run">
+<code class="sig-name descname">__t0_run</code><a class="headerlink" href="#core.Hooks.hooks.__t0_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_predict">
+<code class="sig-name descname">__t0_predict</code><a class="headerlink" href="#core.Hooks.hooks.__t0_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_step">
+<code class="sig-name descname">__t0_step</code><a class="headerlink" href="#core.Hooks.hooks.__t0_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_iteration">
+<code class="sig-name descname">__t0_iteration</code><a class="headerlink" href="#core.Hooks.hooks.__t0_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_sweep">
+<code class="sig-name descname">__t0_sweep</code><a class="headerlink" href="#core.Hooks.hooks.__t0_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t0_comm">
+<code class="sig-name descname">__t0_comm</code><a class="headerlink" href="#core.Hooks.hooks.__t0_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get starting time of the communication</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_run">
+<code class="sig-name descname">__t1_run</code><a class="headerlink" href="#core.Hooks.hooks.__t1_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_predict">
+<code class="sig-name descname">__t1_predict</code><a class="headerlink" href="#core.Hooks.hooks.__t1_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_step">
+<code class="sig-name descname">__t1_step</code><a class="headerlink" href="#core.Hooks.hooks.__t1_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_iteration">
+<code class="sig-name descname">__t1_iteration</code><a class="headerlink" href="#core.Hooks.hooks.__t1_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_sweep">
+<code class="sig-name descname">__t1_sweep</code><a class="headerlink" href="#core.Hooks.hooks.__t1_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of the sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_setup">
+<code class="sig-name descname">__t1_setup</code><a class="headerlink" href="#core.Hooks.hooks.__t1_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to get end time of setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__t1_comm">
+<code class="sig-name descname">__t1_comm</code><a class="headerlink" href="#core.Hooks.hooks.__t1_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>private variable to hold timing of the communication (!)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.logger">
+<code class="sig-name descname">logger</code><a class="headerlink" href="#core.Hooks.hooks.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>logger instance for output</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__stats">
+<code class="sig-name descname">__stats</code><a class="headerlink" href="#core.Hooks.hooks.__stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>dictionary for gathering the statistics of a run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Hooks.hooks.__entry">
+<code class="sig-name descname">__entry</code><a class="headerlink" href="#core.Hooks.hooks.__entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>statistics entry containign all information to identify the value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>namedtuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.add_to_stats">
+<code class="sig-name descname">add_to_stats</code><span class="sig-paren">(</span><em class="sig-param">process</em>, <em class="sig-param">time</em>, <em class="sig-param">level</em>, <em class="sig-param">iter</em>, <em class="sig-param">sweep</em>, <em class="sig-param">type</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.add_to_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.add_to_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to add data to the statistics dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> – the current process recording this data</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – the current level index</p></li>
+<li><p><strong>iter</strong> (<em>int</em>) – the current iteration count</p></li>
+<li><p><strong>sweep</strong> (<em>int</em>) – the current sweep count</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – string to describe the type of value</p></li>
+<li><p><strong>value</strong> – the actual data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_comm">
+<code class="sig-name descname">post_comm</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em>, <em class="sig-param">add_to_stats=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each communication</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+<li><p><strong>add_to_stats</strong> (<em>bool</em>) – set if result should go to stats object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_iteration">
+<code class="sig-name descname">post_iteration</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_predict">
+<code class="sig-name descname">post_predict</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each predictor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_run">
+<code class="sig-name descname">post_run</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_setup">
+<code class="sig-name descname">post_setup</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after setup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_step">
+<code class="sig-name descname">post_step</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each step or block</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.post_sweep">
+<code class="sig-name descname">post_sweep</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.post_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called after each sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_comm">
+<code class="sig-name descname">pre_comm</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before communication starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_iteration">
+<code class="sig-name descname">pre_iteration</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before iteration starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_predict">
+<code class="sig-name descname">pre_predict</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before predictor starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_run">
+<code class="sig-name descname">pre_run</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before time-loop starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_setup">
+<code class="sig-name descname">pre_setup</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before setup starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_step">
+<code class="sig-name descname">pre_step</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook called before each step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.pre_sweep">
+<code class="sig-name descname">pre_sweep</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">level_number</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.pre_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine called before sweep starts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
+<li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.reset_stats">
+<code class="sig-name descname">reset_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.reset_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.reset_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to reset the stats for multiple runs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Hooks.hooks.return_stats">
+<code class="sig-name descname">return_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.return_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Hooks.hooks.return_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the stats</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>stats</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-core.Level">
+<span id="core-level-module"></span><h2>core.Level module<a class="headerlink" href="#module-core.Level" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.Level.level">
+<em class="property">class </em><code class="sig-prename descclassname">core.Level.</code><code class="sig-name descname">level</code><span class="sig-paren">(</span><em class="sig-param">problem_class</em>, <em class="sig-param">problem_params</em>, <em class="sig-param">sweeper_class</em>, <em class="sig-param">sweeper_params</em>, <em class="sig-param">level_params</em>, <em class="sig-param">level_index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Level.html#level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Level.level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.pysdc_helper.FrozenClass</span></code></p>
+<p>Level class containing all management functionality for a single level</p>
+<p>A level contains all data structures, types and objects to perform sweeps on this particular level. It does not
+know about other levels.</p>
+<dl class="attribute">
+<dt id="core.Level.level.params">
+<code class="sig-name descname">params</code><a class="headerlink" href="#core.Level.level.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>parameter object containing the custom parameters passed by the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>__Pars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.status">
+<code class="sig-name descname">status</code><a class="headerlink" href="#core.Level.level.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>status object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>__Status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.level_index">
+<code class="sig-name descname">level_index</code><a class="headerlink" href="#core.Level.level.level_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom string naming this level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.uend">
+<code class="sig-name descname">uend</code><a class="headerlink" href="#core.Level.level.uend" title="Permalink to this definition">¶</a></dt>
+<dd><p>dof values at the right end point of the interval</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.u">
+<code class="sig-name descname">u</code><a class="headerlink" href="#core.Level.level.u" title="Permalink to this definition">¶</a></dt>
+<dd><p>dof values at the nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.uold">
+<code class="sig-name descname">uold</code><a class="headerlink" href="#core.Level.level.uold" title="Permalink to this definition">¶</a></dt>
+<dd><p>copy of dof values for saving data during restriction)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.f">
+<code class="sig-name descname">f</code><a class="headerlink" href="#core.Level.level.f" title="Permalink to this definition">¶</a></dt>
+<dd><p>RHS values at the nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.fold">
+<code class="sig-name descname">fold</code><a class="headerlink" href="#core.Level.level.fold" title="Permalink to this definition">¶</a></dt>
+<dd><p>copy of RHS values for saving data during restriction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Level.level.tau">
+<code class="sig-name descname">tau</code><a class="headerlink" href="#core.Level.level.tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>FAS correction, allocated via step class if necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.dt">
+<em class="property">property </em><code class="sig-name descname">dt</code><a class="headerlink" href="#core.Level.level.dt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meta-getter for the time-step size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>referencing dt from parameters for convenience</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.prob">
+<em class="property">property </em><code class="sig-name descname">prob</code><a class="headerlink" href="#core.Level.level.prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the problem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the problem associated to this level</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pySDC.Problem.ptype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.reset_level">
+<code class="sig-name descname">reset_level</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Level.html#level.reset_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Level.level.reset_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to clean-up the level for the next time step</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.sweep">
+<em class="property">property </em><code class="sig-name descname">sweep</code><a class="headerlink" href="#core.Level.level.sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the sweeper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the sweeper associated to this level</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pySDC.Sweeper.sweeper</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.tag">
+<em class="property">property </em><code class="sig-name descname">tag</code><a class="headerlink" href="#core.Level.level.tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for tag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>tag for sending/receiving</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Level.level.time">
+<em class="property">property </em><code class="sig-name descname">time</code><a class="headerlink" href="#core.Level.level.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meta-getter for the current time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>referencing status time for convenience</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-core.Problem">
+<span id="core-problem-module"></span><h2>core.Problem module<a class="headerlink" href="#module-core.Problem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.Problem.ptype">
+<em class="property">class </em><code class="sig-prename descclassname">core.Problem.</code><code class="sig-name descname">ptype</code><span class="sig-paren">(</span><em class="sig-param">init</em>, <em class="sig-param">dtype_u</em>, <em class="sig-param">dtype_f</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Problem.ptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Prototype class for problems, just defines the attributes essential to get started</p>
+<dl class="attribute">
+<dt id="core.Problem.ptype.logger">
+<code class="sig-name descname">logger</code><a class="headerlink" href="#core.Problem.ptype.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom logger for problem-related logging</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Problem.ptype.params">
+<code class="sig-name descname">params</code><a class="headerlink" href="#core.Problem.ptype.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>parameter object containing the custom parameters passed by the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>__Pars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Problem.ptype.init">
+<code class="sig-name descname">init</code><a class="headerlink" href="#core.Problem.ptype.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of degrees-of-freedom (whatever this may represent)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Problem.ptype.dtype_u">
+<code class="sig-name descname">dtype_u</code><a class="headerlink" href="#core.Problem.ptype.dtype_u" title="Permalink to this definition">¶</a></dt>
+<dd><p>variable data type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.Problem.ptype.dtype_f">
+<code class="sig-name descname">dtype_f</code><a class="headerlink" href="#core.Problem.ptype.dtype_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>RHS data type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Problem.ptype.apply_mass_matrix">
+<code class="sig-name descname">apply_mass_matrix</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.apply_mass_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Problem.ptype.apply_mass_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract interface to apply mass matrix (only needed for FEM)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.Problem.ptype.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Problem.ptype.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract interface to RHS computation of the ODE</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-core.SpaceTransfer">
+<span id="core-spacetransfer-module"></span><h2>core.SpaceTransfer module<a class="headerlink" href="#module-core.SpaceTransfer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.SpaceTransfer.space_transfer">
+<em class="property">class </em><code class="sig-prename descclassname">core.SpaceTransfer.</code><code class="sig-name descname">space_transfer</code><span class="sig-paren">(</span><em class="sig-param">fine_prob</em>, <em class="sig-param">coarse_prob</em>, <em class="sig-param">space_transfer_params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract space_transfer class</p>
+<dl class="attribute">
+<dt id="core.SpaceTransfer.space_transfer.params">
+<code class="sig-name descname">params</code><a class="headerlink" href="#core.SpaceTransfer.space_transfer.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>parameters given by the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>__Pars</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.SpaceTransfer.space_transfer.logger">
+<code class="sig-name descname">logger</code><a class="headerlink" href="#core.SpaceTransfer.space_transfer.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom logger for transfer-related logging</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.SpaceTransfer.space_transfer.fine_prob">
+<code class="sig-name descname">fine_prob</code><a class="headerlink" href="#core.SpaceTransfer.space_transfer.fine_prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>reference to the fine problem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pySDC.Problem.ptype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.SpaceTransfer.space_transfer.coarse_prob">
+<code class="sig-name descname">coarse_prob</code><a class="headerlink" href="#core.SpaceTransfer.space_transfer.coarse_prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>reference to the coarse problem</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pySDC.Problem.ptype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.SpaceTransfer.space_transfer.prolong">
+<code class="sig-name descname">prolong</code><span class="sig-paren">(</span><em class="sig-param">G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract interface for prolongation in space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.SpaceTransfer.space_transfer.restrict">
+<code class="sig-name descname">restrict</code><span class="sig-paren">(</span><em class="sig-param">F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract interface for restriction in space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="core-step-module">
+<h2>core.Step module<a class="headerlink" href="#core-step-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="core-sweeper-module">
+<h2>core.Sweeper module<a class="headerlink" href="#core-sweeper-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">core package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#core-basetransfer-module">core.BaseTransfer module</a></li>
+<li><a class="reference internal" href="#core-collocation-module">core.Collocation module</a></li>
+<li><a class="reference internal" href="#core-controller-module">core.Controller module</a></li>
+<li><a class="reference internal" href="#module-core.Errors">core.Errors module</a></li>
+<li><a class="reference internal" href="#module-core.Hooks">core.Hooks module</a></li>
+<li><a class="reference internal" href="#module-core.Level">core.Level module</a></li>
+<li><a class="reference internal" href="#module-core.Problem">core.Problem module</a></li>
+<li><a class="reference internal" href="#module-core.SpaceTransfer">core.SpaceTransfer module</a></li>
+<li><a class="reference internal" href="#core-step-module">core.Step module</a></li>
+<li><a class="reference internal" href="#core-sweeper-module">core.Sweeper module</a></li>
+<li><a class="reference internal" href="#module-core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../projects/performance.html"
+                        title="previous chapter">Performance analysis of pySDC</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="implementations.html"
+                        title="next chapter">implementations package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/pySDC/core.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementations.html" title="implementations package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../projects/performance.html" title="Performance analysis of pySDC"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
