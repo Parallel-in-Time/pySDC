@@ -39,17 +39,14 @@ jobs:
           
       - name: Lint with flake8
         run: |
-          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
-          conda list
-          echo $PATH
-          ls -ral /usr/share/miniconda/envs/test/bin/
-          /usr/share/miniconda/envs/test/bin/flake8 pySDC
+          pip install flake8 flake8-comprehensions flake8-bugbear
+          flake8 pySDC
           
-      - name: Run nosetest
+      - name: Run pytest
         run: |
-          pip install nose-timer
-          nosetests -v --with-timer --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial,pySDC/projects --cover-html --cover-html-dir=doc/build/test_coverage pySDC/tests
-      
+          pip install pytest-cov
+          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+          
       - name: Build
         uses: ammaraskar/sphinx-action@master
         with:
