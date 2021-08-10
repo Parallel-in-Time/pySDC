@@ -40,6 +40,8 @@ jobs:
       - name: Lint with flake8
         run: |
           conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+          echo $PATH
+          ls -rtl /usr/share/miniconda/envs/test/bin/
           /usr/share/miniconda/envs/test/bin/flake8 pySDC
           
       - name: Run nosetest
