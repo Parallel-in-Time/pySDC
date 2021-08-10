@@ -1,5 +1,4 @@
 import numpy as np
-import json
 from mpi4py import MPI
 from pySDC.core.Hooks import hooks
 

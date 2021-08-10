@@ -44,7 +44,6 @@ class imex_1st_order(sweeper):
 
         # get current level and problem description
         L = self.level
-        P = L.prob
 
         me = []
 

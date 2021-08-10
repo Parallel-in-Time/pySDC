@@ -133,7 +133,7 @@ def run_simulation(prob=None):
         num_procs = 100
         maxmeaniter = 5.0
     else:
-        raise NotImplemented('Problem type not implemented, got %s' % prob)
+        raise NotImplementedError('Problem type not implemented, got %s' % prob)
 
     # instantiate the controller
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,

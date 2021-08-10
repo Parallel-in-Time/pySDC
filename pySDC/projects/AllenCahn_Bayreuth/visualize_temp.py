@@ -56,7 +56,7 @@ def plot_data(path='./data', name='', output='.'):
 
         grid.cbar_axes[0].colorbar(im)
 
-        plt.savefig(f'{output}/{name}_{index}.png',  bbox_inches='tight')
+        plt.savefig(f'{output}/{name}_{index}.png', bbox_inches='tight')
         plt.close()
 
 
@@ -77,7 +77,6 @@ def make_movie(path='./data', name='', output='.'):
     data_files = sorted(glob.glob(f'{path}/{name}_*.dat'))
 
     img_list = []
-    c = 0
     for json_file, data_file in zip(json_files, data_files):
         with open(json_file, 'r') as fp:
             obj = json.load(fp)

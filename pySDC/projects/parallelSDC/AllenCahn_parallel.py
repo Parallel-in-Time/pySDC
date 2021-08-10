@@ -105,7 +105,7 @@ def run_variant(variant=None):
         description['base_transfer_class'] = base_transfer_MPI
         do_print = MPI.COMM_WORLD.Get_rank() == 0
     else:
-        raise NotImplemented('Wrong variant specified, got %s' % variant)
+        raise NotImplementedError('Wrong variant specified, got %s' % variant)
 
     if do_print:
         out = 'Working on %s variant...' % variant

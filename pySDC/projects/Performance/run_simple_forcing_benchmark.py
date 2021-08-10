@@ -8,7 +8,7 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
-from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
+# from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
 
 # from pySDC.projects.Performance.controller_MPI_scorep import controller_MPI
 

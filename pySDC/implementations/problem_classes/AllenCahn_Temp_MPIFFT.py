@@ -1,5 +1,4 @@
 import numpy as np
-from mpi4py import MPI
 from mpi4py_fft import PFFT
 
 from pySDC.core.Errors import ParameterError, ProblemError

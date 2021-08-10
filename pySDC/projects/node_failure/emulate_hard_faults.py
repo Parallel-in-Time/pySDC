@@ -31,7 +31,7 @@ def hard_fault_injection(S):
         rd.seed(S.status.slot)
 
     # draw random number and check if we are below our threshold (hard_random gives percentage)
-    if strategy is 'NOFAULT':
+    if strategy == 'NOFAULT':
         doit = rd.random() < hard_random
         if doit:
             hard_stats.append((S.status.slot, S.status.iter, S.time))
@@ -43,7 +43,7 @@ def hard_fault_injection(S):
             doit = False
 
     # if we set step and iter, inject and recover (if faults are supposed to occur)
-    if ((hard_step == S.status.slot and hard_iter == S.status.iter) or doit) and strategy is not 'NOFAULT':
+    if ((hard_step == S.status.slot and hard_iter == S.status.iter) or doit) and strategy != 'NOFAULT':
 
         print('things went wrong here: step %i -- iteration %i -- time %e' %
               (S.status.slot, S.status.iter, S.time))
@@ -64,13 +64,13 @@ def hard_fault_injection(S):
             lvl.status.time = time
 
         # recovery
-        if strategy is 'SPREAD':
+        if strategy == 'SPREAD':
             S = hard_fault_correction_spread(S)
-        elif strategy is 'INTERP':
+        elif strategy == 'INTERP':
             S = hard_fault_correction_interp(S)
-        elif strategy is 'INTERP_PREDICT':
+        elif strategy == 'INTERP_PREDICT':
             S = hard_fault_correction_interp_predict(S, res, niter)
-        elif strategy is 'SPREAD_PREDICT':
+        elif strategy == 'SPREAD_PREDICT':
             S = hard_fault_correction_spread_predict(S, res, niter)
         else:
             raise NotImplementedError('recovery strategy not implemented')

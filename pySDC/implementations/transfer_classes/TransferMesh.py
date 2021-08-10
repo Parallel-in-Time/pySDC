@@ -124,11 +124,11 @@ class mesh_to_mesh(space_transfer):
                         Rspace.append(restr_factor * Pspace[-1].T)
 
                     else:
-
-                        Rspace.append(restr_factor *
-                                      th.interpolation_matrix_1d(fine_grid, coarse_grid, k=self.params.rorder,
-                                                                 periodic=self.params.periodic,
-                                                                 equidist_nested=self.params.equidist_nested).T)
+                        mat = th.interpolation_matrix_1d(fine_grid, coarse_grid,
+                                                         k=self.params.rorder,
+                                                         periodic=self.params.periodic,
+                                                         equidist_nested=self.params.equidist_nested).T
+                        Rspace.append(restr_factor * mat)
 
             # kronecker 1-d operators for n-d
             self.Pspace = Pspace[0]

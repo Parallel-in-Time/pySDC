@@ -109,7 +109,7 @@ class penningtrap(ptype):
 
         u = self.dtype_u(((3, N), self.init[1], self.init[2]))
 
-        if u0[2][0] is not 1 or u0[3][0] is not 1:
+        if u0[2][0] != 1 or u0[3][0] != 1:
             raise ProblemError('so far only q = m = 1 is implemented')
 
         # set first particle to u0

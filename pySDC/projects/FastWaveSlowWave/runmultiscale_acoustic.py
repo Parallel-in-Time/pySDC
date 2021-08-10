@@ -123,9 +123,9 @@ def compute_and_plot_solutions():
     fig = plt.figure()
 
     sigma_0 = 0.1
-    k = 7.0 * 2.0 * np.pi
+    # k = 7.0 * 2.0 * np.pi
     x_0 = 0.75
-    x_1 = 0.25
+    # x_1 = 0.25
 
     print('Maximum pressure in SDC: %5.3e' % np.linalg.norm(uend[1, :], np.inf))
     print('Maximum pressure in DIRK: %5.3e' % np.linalg.norm(pnew_dirk, np.inf))

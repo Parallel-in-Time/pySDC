@@ -119,7 +119,7 @@ def run_simulation():
     dill.dump(results, f)
     f.close()
 
-    assert os.path.isfile(fname), 'Run for %s did not create stats file' % prob
+    assert os.path.isfile(fname), 'Run did not create stats file'
 
 
 def show_results(cwd=''):

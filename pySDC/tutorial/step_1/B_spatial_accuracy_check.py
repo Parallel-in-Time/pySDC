@@ -175,7 +175,7 @@ def plot_accuracy(results):
 
     # save plot as PDF, beautify
     fname = 'step_1_accuracy_test_space.png'
-    plt.savefig(fname,  bbox_inches='tight')
+    plt.savefig(fname, bbox_inches='tight')
 
     return None
 

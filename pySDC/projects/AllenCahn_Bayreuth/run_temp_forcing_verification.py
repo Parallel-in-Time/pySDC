@@ -142,7 +142,7 @@ def run_simulation(name='', spectral=None, nprocs_time=None, nprocs_space=None, 
         else:
             err = abs(array - uend)
 
-        out = f'...Done <---------\n'
+        out = '...Done <---------\n'
         print(out)
 
         return err

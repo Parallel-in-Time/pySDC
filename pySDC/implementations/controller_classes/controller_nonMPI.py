@@ -675,7 +675,7 @@ class controller_nonMPI(controller):
             raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
 
         # if all stages are the same (or DONE), continue, otherwise abort
-        stages = [S.status.stage for S in local_MS_active if S.status.stage is not 'DONE']
+        stages = [S.status.stage for S in local_MS_active if S.status.stage != 'DONE']
         if stages[1:] == stages[:-1]:
             stage = stages[0]
         else:
@@ -683,7 +683,7 @@ class controller_nonMPI(controller):
 
         self.logger.debug(stage)
 
-        MS_running = [S for S in local_MS_active if S.status.stage is not 'DONE']
+        MS_running = [S for S in local_MS_active if S.status.stage != 'DONE']
 
         switcher = {
             'SPREAD': spread,

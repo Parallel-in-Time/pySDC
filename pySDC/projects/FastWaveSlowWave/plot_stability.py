@@ -77,7 +77,7 @@ def compute_stability():
         for j in range(0, N_f):
             lambda_fast = lambda_f[j]
             lambda_slow = lambda_s[i]
-            if K is not 0:
+            if K != 0:
                 lambdas = [lambda_fast, lambda_slow]
                 # LHS, RHS = L.sweep.get_scalar_problems_sweeper_mats(lambdas=lambdas)
                 Mat_sweep = L.sweep.get_scalar_problems_manysweep_mat(nsweeps=K, lambdas=lambdas)

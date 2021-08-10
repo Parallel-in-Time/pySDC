@@ -95,7 +95,7 @@ def main(ft_strategies):
         ft.strategy = strategy
 
         # read in reference data from clean run, will provide reproducable locations for faults
-        if strategy is not 'NOFAULT':
+        if strategy != 'NOFAULT':
             reffile = np.load('data/PFASST_GRAYSCOTT_stats_hf_NOFAULT_P16.npz')
             ft.refdata = reffile['hard_stats']
 

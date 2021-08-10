@@ -1,6 +1,3 @@
-
-import scipy.sparse as sp
-
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh

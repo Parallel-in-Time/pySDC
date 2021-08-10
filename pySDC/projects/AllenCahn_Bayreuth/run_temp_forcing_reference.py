@@ -121,7 +121,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         out = f'Time to solution: {timing[0][1]:.4f} sec.'
         print(out)
 
-        out = f'...Done <---------\n'
+        out = '...Done <---------\n'
         print(out)
 
 

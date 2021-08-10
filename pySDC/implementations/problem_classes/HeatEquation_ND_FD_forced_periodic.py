@@ -96,7 +96,7 @@ class heatNd_periodic(ptype):
             stencil = [1 / 90, -3 / 20, 3 / 2, -49 / 18, 3 / 2, -3 / 20, 1 / 90]
             zero_pos = 4
         elif order == 8:
-            stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315,	-1 / 560]
+            stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315, -1 / 560]
             zero_pos = 5
         else:
             raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')

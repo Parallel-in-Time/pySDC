@@ -70,7 +70,7 @@ def create_animation(cwd=''):
 
     residual = np.zeros((maxiter_full, maxstep - minstep))
     plot = plt.pcolor(residual, cmap=cmap, vmin=vmin, vmax=vmax)
-    text = plt.text(0, 0, '', horizontalalignment='center', verticalalignment='center')
+    plt.text(0, 0, '', horizontalalignment='center', verticalalignment='center')
 
     ticks = np.arange(vmin, vmax + 1, 2)
     tickpos = np.linspace(ticks[0] + 0.5, ticks[-1] - 0.5, len(ticks))
