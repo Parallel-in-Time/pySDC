@@ -78,7 +78,7 @@ def compute_and_plot_specrad(Nnodes, lam):
         fname = 'data/smoother_specrad_toinf_M' + str(Nnodes) + '_LU_imag.png'
     else:
         fname = 'data/smoother_specrad_toinf_M' + str(Nnodes) + '_LU_real.png'
-    plt.savefig(fname,  transparent=True, bbox_inches='tight')
+    plt.savefig(fname, transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":
