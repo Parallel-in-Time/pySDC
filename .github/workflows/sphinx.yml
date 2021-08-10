@@ -6,6 +6,11 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash -l {0}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -31,19 +36,18 @@ jobs:
           use-only-tar-bz2: true
           
       - name: Install dependencies
-        shell: bash -l {0}
         run: |
           conda install --yes -c conda-forge --file requirements.txt
-          export PATH=/usr/share/miniconda/envs/test/bin/:$PATH
+          # export PATH=/usr/share/miniconda/envs/test/bin/:$PATH
           
       - name: Lint with flake8
         run: |
-          pip install flake8 flake8-comprehensions flake8-bugbear
+          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
           
       - name: Run pytest
         run: |
-          pip install pytest-cov
+          conda install --yes -c conda-forge install pytest-cov
           pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
           
       - name: Build
