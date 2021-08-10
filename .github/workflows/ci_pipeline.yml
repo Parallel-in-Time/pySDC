@@ -38,7 +38,6 @@ jobs:
       - name: Install dependencies
         run: |
           conda install --yes -c conda-forge --file requirements.txt
-          # export PATH=/usr/share/miniconda/envs/test/bin/:$PATH
           
       - name: Lint with flake8
         run: |
