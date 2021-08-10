@@ -24,17 +24,15 @@ def show_residual_across_simulation(stats, fname):
 
     # find boundaries for x-,y-axis as well as arrays
     maxiter = 0
-    for k, v in extract_stats.items():
-        iter = getattr(k, 'iter')
-        maxiter = max(maxiter, iter)
+    for k, _ in extract_stats.items():
+        maxiter = max(maxiter, k.iter)
 
     # grep residuals and put into array
     residual = np.zeros(maxiter)
     residual[:] = -99
     for k, v in extract_stats.items():
-        iter = getattr(k, 'iter')
-        if iter is not -1:
-            residual[iter - 1] = np.log10(v)
+        if k.iter is not -1:
+            residual[k.iter - 1] = np.log10(v)
 
     # Set up latex stuff and fonts
     rc('font', **{"sans-serif": ["Arial"], "size": 30})

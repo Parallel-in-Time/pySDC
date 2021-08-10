@@ -25,7 +25,7 @@ def create_plots(setup, cwd=''):
 
     vmin = 99
     vmax = 0
-    for file, strategy in fields:
+    for file, _ in fields:
         infile = np.load(cwd + 'data/' + file)
 
         data = infile['iter_count'].T

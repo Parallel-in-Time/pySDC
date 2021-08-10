@@ -236,7 +236,7 @@ def run_faulty_simulations(type=None, niters=None, cwd=''):
     # number of runs
     nruns = 500
     results = []
-    for nr in range(nruns):
+    for _ in range(nruns):
         # this is where the iteration is happening
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 

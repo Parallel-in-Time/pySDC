@@ -477,7 +477,7 @@ class controller_MPI(controller):
 
                 nsweeps = self.S.levels[l].params.nsweeps
 
-                for k in range(nsweeps):
+                for _ in range(nsweeps):
 
                     self.hooks.pre_comm(step=self.S, level_number=l)
 

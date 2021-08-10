@@ -28,8 +28,8 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     minres = 0
     maxres = -99
     for k, v in extract_stats.items():
-        maxprocs = max(maxprocs, getattr(k, 'process'))
-        maxiter = max(maxiter, getattr(k, 'iter'))
+        maxprocs = max(maxprocs, k.process)
+        maxiter = max(maxiter, k.iter)
         minres = min(minres, np.log10(v))
         maxres = max(maxres, np.log10(v))
 
@@ -37,8 +37,8 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     residual = np.zeros((maxiter, maxprocs + 1))
     residual[:] = -99
     for k, v in extract_stats.items():
-        step = getattr(k, 'process')
-        iter = getattr(k, 'iter')
+        step = k.process
+        iter = k.iter
         if iter is not -1:
             residual[iter - 1, step] = np.log10(v)
 

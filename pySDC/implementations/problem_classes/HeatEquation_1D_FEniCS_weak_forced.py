@@ -55,7 +55,7 @@ class fenics_heat_weak_fullyimplicit(ptype):
 
         # set mesh and refinement (for multilevel)
         mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
-        for i in range(problem_params['refinements']):
+        for _ in range(problem_params['refinements']):
             mesh = df.refine(mesh)
 
         # define function space for future reference
@@ -231,7 +231,7 @@ class fenics_heat_weak_imex(ptype):
 
         # set mesh and refinement (for multilevel)
         mesh = df.UnitIntervalMesh(problem_params['c_nvars'])
-        for i in range(problem_params['refinements']):
+        for _ in range(problem_params['refinements']):
             mesh = df.refine(mesh)
 
         # define function space for future reference

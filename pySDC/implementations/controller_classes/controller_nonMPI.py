@@ -35,12 +35,12 @@ class controller_nonMPI(controller):
 
         # try to initialize via dill.copy (much faster for many time-steps)
         try:
-            for p in range(num_procs - 1):
+            for _ in range(num_procs - 1):
                 self.MS.append(dill.copy(self.MS[0]))
         # if this fails (e.g. due to un-picklable data in the steps), initialize seperately
         except dill.PicklingError and TypeError:
             self.logger.warning('Need to initialize steps separately due to pickling error')
-            for p in range(num_procs - 1):
+            for _ in range(num_procs - 1):
                 self.MS.append(stepclass.step(description))
 
         if self.params.dump_setup:
@@ -548,7 +548,7 @@ class controller_nonMPI(controller):
 
                 # sweep on middle levels (not on finest, not on coarsest, though)
 
-                for k in range(self.nsweeps[l]):
+                for _ in range(self.nsweeps[l]):
 
                     for S in local_MS_running:
 

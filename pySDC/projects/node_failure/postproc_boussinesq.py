@@ -45,7 +45,7 @@ def create_plots(cwd=''):
     maxiter = 0
     vmax = -99
     vmin = -8
-    for file, strategy, label, color, marker in list:
+    for file, _, _, _, _ in list:
         data = np.load(cwd + 'data/' + file)
 
         iter_count = data['iter_count'][minstep:maxstep]
@@ -69,7 +69,7 @@ def create_plots(cwd=''):
 
     ymin = 99
     ymax = 0
-    for file, strategy, label, color, marker in list:
+    for file, _, label, color, marker in list:
 
         if file is not ref:
             data = np.load(cwd + 'data/' + file)
@@ -96,7 +96,7 @@ def create_plots(cwd=''):
     plt.savefig(fname, bbox_inches='tight')
     # os.system('pdfcrop ' + fname + ' ' + fname)
 
-    for file, strategy, label, color, marker in list:
+    for file, strategy, _, _, _ in list:
 
         data = np.load(cwd + 'data/' + file)
 

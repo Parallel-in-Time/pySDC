@@ -92,10 +92,9 @@ def compute_and_plot_itererror():
             extract_stats = filter_stats(stats, type='residual_post_iteration')
 
             for k, v in extract_stats.items():
-                iter = getattr(k, 'iter')
 
-                if iter is not -1:
-                    residual[cs_ind, nodes_ind, iter - 2] = v
+                if k.iter != -1:
+                    residual[cs_ind, nodes_ind, k.iter - 2] = v
 
             # Compute convergence rates
             for iter in range(0, step_params['maxiter'] - 1):

@@ -168,7 +168,7 @@ class step(FrozenClass):
         """
 
         max_val = 1
-        for k, v in in_dict.items():
+        for _, v in in_dict.items():
             if type(v) is list:
                 max_val = max(max_val, len(v))
             else:
