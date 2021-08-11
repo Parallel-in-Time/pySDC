@@ -77,7 +77,7 @@ If you use pySDC or parts of it for your work, great! Let us know if we can help
    ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019,
    `https://doi.org/10.1145/3310410 <https://doi.org/10.1145/3310410>`_
 
-The current software release can be cited using Zenodo: |badge|
+The current software release can be cited using Zenodo: |zenodo|
 
-.. |badge| image:: https://zenodo.org/badge/26165004.svg
+.. |zenodo| image:: https://zenodo.org/badge/26165004.svg
    :target: https://zenodo.org/badge/latestdoi/26165004
