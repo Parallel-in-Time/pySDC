@@ -7,7 +7,7 @@ Failure injectation as well as the different strategies are contained in ``emula
 We test our ideas for two simple toy problems and two more complex show cases.
 This project contains the code for the publication `Toward fault-tolerant parallel-in-time integration with PFASST <https://arxiv.org/abs/1510.08334>`_ of pySDC v2,
 while the original code can be found under `pySDC: Fault-tolerant PFASST <https://doi.org/10.5281/zenodo.32765>`_.
-Note that due to the long runtime, the results are not generated via Travis. Only the visualization (and therefore the existence of the data files) is tested.
+Note that due to the long runtime, the results are not generated via CI. Only the visualization (and therefore the existence of the data files) is tested.
 
 Propagation of a single node failure
 ------------------------------------
