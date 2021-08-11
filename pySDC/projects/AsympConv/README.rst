@@ -3,7 +3,7 @@ Asymptotic convergence of PFASST
 
 This project investigates the impact of the convergence results described in the paper "Asymptotic convergence of PFASST for linear problems".
 We use 1D heat equation and advection equation to show how PFASST converges in the stiff as well as in the non-stiff limit.
-Note that due to the long runtime, not all results are generated via Travis.
+Note that due to the long runtime, not all results are generated via CI.
 
 Organisation of the project
 ---------------------------

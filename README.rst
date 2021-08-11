@@ -15,7 +15,7 @@ Features
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
 - Works with `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_ , `FEniCS <https://fenicsproject.org/>`_ and `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_
-- Continuous integration via `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_
+- Continuous integration via `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_
 - Fully compatible with 3.6 (or higher)
 
 

@@ -1,9 +1,13 @@
 # added by check_manifest.py
 include *.md
 include *.txt
+include *.rst
 include .coveragerc
+include .flake8
 include Doxyfile
 include LICENSE
+include data/README
+
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst

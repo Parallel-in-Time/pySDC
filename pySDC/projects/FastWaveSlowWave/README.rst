@@ -5,7 +5,7 @@ In this project, we explore semi-implicit spectral deferred corrections (SISDC) 
 We study the performance of the method compared to standard integrators like RK-IMEX or DIRK schemes and analyze the convergence properties for scalar test problems.
 This project contains the code for the publication `Spectral deferred corrections with fast-wave-slow-wave splitting <http://dx.doi.org/10.1137/16M1060078>`_ of pySDC v2,
 while the original code can be found under `The fast-wave-slow-wave release, v2 <https://doi.org/10.5281/zenodo.53849>`_.
-Note that due to the long runtime, not all results are generated via Travis.
+Note that due to the long runtime, not all results are generated via CI.
 For the Boussinesq example and the convergence test of the acoustic-advection equation, only the visualization (and therefore the existence of the data files) is tested.
 We omit the codes in this documentation, since they are rather long and slightly complex.
 
