@@ -72,7 +72,7 @@ To work with the source files, checkout the code from Github and install the dep
 </pre></div>
 </div>
 <p>To check your installation, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nosetests -v pySDC/tests
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest pySDC/tests
 </pre></div>
 </div>
 <p>You may need to update your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> by running</p>
@@ -86,14 +86,14 @@ You can achieve this e.g. by</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpich petsc4py mpi4py fenics
 </pre></div>
 </div>
-<p>Most of the code is tested automatically using <a class="reference external" href="https://travis-ci.org/Parallel-in-Time/pySDC">Travis-CI</a>, so a working version of the installation process can always be found in the <cite>install</cite>-block of the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/.travis.yml">.travis.yml</a> file.</p>
+<p>Most of the code is tested automatically using <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">Github Actions</a>, so a working version of the installation process can always be found in the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml">ci_pipeline.yml</a> file.</p>
 <p>For many examples, <cite>LaTeX</cite> is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
 When using <cite>fenics</cite> or <cite>petsc4py</cite>, a C++ compiler is required (although installation may go through at first).</p>
 <p>For more details on <cite>pySDC</cite>, check out <a class="reference external" href="http://www.parallel-in-time.org/pySDC">http://www.parallel-in-time.org/pySDC</a>.</p>
 </div>
 <div class="section" id="how-to-cite">
 <h2>How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this headline">¶</a></h2>
-<p>If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using <a class="reference external" href="https://doi.org/10.1145/3310410">this paper</a>:</p>
+<p>If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation of <a class="reference external" href="https://doi.org/10.1145/3310410">this paper</a>:</p>
 <blockquote>
 <div><p>Robert Speck, <strong>Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections</strong>,
 ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019,
@@ -103,6 +103,11 @@ ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019
 <div class="section" id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <ul>
+<li><p>August 11, 2021: Version 4.1 has some more changes under the hood, most of them with no significant impact to users.
+The CI pipeline has been completely rewritten, porting the code to <a class="reference external" href="https://github.com/features/actions">Github Actions</a>
+(away from <a class="reference external" href="https://travis-ci.com/">Travis CI</a>), to <a class="reference external" href="https://flake8.pycqa.org">flake8</a> and to <a class="reference external" href="https://pytest.org">pytest</a>
+(away from <a class="reference external" href="https://nose.readthedocs.io">nose</a>). One thing that may have an impact on users is that following the changes
+made in Version 4.0, the PETSc data structures are now much easier, removing a lot of unnecessary boilerplate code.</p></li>
 <li><p>May 4, 2021: Long time, no see, but this major release 4.0 marks some improvements under the hood:</p>
 <ul class="simple">
 <li><p><strong>Rewrote ``mesh`` and ``particle`` data type</strong>: Creation of new arrays for each operation is now avoided by
@@ -250,14 +255,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
 </div>
 <div class="section" id="api-documentation">
 <h2>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
-<p>The Python files contained in <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">implementations</span></code> and <code class="docutils literal notranslate"><span class="pre">helpers</span></code> are fully documented and their API is generated automatically with sphinx-apidoc after each update.
-The API (as well as the tutorial pages) can also be generated manually and locally by executing</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&gt; ./docs/update_apidocs.sh
-&gt; nosetests -v --with-coverage --cover-erase --cover-inclusive --cover-package=pySDC/core,pySDC/implementations,pySDC/helpers,pySDC/tutorial --cover-html --cover-html-dir=target/doc/build/test_coverage pySDC/tests
-&gt; travis-sphinx build
-</pre></div>
-</div>
-<p>in the root directory. Then, the main index can be found in <code class="docutils literal notranslate"><span class="pre">target/doc/build/index.html</span></code>. Anyway, here is the online version:</p>
+<p>The Python files contained in <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">implementations</span></code> and <code class="docutils literal notranslate"><span class="pre">helpers</span></code> are fully documented and their API is generated automatically with sphinx-apidoc after each update:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pySDC/core.html">core package</a></li>
