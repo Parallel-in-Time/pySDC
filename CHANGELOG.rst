@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- August 11, 2021: Version 4.1 has some more changes under the hood, most of them with no significant impact to users.
+  The CI pipeline has been completely rewritten, porting the code to `Github Actions <https://github.com/features/actions>`_
+  (away from `Travis CI <https://travis-ci.com/>`_), to `flake8 <https://flake8.pycqa.org>`_ and to `pytest <https://pytest.org>`_
+  (away from `nose <https://nose.readthedocs.io>`_). One thing that may have an impact on users is that following the changes
+  made in Version 4.0, the PETSc data structures are now much easier, removing a lot of unnecessary boilerplate code.
+
 - May 4, 2021: Long time, no see, but this major release 4.0 marks some improvements under the hood:
 
   - **Rewrote ``mesh`` and ``particle`` data type**: Creation of new arrays for each operation is now avoided by
