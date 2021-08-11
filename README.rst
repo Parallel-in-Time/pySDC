@@ -42,7 +42,7 @@ To check your installation, run
 
 .. code-block:: bash
 
-   nosetests -v pySDC/tests
+   pytest pySDC/tests
 
 You may need to update your ``PYTHONPATH`` by running
 
@@ -60,7 +60,7 @@ You can achieve this e.g. by
 
    conda install -c conda-forge mpich petsc4py mpi4py fenics
 
-Most of the code is tested automatically using `Travis-CI <https://travis-ci.org/Parallel-in-Time/pySDC>`_, so a working version of the installation process can always be found in the `install`-block of the `.travis.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.travis.yml>`_ file.
+Most of the code is tested automatically using `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_, so a working version of the installation process can always be found in the `ci_pipeline.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>`_ file.
 
 For many examples, `LaTeX` is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
 When using `fenics` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
@@ -71,7 +71,7 @@ For more details on `pySDC`, check out `http://www.parallel-in-time.org/pySDC <h
 How to cite
 -----------
 
-If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation using `this paper <https://doi.org/10.1145/3310410>`_:
+If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation of `this paper <https://doi.org/10.1145/3310410>`_:
 
    Robert Speck, **Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections**, 
    ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019,
