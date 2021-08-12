@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Second-order Problems &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="matrixPFASST.html" title="Matrix-based versions of PFASST"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Second-order Problems</a></li> 
       </ul>
     </div>  
 
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="second-order-problems">
+  <section id="second-order-problems">
 <h1>Second-order Problems<a class="headerlink" href="#second-order-problems" title="Permalink to this headline">¶</a></h1>
 <p>In this project, we run several examples of the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/verlet.py">second-order Verlet-SDC integrator</a>.
 This SDC variant is the core integrator for the <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/implementations/sweeper_classes/boris_2nd_order.py">Boris method</a>, which we use e.g. in the 3rd tutorial.</p>
-<div class="section" id="simple-problems">
+<section id="simple-problems">
 <h2>Simple problems<a class="headerlink" href="#simple-problems" title="Permalink to this headline">¶</a></h2>
 <p>We first test the integrator for some rather simple problems, namely the harmonic oscillator and the Henon-Heiles problem.
 For both problems we make use of the hook <code class="docutils literal notranslate"><span class="pre">hamiltonian_output</span></code> to monitor the deviation from the exact Hamiltonian.
@@ -297,17 +297,17 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="projects/../../../data/harmonic_hamiltonian.png"><img alt="projects/../../../data/harmonic_hamiltonian.png" src="projects/../../../data/harmonic_hamiltonian.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/henonheiles_hamiltonian.png"><img alt="projects/../../../data/henonheiles_hamiltonian.png" src="projects/../../../data/henonheiles_hamiltonian.png" /></a>
-</div>
-<div class="section" id="solar-system-problem">
+<a class="reference internal image-reference" href="../../data/harmonic_hamiltonian.png"><img alt="../../data/harmonic_hamiltonian.png" src="../../data/harmonic_hamiltonian.png" /></a>
+<a class="reference internal image-reference" href="../../data/henonheiles_hamiltonian.png"><img alt="../../data/henonheiles_hamiltonian.png" src="../../data/henonheiles_hamiltonian.png" /></a>
+</section>
+<section id="solar-system-problem">
 <h2>Solar system problem<a class="headerlink" href="#solar-system-problem" title="Permalink to this headline">¶</a></h2>
 <p>In this slightly more complex setup we simulate the movement of planets in the solar system.
 The acceleration due to gravitational forces are computed using a simple N^2 solver.
 We can use two different setups:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">OuterSolarSystem</span></code> problem class: only the six outer planets are simulated, namely the Sun (which in its mass contains the inner planets), Jupiter, Saturn, Uranus, Neptune and Pluto.</li>
-<li><code class="docutils literal notranslate"><span class="pre">FullSolarSystem</span></code> problem class: all planets are simulated, with earth and moon combined</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OuterSolarSystem</span></code> problem class: only the six outer planets are simulated, namely the Sun (which in its mass contains the inner planets), Jupiter, Saturn, Uranus, Neptune and Pluto.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FullSolarSystem</span></code> problem class: all planets are simulated, with earth and moon combined</p></li>
 </ul>
 <p>Coarsening can be done using only the sun for computing the acceleration.
 Note how PFASST works very well for the outer solar system problem, but not so well for the full solar system problem.
@@ -598,12 +598,12 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="projects/../../../data/outer_solar_system_hamiltonian.png"><img alt="projects/../../../data/outer_solar_system_hamiltonian.png" src="projects/../../../data/outer_solar_system_hamiltonian.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/outer_solar_system_positions.png"><img alt="projects/../../../data/outer_solar_system_positions.png" src="projects/../../../data/outer_solar_system_positions.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/full_solar_system_hamiltonian.png"><img alt="projects/../../../data/full_solar_system_hamiltonian.png" src="projects/../../../data/full_solar_system_hamiltonian.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/full_solar_system_positions.png"><img alt="projects/../../../data/full_solar_system_positions.png" src="projects/../../../data/full_solar_system_positions.png" /></a>
-</div>
-<div class="section" id="fermi-pasta-ulam-tsingou-problem">
+<a class="reference internal image-reference" href="../../data/outer_solar_system_hamiltonian.png"><img alt="../../data/outer_solar_system_hamiltonian.png" src="../../data/outer_solar_system_hamiltonian.png" /></a>
+<a class="reference internal image-reference" href="../../data/outer_solar_system_positions.png"><img alt="../../data/outer_solar_system_positions.png" src="../../data/outer_solar_system_positions.png" /></a>
+<a class="reference internal image-reference" href="../../data/full_solar_system_hamiltonian.png"><img alt="../../data/full_solar_system_hamiltonian.png" src="../../data/full_solar_system_hamiltonian.png" /></a>
+<a class="reference internal image-reference" href="../../data/full_solar_system_positions.png"><img alt="../../data/full_solar_system_positions.png" src="../../data/full_solar_system_positions.png" /></a>
+</section>
+<section id="fermi-pasta-ulam-tsingou-problem">
 <h2>Fermi-Pasta-Ulam-Tsingou problem<a class="headerlink" href="#fermi-pasta-ulam-tsingou-problem" title="Permalink to this headline">¶</a></h2>
 <p>This is the famous FPUT problem, one of the first numerical simulation done in physics.
 The basis for this setup can be found <a class="reference external" href="http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations">here</a> and we implement this in the <code class="docutils literal notranslate"><span class="pre">FermiPastaUlamTsingou</span></code> problem class.
@@ -860,14 +860,15 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="projects/../../../data/fput_hamiltonian.png"><img alt="projects/../../../data/fput_hamiltonian.png" src="projects/../../../data/fput_hamiltonian.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/fput_positions.png"><img alt="projects/../../../data/fput_positions.png" src="projects/../../../data/fput_positions.png" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/fput_energy.png"><img alt="projects/../../../data/fput_energy.png" src="projects/../../../data/fput_energy.png" /></a>
+<a class="reference internal image-reference" href="../../data/fput_hamiltonian.png"><img alt="../../data/fput_hamiltonian.png" src="../../data/fput_hamiltonian.png" /></a>
+<a class="reference internal image-reference" href="../../data/fput_positions.png"><img alt="../../data/fput_positions.png" src="../../data/fput_positions.png" /></a>
+<a class="reference internal image-reference" href="../../data/fput_energy.png"><img alt="../../data/fput_energy.png" src="../../data/fput_energy.png" /></a>
 <a class="reference internal image-reference" href="../_images/fput_energy_full.png"><img alt="../_images/fput_energy_full.png" src="../_images/fput_energy_full.png" style="width: 347.0px; height: 181.0px;" /></a>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -897,17 +898,15 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -927,12 +926,13 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
         <li class="right" >
           <a href="matrixPFASST.html" title="Matrix-based versions of PFASST"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Second-order Problems</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

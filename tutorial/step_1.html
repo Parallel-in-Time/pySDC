@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Step-1: A first spatial problem &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="../index.html" title="Welcome to pySDC!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-1: A first spatial problem</a></li> 
       </ul>
     </div>  
 
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="step-1-a-first-spatial-problem">
+  <section id="step-1-a-first-spatial-problem">
 <h1>Step-1: A first spatial problem<a class="headerlink" href="#step-1-a-first-spatial-problem" title="Permalink to this headline">¶</a></h1>
 <p>In this step, we create a spatial problem and play with it a little bit.
 No SDC, no multi-level here so far.</p>
-<div class="section" id="part-a-spatial-problem-setup">
+<section id="part-a-spatial-problem-setup">
 <h2>Part A: Spatial problem setup<a class="headerlink" href="#part-a-spatial-problem-setup" title="Permalink to this headline">¶</a></h2>
 <p>We start as simple as possible by creating a first, very simple problem
 using one of the <code class="docutils literal notranslate"><span class="pre">problem_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code>.
@@ -58,11 +58,11 @@ finite difference discretization of the 1D Laplacian. This is tested for
 one particular example.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>Many (most) parameters for pySDC are passed using dictionaries</li>
-<li>Data types are encapsulated: the real values are stored in
+<li><p>Many (most) parameters for pySDC are passed using dictionaries</p></li>
+<li><p>Data types are encapsulated: the real values are stored in
 <code class="docutils literal notranslate"><span class="pre">values</span></code>, meta-information can be stored separately in the data
-structure</li>
-<li>A quick peak into <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code> reveals that the <code class="docutils literal notranslate"><span class="pre">init</span></code>
+structure</p></li>
+<li><p>A quick peak into <code class="docutils literal notranslate"><span class="pre">HeatEquation_1D_FD</span></code> reveals that the <code class="docutils literal notranslate"><span class="pre">init</span></code>
 and the <code class="docutils literal notranslate"><span class="pre">params.nvars</span></code> attribute contain the same values (namely
 <code class="docutils literal notranslate"><span class="pre">nvars</span></code>). Yet, sometime the one or the other is used here (and
 throughout the code). The reason is this: the data structure
@@ -71,9 +71,9 @@ For this, pySDC uses the <code class="docutils literal notranslate"><span class=
 In our simple example, this is he same as <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, but e.g. for
 Finite Elements, the function space is stored in the <code class="docutils literal notranslate"><span class="pre">init</span></code>
 attribute. Thus, whenever a data type is created, use <code class="docutils literal notranslate"><span class="pre">init</span></code>,
-otherwise do whatever looks nice.</li>
-<li>We happily pass classes around so that they can be used to
-instantiate things within subroutines</li>
+otherwise do whatever looks nice.</p></li>
+<li><p>We happily pass classes around so that they can be used to
+instantiate things within subroutines</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/A_spatial_problem_setup.py">pySDC/tutorial/step_1/A_spatial_problem_setup.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -141,8 +141,8 @@ instantiate things within subroutines</li>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-b-spatial-accuracy-check">
+</section>
+<section id="part-b-spatial-accuracy-check">
 <h2>Part B: Spatial accuracy check<a class="headerlink" href="#part-b-spatial-accuracy-check" title="Permalink to this headline">¶</a></h2>
 <p>We now do a more thorough test of the accuracy of the spatial
 discretization. We loop over a set of <code class="docutils literal notranslate"><span class="pre">nvars</span></code>, compute the Laplacian
@@ -150,10 +150,10 @@ of our test vector and look at the error. Then, the order of accuracy in
 space is checked by looking at the numbers and by looking at “points on a line”.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>You better test your operators.. use nvars &gt; 2**16 and things will
-break!</li>
-<li>Add your results into a dictionary for later usage. Use IDs to find
-the data! Also, use headers to store meta-information.</li>
+<li><p>You better test your operators.. use nvars &gt; 2**16 and things will
+break!</p></li>
+<li><p>Add your results into a dictionary for later usage. Use IDs to find
+the data! Also, use headers to store meta-information.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/B_spatial_accuracy_check.py">pySDC/tutorial/step_1/B_spatial_accuracy_check.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -343,9 +343,9 @@ the data! Also, use headers to store meta-information.</li>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="tutorial/../../../step_1_accuracy_test_space.png"><img alt="tutorial/../../../step_1_accuracy_test_space.png" src="tutorial/../../../step_1_accuracy_test_space.png" /></a>
-</div>
-<div class="section" id="part-c-collocation-problem-setup">
+<a class="reference internal image-reference" href="../../step_1_accuracy_test_space.png"><img alt="../../step_1_accuracy_test_space.png" src="../../step_1_accuracy_test_space.png" /></a>
+</section>
+<section id="part-c-collocation-problem-setup">
 <h2>Part C: Collocation problem setup<a class="headerlink" href="#part-c-collocation-problem-setup" title="Permalink to this headline">¶</a></h2>
 <p>Here, we set up our first collocation problem using one of the
 <code class="docutils literal notranslate"><span class="pre">collocation_classes</span></code>, namely <code class="docutils literal notranslate"><span class="pre">GaussRadau_Right</span></code>. Using the spatial
@@ -354,19 +354,19 @@ linear. This fully coupled system is then solved directly and the error
 is compared to the exact solution.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>The collocation matrix <code class="docutils literal notranslate"><span class="pre">Q</span></code> is and will be always relative to the
-temporal domain [0,1]. Use <code class="docutils literal notranslate"><span class="pre">dt</span></code> to scale it appropriately.</li>
-<li>Although convenient to analyze, the matrix formulation is not suited
+<li><p>The collocation matrix <code class="docutils literal notranslate"><span class="pre">Q</span></code> is and will be always relative to the
+temporal domain [0,1]. Use <code class="docutils literal notranslate"><span class="pre">dt</span></code> to scale it appropriately.</p></li>
+<li><p>Although convenient to analyze, the matrix formulation is not suited
 for larger (in space or time) computations. All remaining
 computations in pySDC are thus based on decoupling space and time
-operators (i.e. no Kronecker product).</li>
-<li>We can use the <code class="docutils literal notranslate"><span class="pre">u_exact</span></code> routine here to return the values at any
+operators (i.e. no Kronecker product).</p></li>
+<li><p>We can use the <code class="docutils literal notranslate"><span class="pre">u_exact</span></code> routine here to return the values at any
 given point in time. It is recommended to include either an
 initialization routine or the exact solution (if applicable) into the
-problem class.</li>
-<li>This is where the fun with parameters comes in: How many DOFs do we
+problem class.</p></li>
+<li><p>This is where the fun with parameters comes in: How many DOFs do we
 need in space? How large/small does dt have to be? What frequency in
-space is fine? …</li>
+space is fine? …</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/C_collocation_problem_setup.py">pySDC/tutorial/step_1/C_collocation_problem_setup.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -449,19 +449,19 @@ space is fine? …</li>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-d-collocation-accuracy-test">
+</section>
+<section id="part-d-collocation-accuracy-test">
 <h2>Part D: Collocation accuracy test<a class="headerlink" href="#part-d-collocation-accuracy-test" title="Permalink to this headline">¶</a></h2>
 <p>As for the spatial operator, we now test the accuracy in time. This
 time, we loop over a set of <code class="docutils literal notranslate"><span class="pre">dt</span></code>, compute the solution to the
 collocation problem and look at the error.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>We take a large number of DOFs in space, since we need to beat 5th
-order in time with a 2nd order stencil in space.</li>
-<li>Orders of convergence are not as stable as for the space-only test.
+<li><p>We take a large number of DOFs in space, since we need to beat 5th
+order in time with a 2nd order stencil in space.</p></li>
+<li><p>Orders of convergence are not as stable as for the space-only test.
 One of the problems of this example is that we are actually trying to
-compute 0 very, very thorougly…</li>
+compute 0 very, very thorougly…</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_1/D_collocation_accuracy_check.py">pySDC/tutorial/step_1/D_collocation_accuracy_check.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib</span>
@@ -663,11 +663,12 @@ compute 0 very, very thorougly…</li>
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="tutorial/../../../step_1_accuracy_test_coll.png"><img alt="tutorial/../../../step_1_accuracy_test_coll.png" src="tutorial/../../../step_1_accuracy_test_coll.png" /></a>
-</div>
-</div>
+<a class="reference internal image-reference" href="../../step_1_accuracy_test_coll.png"><img alt="../../step_1_accuracy_test_coll.png" src="../../step_1_accuracy_test_coll.png" /></a>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -698,17 +699,15 @@ compute 0 very, very thorougly…</li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -728,12 +727,13 @@ compute 0 very, very thorougly…</li>
         <li class="right" >
           <a href="../index.html" title="Welcome to pySDC!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-1: A first spatial problem</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

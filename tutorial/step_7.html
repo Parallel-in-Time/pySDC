@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Step-7: pySDC with external libraries &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="step_6.html" title="Step-6: Advanced PFASST controllers"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-7: pySDC with external libraries</a></li> 
       </ul>
     </div>  
 
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="step-7-pysdc-with-external-libraries">
+  <section id="step-7-pysdc-with-external-libraries">
 <h1>Step-7: pySDC with external libraries<a class="headerlink" href="#step-7-pysdc-with-external-libraries" title="Permalink to this headline">¶</a></h1>
 <p>pySDC can be used with external libraries, in particular for spatial discretization, parallelization and solving of linear and/or nonlinear systems.
 In the following, we show a few examples of pySDC + X.</p>
-<div class="section" id="part-a-pysdc-and-fenics">
+<section id="part-a-pysdc-and-fenics">
 <h2>Part A: pySDC and FEniCS<a class="headerlink" href="#part-a-pysdc-and-fenics" title="Permalink to this headline">¶</a></h2>
 <p>In this example, pySDC is coupled with the <a class="reference external" href="https://fenicsproject.org/">FEniCS framework</a> for using finite elements in space.
 This implies significant changes to the algorithm, depending on whether or not the mass matrix should be inverted.
@@ -58,8 +58,8 @@ Otherwise, the mass matrix has to be used for e.g. the tau-correction.
 This example tests different variants of this methodology for SDC, MLSDC and PFASST.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>This example shows that even core routines like the <cite>BaseTransfer</cite> can be overwritten if needed.</li>
-<li>It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be found in the <cite>implementations</cite> folder.</li>
+<li><p>This example shows that even core routines like the <cite>BaseTransfer</cite> can be overwritten if needed.</p></li>
+<li><p>It is also valuable to check out the data type and transfer classes required to work with FEniCS. Both can be found in the <cite>implementations</cite> folder.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py">pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -245,8 +245,8 @@ This example tests different variants of this methodology for SDC, MLSDC and PFA
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-b-mpi4py-fft-for-parallel-fourier-transforms">
+</section>
+<section id="part-b-mpi4py-fft-for-parallel-fourier-transforms">
 <h2>Part B: mpi4py-fft for parallel Fourier transforms<a class="headerlink" href="#part-b-mpi4py-fft-for-parallel-fourier-transforms" title="Permalink to this headline">¶</a></h2>
 <p>The most prominent parallel solver is, probably, the FFT.
 While many implementations or wrappers for Python exist, we decided to use <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a>, which provided the easiest installation, a simple API and good parallel scaling.
@@ -255,8 +255,8 @@ The code allows to work both in real and spectral space, while the latter is usu
 This example tests SDC, MLSDC and PFASST.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>The code runs both in serial using just <cite>python B_pySDC_with_mpi4pyfft.py</cite> and also in parallel using <cite>mpirun -np 2 python B_pySDC_with_mpi4pyfft.py</cite>.</li>
-<li>The nonlinear Schrödinger example is not expected to work well with PFASST. In fact, SDC and MLSDC converge for larger time-steps, but PFASST does not.</li>
+<li><p>The code runs both in serial using just <cite>python B_pySDC_with_mpi4pyfft.py</cite> and also in parallel using <cite>mpirun -np 2 python B_pySDC_with_mpi4pyfft.py</cite>.</p></li>
+<li><p>The nonlinear Schrödinger example is not expected to work well with PFASST. In fact, SDC and MLSDC converge for larger time-steps, but PFASST does not.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py">pySDC/tutorial/step_7/B_pySDC_with_mpi4pyfft.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -413,8 +413,8 @@ This example tests SDC, MLSDC and PFASST.</p>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-c-time-parallel-pysdc-with-space-parallel-petsc">
+</section>
+<section id="part-c-time-parallel-pysdc-with-space-parallel-petsc">
 <h2>Part C: Time-parallel pySDC with space-parallel PETSc<a class="headerlink" href="#part-c-time-parallel-pysdc-with-space-parallel-petsc" title="Permalink to this headline">¶</a></h2>
 <p>With rather unfavorable scaling properties, parallel-in-time methods are only really useful when spatial parallelization is maxed out.
 To work with spatial parallelization, this part shows how to (1) include and work with an external library and (2) set up space- and time-parallel runs.
@@ -422,8 +422,8 @@ We use again the forced heat equation as our testbed and <a class="reference ext
 See <cite>implementations/datatype_classes/petsc_dmda_grid.py</cite> and <cite>implementations/problem_classes/HeatEquation_2D_PETSc_forced.py</cite> for details on the PETSc bindings.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>We need processors in space and time, which can be achieved by <cite>comm.Split</cite> and coloring. The space-communicator is then passed to the problem class.</li>
-<li>Below we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.</li>
+<li><p>We need processors in space and time, which can be achieved by <cite>comm.Split</cite> and coloring. The space-communicator is then passed to the problem class.</p></li>
+<li><p>Below we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/C_pySDC_with_PETSc.py">pySDC/tutorial/step_7/C_pySDC_with_PETSc.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
@@ -595,10 +595,11 @@ See <cite>implementations/datatype_classes/petsc_dmda_grid.py</cite> and <cite>i
 <p>1 processor in time, 1 processor in space</p>
 <p>1 processor in time, 2 processors in space</p>
 <p>2 processor in time, 2 processors in space</p>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -628,17 +629,15 @@ See <cite>implementations/datatype_classes/petsc_dmda_grid.py</cite> and <cite>i
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -658,12 +657,13 @@ See <cite>implementations/datatype_classes/petsc_dmda_grid.py</cite> and <cite>i
         <li class="right" >
           <a href="step_6.html" title="Step-6: Advanced PFASST controllers"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-7: pySDC with external libraries</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

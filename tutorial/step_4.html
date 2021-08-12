@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Step-4: Multilevel SDC &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-4: Multilevel SDC</a></li> 
       </ul>
     </div>  
 
@@ -45,11 +45,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="step-4-multilevel-sdc">
+  <section id="step-4-multilevel-sdc">
 <h1>Step-4: Multilevel SDC<a class="headerlink" href="#step-4-multilevel-sdc" title="Permalink to this headline">¶</a></h1>
 <p>In this step, we will show how pySDC creates a multilevel hierarchy and
 how MLSDC can be run and tested.</p>
-<div class="section" id="part-a-spatial-transfer-operators">
+<section id="part-a-spatial-transfer-operators">
 <h2>Part A: Spatial transfer operators<a class="headerlink" href="#part-a-spatial-transfer-operators" title="Permalink to this headline">¶</a></h2>
 <p>For a mjltilevel hierarchy, we need transfer operators. The user, having
 knowledge of the data types, will have to provide a
@@ -59,12 +59,12 @@ with two different resolutions and check the order of interpolation (4
 in this case).</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>As for the sweeper and many other things, the user does not have to
+<li><p>As for the sweeper and many other things, the user does not have to
 deal with the instantiation of the transfer class, when one of the
-controllers is used. This is for demonstrational purpose only.</li>
-<li>MLSDC (and PFASST) rely on high-order interpolation in space. When
+controllers is used. This is for demonstrational purpose only.</p></li>
+<li><p>MLSDC (and PFASST) rely on high-order interpolation in space. When
 using Lagrange-based interpolation, orders above 4-6 are recommended.
-Restriction, however, can be of order 2 and is thus not tested here.</li>
+Restriction, however, can be of order 2 and is thus not tested here.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/A_spatial_transfer_operators.py">pySDC/tutorial/step_4/A_spatial_transfer_operators.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
@@ -153,8 +153,8 @@ Restriction, however, can be of order 2 and is thus not tested here.</li>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-b-multilevel-hierarchy">
+</section>
+<section id="part-b-multilevel-hierarchy">
 <h2>Part B: Multilevel hierarchy<a class="headerlink" href="#part-b-multilevel-hierarchy" title="Permalink to this headline">¶</a></h2>
 <p>In this example, we demonstrate how the step class creates the
 space-time hierarchy dynamically, depending on the description and its
@@ -171,14 +171,14 @@ of problem classes. The first entry of each list will always belong to
 the finest level.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>Not all lists must habe the same length: The longest list defines the
+<li><p>Not all lists must habe the same length: The longest list defines the
 number of levels and if other lists are shorter, the levels get the
-last entry in these lists (3 nodes on level 1 and 2 in this example).</li>
-<li>As for most other parameters, <code class="docutils literal notranslate"><span class="pre">space_transfer_class</span></code> and
-<code class="docutils literal notranslate"><span class="pre">space_transfer_params</span></code> are part of the description of the problem.</li>
-<li>For advanced users: it is also possible to pass parameters to the
+last entry in these lists (3 nodes on level 1 and 2 in this example).</p></li>
+<li><p>As for most other parameters, <code class="docutils literal notranslate"><span class="pre">space_transfer_class</span></code> and
+<code class="docutils literal notranslate"><span class="pre">space_transfer_params</span></code> are part of the description of the problem.</p></li>
+<li><p>For advanced users: it is also possible to pass parameters to the
 <code class="docutils literal notranslate"><span class="pre">base_transfer</span></code> by specifying <code class="docutils literal notranslate"><span class="pre">base_transfer_params</span></code> or even
-replace this by defining <code class="docutils literal notranslate"><span class="pre">base_transfer_class</span></code> in the description.</li>
+replace this by defining <code class="docutils literal notranslate"><span class="pre">base_transfer_class</span></code> in the description.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/B_multilevel_hierarchy.py">pySDC/tutorial/step_4/B_multilevel_hierarchy.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.core.Step</span> <span class="kn">import</span> <span class="n">step</span>
@@ -251,8 +251,8 @@ replace this by defining <code class="docutils literal notranslate"><span class=
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-c-sdc-vs-mlsdc">
+</section>
+<section id="part-c-sdc-vs-mlsdc">
 <h2>Part C: SDC vs. MLSDC<a class="headerlink" href="#part-c-sdc-vs-mlsdc" title="Permalink to this headline">¶</a></h2>
 <p>After we have seen how a hierarchy is created, we now run MLSDC and
 compare the results with SDC. We create two different descriptions and
@@ -261,11 +261,11 @@ heat equation. We see that the results are pretty much the same, while
 MLSDC only takes about half as many iterations.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>In this case, the number of iterations is halved when using MLSDC.
+<li><p>In this case, the number of iterations is halved when using MLSDC.
 This is the best case and in many situations, this cannot be
-achieved. In particular, the interpolation order is crucial.</li>
-<li>Using the controller parameter <code class="docutils literal notranslate"><span class="pre">predict</span></code>, we can turn the coarse level predictor on (default) or off in the case of MLSDC or PFASST.</li>
-<li>While MLSDC looks less expensive, the number of evaluations of the
+achieved. In particular, the interpolation order is crucial.</p></li>
+<li><p>Using the controller parameter <code class="docutils literal notranslate"><span class="pre">predict</span></code>, we can turn the coarse level predictor on (default) or off in the case of MLSDC or PFASST.</p></li>
+<li><p>While MLSDC looks less expensive, the number of evaluations of the
 right-hand side of the ODE is basically the same: This is due to the
 fact that after each coarse grid correction (i.e. after the
 interpolation), the right-hand side needs to be re-evaluated on the
@@ -273,7 +273,7 @@ finer level to be prepared for the next sweep. One way of improving
 this is to do the interpolation also in the right-hand side itself.
 This can be achieved by specifying
 <code class="docutils literal notranslate"><span class="pre">base_transfer_params['finter]</span> <span class="pre">=</span> <span class="pre">True</span></code> and by passing it to the
-description. See also Part D.</li>
+description. See also Part D.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py">pySDC/tutorial/step_4/C_SDC_vs_MLSDC.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
@@ -397,8 +397,8 @@ description. See also Part D.</li>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="part-d-mlsdc-with-particles">
+</section>
+<section id="part-d-mlsdc-with-particles">
 <h2>Part D: MLSDC with particles<a class="headerlink" href="#part-d-mlsdc-with-particles" title="Permalink to this headline">¶</a></h2>
 <p>For this example, we return to the Boris solver and show how coarsening
 can be done beyond degrees of freedom in space or collocation nodes.
@@ -419,14 +419,14 @@ interpolation! To this end, we also use f-interpolation, which increases
 the iteration counts a bit but leads to a slightly reduced runtime.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li>Again, the number of MLSDC iterations is highly sensitive to the
+<li><p>Again, the number of MLSDC iterations is highly sensitive to the
 interplay of all the different parameters (number of particles,
 smoothing parameter, number of nodes, residual tolerance etc.). It is
 by far not trivial to get a speedup at all (although a reasonable
-setup has been chosen here).</li>
-<li>Of course, this type of coarsening can be combined with the generic
+setup has been chosen here).</p></li>
+<li><p>Of course, this type of coarsening can be combined with the generic
 coarsening strategies. Yet, using a reduced number of collocation
-nodes leads to increased iteration counts here.</li>
+nodes leads to increased iteration counts here.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_4/D_MLSDC_with_particles.py">pySDC/tutorial/step_4/D_MLSDC_with_particles.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
@@ -570,10 +570,11 @@ nodes leads to increased iteration counts here.</li>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -604,17 +605,15 @@ nodes leads to increased iteration counts here.</li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -634,12 +633,13 @@ nodes leads to increased iteration counts here.</li>
         <li class="right" >
           <a href="step_3.html" title="Step-3: Statistics and a new sweeper"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Step-4: Multilevel SDC</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

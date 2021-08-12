@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Asymptotic convergence of PFASST &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="RDC.html" title="RDC: Rational Deferred Corrections"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Asymptotic convergence of PFASST</a></li> 
       </ul>
     </div>  
 
@@ -45,27 +45,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="asymptotic-convergence-of-pfasst">
+  <section id="asymptotic-convergence-of-pfasst">
 <h1>Asymptotic convergence of PFASST<a class="headerlink" href="#asymptotic-convergence-of-pfasst" title="Permalink to this headline">¶</a></h1>
 <p>This project investigates the impact of the convergence results described in the paper “Asymptotic convergence of PFASST for linear problems”.
 We use 1D heat equation and advection equation to show how PFASST converges in the stiff as well as in the non-stiff limit.
 Note that due to the long runtime, not all results are generated via CI.</p>
-<div class="section" id="organisation-of-the-project">
+<section id="organisation-of-the-project">
 <h2>Organisation of the project<a class="headerlink" href="#organisation-of-the-project" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">conv_test_to0.py</span></code> and <code class="docutils literal notranslate"><span class="pre">conv_test_toinf.py</span></code>: plots spectral radius of the smoother’s iteration matrix for different eigenvalues. See Figures 1 and 2 in the paper.</li>
-<li><code class="docutils literal notranslate"><span class="pre">smoother_specrad_heatmap.py</span></code>: generates heatmap of the spectral radius of the smoother’s iteration matrix for different eigenvalues in the test equation. See Figure 3.</li>
-<li><code class="docutils literal notranslate"><span class="pre">PFASST_conv_tests.py</span></code> and <code class="docutils literal notranslate"><span class="pre">PFASST_conv_Linf.py</span></code>: runs PFASST for advection and diffusion checking teh iteration counts until convergence. See Figures 4 and 5 and below.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conv_test_to0.py</span></code> and <code class="docutils literal notranslate"><span class="pre">conv_test_toinf.py</span></code>: plots spectral radius of the smoother’s iteration matrix for different eigenvalues. See Figures 1 and 2 in the paper.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">smoother_specrad_heatmap.py</span></code>: generates heatmap of the spectral radius of the smoother’s iteration matrix for different eigenvalues in the test equation. See Figure 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PFASST_conv_tests.py</span></code> and <code class="docutils literal notranslate"><span class="pre">PFASST_conv_Linf.py</span></code>: runs PFASST for advection and diffusion checking teh iteration counts until convergence. See Figures 4 and 5 and below.</p></li>
 </ul>
 <p>Results:</p>
-<a class="reference internal image-reference" href="projects/../../../data/conv_test_niter_NS3.png"><img alt="projects/../../../data/conv_test_niter_NS3.png" src="projects/../../../data/conv_test_niter_NS3.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/conv_test_niter_NS2.png"><img alt="projects/../../../data/conv_test_niter_NS2.png" src="projects/../../../data/conv_test_niter_NS2.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/conv_test_niter_Linf_diffusion.png"><img alt="projects/../../../data/conv_test_niter_Linf_diffusion.png" src="projects/../../../data/conv_test_niter_Linf_diffusion.png" style="width: 19%;" /></a>
-<a class="reference internal image-reference" href="projects/../../../data/conv_test_niter_Linf_advection.png"><img alt="projects/../../../data/conv_test_niter_Linf_advection.png" src="projects/../../../data/conv_test_niter_Linf_advection.png" style="width: 19%;" /></a>
-</div>
-</div>
+<a class="reference internal image-reference" href="../../data/conv_test_niter_NS3.png"><img alt="../../data/conv_test_niter_NS3.png" src="../../data/conv_test_niter_NS3.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../../data/conv_test_niter_NS2.png"><img alt="../../data/conv_test_niter_NS2.png" src="../../data/conv_test_niter_NS2.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../../data/conv_test_niter_Linf_diffusion.png"><img alt="../../data/conv_test_niter_Linf_diffusion.png" src="../../data/conv_test_niter_Linf_diffusion.png" style="width: 19%;" /></a>
+<a class="reference internal image-reference" href="../../data/conv_test_niter_Linf_advection.png"><img alt="../../data/conv_test_niter_Linf_advection.png" src="../../data/conv_test_niter_Linf_advection.png" style="width: 19%;" /></a>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -93,17 +94,15 @@ Note that due to the long runtime, not all results are generated via CI.</p>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -123,12 +122,13 @@ Note that due to the long runtime, not all results are generated via CI.</p>
         <li class="right" >
           <a href="RDC.html" title="RDC: Rational Deferred Corrections"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Asymptotic convergence of PFASST</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

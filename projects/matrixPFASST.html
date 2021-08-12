@@ -1,20 +1,19 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Matrix-based versions of PFASST &#8212; pySDC 4.1.1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +35,8 @@
         <li class="right" >
           <a href="asymp_conv.html" title="Asymptotic convergence of PFASST"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Matrix-based versions of PFASST</a></li> 
       </ul>
     </div>  
 
@@ -45,13 +45,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="matrix-based-versions-of-pfasst">
+  <section id="matrix-based-versions-of-pfasst">
 <h1>Matrix-based versions of PFASST<a class="headerlink" href="#matrix-based-versions-of-pfasst" title="Permalink to this headline">¶</a></h1>
 <p>In this project, we use and test two matrix-based version of PFASST for linear problems:
 we write PFASST as a standard twogrid method and we derive the propagaton matrix of PFASST.
 Both approaches are compared to the standard multigrid controller of PFASST and with each other.
 This includes tests with the heat, the advection as well as the test equation.</p>
-<div class="section" id="matrix-based-pfasst">
+<section id="matrix-based-pfasst">
 <h2>Matrix-based PFASST<a class="headerlink" href="#matrix-based-pfasst" title="Permalink to this headline">¶</a></h2>
 <p>When written as a multigrid method for a linear composite collocation problem, PFASST can be compactly defined via a
 smoothing and a coarse-grid correction step, just as a standard two-grid method. In the new (and very specialized)
@@ -340,8 +340,8 @@ against the standard PFASST implementation.</p>
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-<div class="section" id="propagator-based-pfasst">
+</section>
+<section id="propagator-based-pfasst">
 <h2>Propagator-based PFASST<a class="headerlink" href="#propagator-based-pfasst" title="Permalink to this headline">¶</a></h2>
 <p>The second approach follows directly from the matrix formulation: instead of writing PFASST as an iterative scheme,
 we now derive the full propagation matrix, which takes the initial value u0 and produces the final value uend,
@@ -619,10 +619,11 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
 </pre></div>
 </div>
 <p>Results:</p>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -651,17 +652,15 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -681,12 +680,13 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
         <li class="right" >
           <a href="asymp_conv.html" title="Asymptotic convergence of PFASST"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Matrix-based versions of PFASST</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>
