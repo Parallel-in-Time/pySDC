@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Assuring we are running in the project's root
 [[ -d "${PWD}/docs" && "./docs/update_apidocs.sh" == "$0" ]] ||
     {
