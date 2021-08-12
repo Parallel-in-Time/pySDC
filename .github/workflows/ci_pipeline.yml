@@ -53,7 +53,8 @@ jobs:
         uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "docs/"
-          
+          pre-build-command: "export PYTHONPATH=$PYTHONPATH:/usr/share/miniconda/envs/test/lib/python3.7/site-packages"
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         if: ${{ github.event_name == 'push' }}
