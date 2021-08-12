@@ -15,7 +15,7 @@ Features
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
 - Works with `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_ , `FEniCS <https://fenicsproject.org/>`_ and `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_
-- Continuous integration via `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_
+- Continuous integration via `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`__
 - Fully compatible with 3.6 (or higher)
 
 
@@ -60,7 +60,7 @@ You can achieve this e.g. by
 
    conda install -c conda-forge mpich petsc4py mpi4py fenics
 
-Most of the code is tested automatically using `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_, so a working version of the installation process can always be found in the `ci_pipeline.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>`_ file.
+Most of the code is tested automatically using `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`__, so a working version of the installation process can always be found in the `ci_pipeline.yml <https://github.com/Parallel-in-Time/pySDC/blob/master/.github/workflows/ci_pipeline.yml>`_ file.
 
 For many examples, `LaTeX` is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
 When using `fenics` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
