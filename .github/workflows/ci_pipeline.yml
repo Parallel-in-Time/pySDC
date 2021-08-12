@@ -44,16 +44,20 @@ jobs:
           conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
           
-      - name: Run pytest
-        run: |
-          conda install --yes -c conda-forge pytest-cov
-          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+#      - name: Run pytest
+#        run: |
+#          conda install --yes -c conda-forge pytest-cov
+#          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
           
-      - name: Build
-        uses: ammaraskar/sphinx-action@master
+#      - name: Build
+#        uses: ammaraskar/sphinx-action@master
+#        with:
+#          docs-folder: "docs/"
+
+      - name: Build and Commit
+        uses: sphinx-notes/pages@master
         with:
-          docs-folder: "docs/"
-          pre-build-command: "export PYTHONPATH=$PYTHONPATH:/usr/share/miniconda/envs/test/lib/python3.7/site-packages"
+          documentation_path: docs/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
