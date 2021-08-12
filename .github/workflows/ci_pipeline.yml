@@ -39,20 +39,15 @@ jobs:
         run: |
           conda install --yes -c conda-forge --file requirements.txt
           
-#      - name: Lint with flake8
-#        run: |
-#          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
-#          flake8 pySDC
+      - name: Lint with flake8
+        run: |
+          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+          flake8 pySDC
           
-#      - name: Run pytest
-#        run: |
-#          conda install --yes -c conda-forge pytest-cov
-#          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
-          
-#      - name: Build
-#        uses: ammaraskar/sphinx-action@master
-#        with:
-#          docs-folder: "docs/"
+      - name: Run pytest
+        run: |
+          conda install --yes -c conda-forge pytest-cov
+          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
       - name: Build documentation
         run: |
