@@ -56,7 +56,6 @@ jobs:
 
       - name: Build documentation
         run: |
-          sh ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
 
       - name: Deploy 🚀
