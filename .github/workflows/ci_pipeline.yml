@@ -39,10 +39,10 @@ jobs:
         run: |
           conda install --yes -c conda-forge --file requirements.txt
           
-      - name: Lint with flake8
-        run: |
-          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
-          flake8 pySDC
+#      - name: Lint with flake8
+#        run: |
+#          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+#          flake8 pySDC
           
 #      - name: Run pytest
 #        run: |
@@ -53,10 +53,11 @@ jobs:
 #        uses: ammaraskar/sphinx-action@master
 #        with:
 #          docs-folder: "docs/"
-      
+
       - name: Build documentation
         run: |
-           sphinx-build -b html docs/source docs/build/html
+          sh ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
