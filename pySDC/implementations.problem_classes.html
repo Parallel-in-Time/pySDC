@@ -65,7 +65,7 @@
 <li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#module-implementations.problem_classes.boussinesq_helpers.helper_classes">implementations.problem_classes.boussinesq_helpers.helper_classes module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#implementations-problem-classes-boussinesq-helpers-standard-integrators-module">implementations.problem_classes.boussinesq_helpers.standard_integrators module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#implementations-problem-classes-boussinesq-helpers-unflatten-module">implementations.problem_classes.boussinesq_helpers.unflatten module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#module-implementations.problem_classes.boussinesq_helpers.unflatten">implementations.problem_classes.boussinesq_helpers.unflatten module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="implementations.problem_classes.boussinesq_helpers.html#module-implementations.problem_classes.boussinesq_helpers">Module contents</a></li>
 </ul>
 </li>
@@ -78,8 +78,155 @@
 <div class="section" id="implementations-problem-classes-acousticadvection-1d-fd-imex-module">
 <h2>implementations.problem_classes.AcousticAdvection_1D_FD_imex module<a class="headerlink" href="#implementations-problem-classes-acousticadvection-1d-fd-imex-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-advectiondiffusionequation-1d-fft-module">
-<h2>implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module<a class="headerlink" href="#implementations-problem-classes-advectiondiffusionequation-1d-fft-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT">
+<span id="implementations-problem-classes-advectiondiffusionequation-1d-fft-module"></span><h2>implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module<a class="headerlink" href="#module-implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.</code><code class="sig-name descname">advectiondiffusion1d_imex</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_imex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,
+IMEX time-stepping</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.xvalues">
+<code class="sig-name descname">xvalues</code><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.xvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>grid points in space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.ddx">
+<code class="sig-name descname">ddx</code><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.ddx" title="Permalink to this definition">¶</a></dt>
+<dd><p>spectral operator for gradient</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.lap">
+<code class="sig-name descname">lap</code><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.lap" title="Permalink to this definition">¶</a></dt>
+<dd><p>spectral operator for Laplacian</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.rfft_object">
+<code class="sig-name descname">rfft_object</code><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.rfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned real-valued FFT for forward transformation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.irfft_object">
+<code class="sig-name descname">irfft_object</code><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.irfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned IFFT for backward transformation, real-valued output</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_imex.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_imex.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple FFT solver for the diffusion part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_imex.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.</code><code class="sig-name descname">advectiondiffusion1d_implicit</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_implicit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex" title="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex</span></code></a></p>
+<p>Example implementing the unforced 1D advection diffusion equation with periodic BC in [-L/2, L/2] in spectral space,
+fully-implicit time-stepping</p>
+<dl class="method">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_implicit.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html#advectiondiffusion1d_implicit.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_implicit.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple FFT solver for the diffusion and advection part (both are linear!)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-advectionequation-1d-fd-module">
 <h2>implementations.problem_classes.AdvectionEquation_1D_FD module<a class="headerlink" href="#implementations-problem-classes-advectionequation-1d-fd-module" title="Permalink to this headline">¶</a></h2>
@@ -93,8 +240,184 @@
 <div class="section" id="implementations-problem-classes-allencahn-2d-fd-module">
 <h2>implementations.problem_classes.AllenCahn_2D_FD module<a class="headerlink" href="#implementations-problem-classes-allencahn-2d-fd-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-allencahn-2d-fft-module">
-<h2>implementations.problem_classes.AllenCahn_2D_FFT module<a class="headerlink" href="#implementations-problem-classes-allencahn-2d-fft-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.AllenCahn_2D_FFT">
+<span id="implementations-problem-classes-allencahn-2d-fft-module"></span><h2>implementations.problem_classes.AllenCahn_2D_FFT module<a class="headerlink" href="#module-implementations.problem_classes.AllenCahn_2D_FFT" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.AllenCahn_2D_FFT.</code><code class="sig-name descname">allencahn2d_imex</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.xvalues">
+<code class="sig-name descname">xvalues</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.xvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>grid points in space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.dx">
+<code class="sig-name descname">dx</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.dx" title="Permalink to this definition">¶</a></dt>
+<dd><p>mesh width</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.lap">
+<code class="sig-name descname">lap</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.lap" title="Permalink to this definition">¶</a></dt>
+<dd><p>spectral operator for Laplacian</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.rfft_object">
+<code class="sig-name descname">rfft_object</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.rfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned real FFT for forward transformation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.irfft_object">
+<code class="sig-name descname">irfft_object</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.irfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned IFFT for backward transformation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple FFT solver for the diffusion part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.AllenCahn_2D_FFT.</code><code class="sig-name descname">allencahn2d_imex_stab</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex" title="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex"><code class="xref py py-class docutils literal notranslate"><span class="pre">implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex</span></code></a></p>
+<p>Example implementing Allen-Cahn equation in 2D using FFTs for solving linear parts, IMEX time-stepping with
+stabilized splitting</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.xvalues">
+<code class="sig-name descname">xvalues</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.xvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>grid points in space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.dx">
+<code class="sig-name descname">dx</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.dx" title="Permalink to this definition">¶</a></dt>
+<dd><p>mesh width</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.lap">
+<code class="sig-name descname">lap</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.lap" title="Permalink to this definition">¶</a></dt>
+<dd><p>spectral operator for Laplacian</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object">
+<code class="sig-name descname">rfft_object</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned real FFT for forward transformation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.irfft_object">
+<code class="sig-name descname">irfft_object</code><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.irfft_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned IFFT for backward transformation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/AllenCahn_2D_FFT.html#allencahn2d_imex_stab.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple FFT solver for the diffusion part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-allencahn-mpifft-module">
 <h2>implementations.problem_classes.AllenCahn_MPIFFT module<a class="headerlink" href="#implementations-problem-classes-allencahn-mpifft-module" title="Permalink to this headline">¶</a></h2>
@@ -102,20 +425,253 @@
 <div class="section" id="implementations-problem-classes-allencahn-temp-mpifft-module">
 <h2>implementations.problem_classes.AllenCahn_Temp_MPIFFT module<a class="headerlink" href="#implementations-problem-classes-allencahn-temp-mpifft-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-auzinger-implicit-module">
-<h2>implementations.problem_classes.Auzinger_implicit module<a class="headerlink" href="#implementations-problem-classes-auzinger-implicit-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.Auzinger_implicit">
+<span id="implementations-problem-classes-auzinger-implicit-module"></span><h2>implementations.problem_classes.Auzinger_implicit module<a class="headerlink" href="#module-implementations.problem_classes.Auzinger_implicit" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.Auzinger_implicit.auzinger">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.Auzinger_implicit.</code><code class="sig-name descname">auzinger</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the Auzinger initial value problem</p>
+<dl class="method">
+<dt id="implementations.problem_classes.Auzinger_implicit.auzinger.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS for both components simultaneously</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS, 2 components</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.Auzinger_implicit.auzinger.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">dt</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Newton solver for the nonlinear system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution u</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.Auzinger_implicit.auzinger.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Auzinger_implicit.html#auzinger.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Auzinger_implicit.auzinger.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for the exact solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mesh type containing the exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-boussinesq-2d-fd-imex-module">
 <h2>implementations.problem_classes.Boussinesq_2D_FD_imex module<a class="headerlink" href="#implementations-problem-classes-boussinesq-2d-fd-imex-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-fastwaveslowwave-0d-module">
-<h2>implementations.problem_classes.FastWaveSlowWave_0D module<a class="headerlink" href="#implementations-problem-classes-fastwaveslowwave-0d-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.FastWaveSlowWave_0D">
+<span id="implementations-problem-classes-fastwaveslowwave-0d-module"></span><h2>implementations.problem_classes.FastWaveSlowWave_0D module<a class="headerlink" href="#module-implementations.problem_classes.FastWaveSlowWave_0D" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.FastWaveSlowWave_0D.</code><code class="sig-name descname">swfw_scalar</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing fast-wave-slow-wave scalar problem</p>
+<p>Attributes:</p>
+<dl class="method">
+<dt id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple im=nversion of (1-dt*lambda)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FastWaveSlowWave_0D.html#swfw_scalar.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FastWaveSlowWave_0D.swfw_scalar.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-fermipastaulamtsingou-module">
-<h2>implementations.problem_classes.FermiPastaUlamTsingou module<a class="headerlink" href="#implementations-problem-classes-fermipastaulamtsingou-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.FermiPastaUlamTsingou">
+<span id="implementations-problem-classes-fermipastaulamtsingou-module"></span><h2>implementations.problem_classes.FermiPastaUlamTsingou module<a class="headerlink" href="#module-implementations.problem_classes.FermiPastaUlamTsingou" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.FermiPastaUlamTsingou.</code><code class="sig-name descname">fermi_pasta_ulam_tsingou</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the outer solar system problem</p>
+<dl class="method">
+<dt id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian">
+<code class="sig-name descname">eval_hamiltonian</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou.eval_hamiltonian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_hamiltonian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the Hamiltonian</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hamiltonian</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">
+<code class="sig-name descname">eval_mode_energy</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou.eval_mode_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the energy following
+<a class="reference external" href="http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations">http://www.scholarpedia.org/article/Fermi-Pasta-Ulam_nonlinear_lattice_oscillations</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>energies</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FermiPastaUlamTsingou.html#fermi_pasta_ulam_tsingou.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact/initial trajectory at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact/initial position and velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-fullsolarsystem-module">
-<h2>implementations.problem_classes.FullSolarSystem module<a class="headerlink" href="#implementations-problem-classes-fullsolarsystem-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.FullSolarSystem">
+<span id="implementations-problem-classes-fullsolarsystem-module"></span><h2>implementations.problem_classes.FullSolarSystem module<a class="headerlink" href="#module-implementations.problem_classes.FullSolarSystem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.FullSolarSystem.full_solar_system">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.FullSolarSystem.</code><code class="sig-name descname">full_solar_system</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FullSolarSystem.html#full_solar_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FullSolarSystem.full_solar_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.problem_classes.OuterSolarSystem.outer_solar_system</span></code></p>
+<p>Example implementing the full solar system problem</p>
+<dl class="method">
+<dt id="implementations.problem_classes.FullSolarSystem.full_solar_system.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/FullSolarSystem.html#full_solar_system.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.FullSolarSystem.full_solar_system.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact/initial trajectory at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact/initial position and velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-generalizedfisher-1d-fd-implicit-module">
 <h2>implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module<a class="headerlink" href="#implementations-problem-classes-generalizedfisher-1d-fd-implicit-module" title="Permalink to this headline">¶</a></h2>
@@ -123,14 +679,189 @@
 <div class="section" id="implementations-problem-classes-generalizedfisher-1d-petsc-module">
 <h2>implementations.problem_classes.GeneralizedFisher_1D_PETSc module<a class="headerlink" href="#implementations-problem-classes-generalizedfisher-1d-petsc-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-grayscott-1d-fenics-implicit-module">
-<h2>implementations.problem_classes.GrayScott_1D_FEniCS_implicit module<a class="headerlink" href="#implementations-problem-classes-grayscott-1d-fenics-implicit-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">
+<span id="implementations-problem-classes-grayscott-1d-fenics-implicit-module"></span><h2>implementations.problem_classes.GrayScott_1D_FEniCS_implicit module<a class="headerlink" href="#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.GrayScott_1D_FEniCS_implicit.</code><code class="sig-name descname">fenics_grayscott</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.V">
+<code class="sig-name descname">V</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w">
+<code class="sig-name descname">w</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>function for the RHS</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1">
+<code class="sig-name descname">w1</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1" title="Permalink to this definition">¶</a></dt>
+<dd><p>split of w, part 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2">
+<code class="sig-name descname">w2</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2" title="Permalink to this definition">¶</a></dt>
+<dd><p>split of w, part 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F1">
+<code class="sig-name descname">F1</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F1" title="Permalink to this definition">¶</a></dt>
+<dd><p>weak form of RHS, first part</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F2">
+<code class="sig-name descname">F2</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F2" title="Permalink to this definition">¶</a></dt>
+<dd><p>weak form of RHS, second part</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F">
+<code class="sig-name descname">F</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.F" title="Permalink to this definition">¶</a></dt>
+<dd><p>weak form of RHS, full</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M">
+<code class="sig-name descname">M</code><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>full mass matrix for both parts</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-factor*A)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/GrayScott_1D_FEniCS_implicit.html#fenics_grayscott.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-grayscott-2d-petsc-periodic-module">
 <h2>implementations.problem_classes.GrayScott_2D_PETSc_periodic module<a class="headerlink" href="#implementations-problem-classes-grayscott-2d-petsc-periodic-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-harmonicoscillator-module">
-<h2>implementations.problem_classes.HarmonicOscillator module<a class="headerlink" href="#implementations-problem-classes-harmonicoscillator-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.HarmonicOscillator">
+<span id="implementations-problem-classes-harmonicoscillator-module"></span><h2>implementations.problem_classes.HarmonicOscillator module<a class="headerlink" href="#module-implementations.problem_classes.HarmonicOscillator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HarmonicOscillator.</code><code class="sig-name descname">harmonic_oscillator</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the harmonic oscillator</p>
+<dl class="method">
+<dt id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_hamiltonian">
+<code class="sig-name descname">eval_hamiltonian</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator.eval_hamiltonian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.eval_hamiltonian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the Hamiltonian</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hamiltonian</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HarmonicOscillator.html#harmonic_oscillator.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HarmonicOscillator.harmonic_oscillator.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact trajectory at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact position and velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-heatequation-1d-fd-module">
 <h2>implementations.problem_classes.HeatEquation_1D_FD module<a class="headerlink" href="#implementations-problem-classes-heatequation-1d-fd-module" title="Permalink to this headline">¶</a></h2>
@@ -141,11 +872,377 @@
 <div class="section" id="implementations-problem-classes-heatequation-1d-fd-periodic-module">
 <h2>implementations.problem_classes.HeatEquation_1D_FD_periodic module<a class="headerlink" href="#implementations-problem-classes-heatequation-1d-fd-periodic-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-heatequation-1d-fenics-matrix-forced-module">
-<h2>implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module<a class="headerlink" href="#implementations-problem-classes-heatequation-1d-fenics-matrix-forced-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced">
+<span id="implementations-problem-classes-heatequation-1d-fenics-matrix-forced-module"></span><h2>implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.</code><code class="sig-name descname">fenics_heat</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1]</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V">
+<code class="sig-name descname">V</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M">
+<code class="sig-name descname">M</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass matrix for FEM</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K">
+<code class="sig-name descname">K</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>stiffness matrix incl. diffusion coefficient (and correct sign)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g">
+<code class="sig-name descname">g</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>forcing term</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc">
+<code class="sig-name descname">bc</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.bc" title="Permalink to this definition">¶</a></dt>
+<dd><p>boundary conditions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix">
+<code class="sig-name descname">apply_mass_matrix</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.apply_mass_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.apply_mass_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to apply mass matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – current values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>M*u</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u_</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.</code><code class="sig-name descname">fenics_heat_mass</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat" title="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat"><code class="xref py py-class docutils literal notranslate"><span class="pre">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat</span></code></a></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], expects mass matrix sweeper</p>
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html#fenics_heat_mass.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced.fenics_heat_mass.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u_</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-heatequation-1d-fenics-weak-forced-module">
-<h2>implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module<a class="headerlink" href="#implementations-problem-classes-heatequation-1d-fenics-weak-forced-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced">
+<span id="implementations-problem-classes-heatequation-1d-fenics-weak-forced-module"></span><h2>implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module<a class="headerlink" href="#module-implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.</code><code class="sig-name descname">fenics_heat_weak_fullyimplicit</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.V">
+<code class="sig-name descname">V</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.w">
+<code class="sig-name descname">w</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>function for weak form</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.a_K">
+<code class="sig-name descname">a_K</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.a_K" title="Permalink to this definition">¶</a></dt>
+<dd><p>weak form of RHS (incl. BC)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.M">
+<code class="sig-name descname">M</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass matrix for FEM</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.g">
+<code class="sig-name descname">g</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>forcing term</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.bc">
+<code class="sig-name descname">bc</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.bc" title="Permalink to this definition">¶</a></dt>
+<dd><p>boundary conditions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s weak solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u_</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_fullyimplicit.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_fullyimplicit.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.</code><code class="sig-name descname">fenics_heat_weak_imex</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1], weak formulation, IMEX</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.V">
+<code class="sig-name descname">V</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.w">
+<code class="sig-name descname">w</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>function for weak form</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.a_K">
+<code class="sig-name descname">a_K</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.a_K" title="Permalink to this definition">¶</a></dt>
+<dd><p>weak form of RHS (incl. BC)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.M">
+<code class="sig-name descname">M</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass matrix for FEM</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.g">
+<code class="sig-name descname">g</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.g" title="Permalink to this definition">¶</a></dt>
+<dd><p>forcing term</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.bc">
+<code class="sig-name descname">bc</code><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.bc" title="Permalink to this definition">¶</a></dt>
+<dd><p>boundary conditions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s weak solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u_</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html#fenics_heat_weak_imex.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-heatequation-2d-fd-periodic-module">
 <h2>implementations.problem_classes.HeatEquation_2D_FD_periodic module<a class="headerlink" href="#implementations-problem-classes-heatequation-2d-fd-periodic-module" title="Permalink to this headline">¶</a></h2>
@@ -153,11 +1250,133 @@
 <div class="section" id="implementations-problem-classes-heatequation-2d-petsc-forced-module">
 <h2>implementations.problem_classes.HeatEquation_2D_PETSc_forced module<a class="headerlink" href="#implementations-problem-classes-heatequation-2d-petsc-forced-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-henonheiles-module">
-<h2>implementations.problem_classes.HenonHeiles module<a class="headerlink" href="#implementations-problem-classes-henonheiles-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.HenonHeiles">
+<span id="implementations-problem-classes-henonheiles-module"></span><h2>implementations.problem_classes.HenonHeiles module<a class="headerlink" href="#module-implementations.problem_classes.HenonHeiles" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.HenonHeiles.henon_heiles">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.HenonHeiles.</code><code class="sig-name descname">henon_heiles</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the harmonic oscillator</p>
+<dl class="method">
+<dt id="implementations.problem_classes.HenonHeiles.henon_heiles.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian">
+<code class="sig-name descname">eval_hamiltonian</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.eval_hamiltonian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.eval_hamiltonian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the Hamiltonian</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hamiltonian</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.HenonHeiles.henon_heiles.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/HenonHeiles.html#henon_heiles.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.HenonHeiles.henon_heiles.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact/initial trajectory at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact/initial position and velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-outersolarsystem-module">
-<h2>implementations.problem_classes.OuterSolarSystem module<a class="headerlink" href="#implementations-problem-classes-outersolarsystem-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.OuterSolarSystem">
+<span id="implementations-problem-classes-outersolarsystem-module"></span><h2>implementations.problem_classes.OuterSolarSystem module<a class="headerlink" href="#module-implementations.problem_classes.OuterSolarSystem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.OuterSolarSystem.outer_solar_system">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.OuterSolarSystem.</code><code class="sig-name descname">outer_solar_system</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.particles.particles'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.particles.acceleration'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the outer solar system problem</p>
+<dl class="method">
+<dt id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian">
+<code class="sig-name descname">eval_hamiltonian</code><span class="sig-paren">(</span><em class="sig-param">u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.eval_hamiltonian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.eval_hamiltonian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the Hamiltonian</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>dtype_u</em>) – the particles</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hamiltonian</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/OuterSolarSystem.html#outer_solar_system.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.OuterSolarSystem.outer_solar_system.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact/initial trajectory at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact/initial position and velocity</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-problem-classes-penningtrap-3d-module">
 <h2>implementations.problem_classes.PenningTrap_3D module<a class="headerlink" href="#implementations-problem-classes-penningtrap-3d-module" title="Permalink to this headline">¶</a></h2>
@@ -165,11 +1384,161 @@
 <div class="section" id="implementations-problem-classes-testequation-0d-module">
 <h2>implementations.problem_classes.TestEquation_0D module<a class="headerlink" href="#implementations-problem-classes-testequation-0d-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-van-der-pol-implicit-module">
-<h2>implementations.problem_classes.Van_der_Pol_implicit module<a class="headerlink" href="#implementations-problem-classes-van-der-pol-implicit-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.Van_der_Pol_implicit">
+<span id="implementations-problem-classes-van-der-pol-implicit-module"></span><h2>implementations.problem_classes.Van_der_Pol_implicit module<a class="headerlink" href="#module-implementations.problem_classes.Van_der_Pol_implicit" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.Van_der_Pol_implicit.</code><code class="sig-name descname">vanderpol</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the van der pol oscillator</p>
+<dl class="method">
+<dt id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS for both components simultaneously</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS, 2 components</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">dt</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Newton solver for the nonlinear system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution u</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/Van_der_Pol_implicit.html#vanderpol.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.Van_der_Pol_implicit.vanderpol.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy routine for the exact solution, currently only passes the initial values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mesh type containing the initial values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-vorticityvelocity-2d-fenics-periodic-module">
-<h2>implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module<a class="headerlink" href="#implementations-problem-classes-vorticityvelocity-2d-fenics-periodic-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic">
+<span id="implementations-problem-classes-vorticityvelocity-2d-fenics-periodic-module"></span><h2>implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module<a class="headerlink" href="#module-implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.</code><code class="sig-name descname">fenics_vortex_2d</code><span class="sig-paren">(</span><em class="sig-param">problem_params</em>, <em class="sig-param">dtype_u=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.fenics_mesh'&gt;</em>, <em class="sig-param">dtype_f=&lt;class 'pySDC.implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the 2d vorticity-velocity equation with periodic BC in [0,1]</p>
+<dl class="attribute">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V">
+<code class="sig-name descname">V</code><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>function space</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.M">
+<code class="sig-name descname">M</code><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.M" title="Permalink to this definition">¶</a></dt>
+<dd><p>mass matrix for FEM</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K">
+<code class="sig-name descname">K</code><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>stiffness matrix incl. diffusion coefficient (and correct sign)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.eval_f">
+<code class="sig-name descname">eval_f</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.eval_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to evaluate both parts of the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the RHS divided into two parts</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.solve_system">
+<code class="sig-name descname">solve_system</code><span class="sig-paren">(</span><em class="sig-param">rhs</em>, <em class="sig-param">factor</em>, <em class="sig-param">u0</em>, <em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.solve_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dolfin’s linear solver for (M-dtA)u = rhs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>(</strong><strong>dtype_u_</strong> (<em>u0</em>) – initial guess for the iterative solver (not used here so far)</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution as mesh</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.u_exact">
+<code class="sig-name descname">u_exact</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/VorticityVelocity_2D_FEniCS_periodic.html#fenics_vortex_2d.u_exact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic.fenics_vortex_2d.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the exact solution at time t</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>exact solution</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-implementations.problem_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.problem_classes" title="Permalink to this headline">¶</a></h2>
@@ -188,37 +1557,37 @@
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-acousticadvection-1d-fd-imex-module">implementations.problem_classes.AcousticAdvection_1D_FD_imex module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-advectiondiffusionequation-1d-fft-module">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-advectionequation-1d-fd-module">implementations.problem_classes.AdvectionEquation_1D_FD module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-advectionequation-1d-fd-dirichlet-module">implementations.problem_classes.AdvectionEquation_1D_FD_dirichlet module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-allencahn-1d-fd-module">implementations.problem_classes.AllenCahn_1D_FD module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-allencahn-2d-fd-module">implementations.problem_classes.AllenCahn_2D_FD module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-allencahn-2d-fft-module">implementations.problem_classes.AllenCahn_2D_FFT module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.AllenCahn_2D_FFT">implementations.problem_classes.AllenCahn_2D_FFT module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-allencahn-mpifft-module">implementations.problem_classes.AllenCahn_MPIFFT module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-allencahn-temp-mpifft-module">implementations.problem_classes.AllenCahn_Temp_MPIFFT module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-auzinger-implicit-module">implementations.problem_classes.Auzinger_implicit module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.Auzinger_implicit">implementations.problem_classes.Auzinger_implicit module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-boussinesq-2d-fd-imex-module">implementations.problem_classes.Boussinesq_2D_FD_imex module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-fastwaveslowwave-0d-module">implementations.problem_classes.FastWaveSlowWave_0D module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-fermipastaulamtsingou-module">implementations.problem_classes.FermiPastaUlamTsingou module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-fullsolarsystem-module">implementations.problem_classes.FullSolarSystem module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.FastWaveSlowWave_0D">implementations.problem_classes.FastWaveSlowWave_0D module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.FermiPastaUlamTsingou">implementations.problem_classes.FermiPastaUlamTsingou module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.FullSolarSystem">implementations.problem_classes.FullSolarSystem module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-generalizedfisher-1d-fd-implicit-module">implementations.problem_classes.GeneralizedFisher_1D_FD_implicit module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-generalizedfisher-1d-petsc-module">implementations.problem_classes.GeneralizedFisher_1D_PETSc module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-grayscott-1d-fenics-implicit-module">implementations.problem_classes.GrayScott_1D_FEniCS_implicit module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">implementations.problem_classes.GrayScott_1D_FEniCS_implicit module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-grayscott-2d-petsc-periodic-module">implementations.problem_classes.GrayScott_2D_PETSc_periodic module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-harmonicoscillator-module">implementations.problem_classes.HarmonicOscillator module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.HarmonicOscillator">implementations.problem_classes.HarmonicOscillator module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-heatequation-1d-fd-module">implementations.problem_classes.HeatEquation_1D_FD module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-heatequation-1d-fd-forced-module">implementations.problem_classes.HeatEquation_1D_FD_forced module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-heatequation-1d-fd-periodic-module">implementations.problem_classes.HeatEquation_1D_FD_periodic module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-heatequation-1d-fenics-matrix-forced-module">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-heatequation-1d-fenics-weak-forced-module">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-heatequation-2d-fd-periodic-module">implementations.problem_classes.HeatEquation_2D_FD_periodic module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-heatequation-2d-petsc-forced-module">implementations.problem_classes.HeatEquation_2D_PETSc_forced module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-henonheiles-module">implementations.problem_classes.HenonHeiles module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-outersolarsystem-module">implementations.problem_classes.OuterSolarSystem module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.HenonHeiles">implementations.problem_classes.HenonHeiles module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.OuterSolarSystem">implementations.problem_classes.OuterSolarSystem module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-penningtrap-3d-module">implementations.problem_classes.PenningTrap_3D module</a></li>
 <li><a class="reference internal" href="#implementations-problem-classes-testequation-0d-module">implementations.problem_classes.TestEquation_0D module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-van-der-pol-implicit-module">implementations.problem_classes.Van_der_Pol_implicit module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-vorticityvelocity-2d-fenics-periodic-module">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.Van_der_Pol_implicit">implementations.problem_classes.Van_der_Pol_implicit module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes">Module contents</a></li>
 </ul>
 </li>

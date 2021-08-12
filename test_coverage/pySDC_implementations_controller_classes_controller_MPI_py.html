@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for pySDC/implementations/controller_classes/controller_MPI.py: 56%</title>
+    <title>Coverage for pySDC/implementations/controller_classes/controller_MPI.py: 57%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,13 +18,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>pySDC/implementations/controller_classes/controller_MPI.py</b> :
-            <span class="pc_cov">56%</span>
+            <span class="pc_cov">57%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             395 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">223 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">172 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">225 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">170 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">7 excluded</button>
         </h2>
     </div>
@@ -455,10 +455,10 @@
     <p id="t401" class="run"><span class="n"><a href="#t401">401</a></span><span class="t">            <span class="key">if</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">predict_type</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t402" class="exc show_exc"><span class="n"><a href="#t402">402</a></span><span class="t">                <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
     <p id="t403" class="pln"><span class="n"><a href="#t403">403</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t404" class="mis show_mis"><span class="n"><a href="#t404">404</a></span><span class="t">            <span class="key">elif</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">predict_type</span> <span class="op">==</span> <span class="str">'fine_only'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t404" class="run"><span class="n"><a href="#t404">404</a></span><span class="t">            <span class="key">elif</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">predict_type</span> <span class="op">==</span> <span class="str">'fine_only'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t405" class="pln"><span class="n"><a href="#t405">405</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t406" class="pln"><span class="n"><a href="#t406">406</a></span><span class="t">                <span class="com"># do a fine sweep only</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t407" class="mis show_mis"><span class="n"><a href="#t407">407</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">sweep</span><span class="op">.</span><span class="nam">update_nodes</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t407" class="run"><span class="n"><a href="#t407">407</a></span><span class="t">                <span class="nam">self</span><span class="op">.</span><span class="nam">S</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">sweep</span><span class="op">.</span><span class="nam">update_nodes</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t408" class="pln"><span class="n"><a href="#t408">408</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t409" class="mis show_mis"><span class="n"><a href="#t409">409</a></span><span class="t">            <span class="key">elif</span> <span class="nam">self</span><span class="op">.</span><span class="nam">params</span><span class="op">.</span><span class="nam">predict_type</span> <span class="op">==</span> <span class="str">'libpfasst_style'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t410" class="pln"><span class="n"><a href="#t410">410</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -865,7 +865,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-08-12 08:08 +0000
+            created at 2021-08-12 09:16 +0000
         </p>
     </div>
 </div>

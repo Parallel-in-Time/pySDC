@@ -100,11 +100,267 @@
 </dd></dl>
 
 </div>
-<div class="section" id="implementations-datatype-classes-mesh-module">
-<h2>implementations.datatype_classes.mesh module<a class="headerlink" href="#implementations-datatype-classes-mesh-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.datatype_classes.mesh">
+<span id="implementations-datatype-classes-mesh-module"></span><h2>implementations.datatype_classes.mesh module<a class="headerlink" href="#module-implementations.datatype_classes.mesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.datatype_classes.mesh.comp2_mesh">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.mesh.</code><code class="sig-name descname">comp2_mesh</code><span class="sig-paren">(</span><em class="sig-param">init</em>, <em class="sig-param">val=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#comp2_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RHS data type for meshes with 2 components</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.mesh.comp2_mesh.comp1">
+<code class="sig-name descname">comp1</code><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp1" title="Permalink to this definition">¶</a></dt>
+<dd><p>first part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.datatype_classes.mesh.comp2_mesh.comp2">
+<code class="sig-name descname">comp2</code><a class="headerlink" href="#implementations.datatype_classes.mesh.comp2_mesh.comp2" title="Permalink to this definition">¶</a></dt>
+<dd><p>second part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.mesh.imex_mesh">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.mesh.</code><code class="sig-name descname">imex_mesh</code><span class="sig-paren">(</span><em class="sig-param">init</em>, <em class="sig-param">val=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#imex_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>RHS data type for meshes with implicit and explicit components</p>
+<p>This data type can be used to have RHS with 2 components (here implicit and explicit)</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.mesh.imex_mesh.impl">
+<code class="sig-name descname">impl</code><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.impl" title="Permalink to this definition">¶</a></dt>
+<dd><p>implicit part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.datatype_classes.mesh.imex_mesh.expl">
+<code class="sig-name descname">expl</code><a class="headerlink" href="#implementations.datatype_classes.mesh.imex_mesh.expl" title="Permalink to this definition">¶</a></dt>
+<dd><p>explicit part</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#implementations.datatype_classes.mesh.mesh" title="implementations.datatype_classes.mesh.mesh">mesh.mesh</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.mesh.mesh">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.mesh.</code><code class="sig-name descname">mesh</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<p>Numpy-based datatype for serial or parallel meshes.
+Can include a communicator and expects a dtype to allow complex data.</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.mesh.mesh._comm">
+<code class="sig-name descname">_comm</code><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh._comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>MPI communicator or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.mesh.mesh.bcast">
+<code class="sig-name descname">bcast</code><span class="sig-paren">(</span><em class="sig-param">root=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.bcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.bcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for broadcasting values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>int</em>) – process with value to broadcast</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>broadcasted values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.mesh.mesh.comm">
+<em class="property">property </em><code class="sig-name descname">comm</code><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Getter for the communicator</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.mesh.mesh.irecv">
+<code class="sig-name descname">irecv</code><span class="sig-paren">(</span><em class="sig-param">source=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.irecv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.irecv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for receiving in time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.mesh.mesh.isend">
+<code class="sig-name descname">isend</code><span class="sig-paren">(</span><em class="sig-param">dest=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/mesh.html#mesh.isend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.mesh.mesh.isend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for sending data forward in time (non-blocking)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>request handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-datatype-classes-particles-module">
-<h2>implementations.datatype_classes.particles module<a class="headerlink" href="#implementations-datatype-classes-particles-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.datatype_classes.particles">
+<span id="implementations-datatype-classes-particles-module"></span><h2>implementations.datatype_classes.particles module<a class="headerlink" href="#module-implementations.datatype_classes.particles" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.acceleration">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.particles.</code><code class="sig-name descname">acceleration</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#acceleration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.acceleration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.datatype_classes.mesh.mesh</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.fields">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.particles.</code><code class="sig-name descname">fields</code><span class="sig-paren">(</span><em class="sig-param">init=None</em>, <em class="sig-param">val=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Field data type for 3 dimensions</p>
+<p>This data type can be used for electric and magnetic fields in 3 dimensions</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.particles.fields.elec">
+<code class="sig-name descname">elec</code><a class="headerlink" href="#implementations.datatype_classes.particles.fields.elec" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the electric field</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.datatype_classes.particles.fields.magn">
+<code class="sig-name descname">magn</code><a class="headerlink" href="#implementations.datatype_classes.particles.fields.magn" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the magnetic field</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.fields.electric">
+<em class="property">class </em><code class="sig-name descname">electric</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.electric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.electric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.datatype_classes.mesh.mesh</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.fields.magnetic">
+<em class="property">class </em><code class="sig-name descname">magnetic</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#fields.magnetic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.fields.magnetic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.datatype_classes.mesh.mesh</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.particles">
+<em class="property">class </em><code class="sig-prename descclassname">implementations.datatype_classes.particles.</code><code class="sig-name descname">particles</code><span class="sig-paren">(</span><em class="sig-param">init=None</em>, <em class="sig-param">val=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Particle data type for particles in 3 dimensions</p>
+<p>This data type can be used for particles in 3 dimensions with 3 position and 3 velocity values per particle</p>
+<dl class="attribute">
+<dt id="implementations.datatype_classes.particles.particles.pos">
+<code class="sig-name descname">pos</code><a class="headerlink" href="#implementations.datatype_classes.particles.particles.pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the positions of all particles</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.datatype_classes.particles.particles.vel">
+<code class="sig-name descname">vel</code><a class="headerlink" href="#implementations.datatype_classes.particles.particles.vel" title="Permalink to this definition">¶</a></dt>
+<dd><p>contains the velocities of all particles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.particles.particles.isend">
+<code class="sig-name descname">isend</code><span class="sig-paren">(</span><em class="sig-param">dest=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.isend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.isend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for sending data forward in time (non-blocking)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>request handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.particles.position">
+<em class="property">class </em><code class="sig-name descname">position</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.datatype_classes.mesh.mesh</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.particles.particles.recv">
+<code class="sig-name descname">recv</code><span class="sig-paren">(</span><em class="sig-param">source=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for receiving in time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<em>int</em>) – source rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.datatype_classes.particles.particles.send">
+<code class="sig-name descname">send</code><span class="sig-paren">(</span><em class="sig-param">dest=None</em>, <em class="sig-param">tag=None</em>, <em class="sig-param">comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine for sending data forward in time (blocking)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> (<em>int</em>) – target rank</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – communication tag</p></li>
+<li><p><strong>comm</strong> – communicator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.datatype_classes.particles.particles.velocity">
+<em class="property">class </em><code class="sig-name descname">velocity</code><span class="sig-paren">(</span><em class="sig-param">*args: Any</em>, <em class="sig-param">**kwargs: Any</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/datatype_classes/particles.html#particles.velocity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.datatype_classes.particles.particles.velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.datatype_classes.mesh.mesh</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="implementations-datatype-classes-petsc-dmda-grid-module">
 <h2>implementations.datatype_classes.petsc_dmda_grid module<a class="headerlink" href="#implementations-datatype-classes-petsc-dmda-grid-module" title="Permalink to this headline">¶</a></h2>
@@ -125,8 +381,8 @@
 <li><a class="reference internal" href="#">implementations.datatype_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-implementations.datatype_classes.fenics_mesh">implementations.datatype_classes.fenics_mesh module</a></li>
-<li><a class="reference internal" href="#implementations-datatype-classes-mesh-module">implementations.datatype_classes.mesh module</a></li>
-<li><a class="reference internal" href="#implementations-datatype-classes-particles-module">implementations.datatype_classes.particles module</a></li>
+<li><a class="reference internal" href="#module-implementations.datatype_classes.mesh">implementations.datatype_classes.mesh module</a></li>
+<li><a class="reference internal" href="#module-implementations.datatype_classes.particles">implementations.datatype_classes.particles module</a></li>
 <li><a class="reference internal" href="#implementations-datatype-classes-petsc-dmda-grid-module">implementations.datatype_classes.petsc_dmda_grid module</a></li>
 <li><a class="reference internal" href="#module-implementations.datatype_classes">Module contents</a></li>
 </ul>
