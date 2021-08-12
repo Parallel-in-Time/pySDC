@@ -54,10 +54,15 @@ jobs:
 #        with:
 #          docs-folder: "docs/"
 
-      - name: Build and Commit
-        uses: sphinx-notes/pages@master
+      - name: Build
+        uses: rickstaa/sphinx-action@master
         with:
-          documentation_path: docs/
+          docs-folder: "docs/"
+
+#      - name: Build and Commit
+#        uses: sphinx-notes/pages@master
+#        with:
+#          documentation_path: docs/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
