@@ -354,4 +354,4 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
-autodoc_mock_imports = ['dolfin']
+autodoc_mock_imports = ['dolfin', 'numpy']

@@ -39,7 +39,7 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
     for k, v in extract_stats.items():
         step = k.process
         iter = k.iter
-        if iter is not -1:
+        if iter != -1:
             residual[iter - 1, step] = np.log10(v)
 
     # Set up latex stuff and fonts
