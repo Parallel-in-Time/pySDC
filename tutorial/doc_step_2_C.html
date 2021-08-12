@@ -1,18 +1,20 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>&lt;no title&gt; &#8212; pySDC 4.1.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -112,72 +114,6 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-08-12 12:05:36,512 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2021-08-12 12:05:36,512 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
-
-Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
-    mssdc_jac = True
-    predict_type = None
-    all_to_done = False
-    logger_level = 20
---&gt; log_to_file = True
-    dump_setup = True
---&gt; fname = step_2_C_out.txt
-    use_iteration_estimator = False
---&gt; hook_class = &lt;class &#39;pySDC.core.Hooks.hooks&#39;&gt;
-
-Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
---&gt; maxiter = 20
-    Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
-        Level  0
---&gt;         dt = 0.1
---&gt;         restol = 1e-10
-            nsweeps = 1
-            residual_type = full_abs
---&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced.heat1d_forced&#39;&gt;
---&gt;             nu = 0.1
---&gt;             freq = 4
---&gt;             nvars = 1023
---&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.mesh&#39;&gt;
---&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.mesh.imex_mesh&#39;&gt;
---&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order&#39;&gt;
-                    do_coll_update = False
-                    initial_guess = spread
---&gt;                 num_nodes = 3
-                    QI = IE
-                    QE = EE
---&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
-
-2021-08-12 12:05:36,513 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
-2021-08-12 12:05:36,513 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
-
-2021-08-12 12:05:36,518 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
-2021-08-12 12:05:36,523 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442665e-04
-2021-08-12 12:05:36,528 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377584e-05
-2021-08-12 12:05:36,532 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707912e-05
-2021-08-12 12:05:36,537 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272028e-06
-2021-08-12 12:05:36,544 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36446132e-07
-2021-08-12 12:05:36,549 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953993e-07
-2021-08-12 12:05:36,554 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601669e-08
-2021-08-12 12:05:36,558 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07284264e-09
-2021-08-12 12:05:36,563 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27497827e-10
-2021-08-12 12:05:36,568 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.19825991e-10
-2021-08-12 12:05:36,572 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48577713e-11
-2021-08-12 12:05:36,578 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
-2021-08-12 12:05:36,583 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
-2021-08-12 12:05:36,588 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642622e-04
-2021-08-12 12:05:36,593 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982057e-05
-2021-08-12 12:05:36,598 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216754e-06
-2021-08-12 12:05:36,602 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278800e-06
-2021-08-12 12:05:36,607 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85496171e-07
-2021-08-12 12:05:36,612 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78948556e-08
-2021-08-12 12:05:36,616 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68232042e-09
-2021-08-12 12:05:36,621 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26304034e-09
-2021-08-12 12:05:36,626 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.83448663e-10
-2021-08-12 12:05:36,630 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.96573122e-11
-Error after SDC iterations: 1.166689e-05
-</pre></div>
-</div>
 
 
           </div>
@@ -193,15 +129,17 @@ Error after SDC iterations: 1.166689e-05
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
+  <h3>Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -220,7 +158,7 @@ Error after SDC iterations: 1.166689e-05
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

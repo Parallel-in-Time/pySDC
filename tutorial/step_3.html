@@ -1,18 +1,20 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Step-3: Statistics and a new sweeper &#8212; pySDC 4.1.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -70,15 +72,15 @@ a list of iterations and residuals to see how SDC converged over the
 iterations.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li><p>Here, we use the <code class="docutils literal notranslate"><span class="pre">controller_params</span></code> to control the logging verbosity, see <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging-levels">here</a> for more details.</p></li>
-<li><p>Admittedly, the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary is a complex thing, but it
+<li>Here, we use the <code class="docutils literal notranslate"><span class="pre">controller_params</span></code> to control the logging verbosity, see <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging-levels">here</a> for more details.</li>
+<li>Admittedly, the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary is a complex thing, but it
 allows users to add other details to it without changing its
-definition (see next part).</p></li>
-<li><p>For more details on how the entries of <code class="docutils literal notranslate"><span class="pre">stats</span></code> are created, please
-check the <code class="docutils literal notranslate"><span class="pre">Hooks</span></code> class.</p></li>
-<li><p>We also use the <code class="docutils literal notranslate"><span class="pre">get_list_of_type</span></code> function to show what kind of
+definition (see next part).</li>
+<li>For more details on how the entries of <code class="docutils literal notranslate"><span class="pre">stats</span></code> are created, please
+check the <code class="docutils literal notranslate"><span class="pre">Hooks</span></code> class.</li>
+<li>We also use the <code class="docutils literal notranslate"><span class="pre">get_list_of_type</span></code> function to show what kind of
 values are registered in the statistics. This can be helpful, if
-users register their own types, see below.</p></li>
+users register their own types, see below.</li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span>
@@ -188,29 +190,6 @@ users register their own types, see below.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">List</span> <span class="n">of</span> <span class="n">registered</span> <span class="n">statistic</span> <span class="n">types</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;timing_setup&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_sweep&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_iteration&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_step&#39;</span><span class="p">,</span> <span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_post_step&#39;</span><span class="p">,</span> <span class="s1">&#39;timing_run&#39;</span><span class="p">]</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">1</span><span class="p">:</span> <span class="mf">4.1119e-03</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">2</span><span class="p">:</span> <span class="mf">6.6844e-04</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">3</span><span class="p">:</span> <span class="mf">8.8038e-05</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">4</span><span class="p">:</span> <span class="mf">1.2171e-05</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">5</span><span class="p">:</span> <span class="mf">1.3827e-06</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">6</span><span class="p">:</span> <span class="mf">6.3645e-07</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">7</span><span class="p">:</span> <span class="mf">1.6895e-07</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">8</span><span class="p">:</span> <span class="mf">3.5260e-08</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">9</span><span class="p">:</span> <span class="mf">6.0728e-09</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">8.2750e-10</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">11</span><span class="p">:</span> <span class="mf">1.1983e-10</span>
-<span class="n">Residual</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">1.4858e-11</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.10</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.20</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.30</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.40</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.60</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.70</span><span class="p">:</span> <span class="mi">12</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">0.80</span><span class="p">:</span> <span class="mi">12</span>
-</pre></div>
-</div>
 </div>
 <div class="section" id="part-b-adding-statistics">
 <h2>Part B: Adding statistics<a class="headerlink" href="#part-b-adding-statistics" title="Permalink to this headline">¶</a></h2>
@@ -228,13 +207,13 @@ all necessary computations are done and the value is added to the
 statistics for later processing.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li><p>In order to extend (and not replace) pySDC’s statistics, make sure
+<li>In order to extend (and not replace) pySDC’s statistics, make sure
 that your custom hook class calls <code class="docutils literal notranslate"><span class="pre">super</span></code> each time a function is
-called.</p></li>
-<li><p>User-defined statistics can also be used from within the problem
+called.</li>
+<li>User-defined statistics can also be used from within the problem
 class: simply define a problem attribute (e.g. the number of GMRES
 iterations in the spatial solver) and access it during the hook call
-using the level.</p></li>
+using the level.</li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/B_adding_statistics.py">pySDC/tutorial/step_3/B_adding_statistics.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -341,60 +320,6 @@ using the level.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-08-12 12:05:37,081 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2021-08-12 12:05:37,082 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
-
-Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
-    mssdc_jac = True
-    predict_type = None
-    all_to_done = False
-    logger_level = 20
---&gt; log_to_file = True
-    dump_setup = True
---&gt; fname = step_3_B_out.txt
-    use_iteration_estimator = False
---&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
-
-Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
---&gt; maxiter = 20
-    Level: &lt;class &#39;pySDC.core.Level.level&#39;&gt;
-        Level  0
---&gt;         dt = 0.0625
---&gt;         restol = 1e-08
-            nsweeps = 1
-            residual_type = full_abs
---&gt;         Problem: &lt;class &#39;pySDC.implementations.problem_classes.PenningTrap_3D.penningtrap&#39;&gt;
---&gt;             omega_E = 4.9
---&gt;             omega_B = 25.0
---&gt;             u0 = [list([10, 0, 0]) list([100, 0, 100]) list([1]) list([1])]
---&gt;             nparts = 1
---&gt;             sig = 0.1
---&gt;             Data type u: &lt;class &#39;pySDC.implementations.datatype_classes.particles.particles&#39;&gt;
---&gt;             Data type f: &lt;class &#39;pySDC.implementations.datatype_classes.particles.fields&#39;&gt;
---&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
-                    do_coll_update = False
-                    initial_guess = spread
---&gt;                 num_nodes = 3
---&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
-
-2021-08-12 12:05:37,082 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
-2021-08-12 12:05:37,082 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
-
-2021-08-12 12:05:37,820 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2021-08-12 12:05:37,828 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2021-08-12 12:05:37,836 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2021-08-12 12:05:37,844 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2021-08-12 12:05:37,851 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2021-08-12 12:05:37,859 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2021-08-12 12:05:37,867 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2021-08-12 12:05:37,874 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534544e-06
-2021-08-12 12:05:37,882 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2021-08-12 12:05:37,890 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407602e-08
-2021-08-12 12:05:37,898 - hooks - Hooks - post_sweep - 200 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17124807e-09
-Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
-Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
-</pre></div>
-</div>
 </div>
 <div class="section" id="part-c-studying-collocation-node-types">
 <h2>Part C: Studying collocation node types<a class="headerlink" href="#part-c-studying-collocation-node-types" title="Permalink to this headline">¶</a></h2>
@@ -408,16 +333,16 @@ different collocation class. While slightly inefficient, this makes sure
 that the variables and statistics are reset each time.</p>
 <p>Important things to note:</p>
 <ul class="simple">
-<li><p>Interestingly, the energy does not deviate a lot for Gauss-Lobatto
+<li>Interestingly, the energy does not deviate a lot for Gauss-Lobatto
 and Gauss-Legendre nodes. This is related to their symmetric nature
-(in contrast to Gauss-Radau).</p></li>
-<li><p>Using a lower residual tolerance actually improves the energy
+(in contrast to Gauss-Radau).</li>
+<li>Using a lower residual tolerance actually improves the energy
 conservation even further, at least for symmetric collocation nodes.
-Rule of thumb: conservation up to residual tolerance is achieved.</p></li>
-<li><p>Working with multiple <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionaries is not straightforward.
+Rule of thumb: conservation up to residual tolerance is achieved.</li>
+<li>Working with multiple <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionaries is not straightforward.
 Yet, putting them into a meta-dictionary is useful (as done here).
 Alternatively, each <code class="docutils literal notranslate"><span class="pre">stats</span></code> can be processed on the fly and only
-the relevant information can be stored.</p></li>
+the relevant information can be stored.</li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/C_study_collocations.py">pySDC/tutorial/step_3/C_study_collocations.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -532,11 +457,6 @@ the relevant information can be stored.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussRadau_Right</span><span class="p">:</span> <span class="mf">1.44960920e+01</span>
-<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLegendre</span><span class="p">:</span> <span class="mf">2.33862993e-05</span>
-<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLobatto</span><span class="p">:</span> <span class="mf">9.32710282e-06</span>
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -570,15 +490,17 @@ the relevant information can be stored.</p></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
+  <h3>Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -603,7 +525,7 @@ the relevant information can be stored.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

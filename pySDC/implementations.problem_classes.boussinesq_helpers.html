@@ -1,18 +1,20 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>implementations.problem_classes.boussinesq_helpers package &#8212; pySDC 4.1.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,50 +52,260 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-problem-classes-boussinesq-helpers-build2dfdmatrix-module">
-<h2>implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module<a class="headerlink" href="#implementations-problem-classes-boussinesq-helpers-build2dfdmatrix-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.boussinesq_helpers.build2DFDMatrix">
+<span id="implementations-problem-classes-boussinesq-helpers-build2dfdmatrix-module"></span><h2>implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.build2DFDMatrix" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.</code><code class="descname">get2DMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>h</em>, <em>bc_hor</em>, <em>bc_ver</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/build2DFDMatrix.html#get2DMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMesh">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.</code><code class="descname">get2DMesh</code><span class="sig-paren">(</span><em>N</em>, <em>x_b</em>, <em>z_b</em>, <em>bc_hor</em>, <em>bc_ver</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/build2DFDMatrix.html#get2DMesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMesh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.</code><code class="descname">get2DUpwindMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>dx</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/build2DFDMatrix.html#get2DUpwindMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.</code><code class="descname">getBCHorizontal</code><span class="sig-paren">(</span><em>value</em>, <em>N</em>, <em>dx</em>, <em>bc_hor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/build2DFDMatrix.html#getBCHorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.</code><code class="descname">getBCVertical</code><span class="sig-paren">(</span><em>value</em>, <em>N</em>, <em>dz</em>, <em>bc_ver</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/build2DFDMatrix.html#getBCVertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-boussinesq-helpers-buildboussinesq2dmatrix-module">
-<h2>implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module<a class="headerlink" href="#implementations-problem-classes-boussinesq-helpers-buildboussinesq2dmatrix-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix">
+<span id="implementations-problem-classes-boussinesq-helpers-buildboussinesq2dmatrix-module"></span><h2>implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.</code><code class="descname">getBoussinesq2DMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>h</em>, <em>bc_hor</em>, <em>bc_ver</em>, <em>c_s</em>, <em>Nfreq</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildBoussinesq2DMatrix.html#getBoussinesq2DMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.</code><code class="descname">getBoussinesq2DUpwindMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>dx</em>, <em>u_adv</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildBoussinesq2DMatrix.html#getBoussinesq2DUpwindMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.</code><code class="descname">getBoussinesqBCHorizontal</code><span class="sig-paren">(</span><em>value</em>, <em>N</em>, <em>dx</em>, <em>bc_hor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildBoussinesq2DMatrix.html#getBoussinesqBCHorizontal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCVertical">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.</code><code class="descname">getBoussinesqBCVertical</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildBoussinesq2DMatrix.html#getBoussinesqBCVertical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCVertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module">
-<h2>implementations.problem_classes.boussinesq_helpers.buildFDMatrix module<a class="headerlink" href="#implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix">
+<span id="implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module"></span><h2>implementations.problem_classes.boussinesq_helpers.buildFDMatrix module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildFDMatrix.</code><code class="descname">getBCLeft</code><span class="sig-paren">(</span><em>value</em>, <em>N</em>, <em>dx</em>, <em>type</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getBCLeft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildFDMatrix.</code><code class="descname">getBCRight</code><span class="sig-paren">(</span><em>value</em>, <em>N</em>, <em>dx</em>, <em>type</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getBCRight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildFDMatrix.</code><code class="descname">getMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>dx</em>, <em>bc_left</em>, <em>bc_right</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.buildFDMatrix.</code><code class="descname">getUpwindMatrix</code><span class="sig-paren">(</span><em>N</em>, <em>dx</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/buildFDMatrix.html#getUpwindMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-implementations.problem_classes.boussinesq_helpers.helper_classes">
 <span id="implementations-problem-classes-boussinesq-helpers-helper-classes-module"></span><h2>implementations.problem_classes.boussinesq_helpers.helper_classes module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.helper_classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="implementations.problem_classes.boussinesq_helpers.helper_classes.Callback">
-<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.boussinesq_helpers.helper_classes.</code><code class="sig-name descname">Callback</code><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.helper_classes.</code><code class="descname">Callback</code><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter">
-<code class="sig-name descname">getcounter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback.getcounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getcounter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback.getcounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual">
-<code class="sig-name descname">getresidual</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback.getresidual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual" title="Permalink to this definition">¶</a></dt>
+<code class="descname">getresidual</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#Callback.getresidual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="implementations.problem_classes.boussinesq_helpers.helper_classes.logging">
-<em class="property">class </em><code class="sig-prename descclassname">implementations.problem_classes.boussinesq_helpers.helper_classes.</code><code class="sig-name descname">logging</code><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.helper_classes.</code><code class="descname">logging</code><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">iterations</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#logging.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add</code><span class="sig-paren">(</span><em>iterations</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/helper_classes.html#logging.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="implementations-problem-classes-boussinesq-helpers-standard-integrators-module">
-<h2>implementations.problem_classes.boussinesq_helpers.standard_integrators module<a class="headerlink" href="#implementations-problem-classes-boussinesq-helpers-standard-integrators-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.boussinesq_helpers.standard_integrators">
+<span id="implementations-problem-classes-boussinesq-helpers-standard-integrators-module"></span><h2>implementations.problem_classes.boussinesq_helpers.standard_integrators module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.standard_integrators" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit">
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.standard_integrators.</code><code class="descname">SplitExplicit</code><span class="sig-paren">(</span><em>problem</em>, <em>method</em>, <em>pparams</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps">
+<code class="descname">NumSmallTimeSteps</code><span class="sig-paren">(</span><em>dx</em>, <em>dz</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.NumSmallTimeSteps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.RK3Lin">
+<code class="descname">RK3Lin</code><span class="sig-paren">(</span><em>u0</em>, <em>FSlow</em>, <em>ns</em>, <em>dTau</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.RK3Lin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.RK3Lin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.VerletLin">
+<code class="descname">VerletLin</code><span class="sig-paren">(</span><em>u0</em>, <em>FSlow</em>, <em>ns</em>, <em>dTau</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.VerletLin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.VerletLin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fast">
+<code class="descname">f_fast</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.f_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastMom">
+<code class="descname">f_fastMom</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.f_fastMom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastMom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastTher">
+<code class="descname">f_fastTher</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.f_fastTher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastTher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_slow">
+<code class="descname">f_slow</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.f_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_slow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.timestep">
+<code class="descname">timestep</code><span class="sig-paren">(</span><em>u0</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#SplitExplicit.timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2">
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.standard_integrators.</code><code class="descname">bdf2</code><span class="sig-paren">(</span><em>problem</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#bdf2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f">
+<code class="descname">f</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#bdf2.f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f_solve">
+<code class="descname">f_solve</code><span class="sig-paren">(</span><em>b</em>, <em>alpha</em>, <em>u0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#bdf2.f_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f_solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.firsttimestep">
+<code class="descname">firsttimestep</code><span class="sig-paren">(</span><em>u0</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#bdf2.firsttimestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.firsttimestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.timestep">
+<code class="descname">timestep</code><span class="sig-paren">(</span><em>u0</em>, <em>um1</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#bdf2.timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk">
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.standard_integrators.</code><code class="descname">dirk</code><span class="sig-paren">(</span><em>problem</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#dirk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f">
+<code class="descname">f</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#dirk.f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f_solve">
+<code class="descname">f_solve</code><span class="sig-paren">(</span><em>b</em>, <em>alpha</em>, <em>u0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#dirk.f_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f_solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.timestep">
+<code class="descname">timestep</code><span class="sig-paren">(</span><em>u0</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#dirk.timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex">
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.standard_integrators.</code><code class="descname">rk_imex</code><span class="sig-paren">(</span><em>problem</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#rk_imex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast">
+<code class="descname">f_fast</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#rk_imex.f_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast_solve">
+<code class="descname">f_fast_solve</code><span class="sig-paren">(</span><em>rhs</em>, <em>alpha</em>, <em>u0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#rk_imex.f_fast_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast_solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_slow">
+<code class="descname">f_slow</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#rk_imex.f_slow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_slow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.timestep">
+<code class="descname">timestep</code><span class="sig-paren">(</span><em>u0</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#rk_imex.timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal">
+<em class="property">class </em><code class="descclassname">implementations.problem_classes.boussinesq_helpers.standard_integrators.</code><code class="descname">trapezoidal</code><span class="sig-paren">(</span><em>problem</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#trapezoidal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f">
+<code class="descname">f</code><span class="sig-paren">(</span><em>u</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#trapezoidal.f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f_solve">
+<code class="descname">f_solve</code><span class="sig-paren">(</span><em>b</em>, <em>alpha</em>, <em>u0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#trapezoidal.f_solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f_solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.timestep">
+<code class="descname">timestep</code><span class="sig-paren">(</span><em>u0</em>, <em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/standard_integrators.html#trapezoidal.timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-problem-classes-boussinesq-helpers-unflatten-module">
-<h2>implementations.problem_classes.boussinesq_helpers.unflatten module<a class="headerlink" href="#implementations-problem-classes-boussinesq-helpers-unflatten-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.problem_classes.boussinesq_helpers.unflatten">
+<span id="implementations-problem-classes-boussinesq-helpers-unflatten-module"></span><h2>implementations.problem_classes.boussinesq_helpers.unflatten module<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers.unflatten" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="implementations.problem_classes.boussinesq_helpers.unflatten.unflatten">
+<code class="descclassname">implementations.problem_classes.boussinesq_helpers.unflatten.</code><code class="descname">unflatten</code><span class="sig-paren">(</span><em>uin</em>, <em>dim</em>, <em>Nx</em>, <em>Nz</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/boussinesq_helpers/unflatten.html#unflatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.problem_classes.boussinesq_helpers.unflatten.unflatten" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-implementations.problem_classes.boussinesq_helpers">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.problem_classes.boussinesq_helpers" title="Permalink to this headline">¶</a></h2>
@@ -110,12 +322,12 @@
   <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.boussinesq_helpers package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-boussinesq-helpers-build2dfdmatrix-module">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-boussinesq-helpers-buildboussinesq2dmatrix-module">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-boussinesq-helpers-buildfdmatrix-module">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.build2DFDMatrix">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.helper_classes">implementations.problem_classes.boussinesq_helpers.helper_classes module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-boussinesq-helpers-standard-integrators-module">implementations.problem_classes.boussinesq_helpers.standard_integrators module</a></li>
-<li><a class="reference internal" href="#implementations-problem-classes-boussinesq-helpers-unflatten-module">implementations.problem_classes.boussinesq_helpers.unflatten module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.standard_integrators">implementations.problem_classes.boussinesq_helpers.standard_integrators module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.unflatten">implementations.problem_classes.boussinesq_helpers.unflatten module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers">Module contents</a></li>
 </ul>
 </li>
@@ -135,15 +347,17 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
+  <h3>Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -170,7 +384,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -1,18 +1,20 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Attempts to parallelize SDC &#8212; pySDC 4.1.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -54,10 +56,10 @@ This code is used for the publication “Parallelizing SDC across the method”.
 So far, this matrix is a lower triangular matrix, containing e.g. the Euler scheme or parts of the LU-decomposition of Q.
 Here, we study different ideas to work with a diagonal matrix and compare them to the standard schemes:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">IE</span></code> and <code class="docutils literal notranslate"><span class="pre">LU</span></code>: the standard scheme using implicit Euler or the LU trick</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">IEpar</span></code>: one Euler step from t0 to the current node</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Qpar</span></code>: Jacobi-like diagonal part of Q</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MIN</span></code>: A simple minimzation-based preconditioner</p></li>
+<li><code class="docutils literal notranslate"><span class="pre">IE</span></code> and <code class="docutils literal notranslate"><span class="pre">LU</span></code>: the standard scheme using implicit Euler or the LU trick</li>
+<li><code class="docutils literal notranslate"><span class="pre">IEpar</span></code>: one Euler step from t0 to the current node</li>
+<li><code class="docutils literal notranslate"><span class="pre">Qpar</span></code>: Jacobi-like diagonal part of Q</li>
+<li><code class="docutils literal notranslate"><span class="pre">MIN</span></code>: A simple minimzation-based preconditioner</li>
 </ul>
 <p>This part also contains <code class="docutils literal notranslate"><span class="pre">minimization.py</span></code>, producing the heat maps for the spectral radius of the stiff limit matrix.</p>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/preconditioner_playground.py">pySDC/projects/parallelSDC/preconditioner_playground.py</a></p>
@@ -307,10 +309,10 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_heat.png"><img alt="../_images/parallelSDC_preconditioner_heat.png" src="../_images/parallelSDC_preconditioner_heat.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_advection.png"><img alt="../_images/parallelSDC_preconditioner_advection.png" src="../_images/parallelSDC_preconditioner_advection.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_vanderpol.png" src="../_images/parallelSDC_preconditioner_vanderpol.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_fisher.png"><img alt="../_images/parallelSDC_preconditioner_fisher.png" src="../_images/parallelSDC_preconditioner_fisher.png" style="width: 272.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_heat.png"><img alt="projects/../../../data/parallelSDC_preconditioner_heat.png" src="projects/../../../data/parallelSDC_preconditioner_heat.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_advection.png"><img alt="projects/../../../data/parallelSDC_preconditioner_advection.png" src="projects/../../../data/parallelSDC_preconditioner_advection.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_vanderpol.png"><img alt="projects/../../../data/parallelSDC_preconditioner_vanderpol.png" src="projects/../../../data/parallelSDC_preconditioner_vanderpol.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_fisher.png"><img alt="projects/../../../data/parallelSDC_preconditioner_fisher.png" src="projects/../../../data/parallelSDC_preconditioner_fisher.png" /></a>
 </div>
 <div class="section" id="node-parallel-sdc-with-mpi">
 <h2>Node-parallel SDC with MPI<a class="headerlink" href="#node-parallel-sdc-with-mpi" title="Permalink to this headline">¶</a></h2>
@@ -567,10 +569,10 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png" /></a>
 </div>
 <div class="section" id="simplified-newton-for-nonlinear-problems">
 <h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Permalink to this headline">¶</a></h2>
@@ -763,34 +765,8 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">4.00</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">7.50</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">5</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.50</span> <span class="o">--</span> <span class="mf">0.25</span>
-
-</pre></div>
-</div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 403.0px; height: 265.0px;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_fisher.png"><img alt="projects/../../../data/parallelSDC_fisher.png" src="projects/../../../data/parallelSDC_fisher.png" /></a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py">pySDC/projects/parallelSDC/newton_vs_sdc.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
@@ -961,7 +937,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 286.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_fisher_newton.png"><img alt="projects/../../../data/parallelSDC_fisher_newton.png" src="projects/../../../data/parallelSDC_fisher_newton.png" /></a>
 </div>
 <div class="section" id="id1">
 <h2>Node-parallel SDC with MPI<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
@@ -1218,10 +1194,10 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 267.0px; height: 181.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 267.0px; height: 181.0px;" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_heat.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_advection.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_vanderpol.png" /></a>
+<a class="reference internal image-reference" href="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png"><img alt="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png" src="projects/../../../data/parallelSDC_preconditioner_MPI_fisher.png" /></a>
 </div>
 </div>
 
@@ -1256,15 +1232,17 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
+  <h3>Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1289,7 +1267,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

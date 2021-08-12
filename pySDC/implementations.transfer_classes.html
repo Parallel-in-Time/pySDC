@@ -1,18 +1,20 @@
 
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>implementations.transfer_classes package &#8212; pySDC 4.1.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -49,32 +51,450 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="implementations-transfer-classes-basetransfer-mass-module">
-<h2>implementations.transfer_classes.BaseTransfer_mass module<a class="headerlink" href="#implementations-transfer-classes-basetransfer-mass-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.BaseTransfer_mass">
+<span id="implementations-transfer-classes-basetransfer-mass-module"></span><h2>implementations.transfer_classes.BaseTransfer_mass module<a class="headerlink" href="#module-implementations.transfer_classes.BaseTransfer_mass" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.BaseTransfer_mass.</code><code class="descname">base_transfer_mass</code><span class="sig-paren">(</span><em>fine_level</em>, <em>coarse_level</em>, <em>base_transfer_params</em>, <em>space_transfer_class</em>, <em>space_transfer_params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransfer_mass.html#base_transfer_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.BaseTransfer.base_transfer</span></code></p>
+<p>Standard base_transfer class</p>
+<dl class="attribute">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.logger">
+<code class="descname">logger</code><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>custom logger for sweeper-related logging</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.params">
+<code class="descname">params</code><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>parameter object containing the custom parameters passed by the user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">__Pars</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.fine">
+<code class="descname">fine</code><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.fine" title="Permalink to this definition">¶</a></dt>
+<dd><p>reference to the fine level</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">pySDC.Level.level</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.coarse">
+<code class="descname">coarse</code><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.coarse" title="Permalink to this definition">¶</a></dt>
+<dd><p>reference to the coarse level</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">pySDC.Level.level</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransfer_mass.html#base_transfer_mass.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong_f">
+<code class="descname">prolong_f</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransfer_mass.html#base_transfer_mass.prolong_f"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.prolong_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Space-time prolongation routine w.r.t. the rhs f</p>
+<p>This routine applies the spatial prolongation routine to the difference between the computed and the restricted
+values on the coarse level and then adds this difference to the fine values as coarse correction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/BaseTransfer_mass.html#base_transfer_mass.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.BaseTransfer_mass.base_transfer_mass.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Space-time restriction routine</p>
+<p>The routine applies the spatial restriction operator to teh fine values on the fine nodes, then reevaluates f
+on the coarse level. This is used for the first part of the FAS correction tau via integration. The second part
+is the integral over the fine values, restricted to the coarse level. Finally, possible tau corrections on the
+fine level are restricted as well.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transferfenicsmesh-module">
-<h2>implementations.transfer_classes.TransferFenicsMesh module<a class="headerlink" href="#implementations-transfer-classes-transferfenicsmesh-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferFenicsMesh">
+<span id="implementations-transfer-classes-transferfenicsmesh-module"></span><h2>implementations.transfer_classes.TransferFenicsMesh module<a class="headerlink" href="#module-implementations.transfer_classes.TransferFenicsMesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferFenicsMesh.</code><code class="descname">mesh_to_mesh_fenics</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>This implementation can restrict and prolong between fenics meshes</p>
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project">
+<code class="descname">project</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation via projection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferFenicsMesh.html#mesh_to_mesh_fenics.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferFenicsMesh.mesh_to_mesh_fenics.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transfermesh-module">
-<h2>implementations.transfer_classes.TransferMesh module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferMesh">
+<span id="implementations-transfer-classes-transfermesh-module"></span><h2>implementations.transfer_classes.TransferMesh module<a class="headerlink" href="#module-implementations.transfer_classes.TransferMesh" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferMesh.mesh_to_mesh">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferMesh.</code><code class="descname">mesh_to_mesh</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh.html#mesh_to_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh.mesh_to_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon base_transfer class, implements Transfer.py</p>
+<p>This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
+via matrix-vector products</p>
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh.mesh_to_mesh.Rspace">
+<code class="descname">Rspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh.mesh_to_mesh.Rspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial restriction matrix, dim. Nf x Nc</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh.mesh_to_mesh.Pspace">
+<code class="descname">Pspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh.mesh_to_mesh.Pspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial prolongation matrix, dim. Nc x Nf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh.mesh_to_mesh.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh.html#mesh_to_mesh.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh.mesh_to_mesh.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation
+:param G: the coarse level data (easier to access than via the coarse attribute)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh.mesh_to_mesh.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh.html#mesh_to_mesh.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh.mesh_to_mesh.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation
+:param F: the fine level data (easier to access than via the fine attribute)</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transfermesh-fft-module">
-<h2>implementations.transfer_classes.TransferMesh_FFT module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-fft-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferMesh_FFT">
+<span id="implementations-transfer-classes-transfermesh-fft-module"></span><h2>implementations.transfer_classes.TransferMesh_FFT module<a class="headerlink" href="#module-implementations.transfer_classes.TransferMesh_FFT" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferMesh_FFT.</code><code class="descname">mesh_to_mesh_fft</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT.html#mesh_to_mesh_fft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon base_transfer class, implements Transfer.py</p>
+<p>This implementation can restrict and prolong between 1d meshes with FFT for periodic boundaries</p>
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine">
+<code class="descname">irfft_object_fine</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.irfft_object_fine" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned FFT for backward transformation, real-valued output</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse">
+<code class="descname">rfft_object_coarse</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse" title="Permalink to this definition">¶</a></dt>
+<dd><p>planned real-valued FFT for forward transformation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT.html#mesh_to_mesh_fft.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT.html#mesh_to_mesh_fft.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transfermesh-fft2d-module">
-<h2>implementations.transfer_classes.TransferMesh_FFT2D module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-fft2d-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferMesh_FFT2D">
+<span id="implementations-transfer-classes-transfermesh-fft2d-module"></span><h2>implementations.transfer_classes.TransferMesh_FFT2D module<a class="headerlink" href="#module-implementations.transfer_classes.TransferMesh_FFT2D" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferMesh_FFT2D.</code><code class="descname">mesh_to_mesh_fft2d</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT2D.html#mesh_to_mesh_fft2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon base_transfer class, implements Transfer.py</p>
+<p>This implementation can restrict and prolong between 2d meshes with FFT for periodic boundaries</p>
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Rspace">
+<code class="descname">Rspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Rspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial restriction matrix, dim. Nf x Nc</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Pspace">
+<code class="descname">Pspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.Pspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial prolongation matrix, dim. Nc x Nf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT2D.html#mesh_to_mesh_fft2d.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_FFT2D.html#mesh_to_mesh_fft2d.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_FFT2D.mesh_to_mesh_fft2d.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transfermesh-mpifft-module">
-<h2>implementations.transfer_classes.TransferMesh_MPIFFT module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-mpifft-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferMesh_MPIFFT">
+<span id="implementations-transfer-classes-transfermesh-mpifft-module"></span><h2>implementations.transfer_classes.TransferMesh_MPIFFT module<a class="headerlink" href="#module-implementations.transfer_classes.TransferMesh_MPIFFT" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferMesh_MPIFFT.</code><code class="descname">fft_to_fft</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_MPIFFT.html#fft_to_fft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon base_transfer class, implements Transfer.py</p>
+<p>This implementation can restrict and prolong between PMESH datatypes meshes with FFT for periodic boundaries</p>
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_MPIFFT.html#fft_to_fft.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_MPIFFT.html#fft_to_fft.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_MPIFFT.fft_to_fft.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transfermesh-nocoarse-module">
-<h2>implementations.transfer_classes.TransferMesh_NoCoarse module<a class="headerlink" href="#implementations-transfer-classes-transfermesh-nocoarse-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferMesh_NoCoarse">
+<span id="implementations-transfer-classes-transfermesh-nocoarse-module"></span><h2>implementations.transfer_classes.TransferMesh_NoCoarse module<a class="headerlink" href="#module-implementations.transfer_classes.TransferMesh_NoCoarse" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferMesh_NoCoarse.</code><code class="descname">mesh_to_mesh</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_NoCoarse.html#mesh_to_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon base_transfer class, implements Transfer.py</p>
+<p>This implementation can restrict and prolong between nd meshes with dirichlet-0 or periodic boundaries
+via matrix-vector products</p>
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Rspace">
+<code class="descname">Rspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Rspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial restriction matrix, dim. Nf x Nc</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Pspace">
+<code class="descname">Pspace</code><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.Pspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>spatial prolongation matrix, dim. Nc x Nf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_NoCoarse.html#mesh_to_mesh.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferMesh_NoCoarse.html#mesh_to_mesh.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferMesh_NoCoarse.mesh_to_mesh.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transferpetscdmda-module">
-<h2>implementations.transfer_classes.TransferPETScDMDA module<a class="headerlink" href="#implementations-transfer-classes-transferpetscdmda-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferPETScDMDA">
+<span id="implementations-transfer-classes-transferpetscdmda-module"></span><h2>implementations.transfer_classes.TransferPETScDMDA module<a class="headerlink" href="#module-implementations.transfer_classes.TransferPETScDMDA" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferPETScDMDA.</code><code class="descname">mesh_to_mesh_petsc_dmda</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferPETScDMDA.html#mesh_to_mesh_petsc_dmda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>This implementation can restrict and prolong between PETSc DMDA grids</p>
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferPETScDMDA.html#mesh_to_mesh_petsc_dmda.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolongation implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferPETScDMDA.html#mesh_to_mesh_petsc_dmda.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restriction implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="implementations-transfer-classes-transferparticles-nocoarse-module">
-<h2>implementations.transfer_classes.TransferParticles_NoCoarse module<a class="headerlink" href="#implementations-transfer-classes-transferparticles-nocoarse-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-implementations.transfer_classes.TransferParticles_NoCoarse">
+<span id="implementations-transfer-classes-transferparticles-nocoarse-module"></span><h2>implementations.transfer_classes.TransferParticles_NoCoarse module<a class="headerlink" href="#module-implementations.transfer_classes.TransferParticles_NoCoarse" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles">
+<em class="property">class </em><code class="descclassname">implementations.transfer_classes.TransferParticles_NoCoarse.</code><code class="descname">particles_to_particles</code><span class="sig-paren">(</span><em>fine_prob</em>, <em>coarse_prob</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferParticles_NoCoarse.html#particles_to_particles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.SpaceTransfer.space_transfer</span></code></p>
+<p>Custon transfer class, implements SpaceTransfer.py</p>
+<p>This implementation is just a dummy for particles with no direct functionality, i.e. the number of particles is not
+reduced on the coarse problem</p>
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.prolong">
+<code class="descname">prolong</code><span class="sig-paren">(</span><em>G</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferParticles_NoCoarse.html#particles_to_particles.prolong"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.prolong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy prolongation routine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>G</strong> – the coarse level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.restrict">
+<code class="descname">restrict</code><span class="sig-paren">(</span><em>F</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/transfer_classes/TransferParticles_NoCoarse.html#particles_to_particles.restrict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementations.transfer_classes.TransferParticles_NoCoarse.particles_to_particles.restrict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy restriction routine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>F</strong> – the fine level data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-implementations.transfer_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.transfer_classes" title="Permalink to this headline">¶</a></h2>
@@ -91,15 +511,15 @@
   <ul>
 <li><a class="reference internal" href="#">implementations.transfer_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-basetransfer-mass-module">implementations.transfer_classes.BaseTransfer_mass module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transferfenicsmesh-module">implementations.transfer_classes.TransferFenicsMesh module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-module">implementations.transfer_classes.TransferMesh module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-fft-module">implementations.transfer_classes.TransferMesh_FFT module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-fft2d-module">implementations.transfer_classes.TransferMesh_FFT2D module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-mpifft-module">implementations.transfer_classes.TransferMesh_MPIFFT module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transfermesh-nocoarse-module">implementations.transfer_classes.TransferMesh_NoCoarse module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transferpetscdmda-module">implementations.transfer_classes.TransferPETScDMDA module</a></li>
-<li><a class="reference internal" href="#implementations-transfer-classes-transferparticles-nocoarse-module">implementations.transfer_classes.TransferParticles_NoCoarse module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.BaseTransfer_mass">implementations.transfer_classes.BaseTransfer_mass module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferFenicsMesh">implementations.transfer_classes.TransferFenicsMesh module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferMesh">implementations.transfer_classes.TransferMesh module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferMesh_FFT">implementations.transfer_classes.TransferMesh_FFT module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferMesh_FFT2D">implementations.transfer_classes.TransferMesh_FFT2D module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferMesh_MPIFFT">implementations.transfer_classes.TransferMesh_MPIFFT module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferMesh_NoCoarse">implementations.transfer_classes.TransferMesh_NoCoarse module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferPETScDMDA">implementations.transfer_classes.TransferPETScDMDA module</a></li>
+<li><a class="reference internal" href="#module-implementations.transfer_classes.TransferParticles_NoCoarse">implementations.transfer_classes.TransferParticles_NoCoarse module</a></li>
 <li><a class="reference internal" href="#module-implementations.transfer_classes">Module contents</a></li>
 </ul>
 </li>
@@ -119,15 +539,17 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
+  <h3>Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -153,7 +575,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

@@ -32,7 +32,7 @@ implementations.datatype\_classes.particles module
 implementations.datatype\_classes.petsc\_dmda\_grid module
 ----------------------------------------------------------
 
-.. automodule:: implementations.datatype_classes.petsc_dmda_grid
+.. automodule:: implementations.datatype_classes.petsc_vec
     :members:
     :undoc-members:
     :show-inheritance:
