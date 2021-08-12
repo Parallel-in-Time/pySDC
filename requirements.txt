@@ -15,4 +15,4 @@ mpi4py-fft>=2.0.2
 pip
 pytest
 pytest-cov
-sphinx==1.8.5
+sphinx
