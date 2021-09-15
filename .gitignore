@@ -2,6 +2,9 @@
 /doc/latex
 /doc/html
 *out.txt
+*out_1x1.txt
+*out_1x2.txt
+*out_2x2.txt
 *sdc.txt
 *detail.txt
 data/*
