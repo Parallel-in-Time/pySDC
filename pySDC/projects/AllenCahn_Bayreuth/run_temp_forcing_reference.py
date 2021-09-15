@@ -41,7 +41,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-06
+    level_params['dt'] = 1E-03
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -55,11 +55,11 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
     problem_params = dict()
     problem_params['L'] = 1.0
     problem_params['nvars'] = [(128, 128)]
-    problem_params['eps'] = [0.04]
-    problem_params['radius'] = 0.25
+    problem_params['eps'] = [0.03]
+    problem_params['radius'] = 0.35682
     problem_params['TM'] = 1.0
-    problem_params['D'] = 0.1
-    problem_params['dw'] = [21.0]
+    problem_params['D'] = 10.0
+    problem_params['dw'] = [1.0]
     problem_params['comm'] = space_comm
     problem_params['name'] = name
     problem_params['init_type'] = 'circle'
@@ -85,7 +85,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 1 * 0.001
+    Tend = 100 * 0.001
 
     if space_rank == 0:
         out = f'---------> Running {name} with spectral={spectral} and {space_size} process(es) in space...'
