@@ -9,10 +9,10 @@ def iteration_vs_estimate():
     K = 10
     swee = sweeper({'collocation_class': CollGaussRadau_Right, 'num_nodes': M})
     Q = swee.coll.Qmat[1:, 1:]
-    # Qd = swee.get_Qdelta_implicit(swee.coll, 'IE')[1:, 1:]
-    Qd = swee.get_Qdelta_implicit(swee.coll, 'LU')[1:, 1:]
-    Qd = swee.get_Qdelta_explicit(swee.coll, 'EE')[1:, 1:]
-    print(swee.coll.nodes)
+    Qd = swee.get_Qdelta_implicit(swee.coll, 'IE')[1:, 1:]
+    # Qd = swee.get_Qdelta_implicit(swee.coll, 'LU')[1:, 1:]
+    # Qd = swee.get_Qdelta_explicit(swee.coll, 'EE')[1:, 1:]
+    print(np.linalg.norm(Q-Qd, np.inf))
     exit()
     I = np.eye(M)
 
