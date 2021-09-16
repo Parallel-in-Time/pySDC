@@ -4029,6 +4029,76 @@ discretized using central finite differences</p>
 </dd></dl>
 
 </section>
+<section id="module-implementations.problem_classes.LogisticEquation">
+<span id="implementations-problem-classes-logisticequation-module"></span><h2>implementations.problem_classes.LogisticEquation module<a class="headerlink" href="#module-implementations.problem_classes.LogisticEquation" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.LogisticEquation.logistics_equation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.LogisticEquation.</span></span><span class="sig-name descname"><span class="pre">logistics_equation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">problem_params</span></em>, <em class="sig-param"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></em>, <em class="sig-param"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LogisticEquation.html#logistics_equation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LogisticEquation.logistics_equation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing the logistic equation, taken from
+<a class="reference external" href="https://www-users.cse.umn.edu/~olver/">https://www-users.cse.umn.edu/~olver/</a><a href="#id1"><span class="problematic" id="id2">ln_</span></a>/odq.pdf (Example 2.2)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.LogisticEquation.logistics_equation.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LogisticEquation.html#logistics_equation.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LogisticEquation.logistics_equation.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS, 1 component</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.LogisticEquation.logistics_equation.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LogisticEquation.html#logistics_equation.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LogisticEquation.logistics_equation.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Newton solver for the nonlinear equation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution u</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.LogisticEquation.logistics_equation.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/LogisticEquation.html#logistics_equation.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.LogisticEquation.logistics_equation.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exact solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mesh type containing the values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-implementations.problem_classes.NonlinearSchroedinger_MPIFFT">
 <span id="implementations-problem-classes-nonlinearschroedinger-mpifft-module"></span><h2>implementations.problem_classes.NonlinearSchroedinger_MPIFFT module<a class="headerlink" href="#module-implementations.problem_classes.NonlinearSchroedinger_MPIFFT" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -4537,6 +4607,76 @@ IMEX time-stepping</p>
 </dd></dl>
 
 </section>
+<section id="module-implementations.problem_classes.nonlinear_ODE_1">
+<span id="implementations-problem-classes-nonlinear-ode-1-module"></span><h2>implementations.problem_classes.nonlinear_ODE_1 module<a class="headerlink" href="#module-implementations.problem_classes.nonlinear_ODE_1" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.nonlinear_ODE_1.</span></span><span class="sig-name descname"><span class="pre">nonlinear_ODE_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">problem_params</span></em>, <em class="sig-param"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></em>, <em class="sig-param"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
+<p>Example implementing some simple nonlinear ODE with a singularity in the derivative, taken from
+<a class="reference external" href="https://www.osti.gov/servlets/purl/6111421">https://www.osti.gov/servlets/purl/6111421</a> (Problem E-4)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f">
+<span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.eval_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to compute the RHS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>dtype_u</em>) – the current values</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (not used here)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RHS, 1 component</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_f</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.solve_system">
+<span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.solve_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple Newton solver for the nonlinear equation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the nonlinear system</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – abbrev. for the node-to-node stepsize (or any other factor required)</p></li>
+<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
+<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>solution u</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.u_exact">
+<span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/nonlinear_ODE_1.html#nonlinear_ODE_1.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1.u_exact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exact solution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>mesh type containing the values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dtype_u</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-implementations.problem_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.problem_classes" title="Permalink to this headline">¶</a></h2>
 </section>
@@ -4584,12 +4724,14 @@ IMEX time-stepping</p>
 <li><a class="reference internal" href="#module-implementations.problem_classes.HeatEquation_2D_PETSc_forced">implementations.problem_classes.HeatEquation_2D_PETSc_forced module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.HeatEquation_ND_FD_forced_periodic">implementations.problem_classes.HeatEquation_ND_FD_forced_periodic module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.HenonHeiles">implementations.problem_classes.HenonHeiles module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.LogisticEquation">implementations.problem_classes.LogisticEquation module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.NonlinearSchroedinger_MPIFFT">implementations.problem_classes.NonlinearSchroedinger_MPIFFT module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.OuterSolarSystem">implementations.problem_classes.OuterSolarSystem module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.PenningTrap_3D">implementations.problem_classes.PenningTrap_3D module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.TestEquation_0D">implementations.problem_classes.TestEquation_0D module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.Van_der_Pol_implicit">implementations.problem_classes.Van_der_Pol_implicit module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic">implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.nonlinear_ODE_1">implementations.problem_classes.nonlinear_ODE_1 module</a></li>
 <li><a class="reference internal" href="#module-implementations.problem_classes">Module contents</a></li>
 </ul>
 </li>
@@ -4644,7 +4786,7 @@ IMEX time-stepping</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     </div>
   </body>
 </html>

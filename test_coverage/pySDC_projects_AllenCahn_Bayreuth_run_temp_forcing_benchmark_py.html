@@ -115,8 +115,8 @@
     <p id="t61" class="mis show_mis"><span class="n"><a href="#t61">61</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'eps'</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="num">0.04</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p id="t62" class="mis show_mis"><span class="n"><a href="#t62">62</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'radius'</span><span class="op">]</span> <span class="op">=</span> <span class="num">0.25</span>&nbsp;</span><span class="r"></span></p>
     <p id="t63" class="mis show_mis"><span class="n"><a href="#t63">63</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'TM'</span><span class="op">]</span> <span class="op">=</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t64" class="mis show_mis"><span class="n"><a href="#t64">64</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'D'</span><span class="op">]</span> <span class="op">=</span> <span class="num">0.1</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t65" class="mis show_mis"><span class="n"><a href="#t65">65</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'dw'</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="num">21.0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t64" class="mis show_mis"><span class="n"><a href="#t64">64</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'D'</span><span class="op">]</span> <span class="op">=</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t65" class="mis show_mis"><span class="n"><a href="#t65">65</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'dw'</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="num">300.0</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p id="t66" class="mis show_mis"><span class="n"><a href="#t66">66</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'comm'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">space_comm</span>&nbsp;</span><span class="r"></span></p>
     <p id="t67" class="mis show_mis"><span class="n"><a href="#t67">67</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'name'</span><span class="op">]</span> <span class="op">=</span> <span class="nam">name</span>&nbsp;</span><span class="r"></span></p>
     <p id="t68" class="mis show_mis"><span class="n"><a href="#t68">68</a></span><span class="t">    <span class="nam">problem_params</span><span class="op">[</span><span class="str">'init_type'</span><span class="op">]</span> <span class="op">=</span> <span class="str">'circle_rand'</span>&nbsp;</span><span class="r"></span></p>
@@ -144,7 +144,7 @@
     <p id="t90" class="pln"><span class="n"><a href="#t90">90</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t91" class="pln"><span class="n"><a href="#t91">91</a></span><span class="t">    <span class="com"># set time parameters</span>&nbsp;</span><span class="r"></span></p>
     <p id="t92" class="mis show_mis"><span class="n"><a href="#t92">92</a></span><span class="t">    <span class="nam">t0</span> <span class="op">=</span> <span class="num">0.0</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t93" class="mis show_mis"><span class="n"><a href="#t93">93</a></span><span class="t">    <span class="nam">Tend</span> <span class="op">=</span> <span class="num">32</span> <span class="op">*</span> <span class="num">0.001</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t93" class="mis show_mis"><span class="n"><a href="#t93">93</a></span><span class="t">    <span class="nam">Tend</span> <span class="op">=</span> <span class="num">100</span> <span class="op">*</span> <span class="num">0.001</span>&nbsp;</span><span class="r"></span></p>
     <p id="t94" class="pln"><span class="n"><a href="#t94">94</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t95" class="mis show_mis"><span class="n"><a href="#t95">95</a></span><span class="t">    <span class="key">if</span> <span class="nam">space_rank</span> <span class="op">==</span> <span class="num">0</span> <span class="key">and</span> <span class="nam">time_rank</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t96" class="mis show_mis"><span class="n"><a href="#t96">96</a></span><span class="t">        <span class="nam">out</span> <span class="op">=</span> <span class="str">f'---------> Running {name} with {time_size} process(es) in time and {space_size} process(es) in space...'</span>&nbsp;</span><span class="r"></span></p>
@@ -193,7 +193,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-08-23 11:41 +0000
+            created at 2021-09-16 10:45 +0000
         </p>
     </div>
 </div>
