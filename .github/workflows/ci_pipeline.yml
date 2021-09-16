@@ -17,6 +17,7 @@ jobs:
         
       - name: Add packages
         run: |
+          sudo apt-get update
           sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
           
       - name: Cache conda
