@@ -18,13 +18,13 @@ def testequation_setup(prec_type=None, maxiter=None):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 0.0
-    level_params['dt'] = 0.25
+    level_params['dt'] = 1.0
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = [3]
+    sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = prec_type
     sweeper_params['initial_guess'] = 'spread'
 
@@ -35,7 +35,7 @@ def testequation_setup(prec_type=None, maxiter=None):
     # problem_params['lambdas'] = [[-1.0]]
     # .. or a list of values like this ...
     # problem_params['lambdas'] = [[-1.0, -2.0, 1j, -1j]]
-    problem_params['lambdas'] = [[-1000]]
+    problem_params['lambdas'] = [[-1.0 + 0j]]
     # note: PFASST will do all of those at once, but without interaction (realized via diagonal matrix).
     # The propagation matrix will be diagonal too, corresponding to the respective lambda value.
 
@@ -45,7 +45,7 @@ def testequation_setup(prec_type=None, maxiter=None):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 30
+    controller_params['logger_level'] = 20
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -64,11 +64,11 @@ def compare_preconditioners(f=None, list_of_k=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 1.0
+    Tend = 2.0
 
     for k in list_of_k:
 
-        description_IE, controller_params_IE = testequation_setup(prec_type='IE', maxiter=k)
+        description_IE, controller_params_IE = testequation_setup(prec_type='MIN3', maxiter=k)
         description_LU, controller_params_LU = testequation_setup(prec_type='LU', maxiter=k)
 
         out = f'\nWorking with maxiter = {k}'
@@ -114,7 +114,7 @@ def compare_preconditioners(f=None, list_of_k=None):
 def main():
 
     f = open('comparison_IE_vs_LU.txt', 'w')
-    compare_preconditioners(f=f, list_of_k=[1, 2, 3, 4])
+    compare_preconditioners(f=f, list_of_k=[1])
     f.close()
 
 
