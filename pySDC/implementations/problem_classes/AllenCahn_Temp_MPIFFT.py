@@ -122,7 +122,7 @@ class allencahn_temp_imex(ptype):
                 f.expl[..., 0] = self.fft.forward(tmpf)
 
             f.impl[..., 1] = -self.params.D * self.K2 * u[..., 1]
-            f.expl[..., 1] = -f.impl[..., 0] - f.expl[..., 0]
+            f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
         else:
 
@@ -138,7 +138,7 @@ class allencahn_temp_imex(ptype):
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = -self.params.D * self.K2 * u_hat
             f.impl[..., 1] = self.fft.backward(lap_u_hat, f.impl[..., 1])
-            f.expl[..., 1] = -f.impl[..., 0] - f.expl[..., 0]
+            f.expl[..., 1] = f.impl[..., 0] + f.expl[..., 0]
 
         return f
 
@@ -225,10 +225,10 @@ class allencahn_temp_imex(ptype):
         def sine():
             tmp_me = newDistArray(self.fft, self.params.spectral)
             if self.params.spectral:
-                tmp = np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1])
+                tmp = 0.5 * (2.0 + 0.0 * np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
                 tmp_me[:] = self.fft.forward(tmp)
             else:
-                tmp_me[:] = np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1])
+                tmp_me[:] = 0.5 * (2.0 + 0.0 * np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
             return tmp_me
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'

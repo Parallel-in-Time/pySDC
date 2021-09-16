@@ -61,8 +61,8 @@ def run_simulation(name=None, nprocs_space=None):
     problem_params['eps'] = [0.04]
     problem_params['radius'] = 0.25
     problem_params['TM'] = 1.0
-    problem_params['D'] = 0.1
-    problem_params['dw'] = [21.0]
+    problem_params['D'] = 1.0
+    problem_params['dw'] = [300.0]
     problem_params['comm'] = space_comm
     problem_params['name'] = name
     problem_params['init_type'] = 'circle_rand'
@@ -90,7 +90,7 @@ def run_simulation(name=None, nprocs_space=None):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32 * 0.001
+    Tend = 100 * 0.001
 
     if space_rank == 0 and time_rank == 0:
         out = f'---------> Running {name} with {time_size} process(es) in time and {space_size} process(es) in space...'
