@@ -225,10 +225,10 @@ class allencahn_temp_imex(ptype):
         def sine():
             tmp_me = newDistArray(self.fft, self.params.spectral)
             if self.params.spectral:
-                tmp = 0.5*(2.0 + 0.0*np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
+                tmp = 0.5 * (2.0 + 0.0 * np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
                 tmp_me[:] = self.fft.forward(tmp)
             else:
-                tmp_me[:] = 0.5*(2.0 + 0.0*np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
+                tmp_me[:] = 0.5 * (2.0 + 0.0 * np.sin(2 * np.pi * self.X[0]) * np.sin(2 * np.pi * self.X[1]))
             return tmp_me
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
