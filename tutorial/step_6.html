@@ -47,7 +47,7 @@
             
   <section id="step-6-advanced-pfasst-controllers">
 <h1>Step-6: Advanced PFASST controllers<a class="headerlink" href="#step-6-advanced-pfasst-controllers" title="Permalink to this headline">¶</a></h1>
-<p>We discuss controller implementations, features and parallelization of PFASST controller in this step.</p>
+<p>We discuss controller implementations, features and parallelization of PFASST controllers in this step.</p>
 <section id="part-a-the-nonmpi-controller">
 <h2>Part A: The nonMPI controller<a class="headerlink" href="#part-a-the-nonmpi-controller" title="Permalink to this headline">¶</a></h2>
 <p>pySDC comes with (at least) two controllers: the standard, non-MPI controller we have used so far and the MPI_parallel one.
@@ -386,13 +386,13 @@ To do this, pySDC comes with the MPI-parallelized controller, namely <code class
 It is supposed to yield the same results as the non-MPI counterpart and this is what we are demonstrating here (at least for one particular example).
 The actual code of this part is rather short, since the only task is to call another snippet (<code class="docutils literal notranslate"><span class="pre">playground_parallelization.py</span></code>) with different number of parallel processes.
 This is realized using Python’s <code class="docutils literal notranslate"><span class="pre">subprocess</span></code> library and we check at the end if each call returned normally.
-Now, the snippet called by the example is the basically the same code as use by Parts A and B.
+Now, the snippet called by the example is basically the same code as used by Parts A and B.
 We can use the results of Parts A and B to compare with and we expect the same number of iterations, the same accuracy and the same difference between the two flavors as in Part A (up to machine precision).</p>
 <p>Important things to note:</p>
 <ul class="simple">
 <li><p>The additional Python script <code class="docutils literal notranslate"><span class="pre">playground_parallelization.py</span></code> contains the code to run the MPI-parallel controller. To this end, we import the routine <code class="docutils literal notranslate"><span class="pre">set_parameters</span></code> from Part A to ensure that we use the same set of parameters for all runs.</p></li>
 <li><p>This example also shows how the statistics of multiple MPI processes can be gathered and processed by rank 0, see <code class="docutils literal notranslate"><span class="pre">playground_parallelization.py</span></code>.</p></li>
-<li><p>The controller need a working installation of <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>. Since this is not always easy to achieve and since debugging a parallel program can cause a lot of headaches, the non-MPI controller performs the same operations in serial.</p></li>
+<li><p>The controller needs a working installation of <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>. Since this is not always easy to achieve and since debugging a parallel program can cause a lot of headaches, the non-MPI controller performs the same operations in serial.</p></li>
 <li><p>The somewhat weird notation with the current working directory <code class="docutils literal notranslate"><span class="pre">cwd</span></code> is due to the corresponding test, which, run by nosetests, has a different working directory than the tutorial.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/C_MPI_parallelization.py">pySDC/tutorial/step_6/C_MPI_parallelization.py</a> and

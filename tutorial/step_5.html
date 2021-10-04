@@ -51,13 +51,13 @@
 <section id="part-a-multistep-multilevel-hierarchy">
 <h2>Part A: Multistep multilevel hierarchy<a class="headerlink" href="#part-a-multistep-multilevel-hierarchy" title="Permalink to this headline">¶</a></h2>
 <p>In this first part, we create a controller and demonstrate how pySDC’s data structures represent multiple time-steps.
-While for SDC the <code class="docutils literal notranslate"><span class="pre">step</span></code> data structure is the key part, we now habe simply a list of steps, bundled in the <code class="docutils literal notranslate"><span class="pre">MS</span></code> attribute of the controller.
+While for SDC the <code class="docutils literal notranslate"><span class="pre">step</span></code> data structure is the key part, we now have simply a list of steps, bundled in the <code class="docutils literal notranslate"><span class="pre">MS</span></code> attribute of the controller.
 The nice thing about going form MLSDC to PFASST is that only the number of processes in the <code class="docutils literal notranslate"><span class="pre">num_procs</span></code> variable has to be changed.
 This way the controller knows that multiple steps have to be computed in parallel.</p>
 <p>Important things to note:</p>
 <ul class="simple">
 <li><p>To avoid the tedious installation of mpi4py and to have full access to all data at all times, the controllers with the <code class="docutils literal notranslate"><span class="pre">_nonMPI</span></code> suffix only emulate parallelism.
-The algorithm is the same, but the steps are performed serially. Using <code class="docutils literal notranslate"><span class="pre">MPI</span></code> controllers allow for real parallelism and should yield the same results (see next tutorial step).</p></li>
+The algorithm is the same, but the steps are performed serially. Using <code class="docutils literal notranslate"><span class="pre">MPI</span></code> controllers allows for real parallelism and should yield the same results (see next tutorial step).</p></li>
 <li><p>While in principle all steps can have a different number of levels, the controllers implemented so far assume that the number of levels is constant.
 Also, the instantiation of (the list of) steps via the controllers is implemented only for this case. Yet, pySDC’s data structures in principle allow for different approaches.</p></li>
 </ul>
@@ -146,9 +146,9 @@ Also, the instantiation of (the list of) steps via the controllers is implemente
 <h2>Part B: My first PFASST run<a class="headerlink" href="#part-b-my-first-pfasst-run" title="Permalink to this headline">¶</a></h2>
 <p>After we have created our multistep-multilevel hierarchy, we are now ready to run PFASST.
 We choose the simple heat equation for our first test.
-One of the most important characteristic of a parallel-in-time algorithm is its behavior for increasing number of parallel time-steps for a given problem (i.e. with <code class="docutils literal notranslate"><span class="pre">dt</span></code> and <code class="docutils literal notranslate"><span class="pre">Tend</span></code> fixed).
-Therefore, we loop over the number of parallel time-steps in this eample to see how PFASST performs for 1, 2, …, 16 parallel steps.
-We compute and check the error as well as multiple statistical quantaties, e.g. the mean number of iterations, the range of iterations counts and so on.
+One of the most important characteristics of a parallel-in-time algorithm is its behavior for increasing number of parallel time-steps for a given problem (i.e. with <code class="docutils literal notranslate"><span class="pre">dt</span></code> and <code class="docutils literal notranslate"><span class="pre">Tend</span></code> fixed).
+Therefore, we loop over the number of parallel time-steps in this example to see how PFASST performs for 1, 2, …, 16 parallel steps.
+We compute and check the error as well as multiple statistical quantities, e.g. the mean number of iterations, the range of iteration counts and so on.
 We see that PFASST performs very well in this case, the iteration counts do not increase significantly.</p>
 <p>Important things to note:</p>
 <ul class="simple">
@@ -411,14 +411,14 @@ Making the problem more complicated, less/more stiff, changing the order of the 
 <section id="part-c-advection-and-pfasst">
 <h2>Part C: Advection and PFASST<a class="headerlink" href="#part-c-advection-and-pfasst" title="Permalink to this headline">¶</a></h2>
 <p>We saw in the last part that PFASST does perform very well for certain parabolic problems. Now, we test PFASST for an advection test case to see how things go then.
-The basic set up is the same, but now using only an implicit sweeper and periodic boundary conditions.
+The basic setup is the same, but now using only an implicit sweeper and periodic boundary conditions.
 To make things more interesting, we choose two different sweepers: the LU-trick as well as the implicit Euler and check how these are performing for this kind of problem.
 We see that in contrast to the parabolic problem, the iteration counts actually increase significantly, if more parallel time-steps are computed.
 Again, this heavily depends on the actual problem under consideration, but it is a typical behavior of parallel-in-time algorithms of this type.</p>
 <p>Important things to note:</p>
 <ul class="simple">
 <li><p>The setup is actually periodic in time as well! At <code class="docutils literal notranslate"><span class="pre">Tend</span> <span class="pre">=</span> <span class="pre">1</span></code> the exact solution looks exactly like the initial condition.</p></li>
-<li><p>Like the standard IME sweeper, the <code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code> sweeper allows the user to change the preconditioner, named <code class="docutils literal notranslate"><span class="pre">QI</span></code>.
+<li><p>Like the standard IMEX sweeper, the <code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code> sweeper allows the user to change the preconditioner, named <code class="docutils literal notranslate"><span class="pre">QI</span></code>.
 To get the standard implicit Euler scheme, choose <code class="docutils literal notranslate"><span class="pre">IE</span></code>, while for the LU-trick, choose <code class="docutils literal notranslate"><span class="pre">LU</span></code>.
 More choices have been implemented in <code class="docutils literal notranslate"><span class="pre">pySDC.plugins.sweeper_helper.get_Qd</span></code>.</p></li>
 </ul>
