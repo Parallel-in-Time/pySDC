@@ -21,7 +21,7 @@ Important things to note:
    structure
 -  A quick peak into ``HeatEquation_1D_FD`` reveals that the ``init``
    and the ``params.nvars`` attribute contain the same values (namely
-   ``nvars``). Yet, sometime the one or the other is used here (and
+   ``nvars``). Yet, sometimes one or the other is used here (and
    throughout the code). The reason is this: the data structure
    (``mesh`` in this case) needs some form of standard initialization.
    For this, pySDC uses the ``init`` attribute each problem class has.

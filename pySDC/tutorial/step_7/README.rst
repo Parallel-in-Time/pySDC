@@ -25,7 +25,7 @@ Part B: mpi4py-fft for parallel Fourier transforms
 
 The most prominent parallel solver is, probably, the FFT.
 While many implementations or wrappers for Python exist, we decided to use `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_, which provided the easiest installation, a simple API and good parallel scaling.
-As an example we here test the nonlinear Schrödinger equation, using the IMEX sweeper to treat the nonlinear parts explicitly.
+As an example, we here test the nonlinear Schrödinger equation, using the IMEX sweeper to treat the nonlinear parts explicitly.
 The code allows to work both in real and spectral space, while the latter is usually faster.
 This example tests SDC, MLSDC and PFASST.
 
@@ -48,6 +48,6 @@ See `implementations/datatype_classes/petsc_dmda_grid.py` and `implementations/p
 Important things to note:
 
 - We need processors in space and time, which can be achieved by `comm.Split` and coloring. The space-communicator is then passed to the problem class.
-- Below we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.
+- Below, we run the code 3 times: with 1 and 2 processors in space as well as 4 processors (2 in time and 2 in space). Do not expect scaling due to the CI environment.
 
 .. include:: doc_step_7_C.rst
