@@ -29,7 +29,7 @@ To prevent this, information can be sent forward immediately, but then this is n
 
 Important things to note:
 
-- Use the controller parameter ``mssdc_jac`` to controll whether the method should be "parallel" (Jacobi-like) or "serial" (Gauss-like).
+- Use the controller parameter ``mssdc_jac`` to control whether the method should be "parallel" (Jacobi-like) or "serial" (Gauss-like).
 - We increased the logging value here again, (safely) ignoring the warnings for multi-step SDC.
 
 .. include:: doc_step_8_B.rst

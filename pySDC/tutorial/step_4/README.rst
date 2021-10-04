@@ -7,9 +7,9 @@ how MLSDC can be run and tested.
 Part A: Spatial transfer operators
 ----------------------------------
 
-For a mjltilevel hierarchy, we need transfer operators. The user, having
+For a multilevel hierarchy, we need transfer operators. The user, having
 knowledge of the data types, will have to provide a
-``space_transfer_class`` which deals with restriciton and interpolation
+``space_transfer_class`` which deals with restriction and interpolation
 in the spatial dimension. In this part, we simply set up two problems
 with two different resolutions and check the order of interpolation (4
 in this case).
@@ -36,15 +36,15 @@ collocation-based coarsening, we simply replace the ``num_nodes``
 parameter by a list, where the first entry corresponds to the finest
 level. For spatial coarsening, the problem parameter ``nvars`` is
 replaced by a list, too. During the step setup, these dictionaries with
-lists entries are transformed into lists of dictionaries corresponding
+list entries are transformed into lists of dictionaries corresponding
 to the levels (3 in this case). A third generic way of creating multiple
-levels is to replace an entry in the dscription by a list, e.g. a list
+levels is to replace an entry in the description by a list, e.g. a list
 of problem classes. The first entry of each list will always belong to
 the finest level.
 
 Important things to note:
 
--  Not all lists must habe the same length: The longest list defines the
+-  Not all lists must have the same length: The longest list defines the
    number of levels and if other lists are shorter, the levels get the
    last entry in these lists (3 nodes on level 1 and 2 in this example).
 -  As for most other parameters, ``space_transfer_class`` and
@@ -69,7 +69,8 @@ Important things to note:
 -  In this case, the number of iterations is halved when using MLSDC.
    This is the best case and in many situations, this cannot be
    achieved. In particular, the interpolation order is crucial.
--  Using the controller parameter ``predict``, we can turn the coarse level predictor on (default) or off in the case of MLSDC or PFASST.
+-  Using the controller parameter ``predict``, we can turn the coarse
+   level predictor on (default) or off in the case of MLSDC or PFASST.
 -  While MLSDC looks less expensive, the number of evaluations of the
    right-hand side of the ODE is basically the same: This is due to the
    fact that after each coarse grid correction (i.e. after the
@@ -94,10 +95,10 @@ replace the problem class by a simpler version: the coarse evaluation of
 the forces omits the particle-particle interaction and only takes
 external forces into account. This is done simply by replacing the
 problem class by a list of two problem classes in the description. In
-the rsults, we can see that all versions produce more or less the same
+the results, we can see that all versions produce more or less the same
 energies, where MLSDC without f-interpolation takes about half as many
 iterations and with f-interpolation slightly more. We also check the
-timings of the three runs: although MLSDC requires much less iterations,
+timings of the three runs: although MLSDC requires much fewer iterations,
 it takes longer to run. This is due to the fact that the right-hand side
 of the ODE (i.e. the costly force evaluation) is required after each
 interpolation! To this end, we also use f-interpolation, which increases

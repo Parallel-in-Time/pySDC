@@ -21,7 +21,7 @@ all residuals logged during time 0.1 (i.e. for all iterations in the
 first time step). Analogously, we could ask for all residuals at the
 final iteration of each step by calling
 ``filter_stats(stats, iter=-1, type='residual')``. The second helper
-routine converts the filtered or non-filtered dictionary to a listof
+routine converts the filtered or non-filtered dictionary to a list of
 tuples, where the first part is the item defined by the parameter
 ``sortby`` and the second part is the value. Here, we would like to have
 a list of iterations and residuals to see how SDC converged over the
