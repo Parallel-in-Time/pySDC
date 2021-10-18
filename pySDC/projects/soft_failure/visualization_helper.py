@@ -31,7 +31,7 @@ def show_residual_across_simulation(stats, fname):
     residual = np.zeros(maxiter)
     residual[:] = -99
     for k, v in extract_stats.items():
-        if k.iter is not -1:
+        if k.iter != -1:
             residual[k.iter - 1] = np.log10(v)
 
     # Set up latex stuff and fonts
