@@ -56,4 +56,4 @@ class EquidistantInner(CollBase):
         b = self.tright
         nodes = np.linspace(a, b, M + 1, endpoint=False)
         nodes = nodes[1:]
-        return nodes
+        return nodes.squeeze()
