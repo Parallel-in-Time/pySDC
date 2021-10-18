@@ -55,4 +55,4 @@ class Equidistant(CollBase):
         a = self.tleft
         b = self.tright
         nodes = np.linspace(a, b, M)
-        return nodes
+        return nodes.squeeze()

@@ -53,7 +53,7 @@ class EquidistantSpline_Right(CollBase):
         Returns:
             np.ndarray: array of equidistant nodes
         """
-        return np.linspace(self.tleft + 1.0 / self.num_nodes, self.tright, self.num_nodes, endpoint=True)
+        return np.linspace(self.tleft + 1.0 / self.num_nodes, self.tright, self.num_nodes, endpoint=True).squeeze()
 
     def _getWeights(self, a, b):
         """
