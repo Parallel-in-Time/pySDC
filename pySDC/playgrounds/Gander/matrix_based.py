@@ -118,5 +118,5 @@ def estimates_over_lambda():
     plt.show()
 
 if __name__ == '__main__':
-    iteration_vs_estimate()
-    # estimates_over_lambda()
+    # iteration_vs_estimate()
+    estimates_over_lambda()

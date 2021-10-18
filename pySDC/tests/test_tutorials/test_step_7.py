@@ -1,11 +1,12 @@
 import os
 import subprocess
+import pytest
 
-from pySDC.tutorial.step_7.A_pySDC_with_FEniCS import main as main_A
 from pySDC.tutorial.step_7.B_pySDC_with_mpi4pyfft import main as main_B
 
-
+@pytest.mark.fenics
 def test_A():
+    from pySDC.tutorial.step_7.A_pySDC_with_FEniCS import main as main_A
     main_A()
 
 
