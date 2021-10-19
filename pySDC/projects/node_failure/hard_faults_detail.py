@@ -140,7 +140,7 @@ def main(ft_setups, ft_strategies):
             for k, v in extract_stats.items():
                 step = k.process
                 iter = k.iter
-                if iter is not -1:
+                if iter != -1:
                     residual[iter - 1, step] = np.log10(v)
             print('')
             np.savez('data/' + setup + '_steps_vs_iteration_hf_' + strategy, residual=residual, ft_step=ft.hard_step,
