@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v2
         env:
           # Increase this value to reset cache if etc/example-environment.yml has not changed
-          CACHE_NUMBER: 1
+          CACHE_NUMBER: 2
         with:
           path: ~/conda_pkgs_dir
           key:
@@ -34,23 +34,23 @@ jobs:
         with:
           auto-update-conda: true
           python-version: 3.9
-          mamba-version: "*"
-          channels: conda-forge,defaults
-          channel-priority: true
           use-only-tar-bz2: true
-          
+#          mamba-version: "*"
+#          channels: conda-forge,defaults
+#          channel-priority: true
+
       - name: Install dependencies
         run: |
-          mamba install --yes -c conda-forge --file requirements.txt
+          conda install --yes -c conda-forge --file requirements.txt
           
       - name: Lint with flake8
         run: |
-          mamba install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
           
       - name: Run pytest
         run: |
-          mamba install --yes -c conda-forge pytest-cov
+          conda install --yes -c conda-forge pytest-cov
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
       - name: Build documentation
