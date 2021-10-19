@@ -165,7 +165,7 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extract_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">step</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">process</span>
             <span class="nb">iter</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">iter</span>
-            <span class="k">if</span> <span class="nb">iter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">iter</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">residual</span><span class="p">[</span><span class="nb">iter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
         <span class="c1"># stats magic: get niter (probably redundant with maxiter)</span>
