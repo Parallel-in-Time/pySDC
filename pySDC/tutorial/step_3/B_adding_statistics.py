@@ -53,7 +53,7 @@ def run_penning_trap_simulation():
     problem_params = dict()
     problem_params['omega_E'] = 4.9  # E-field frequency
     problem_params['omega_B'] = 25.0  # B-field frequency
-    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])  # initial center of positions
+    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]], dtype=object)  # initial center of positions
     problem_params['nparts'] = 1  # number of particles in the trap
     problem_params['sig'] = 0.1  # smoothing parameter for the forces
 

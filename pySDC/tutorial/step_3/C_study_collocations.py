@@ -57,7 +57,7 @@ def run_simulation():
     problem_params = dict()
     problem_params['omega_E'] = 4.9
     problem_params['omega_B'] = 25.0
-    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]])
+    problem_params['u0'] = np.array([[10, 0, 0], [100, 0, 100], [1], [1]], dtype=object)
     problem_params['nparts'] = 1
     problem_params['sig'] = 0.1
 
