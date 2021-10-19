@@ -33,7 +33,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: 3.7
+          python-version: 3.9
           use-only-tar-bz2: true
           
       - name: Install dependencies
@@ -48,7 +48,7 @@ jobs:
       - name: Run pytest
         run: |
           conda install --yes -c conda-forge pytest-cov
-          pytest --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
       - name: Build documentation
         run: |
