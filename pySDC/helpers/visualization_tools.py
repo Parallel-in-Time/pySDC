@@ -42,7 +42,7 @@ def show_residual_across_simulation(stats, fname='residuals.png'):
         if iter != -1:
             residual[iter - 1, step] = np.log10(v)
 
-    # Set up latex stuff and fonts
+    # Set up plotting stuff and fonts
     rc('font', **{"sans-serif": ["Arial"], "size": 30})
     rc('legend', fontsize='small')
     rc('xtick', labelsize='small')

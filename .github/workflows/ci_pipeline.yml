@@ -34,20 +34,21 @@ jobs:
         with:
           auto-update-conda: true
           python-version: 3.9
+          mamba-version: "*"
           use-only-tar-bz2: true
           
       - name: Install dependencies
         run: |
-          conda install --yes -c conda-forge --file requirements.txt
+          mamba install --yes -c conda-forge --file requirements.txt
           
       - name: Lint with flake8
         run: |
-          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
+          mamba install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
           
       - name: Run pytest
         run: |
-          conda install --yes -c conda-forge pytest-cov
+          mamba install --yes -c conda-forge pytest-cov
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
       - name: Build documentation
