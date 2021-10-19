@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for pySDC/core/Step.py: 96%</title>
+    <title>Coverage for pySDC/core/Step.py: 97%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,12 +18,12 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>pySDC/core/Step.py</b> :
-            <span class="pc_cov">96%</span>
+            <span class="pc_cov">97%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            109 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">105 run</button>
+            116 statements &nbsp;
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">112 run</button>
             <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">4 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">7 excluded</button>
         </h2>
@@ -211,7 +211,7 @@
     <p id="t157" class="pln"><span class="n"><a href="#t157">157</a></span><span class="t">                                    <span class="nam">coarse_level</span><span class="op">=</span><span class="nam">self</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="nam">l</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t158" class="pln"><span class="n"><a href="#t158">158</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t159" class="run"><span class="n"><a href="#t159">159</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t160" class="pln"><span class="n"><a href="#t160">160</a></span><span class="t">    <span class="key">def</span> <span class="nam">__dict_to_list</span><span class="op">(</span><span class="nam">in_dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t160" class="run"><span class="n"><a href="#t160">160</a></span><span class="t">    <span class="key">def</span> <span class="nam">__dict_to_list</span><span class="op">(</span><span class="nam">in_dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t161" class="pln"><span class="n"><a href="#t161">161</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t162" class="pln"><span class="n"><a href="#t162">162</a></span><span class="t"><span class="str">        Straightforward helper function to convert dictionary of list to list of dictionaries</span>&nbsp;</span><span class="r"></span></p>
     <p id="t163" class="pln"><span class="n"><a href="#t163">163</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -302,7 +302,7 @@
     <p id="t248" class="run"><span class="n"><a href="#t248">248</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">u</span><span class="op">[</span><span class="num">0</span><span class="op">]</span> <span class="op">=</span> <span class="nam">P</span><span class="op">.</span><span class="nam">dtype_u</span><span class="op">(</span><span class="nam">u0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t249" class="pln"><span class="n"><a href="#t249">249</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t250" class="run"><span class="n"><a href="#t250">250</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t251" class="pln"><span class="n"><a href="#t251">251</a></span><span class="t">    <span class="key">def</span> <span class="nam">prev</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t251" class="run"><span class="n"><a href="#t251">251</a></span><span class="t">    <span class="key">def</span> <span class="nam">prev</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t252" class="pln"><span class="n"><a href="#t252">252</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t253" class="pln"><span class="n"><a href="#t253">253</a></span><span class="t"><span class="str">        Getter for previous step</span>&nbsp;</span><span class="r"></span></p>
     <p id="t254" class="pln"><span class="n"><a href="#t254">254</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -312,7 +312,7 @@
     <p id="t258" class="run"><span class="n"><a href="#t258">258</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__prev</span>&nbsp;</span><span class="r"></span></p>
     <p id="t259" class="pln"><span class="n"><a href="#t259">259</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t260" class="run"><span class="n"><a href="#t260">260</a></span><span class="t">    <span class="op">@</span><span class="nam">prev</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t261" class="pln"><span class="n"><a href="#t261">261</a></span><span class="t">    <span class="key">def</span> <span class="nam">prev</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">p</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t261" class="run"><span class="n"><a href="#t261">261</a></span><span class="t">    <span class="key">def</span> <span class="nam">prev</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">p</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t262" class="pln"><span class="n"><a href="#t262">262</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t263" class="pln"><span class="n"><a href="#t263">263</a></span><span class="t"><span class="str">        Setter for previous step</span>&nbsp;</span><span class="r"></span></p>
     <p id="t264" class="pln"><span class="n"><a href="#t264">264</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -322,7 +322,7 @@
     <p id="t268" class="run"><span class="n"><a href="#t268">268</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">__prev</span> <span class="op">=</span> <span class="nam">p</span>&nbsp;</span><span class="r"></span></p>
     <p id="t269" class="pln"><span class="n"><a href="#t269">269</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t270" class="run"><span class="n"><a href="#t270">270</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t271" class="pln"><span class="n"><a href="#t271">271</a></span><span class="t">    <span class="key">def</span> <span class="nam">next</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t271" class="run"><span class="n"><a href="#t271">271</a></span><span class="t">    <span class="key">def</span> <span class="nam">next</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t272" class="pln"><span class="n"><a href="#t272">272</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t273" class="pln"><span class="n"><a href="#t273">273</a></span><span class="t"><span class="str">        Getter for next step</span>&nbsp;</span><span class="r"></span></p>
     <p id="t274" class="pln"><span class="n"><a href="#t274">274</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -332,7 +332,7 @@
     <p id="t278" class="run"><span class="n"><a href="#t278">278</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">__next</span>&nbsp;</span><span class="r"></span></p>
     <p id="t279" class="pln"><span class="n"><a href="#t279">279</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t280" class="run"><span class="n"><a href="#t280">280</a></span><span class="t">    <span class="op">@</span><span class="nam">next</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t281" class="pln"><span class="n"><a href="#t281">281</a></span><span class="t">    <span class="key">def</span> <span class="nam">next</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">p</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t281" class="run"><span class="n"><a href="#t281">281</a></span><span class="t">    <span class="key">def</span> <span class="nam">next</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">p</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t282" class="pln"><span class="n"><a href="#t282">282</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t283" class="pln"><span class="n"><a href="#t283">283</a></span><span class="t"><span class="str">        Setter for next step</span>&nbsp;</span><span class="r"></span></p>
     <p id="t284" class="pln"><span class="n"><a href="#t284">284</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -342,7 +342,7 @@
     <p id="t288" class="run"><span class="n"><a href="#t288">288</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">__next</span> <span class="op">=</span> <span class="nam">p</span>&nbsp;</span><span class="r"></span></p>
     <p id="t289" class="pln"><span class="n"><a href="#t289">289</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t290" class="run"><span class="n"><a href="#t290">290</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t291" class="pln"><span class="n"><a href="#t291">291</a></span><span class="t">    <span class="key">def</span> <span class="nam">dt</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t291" class="run"><span class="n"><a href="#t291">291</a></span><span class="t">    <span class="key">def</span> <span class="nam">dt</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t292" class="pln"><span class="n"><a href="#t292">292</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t293" class="pln"><span class="n"><a href="#t293">293</a></span><span class="t"><span class="str">        Getter for current time-step size</span>&nbsp;</span><span class="r"></span></p>
     <p id="t294" class="pln"><span class="n"><a href="#t294">294</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -352,7 +352,7 @@
     <p id="t298" class="run"><span class="n"><a href="#t298">298</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">levels</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">.</span><span class="nam">dt</span>&nbsp;</span><span class="r"></span></p>
     <p id="t299" class="pln"><span class="n"><a href="#t299">299</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t300" class="run"><span class="n"><a href="#t300">300</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t301" class="pln"><span class="n"><a href="#t301">301</a></span><span class="t">    <span class="key">def</span> <span class="nam">time</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t301" class="run"><span class="n"><a href="#t301">301</a></span><span class="t">    <span class="key">def</span> <span class="nam">time</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t302" class="pln"><span class="n"><a href="#t302">302</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t303" class="pln"><span class="n"><a href="#t303">303</a></span><span class="t"><span class="str">        Getter for current time</span>&nbsp;</span><span class="r"></span></p>
     <p id="t304" class="pln"><span class="n"><a href="#t304">304</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -365,7 +365,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-10-04 14:02 +0000
+            created at 2021-10-19 13:51 +0000
         </p>
     </div>
 </div>

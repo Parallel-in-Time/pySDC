@@ -22,8 +22,8 @@
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            22 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">22 run</button>
+            23 statements &nbsp;
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">23 run</button>
             <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">1 excluded</button>
         </h2>
@@ -98,7 +98,7 @@
     <p id="t44" class="run"><span class="n"><a href="#t44">44</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">right_is_node</span> <span class="op">=</span> <span class="key">False</span>&nbsp;</span><span class="r"></span></p>
     <p id="t45" class="pln"><span class="n"><a href="#t45">45</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t46" class="run"><span class="n"><a href="#t46">46</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t47" class="pln"><span class="n"><a href="#t47">47</a></span><span class="t">    <span class="key">def</span> <span class="nam">_getNodes</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t47" class="run"><span class="n"><a href="#t47">47</a></span><span class="t">    <span class="key">def</span> <span class="nam">_getNodes</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t48" class="pln"><span class="n"><a href="#t48">48</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t49" class="pln"><span class="n"><a href="#t49">49</a></span><span class="t"><span class="str">        Computes integration nodes with both boundaries excluded</span>&nbsp;</span><span class="r"></span></p>
     <p id="t50" class="pln"><span class="n"><a href="#t50">50</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -110,13 +110,13 @@
     <p id="t56" class="run"><span class="n"><a href="#t56">56</a></span><span class="t">        <span class="nam">b</span> <span class="op">=</span> <span class="nam">self</span><span class="op">.</span><span class="nam">tright</span>&nbsp;</span><span class="r"></span></p>
     <p id="t57" class="run"><span class="n"><a href="#t57">57</a></span><span class="t">        <span class="nam">nodes</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">linspace</span><span class="op">(</span><span class="nam">a</span><span class="op">,</span> <span class="nam">b</span><span class="op">,</span> <span class="nam">M</span> <span class="op">+</span> <span class="num">1</span><span class="op">,</span> <span class="nam">endpoint</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t58" class="run"><span class="n"><a href="#t58">58</a></span><span class="t">        <span class="nam">nodes</span> <span class="op">=</span> <span class="nam">nodes</span><span class="op">[</span><span class="num">1</span><span class="op">:</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t59" class="run"><span class="n"><a href="#t59">59</a></span><span class="t">        <span class="key">return</span> <span class="nam">nodes</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t59" class="run"><span class="n"><a href="#t59">59</a></span><span class="t">        <span class="key">return</span> <span class="nam">nodes</span><span class="op">.</span><span class="nam">squeeze</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </div>
 <div id="footer">
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-10-04 14:02 +0000
+            created at 2021-10-19 13:51 +0000
         </p>
     </div>
 </div>

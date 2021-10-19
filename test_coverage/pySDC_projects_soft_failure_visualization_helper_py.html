@@ -85,7 +85,7 @@
     <p id="t31" class="run"><span class="n"><a href="#t31">31</a></span><span class="t">    <span class="nam">residual</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">zeros</span><span class="op">(</span><span class="nam">maxiter</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t32" class="run"><span class="n"><a href="#t32">32</a></span><span class="t">    <span class="nam">residual</span><span class="op">[</span><span class="op">:</span><span class="op">]</span> <span class="op">=</span> <span class="op">-</span><span class="num">99</span>&nbsp;</span><span class="r"></span></p>
     <p id="t33" class="run"><span class="n"><a href="#t33">33</a></span><span class="t">    <span class="key">for</span> <span class="nam">k</span><span class="op">,</span> <span class="nam">v</span> <span class="key">in</span> <span class="nam">extract_stats</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t34" class="run"><span class="n"><a href="#t34">34</a></span><span class="t">        <span class="key">if</span> <span class="nam">k</span><span class="op">.</span><span class="nam">iter</span> <span class="key">is</span> <span class="key">not</span> <span class="op">-</span><span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t34" class="run"><span class="n"><a href="#t34">34</a></span><span class="t">        <span class="key">if</span> <span class="nam">k</span><span class="op">.</span><span class="nam">iter</span> <span class="op">!=</span> <span class="op">-</span><span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t35" class="run"><span class="n"><a href="#t35">35</a></span><span class="t">            <span class="nam">residual</span><span class="op">[</span><span class="nam">k</span><span class="op">.</span><span class="nam">iter</span> <span class="op">-</span> <span class="num">1</span><span class="op">]</span> <span class="op">=</span> <span class="nam">np</span><span class="op">.</span><span class="nam">log10</span><span class="op">(</span><span class="nam">v</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t36" class="pln"><span class="n"><a href="#t36">36</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t37" class="pln"><span class="n"><a href="#t37">37</a></span><span class="t">    <span class="com"># Set up latex stuff and fonts</span>&nbsp;</span><span class="r"></span></p>
@@ -184,7 +184,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-10-04 14:02 +0000
+            created at 2021-10-19 13:51 +0000
         </p>
     </div>
 </div>

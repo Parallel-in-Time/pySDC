@@ -22,8 +22,8 @@
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            67 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">67 run</button>
+            71 statements &nbsp;
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">71 run</button>
             <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">6 excluded</button>
         </h2>
@@ -113,7 +113,7 @@
     <p id="t59" class="run"><span class="n"><a href="#t59">59</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">left_is_node</span> <span class="op">=</span> <span class="key">None</span>&nbsp;</span><span class="r"></span></p>
     <p id="t60" class="pln"><span class="n"><a href="#t60">60</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t61" class="run"><span class="n"><a href="#t61">61</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t62" class="pln"><span class="n"><a href="#t62">62</a></span><span class="t">    <span class="key">def</span> <span class="nam">evaluate</span><span class="op">(</span><span class="nam">weights</span><span class="op">,</span> <span class="nam">data</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t62" class="run"><span class="n"><a href="#t62">62</a></span><span class="t">    <span class="key">def</span> <span class="nam">evaluate</span><span class="op">(</span><span class="nam">weights</span><span class="op">,</span> <span class="nam">data</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t63" class="pln"><span class="n"><a href="#t63">63</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t64" class="pln"><span class="n"><a href="#t64">64</a></span><span class="t"><span class="str">        Evaluates the quadrature over the full interval</span>&nbsp;</span><span class="r"></span></p>
     <p id="t65" class="pln"><span class="n"><a href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -165,7 +165,7 @@
     <p id="t111" class="exc show_exc"><span class="n"><a href="#t111">111</a></span><span class="t">        <span class="key">raise</span> <span class="nam">NotImplementedError</span><span class="op">(</span><span class="str">'ERROR: collocation has to implement _getNodes(self)'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t112" class="pln"><span class="n"><a href="#t112">112</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t113" class="run"><span class="n"><a href="#t113">113</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t114" class="pln"><span class="n"><a href="#t114">114</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_Qmatrix</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t114" class="run"><span class="n"><a href="#t114">114</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_Qmatrix</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t115" class="pln"><span class="n"><a href="#t115">115</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t116" class="pln"><span class="n"><a href="#t116">116</a></span><span class="t"><span class="str">        Compute tleft-to-node integration matrix for later use in collocation formulation</span>&nbsp;</span><span class="r"></span></p>
     <p id="t117" class="pln"><span class="n"><a href="#t117">117</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -199,7 +199,7 @@
     <p id="t145" class="run"><span class="n"><a href="#t145">145</a></span><span class="t">        <span class="key">return</span> <span class="nam">Q</span>&nbsp;</span><span class="r"></span></p>
     <p id="t146" class="pln"><span class="n"><a href="#t146">146</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t147" class="run"><span class="n"><a href="#t147">147</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t148" class="pln"><span class="n"><a href="#t148">148</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_Smatrix</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t148" class="run"><span class="n"><a href="#t148">148</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_Smatrix</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t149" class="pln"><span class="n"><a href="#t149">149</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t150" class="pln"><span class="n"><a href="#t150">150</a></span><span class="t"><span class="str">        Compute node-to-node integration matrix for later use in collocation formulation</span>&nbsp;</span><span class="r"></span></p>
     <p id="t151" class="pln"><span class="n"><a href="#t151">151</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -217,7 +217,7 @@
     <p id="t163" class="run"><span class="n"><a href="#t163">163</a></span><span class="t">        <span class="key">return</span> <span class="nam">S</span>&nbsp;</span><span class="r"></span></p>
     <p id="t164" class="pln"><span class="n"><a href="#t164">164</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t165" class="run"><span class="n"><a href="#t165">165</a></span><span class="t">    <span class="op">@</span><span class="nam">property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t166" class="pln"><span class="n"><a href="#t166">166</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_deltas</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t166" class="run"><span class="n"><a href="#t166">166</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gen_deltas</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t167" class="pln"><span class="n"><a href="#t167">167</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t168" class="pln"><span class="n"><a href="#t168">168</a></span><span class="t"><span class="str">        Compute distances between the nodes</span>&nbsp;</span><span class="r"></span></p>
     <p id="t169" class="pln"><span class="n"><a href="#t169">169</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -236,7 +236,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-10-04 14:02 +0000
+            created at 2021-10-19 13:51 +0000
         </p>
     </div>
 </div>
