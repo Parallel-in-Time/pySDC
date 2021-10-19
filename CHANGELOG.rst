@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- October 21, 2021: Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test suite seems to run
+  faster now, since sorting out the dependencies is faster.
+
 - August 11, 2021: Version 4.1 has some more changes under the hood, most of them with no significant impact to users.
   The CI pipeline has been completely rewritten, porting the code to `Github Actions <https://github.com/features/actions>`_
   (away from `Travis CI <https://travis-ci.com/>`_), to `flake8 <https://flake8.pycqa.org>`_ and to `pytest <https://pytest.org>`_
