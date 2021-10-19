@@ -35,6 +35,8 @@ jobs:
           auto-update-conda: true
           python-version: 3.9
           mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
           use-only-tar-bz2: true
           
       - name: Install dependencies
