@@ -9,7 +9,7 @@ sympy>=1.0
 # These packages are required for some of the more involved examples (and data types etc.), can be omitted
 petsc4py>=3.10.0
 mpi4py>=3.0.0
-fenics==2018.1.0
+fenics>=2019.1.0
 mpi4py-fft>=2.0.2
 # These packages are used for CI/CD and can be ignored
 pip
