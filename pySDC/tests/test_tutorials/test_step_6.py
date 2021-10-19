@@ -1,4 +1,5 @@
 import pkg_resources
+import pytest
 
 from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
 from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
@@ -12,6 +13,7 @@ def test_A():
 def test_B():
     main_B()
 
+@pytest.mark.parallel
 def test_C():
     installed_packages = [d for d in pkg_resources.working_set]
     flat_installed_packages = [package.project_name for package in installed_packages]

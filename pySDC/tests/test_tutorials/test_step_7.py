@@ -13,7 +13,7 @@ def test_A():
 def test_B():
     main_B()
 
-
+@pytest.mark.parallel
 def test_C_1x1():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
@@ -35,7 +35,7 @@ def test_C_1x1():
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                               (p.returncode, num_procs)
 
-
+@pytest.mark.parallel
 def test_C_1x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
@@ -56,6 +56,7 @@ def test_C_1x2():
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
                               (p.returncode, num_procs)
 
+@pytest.mark.parallel
 def test_C_2x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
