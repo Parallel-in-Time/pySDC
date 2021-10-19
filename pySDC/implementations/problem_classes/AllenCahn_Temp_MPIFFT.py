@@ -54,7 +54,7 @@ class allencahn_temp_imex(ptype):
         # creating FFT structure
         ndim = len(problem_params['nvars'])
         axes = tuple(range(ndim))
-        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float, collapse=True)
+        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64, collapse=True)
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
