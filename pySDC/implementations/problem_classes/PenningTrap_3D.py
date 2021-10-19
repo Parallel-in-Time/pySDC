@@ -191,11 +191,9 @@ class penningtrap(ptype):
         Ip = u0[0][1] - Im
 
         # compute position in complex notation
-        w = np.complex128(Rp, Ip) * np.exp(-np.complex128(0, Op * t)) + np.complex128(Rm, Im) * \
-            np.exp(-np.complex128(0, Om * t))
+        w = (Rp + Ip * 1j) * np.exp(-Op * t * 1j) + (Rm + Im * 1j) * np.exp(-Om * t * 1j)
         # compute velocity as time derivative of the position
-        dw = -1j * Op * np.complex128(Rp, Ip) * np.exp(-np.complex128(0, Op * t)) - 1j * Om * np.complex128(Rm, Im) * \
-            np.exp(-np.complex128(0, Om * t))
+        dw = -1j * Op * (Rp + Ip * 1j) * np.exp(-Op * t * 1j) - 1j * Om * (Rm + Im * 1j) * np.exp(-Om * t * 1j)
 
         # get the appropriate real and imaginary parts
         u.pos[0, 0] = w.real
