@@ -249,7 +249,7 @@ def visualize_radii():
 
         # test if all went well
         assert glob.glob(f'{f}.pdf'), 'ERROR: plotting did not create PDF file'
-        assert glob.glob(f'{f}.pgf'), 'ERROR: plotting did not create PGF file'
+        # assert glob.glob(f'{f}.pgf'), 'ERROR: plotting did not create PGF file'
         assert glob.glob(f'{f}.png'), 'ERROR: plotting did not create PNG file'
 
         # set up plot for volumes
@@ -274,7 +274,7 @@ def visualize_radii():
 
         # test if all went well
         assert glob.glob(f'{f}.pdf'), 'ERROR: plotting did not create PDF file'
-        assert glob.glob(f'{f}.pgf'), 'ERROR: plotting did not create PGF file'
+        # assert glob.glob(f'{f}.pgf'), 'ERROR: plotting did not create PGF file'
         assert glob.glob(f'{f}.png'), 'ERROR: plotting did not create PNG file'
 
 

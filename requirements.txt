@@ -13,6 +13,9 @@ fenics>=2019.1.0
 mpi4py-fft>=2.0.2
 # These packages are used for CI/CD and can be ignored
 pip
+flake8
+flake8-comprehensions
+flake8-bugbear
 pytest
 pytest-cov
 sphinx
