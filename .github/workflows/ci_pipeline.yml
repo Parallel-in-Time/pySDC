@@ -18,10 +18,11 @@ jobs:
       - name: Add packages
         run: |
           sudo apt-get update
-          sudo apt-get install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng
+          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
           
       - name: Cache conda
         uses: actions/cache@v2
+#        if: ${{ !env.ACT }}
         env:
           # Increase this value to reset cache if etc/example-environment.yml has not changed
           CACHE_NUMBER: 2
@@ -29,7 +30,16 @@ jobs:
           path: ~/conda_pkgs_dir
           key:
             ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
-            
+
+      - name: Install miniconda
+        if: ${{ env.ACT }}
+        run: |
+          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+          wget $MINICONDA_URL
+          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
+          sudo bash $MINICONDA_SH -b -p $CONDA
+          rm $MINICONDA_SH # Clean up after installing
+
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
