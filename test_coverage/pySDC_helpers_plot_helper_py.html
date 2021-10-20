@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for pySDC/helpers/plot_helper.py: 93%</title>
+    <title>Coverage for pySDC/helpers/plot_helper.py: 97%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,13 +18,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>pySDC/helpers/plot_helper.py</b> :
-            <span class="pc_cov">93%</span>
+            <span class="pc_cov">97%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             29 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">27 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">2 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">28 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">1 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
         </h2>
     </div>
@@ -97,7 +97,7 @@
     <p id="t43" class="pln"><span class="n"><a href="#t43">43</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t44" class="run"><span class="n"><a href="#t44">44</a></span><span class="t">    <span class="key">if</span> <span class="nam">find_executable</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t45" class="pln"><span class="n"><a href="#t45">45</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t46" class="mis show_mis"><span class="n"><a href="#t46">46</a></span><span class="t">        <span class="nam">latex_support</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t46" class="run"><span class="n"><a href="#t46">46</a></span><span class="t">        <span class="nam">latex_support</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p id="t47" class="pln"><span class="n"><a href="#t47">47</a></span><span class="t">            <span class="str">"pgf.texsystem"</span><span class="op">:</span> <span class="str">"pdflatex"</span><span class="op">,</span>  <span class="com"># change this if using xetex or lautex</span>&nbsp;</span><span class="r"></span></p>
     <p id="t48" class="pln"><span class="n"><a href="#t48">48</a></span><span class="t">            <span class="str">"text.usetex"</span><span class="op">:</span> <span class="key">True</span><span class="op">,</span>  <span class="com"># use LaTeX to write all text</span>&nbsp;</span><span class="r"></span></p>
     <p id="t49" class="pln"><span class="n"><a href="#t49">49</a></span><span class="t">            <span class="str">"pgf.preamble"</span><span class="op">:</span> <span class="str">r"\usepackage[utf8x]{inputenc}"</span>&nbsp;</span><span class="r"></span></p>
@@ -106,7 +106,7 @@
     <p id="t52" class="pln"><span class="n"><a href="#t52">52</a></span><span class="t">                            <span class="str">r"\usepackage{amsmath,amssymb,marvosym}"</span>&nbsp;</span><span class="r"></span></p>
     <p id="t53" class="pln"><span class="n"><a href="#t53">53</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p id="t54" class="pln"><span class="n"><a href="#t54">54</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t55" class="run"><span class="n"><a href="#t55">55</a></span><span class="t">        <span class="nam">latex_support</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t55" class="mis show_mis"><span class="n"><a href="#t55">55</a></span><span class="t">        <span class="nam">latex_support</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p id="t56" class="pln"><span class="n"><a href="#t56">56</a></span><span class="t">            <span class="str">"text.usetex"</span><span class="op">:</span> <span class="key">False</span><span class="op">,</span>  <span class="com"># use LaTeX to write all text</span>&nbsp;</span><span class="r"></span></p>
     <p id="t57" class="pln"><span class="n"><a href="#t57">57</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p id="t58" class="pln"><span class="n"><a href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -121,7 +121,7 @@
     <p id="t67" class="pln"><span class="n"><a href="#t67">67</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t68" class="run"><span class="n"><a href="#t68">68</a></span><span class="t"><span class="key">def</span> <span class="nam">savefig</span><span class="op">(</span><span class="nam">filename</span><span class="op">,</span> <span class="nam">save_pdf</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">save_pgf</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">save_png</span><span class="op">=</span><span class="key">True</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t69" class="run"><span class="n"><a href="#t69">69</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_pgf</span> <span class="key">and</span> <span class="nam">find_executable</span><span class="op">(</span><span class="str">'latex'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t70" class="mis show_mis"><span class="n"><a href="#t70">70</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'{}.pgf'</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t70" class="run"><span class="n"><a href="#t70">70</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'{}.pgf'</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t71" class="run"><span class="n"><a href="#t71">71</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_pdf</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t72" class="run"><span class="n"><a href="#t72">72</a></span><span class="t">        <span class="nam">plt</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'{}.pdf'</span><span class="op">.</span><span class="nam">format</span><span class="op">(</span><span class="nam">filename</span><span class="op">)</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t73" class="run"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="key">if</span> <span class="nam">save_png</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -132,7 +132,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-10-20 16:17 +0000
+            created at 2021-10-20 16:56 +0000
         </p>
     </div>
 </div>
