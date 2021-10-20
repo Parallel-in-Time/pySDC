@@ -18,7 +18,8 @@ jobs:
       - name: Add packages
         run: |
           sudo apt-get update
-          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+          sudo apt-get --yes install nodejs
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
       - name: Cache conda
         uses: actions/cache@v2
@@ -55,12 +56,10 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
 
       - name: Run pytest
         run: |
-          conda install --yes -c conda-forge pytest-cov
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
       - name: Build documentation

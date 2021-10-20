@@ -1,6 +1,6 @@
 import matplotlib as mpl
-mpl.use('pgf')
 import matplotlib.pyplot as plt
+from distutils.spawn import find_executable
 
 
 def figsize(textwidth, scale, ratio):
@@ -14,9 +14,7 @@ def figsize(textwidth, scale, ratio):
 
 def setup_mpl(font_size=8):
     # Set up plotting parameters
-    pgf_with_latex = {  # setup matplotlib to use latex for output
-        "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
-        "text.usetex": True,  # use LaTeX to write all text
+    style_options = {  # setup matplotlib to use latex for output
         "font.family": "serif",
         "font.serif": [],  # blank entries should cause plots to inherit fonts from the document
         "font.sans-serif": [],
@@ -39,12 +37,26 @@ def setup_mpl(font_size=8):
         "grid.alpha": 0.25,
         "figure.subplot.hspace": 0.0,
         "savefig.pad_inches": 0.01,
-        "pgf.preamble": r"\usepackage[utf8x]{inputenc}"
-                        r"\usepackage[T1]{fontenc}"
-                        r"\usepackage{underscore}"
-                        r"\usepackage{amsmath,amssymb,marvosym}"
     }
-    mpl.rcParams.update(pgf_with_latex)
+
+    mpl.rcParams.update(style_options)
+
+    if find_executable('latex'):
+
+        latex_support = {
+            "pgf.texsystem": "pdflatex",  # change this if using xetex or lautex
+            "text.usetex": True,  # use LaTeX to write all text
+            "pgf.preamble": r"\usepackage[utf8x]{inputenc}"
+                            r"\usepackage[T1]{fontenc}"
+                            r"\usepackage{underscore}"
+                            r"\usepackage{amsmath,amssymb,marvosym}"
+        }
+    else:
+        latex_support = {
+            "text.usetex": False,  # use LaTeX to write all text
+        }
+
+    mpl.rcParams.update(latex_support)
 
 
 def newfig(textwidth, scale, ratio=0.6180339887):
@@ -54,7 +66,7 @@ def newfig(textwidth, scale, ratio=0.6180339887):
 
 
 def savefig(filename, save_pdf=True, save_pgf=True, save_png=True):
-    if save_pgf:
+    if save_pgf and find_executable('latex'):
         plt.savefig('{}.pgf'.format(filename), bbox_inches='tight')
     if save_pdf:
         plt.savefig('{}.pdf'.format(filename), bbox_inches='tight')
