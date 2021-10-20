@@ -234,7 +234,7 @@ def show_results(fname, cwd=''):
     plt_helper.savefig(f)
 
     assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    # assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     # set up plot for radii
@@ -272,7 +272,7 @@ def show_results(fname, cwd=''):
     plt_helper.savefig(f)
 
     assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    # assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     # set up plot for interface width
@@ -301,7 +301,7 @@ def show_results(fname, cwd=''):
     plt_helper.savefig(f)
 
     assert os.path.isfile(f + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
+    # assert os.path.isfile(f + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(f + '.png'), 'ERROR: plotting did not create PNG file'
 
     return None

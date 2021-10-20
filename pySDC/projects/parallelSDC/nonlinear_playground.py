@@ -169,7 +169,7 @@ def plot_graphs():
     plt_helper.savefig(fname)
 
     assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
+    # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
 
