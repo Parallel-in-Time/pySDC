@@ -18,8 +18,7 @@ jobs:
       - name: Add packages
         run: |
           sudo apt-get update
-          sudo apt-get --yes install nodejs
-#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
       - name: Cache conda
         uses: actions/cache@v2
