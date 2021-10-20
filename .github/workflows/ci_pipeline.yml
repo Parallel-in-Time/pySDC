@@ -19,10 +19,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-          
+
       - name: Cache conda
         uses: actions/cache@v2
-#        if: ${{ !env.ACT }}
         env:
           # Increase this value to reset cache if etc/example-environment.yml has not changed
           CACHE_NUMBER: 2
@@ -31,7 +30,7 @@ jobs:
           key:
             ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
 
-      - name: Install miniconda
+      - name: act workarounds
         if: ${{ env.ACT }}
         run: |
           MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
@@ -39,6 +38,7 @@ jobs:
           MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
           sudo bash $MINICONDA_SH -b -p $CONDA
           rm $MINICONDA_SH # Clean up after installing
+          mkdir data
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -52,12 +52,12 @@ jobs:
       - name: Install dependencies
         run: |
           conda install --yes -c conda-forge --file requirements.txt
-          
+
       - name: Lint with flake8
         run: |
           conda install --yes -c conda-forge flake8 flake8-comprehensions flake8-bugbear
           flake8 pySDC
-          
+
       - name: Run pytest
         run: |
           conda install --yes -c conda-forge pytest-cov
@@ -71,7 +71,7 @@ jobs:
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' }} && ${{ !env.ACT }}
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: docs/build/html # The folder the action should deploy.
