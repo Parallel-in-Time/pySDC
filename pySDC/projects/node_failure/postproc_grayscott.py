@@ -95,7 +95,7 @@ def create_plots(cwd=''):
     plt_helper.savefig(fname)
 
     assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-    assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
+    # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
     assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
     for file, strategy, _, _, _ in list:
@@ -146,7 +146,7 @@ def create_plots(cwd=''):
         plt_helper.savefig(fname)
 
         assert os.path.isfile(fname + '.pdf'), 'ERROR: plotting did not create PDF file'
-        assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
+        # assert os.path.isfile(fname + '.pgf'), 'ERROR: plotting did not create PGF file'
         assert os.path.isfile(fname + '.png'), 'ERROR: plotting did not create PNG file'
 
 
