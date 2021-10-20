@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>helpers.plot_helper &#8212; pySDC 4.1.1 documentation</title>
+    <title>helpers.plot_helper &#8212; pySDC 4.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.plot_helper</a></li> 
       </ul>
@@ -39,8 +39,8 @@
             
   <h1>Source code for helpers.plot_helper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-<span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;pgf&#39;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
 
 
 <div class="viewcode-block" id="figsize"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.figsize">[docs]</a><span class="k">def</span> <span class="nf">figsize</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
@@ -54,9 +54,7 @@
 
 <div class="viewcode-block" id="setup_mpl"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.setup_mpl">[docs]</a><span class="k">def</span> <span class="nf">setup_mpl</span><span class="p">(</span><span class="n">font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
     <span class="c1"># Set up plotting parameters</span>
-    <span class="n">pgf_with_latex</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># setup matplotlib to use latex for output</span>
-        <span class="s2">&quot;pgf.texsystem&quot;</span><span class="p">:</span> <span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span>  <span class="c1"># change this if using xetex or lautex</span>
-        <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># use LaTeX to write all text</span>
+    <span class="n">style_options</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># setup matplotlib to use latex for output</span>
         <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;serif&quot;</span><span class="p">,</span>
         <span class="s2">&quot;font.serif&quot;</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># blank entries should cause plots to inherit fonts from the document</span>
         <span class="s2">&quot;font.sans-serif&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -79,12 +77,26 @@
         <span class="s2">&quot;grid.alpha&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
         <span class="s2">&quot;figure.subplot.hspace&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s2">&quot;savefig.pad_inches&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
-        <span class="s2">&quot;pgf.preamble&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\usepackage[utf8x]</span><span class="si">{inputenc}</span><span class="s2">&quot;</span>
-                        <span class="sa">r</span><span class="s2">&quot;\usepackage[T1]</span><span class="si">{fontenc}</span><span class="s2">&quot;</span>
-                        <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{underscore}</span><span class="s2">&quot;</span>
-                        <span class="sa">r</span><span class="s2">&quot;\usepackage{amsmath,amssymb,marvosym}&quot;</span>
     <span class="p">}</span>
-    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pgf_with_latex</span><span class="p">)</span></div>
+
+    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">style_options</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
+
+        <span class="n">latex_support</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;pgf.texsystem&quot;</span><span class="p">:</span> <span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span>  <span class="c1"># change this if using xetex or lautex</span>
+            <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># use LaTeX to write all text</span>
+            <span class="s2">&quot;pgf.preamble&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\usepackage[utf8x]</span><span class="si">{inputenc}</span><span class="s2">&quot;</span>
+                            <span class="sa">r</span><span class="s2">&quot;\usepackage[T1]</span><span class="si">{fontenc}</span><span class="s2">&quot;</span>
+                            <span class="sa">r</span><span class="s2">&quot;\usepackage</span><span class="si">{underscore}</span><span class="s2">&quot;</span>
+                            <span class="sa">r</span><span class="s2">&quot;\usepackage{amsmath,amssymb,marvosym}&quot;</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">latex_support</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># use LaTeX to write all text</span>
+        <span class="p">}</span>
+
+    <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">latex_support</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="newfig"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.newfig">[docs]</a><span class="k">def</span> <span class="nf">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mf">0.6180339887</span><span class="p">):</span>
@@ -94,7 +106,7 @@
 
 
 <div class="viewcode-block" id="savefig"><a class="viewcode-back" href="../../pySDC/helpers.html#helpers.plot_helper.savefig">[docs]</a><span class="k">def</span> <span class="nf">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">save_pdf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_pgf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_png</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">save_pgf</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">save_pgf</span> <span class="ow">and</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;latex&#39;</span><span class="p">):</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pgf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">save_pdf</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.pdf&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
@@ -132,7 +144,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers.plot_helper</a></li> 
       </ul>

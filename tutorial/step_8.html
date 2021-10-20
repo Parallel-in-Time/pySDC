@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Step-8: Advanced topics &#8212; pySDC 4.1.1 documentation</title>
+    <title>Step-8: Advanced topics &#8212; pySDC 4.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="step_7.html" title="Step-7: pySDC with external libraries"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-8: Advanced topics</a></li> 
       </ul>
     </div>  
@@ -136,7 +136,7 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">8</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 603.5px; height: 434.5px;" /></a>
+<a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 619.5px; height: 438.0px;" /></a>
 </section>
 <section id="part-b-multi-step-sdc">
 <h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Permalink to this headline">¶</a></h2>
@@ -330,8 +330,8 @@ To prevent this, information can be sent forward immediately, but then this is n
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">8</span> <span class="o">/</span> <span class="mi">18</span> <span class="o">/</span> <span class="mi">11</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_jac.png"><img alt="../_images/step_8_residuals_mssdc_jac.png" src="../_images/step_8_residuals_mssdc_jac.png" style="width: 595.5px; height: 434.5px;" /></a>
-<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_gs.png"><img alt="../_images/step_8_residuals_mssdc_gs.png" src="../_images/step_8_residuals_mssdc_gs.png" style="width: 590.5px; height: 434.5px;" /></a>
+<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_jac.png"><img alt="../_images/step_8_residuals_mssdc_jac.png" src="../_images/step_8_residuals_mssdc_jac.png" style="width: 608.5px; height: 438.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_gs.png"><img alt="../_images/step_8_residuals_mssdc_gs.png" src="../_images/step_8_residuals_mssdc_gs.png" style="width: 603.0px; height: 438.0px;" /></a>
 </section>
 <section id="part-c-iteration-estimator">
 <h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Permalink to this headline">¶</a></h2>
@@ -643,7 +643,7 @@ This example takes three different test cases and checks how well the iteration 
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 8.5566e-09
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5246e-09
 
-...done, took 2.116288185119629 seconds!
+...done, took 1.9266457557678223 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -657,7 +657,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5501e-08 / 9.4213e-09
    Errors after step   1.0000 with 3 iterations: 3.6812e-08 / 1.0487e-08
 
-...done, took 5.064230918884277 seconds!
+...done, took 4.585777997970581 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -671,7 +671,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
 
-...done, took 0.4281294345855713 seconds!
+...done, took 0.3777444362640381 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -685,7 +685,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
 
-...done, took 1.086381196975708 seconds!
+...done, took 0.9792828559875488 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -699,7 +699,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
 
-...done, took 0.9534797668457031 seconds!
+...done, took 0.8136575222015381 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -713,7 +713,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
 
-...done, took 1.807680368423462 seconds!
+...done, took 1.544712781906128 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -784,7 +784,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
         <li class="right" >
           <a href="step_7.html" title="Step-7: pySDC with external libraries"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-8: Advanced topics</a></li> 
       </ul>
     </div>
