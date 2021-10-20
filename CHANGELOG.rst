@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- October 21, 2021 (WIP): Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
+- October 20, 2021: Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
   suite seems to run faster now, since sorting out the dependencies is faster. Tested `mamba <https://github.com/mamba-org/mamba>`_,
   but this is not stable enough, yet. Also, the CI workflow can now run locally using `act <https://github.com/nektos/act>`_.
 
