@@ -112,9 +112,11 @@ ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
 <ul>
-<li><p>October 21, 2021 (WIP): Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
+<li><p>October 20, 2021: Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
 suite seems to run faster now, since sorting out the dependencies is faster. Tested <a class="reference external" href="https://github.com/mamba-org/mamba">mamba</a>,
-but this is not stable enough, yet. Also, the CI workflow can now run locally using <a class="reference external" href="https://github.com/nektos/act">act</a>.</p></li>
+but this is not stable enough, yet. Also, the CI workflow can now run locally using <a class="reference external" href="https://github.com/nektos/act">act</a>.
+We introduced markers for soem of the tests in preparation of distributed tests on different platforms. And finally, a LaTeX
+installation is no longer needed use plotting (but recommended).</p></li>
 <li><p>August 11, 2021: Version 4.1 has some more changes under the hood, most of them with no significant impact to users.
 The CI pipeline has been completely rewritten, porting the code to <a class="reference external" href="https://github.com/features/actions">Github Actions</a>
 (away from <a class="reference external" href="https://travis-ci.com/">Travis CI</a>), to <a class="reference external" href="https://flake8.pycqa.org">flake8</a> and to <a class="reference external" href="https://pytest.org">pytest</a>
