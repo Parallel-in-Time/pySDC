@@ -14,7 +14,7 @@ Features
 - 8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
-- Works with `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_, `FEniCS <https://fenicsproject.org/>`_ and `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_
+- Works with `FEniCS <https://fenicsproject.org/>`_, `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ and `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_
 - Continuous integration via `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`__
 - Fully compatible with Python 3.6 - 3.9
 
@@ -68,7 +68,7 @@ This workflow can be run locally using `act <https://github.com/nektos/act>`_ by
 
    act --env CONDA=/usr/share/miniconda -j ci
 
-See also `here <https://github.com/lmmx/devnotes/wiki/Running-GitHub-CI-locally-with-nektos-act-(Docker)-in-LXC>`_ for details on how to run workflos depending on miniconda locally.
+See also `this page <https://github.com/lmmx/devnotes/wiki/Running-GitHub-CI-locally-with-nektos-act-(Docker)-in-LXC>`_ for details on how to run workflows depending on miniconda locally.
 
 For many examples, `LaTeX` is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
 When using `fenics` or `petsc4py`, a C++ compiler is required (although installation may go through at first).
