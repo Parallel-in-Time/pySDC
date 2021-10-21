@@ -14,7 +14,7 @@ Features
 - 8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics
 - Projects: many documented projects with defined and tested outcomes
 - Many different examples, collocation types, data types already implemented
-- Works with `FEniCS <https://fenicsproject.org/>`_, `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ and `PETSc <http://www.mcs.anl.gov/petsc/>`_ through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_
+- Works with `FEniCS <https://fenicsproject.org/>`_, `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ and `PETSc <http://www.mcs.anl.gov/petsc/>`_ (through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_)
 - Continuous integration via `Github Actions <https://github.com/Parallel-in-Time/pySDC/actions>`__
 - Fully compatible with Python 3.6 - 3.9
 
