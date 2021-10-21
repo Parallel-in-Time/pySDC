@@ -54,7 +54,7 @@ New ideas like e.g. sweepers or predictors can be tested and first toy problems 
 <li><p>8 tutorials: from setting up a first collocation problem to SDC, PFASST and advanced topics</p></li>
 <li><p>Projects: many documented projects with defined and tested outcomes</p></li>
 <li><p>Many different examples, collocation types, data types already implemented</p></li>
-<li><p>Works with <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> through <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>, <a class="reference external" href="https://fenicsproject.org/">FEniCS</a> and <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a></p></li>
+<li><p>Works with <a class="reference external" href="https://fenicsproject.org/">FEniCS</a>, <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a> and <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> (through <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>)</p></li>
 <li><p>Continuous integration via <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">Github Actions</a></p></li>
 <li><p>Fully compatible with Python 3.6 - 3.9</p></li>
 </ul>
@@ -94,7 +94,7 @@ This workflow can be run locally using <a class="reference external" href="https
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>act --env <span class="nv">CONDA</span><span class="o">=</span>/usr/share/miniconda -j ci
 </pre></div>
 </div>
-<p>See also <a class="reference external" href="https://github.com/lmmx/devnotes/wiki/Running-GitHub-CI-locally-with-nektos-act-(Docker)-in-LXC">here</a> for details on how to run workflos depending on miniconda locally.</p>
+<p>See also <a class="reference external" href="https://github.com/lmmx/devnotes/wiki/Running-GitHub-CI-locally-with-nektos-act-(Docker)-in-LXC">this page</a> for details on how to run workflows depending on miniconda locally.</p>
 <p>For many examples, <cite>LaTeX</cite> is used for the plots, i.e. a decent installation of this is needed in order to run the tests.
 When using <cite>fenics</cite> or <cite>petsc4py</cite>, a C++ compiler is required (although installation may go through at first).</p>
 <p>For more details on <cite>pySDC</cite>, check out <a class="reference external" href="http://www.parallel-in-time.org/pySDC">http://www.parallel-in-time.org/pySDC</a>.</p>
