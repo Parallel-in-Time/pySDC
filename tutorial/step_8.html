@@ -317,9 +317,9 @@ To prevent this, information can be sent forward immediately, but then this is n
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="n">PFASST</span><span class="p">:</span> <span class="mf">2.87344391e-07</span>
 <span class="n">Error</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87650037e-07</span>
 <span class="n">Error</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">2.87540078e-07</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646529e-10</span>
-<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687317e-10</span>
-<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959212e-10</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">parallel</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">3.05646446e-10</span>
+<span class="n">Diff</span> <span class="n">PFASST</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.95687310e-10</span>
+<span class="n">Diff</span> <span class="n">parallel</span> <span class="n">vs</span><span class="o">.</span> <span class="n">serial</span> <span class="n">MSSDC</span><span class="p">:</span> <span class="mf">1.09959191e-10</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span>  <span class="mi">8</span> <span class="o">/</span>  <span class="mi">8</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">5</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">/</span>  <span class="mi">9</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span> <span class="p">(</span><span class="n">PFASST</span><span class="o">/</span><span class="n">parMSSDC</span><span class="o">/</span><span class="n">serMSSDC</span><span class="p">):</span>  <span class="mi">6</span> <span class="o">/</span> <span class="mi">11</span> <span class="o">/</span>  <span class="mi">9</span>
@@ -636,28 +636,28 @@ This example takes three different test cases and checks how well the iteration 
    Mean number of iterations: 5.75
    Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 8.6496e-09
    Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 2.9864e-08
-   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 3.5300e-09
-   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 4.9219e-09
-   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 6.2371e-09
-   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 7.4550e-09
+   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 3.5299e-09
+   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 4.9220e-09
+   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 6.2372e-09
+   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 7.4551e-09
    Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 8.5566e-09
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5246e-09
 
-...done, took 2.1670687198638916 seconds!
+...done, took 1.4934604167938232 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 3.00
    Errors after step   0.1250 with 3 iterations: 9.8193e-09 / 6.6457e-10
-   Errors after step   0.2500 with 3 iterations: 1.7173e-08 / 2.2931e-09
-   Errors after step   0.3750 with 3 iterations: 2.2849e-08 / 3.8867e-09
-   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 5.4194e-09
-   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 6.8675e-09
-   Errors after step   0.7500 with 3 iterations: 3.3516e-08 / 8.2083e-09
-   Errors after step   0.8750 with 3 iterations: 3.5501e-08 / 9.4213e-09
-   Errors after step   1.0000 with 3 iterations: 3.6812e-08 / 1.0487e-08
+   Errors after step   0.2500 with 3 iterations: 1.7173e-08 / 2.2933e-09
+   Errors after step   0.3750 with 3 iterations: 2.2850e-08 / 3.8872e-09
+   Errors after step   0.5000 with 3 iterations: 2.7308e-08 / 5.4199e-09
+   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 6.8678e-09
+   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 8.2091e-09
+   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 9.4215e-09
+   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.0487e-08
 
-...done, took 5.236346483230591 seconds!
+...done, took 3.4686944484710693 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -671,7 +671,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
 
-...done, took 0.42882585525512695 seconds!
+...done, took 0.2905704975128174 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -685,7 +685,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
 
-...done, took 1.1683318614959717 seconds!
+...done, took 0.7021946907043457 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -699,7 +699,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
 
-...done, took 0.9490084648132324 seconds!
+...done, took 0.5885136127471924 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -713,7 +713,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
 
-...done, took 1.736292839050293 seconds!
+...done, took 1.1173489093780518 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
