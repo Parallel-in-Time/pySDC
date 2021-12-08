@@ -41,10 +41,10 @@ TJ = (sp.eye(nX) - Pr @ PJc @ Re @ A) @ sRJ.power(3)
 
 # %%
 
-nIter = 100
-dK = 10
+nIter = 10
+dK = 5
 
-def coarse(x, dK=dK):
+def coarse(x, dK=1):
     xK = x
     for k in range(dK):
         xK = RJ @ xK #+ RJ @ b
@@ -54,7 +54,7 @@ def coarse(x, dK=dK):
 def fine(x, dK=dK):
     xK = x
     for k in range(dK):
-        xK = TG @ xK #+ PGS @ b
+        xK = RJ @ xK #+ PGS @ b
     return xK
 
 def initBlocks(x):
@@ -82,7 +82,7 @@ for k in range(nK):
         uGk = coarse(uNum[k, l], dK=1)
         uGkp1 = coarse(uNum[k+1, l], dK=1)
 
-        uNum[k+1, l+1] = uF + 1*(uGkp1 - uGk)
+        uNum[k+1, l+1] = uF + 0.25*(uGkp1 - uGk)
 
 
 for l in range(nB):
