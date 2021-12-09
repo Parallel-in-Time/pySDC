@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.Errors import ParameterError, ProblemError
+from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh
 
