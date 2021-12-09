@@ -285,6 +285,14 @@ implementations.problem\_classes.PenningTrap\_3D module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.Piline module
+----------------------------------------------
+
+.. automodule:: implementations.problem_classes.Piline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.TestEquation\_0D module
 --------------------------------------------------------
 
