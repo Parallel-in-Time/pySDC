@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conda install --yes -c conda-forge --file requirements.txt
+          conda install --yes --override-channel -c conda-forge --file requirements.txt
 
       - name: Lint with flake8
         run: |
