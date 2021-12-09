@@ -83,14 +83,14 @@ def plot_voltages(cwd='./'):
     # convert filtered statistics to list of iterations count, sorted by process
     v1 = sort_stats(filter_stats(stats, type='v1'), sortby='time')
     v2 = sort_stats(filter_stats(stats, type='v2'), sortby='time')
-    v3 = sort_stats(filter_stats(stats, type='v3'), sortby='time')
+    p3 = sort_stats(filter_stats(stats, type='p3'), sortby='time')
 
     times = [v[0] for v in v1]
 
     # plt_helper.setup_mpl()
     plt_helper.plt.plot(times, [v[1] for v in v1], label='v1')
     plt_helper.plt.plot(times, [v[1] for v in v2], label='v2')
-    plt_helper.plt.plot(times, [v[1] for v in v3], label='v3')
+    plt_helper.plt.plot(times, [v[1] for v in p3], label='p3')
     plt_helper.plt.legend()
 
     plt_helper.plt.show()

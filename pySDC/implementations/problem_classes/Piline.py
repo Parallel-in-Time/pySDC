@@ -97,7 +97,7 @@ class piline(ptype):
 
         me[0] = 0.0  # v1
         me[1] = 0.0  # v2
-        me[2] = 0.0  # v3
+        me[2] = 0.0  # p3
         # me[3] = 0.0  # i_Vs
         # me[4] = self.params.Vs / self.params.Rs  # i_C1
         # me[5] = 0.0  # i_Rpi
