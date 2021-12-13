@@ -20,37 +20,34 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-#      - name: Cache conda
-#        uses: actions/cache@v2
-#        env:
-#          # Increase this value to reset cache if etc/example-environment.yml has not changed
-#          CACHE_NUMBER: 3
-#        with:
-#          path: ~/conda_pkgs_dir
-#          key:
-#            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
-#
-#      - name: act workarounds
-#        if: ${{ env.ACT }}
-#        run: |
-#          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-#          wget $MINICONDA_URL
-#          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-#          sudo bash $MINICONDA_SH -b -p $CONDA
-#          rm $MINICONDA_SH # Clean up after installing
-#          mkdir data
-#
-#      - uses: conda-incubator/setup-miniconda@v2
-#        with:
-#          auto-update-conda: true
-#          python-version: 3.9
-#          use-only-tar-bz2: true
-#          mamba-version: "*"
-#          channels: conda-forge,defaults
-#          channel-priority: true
-      
-      - name: install mamba
-        uses: mamba-org/provision-with-micromamba@main
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 3
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
+
+      - name: act workarounds
+        if: ${{ env.ACT }}
+        run: |
+          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+          wget $MINICONDA_URL
+          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
+          sudo bash $MINICONDA_SH -b -p $CONDA
+          rm $MINICONDA_SH # Clean up after installing
+          mkdir data
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: 3.9
+          use-only-tar-bz2: true
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
 
       - name: Install dependencies
         run: |
