@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Step-2: Data structures and my first sweeper &#8212; pySDC 4.2.2 documentation</title>
+    <title>Step-2: Data structures and my first sweeper &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="step_1.html" title="Step-1: A first spatial problem"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-2: Data structures and my first sweeper</a></li> 
       </ul>
     </div>  
@@ -400,8 +400,8 @@ relevant parameters are accessable using the <code class="docutils literal notra
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-12-13 08:19:08,475 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2021-12-13 08:19:08,475 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2021-12-13 09:18:35,315 - controller - Controller - dump_setup - 109 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2021-12-13 09:18:35,315 - controller - Controller - dump_setup - 172 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -436,33 +436,33 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
                     QE = EE
 --&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
 
-2021-12-13 08:19:08,475 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
-2021-12-13 08:19:08,475 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
+2021-12-13 09:18:35,315 - controller - Controller - dump_setup - 174 - INFO: ----------------------------------------------------------------------------------------------------
+2021-12-13 09:18:35,315 - controller - Controller - dump_setup - 176 - INFO: Setup overview (--&gt; user-defined) -- END
 
-2021-12-13 08:19:08,481 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
-2021-12-13 08:19:08,485 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442665e-04
-2021-12-13 08:19:08,490 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377584e-05
-2021-12-13 08:19:08,494 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707912e-05
-2021-12-13 08:19:08,499 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272028e-06
-2021-12-13 08:19:08,503 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36446132e-07
-2021-12-13 08:19:08,508 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953993e-07
-2021-12-13 08:19:08,512 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601669e-08
-2021-12-13 08:19:08,517 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07284264e-09
-2021-12-13 08:19:08,521 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27497827e-10
-2021-12-13 08:19:08,525 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.19825991e-10
-2021-12-13 08:19:08,530 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48577713e-11
-2021-12-13 08:19:08,535 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
-2021-12-13 08:19:08,540 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
-2021-12-13 08:19:08,544 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642622e-04
-2021-12-13 08:19:08,549 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982057e-05
-2021-12-13 08:19:08,554 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216754e-06
-2021-12-13 08:19:08,558 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278800e-06
-2021-12-13 08:19:08,563 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85496171e-07
-2021-12-13 08:19:08,567 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78948556e-08
-2021-12-13 08:19:08,572 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68232042e-09
-2021-12-13 08:19:08,576 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26304034e-09
-2021-12-13 08:19:08,581 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.83448663e-10
-2021-12-13 08:19:08,585 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.96573122e-11
+2021-12-13 09:18:35,320 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 4.11190756e-03
+2021-12-13 09:18:35,325 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 6.68442665e-04
+2021-12-13 09:18:35,330 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 8.80377584e-05
+2021-12-13 09:18:35,334 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.21707912e-05
+2021-12-13 09:18:35,339 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 1.38272028e-06
+2021-12-13 09:18:35,343 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 6.36446132e-07
+2021-12-13 09:18:35,348 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.68953993e-07
+2021-12-13 09:18:35,352 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 3.52601669e-08
+2021-12-13 09:18:35,357 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 6.07284264e-09
+2021-12-13 09:18:35,361 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 8.27497827e-10
+2021-12-13 09:18:35,366 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.19825991e-10
+2021-12-13 09:18:35,370 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.100000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.48577713e-11
+2021-12-13 09:18:35,376 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 6.69984764e-03
+2021-12-13 09:18:35,380 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 1.05518433e-03
+2021-12-13 09:18:35,385 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 1.40642622e-04
+2021-12-13 09:18:35,390 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 1.85982057e-05
+2021-12-13 09:18:35,394 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 2.79216754e-06
+2021-12-13 09:18:35,399 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.12278800e-06
+2021-12-13 09:18:35,403 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 2.85496171e-07
+2021-12-13 09:18:35,408 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 5.78948556e-08
+2021-12-13 09:18:35,412 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 9.68232042e-09
+2021-12-13 09:18:35,417 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 1.26304034e-09
+2021-12-13 09:18:35,421 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 1.83448663e-10
+2021-12-13 09:18:35,426 - hooks - Hooks - post_sweep - 197 - INFO: Process  0 on time 0.200000 at stage         IT_FINE: Level: 0 -- Iteration: 12 -- Sweep:  1 -- residual: 1.96573122e-11
 Error after SDC iterations: 1.166689e-05
 </pre></div>
 </div>
@@ -528,7 +528,7 @@ Error after SDC iterations: 1.166689e-05
         <li class="right" >
           <a href="step_1.html" title="Step-1: A first spatial problem"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-2: Data structures and my first sweeper</a></li> 
       </ul>
     </div>
