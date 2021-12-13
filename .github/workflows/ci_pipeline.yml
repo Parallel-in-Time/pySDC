@@ -45,13 +45,13 @@ jobs:
           auto-update-conda: true
           python-version: 3.9
           use-only-tar-bz2: true
-#          mamba-version: "*"
-#          channels: conda-forge,defaults
-#          channel-priority: true
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
 
       - name: Install dependencies
         run: |
-          conda install --yes --override-channel -c conda-forge --file requirements.txt
+          mamba install --yes --override-channel -c conda-forge --file requirements.txt
 
       - name: Lint with flake8
         run: |
