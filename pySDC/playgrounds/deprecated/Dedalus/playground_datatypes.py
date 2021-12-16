@@ -67,35 +67,35 @@ exit()
 g = domain.new_field()
 g['g'] = np.sin(2*np.pi*x)
 
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(10000):
     f = domain.new_field()
     f['g'] = g['g'] + g['g']
     # f['c'][:] = g['c'][:]
-t1 = time.time()
+t1 = time.perf_counter()
 print(t1-t0)
 
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(10000):
     f = (g + g).evaluate()
     # f['c'][:] = g['c'][:]
-t1 = time.time()
+t1 = time.perf_counter()
 print(t1-t0)
 
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(10000):
     f = np.zeros(tuple(domain.global_grid_shape()))
     f = g['g'] + g['g']
     # f['c'] = g['c']
-t1 = time.time()
+t1 = time.perf_counter()
 print(t1-t0)
 
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(10000):
     # f = wrapper(domain)
     f = g+g
     # f['c'] = g['c']
-t1 = time.time()
+t1 = time.perf_counter()
 print(t1-t0)
 
 

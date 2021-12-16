@@ -39,10 +39,10 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-t0 = time.time()
+t0 = time.perf_counter()
 pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measure', comm=comm)
 tmp = pm.create(type='real')
-t1 = time.time()
+t1 = time.perf_counter()
 
 # a = pmesh_datatype((pm, (2, (4, 4))))
 
@@ -51,7 +51,7 @@ print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
 
 dt = 0.121233
 res = 0.0
-t0 = time.time()
+t0 = time.perf_counter()
 # for n in range(nruns):
 #
 #     # set initial condition
@@ -85,7 +85,7 @@ t0 = time.time()
 #
 #     # compute residual of (I-dt*A)u = u_old
 #     res = max(abs(sol - dt*lap - u_old), res)
-# t1 = time.time()
+# t1 = time.perf_counter()
 #
 # print(f'PMESH residual: {res:6.4e}')  # Should be approx. 5.9E-11
 # print(f'PMESH runtime: {t1 - t0:6.4f} sec.')  # Approx. 0.9 seconds on my machine
@@ -136,5 +136,5 @@ uexc.resample(uf)
 print(uf.preview().shape, np.amax(abs(uf-uexf)))
 print()
 
-t1 = time.time()
+t1 = time.perf_counter()
 print(f'Time: {t1-t0}')

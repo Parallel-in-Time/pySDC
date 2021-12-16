@@ -18,7 +18,7 @@ else:
 
 group = win.Get_group()
 
-t0 = time.time()
+t0 = time.perf_counter()
 
 if rank == 0:
     sleep(10000000)
@@ -43,7 +43,7 @@ else:
         sleep(70000000)
         print("[%02d] Received data %s" % (rank, rbuf))
 
-t1 = time.time()
+t1 = time.perf_counter()
 group.Free()
 win.Free()
 

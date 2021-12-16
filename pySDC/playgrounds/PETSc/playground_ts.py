@@ -238,7 +238,7 @@ if True:                       # Configure algebraic multigrid, could use run-ti
 
 ts.setFromOptions()             # Apply run-time options, e.g. -ts_adapt_monitor -ts_type arkimex -snes_converged_reason
 ode.evalSolution(0.0, x)
-t0 = time.time()
+t0 = time.perf_counter()
 
 # pr = cProfile.Profile()
 # pr.enable()
@@ -249,7 +249,7 @@ ts.solve(x)
 # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 # ps.print_stats()
 # print(s.getvalue())
-print('Time:', time.time() - t0)
+print('Time:', time.perf_counter() - t0)
 
 uex = ode.gvec.duplicate()
 ode.evalSolution(1.0, uex)

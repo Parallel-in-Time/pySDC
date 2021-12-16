@@ -41,7 +41,7 @@ def run_implicit_Euler(t0, dt, Tend):
     radius = []
     exact_radius = []
     nsteps = int((Tend - t0) / dt)
-    startt = time.time()
+    startt = time.perf_counter()
     t = t0
     for n in range(nsteps):
 
@@ -56,7 +56,7 @@ def run_implicit_Euler(t0, dt, Tend):
 
         print(' ... done with time = %6.4f, step = %i / %i' % (t, n + 1, nsteps))
 
-    print('Time to solution: %6.4f sec.' % (time.time() - startt))
+    print('Time to solution: %6.4f sec.' % (time.perf_counter() - startt))
 
     fname = 'data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
     loaded = np.load(fname)
@@ -83,7 +83,7 @@ def run_imex_Euler(t0, dt, Tend):
     radius = []
     exact_radius = []
     nsteps = int((Tend - t0) / dt)
-    startt = time.time()
+    startt = time.perf_counter()
     t = t0
     for n in range(nsteps):
 
@@ -100,7 +100,7 @@ def run_imex_Euler(t0, dt, Tend):
 
         print(' ... done with time = %6.4f, step = %i / %i' % (t, n + 1, nsteps))
 
-    print('Time to solution: %6.4f sec.' % (time.time() - startt))
+    print('Time to solution: %6.4f sec.' % (time.perf_counter() - startt))
 
     fname = 'data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
     loaded = np.load(fname)
@@ -127,7 +127,7 @@ def run_CrankNicholson(t0, dt, Tend):
     radius = []
     exact_radius = []
     nsteps = int((Tend - t0)/dt)
-    startt = time.time()
+    startt = time.perf_counter()
     t = t0
     for n in range(nsteps):
 
@@ -143,7 +143,7 @@ def run_CrankNicholson(t0, dt, Tend):
 
         print(' ... done with time = %6.4f, step = %i / %i' % (t, n + 1, nsteps))
 
-    print('Time to solution: %6.4f sec.' % (time.time() - startt))
+    print('Time to solution: %6.4f sec.' % (time.perf_counter() - startt))
 
     fname = 'data/AC_reference_Tend{:.1e}'.format(Tend) + '.npz'
     loaded = np.load(fname)

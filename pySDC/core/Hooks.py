@@ -92,7 +92,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_setup = time.time()
+        self.__t0_setup = time.perf_counter()
 
     def pre_run(self, step, level_number):
         """
@@ -102,7 +102,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_run = time.time()
+        self.__t0_run = time.perf_counter()
 
     def pre_predict(self, step, level_number):
         """
@@ -112,7 +112,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_predict = time.time()
+        self.__t0_predict = time.perf_counter()
 
     def pre_step(self, step, level_number):
         """
@@ -122,7 +122,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_step = time.time()
+        self.__t0_step = time.perf_counter()
 
     def pre_iteration(self, step, level_number):
         """
@@ -132,7 +132,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_iteration = time.time()
+        self.__t0_iteration = time.perf_counter()
 
     def pre_sweep(self, step, level_number):
         """
@@ -142,7 +142,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t0_sweep = time.time()
+        self.__t0_sweep = time.perf_counter()
 
     def pre_comm(self, step, level_number):
         """
@@ -153,11 +153,11 @@ class hooks(object):
             level_number (int): the current level number
         """
         if len(self.__t0_comm) >= level_number + 1:
-            self.__t0_comm[level_number] = time.time()
+            self.__t0_comm[level_number] = time.perf_counter()
         else:
             while len(self.__t0_comm) < level_number:
                 self.__t0_comm.append(None)
-            self.__t0_comm.append(time.time())
+            self.__t0_comm.append(time.perf_counter())
             while len(self.__t1_comm) <= level_number:
                 self.__t1_comm.append(0.0)
             assert len(self.__t0_comm) == level_number + 1
@@ -173,7 +173,7 @@ class hooks(object):
             add_to_stats (bool): set if result should go to stats object
         """
         assert len(self.__t1_comm) >= level_number + 1
-        self.__t1_comm[level_number] += time.time() - self.__t0_comm[level_number]
+        self.__t1_comm[level_number] += time.perf_counter() - self.__t0_comm[level_number]
 
         if add_to_stats:
             L = step.levels[level_number]
@@ -190,7 +190,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t1_sweep = time.time()
+        self.__t1_sweep = time.perf_counter()
 
         L = step.levels[level_number]
 
@@ -213,7 +213,7 @@ class hooks(object):
             level_number (int): the current level number
         """
 
-        self.__t1_iteration = time.time()
+        self.__t1_iteration = time.perf_counter()
 
         L = step.levels[level_number]
 
@@ -232,7 +232,7 @@ class hooks(object):
             level_number (int): the current level number
         """
 
-        self.__t1_step = time.time()
+        self.__t1_step = time.perf_counter()
 
         L = step.levels[level_number]
 
@@ -251,7 +251,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t1_predict = time.time()
+        self.__t1_predict = time.perf_counter()
 
         L = step.levels[level_number]
 
@@ -266,7 +266,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t1_run = time.time()
+        self.__t1_run = time.perf_counter()
 
         L = step.levels[level_number]
 
@@ -281,7 +281,7 @@ class hooks(object):
             step (pySDC.Step.step): the current step
             level_number (int): the current level number
         """
-        self.__t1_setup = time.time()
+        self.__t1_setup = time.perf_counter()
 
         self.add_to_stats(process=-1, time=-1, level=-1, iter=-1, sweep=-1, type='timing_setup',
                           value=self.__t1_setup - self.__t0_setup)

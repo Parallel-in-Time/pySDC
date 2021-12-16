@@ -126,18 +126,18 @@ print(np.all(u == ucopy))
 
 nruns = 30000
 s = 0
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(nruns):
     u = newDistArray(fft, False, val=i)
     v = u.copy()
     u[0][0] = 0
     # print(u[0][0], v[0][0])
     s += u[0][0] - v[0][0]
-t1 = time.time()
+t1 = time.perf_counter()
 print(s + nruns*(nruns-1)/2, t1-t0)
 
 s = 0
-t0 = time.time()
+t0 = time.perf_counter()
 for i in range(nruns):
     u = np.full((nvars, nvars), fill_value=i, dtype=np.float64)
     # u = np.empty((nvars, nvars), dtype=np.float64)
@@ -147,5 +147,5 @@ for i in range(nruns):
     u[0][0] = 0
     # print(u[0][0], v[0][0])
     s += u[0][0] - v[0][0]
-t1 = time.time()
+t1 = time.perf_counter()
 print(s + nruns*(nruns-1)/2, t1-t0)
