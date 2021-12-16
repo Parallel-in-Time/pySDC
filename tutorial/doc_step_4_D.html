@@ -167,9 +167,9 @@
     <span class="n">uinit</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_init</span><span class="p">()</span>
 
     <span class="c1"># call and time main function to get things done...</span>
-    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
-    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
 
     <span class="k">return</span> <span class="n">stats</span><span class="p">,</span> <span class="n">end_time</span>
 
@@ -179,7 +179,7 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">4.70346856</span> <span class="o">--</span>   <span class="mf">5.26211166</span> <span class="o">--</span>   <span class="mf">6.06610131</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Timings</span> <span class="k">for</span> <span class="n">SDC</span><span class="p">,</span> <span class="n">MLSDC</span> <span class="ow">and</span> <span class="n">MLSDC</span><span class="o">+</span><span class="n">finter</span><span class="p">:</span>   <span class="mf">4.53585042</span> <span class="o">--</span>   <span class="mf">4.98621427</span> <span class="o">--</span>   <span class="mf">5.80741430</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span> <span class="mi">12</span><span class="p">:</span> <span class="mf">406977.9425667251</span> <span class="o">--</span> <span class="mf">2.35039652e-03</span>
 <span class="n">Total</span> <span class="n">energy</span> <span class="ow">and</span> <span class="n">relative</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">iteration</span>  <span class="mi">0</span><span class="p">:</span> <span class="mf">407936.7556966486</span> <span class="o">--</span> <span class="mf">0.00000000e+00</span>
