@@ -12,7 +12,7 @@ rank = comm.Get_rank()
 
 comm.Barrier()
 
-t0 = time.time()
+t0 = time.perf_counter()
 
 if rank == 0:
     sbuf = np.empty(40000000)
@@ -28,6 +28,6 @@ else:
     comm.Recv(rbuf[:], source=0, tag=99)
     print("[%02d] Received data %s" % (rank, rbuf))
 
-t1 = time.time()
+t1 = time.perf_counter()
 
 print(f'Rank: {rank} -- Time: {t1-t0}')

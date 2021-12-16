@@ -18,7 +18,7 @@ def doublesine(i, v):
 nvars = 128
 nruns = 1
 
-# t0 = time.time()
+# t0 = time.perf_counter()
 # pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measure', comm=None)
 # u = pm.create(type='real')
 # u = u.apply(doublesine, kind='index', out=Ellipsis)
@@ -29,7 +29,7 @@ nruns = 1
 #     # print(type(u.value))
 #     res = max(res, np.linalg.norm(tmp))
 # print(res)
-# t1 = time.time()
+# t1 = time.perf_counter()
 #
 # print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
 #
@@ -51,7 +51,7 @@ time_rank = time_comm.Get_rank()
 
 print(world_rank, time_rank, space_rank)
 
-t0 = time.time()
+t0 = time.perf_counter()
 
 if time_rank == 0:
     pm = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, dtype='f8', plan_method='measure', comm=space_comm)
@@ -64,7 +64,7 @@ else:
     u = pm.create(type='real', value=tmp)
 
 
-t1 = time.time()
+t1 = time.perf_counter()
 
 print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
 exit()

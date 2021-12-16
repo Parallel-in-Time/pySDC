@@ -67,7 +67,7 @@ def main(nprocs_space=None):
 
     comm.Barrier()
 
-    t0 = time.time()
+    t0 = time.perf_counter()
 
     if time_rank < time_size - 1:
         send_stuff(th, space_rank, time_rank, time_comm)
@@ -79,7 +79,7 @@ def main(nprocs_space=None):
         sleep(100000000)
         th[0].join()
 
-    t1 = time.time()
+    t1 = time.perf_counter()
 
     comm.Barrier()
 

@@ -127,9 +127,9 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     uinit = P.u_init()
 
     # call and time main function to get things done...
-    start_time = time.time()
+    start_time = time.perf_counter()
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    end_time = time.time() - start_time
+    end_time = time.perf_counter() - start_time
 
     return stats, end_time
 

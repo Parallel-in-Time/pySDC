@@ -89,7 +89,7 @@ def main():
     nx = OptDB.getInt('nx', n)
     ny = OptDB.getInt('ny', n)
 
-    t0 = time.time()
+    t0 = time.perf_counter()
     da = PETSc.DMDA().create([nx, ny], stencil_width=1, comm=space_comm)
     pde = Poisson2D(da)
 
@@ -109,7 +109,7 @@ def main():
     pc.setType('none')
     ksp.setFromOptions()
 
-    t1 = time.time()
+    t1 = time.perf_counter()
 
     pde.formRHS(b)
     ksp.solve(b, x)
@@ -117,7 +117,7 @@ def main():
     u = da.createNaturalVec()
     da.globalToNatural(x, u)
 
-    t2 = time.time()
+    t2 = time.perf_counter()
 
     n = 8
 

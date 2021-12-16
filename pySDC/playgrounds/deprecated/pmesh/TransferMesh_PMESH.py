@@ -31,7 +31,7 @@ class pmesh_to_pmesh(space_transfer):
         Args:
             F: the fine level data (easier to access than via the fine attribute)
         """
-        t0 = time.time()
+        t0 = time.perf_counter()
         if isinstance(F, pmesh_datatype):
             G = self.coarse_prob.dtype_u(self.coarse_prob.init)
             # convert numpy array to RealField
@@ -61,7 +61,7 @@ class pmesh_to_pmesh(space_transfer):
             G.expl.values[:] = tmp_G.value
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
-        t1 = time.time()
+        t1 = time.perf_counter()
         print(f'Space restrict: {t1 - t0}')
         return G
 
@@ -72,7 +72,7 @@ class pmesh_to_pmesh(space_transfer):
         Args:
             G: the coarse level data (easier to access than via the coarse attribute)
         """
-        t0 = time.time()
+        t0 = time.perf_counter()
         if isinstance(G, pmesh_datatype):
             F = self.fine_prob.dtype_u(self.fine_prob.init)
             # convert numpy array to RealField
@@ -100,6 +100,6 @@ class pmesh_to_pmesh(space_transfer):
             F.expl.values = tmp_F.value / 2
         else:
             raise TransferError('Unknown data type, got %s' % type(G))
-        t1 = time.time()
+        t1 = time.perf_counter()
         print(f'Space interpolate: {t1 - t0}')
         return F

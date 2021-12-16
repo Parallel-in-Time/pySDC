@@ -28,11 +28,11 @@ def mesh_test(oloops, iloops, N):
     maxb = 0.0
     for i in range(oloops):
 
-        t0 = time.time()
+        t0 = time.perf_counter()
         a = mesh(init=N, val=1.0 * i)
         b = mesh(a)
         maxb = inner_loop(iloops, mesh, maxb, a, b)
-        t1 = time.time()
+        t1 = time.perf_counter()
 
         maxtime = max(maxtime, t1 - t0)
         mintime = min(mintime, t1 - t0)
@@ -50,11 +50,11 @@ def parallelmesh_test(oloops, iloops, N):
     maxb = 0.0
     for i in range(oloops):
 
-        t0 = time.time()
+        t0 = time.perf_counter()
         a = mesh(init=(N, None, np.zeros(1).dtype), val=1.0 * i)
         b = mesh(a)
         maxb = inner_loop(iloops, mesh, maxb, a, b)
-        t1 = time.time()
+        t1 = time.perf_counter()
 
         maxtime = max(maxtime, t1 - t0)
         mintime = min(mintime, t1 - t0)
@@ -76,12 +76,12 @@ def field_test(oloops, iloops, N):
     maxb = 0.0
     for i in range(oloops):
 
-        t0 = time.time()
+        t0 = time.perf_counter()
         a = dedalus_field(init=domain)
         a.values[0]['g'][:] = 1.0 * i
         b = dedalus_field(a)
         maxb = inner_loop(iloops, dedalus_field, maxb, a, b)
-        t1 = time.time()
+        t1 = time.perf_counter()
 
         maxtime = max(maxtime, t1 - t0)
         mintime = min(mintime, t1 - t0)
@@ -103,12 +103,12 @@ def fast_field_test(oloops, iloops, N):
     maxb = 0.0
     for i in range(oloops):
 
-        t0 = time.time()
+        t0 = time.perf_counter()
         a = dedalus_field_fast(init=domain)
         a['g'][:] = 1.0 * i
         b = dedalus_field_fast(a)
         maxb = inner_loop(iloops, dedalus_field_fast, maxb, a, b)
-        t1 = time.time()
+        t1 = time.perf_counter()
 
         maxtime = max(maxtime, t1 - t0)
         mintime = min(mintime, t1 - t0)

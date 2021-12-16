@@ -10,7 +10,7 @@ def sleep(n):
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
-t0 = time.time()
+t0 = time.perf_counter()
 
 if rank == 0:
     sbuf = np.empty(40000000)
@@ -30,7 +30,7 @@ else:
     win.Unlock(0)
     print("[%02d] Received data %s" % (rank, rbuf))
 
-t1 = time.time()
+t1 = time.perf_counter()
 
 win.Free()
 

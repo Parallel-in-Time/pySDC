@@ -32,7 +32,7 @@ def main():
 
     comm.Barrier()
 
-    t0 = time.time()
+    t0 = time.perf_counter()
 
     if rank == 0:
         sbuf = np.empty(4000000)
@@ -51,7 +51,7 @@ def main():
         print('rdone')
         print("[%02d] Received data %s" % (rank, rbuf))
 
-    t1 = time.time()
+    t1 = time.perf_counter()
 
     comm.Barrier()
 
