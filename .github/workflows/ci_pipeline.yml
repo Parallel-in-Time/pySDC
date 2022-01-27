@@ -5,9 +5,7 @@ on:
 
 jobs:
   ci:
-    runs-on: 
-      - ubuntu-latest
-      - self-hosted
+    runs-on: self-hosted
     
     defaults:
       run:
