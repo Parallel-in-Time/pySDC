@@ -109,6 +109,14 @@ implementations.problem\_classes.Boussinesq\_2D\_FD\_imex module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.BuckConverter module
+-----------------------------------------------------
+
+.. automodule:: implementations.problem_classes.BuckConverter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.FastWaveSlowWave\_0D module
 ------------------------------------------------------------
 
