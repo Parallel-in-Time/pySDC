@@ -30,7 +30,7 @@ def test_canintegratepolynomials(collclass):
         # use quadrature rule to compute integral
         int_coll = coll.evaluate(coll.weights, poly_vals)
         # For large values of M, substantial differences from different round of error have to be considered
-        assert abs(int_ex - int_coll) < 1e-11, "For node type " + coll.__class__.__name__ + ", failed to integrate polynomial of degree " + str(coll.order-1) + " exactly. Error: %5.3e" % abs(int_ex - int_coll)
+        assert abs(int_ex - int_coll) < 5e-11, "For node type " + coll.__class__.__name__ + ", failed to integrate polynomial of degree " + str(coll.order-1) + " exactly. Error: %5.3e" % abs(int_ex - int_coll)
 
 
 @pytest.mark.parametrize("collclass", classes)
