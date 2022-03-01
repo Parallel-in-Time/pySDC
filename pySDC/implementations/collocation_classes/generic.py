@@ -22,19 +22,22 @@ class Collocation(CollBase):
             self._getWeights = self._getWeights_spline
             # We need: 1<=order<=5 and order < num_nodes
             self.order = min(num_nodes - 1, 3)
-        elif quad_type == 'GAUSS':
-            self.order = 2 * num_nodes
-        elif quad_type.startswith('RADAU'):
-            self.order = 2 * num_nodes - 1
-        elif quad_type == 'LOBATTO':
-            self.order = 2 * num_nodes - 2
+        elif node_type == 'EQUID':
+            self.order = num_nodes
+        else:
+            if quad_type == 'GAUSS':
+                self.order = 2 * num_nodes
+            elif quad_type.startswith('RADAU'):
+                self.order = 2 * num_nodes - 1
+            elif quad_type == 'LOBATTO':
+                self.order = 2 * num_nodes - 2
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
         self.Qmat = self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
-        self.left_is_node = False
-        self.right_is_node = False
+        self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
+        self.right_is_node = quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
     @property
     def _getNodes(self):
