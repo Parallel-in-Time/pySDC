@@ -39,13 +39,13 @@ class NodesGenerator(object):
         # Equidistant nodes
         if self.node_type == 'EQUID':
             if self.quad_type == 'GAUSS':
-                return np.linspace(-1, 1, num=num_nodes+2)[1:-1]
+                return np.linspace(-1, 1, num=num_nodes + 2)[1:-1]
             elif self.quad_type == 'LOBATTO':
                 return np.linspace(-1, 1, num=num_nodes)
             elif self.quad_type == 'RADAU-RIGHT':
-                return np.linspace(-1, 1, num=num_nodes+1)[1:]
+                return np.linspace(-1, 1, num=num_nodes + 1)[1:]
             elif self.quad_type == 'RADAU-LEFT':
-                return np.linspace(-1, 1, num=num_nodes+1)[:-1]
+                return np.linspace(-1, 1, num=num_nodes + 1)[:-1]
 
         # Quadrature nodes linked to orthogonal polynomials
         alpha, beta = self.getTridiagCoefficients(num_nodes)
@@ -57,8 +57,8 @@ class NodesGenerator(object):
     def getOrthogPolyCoefficients(self, num_coeff):
         if self.node_type == 'LEGENDRE':
             k = np.arange(num_coeff, dtype=float)
-            alpha = 0*k
-            beta = k**2/(4*k**2 - 1)
+            alpha = 0 * k
+            beta = k**2 / (4 * k**2 - 1)
             beta[0] = 2
         elif self.node_type == 'CHEBY-1':
             alpha = np.zeros(num_coeff)
@@ -69,7 +69,7 @@ class NodesGenerator(object):
         elif self.node_type == 'CHEBY-2':
             alpha = np.zeros(num_coeff)
             beta = np.full(num_coeff, 0.25)
-            beta[0] = np.pi/2
+            beta[0] = np.pi / 2
         elif self.node_type == 'CHEBY-3':
             alpha = np.zeros(num_coeff)
             alpha[0] = 0.5
@@ -107,7 +107,7 @@ class NodesGenerator(object):
         pi = np.array([np.zeros_like(t) for i in range(3)])
         pi[1:] += 1
         for alpha_j, beta_j in zip(alpha, beta):
-            pi[2] *= (t-alpha_j)
+            pi[2] *= (t - alpha_j)
             pi[0] *= beta_j
             pi[2] -= pi[0]
             pi[0] = pi[1]
@@ -122,7 +122,7 @@ class NodesGenerator(object):
         if self.quad_type.startswith('RADAU'):
             b = -1. if self.quad_type.endswith('LEFT') else 1.
             b1, b2 = self.evalOrthogPoly(b, alpha[:-1], beta[:-1])[:2]
-            alpha[-1] = b - beta[-1]*b1/b2
+            alpha[-1] = b - beta[-1] * b1 / b2
         elif self.quad_type == 'LOBATTO':
             a, b = -1., 1.
             a2, a1 = self.evalOrthogPoly(a, alpha[:-1], beta[:-1])[:2]
@@ -130,5 +130,5 @@ class NodesGenerator(object):
             alpha[-1], beta[-1] = np.linalg.solve(
                 [[a1, a2],
                  [b1, b2]],
-                [a*a1, b*b1])
+                [a * a1, b * b1])
         return alpha, beta

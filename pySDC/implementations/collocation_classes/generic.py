@@ -9,6 +9,7 @@ NODE_TYPES = ['EQUID', 'LEGENDRE',
 
 QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
 
+
 class Collocation(CollBase):
 
     def __init__(self, num_nodes, tleft, tright,
@@ -51,7 +52,7 @@ class Collocation(CollBase):
         b = self.tright
         nodes += 1
         nodes /= 2
-        nodes *= b-a
+        nodes *= b - a
         nodes += a
 
         return nodes
