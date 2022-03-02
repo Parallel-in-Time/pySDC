@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 from scipy.interpolate import BarycentricInterpolator
-from scipy.special.orthogonal import roots_legendre
+from scipy.special import roots_legendre
 
 from pySDC.core.Errors import CollocationError
 
