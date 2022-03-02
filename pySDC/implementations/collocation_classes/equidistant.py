@@ -1,10 +1,6 @@
-from functools import partial
 from warnings import warn
 
 from pySDC.implementations.collocations import Collocation
-
-Equidistant = partial(
-    Collocation, node_type='EQUID', quad_type='LOBATTO', useSpline=False)
 
 warn("This import is deprecated and will be removed in future versions."
      "To use this type of collocation, "
@@ -13,3 +9,11 @@ warn("This import is deprecated and will be removed in future versions."
      "coll = Collocation(num_nodes, tleft, tright, "
      "node_type='EQUID', quadType='LOBATTO')\n",
      DeprecationWarning, stacklevel=2)
+
+
+class Equidistant(Collocation):
+
+    def __init__(self, num_nodes, tleft, tright):
+        super(Equidistant, self).__init__(
+            num_nodes, tleft, tright,
+            node_type='EQUID', quad_type='LOBATTO', useSpline=False)
