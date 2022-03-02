@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.interpolate as intpl
+from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Collocation import CollBase
 from pySDC.core.Errors import CollocationError
@@ -72,11 +73,28 @@ class EquidistantSpline_Right(CollBase):
         circ_one[0] = 1.0
         tcks = []
         for i in range(self.num_nodes):
-            tcks.append(
-                intpl.splrep(self.nodes, np.roll(circ_one, i), xb=self.tleft, xe=self.tright, k=self.order, s=0.0))
+            tcks.append(intpl.splrep(
+                self.nodes, np.roll(circ_one, i),
+                xb=self.tleft, xe=self.tright, k=self.order, s=0.0))
 
         weights = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
             weights[i] = intpl.splint(a, b, tcks[i])
 
         return weights
+
+    @property
+    def _gen_Qmatrix(self):
+        """
+        Compute tleft-to-node integration matrix for later use in collocation formulation
+        Returns:
+            numpy.ndarray: matrix containing the weights for tleft to node
+        """
+        M = self.num_nodes
+        Q = np.zeros([M + 1, M + 1])
+
+        # for all nodes, get weights for the interval [tleft,node]
+        for m in np.arange(M):
+            Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+
+        return Q
