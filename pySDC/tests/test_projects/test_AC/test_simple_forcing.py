@@ -1,5 +1,7 @@
 import pytest
 import subprocess
+import warnings
+
 from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
 
 def test_main_serial():
@@ -10,23 +12,24 @@ def test_main_serial():
 @pytest.mark.parallel
 def test_main_parallel():
 
-    # try to import MPI here, will fail if things go wrong (and not later on in the subprocess part)
-    import mpi4py
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
 
-    nprocs = 2
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    (output, err) = p.communicate()
-    print(output)
-    assert err == ''
+        # try to import MPI here, will fail if things go wrong (and not later on in the subprocess part)
+        import mpi4py
 
-    nprocs = 4
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
-    p.wait()
-    (output, err) = p.communicate()
-    print(output)
-    assert err == ''
+        nprocs = 2
+        cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
+        p.wait()
+        (output, err) = p.communicate()
+        print(output)
+        assert err == ''
 
-
+        nprocs = 4
+        cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
+        p.wait()
+        (output, err) = p.communicate()
+        print(output)
+        assert err == ''
