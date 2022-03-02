@@ -8,12 +8,69 @@ QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
 
 
 class NodesError(Exception):
+    """Exception class to handle error in NodesGenerator class"""
     pass
 
 
 class NodesGenerator(object):
+    """
+    Class that can be used to generate generic distribution of nodes derived
+    from Gauss quadrature rule.
+    Its implementation is fully inspired from a book of W. Gautschi [1]_.
+
+    Attributes
+    ----------
+    node_type : str
+        The type of node distribution
+    quad_type : str
+        The quadrature type
+
+    Methods
+    -------
+    __init__(self, node_type='LEGENDRE', quad_type='LOBATTO')
+        Instanciate the NodesGenerator object.
+    getNodes(self, num_nodes)
+        Computes a given number of quadrature nodes.
+    getOrthogPolyCoefficients(self, num_coeff)
+        Produces a given number of analytic three-term recurrence coefficients.
+    evalOrthogPoly(self, t, alpha, beta)
+        Evaluates the two higher order orthogonal polynomials corresponding
+        to the given (alpha,beta) coefficients.
+    getTridiagCoefficients(self, num_nodes)
+        Computes recurrence coefficients for the tridiagonal Jacobian matrix,
+        taking into account the quadrature type.
+
+    .. [1] W. Gautschi, "Orthogonal polynomials: computation and approximation."
+       OUP Oxford, 2004.
+    """
 
     def __init__(self, node_type='LEGENDRE', quad_type='LOBATTO'):
+        """
+
+        Parameters
+        ----------
+        node_type : str, optional
+            The type of node distribution, can be
+
+            - EQUID : equidistant nodes
+            - LEGENDRE : node distribution from Legendre polynomials
+            - CHEBY-1 : node distribution from Chebychev polynomials (1st kind)
+            - CHEBY-2 : node distribution from Chebychev polynomials (2nd kind)
+            - CHEBY-3 : node distribution from Chebychev polynomials (3rd kind)
+            - CHEBY-4 : node distribution from Chebychev polynomials (4th kind)
+
+            The default is 'LEGENDRE'.
+
+        quad_type : str, optional
+            The quadrature type, can be
+
+            - GAUSS : inner point only, no node at boundary
+            - RADAU-LEFT : only left boundary as node
+            - RADAU-RIGHT : only right boundary as node
+            - LOBATTO : left and right boundary as node
+
+            The default is 'LOBATTO'.
+        """
 
         # Check argument validity
         for arg, vals in zip(['node_type', 'quad_type'],
@@ -28,6 +85,19 @@ class NodesGenerator(object):
         self.quad_type = quad_type
 
     def getNodes(self, num_nodes):
+        """
+        Computes a given number of quadrature nodes.
+
+        Parameters
+        ----------
+        num_nodes : int
+            Number of nodes to compute.
+
+        Returns
+        -------
+        nodes : np.1darray
+            Nodes located in [-1, 1], in increasing order.
+        """
         # Check number of nodes
         if self.quad_type in ['LOBATTO', 'RADAU-LEFT'] and num_nodes < 2:
             raise NodesError(
@@ -55,6 +125,21 @@ class NodesGenerator(object):
         return nodes
 
     def getOrthogPolyCoefficients(self, num_coeff):
+        """
+        Produces a given number of analytic three-term recurrence coefficients.
+
+        Parameters
+        ----------
+        num_coeff : int
+            Number of coefficients to compute.
+
+        Returns
+        -------
+        alpha : np.1darray
+            The alpha coefficients of the three-term recurrence.
+        beta : np.1darray
+            The beta coefficients of the three-term recurrence.
+        """
         if self.node_type == 'LEGENDRE':
             k = np.arange(num_coeff, dtype=float)
             alpha = 0 * k
@@ -84,24 +169,24 @@ class NodesGenerator(object):
 
     def evalOrthogPoly(self, t, alpha, beta):
         """
-        Evaluate the two higher order orthogonal polynomials corresponding
+        Evaluates the two higher order orthogonal polynomials corresponding
         to the given (alpha,beta) coefficients.
 
         Parameters
         ----------
-        t : TYPE
-            DESCRIPTION.
-        alpha : TYPE
-            DESCRIPTION.
-        beta : TYPE
-            DESCRIPTION.
+        t : float or np.1darray
+            The point where to evaluate the orthogonal polynomials.
+        alpha : np.1darray
+            The alpha coefficients of the three-term recurrence.
+        beta : np.1darray
+            The beta coefficients of the three-term recurrence.
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
-        TYPE
-            DESCRIPTION.
+        pi[0] : float or np.1darray
+            The second higher order orthogonal polynomial evaluation.
+        pi[1] : float or np.1darray
+            The higher oder orthogonal polynomial evaluation.
         """
         t = np.asarray(t, dtype=float)
         pi = np.array([np.zeros_like(t) for i in range(3)])
@@ -115,6 +200,22 @@ class NodesGenerator(object):
         return pi[0], pi[1]
 
     def getTridiagCoefficients(self, num_nodes):
+        """
+        Computes recurrence coefficients for the tridiagonal Jacobian matrix,
+        taking into account the quadrature type.
+
+        Parameters
+        ----------
+        num_nodes : int
+            Number of nodes that should be computed from those coefficients.
+
+        Returns
+        -------
+        alpha : np.1darray
+            The modified alpha coefficients of the three-term recurrence.
+        beta : np.1darray
+            The modified beta coefficients of the three-term recurrence.
+        """
         # Coefficients for Gauss quadrature type
         alpha, beta = self.getOrthogPolyCoefficients(num_nodes)
 
