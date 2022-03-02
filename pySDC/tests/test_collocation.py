@@ -50,11 +50,9 @@ def testEquivalencies():
         cOrig = CollClass(M, tLeft, tRight)
         cNew = Collocation(M, tLeft, tRight, *params)
         for attr in lAttrVect:
-            if not norm(getattr(cOrig, attr)-getattr(cNew, attr)) < tol:
-                print(params)
+            assert norm(getattr(cOrig, attr)-getattr(cNew, attr)) < tol
         for attr in lAttrScalar:
-            if not getattr(cOrig, attr) == getattr(cNew, attr):
-                print(params)
+            assert getattr(cOrig, attr) == getattr(cNew, attr)
 
 @pytest.mark.parametrize("collclass", classes)
 def test_canintegratepolynomials(collclass):
