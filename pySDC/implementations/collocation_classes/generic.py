@@ -11,9 +11,66 @@ QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
 
 
 class Collocation(CollBase):
+    """
+    Generic collocation class alowing to produce many kind of quadrature nodes
+    from various distribution.
+    It is based on the two main parameters that define the nodes :
+
+    - node_type : the node distribution used for the collocation method
+    - quad_type : the type of quadrature used (inclusion of not of boundary)
+
+    Current implementation provides the following available parameter values
+    for node_type :
+
+    - EQUID : equidistant node distribution
+    - LEGENDRE : distribution from Legendre polynomials
+    - CHEBY-{1,2,3,4} : distribution from Chebyshev polynomials of a given kind
+
+    The type of quadrature cann be GAUSS (only inner nodes), RADAU-LEFT
+    (inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
+    boundary) and LOBATTO (inclusion of left and right boundary).
+
+    Furthermore, the ``useSpline`` option can be activated to eventually use
+    spline interpolation when computing the weights.
+
+    Here is the equivalency table with the original classes implemented in
+    pySDC :
+
+    +-------------------------+-----------+-------------+-----------+
+    | Original Class          | node_type | quad_type   | useSpline |
+    +-------------------------+-----------+-------------+-----------+
+    | Equidistant             | EQUID     | LOBATTO     | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | EquidistantInner        | EQUID     | GAUSS       | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | EquidistantNoLeft       | EQUID     | RADAU-RIGHT | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | EquidistantSpline_Right | EQUID     | RADAU-RIGHT | True      |
+    +-------------------------+-----------+-------------+-----------+
+    | CollGaussLegendre       | LEGENDRE  | GAUSS       | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | CollGaussLobatto        | LEGENDRE  | LOBATTO     | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | CollGaussRadau_Left     | LEGENDRE  | RADAU-LEFT  | False     |
+    +-------------------------+-----------+-------------+-----------+
+    | CollGaussRadau_Right    | LEGENDRE  | RADAU-RIGHT | False     |
+    +-------------------------+-----------+-------------+-----------+
+    """
 
     def __init__(self, num_nodes, tleft, tright,
                  node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False):
+        """
+        Initialization
+
+        Args:
+            num_nodes (int): number of nodes
+            tleft (float): left interval boundary (usually 0)
+            tright (float): right interval boundary (usually 1)
+            node_type (str): node distribution to use (default LEGENDRE)
+            quad_type (str): quadrature type to use (default LOBATTO)
+            useSpline (bool): wether or not use spline interpolation to compute
+                weights (default False)
+        """
         # Base constructor
         super(Collocation, self).__init__(num_nodes, tleft, tright)
         # Instanciate attributes
