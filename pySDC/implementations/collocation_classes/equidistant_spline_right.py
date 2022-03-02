@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.interpolate as intpl
-from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Collocation import CollBase
 from pySDC.core.Errors import CollocationError
