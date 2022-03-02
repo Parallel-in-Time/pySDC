@@ -96,7 +96,7 @@ class CollBase(object):
             tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
 
         # Generate evaluation points for quadrature
-        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = roots_legendre((self.num_nodes+1)//2)
         phi = (b - a) / 2 * tau + (b + a) / 2
 
         weights = [np.sum((b - a) / 2 * omega * p(phi)) for p in tcks]
@@ -132,7 +132,7 @@ class CollBase(object):
 
         # Generate evaluation points for quadrature
         a, b = self.tleft, self.nodes[:, None]
-        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = roots_legendre((self.num_nodes+1)//2)
         tau, omega = tau[None, :], omega[None, :]
         phi = (b - a) / 2 * tau + (b + a) / 2
 
