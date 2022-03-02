@@ -4,11 +4,6 @@ from pySDC.core.Nodes import NodesGenerator
 import numpy as np
 import scipy.interpolate as intpl
 
-NODE_TYPES = ['EQUID', 'LEGENDRE',
-              'CHEBY-1', 'CHEBY-2', 'CHEBY-3', 'CHEBY-4']
-
-QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
-
 
 class Collocation(CollBase):
     """
