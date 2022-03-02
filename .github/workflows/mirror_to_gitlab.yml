@@ -6,6 +6,7 @@ on:
 
 jobs:
    mirror:
+    if: github.repository_owner == 'Parallel-in-Time'
     runs-on: ubuntu-latest
     
     steps:
