@@ -85,7 +85,7 @@ class Collocation(CollBase):
                 self.order = 2 * num_nodes - 2
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
-        self.Qmat = self._gen_Qmatrix
+        self.Qmat = self._gen_Qmatrix_spline if useSpline else self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
         self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
@@ -138,3 +138,19 @@ class Collocation(CollBase):
             weights[i] = intpl.splint(a, b, tcks[i])
 
         return weights
+
+    @property
+    def _gen_Qmatrix_spline(self):
+        """
+        Compute tleft-to-node integration matrix for later use in collocation formulation
+        Returns:
+            numpy.ndarray: matrix containing the weights for tleft to node
+        """
+        M = self.num_nodes
+        Q = np.zeros([M + 1, M + 1])
+
+        # for all nodes, get weights for the interval [tleft,node]
+        for m in np.arange(M):
+            Q[m + 1, 1:] = self._getWeights(self.tleft, self.nodes[m])
+
+        return Q
