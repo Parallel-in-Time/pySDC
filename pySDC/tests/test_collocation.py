@@ -4,7 +4,7 @@ import numpy as np
 from pySDC.core.Collocation import CollBase
 from pySDC.tests.test_helpers import get_derived_from_in_package
 
-from pySDC.implementations.collocation_classes.generic import Collocation
+from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.collocation_classes.equidistant import \
     Equidistant
 from pySDC.implementations.collocation_classes.equidistant_inner import \
