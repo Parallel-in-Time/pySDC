@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.special.orthogonal import roots_legendre
+from scipy.special import roots_legendre
 from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Errors import CollocationError, ParameterError
@@ -51,7 +51,10 @@ class Equidistant_RDC(Equidistant):
         if nnodes < 2:
             raise CollocationError("Number of nodes should be at least 2 for equidistant, but is %d" % num_nodes)
 
-        super(Equidistant, self).__init__(nnodes, tleft, tright)
+        try:
+            super(Equidistant, self).__init__(nnodes, tleft, tright)
+        except AttributeError:
+            pass
 
         self.order = self.num_nodes
         self.nodes = self._getNodes
