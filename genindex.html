@@ -71,6 +71,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__entry">__entry (core.Hooks.hooks attribute)</a>
 </li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.__init__">__init__() (core.Nodes.NodesGenerator method)</a>
+</li>
       <li><a href="pySDC/helpers.html#helpers.pysdc_helper.FrozenClass.__isfrozen">__isfrozen (helpers.pysdc_helper.FrozenClass attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__stats">__stats (core.Hooks.hooks attribute)</a>
@@ -85,10 +87,10 @@
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_setup">__t0_setup (core.Hooks.hooks attribute)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_step">__t0_step (core.Hooks.hooks attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_step">__t0_step (core.Hooks.hooks attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_sweep">__t0_sweep (core.Hooks.hooks attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t1_comm">__t1_comm (core.Hooks.hooks attribute)</a>
@@ -295,6 +297,8 @@
 </li>
       <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right">CollGaussRadau_Right (class in implementations.collocation_classes.gauss_radau_right)</a>
 </li>
+      <li><a href="pySDC/implementations.html#implementations.collocations.Collocation">Collocation (class in implementations.collocations)</a>
+</li>
       <li><a href="pySDC/core.html#core.Errors.CollocationError">CollocationError</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.mesh.mesh.comm">comm (implementations.datatype_classes.mesh.mesh property)</a>
@@ -395,6 +399,13 @@
 </li>
       </ul></li>
       <li>
+    core.Nodes
+
+      <ul>
+        <li><a href="pySDC/core.html#module-core.Nodes">module</a>
+</li>
+      </ul></li>
+      <li>
     core.Problem
 
       <ul>
@@ -433,25 +444,7 @@
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.ddx">ddx (implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.delta_m">delta_m (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.delta_m">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.delta_m">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.delta_m">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.delta_m">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.delta_m">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.delta_m">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.delta_m">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.delta_m">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">dirk (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
 
       <ul>
@@ -464,6 +457,8 @@
         <li><a href="pySDC/core.html#core.Step.step.dt">(core.Step.step property)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.Collocation.StableBarycentricInterpolator.dtype">dtype (core.Collocation.StableBarycentricInterpolator attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.Problem.ptype.dtype_f">dtype_f (core.Problem.ptype attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Problem.ptype.dtype_u">dtype_u (core.Problem.ptype attribute)</a>
@@ -673,6 +668,8 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">eval_mode_energy() (implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.evalOrthogPoly">evalOrthogPoly() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id0">[1]</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.evaluate">evaluate() (core.Collocation.CollBase static method)</a>
 </li>
@@ -914,7 +911,13 @@
         <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix">(in module implementations.problem_classes.boussinesq_helpers.buildFDMatrix)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getNodes">getNodes() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id2">[1]</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getOrthogPolyCoefficients">getOrthogPolyCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id3">[1]</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual">getresidual() (implementations.problem_classes.boussinesq_helpers.helper_classes.Callback method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getTridiagCoefficients">getTridiagCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id4">[1]</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix">getUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.buildFDMatrix)</a>
 </li>
@@ -1106,6 +1109,13 @@
 
       <ul>
         <li><a href="pySDC/implementations.collocation_classes.html#module-implementations.collocation_classes.gauss_radau_right">module</a>
+</li>
+      </ul></li>
+      <li>
+    implementations.collocations
+
+      <ul>
+        <li><a href="pySDC/implementations.html#module-implementations.collocations">module</a>
 </li>
       </ul></li>
       <li>
@@ -1752,27 +1762,7 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.left_is_node">left_is_node (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.left_is_node">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.left_is_node">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.left_is_node">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.left_is_node">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.left_is_node">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.left_is_node">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.left_is_node">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.left_is_node">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Level.level">level (class in core.Level)</a>
 
       <ul>
@@ -1783,6 +1773,8 @@
 </li>
       <li><a href="pySDC/core.html#core.Step.step.levels">levels (core.Step.step attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.BaseTransfer.base_transfer.logger">logger (core.BaseTransfer.base_transfer attribute)</a>
 
       <ul>
@@ -1861,6 +1853,8 @@
 </li>
         <li><a href="pySDC/core.html#module-core.Level">core.Level</a>
 </li>
+        <li><a href="pySDC/core.html#module-core.Nodes">core.Nodes</a>
+</li>
         <li><a href="pySDC/core.html#module-core.Problem">core.Problem</a>
 </li>
         <li><a href="pySDC/core.html#module-core.SpaceTransfer">core.SpaceTransfer</a>
@@ -1900,6 +1894,8 @@
         <li><a href="pySDC/implementations.collocation_classes.html#module-implementations.collocation_classes.gauss_radau_left">implementations.collocation_classes.gauss_radau_left</a>
 </li>
         <li><a href="pySDC/implementations.collocation_classes.html#module-implementations.collocation_classes.gauss_radau_right">implementations.collocation_classes.gauss_radau_right</a>
+</li>
+        <li><a href="pySDC/implementations.html#module-implementations.collocations">implementations.collocations</a>
 </li>
         <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes">implementations.controller_classes</a>
 </li>
@@ -2080,52 +2076,22 @@
 </li>
       <li><a href="pySDC/helpers.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Collocation.CollBase.nodes">nodes (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.nodes">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.node_type">node_type (core.Nodes.NodesGenerator attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.nodes">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.nodes">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.nodes">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.nodes">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.nodes">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.nodes">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.nodes">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Collocation.CollBase.nodes">nodes (core.Collocation.CollBase attribute)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesError">NodesError</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator">NodesGenerator (class in core.Nodes)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">nonlinear_ODE_1 (class in implementations.problem_classes.nonlinear_ODE_1)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">nonlinearschroedinger_imex (class in implementations.problem_classes.NonlinearSchroedinger_MPIFFT)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.num_nodes">num_nodes (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.num_nodes">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.num_nodes">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.num_nodes">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.num_nodes">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.num_nodes">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.num_nodes">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.num_nodes">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.num_nodes">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps">NumSmallTimeSteps() (implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit method)</a>
 </li>
   </ul></td>
@@ -2133,26 +2099,6 @@
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.order">order (implementations.collocation_classes.equidistant.Equidistant attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.order">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.order">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.order">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.order">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.order">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.order">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.order">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.OuterSolarSystem.outer_solar_system">outer_solar_system (class in implementations.problem_classes.OuterSolarSystem)</a>
 </li>
@@ -2320,33 +2266,17 @@
         <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI">(implementations.sweeper_classes.imex_1st_order.imex_1st_order attribute)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.html#core.Collocation.CollBase.Qmat">Qmat (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.Qmat">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.Qmat">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.Qmat">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.Qmat">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.Qmat">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.Qmat">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.Qmat">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.Qmat">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Collocation.CollBase.Qmat">Qmat (core.Collocation.CollBase attribute)</a>
+</li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.QQ">QQ (implementations.sweeper_classes.verlet.verlet attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.qQ">qQ (implementations.sweeper_classes.verlet.verlet attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.QT">QT (implementations.sweeper_classes.verlet.verlet attribute)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.quad_type">quad_type (core.Nodes.NodesGenerator attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.Qx">Qx (implementations.sweeper_classes.verlet.verlet attribute)</a>
 </li>
@@ -2400,6 +2330,8 @@
         <li><a href="pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda.restrict">(implementations.transfer_classes.TransferPETScDMDA.mesh_to_mesh_petsc_dmda method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/helpers.html#helpers.transfer_helper.restriction_matrix_1d">restriction_matrix_1d() (in module helpers.transfer_helper)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.return_stats">return_stats() (core.Hooks.hooks method)</a>
@@ -2412,32 +2344,12 @@
         <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab.rfft_object">(implementations.problem_classes.AllenCahn_2D_FFT.allencahn2d_imex_stab attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.transfer_classes.html#implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft.rfft_object_coarse">rfft_object_coarse (implementations.transfer_classes.TransferMesh_FFT.mesh_to_mesh_fft attribute)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh">rhs_fenics_mesh (class in implementations.datatype_classes.fenics_mesh)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.right_is_node">right_is_node (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.right_is_node">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.right_is_node">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.right_is_node">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.right_is_node">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.right_is_node">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.right_is_node">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.right_is_node">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.right_is_node">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.RK3Lin">RK3Lin() (implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.standard_integrators.rk_imex">rk_imex (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
@@ -2483,25 +2395,7 @@
       <li><a href="pySDC/helpers.html#helpers.visualization_tools.show_residual_across_simulation">show_residual_across_simulation() (in module helpers.visualization_tools)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.Smat">Smat (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.Smat">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.Smat">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.Smat">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.Smat">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.Smat">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.Smat">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.Smat">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.Smat">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex.solve_system">solve_system() (implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex method)</a>
 
       <ul>
@@ -2638,6 +2532,8 @@
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST">ST (implementations.sweeper_classes.boris_2nd_order.boris_2nd_order attribute)</a>
 </li>
+      <li><a href="pySDC/core.html#core.Collocation.StableBarycentricInterpolator">StableBarycentricInterpolator (class in core.Collocation)</a>
+</li>
       <li><a href="pySDC/core.html#core.Level.level.status">status (core.Level.level attribute)</a>
 
       <ul>
@@ -2692,28 +2588,10 @@
         <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.timestep">(implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.html#core.Collocation.CollBase.tleft">tleft (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.tleft">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.tleft">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.tleft">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.tleft">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.tleft">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.tleft">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.tleft">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.tleft">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Collocation.CollBase.tleft">tleft (core.Collocation.CollBase attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.Step.step.transfer">transfer() (core.Step.step method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Errors.TransferError">TransferError</a>
@@ -2725,25 +2603,7 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.tright">tright (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.tright">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.tright">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.tright">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.tright">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.tright">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.tright">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.tright">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.tright">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -2912,6 +2772,8 @@
         <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.w">(implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1">w1 (implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2">w2 (implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott attribute)</a>
@@ -2919,25 +2781,7 @@
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt">wait_with_interrupt() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.weights">weights (core.Collocation.CollBase attribute)</a>
-
-      <ul>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant.weights">(implementations.collocation_classes.equidistant.Equidistant attribute)</a>
 </li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner.weights">(implementations.collocation_classes.equidistant_inner.EquidistantInner attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft.weights">(implementations.collocation_classes.equidistant_right.EquidistantNoLeft attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right.weights">(implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_legendre.CollGaussLegendre.weights">(implementations.collocation_classes.gauss_legendre.CollGaussLegendre attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto.weights">(implementations.collocation_classes.gauss_lobatto.CollGaussLobatto attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left.weights">(implementations.collocation_classes.gauss_radau_left.CollGaussRadau_Left attribute)</a>
-</li>
-        <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right.weights">(implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 

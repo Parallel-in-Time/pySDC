@@ -38,76 +38,25 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.collocation_classes.gauss_lobatto</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy.polynomial.legendre</span> <span class="k">as</span> <span class="nn">leg</span>
+<span></span><span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.core.Collocation</span> <span class="kn">import</span> <span class="n">CollBase</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">CollocationError</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.collocations</span> <span class="kn">import</span> <span class="n">Collocation</span>
+
+<span class="n">warn</span><span class="p">(</span><span class="s2">&quot;This import is deprecated and will be removed in future versions.&quot;</span>
+     <span class="s2">&quot;To use this type of collocation, &quot;</span>
+     <span class="s2">&quot;please use the new generic Collocation class in &quot;</span>
+     <span class="s2">&quot;pySDC.implementations.collocations, for example:</span><span class="se">\n</span><span class="s2">&quot;</span>
+     <span class="s2">&quot;coll = Collocation(num_nodes, tleft, tright, &quot;</span>
+     <span class="s2">&quot;node_type=&#39;LEGENDRE&#39;, quadType=&#39;LOBATTO&#39;)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+     <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CollGaussLobatto"><a class="viewcode-back" href="../../../pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto">[docs]</a><span class="k">class</span> <span class="nc">CollGaussLobatto</span><span class="p">(</span><span class="n">CollBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements Gauss-Lobatto Quadrature</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        order (int): order of the quadrature</span>
-<span class="sd">        num_nodes (int): number of collocation nodes</span>
-<span class="sd">        tleft (float): left interval point</span>
-<span class="sd">        tright (float): right interval point</span>
-<span class="sd">        nodes (numpy.ndarray): array of quadrature nodes</span>
-<span class="sd">        weights (numpy.ndarray): array of quadrature weights for the full interval</span>
-<span class="sd">        Qmat (numpy.ndarray): matrix containing the weights for tleft to node</span>
-<span class="sd">        Smat (numpy.ndarray): matrix containing the weights for node to node</span>
-<span class="sd">        delta_m (numpy.ndarray): array of distances between nodes</span>
-<span class="sd">        right_is_node (bool): flag to indicate whether right point is collocation node</span>
-<span class="sd">        left_is_node (bool): flag to indicate whether left point is collocation node</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CollGaussLobatto"><a class="viewcode-back" href="../../../pySDC/implementations.collocation_classes.html#implementations.collocation_classes.gauss_lobatto.CollGaussLobatto">[docs]</a><span class="k">class</span> <span class="nc">CollGaussLobatto</span><span class="p">(</span><span class="n">Collocation</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialization</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            num_nodes (int): number of nodes</span>
-<span class="sd">            tleft (float): left interval boundary (usually 0)</span>
-<span class="sd">            tright (float): right interval boundary (usually 1)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CollGaussLobatto</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">,</span> <span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">num_nodes</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">CollocationError</span><span class="p">(</span><span class="s2">&quot;Number of nodes should be at least 2 for Gauss-Lobatto, but is </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">num_nodes</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="mi">2</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getNodes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getWeights</span><span class="p">(</span><span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Qmat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_Qmatrix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Smat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_Smatrix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delta_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_deltas</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">left_is_node</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">right_is_node</span> <span class="o">=</span> <span class="kc">True</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_getNodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Computes Gauss-Lobatto integration nodes.</span>
-
-<span class="sd">        Calculates the Gauss-Lobatto integration nodes via a root calculation of derivatives of the legendre</span>
-<span class="sd">        polynomials. Note that the precision of float 64 is not guarantied.</span>
-
-<span class="sd">        Copyright by Dieter Moser, 2014</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            np.ndarray: array of Gauss-Lobatto nodes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tleft</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tright</span>
-
-        <span class="n">roots</span> <span class="o">=</span> <span class="n">leg</span><span class="o">.</span><span class="n">legroots</span><span class="p">(</span><span class="n">leg</span><span class="o">.</span><span class="n">legder</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)))</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roots</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-
-        <span class="n">nodes</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nodes</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">nodes</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
-
-        <span class="k">return</span> <span class="n">nodes</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CollGaussLobatto</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">num_nodes</span><span class="p">,</span> <span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">,</span>
+            <span class="n">node_type</span><span class="o">=</span><span class="s1">&#39;LEGENDRE&#39;</span><span class="p">,</span> <span class="n">quad_type</span><span class="o">=</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">,</span> <span class="n">useSpline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>
