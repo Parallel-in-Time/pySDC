@@ -1,7 +1,9 @@
 from argparse import ArgumentParser
+import warnings
 import numpy as np
 from mpi4py import MPI
 
+warnings.filterwarnings("ignore")
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
