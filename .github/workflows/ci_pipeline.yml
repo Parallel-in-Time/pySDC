@@ -12,60 +12,60 @@ jobs:
         shell: bash -l {0}
     
     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v1
         
-#       - name: Add packages
-#         run: |
-#           sudo apt-get update
-#           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+      - name: Add packages
+        run: |
+          sudo apt-get update
+          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-#       - name: Cache conda
-#         uses: actions/cache@v2
-#         env:
-#           # Increase this value to reset cache if etc/example-environment.yml has not changed
-#           CACHE_NUMBER: 3
-#         with:
-#           path: ~/conda_pkgs_dir
-#           key:
-#             ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 3
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
 
-#       - name: act workarounds
-#         if: ${{ env.ACT }}
-#         run: |
-#           MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-#           wget $MINICONDA_URL
-#           MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-#           sudo bash $MINICONDA_SH -b -p $CONDA
-#           rm $MINICONDA_SH # Clean up after installing
-#           mkdir data
+      - name: act workarounds
+        if: ${{ env.ACT }}
+        run: |
+          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+          wget $MINICONDA_URL
+          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
+          sudo bash $MINICONDA_SH -b -p $CONDA
+          rm $MINICONDA_SH # Clean up after installing
+          mkdir data
 
-#       - uses: conda-incubator/setup-miniconda@v2
-#         with:
-#           auto-update-conda: true
-#           python-version: 3.9
-#           use-only-tar-bz2: true
-#           mamba-version: "*"
-#           channels: conda-forge,defaults
-#           channel-priority: true
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: 3.9
+          use-only-tar-bz2: true
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
 
-#       - name: Install dependencies
-#         run: |
-#           mamba install --yes --override-channel -c conda-forge --file requirements.txt
+      - name: Install dependencies
+        run: |
+          mamba install --yes --override-channel -c conda-forge --file requirements.txt
 
-#       - name: Lint with flake8
-#         run: |
-#           flake8 pySDC
+      - name: Lint with flake8
+        run: |
+          flake8 pySDC
 
-#       - name: Run pytest
-#         run: |
-#           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+      - name: Run pytest
+        run: |
+          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
-#       - name: Build documentation
-#         run: |
-#           chmod u+x ./docs/update_apidocs.sh
-#           ./docs/update_apidocs.sh
-#           sphinx-build -b html docs/source docs/build/html
+      - name: Build documentation
+        run: |
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
