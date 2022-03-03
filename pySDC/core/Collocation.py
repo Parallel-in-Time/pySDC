@@ -24,7 +24,7 @@ class StableBarycentricInterpolator(BarycentricInterpolator):
         sign = np.sign(diffs).prod(axis=1)
         wLog = -np.log(np.abs(diffs)).sum(axis=1)
         wScale = wLog.max()
-        invProd = np.exp(wLog-wScale)
+        invProd = np.exp(wLog - wScale)
         invProd *= sign
 
         np.copyto(self.wi, invProd)
