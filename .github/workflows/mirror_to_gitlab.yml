@@ -16,5 +16,3 @@ jobs:
             REMOTE: 'https://gitlab.hzdr.de/r.speck/pysdc.git'
             GIT_USERNAME: r.speck
             GIT_PASSWORD: ${{ secrets.GITLAB_SECRET }}
-          
-     

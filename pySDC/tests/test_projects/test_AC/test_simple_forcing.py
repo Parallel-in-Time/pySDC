@@ -1,5 +1,6 @@
 import pytest
 import subprocess
+
 from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
 
 def test_main_serial():
@@ -28,5 +29,3 @@ def test_main_parallel():
     (output, err) = p.communicate()
     print(output)
     assert err == ''
-
-

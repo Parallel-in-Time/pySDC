@@ -2,9 +2,32 @@ import logging
 
 import numpy as np
 from scipy.interpolate import BarycentricInterpolator
-from scipy.special.orthogonal import roots_legendre
+from scipy.special import roots_legendre
 
 from pySDC.core.Errors import CollocationError
+
+
+class StableBarycentricInterpolator(BarycentricInterpolator):
+
+    def __init__(self, xi, yi=None, axis=0):
+        super(BarycentricInterpolator, self).__init__(xi, yi, axis)
+        self.xi = np.asfarray(xi)
+        self.set_yi(yi)
+        self.n = len(self.xi)
+
+        self._inv_capacity = 4.0 / (np.max(self.xi) - np.min(self.xi))
+
+        self.wi = np.zeros(self.n)
+
+        diffs = self.xi[:, None] - self.xi[None, :]
+        diffs[np.diag_indices_from(diffs)] = 1
+        sign = np.sign(diffs).prod(axis=1)
+        wLog = -np.log(np.abs(diffs)).sum(axis=1)
+        wScale = wLog.max()
+        invProd = np.exp(wLog - wScale)
+        invProd *= sign
+
+        np.copyto(self.wi, invProd)
 
 
 class CollBase(object):
@@ -93,10 +116,10 @@ class CollBase(object):
         circ_one[0] = 1.0
         tcks = []
         for i in range(self.num_nodes):
-            tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
+            tcks.append(StableBarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
 
         # Generate evaluation points for quadrature
-        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = roots_legendre((self.num_nodes + 1) // 2)
         phi = (b - a) / 2 * tau + (b + a) / 2
 
         weights = [np.sum((b - a) / 2 * omega * p(phi)) for p in tcks]
@@ -128,11 +151,11 @@ class CollBase(object):
         circ_one[0] = 1.0
         tcks = []
         for i in range(M):
-            tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
+            tcks.append(StableBarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
 
         # Generate evaluation points for quadrature
         a, b = self.tleft, self.nodes[:, None]
-        tau, omega = roots_legendre(self.num_nodes)
+        tau, omega = roots_legendre((self.num_nodes + 1) // 2)
         tau, omega = tau[None, :], omega[None, :]
         phi = (b - a) / 2 * tau + (b + a) / 2
 
