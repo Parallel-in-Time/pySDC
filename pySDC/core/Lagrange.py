@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def computeFejerRule(n):
     # Fejer rule of the first kind
     # Computation using DFT (Waldvogel 2006)
@@ -11,10 +12,10 @@ def computeFejerRule(n):
     weights = np.empty(n, dtype=float)
 
     # Compute nodes
-    theta = np.arange(1, n+1, dtype=float)[-1::-1]
+    theta = np.arange(1, n + 1, dtype=float)[-1::-1]
     theta *= 2
     theta -= 1
-    theta *= np.pi/(2*n)
+    theta *= np.pi / (2 * n)
     np.cos(theta, out=nodes)
 
     # Compute weights
@@ -26,8 +27,7 @@ def computeFejerRule(n):
     # -- Build v0
     v0 = np.concatenate([
         2 * np.exp(1j * np.pi * K / n) / (1 - 4 * K**2),
-        np.zeros(lN + 1)
-        ])
+        np.zeros(lN + 1)])
     # -- Build v1 from v0
     v1 = np.empty(len(v0) - 1, dtype=complex)
     np.conjugate(v0[:0:-1], out=v1)
@@ -53,8 +53,8 @@ class LagrangeApproximation(object):
         diffs[np.diag_indices_from(diffs)] = 1
 
         def analytic(diffs):
-            diffs *= 4 / (points.max() - points.min())
             # Fast implementation (unstable for large number of points)
+            diffs *= 4 / (points.max() - points.min())
             invProd = np.prod(diffs, axis=1)
             invProd **= -1
             return invProd
@@ -69,7 +69,7 @@ class LagrangeApproximation(object):
                 wScale = wLog.max()
             else:
                 raise NotImplementedError(f'scaleRef={scaleRef}')
-            invProd = np.exp(wLog-wScale)
+            invProd = np.exp(wLog - wScale)
             invProd *= sign
             return invProd
 
@@ -78,7 +78,8 @@ class LagrangeApproximation(object):
             diffs *= 4 / (points.max() - points.min())
             sign = np.sign(diffs).prod(axis=1)
             vv = np.exp(np.log(np.abs(diffs)).sum(axis=1))
-            invProd = 1./(sign*vv)
+            invProd = (sign * vv)
+            invProd **= -1
             invProd /= np.linalg.norm(invProd, np.inf)
             return invProd
 
@@ -113,7 +114,7 @@ class LagrangeApproximation(object):
         # Compute difference between times and Lagrange points
         times = np.asarray(times)
         with np.errstate(divide='ignore'):
-            iDiff = 1/(times[:, None] - self.points[None, :])
+            iDiff = 1 / (times[:, None] - self.points[None, :])
 
         # Find evaluated positions that coincide with one Lagrange point
         concom = (iDiff == np.inf) | (iDiff == -np.inf)
@@ -132,7 +133,7 @@ class LagrangeApproximation(object):
 
         if numQuad == 'LEGENDRE':
             # Legendre gauss rule, integrate exactly polynomials of deg. (2n-1)
-            iNodes, iWeights = np.polynomial.legendre.leggauss(self.n//2)
+            iNodes, iWeights = np.polynomial.legendre.leggauss(self.n // 2)
         elif numQuad == 'FEJER':
             # Fejer-I rule, integrate exactly polynomial of deg. n-1
             iNodes, iWeights = computeFejerRule(self.n - 1 - (self.n % 2))
@@ -143,7 +144,7 @@ class LagrangeApproximation(object):
         intervals = np.array(intervals)
         aj, bj = intervals[:, 0][:, None], intervals[:, 1][:, None]
         tau, omega = iNodes[None, :], iWeights[None, :]
-        tEval = (bj-aj)/2*tau + (bj+aj)/2
+        tEval = (bj - aj) / 2 * tau + (bj + aj) / 2
 
         # Compute the integrand function on nodes
         integrand = self.getInterpolationMatrix(tEval.ravel()).T.reshape(
@@ -151,7 +152,7 @@ class LagrangeApproximation(object):
 
         # Apply quadrature rule to integrate
         integrand *= omega
-        integrand *= (bj-aj)/2
+        integrand *= (bj - aj) / 2
         PInter = integrand.sum(axis=-1).T
 
         return PInter
