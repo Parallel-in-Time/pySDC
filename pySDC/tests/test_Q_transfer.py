@@ -46,7 +46,7 @@ def test_Q_transfer(collclass):
                 err_restr = np.linalg.norm(urestr-ucoarse, np.inf)
 
                 if polyorder <= order:
-                    assert err_inter < 2E-15, "ERROR: Q-interpolation order is not reached, got %s" %err_inter
+                    assert err_inter < 5E-15, "ERROR: Q-interpolation order is not reached, got %s" %err_inter
                     assert err_restr < 2E-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
                 else:
                     assert err_inter > 2E-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
