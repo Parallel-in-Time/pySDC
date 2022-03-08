@@ -89,18 +89,3 @@ The current software release can be cited using Zenodo: |zenodo|
 
 .. |zenodo| image:: https://zenodo.org/badge/26165004.svg
    :target: https://zenodo.org/badge/latestdoi/26165004
-
-Acknowledgements
-----------------
-
-<div style="text-align: justify">
-This project has received funding from the European High-Performance Computing Joint Undertaking (JU) under grant agreement No 955701.
-The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
-This project also received funding from the German Federal Ministry of Education and Research (BMBF) grant 16HPC048.
-</div>
-
-<p align="center">
-  <img src="./doku/EuroHPC.jpg" height="105"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./doku/logo_eu.png" height="95" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./doku/BMBF_gefoerdert_2017_en.jpg" height="105" />
-</p>
