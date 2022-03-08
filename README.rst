@@ -98,10 +98,10 @@ The JU receives support from the European Union’s Horizon 2020 research and in
 This project also received funding from the `German Federal Ministry of Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_ (BMBF) grant 16HPC047.
 
 .. image:: docs/source/logo/Time-X.png
-   :width: 35%
+   :width: 20%
 
 .. image:: docs/source/logo/EU.png
-   :width: 25%
+   :width: 15%
 
 .. image:: docs/source/logo/BMBF.jpg
-   :width: 30%
+   :width: 20%
