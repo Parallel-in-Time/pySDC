@@ -15,7 +15,7 @@ def test_main_parallel():
     import mpi4py
 
     nprocs = 2
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
+    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); export HWLOC_HIDE_ERRORS=2; mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
     (output, err) = p.communicate()
@@ -23,7 +23,7 @@ def test_main_parallel():
     assert err == ''
 
     nprocs = 4
-    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
+    cmd = f"export PYTHONPATH=$PYTHONPATH:$(pwd); export HWLOC_HIDE_ERRORS=2; mpirun -np {nprocs} python pySDC/projects/AllenCahn_Bayreuth/run_simple_forcing_benchmark.py -n {nprocs}"
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
     (output, err) = p.communicate()
