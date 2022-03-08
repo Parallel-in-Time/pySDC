@@ -54,7 +54,6 @@ class LagrangeApproximation(object):
 
         def analytic(diffs):
             # Fast implementation (unstable for large number of points)
-            diffs *= 4 / (points.max() - points.min())
             invProd = np.prod(diffs, axis=1)
             invProd **= -1
             return invProd
