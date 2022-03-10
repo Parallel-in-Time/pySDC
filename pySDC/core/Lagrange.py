@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import roots_legendre
 
 
 def computeFejerRule(n):
@@ -45,7 +46,7 @@ def computeFejerRule(n):
 
 class LagrangeApproximation(object):
 
-    def __init__(self, points, weightComputation='STABLE', scaleRef='MAX'):
+    def __init__(self, points, weightComputation='AUTO', scaleRef='MAX'):
 
         points = np.asarray(points).ravel()
 
@@ -128,14 +129,17 @@ class LagrangeApproximation(object):
 
         return PInter
 
-    def getIntegrationMatrix(self, intervals, numQuad='LEGENDRE'):
+    def getIntegrationMatrix(self, intervals, numQuad='LEGENDRE_NUMPY'):
 
-        if numQuad == 'LEGENDRE':
+        if numQuad == 'LEGENDRE_NUMPY':
             # Legendre gauss rule, integrate exactly polynomials of deg. (2n-1)
-            iNodes, iWeights = np.polynomial.legendre.leggauss(self.n // 2)
+            iNodes, iWeights = np.polynomial.legendre.leggauss((self.n + 1) // 2)
+        elif numQuad == 'LEGENDRE_SCIPY':
+            # Using Legendre scipy implementation
+            iNodes, iWeights = roots_legendre((self.n + 1) // 2)
         elif numQuad == 'FEJER':
             # Fejer-I rule, integrate exactly polynomial of deg. n-1
-            iNodes, iWeights = computeFejerRule(self.n - 1 - (self.n % 2))
+            iNodes, iWeights = computeFejerRule(self.n - ((self.n + 1) % 2))
         else:
             raise NotImplementedError(f'numQuad={numQuad}')
 
