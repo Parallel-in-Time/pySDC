@@ -8,7 +8,6 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 class buck_converter(ptype):
     """
     Example implementing the Buck converter model as in the description in the PinTSimE project
-
     Attributes:
         A: system matrix, representing the 3 ODEs
     """
@@ -16,7 +15,6 @@ class buck_converter(ptype):
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
-
         Args:
             problem_params (dict): custom parameters for the example
             dtype_u: mesh data type for solution
@@ -26,7 +24,7 @@ class buck_converter(ptype):
         problem_params['nvars'] = 3
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['duty', 'fsw', 'Vs', 'Rs', 'C1', 'L1', 'C2', 'Rl']
+        essential_keys = ['duty', 'fsw', 'Vs', 'Rs', 'C1', 'Rp', 'L1', 'C2', 'Rl']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -41,31 +39,35 @@ class buck_converter(ptype):
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
-
         Args:
             u (dtype_u): current values
             t (float): current time
-
         Returns:
             dtype_f: the RHS
         """
+        Tsw = 1 / self.params.fsw
 
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
-        f.expl[0] = self.params.Vs / (self.params.Rs * self.params.C1)
+
+        if 0 <= ((t / Tsw) % 1) <= self.params.duty:
+            f.expl[0] = self.params.Vs / (self.params.Rs * self.params.C1)
+            f.expl[2] = 0
+
+        else:
+            f.expl[0] = self.params.Vs / (self.params.Rs * self.params.C1)
+            f.expl[2] = -(self.params.Rp * self.params.Vs) / (self.params.L1 * self.params.Rs)
 
         return f
 
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-factor*A)u = rhs
-
         Args:
             rhs (dtype_f): right-hand side for the linear system
             factor (float): abbrev. for the local stepsize (or any other factor required)
             u0 (dtype_u): initial guess for the iterative solver
             t (float): current time (e.g. for time-dependent BCs)
-
         Returns:
             dtype_u: solution as mesh
         """
@@ -82,6 +84,7 @@ class buck_converter(ptype):
 
             self.A[2, 0] = 1 / self.params.L1
             self.A[2, 1] = -1 / self.params.L1
+            self.A[2, 2] = -self.params.Rp / self.params.L1
 
         else:
 
@@ -90,6 +93,7 @@ class buck_converter(ptype):
             self.A[1, 1] = -1 / (self.params.C2 * self.params.Rl)
             self.A[1, 2] = 1 / self.params.C2
 
+            self.A[2, 0] = self.params.Rp / (self.params.L1 * self.params.Rs)
             self.A[2, 1] = -1 / self.params.L1
 
         me = self.dtype_u(self.init)
@@ -99,10 +103,8 @@ class buck_converter(ptype):
     def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
-
         Args:
             t (float): current time
-
         Returns:
             dtype_u: exact solution
         """
