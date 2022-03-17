@@ -1846,29 +1846,25 @@ time-dependent forcing</p>
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.problem_classes.BuckConverter.</span></span><span class="sig-name descname"><span class="pre">buck_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.mesh'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f=&lt;class</span> <span class="pre">'pySDC.implementations.datatype_classes.mesh.imex_mesh'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/BuckConverter.html#buck_converter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Problem.ptype</span></code></p>
-<p>Example implementing the Buck converter model as in the description in the PinTSimE project</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.A">
-<span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.A" title="Permalink to this definition">¶</a></dt>
-<dd><p>system matrix, representing the 3 ODEs</p>
-</dd></dl>
-
+<p>Example implementing the Buck converter model as in the description in the PinTSimE project
+.. attribute:: A</p>
+<blockquote>
+<div><p>system matrix, representing the 3 ODEs</p>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.eval_f">
 <span class="sig-name descname"><span class="pre">eval_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/BuckConverter.html#buck_converter.eval_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.eval_f" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to evaluate the RHS</p>
+<dd><p>Routine to evaluate the RHS
+:param u: current values
+:type u: dtype_u
+:param t: current time
+:type t: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>dtype_u</em>) – current values</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the RHS</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the RHS</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dtype_f</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dtype_f</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1876,21 +1872,21 @@ time-dependent forcing</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.solve_system">
 <span class="sig-name descname"><span class="pre">solve_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/BuckConverter.html#buck_converter.solve_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.solve_system" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simple linear solver for (I-factor*A)u = rhs</p>
+<dd><p>Simple linear solver for (I-factor*A)u = rhs
+:param rhs: right-hand side for the linear system
+:type rhs: dtype_f
+:param factor: abbrev. for the local stepsize (or any other factor required)
+:type factor: float
+:param u0: initial guess for the iterative solver
+:type u0: dtype_u
+:param t: current time (e.g. for time-dependent BCs)
+:type t: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rhs</strong> (<em>dtype_f</em>) – right-hand side for the linear system</p></li>
-<li><p><strong>factor</strong> (<em>float</em>) – abbrev. for the local stepsize (or any other factor required)</p></li>
-<li><p><strong>u0</strong> (<em>dtype_u</em>) – initial guess for the iterative solver</p></li>
-<li><p><strong>t</strong> (<em>float</em>) – current time (e.g. for time-dependent BCs)</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>solution as mesh</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>solution as mesh</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dtype_u</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1898,16 +1894,15 @@ time-dependent forcing</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="implementations.problem_classes.BuckConverter.buck_converter.u_exact">
 <span class="sig-name descname"><span class="pre">u_exact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/problem_classes/BuckConverter.html#buck_converter.u_exact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.problem_classes.BuckConverter.buck_converter.u_exact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Routine to compute the exact solution at time t</p>
+<dd><p>Routine to compute the exact solution at time t
+:param t: current time
+:type t: float</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>t</strong> (<em>float</em>) – current time</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>exact solution</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>exact solution</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dtype_u</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dtype_u</p>
 </dd>
 </dl>
 </dd></dl>
@@ -4839,8 +4834,9 @@ IMEX time-stepping</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="../index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -4889,12 +4885,17 @@ IMEX time-stepping</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="implementations.datatype_classes.html"
-                        title="previous chapter">implementations.datatype_classes package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="implementations.problem_classes.acoustic_helpers.html"
-                        title="next chapter">implementations.problem_classes.acoustic_helpers package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="implementations.datatype_classes.html"
+                          title="previous chapter">implementations.datatype_classes package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="implementations.problem_classes.acoustic_helpers.html"
+                          title="next chapter">implementations.problem_classes.acoustic_helpers package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -4938,7 +4939,7 @@ IMEX time-stepping</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>
