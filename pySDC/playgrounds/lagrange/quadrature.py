@@ -204,9 +204,9 @@ def plotQuadErrors(nodesType, numQuad, figTitle=False):
         plt.legend()
         if err:
             if numQuad == 'ORIG':
-                plt.ylim(1e-17, 1e-10)
+                plt.ylim(1e-17, 1e-9)
             else:
-                plt.ylim(1e-17, 1e-12)
+                plt.ylim(1e-17, 1e-11)
         plt.xlabel('Polynomial degree')
 
     plt.figure()
