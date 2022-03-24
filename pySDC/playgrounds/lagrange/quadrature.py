@@ -130,6 +130,8 @@ def computeQuadratureErrors(nodeType, quadType, numQuad):
 
     tComp = np.zeros(nMax - 2)
 
+    np.random.seed(1990)
+
     for i in range(nInterTest):
 
         tLeft = np.random.rand() * 0.2
