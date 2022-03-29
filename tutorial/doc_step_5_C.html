@@ -84,6 +84,7 @@
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;predict_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pfasst_burnin&#39;</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -189,79 +190,79 @@
 </div>
 <p>Results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Working with QI = LU on  1 processes...
-   Mean number of iterations: 6.00
+   Mean number of iterations: 5.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
    Std and var for number of iterations: 0.00 -- 0.00
 
 Working with QI = LU on  2 processes...
-   Mean number of iterations: 6.50
+   Mean number of iterations: 5.50
    Range of values for number of iterations:  1 
    Position of max/min number of iterations:  1 --  0
    Std and var for number of iterations: 0.50 -- 0.25
    Std and var for number of iterations: 0.50 -- 0.25
 
 Working with QI = LU on  4 processes...
-   Mean number of iterations: 7.25
+   Mean number of iterations: 6.25
    Range of values for number of iterations:  2 
    Position of max/min number of iterations:  2 --  0
    Std and var for number of iterations: 0.83 -- 0.69
    Std and var for number of iterations: 0.83 -- 0.69
 
 Working with QI = LU on  8 processes...
-   Mean number of iterations: 8.62
+   Mean number of iterations: 7.62
    Range of values for number of iterations:  5 
    Position of max/min number of iterations:  7 --  0
    Std and var for number of iterations: 1.58 -- 2.48
    Std and var for number of iterations: 1.58 -- 2.48
 
 Working with QI = LU on 16 processes...
-   Mean number of iterations: 11.00
+   Mean number of iterations: 10.00
    Range of values for number of iterations:  9 
    Position of max/min number of iterations: 14 --  0
    Std and var for number of iterations: 2.78 -- 7.75
    Std and var for number of iterations: 2.78 -- 7.75
 
-Mean number of iterations went up from 6.00 to 11.00 for QI = LU!
+Mean number of iterations went up from 5.00 to 10.00 for QI = LU!
 
 
 Working with QI = IE on  1 processes...
-   Mean number of iterations: 7.00
+   Mean number of iterations: 6.00
    Range of values for number of iterations:  0 
    Position of max/min number of iterations:  0 --  0
    Std and var for number of iterations: 0.00 -- 0.00
    Std and var for number of iterations: 0.00 -- 0.00
 
 Working with QI = IE on  2 processes...
-   Mean number of iterations: 7.50
+   Mean number of iterations: 6.50
    Range of values for number of iterations:  1 
    Position of max/min number of iterations:  1 --  0
    Std and var for number of iterations: 0.50 -- 0.25
    Std and var for number of iterations: 0.50 -- 0.25
 
 Working with QI = IE on  4 processes...
-   Mean number of iterations: 8.00
+   Mean number of iterations: 7.00
    Range of values for number of iterations:  2 
    Position of max/min number of iterations:  3 --  0
    Std and var for number of iterations: 0.71 -- 0.50
    Std and var for number of iterations: 0.71 -- 0.50
 
 Working with QI = IE on  8 processes...
-   Mean number of iterations: 8.88
+   Mean number of iterations: 8.00
    Range of values for number of iterations:  3 
-   Position of max/min number of iterations:  5 --  0
-   Std and var for number of iterations: 1.05 -- 1.11
-   Std and var for number of iterations: 1.05 -- 1.11
+   Position of max/min number of iterations:  4 --  0
+   Std and var for number of iterations: 1.12 -- 1.25
+   Std and var for number of iterations: 1.12 -- 1.25
 
 Working with QI = IE on 16 processes...
-   Mean number of iterations: 10.38
+   Mean number of iterations: 9.44
    Range of values for number of iterations:  6 
    Position of max/min number of iterations: 14 --  0
-   Std and var for number of iterations: 1.76 -- 3.11
-   Std and var for number of iterations: 1.76 -- 3.11
+   Std and var for number of iterations: 1.73 -- 3.00
+   Std and var for number of iterations: 1.73 -- 3.00
 
-Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
+Mean number of iterations went up from 6.00 to 9.44 for QI = IE!
 
 
 </pre></div>
@@ -310,7 +311,7 @@ Mean number of iterations went up from 7.00 to 10.38 for QI = IE!
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

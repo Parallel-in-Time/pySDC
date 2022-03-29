@@ -150,6 +150,7 @@
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;all_to_done&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># can ask the controller to keep iterating all steps until the end</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;use_iteration_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># activate iteration estimator</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;predict_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pfasst_burnin&#39;</span>  <span class="c1"># activate iteration estimator</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -240,8 +241,19 @@
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Working</span> <span class="k">with</span>  <span class="mi">1</span> <span class="n">processes</span><span class="o">...</span>
 <span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87300682e-07</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">5</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">5</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">4</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">4</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">3</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">3</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">3</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">3</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">3</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">3</span> 
+
+<span class="n">Working</span> <span class="k">with</span>  <span class="mi">2</span> <span class="n">processes</span><span class="o">...</span>
+<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87272109e-07</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">4</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">4</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">4</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">4</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">4</span> 
@@ -249,8 +261,8 @@
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">4</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">4</span> 
 
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">2</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87272304e-07</span>
+<span class="n">Working</span> <span class="k">with</span>  <span class="mi">4</span> <span class="n">processes</span><span class="o">...</span>
+<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87294210e-07</span>
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">5</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">5</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">5</span> 
@@ -260,27 +272,16 @@
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">5</span> 
 <span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">5</span> 
 
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">4</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87296366e-07</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">6</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">6</span> 
-
 <span class="n">Working</span> <span class="k">with</span>  <span class="mi">8</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87297839e-07</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">8</span> 
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">8</span> 
+<span class="n">Error</span> <span class="n">vs</span><span class="o">.</span> <span class="n">exact</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.87290949e-07</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">7</span> 
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">7</span> 
 
 </pre></div>
 </div>
@@ -328,7 +329,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

@@ -82,6 +82,7 @@
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;predict_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pfasst_burnin&#39;</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -155,8 +156,8 @@
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">1.3505E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: error is too high, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;ERROR: range of number of iterations is too high, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">7.0</span><span class="p">,</span> <span class="s2">&quot;ERROR: mean number of iteratiobs is too high, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;ERROR: range of number of iterations is too high, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">5.0</span><span class="p">,</span> <span class="s2">&quot;ERROR: mean number of iteratiobs is too high, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
@@ -167,123 +168,123 @@
 </div>
 <p>Results:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Working</span> <span class="k">with</span>  <span class="mi">1</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">5</span>
 
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">4.94</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
 
 
 <span class="n">Working</span> <span class="k">with</span>  <span class="mi">2</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">5</span>
 
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">4.88</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
-
-
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">4</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.94</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.24</span> <span class="o">--</span> <span class="mf">0.06</span>
-
-
-<span class="n">Working</span> <span class="k">with</span>  <span class="mi">8</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">6</span>
-
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.12</span>
-   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.33</span> <span class="o">--</span> <span class="mf">0.11</span>
 
 
-<span class="n">Working</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">processes</span><span class="o">...</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">6</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">7</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">7</span>
+<span class="n">Working</span> <span class="k">with</span>  <span class="mi">4</span> <span class="n">processes</span><span class="o">...</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">4</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">4</span>
 
-   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.62</span>
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">4.75</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">1</span> 
-   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">6</span> <span class="o">--</span>  <span class="mi">0</span>
-   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.48</span> <span class="o">--</span> <span class="mf">0.23</span>
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span> <span class="mi">12</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.43</span> <span class="o">--</span> <span class="mf">0.19</span>
+
+
+<span class="n">Working</span> <span class="k">with</span>  <span class="mi">8</span> <span class="n">processes</span><span class="o">...</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">5</span>
+
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.00</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
+
+
+<span class="n">Working</span> <span class="k">with</span> <span class="mi">16</span> <span class="n">processes</span><span class="o">...</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">1.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">2.75</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.00</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.25</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.50</span><span class="p">:</span>  <span class="mi">5</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">3.75</span><span class="p">:</span>  <span class="mi">5</span>
+
+   <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">5.00</span>
+   <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
+   <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
+   <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
 
 
 </pre></div>
@@ -332,7 +333,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

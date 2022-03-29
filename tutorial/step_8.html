@@ -117,7 +117,7 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 
     <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">6.1555e-05</span><span class="p">,</span> <span class="s1">&#39;ERROR: error is too large, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span> <span class="s1">&#39;ERROR: residual plot has not been created&#39;</span>
-    <span class="k">assert</span> <span class="n">min_iter</span> <span class="o">==</span> <span class="mi">8</span> <span class="ow">and</span> <span class="n">max_iter</span> <span class="o">==</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;ERROR: number of iterations not as expected, got </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
+    <span class="k">assert</span> <span class="n">min_iter</span> <span class="o">==</span> <span class="mi">7</span> <span class="ow">and</span> <span class="n">max_iter</span> <span class="o">==</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;ERROR: number of iterations not as expected, got </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
                                             <span class="p">(</span><span class="n">min_iter</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">)</span>
 
 
@@ -126,14 +126,14 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">8</span>
-<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">8</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.00</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.12</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.25</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.38</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.50</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.62</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.75</span><span class="p">:</span> <span class="mi">7</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">iterations</span> <span class="k">for</span> <span class="n">time</span> <span class="mf">0.88</span><span class="p">:</span> <span class="mi">7</span>
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 590.5px; height: 434.5px;" /></a>
@@ -643,7 +643,7 @@ This example takes three different test cases and checks how well the iteration 
    Errors after step   0.8750 with 6 iterations: 3.6531e-08 / 8.5568e-09
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5247e-09
 
-...done, took 1.4963591159998941 seconds!
+...done, took 1.3777183999998215 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -657,7 +657,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 9.4215e-09
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.0487e-08
 
-...done, took 3.663102179999896 seconds!
+...done, took 3.369936460999952 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -671,7 +671,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
 
-...done, took 0.3136299939997116 seconds!
+...done, took 0.2828170909999699 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -685,7 +685,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
 
-...done, took 0.864307571000154 seconds!
+...done, took 0.8097050719998151 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -699,7 +699,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
 
-...done, took 0.6092589400000179 seconds!
+...done, took 0.5721805839998524 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -713,7 +713,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
 
-...done, took 1.1662087129998326 seconds!
+...done, took 1.0772264259999247 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -796,7 +796,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>

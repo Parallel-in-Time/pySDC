@@ -355,50 +355,50 @@
                 <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
 
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;libpfasst_style&#39;</span><span class="p">:</span>
-
-                <span class="c1"># loop over all steps</span>
-                <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
-                    <span class="c1"># restrict to coarsest level</span>
-                    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)):</span>
-                        <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
-
-                <span class="c1"># run in serial on coarse level</span>
-                <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-
-                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="c1"># receive from previous step (if not first)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Process </span><span class="si">%2i</span><span class="s1"> receives from </span><span class="si">%2i</span><span class="s1"> on level </span><span class="si">%2i</span><span class="s1"> with tag </span><span class="si">%s</span><span class="s1"> -- PREDICT&#39;</span> <span class="o">%</span>
-                                          <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tag</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-                    <span class="c1"># do the coarse sweep</span>
-                    <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
-
-                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="c1"># send to succ step</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Process </span><span class="si">%2i</span><span class="s1"> provides data on level </span><span class="si">%2i</span><span class="s1"> with tag </span><span class="si">%s</span><span class="s1"> -- PREDICT&#39;</span>
-                                          <span class="o">%</span> <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tag</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">add_to_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-                <span class="c1"># go back to fine level, sweeping</span>
-                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-
-                    <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-                        <span class="c1"># prolong values</span>
-                        <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
-
-                        <span class="k">if</span> <span class="n">l</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
-
-                <span class="c1"># end with a fine sweep</span>
-                <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
-                    <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">update_nodes</span><span class="p">()</span>
+            <span class="c1"># elif self.params.predict_type == &#39;libpfasst_style&#39;:</span>
+            <span class="c1">#</span>
+            <span class="c1">#     # loop over all steps</span>
+            <span class="c1">#     for S in local_MS_running:</span>
+            <span class="c1">#</span>
+            <span class="c1">#         # restrict to coarsest level</span>
+            <span class="c1">#         for l in range(1, len(S.levels)):</span>
+            <span class="c1">#             S.transfer(source=S.levels[l - 1], target=S.levels[l])</span>
+            <span class="c1">#</span>
+            <span class="c1">#     # run in serial on coarse level</span>
+            <span class="c1">#     for S in local_MS_running:</span>
+            <span class="c1">#</span>
+            <span class="c1">#         self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)</span>
+            <span class="c1">#         # receive from previous step (if not first)</span>
+            <span class="c1">#         if not S.status.first:</span>
+            <span class="c1">#             self.logger.debug(&#39;Process %2i receives from %2i on level %2i with tag %s -- PREDICT&#39; %</span>
+            <span class="c1">#                               (S.status.slot, S.prev.status.slot, len(S.levels) - 1, 0))</span>
+            <span class="c1">#             self.recv(S.levels[-1], S.prev.levels[-1], tag=(len(S.levels), 0, S.prev.status.slot))</span>
+            <span class="c1">#         self.hooks.post_comm(step=S, level_number=len(S.levels) - 1)</span>
+            <span class="c1">#</span>
+            <span class="c1">#         # do the coarse sweep</span>
+            <span class="c1">#         S.levels[-1].sweep.update_nodes()</span>
+            <span class="c1">#</span>
+            <span class="c1">#         self.hooks.pre_comm(step=S, level_number=len(S.levels) - 1)</span>
+            <span class="c1">#         # send to succ step</span>
+            <span class="c1">#         if not S.status.last:</span>
+            <span class="c1">#             self.logger.debug(&#39;Process %2i provides data on level %2i with tag %s -- PREDICT&#39;</span>
+            <span class="c1">#                               % (S.status.slot, len(S.levels) - 1, 0))</span>
+            <span class="c1">#             self.send(S.levels[-1], tag=(len(S.levels), 0, S.status.slot))</span>
+            <span class="c1">#         self.hooks.post_comm(step=S, level_number=len(S.levels) - 1, add_to_stats=True)</span>
+            <span class="c1">#</span>
+            <span class="c1">#     # go back to fine level, sweeping</span>
+            <span class="c1">#     for l in range(self.nlevels - 1, 0, -1):</span>
+            <span class="c1">#</span>
+            <span class="c1">#         for S in local_MS_running:</span>
+            <span class="c1">#             # prolong values</span>
+            <span class="c1">#             S.transfer(source=S.levels[l], target=S.levels[l - 1])</span>
+            <span class="c1">#</span>
+            <span class="c1">#             if l - 1 &gt; 0:</span>
+            <span class="c1">#                 S.levels[l - 1].sweep.update_nodes()</span>
+            <span class="c1">#</span>
+            <span class="c1">#     # end with a fine sweep</span>
+            <span class="c1">#     for S in local_MS_running:</span>
+            <span class="c1">#         S.levels[0].sweep.update_nodes()</span>
 
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;pfasst_burnin&#39;</span><span class="p">:</span>
 
@@ -443,6 +443,20 @@
                     <span class="c1"># interpolate back to finest level</span>
                     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
                         <span class="n">S</span><span class="o">.</span><span class="n">transfer</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span> <span class="n">target</span><span class="o">=</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+
+                    <span class="c1"># send updated values forward</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">last</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Process </span><span class="si">%2i</span><span class="s1"> provides data on level </span><span class="si">%2i</span><span class="s1"> with tag </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                          <span class="o">%</span> <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tag</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">))</span>
+
+                    <span class="c1"># receive values</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">prev_done</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Process </span><span class="si">%2i</span><span class="s1"> receives from </span><span class="si">%2i</span><span class="s1"> on level </span><span class="si">%2i</span><span class="s1"> with tag </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                          <span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tag</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">slot</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">post_comm</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
                 <span class="c1"># end this with a fine sweep</span>
                 <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
@@ -776,7 +790,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
     </div>
   </body>
 </html>
