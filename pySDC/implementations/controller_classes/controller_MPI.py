@@ -406,42 +406,42 @@ class controller_MPI(controller):
                 # do a fine sweep only
                 self.S.levels[0].sweep.update_nodes()
 
-            elif self.params.predict_type == 'libpfasst_style':
-
-                # restrict to coarsest level
-                for l in range(1, len(self.S.levels)):
-                    self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
-
-                self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-                if not self.S.status.first:
-                    self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                       self.S.status.iter))
-                    self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-                self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-
-                # do the sweep with new values
-                self.S.levels[-1].sweep.update_nodes()
-                self.S.levels[-1].sweep.compute_end_point()
-
-                self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-                if not self.S.status.last:
-                    self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                       self.S.status.iter))
-                    self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
-                self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
-
-                # go back to fine level, sweeping
-                for l in range(len(self.S.levels) - 1, 0, -1):
-                    # prolong values
-                    self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-                    # on middle levels: do sweep as usual
-                    if l - 1 > 0:
-                        self.S.levels[l - 1].sweep.update_nodes()
-
-                # end with a fine sweep
-                self.S.levels[0].sweep.update_nodes()
+            # elif self.params.predict_type == 'libpfasst_style':
+            #
+            #     # restrict to coarsest level
+            #     for l in range(1, len(self.S.levels)):
+            #         self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+            #
+            #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+            #     if not self.S.status.first:
+            #         self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
+            #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+            #                            self.S.status.iter))
+            #         self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+            #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
+            #
+            #     # do the sweep with new values
+            #     self.S.levels[-1].sweep.update_nodes()
+            #     self.S.levels[-1].sweep.compute_end_point()
+            #
+            #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+            #     if not self.S.status.last:
+            #         self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
+            #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+            #                            self.S.status.iter))
+            #         self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
+            #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
+            #
+            #     # go back to fine level, sweeping
+            #     for l in range(len(self.S.levels) - 1, 0, -1):
+            #         # prolong values
+            #         self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+            #         # on middle levels: do sweep as usual
+            #         if l - 1 > 0:
+            #             self.S.levels[l - 1].sweep.update_nodes()
+            #
+            #     # end with a fine sweep
+            #     self.S.levels[0].sweep.update_nodes()
 
             elif self.params.predict_type == 'pfasst_burnin':
 
@@ -477,6 +477,30 @@ class controller_MPI(controller):
                 # interpolate back to finest level
                 for l in range(len(self.S.levels) - 1, 0, -1):
                     self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+                self.hooks.pre_comm(step=self.S, level_number=0)
+
+                self.wait_with_interrupt(request=self.req_send[0])
+                if self.S.status.force_done:
+                    return None
+
+                self.S.levels[0].sweep.compute_end_point()
+
+                if not self.S.status.last:
+                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       self.S.status.iter, self.S.status.iter))
+                    self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+
+                if not self.S.status.first and not self.S.status.prev_done:
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       self.S.status.iter, self.S.status.iter))
+                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                    if self.S.status.force_done:
+                        return None
+
+                self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=False)
 
                 # end this with a fine sweep
                 self.S.levels[0].sweep.update_nodes()
