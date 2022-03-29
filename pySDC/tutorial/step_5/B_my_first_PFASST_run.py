@@ -42,6 +42,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['predict_type'] = 'pfasst_burnin'
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -115,8 +116,8 @@ def main():
         print()
 
         assert err < 1.3505E-04, "ERROR: error is too high, got %s" % err
-        assert np.ptp(niters) <= 2, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
-        assert np.mean(niters) <= 7.0, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
+        assert np.ptp(niters) <= 1, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
+        assert np.mean(niters) <= 5.0, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
 
     f.close()
 
