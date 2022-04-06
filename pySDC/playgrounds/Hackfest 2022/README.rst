@@ -53,6 +53,12 @@ In order to work with the Jupyter notebooks, you first have to install ``jupyter
 .. code-block:: text
     > conda install -c conda-forge jupyter
 
+We need one more magical package, this time via ``pip``:
+
+.. code-block:: text
+    > pip install jdc
+
+These `Jupyter Dynamic Classes <https://alexhagen.github.io/jdc/>`_ allows us to define a class ovber multiple cells to keep things short and to have sufficient documentation.
 Continue with one of the playgrounds in this directory then. You may have to augment the ``PYTHONPATH`` to find the root directory of `pySDC` before things run from the ``playgrounds`` directory:
 
 .. code-block:: text
