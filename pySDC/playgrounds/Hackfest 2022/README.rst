@@ -10,8 +10,8 @@ In order to start playing, install `pySDC` and it's dependencies, ideally in dev
 First start by setting up a virtual environment, e.g. by using `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_:
 
 .. code-block:: text
-   > conda create -n pySDC39
-   > conda activate pySDC39
+   > conda create -n pySDC
+   > conda activate pySDC
    > conda install -c conda-forge --file requirements.txt
 
 When this is done (and it can take a while), download `pySDC` from GitHub.
@@ -44,7 +44,7 @@ Change to `pySDC`'s root directory and run
     > pytest pySDC/tests
 
 This will check if "all" went well and it will take about 30-60 minutes to complete, depending on your computer.
-If all goes well, you are now ready to play with pySDC.
+If all goes well, you are now ready to play with `pySDC`.
 
 Jupyter
 -------
@@ -53,4 +53,7 @@ In order to work with the Jupyter notebooks, you first have to install ``jupyter
 .. code-block:: text
     > conda install -c conda-forge jupyter
 
-Continue with one of the playgrounds in this directory then.
+Continue with one of the playgrounds in this directory then. You may have to augment the ``PYTHONPATH`` to find the root directory of `pySDC` before things run from the ``playgrounds`` directory:
+
+.. code-block:: text
+    > export PYTHONPATH=$PYTHONPATH:<path_to_pySDC>
