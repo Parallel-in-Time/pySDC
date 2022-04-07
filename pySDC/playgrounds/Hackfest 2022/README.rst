@@ -9,7 +9,7 @@ Installation
 In order to start playing, install `pySDC` and it's dependencies, ideally in developer mode.
 First start by setting up a virtual environment, e.g. by using `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_:
 
-.. code-block:: text
+.. code-block:: bash
    > conda create -n pySDC
    > conda activate pySDC
    > conda install -c conda-forge --file requirements.txt
@@ -27,7 +27,7 @@ Finally, the code can also be obtained using ``pip install``, but then sources a
 
 So, please go ahead and clone from Github:
 
-.. code-block:: text
+.. code-block:: bash
     > git clone https://github.com/<your_account>/pySDC.git
 
 Note that this folder and all changes in it will remain even if you leave the virtual environment.
@@ -40,7 +40,7 @@ Testing
 
 Change to `pySDC`'s root directory and run
 
-.. code-block:: text
+.. code-block:: bash
     > pytest pySDC/tests
 
 This will check if "all" went well and it will take about 30-60 minutes to complete, depending on your computer.
@@ -48,18 +48,25 @@ If all goes well, you are now ready to play with `pySDC`.
 
 Jupyter
 -------
-In order to work with the Jupyter notebooks, you first have to install ``jupyter`` with
+In order to work with the Jupyter notebooks, you first have to install ``jupyter`` and
+(since we'll be running stuff in parallel later on) ``ipyparallel`` with
 
-.. code-block:: text
-    > conda install -c conda-forge jupyter
+.. code-block:: bash
+    > conda install -c conda-forge jupyter ipyparallel
 
 We need one more magical package, this time via ``pip``:
 
-.. code-block:: text
+.. code-block:: bash
     > pip install jdc
 
 These `Jupyter Dynamic Classes <https://alexhagen.github.io/jdc/>`_ allows us to define a class ovber multiple cells to keep things short and to have sufficient documentation.
 Continue with one of the playgrounds in this directory then. You may have to augment the ``PYTHONPATH`` to find the root directory of `pySDC` before things run from the ``playgrounds`` directory:
 
-.. code-block:: text
+.. code-block:: bash
     > export PYTHONPATH=$PYTHONPATH:<path_to_pySDC>
+
+Then, if you want to run stuff in parallel (but locally), start an ``ipcluster`` with
+
+.. code-block:: bash
+    > ipcluster start --engines=MPI -n 4
+
