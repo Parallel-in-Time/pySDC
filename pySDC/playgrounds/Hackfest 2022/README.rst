@@ -1,6 +1,6 @@
 pySDC Hackfest 2022
 ===================
-**Time**: May 16 + 17, 2022
+**Time**: May 10 + 11, 2022
 
 **Place**: TU Hamburg-Harburg
 
@@ -64,7 +64,7 @@ We need one more magical package, this time via ``pip``:
 
     pip install jdc
 
-These `Jupyter Dynamic Classes <https://alexhagen.github.io/jdc/>`_ allows us to define a class ovber multiple cells to keep things short and to have sufficient documentation.
+These `Jupyter Dynamic Classes <https://alexhagen.github.io/jdc/>`_ allows us to define a class spanning multiple cells to keep things short and to have sufficient documentation.
 Continue with one of the playgrounds in this directory then. You may have to augment the ``PYTHONPATH`` to find the root directory of `pySDC` before things run from the ``playgrounds`` directory:
 
 .. code-block:: bash
