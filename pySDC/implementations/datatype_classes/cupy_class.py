@@ -70,7 +70,7 @@ class cupy_class(cp.ndarray):
         return float(global_absval)
 
 
-class imex_cupy_mesh(object):
+class imex_cupy_class(object):
     """
     RHS data type for meshes with implicit and explicit components
 
@@ -105,7 +105,7 @@ class imex_cupy_mesh(object):
             raise DataError('something went wrong during %s initialization' % type(self))
 
 
-class comp2_cupy_mesh(object):
+class comp2_cupy_class(object):
     """
     RHS data type for meshes with 2 components
 
