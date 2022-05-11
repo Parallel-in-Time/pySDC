@@ -45,7 +45,7 @@ Tend = 0.016
 
 # initialize controller parameters
 controller_params = dict()
-controller_params['logger_level'] = 20
+controller_params['logger_level'] = 30
 
 # fill description dictionary for easy step instantiation
 description = dict()
