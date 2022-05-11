@@ -441,6 +441,12 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.ddx">ddx (implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex attribute)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.default">default() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.delta_m">delta_m (core.Collocation.CollBase attribute)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">dirk (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
@@ -1375,8 +1381,6 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.GeneralizedFisher_1D_FD_implicit">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GeneralizedFisher_1D_PETSc
 
@@ -1391,6 +1395,8 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_2D_PETSc_periodic
 
@@ -1715,6 +1721,36 @@
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.isend">(implementations.datatype_classes.particles.particles method)</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.petsc_vec.petsc_vec.isend">(implementations.datatype_classes.petsc_vec.petsc_vec method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.it_check">it_check() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse">it_coarse() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.it_down">it_down() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.it_fine">it_fine() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.it_up">it_up() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -2172,10 +2208,10 @@
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_setup">post_setup() (core.Hooks.hooks method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_step">post_step() (core.Hooks.hooks method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_sweep">post_sweep() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.pre_comm">pre_comm() (core.Hooks.hooks method)</a>
@@ -2193,7 +2229,13 @@
       <li><a href="pySDC/core.html#core.Hooks.hooks.pre_sweep">pre_sweep() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Sweeper.sweeper.predict">predict() (core.Sweeper.sweeper method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.predict">(implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 </li>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.html#core.Step.step.prev">prev (core.Step.step property)</a>
 </li>
       <li><a href="pySDC/core.html#core.Level.level.prob">prob (core.Level.level property)</a>
@@ -2526,6 +2568,12 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit">SplitExplicit (class in implementations.problem_classes.boussinesq_helpers.standard_integrators)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.spread">spread() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
+
+      <ul>
+        <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ">SQ (implementations.sweeper_classes.boris_2nd_order.boris_2nd_order attribute)</a>
 </li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST">ST (implementations.sweeper_classes.boris_2nd_order.boris_2nd_order attribute)</a>

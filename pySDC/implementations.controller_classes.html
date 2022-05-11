@@ -81,6 +81,42 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine to catch wrong status</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.it_check">
+<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Key routine to check for convergence/termination</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.it_coarse">
+<span class="sig-name descname"><span class="pre">it_coarse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.it_coarse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coarse sweep</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.it_down">
+<span class="sig-name descname"><span class="pre">it_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.it_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go down the hierarchy from finest to coarsest level</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.it_fine">
+<span class="sig-name descname"><span class="pre">it_fine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.it_fine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_fine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fine sweeps</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.it_up">
+<span class="sig-name descname"><span class="pre">it_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.it_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolong corrections up to finest level (parallel)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.pfasst">
 <span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.pfasst" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function including the stages of SDC, MLSDC and PFASST (the “controller”)</p>
@@ -93,6 +129,12 @@
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictor phase</p>
 </dd></dl>
 
 <dl class="py method">
@@ -149,6 +191,12 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.spread">
+<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_procs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.spread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spreading phase</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt">
 <span class="sig-name descname"><span class="pre">wait_with_interrupt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.wait_with_interrupt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapper for waiting for the completion of a non-blocking communication, can be interrupted</p>
@@ -181,6 +229,72 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.default">
+<span class="sig-name descname"><span class="pre">default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default routine to catch wrong status</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check">
+<span class="sig-name descname"><span class="pre">it_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Key routine to check for convergence/termination</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse">
+<span class="sig-name descname"><span class="pre">it_coarse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_coarse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coarse sweep</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down">
+<span class="sig-name descname"><span class="pre">it_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_down"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go down the hierarchy from finest to coarsest level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">
+<span class="sig-name descname"><span class="pre">it_fine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_fine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fine sweeps</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up">
+<span class="sig-name descname"><span class="pre">it_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.it_up"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prolong corrections up to finest level (parallel)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst">
 <span class="sig-name descname"><span class="pre">pfasst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_active</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.pfasst"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function including the stages of SDC, MLSDC and PFASST (the “controller”)</p>
@@ -189,6 +303,17 @@ stats object containing statistics for each step, each level and each iteration<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>local_MS_active</strong> (<em>list</em>) – all active steps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictor phase</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,6 +377,17 @@ stats object containing statistics for each step, each level and each iteration<
 <li><p><strong>source</strong> – level which has the new values</p></li>
 <li><p><strong>tag</strong> – identifier for this message</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread">
+<span class="sig-name descname"><span class="pre">spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.spread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spreading phase</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
 </dd>
 </dl>
 </dd></dl>
