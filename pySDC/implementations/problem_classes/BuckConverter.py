@@ -7,7 +7,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 class buck_converter(ptype):
     """
-    Example implementing the Buck converter model as in the description in the PinTSimE project
+    Example implementing the buck converter model as in the description in the PinTSimE project
     Attributes:
         A: system matrix, representing the 3 ODEs
     """
