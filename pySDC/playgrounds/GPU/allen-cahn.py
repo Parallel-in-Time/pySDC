@@ -1,4 +1,5 @@
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
+# from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit
+from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_fullyimplicit
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI

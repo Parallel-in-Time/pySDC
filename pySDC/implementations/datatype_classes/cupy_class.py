@@ -36,7 +36,7 @@ class cupy_class(cp.ndarray):
             # TODO: gibt es nicht für cupy
             # obj.fill(val)
             # print(init)
-            # print(type(obj))
+            print(type(obj))
             # print(obj.shape)
             obj[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
         else:
