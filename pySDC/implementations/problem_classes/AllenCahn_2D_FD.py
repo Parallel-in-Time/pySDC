@@ -80,7 +80,8 @@ class allencahn_fullyimplicit(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        stencil = [1, -2, 1]
+        stencil = [-2, 1]
+        # stencil = [1, -2, 1]
         zero_pos = 2
         """
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
@@ -91,13 +92,22 @@ class allencahn_fullyimplicit(ptype):
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
-        """
+        
         dstencil = cp.concatenate((stencil, cp.delete(stencil, zero_pos - 1)))
         offsets = cp.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
                                   [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
         doffsets = cp.concatenate((offsets, cp.delete(offsets, zero_pos - 1) - N[0]))
 
         A = csp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
+        A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
+        A *= 1.0 / (dx ** 2)
+        """
+        A = stencil[0] * csp.eye(N[0], format='csr')  # TODO: is this the right format? Was: csc
+        for i in range(1, len(stencil)):
+            A += stencil[i] * csp.eye(N[0], k=-i, format='csr')
+            A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
+            A += stencil[i] * csp.eye(N[0], k=N - i, format='csr')
+            A += stencil[i] * csp.eye(N[0], k=-N + i, format='csr')
         A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
         return A
