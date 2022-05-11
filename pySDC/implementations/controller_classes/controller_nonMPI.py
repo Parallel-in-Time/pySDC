@@ -676,6 +676,7 @@ class controller_nonMPI(controller):
 
                 for k in range(self.nsweeps[l - 1]):
 
+                    for S in local_MS_running:
 
                         # send updated values forward
                         self.hooks.pre_comm(step=S, level_number=l - 1)
