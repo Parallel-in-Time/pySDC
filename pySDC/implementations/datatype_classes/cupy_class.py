@@ -64,7 +64,7 @@ class cupy_class:
             new.values = other + self.values
         return new
 
-    def __mul__(self, other):
+    def __rmul__(self, other):
         new = None
         if type(other) is cupy_class:
             raise NotImplementedError("not implemendet to multiplicate to cupy_class obj")
@@ -72,6 +72,21 @@ class cupy_class:
             new = cupy_class(self)
             new.values = other * self.values
         return new
+
+    def __sub__(self, other):
+        new = cupy_class(self)
+        if type(other) is cupy_class:
+            new.values = self.values - other.values
+        if type(other) is int or type(other) is float:
+            new = cupy_class(self)
+            # TODO: check which one is korrekt
+            # new.values = self.values - other
+            # new.values = other - self.values
+        return new
+
+    def get(self):
+        return self.values.get()
+
 
 
 class imex_cupy_class(object):
