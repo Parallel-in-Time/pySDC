@@ -46,7 +46,7 @@ Tend = 0.016
 
 # initialize controller parameters
 controller_params = dict()
-controller_params['logger_level'] = 30
+controller_params['logger_level'] = 10
 
 # fill description dictionary for easy step instantiation
 description = dict()
@@ -71,11 +71,11 @@ uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
 plt.subplot(1, 2, 1)
 plt.title("u(t0)")
-plt.imshow(uinit,extent=[-0.5,0.5,-0.5,0.5])
+plt.imshow(uinit.get(),extent=[-0.5,0.5,-0.5,0.5])
 
 plt.subplot(1, 2, 2)
 plt.title("u(Tend)")
-plt.imshow(uend,extent=[-0.5,0.5,-0.5,0.5])
+plt.imshow(uend.get(),extent=[-0.5,0.5,-0.5,0.5])
 plt.savefig("plot")
 
 
