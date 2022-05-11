@@ -60,7 +60,7 @@ class allencahn_fullyimplicit(ptype):
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.dx)
-        print(self.A)
+        # print(self.A)
         # self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
         self.xvalues = cp.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
@@ -210,7 +210,7 @@ class allencahn_fullyimplicit(ptype):
         """
         mx, my = cp.meshgrid(self.xvalues, self.xvalues)
         me[:] = cp.tanh((self.params.radius - cp.sqrt(mx ** 2 + my ** 2)) / (cp.sqrt(2) * self.params.eps))
-
+        # print(type(me))
         return me
 
 

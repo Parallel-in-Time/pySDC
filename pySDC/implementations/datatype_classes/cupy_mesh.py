@@ -30,11 +30,14 @@ class cupy_mesh(cp.ndarray):
             obj[:] = init[:]
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], cp.dtype):
-            #obj = cp.ndarray.__new__(cls, shape=init[0], dtype=init[2], strides=strides, order=order)  # TODO: not in cp.ndarray , buffer=buffer, offset=offset
+            obj = cp.ndarray.__new__(cls, shape=init[0], dtype=init[2], strides=strides, order=order)  # TODO: not in cp.ndarray , buffer=buffer, offset=offset
             # obj = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
             # TODO: gibt es nicht für cupy
             # obj.fill(val)
-            obj = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
+            # print(init)
+            # print(type(obj))
+            # print(obj.shape)
+            obj[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
         else:
             raise NotImplementedError(type(init))
         return obj
