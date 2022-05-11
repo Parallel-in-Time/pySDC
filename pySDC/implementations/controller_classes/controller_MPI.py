@@ -413,9 +413,9 @@ class controller_MPI(controller):
                 'IT_UP': self.it_up
             }
 
-            switcher.get(stage, self.default)()
+            switcher.get(stage, self.default)(comm, num_procs)
 
-    def spread(self):
+    def spread(self, comm, num_procs):
         """
         Spreading phase
         """
@@ -436,7 +436,7 @@ class controller_MPI(controller):
         else:
             self.S.status.stage = 'IT_CHECK'
 
-    def predict(self):
+    def predict(self, comm, num_procs):
         """
         Predictor phase
         """
@@ -502,7 +502,7 @@ class controller_MPI(controller):
                         'recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
                         (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                          self.S.status.iter, p))
-                    self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=self.comm)
+                    self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
                 self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
 
                 # do the sweep with new values
@@ -515,7 +515,7 @@ class controller_MPI(controller):
                         'send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
                         (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                          self.S.status.iter, p))
-                    self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=self.comm).Wait()
+                    self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
                 self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1,
                                      add_to_stats=(p == self.S.status.slot))
 
@@ -535,13 +535,13 @@ class controller_MPI(controller):
                 self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    self.S.status.iter, self.S.status.iter))
-                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=self.comm)
+                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.first and not self.S.status.prev_done:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    self.S.status.iter, self.S.status.iter))
-                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=self.comm)
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
                 if self.S.status.force_done:
                     return None
 
@@ -562,14 +562,14 @@ class controller_MPI(controller):
         # update stage
         self.S.status.stage = 'IT_CHECK'
 
-    def it_check(self):
+    def it_check(self, comm, num_procs):
         """
         Key routine to check for convergence/termination
         """
         if not self.params.use_iteration_estimator:
-            self.check_residual(comm=self.comm)
+            self.check_residual(comm=comm)
         else:
-            self.check_iteration_estimate(comm=self.comm)
+            self.check_iteration_estimate(comm=comm)
         if self.S.status.force_done:
             return None
 
@@ -591,7 +591,7 @@ class controller_MPI(controller):
             if len(self.S.levels) > 1:  # MLSDC or PFASST
                 self.S.status.stage = 'IT_DOWN'
             else:
-                if self.num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+                if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
                     self.S.status.stage = 'IT_FINE'
                 else:
                     self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
@@ -620,7 +620,7 @@ class controller_MPI(controller):
             self.hooks.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
 
-    def it_fine(self):
+    def it_fine(self, comm, num_procs):
         """
         Fine sweeps
         """
@@ -646,13 +646,13 @@ class controller_MPI(controller):
                 self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
                                    self.S.status.iter, self.S.status.iter))
-                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=self.comm)
+                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
 
             if not self.S.status.first and not self.S.status.prev_done:
                 self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
                                   (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
                                    self.S.status.iter, self.S.status.iter))
-                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=self.comm)
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
                 if self.S.status.force_done:
                     return None
 
@@ -666,7 +666,7 @@ class controller_MPI(controller):
         # update stage
         self.S.status.stage = 'IT_CHECK'
 
-    def it_down(self):
+    def it_down(self, comm, num_procs):
         """
         Go down the hierarchy from finest to coarsest level
         """
@@ -694,7 +694,7 @@ class controller_MPI(controller):
                                        l * 100 + self.S.status.iter, self.S.status.iter))
                     self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next,
                                                                    tag=l * 100 + self.S.status.iter,
-                                                                   comm=self.comm)
+                                                                   comm=comm)
 
                 if not self.S.status.first and not self.S.status.prev_done:
                     self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
@@ -702,7 +702,7 @@ class controller_MPI(controller):
                                        l * 100 + self.S.status.iter, self.S.status.iter))
                     self.recv(target=self.S.levels[l], source=self.S.prev,
                               tag=l * 100 + self.S.status.iter,
-                              comm=self.comm)
+                              comm=comm)
                     if self.S.status.force_done:
                         return None
 
@@ -719,7 +719,7 @@ class controller_MPI(controller):
         # update stage
         self.S.status.stage = 'IT_COARSE'
 
-    def it_coarse(self):
+    def it_coarse(self, comm, num_procs):
         """
         Coarse sweep
         """
@@ -732,7 +732,7 @@ class controller_MPI(controller):
                                (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
             self.recv(target=self.S.levels[-1], source=self.S.prev,
                       tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
-                      comm=self.comm)
+                      comm=comm)
             if self.S.status.force_done:
                 return None
 
@@ -757,7 +757,7 @@ class controller_MPI(controller):
             self.req_send[-1] = \
                 self.S.levels[-1].uend.isend(dest=self.S.next,
                                              tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
-                                             comm=self.comm)
+                                             comm=comm)
             self.wait_with_interrupt(request=self.req_send[-1])
             if self.S.status.force_done:
                 return None
@@ -770,7 +770,7 @@ class controller_MPI(controller):
         else:
             self.S.status.stage = 'IT_CHECK'  # MSSDC
 
-    def it_up(self):
+    def it_up(self, comm, num_procs):
         """
         Prolong corrections up to finest level (parallel)
         """
@@ -803,7 +803,7 @@ class controller_MPI(controller):
                         self.req_send[l - 1] = \
                             self.S.levels[l - 1].uend.isend(dest=self.S.next,
                                                             tag=(l - 1) * 100 + self.S.status.iter,
-                                                            comm=self.comm)
+                                                            comm=comm)
 
                     if not self.S.status.first and not self.S.status.prev_done:
                         self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
@@ -811,7 +811,7 @@ class controller_MPI(controller):
                                            (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
                         self.recv(target=self.S.levels[l - 1], source=self.S.prev,
                                   tag=(l - 1) * 100 + self.S.status.iter,
-                                  comm=self.comm)
+                                  comm=comm)
                         if self.S.status.force_done:
                             return None
 
@@ -825,7 +825,7 @@ class controller_MPI(controller):
         # update stage
         self.S.status.stage = 'IT_FINE'
 
-    def default(self):
+    def default(self, num_procs):
         """
         Default routine to catch wrong status
         """
