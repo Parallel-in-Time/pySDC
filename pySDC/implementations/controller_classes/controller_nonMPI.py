@@ -690,6 +690,7 @@ class controller_nonMPI(controller):
 
         # if all stages are the same (or DONE), continue, otherwise abort
         stages = [S.status.stage for S in local_MS_active if S.status.stage != 'DONE']
+        #print(stages, local_MS_active)
         if stages[1:] == stages[:-1]:
             stage = stages[0]
         else:
