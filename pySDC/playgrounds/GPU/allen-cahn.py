@@ -74,6 +74,7 @@ plt.imshow(uinit,extent=[-0.5,0.5,-0.5,0.5])
 plt.subplot(1, 2, 2)
 plt.title("u(Tend)")
 plt.imshow(uend,extent=[-0.5,0.5,-0.5,0.5])
+plt.savefig("plot")
 
 
 # filter statistics by variant (number of iterations)

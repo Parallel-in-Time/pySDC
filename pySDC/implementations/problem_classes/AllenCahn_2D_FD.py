@@ -1,7 +1,11 @@
 
 import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import cg
+# import scipy.sparse as sp
+# from scipy.sparse.linalg import cg
+import cupy as cp
+import cupyx.scipy.sparse as csp
+from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
+
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -47,13 +51,16 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+        # super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
+        #                                               dtype_u, dtype_f, problem_params)
+        super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, cp.dtype('float64')),
                                                       dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.dx)
-        self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
+        # self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
+        self.xvalues = cp.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
         self.newton_itercount = 0
         self.lin_itercount = 0
@@ -75,6 +82,7 @@ class allencahn_fullyimplicit(ptype):
 
         stencil = [1, -2, 1]
         zero_pos = 2
+        """
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
         offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
                                   [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
@@ -83,7 +91,15 @@ class allencahn_fullyimplicit(ptype):
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
+        """
+        dstencil = cp.concatenate((stencil, cp.delete(stencil, zero_pos - 1)))
+        offsets = cp.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        doffsets = cp.concatenate((offsets, cp.delete(offsets, zero_pos - 1) - N[0]))
 
+        A = csp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
+        A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
+        A *= 1.0 / (dx ** 2)
         return A
 
     # noinspection PyTypeChecker
@@ -106,7 +122,8 @@ class allencahn_fullyimplicit(ptype):
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        # Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         # start newton iteration
         n = 0
@@ -117,13 +134,13 @@ class allencahn_fullyimplicit(ptype):
             g = u - factor * (self.A.dot(u) + 1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = cp.linalg.norm(g, np.inf)
 
             if res < self.params.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A + 1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
+            dg = Id - factor * (self.A + 1.0 / eps2 * csp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -173,10 +190,14 @@ class allencahn_fullyimplicit(ptype):
 
         assert t == 0, 'ERROR: u_exact only valid for t=0'
         me = self.dtype_u(self.init, val=0.0)
+        """
         for i in range(self.params.nvars[0]):
             for j in range(self.params.nvars[1]):
                 r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
                 me[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+        """
+        mx, my = cp.meshgrid(self.xvalues, self.xvalues)
+        me[:] = cp.tanh((self.params.radius - cp.sqrt(mx ** 2 + my ** 2)) / (cp.sqrt(2) * self.params.eps))
 
         return me
 
@@ -241,7 +262,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         me = self.dtype_u(self.init)
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        # Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         me[:] = cg(Id - factor * self.A, rhs.flatten(), x0=u0.flatten(), tol=self.params.lin_tol,
                    maxiter=self.params.lin_maxiter, callback=callback)[0].reshape(self.params.nvars)
@@ -308,7 +330,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        # Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         # start newton iteration
         n = 0
@@ -319,13 +342,14 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
             g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            # res = np.linalg.norm(g, np.inf)
+            res = cp.linalg.norm(g, np.inf)
 
             if res < self.params.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags(((nu + 1) * u ** nu), offsets=0))
+            dg = Id - factor * (self.A - 1.0 / eps2 * csp.diags(((nu + 1) * u ** nu), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -406,7 +430,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
         me = self.dtype_u(self.init)
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         me[:] = cg(Id - factor * self.A, rhs.flatten(), x0=u0.flatten(), tol=self.params.lin_tol,
                    maxiter=self.params.lin_maxiter, callback=callback)[0].reshape(self.params.nvars)
@@ -435,7 +459,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         # start newton iteration
         n = 0
@@ -446,13 +470,13 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             g = u - factor * (1.0 / eps2 * u * (1.0 - u ** nu)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = cp.linalg.norm(g, np.inf)
 
             if res < self.params.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (1.0 / eps2 * sp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
+            dg = Id - factor * (1.0 / eps2 * csp.diags((1.0 - (nu + 1) * u ** nu), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
@@ -529,7 +553,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
         nu = self.params.nu
         eps2 = self.params.eps ** 2
 
-        Id = sp.eye(self.params.nvars[0] * self.params.nvars[1])
+        Id = csp.eye(self.params.nvars[0] * self.params.nvars[1])
 
         # start newton iteration
         n = 0
@@ -540,13 +564,13 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
             g = u - factor * (self.A.dot(u) - 1.0 / eps2 * u ** (nu + 1)) - rhs.flatten()
 
             # if g is close to 0, then we are done
-            res = np.linalg.norm(g, np.inf)
+            res = cp.linalg.norm(g, np.inf)
 
             if res < self.params.newton_tol:
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 1.0 / eps2 * sp.diags(((nu + 1) * u ** nu), offsets=0))
+            dg = Id - factor * (self.A - 1.0 / eps2 * csp.diags(((nu + 1) * u ** nu), offsets=0))
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
