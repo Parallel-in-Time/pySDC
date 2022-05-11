@@ -12,7 +12,7 @@ class cupy_class(cp.ndarray):
     cupy-based datatype
     """
 
-    def __init__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
+    def __init__(self, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
         """
         Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
 
@@ -20,28 +20,19 @@ class cupy_class(cp.ndarray):
             init: either another mesh or a tuple containing the dimensions and the dtype
             val: value to initialize
 
-        Returns:
-            obj of type mesh
+        Attributes:
+            values: cupy.ndarray
 
         """
         if isinstance(init, cupy_class):
-            obj = cp.ndarray.__init__(cls, shape=init.shape, dtype=init.dtype, strides=strides,
-                                      order=order)  # TODO: not in cp.ndarray , buffer=buffer, offset=offset
-            obj[:] = init[:]
+            self.values = cp.ndarray(shape=init.values.shape, dtype=init.values.dtype, strides=strides, order=order)
+            self.values[:] = init.values.copy()
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], cp.dtype):
-            obj = cp.ndarray.__init__(cls, shape=init[0], dtype=init[2], strides=strides,
-                                      order=order)  # TODO: not in cp.ndarray , buffer=buffer, offset=offset
-            # obj = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
-            # TODO: gibt es nicht für cupy
-            # obj.fill(val)
-            # print(init)
-            print(type(obj))
-            # print(obj.shape)
-            obj[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
+            self.values = cp.ndarray(shape=init[0], dtype=init[2], strides=strides, order=order)
+            self.values[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
         else:
             raise NotImplementedError(type(init))
-        return obj
 
     def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
         """
@@ -65,9 +56,15 @@ class cupy_class(cp.ndarray):
             float: absolute maximum of all mesh values
         """
         # take absolute values of the mesh values
-        local_absval = float(cp.amax(cp.ndarray.__abs__(self)))
+        local_absval = float(cp.amax(cp.ndarray.__abs__(self.values)))
         global_absval = local_absval
         return float(global_absval)
+
+    def __setitem__(self, key, value):
+        self.values[key] = value
+
+    def __getitem__(self, item):
+        return self.values[item]
 
 
 class imex_cupy_class(object):
