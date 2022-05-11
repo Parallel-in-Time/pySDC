@@ -7,7 +7,7 @@ except ImportError:
     MPI = None
 
 
-class cupy_class(cp.ndarray):
+class cupy_class:
     """
     cupy-based datatype
     """
@@ -33,20 +33,6 @@ class cupy_class(cp.ndarray):
             self.values[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
         else:
             raise NotImplementedError(type(init))
-
-    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
-        """
-        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
-        for cupy: https://docs.cupy.dev/en/stable/user_guide/interoperability.html#numpy
-        """
-        args = []
-        for _, input_ in enumerate(inputs):
-            if isinstance(input_, cupy_class):
-                args.append(input_.view(cp.ndarray))
-            else:
-                args.append(input_)
-        results = super(cupy_class, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(cupy_class)
-        return results
 
     def __abs__(self):
         """
