@@ -55,6 +55,24 @@ class cupy_class:
     def flatten(self):
         return self.values.flatten()
 
+    def __add__(self, other):
+        if type(other) is cupy_class:
+            new = cupy_class(other)
+            new.values = other.values + self.values
+        if type(other) is int or type(other) is float:
+            new = cupy_class(self)
+            new.values = other + self.values
+        return new
+
+    def __mul__(self, other):
+        new = None
+        if type(other) is cupy_class:
+            raise NotImplementedError("not implemendet to multiplicate to cupy_class obj")
+        if type(other) is int or type(other) is float:
+            new = cupy_class(self)
+            new.values = other * self.values
+        return new
+
 
 class imex_cupy_class(object):
     """
