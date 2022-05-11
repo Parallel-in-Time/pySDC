@@ -66,6 +66,9 @@ class cupy_class(cp.ndarray):
     def __getitem__(self, item):
         return self.values[item]
 
+    def flatten(self):
+        return self.values.flatten()
+
 
 class imex_cupy_class(object):
     """
