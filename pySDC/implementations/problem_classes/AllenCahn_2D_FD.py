@@ -9,7 +9,8 @@ from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
+# from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
+from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -25,7 +26,7 @@ class allencahn_fullyimplicit(ptype):
         dx: distance between two spatial nodes (same for both directions)
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=cupy_mesh):
         """
         Initialization routine
 
@@ -59,6 +60,7 @@ class allencahn_fullyimplicit(ptype):
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.dx)
+        print(self.A)
         # self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
         self.xvalues = cp.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
@@ -80,7 +82,7 @@ class allencahn_fullyimplicit(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        stencil = [-2, 1]
+        stencil = cp.asarray([-2, 1])
         # stencil = [1, -2, 1]
         zero_pos = 2
         """
@@ -106,8 +108,8 @@ class allencahn_fullyimplicit(ptype):
         for i in range(1, len(stencil)):
             A += stencil[i] * csp.eye(N[0], k=-i, format='csr')
             A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
-            A += stencil[i] * csp.eye(N[0], k=N - i, format='csr')
-            A += stencil[i] * csp.eye(N[0], k=-N + i, format='csr')
+            A += stencil[i] * csp.eye(N[0], k=N[0] - i, format='csr')
+            A += stencil[i] * csp.eye(N[0], k=-N[0] + i, format='csr')
         A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
         return A
@@ -218,7 +220,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
 
@@ -290,7 +292,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
 
@@ -386,7 +388,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=comp2_cupy_mesh):
         """
         Initialization routine
 
@@ -513,7 +515,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=comp2_cupy_mesh):
         """
         Initialization routine
 
