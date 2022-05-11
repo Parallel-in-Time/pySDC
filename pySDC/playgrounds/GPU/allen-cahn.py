@@ -3,7 +3,7 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
+# from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 import numpy as np
 import matplotlib.pylab as plt
 
@@ -19,8 +19,8 @@ problem_params['newton_maxiter'] = 100
 problem_params['newton_tol'] = 1E-08
 problem_params['lin_tol'] = 1E-09
 problem_params['lin_maxiter'] = 100
-problem_params['dtype_u'] = cupy_mesh
-problem_params['dtype_f'] = cupy_mesh
+# problem_params['dtype_u'] = cupy_mesh
+# problem_params['dtype_f'] = cupy_mesh
 
 # initialize level parameters
 level_params = dict()
@@ -63,6 +63,7 @@ controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
 # get initial values on finest level
 P = controller.MS[0].levels[0].prob
 uinit = P.u_exact(t0)
+# print(P.u_exact(t0))
 
 # call main function to get things done...
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
