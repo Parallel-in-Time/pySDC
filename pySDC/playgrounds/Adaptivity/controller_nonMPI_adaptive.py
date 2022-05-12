@@ -1,11 +1,7 @@
 import itertools
-import copy as cp
 import numpy as np
-import dill
 
-from pySDC.core.Controller import controller
-from pySDC.core import Step as stepclass
-from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
+from pySDC.core.Errors import ControllerError, ParameterError
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
@@ -32,18 +28,18 @@ class controller_nonMPI_adaptive(controller_nonMPI):
         if 'use_adaptivity' not in controller_params.keys():
             controller_params['use_adaptivity'] = True
         if 'e_tol' not in description['level_params'].keys():
-            raise ParameterError(f'Please supply "e_tol" in the level parameters')
+            raise ParameterError('Please supply "e_tol" in the level parameters')
         if 'restol' in description['level_params'].keys():
             if description['level_params']['restol'] > 0:
                 description['level_params']['restol'] = 0
-                print(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to have a constant order in time for adaptivity. Setting restol=0')
+                print(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to have a consta\
+nt order in time for adaptivity. Setting restol=0')
 
         # call parent's initialization routine
         super(controller_nonMPI_adaptive, self).__init__(num_procs, controller_params, description)
 
-        self.restart = [False]*num_procs
+        self.restart = [False] * num_procs
 
- 
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -96,13 +92,13 @@ class controller_nonMPI_adaptive(controller_nonMPI):
                 done = self.pfasst(MS_active)
 
             # restart the entire block from scratch if a single step needs to be restarted
-            if True in self.restart: # recompute current block
+            if True in self.restart:  # recompute current block
                 # restart active steps (reset all values and pass u0 to u0)
                 if len(self.MS) > 1:
-                    raise NotImplementedError(f'restart only implemented for 1 rank just yet')
+                    raise NotImplementedError('restart only implemented for 1 rank just yet')
                 self.restart_block(active_slots, time, self.MS[active_slots[0]].levels[0].u[0])
-                 
-            else: # move on to next block
+
+            else:  # move on to next block
                 # uend is uend of the last active step in the list
                 uend = self.MS[active_slots[-1]].levels[0].uend
 
@@ -121,8 +117,6 @@ class controller_nonMPI_adaptive(controller_nonMPI):
             self.hooks.post_run(step=S, level_number=0)
 
         return uend, self.hooks.return_stats()
-
-
 
     def it_check(self, local_MS_running):
         """
@@ -215,12 +209,12 @@ class controller_nonMPI_adaptive(controller_nonMPI):
             local_error = abs(L.uold[-1] - L.u[-1])
 
             # compute next step size
-            order = S.status.iter # embedded error estimate is same order as time marching
-            h_opt = L.params.dt * 0.9 * (L.params.e_tol/local_error)**(1./order)
+            order = S.status.iter  # embedded error estimate is same order as time marching
+            h_opt = L.params.dt * 0.9 * (L.params.e_tol / local_error)**(1. / order)
 
             # distribute step sizes
             if len(MS) > 1:
-                raise NotImplementedError(f'Adaptivity only implemented for 1 rank just yet')
+                raise NotImplementedError('Adaptivity only implemented for 1 rank just yet')
             else:
                 L.params.dt = h_opt
 
