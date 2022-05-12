@@ -37,9 +37,11 @@ class controller_nonMPI_adaptive(controller_nonMPI):
             if description['level_params']['restol'] > 0:
                 description['level_params']['restol'] = 0
                 print(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to have a constant order in time for adaptivity. Setting restol=0')
-         
+
         # call parent's initialization routine
         super(controller_nonMPI_adaptive, self).__init__(num_procs, controller_params, description)
+
+        self.restart = [False]*num_procs
 
  
     def run(self, u0, t0, Tend):
@@ -93,11 +95,8 @@ class controller_nonMPI_adaptive(controller_nonMPI):
             while not done:
                 done = self.pfasst(MS_active)
 
-            # check whether any step wants to be recomputed
-            restart = [self.MS[p].status.stage == 'RESTART' for p in active_slots]
-             
             # restart the entire block from scratch if a single step needs to be restarted
-            if True in restart: # recompute current block
+            if True in self.restart: # recompute current block
                 # restart active steps (reset all values and pass u0 to u0)
                 if len(self.MS) > 1:
                     raise NotImplementedError(f'restart only implemented for 1 rank just yet')
@@ -176,9 +175,7 @@ class controller_nonMPI_adaptive(controller_nonMPI):
                 S.status.done = all([T.status.done for T in local_MS_running])
                 self.hooks.post_comm(step=S, level_number=0, add_to_stats=True)
 
-            if S.status.stage == 'RESTART':
-                pass
-            elif not S.status.done:
+            if not S.status.done:
                 # increment iteration count here (and only here)
                 S.status.iter += 1
                 self.hooks.pre_iteration(step=S, level_number=0)
@@ -205,7 +202,9 @@ class controller_nonMPI_adaptive(controller_nonMPI):
         """
 
         # loop through steps and compute local error and optimal step size from there
-        for S in MS:
+        for i in range(len(MS)):
+            S = MS[i]
+
             # check if we performed the desired amount of sweeps
             if S.status.iter < S.params.maxiter:
                 continue
@@ -227,49 +226,6 @@ class controller_nonMPI_adaptive(controller_nonMPI):
 
             # check whether to move on or restart
             if local_error >= L.params.e_tol:
-                S.status.stage = 'RESTART'
-
-    def abort(self, local_MS_active):
-        """
-        Dummy function with the only purpose to set the status to done regardless of convergece
-        """
-        for S in local_MS_active:
-            S.status.done = True
-
-    def pfasst(self, local_MS_active):
-        """
-        Main function including the stages of SDC, MLSDC and PFASST (the "controller")
-
-        For the workflow of this controller, check out one of our PFASST talks or the pySDC paper
-
-        This method changes self.MS directly by accessing active steps through local_MS_active. Nothing is returned.
-
-        Args:
-            local_MS_active (list): all active steps
-        """
-
-        # if all stages are the same (or DONE), continue, otherwise abort
-        stages = [S.status.stage for S in local_MS_active if S.status.stage != 'DONE']
-        if stages[1:] == stages[:-1]:
-            stage = stages[0]
-        else:
-            raise ControllerError('not all stages are equal')
-
-        self.logger.debug(stage)
-
-        MS_running = [S for S in local_MS_active if S.status.stage != 'DONE']
-
-        switcher = {
-            'SPREAD': self.spread,
-            'PREDICT': self.predict,
-            'IT_CHECK': self.it_check,
-            'IT_FINE': self.it_fine,
-            'IT_DOWN': self.it_down,
-            'IT_COARSE': self.it_coarse,
-            'IT_UP': self.it_up,
-            'RESTART' : self.abort,
-        }
-
-        switcher.get(stage, self.default)(MS_running)
-
-        return all([S.status.done for S in local_MS_active])
+                self.restart[i] = True
+            else:
+                self.restart[i] = False
