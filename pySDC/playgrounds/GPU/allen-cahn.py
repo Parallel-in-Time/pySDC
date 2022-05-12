@@ -6,6 +6,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 # from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 import numpy as np
+import pickle
 import matplotlib.pylab as plt
 
 
@@ -70,6 +71,16 @@ uinit = P.u_exact(t0)
 # call main function to get things done...
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+# write down stats to .pickle file
+name = 'pickle/ac-jusuf-pySDC.pickle'
+data = {
+      'P': P,
+      'nvars': problem_params['nvars'],
+      'stats': stats
+}
+with open(name, 'wb') as f:
+    pickle.dump(data, f)
+
 # plt.subplot(1, 2, 1)
 # plt.title("u(t0)")
 # plt.imshow(uinit.get(),extent=[-0.5,0.5,-0.5,0.5])
@@ -80,21 +91,3 @@ uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 # plt.savefig("plot")
 
 
-# filter statistics by variant (number of iterations)
-filtered_stats = filter_stats(stats, type='niter')
-
-# convert filtered statistics to list of iterations count, sorted by time-step
-iter_counts = sort_stats(filtered_stats, sortby='time')
-
-# compute and print statistics
-niters = np.array([item[1] for item in iter_counts])
-print('CPU NxN: ', problem_params['nvars'])
-print(f'Mean number of iterations: {np.mean(niters):4.2f}')
-print(f'Range of values for number of iterations: {np.ptp(niters)}')
-print(f'Position of max/min number of iterations: {int(np.argmax(niters))} / {int(np.argmax(niters))}')
-print(f'Iteration count nonlinear solver (sum/mean per call): '
-      f'{P.newton_itercount} / {P.newton_itercount / max(P.newton_ncalls, 1)}')
-timing_step = sort_stats(filter_stats(stats, type='timing_step'), sortby='time')
-print('Timing step:\n', timing_step)
-timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
-print('Time to solution: %6.4f sec.' % timing[0][1])
