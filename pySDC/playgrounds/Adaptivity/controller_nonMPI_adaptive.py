@@ -14,6 +14,7 @@ class controller_nonMPI_adaptive(controller_nonMPI):
     """
 
     PFASST controller, running serialized version of PFASST in blocks (MG-style)
+    -> added adaptivity on top of controller_nonMPI
 
     """
 
@@ -40,8 +41,7 @@ class controller_nonMPI_adaptive(controller_nonMPI):
         # call parent's initialization routine
         super(controller_nonMPI_adaptive, self).__init__(num_procs, controller_params, description)
 
-        #self.force_restart = adaptivity
-
+ 
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
@@ -201,7 +201,7 @@ class controller_nonMPI_adaptive(controller_nonMPI):
 
     def adaptivity(self, MS):
         """
-        Method to compute time step size adaptively
+        Method to compute time step size adaptively based on embedded error estimate
         """
 
         # loop through steps and compute local error and optimal step size from there
@@ -230,6 +230,9 @@ class controller_nonMPI_adaptive(controller_nonMPI):
                 S.status.stage = 'RESTART'
 
     def abort(self, local_MS_active):
+        """
+        Dummy function with the only purpose to set the status to done regardless of convergece
+        """
         for S in local_MS_active:
             S.status.done = True
 
