@@ -121,10 +121,13 @@ def my_plot(cwd='./'):
     axs[1].plot(t, dt, label='pySDC')
     axs[1].set_yscale('log')
 
-    #with open('piline_reference.pickle', 'rb') as f:
-    #    ref = pickle.load(f)
-    # 
-    #axs[1].plot(ref['t'][1:-1], ref['dt'][1:-1], linestyle='--', label='own code')
+    try:
+        with open('vdp_adaptivity_reference.pickle', 'rb') as f:
+            ref = pickle.load(f)
+         
+        axs[1].plot(ref['t'][1:-1], ref['dt'][1:-1], linestyle='--', label='own code')
+    except:
+        pass
 
     axs[1].legend(frameon=False)
 
