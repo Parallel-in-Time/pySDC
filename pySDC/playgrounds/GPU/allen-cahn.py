@@ -39,7 +39,7 @@ sweeper_params['initial_guess'] = 'spread'
 
 # initialize step parameters
 step_params = dict()
-step_params['maxiter'] = 5
+step_params['maxiter'] = 50
 
 # setup parameters "in time"
 t0 = 0
