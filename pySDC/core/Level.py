@@ -22,6 +22,8 @@ class _Status(FrozenClass):
         self.updated = False
         self.time = None
         self.sweep = None
+        self.e_embedded = None
+        self.e_extrapolated = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
