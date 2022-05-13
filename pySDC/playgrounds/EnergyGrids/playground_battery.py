@@ -2,6 +2,7 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.visualization_tools import show_residual_across_simulation
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
@@ -13,7 +14,7 @@ import pySDC.helpers.plot_helper as plt_helper
 
 def main():
     """
-    A simple test program to do PFASST runs for the battery drain model
+    A simple test program to do SDC/PFASST runs for the battery drain model
     """
     
     # initialize level parameters
@@ -79,6 +80,10 @@ def main():
     f.close()
     
 def plot_voltages(cwd='./'):
+    """
+        Routine to plot the numerical solution of the model
+    """
+    
     f = open(cwd + 'battery.dat', 'rb')
     stats = dill.load(f)
     f.close()
@@ -95,8 +100,40 @@ def plot_voltages(cwd='./'):
     plt_helper.plt.legend()
     
     plt_helper.plt.show()
+    
+def plot_residuals(cwd='./'):
+    """
+        Routine to plot the residuals for one block of each iteration and each process
+    """
+    
+    f = open(cwd + 'battery.dat', 'rb')
+    stats = dill.load(f)
+    f.close()
+    
+    # filter statistics by type (number of iterations)
+    filtered_stats = filter_stats(stats, type='niter')
 
+    # convert filtered statistics to list of iterations count, sorted by process
+    iter_counts = sort_stats(filtered_stats, sortby='time')
+    
+    # compute and print statistics
+    min_iter = 20
+    max_iter = 0
+    f = open('battery_out.txt', 'w')
+    for item in iter_counts:
+        out = 'Number of iterations for time %4.2f: %1i' % item
+        f.write(out + '\n')
+        print(out)
+        min_iter = min(min_iter, item[1])
+        max_iter = max(max_iter, item[1])
+    f.close()
+    
+    # call helper routine to produce residual plot
+
+    fname = 'battery_residuals.png'
+    show_residual_across_simulation(stats=stats, fname=fname)
 
 if __name__ == "__main__":
     main()
     plot_voltages()
+    plot_residuals()
