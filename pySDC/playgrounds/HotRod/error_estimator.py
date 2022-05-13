@@ -131,14 +131,12 @@ class ErrorEstimator_nonMPI:
 
     def embedded_estimate(self, MS):
         """
-        Compute embedded error estimate on the last node of finest levels of each step
+        Compute embedded error estimate on the last node of each level
         """
-        for i in range(len(MS)):
-            S = MS[i]
-            L = S.levels[0]
-
-            # order rises by one between sweeps, making this so ridiculously easy
-            L.status.e_embedded = abs(L.uold[-1] - L.u[-1])
+        for S in MS:
+            for L in S.levels:
+                # order rises by one between sweeps, making this so ridiculously easy
+                L.status.e_embedded = abs(L.uold[-1] - L.u[-1])
 
     def extrapolation_estimate(self, MS, root=0):
         """
@@ -147,27 +145,27 @@ class ErrorEstimator_nonMPI:
         error only on the last step in a block for instance, we don't automatically compute this error on all steps,
         but only on the root step.
         """
-        e_ex = [0.] * len(MS)
         if None not in self.dt:
             if None in self.u_coeff or self.params.use_adaptivity:
                 self.get_extrapolation_coefficients()
 
             if len(MS) > 1:
                 raise NotImplementedError('Extrapolated estimate only works in serial for now')
+            if len(MS[0].levels) > 1:
+                raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
 
             u_ex = MS[root].levels[0].u[-1] * 0.
             for i in range(self.n):
                 u_ex += self.u_coeff[i] * self.u[i] + self.f_coeff[i] * self.f[i]
 
             MS[root].levels[0].status.e_extrapolated = abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
-        return e_ex
 
     def estimate(self, MS):
         # only estimate errors when last sweep is performed
         if MS[-1].status.iter == MS[-1].params.maxiter:
 
             if self.params.use_extrapolation_estimate:
-                self.e_ex = self.extrapolation_estimate(MS)
+                self.extrapolation_estimate(MS)
                 self.store_values(MS)
 
             if self.params.use_embedded_estimate:
