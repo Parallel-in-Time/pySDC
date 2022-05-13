@@ -9,16 +9,15 @@ import numpy as np
 import pickle
 import matplotlib.pylab as plt
 
-
+Ns = np.asarray([128, 256, 512, 1024, 2048])
 # initialize problem parameters
-
 problem_params = dict()
 problem_params['nu'] = 2
 problem_params['eps'] = 0.04
 problem_params['radius'] = 0.25
-problem_params['nvars'] = [(1024, 1024)]
-problem_params['newton_maxiter'] = 100
-problem_params['newton_tol'] = 1E-08
+# problem_params['nvars'] = [(1024, 1024)]
+# problem_params['newton_maxiter'] = 100
+# problem_params['newton_tol'] = 1E-08
 problem_params['lin_tol'] = 1E-10
 problem_params['lin_maxiter'] = 99
 # problem_params['dtype_u'] = cupy_mesh
@@ -48,46 +47,37 @@ Tend = 8*1E-03
 
 # initialize controller parameters
 controller_params = dict()
-controller_params['logger_level'] = 20
+controller_params['logger_level'] = 10
+for N in Ns:
+    problem_params['nvars'] = [(N, N)]
+    # fill description dictionary for easy step instantiation
+    description = dict()
+    description['problem_class'] = allencahn_semiimplicit
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
 
-# fill description dictionary for easy step instantiation
-description = dict()
-description['problem_class'] = allencahn_semiimplicit
-description['problem_params'] = problem_params  # pass problem parameters
-description['sweeper_class'] = imex_1st_order  # pass sweeper
-description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-description['level_params'] = level_params  # pass level parameters
-description['step_params'] = step_params  # pass step parameters
+    # instantiate controller
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
-# instantiate controller
+    # get initial values on finest level
+    P = controller.MS[0].levels[0].prob
+    uinit = P.u_exact(t0)
 
-controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    # call main function to get things done...
+    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-# get initial values on finest level
-P = controller.MS[0].levels[0].prob
-uinit = P.u_exact(t0)
-# print(P.u_exact(t0))
-
-# call main function to get things done...
-uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-
-# write down stats to .pickle file
-name = 'pickle/ac-jusuf-pySDC.pickle'
-data = {
-      'P': P,
-      'nvars': problem_params['nvars'],
-      'stats': stats
-}
-with open(name, 'wb') as f:
-    pickle.dump(data, f)
-
-# plt.subplot(1, 2, 1)
-# plt.title("u(t0)")
-# plt.imshow(uinit.get(),extent=[-0.5,0.5,-0.5,0.5])
-
-# plt.subplot(1, 2, 2)
-# plt.title("u(Tend)")
-# plt.imshow(uend.get(),extent=[-0.5,0.5,-0.5,0.5])
-# plt.savefig("plot")
+    # write down stats to .pickle file
+    # name = f'pickle/ac-jusuf-pySDC-N{N}-gpu.pickle'
+    name = f'pickle/ac-jusuf-pySDC-N{N}-cpu.pickle'
+    data = {
+        'P': P,
+        'nvars': problem_params['nvars'],
+        'stats': stats
+    }
+    with open(name, 'wb') as f:
+        pickle.dump(data, f)
 
 
