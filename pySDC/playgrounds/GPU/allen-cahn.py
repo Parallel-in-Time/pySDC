@@ -74,6 +74,8 @@ for i, N in enumerate(Ns):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+
+    # get the stats
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
     times[i] = timing[0][1]
     timing_setup = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
