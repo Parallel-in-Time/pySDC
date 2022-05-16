@@ -12,7 +12,7 @@ class _Pars(FrozenClass):
         self.use_adaptivity = False
         self.use_extrapolation_estimate = False
         self.use_embedded_estimate = False
-        self.full_order = True
+        self.HotRod = False
 
         for k, v in params.items():
             setattr(self, k, v)
@@ -25,7 +25,7 @@ class ErrorEstimator_nonMPI:
     def __init__(self, controller, params):
         self.params = _Pars(params)
 
-        if self.params.use_extrapolation_estimate:
+        if self.params.use_extrapolation_estimate or self.params.HotRod:
             if not controller.MS[0].levels[0].params.restol == 0:
                 raise NotImplementedError('Extrapolation based error estimate so far only with fixed order')
             maxiter = [0] * len(controller.MS)
@@ -43,10 +43,10 @@ class ErrorEstimator_nonMPI:
         initialized which are needed for this process.
         """
         # determine the order of the Taylor expansion to be higher than that of the time marching scheme
-        if self.params.full_order:
-            self.order = controller.MS[0].params.maxiter + 2
-        else:
+        if self.params.HotRod:
             self.order = controller.MS[0].params.maxiter - 1 + 2
+        else:
+            self.order = controller.MS[0].params.maxiter + 2
 
         self.n = (self.order + 1) // 2  # since we store u and f, we need only half of each (the +1 is for rounding)
         self.n_per_proc = int(np.ceil(self.n / len(controller.MS)))  # number of steps that each step needs to store
@@ -141,7 +141,7 @@ class ErrorEstimator_nonMPI:
     def extrapolation_estimate(self, MS, root=0):
         """
         The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
-        solution obtained by the time marching scheme. As in PinT, we might prefer to save memory by computing the
+        solution obtained by the time marching scheme. As, in PinT, we might prefer to save memory by computing the
         error only on the last step in a block for instance, we don't automatically compute this error on all steps,
         but only on the root step.
         """
@@ -161,8 +161,8 @@ class ErrorEstimator_nonMPI:
             MS[root].levels[0].status.e_extrapolated = abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
-        # only estimate errors when last sweep is performed
-        if MS[-1].status.iter == MS[-1].params.maxiter:
+        # only estimate errors when last sweep is performed and not when doing Hot Rod
+        if MS[-1].status.iter == MS[-1].params.maxiter and not self.params.HotRod:
 
             if self.params.use_extrapolation_estimate:
                 self.extrapolation_estimate(MS)
