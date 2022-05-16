@@ -1,10 +1,4 @@
-import itertools
-import numpy as np
-
-from pySDC.core.Errors import ControllerError, ParameterError
-
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-
 from error_estimator import ErrorEstimator_nonMPI
 
 
@@ -17,14 +11,16 @@ class controller_nonMPI_resilient(controller_nonMPI):
 
     def __init__(self, num_procs, controller_params, description):
         # additional parameters
-        controller_params['use_embedded_estimate'] = description['error_estimator_params'].get('use_embedded_estimate', False)
+        controller_params['use_embedded_estimate'] = description['error_estimator_params'].get('use_embedded_estimate',
+                                                                                               False)
+        controller_params['HotRod'] = controller_params.get('HotRod', False)
+        description['error_estimator_params']['HotRod'] = controller_params.get('HotRod', False)
 
         # call parent's initialization routine
         super(controller_nonMPI_resilient, self).__init__(num_procs, controller_params, description)
 
         self.error_estimator = ErrorEstimator_nonMPI(self, description.get('error_estimator_params', {}))
-
-
+        self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate or self.params.HotRod
 
     def it_check(self, local_MS_running):
         """
@@ -57,6 +53,8 @@ class controller_nonMPI_resilient(controller_nonMPI):
 
         self.error_estimator.estimate(local_MS_running)
 
+        self.resilence(local_MS_running)
+
         for S in local_MS_running:
 
             S.status.done = self.check_convergence(S)
@@ -81,7 +79,7 @@ class controller_nonMPI_resilient(controller_nonMPI):
                 S.status.iter += 1
                 self.hooks.pre_iteration(step=S, level_number=0)
 
-                if self.params.use_iteration_estimator or self.params.use_embedded_estimate:
+                if self.store_uold:
                     # store pervious iterate to compute difference later on
                     S.levels[0].uold[:] = S.levels[0].u[:]
 
@@ -96,3 +94,18 @@ class controller_nonMPI_resilient(controller_nonMPI):
                 S.levels[0].sweep.compute_end_point()
                 self.hooks.post_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
+
+    def resilence(self, local_MS_running):
+        if self.params.HotRod:
+            self.hotrod(local_MS_running)
+
+    def hotrod(self, local_MS_running):
+        for S in local_MS_running:
+            if S.status.iter == S.params.maxiter:
+                self.error_estimator.embedded_estimate([S])
+                for l in S.levels:
+                    l.u[:] = l.uold[:]
+
+            elif S.status.iter == S.params.maxiter - 1:
+                self.error_estimator.extrapolation_estimate([S])
+                self.error_estimator.store_values([S])
