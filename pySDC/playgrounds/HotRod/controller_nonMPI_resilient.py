@@ -197,14 +197,27 @@ nt order in time for adaptivity. Setting restol=0')
         return uend, self.hooks.return_stats()
 
     def resilence(self, local_MS_running):
+        """
+        Call various functions that are supposed to provide some sort of resilience form here
+        """
+
         if self.params.HotRod:
             self.hotrod(local_MS_running)
 
     def hotrod(self, local_MS_running):
-        for S in local_MS_running:
+        for i in range(len(local_MS_running)):
+            S = local_MS_running[i]
             if S.status.iter == S.params.maxiter:
                 for l in S.levels:
+                    # throw away the final sweep to match the error estimates
                     l.u[:] = l.uold[:]
+
+                    # check if a fault is detected
+                    if None not in [l.status.e_extrapolated, l.status.e_embedded]:
+                        diff = l.status.e_extrapolated - l.status.e_embedded
+                        if diff > self.params.HotRod_tol:
+                            print('restarting')
+                            self.restart[i] = True
 
     def adaptivity(self, MS):
         """
