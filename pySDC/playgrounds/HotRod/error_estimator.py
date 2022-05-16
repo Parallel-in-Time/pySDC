@@ -94,7 +94,7 @@ class ErrorEstimator_nonMPI:
         self.f_coeff[self.n * 2 - self.order:] = coeff[self.n:self.order]
 
         # determine prefactor
-        r = abs(self.dt / self.dt[-1])**(self.order)
+        r = abs(self.dt / self.dt[-1])**(self.order - 1)
         inv_prefactor = -sum(r[1:]) - 1.
         for i in range(len(self.u_coeff)):
             inv_prefactor += sum(r[1: i + 1]) * self.u_coeff[i]
@@ -105,29 +105,30 @@ class ErrorEstimator_nonMPI:
         Store the required attributes of the step to do the extrapolation. We only care about the last collocation
         node on the finest level at the moment.
         """
-        if len(MS) > 1:
-            raise NotImplementedError('Storage of values for extrapolated estimate only works in serial for now')
-        for i in range(len(MS)):
-            S = MS[i]
+        if self.extrapolation_estimate:
+            if len(MS) > 1:
+                raise NotImplementedError('Storage of values for extrapolated estimate only works in serial for now')
+            for i in range(len(MS)):
+                S = MS[i]
 
-            self.u[0:-1] = self.u[1:]
-            self.u[-1] = S.levels[0].u[-1]
+                self.u[0:-1] = self.u[1:]
+                self.u[-1] = S.levels[0].u[-1]
 
-            self.f[0:-1] = self.f[1:]
-            f = S.levels[0].f[-1]
-            if type(f) == imex_mesh:
-                self.f[-1] = f.impl + f.expl
-            elif type(f) == mesh:
-                self.f[-1] = f
-            else:
-                raise DataError(f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
-                works with types imex_mesh and mesh')
+                self.f[0:-1] = self.f[1:]
+                f = S.levels[0].f[-1]
+                if type(f) == imex_mesh:
+                    self.f[-1] = f.impl + f.expl
+                elif type(f) == mesh:
+                    self.f[-1] = f
+                else:
+                    raise DataError(f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
+                    works with types imex_mesh and mesh')
 
-            self.t[0:-1] = self.t[1:]
-            self.t[-1] = S.levels[0].time + S.levels[0].dt
+                self.t[0:-1] = self.t[1:]
+                self.t[-1] = S.levels[0].time + S.levels[0].dt
 
-            self.dt[0:-1] = self.dt[1:]
-            self.dt[-1] = S.levels[0].dt
+                self.dt[0:-1] = self.dt[1:]
+                self.dt[-1] = S.levels[0].dt
 
     def embedded_estimate(self, MS):
         """
@@ -161,12 +162,20 @@ class ErrorEstimator_nonMPI:
             MS[root].levels[0].status.e_extrapolated = abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
-        # only estimate errors when last sweep is performed and not when doing Hot Rod
-        if MS[-1].status.iter == MS[-1].params.maxiter and not self.params.HotRod:
+        if self.params.HotRod:
+            for S in MS:
+                if S.status.iter == S.params.maxiter - 1:
+                    self.extrapolation_estimate([S])
+                elif S.status.iter == S.params.maxiter:
+                    self.embedded_estimate([S])
 
-            if self.params.use_extrapolation_estimate:
-                self.extrapolation_estimate(MS)
-                self.store_values(MS)
+        else:
+            for S in MS:
+                # only estimate errors when last sweep is performed and not when doing Hot Rod
+                if S.status.iter == S.params.maxiter:
 
-            if self.params.use_embedded_estimate:
-                self.embedded_estimate(MS)
+                    if self.params.use_extrapolation_estimate:
+                        self.extrapolation_estimate([S])
+
+                    if self.params.use_embedded_estimate or self.params.use_adaptivity:
+                        self.embedded_estimate([S])

@@ -18,6 +18,7 @@ class controller_nonMPI_resilient(controller_nonMPI):
                                                                                                False)
         controller_params['HotRod'] = controller_params.get('HotRod', False)
         description['error_estimator_params']['HotRod'] = controller_params.get('HotRod', False)
+        description['error_estimator_params']['use_adaptivity'] = controller_params.get('use_adaptivity', False)
 
         # additional parameters
         if controller_params['HotRod']:
@@ -177,6 +178,8 @@ nt order in time for adaptivity. Setting restol=0')
                 # uend is uend of the last active step in the list
                 uend = self.MS[active_slots[-1]].levels[0].uend
 
+                self.error_estimator.store_values(MS_active)
+
                 for p in active_slots:
                     time[p] += num_procs * self.MS[p].dt
 
@@ -200,13 +203,8 @@ nt order in time for adaptivity. Setting restol=0')
     def hotrod(self, local_MS_running):
         for S in local_MS_running:
             if S.status.iter == S.params.maxiter:
-                self.error_estimator.embedded_estimate([S])
                 for l in S.levels:
                     l.u[:] = l.uold[:]
-
-            elif S.status.iter == S.params.maxiter - 1:
-                self.error_estimator.extrapolation_estimate([S])
-                self.error_estimator.store_values([S])
 
     def adaptivity(self, MS):
         """
@@ -223,12 +221,9 @@ nt order in time for adaptivity. Setting restol=0')
 
             L = S.levels[0]
 
-            # do embedded method on the last collocation node
-            local_error = abs(L.uold[-1] - L.u[-1])
-
             # compute next step size
             order = S.status.iter  # embedded error estimate is same order as time marching
-            h_opt = L.params.dt * 0.9 * (L.params.e_tol / local_error)**(1. / order)
+            h_opt = L.params.dt * 0.9 * (L.params.e_tol / L.status.e_embedded)**(1. / order)
 
             # distribute step sizes
             if len(MS) > 1:
@@ -237,7 +232,7 @@ nt order in time for adaptivity. Setting restol=0')
                 L.params.dt = h_opt
 
             # check whether to move on or restart
-            if local_error >= L.params.e_tol:
+            if L.status.e_embedded >= L.params.e_tol:
                 self.restart[i] = True
             else:
                 self.restart[i] = False
