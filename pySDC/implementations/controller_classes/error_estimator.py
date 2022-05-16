@@ -1,31 +1,16 @@
 import numpy as np
 from scipy.special import factorial
 
-from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 from pySDC.core.Errors import DataError
 
 
-# short helper class to add params as attributes
-class _Pars(FrozenClass):
-    def __init__(self, params):
-        self.use_adaptivity = False
-        self.use_extrapolation_estimate = False
-        self.use_embedded_estimate = False
-        self.HotRod = False
-
-        for k, v in params.items():
-            setattr(self, k, v)
-
-        self._freeze()
-
-
 class ErrorEstimator_nonMPI:
 
-    def __init__(self, controller, params):
-        self.params = _Pars(params)
+    def __init__(self, controller):
+        self.params = controller.params
 
-        if self.params.use_extrapolation_estimate or self.params.HotRod:
+        if self.params.use_extrapolation_estimate:
             if not controller.MS[0].levels[0].params.restol == 0:
                 raise NotImplementedError('Extrapolation based error estimate so far only with fixed order')
             maxiter = [0] * len(controller.MS)
@@ -43,7 +28,7 @@ class ErrorEstimator_nonMPI:
         initialized which are needed for this process.
         """
         # determine the order of the Taylor expansion to be higher than that of the time marching scheme
-        if self.params.HotRod:
+        if self.params.use_HotRod:
             self.order = controller.MS[0].params.maxiter - 1 + 2
         else:
             self.order = controller.MS[0].params.maxiter + 2
@@ -105,7 +90,7 @@ class ErrorEstimator_nonMPI:
         Store the required attributes of the step to do the extrapolation. We only care about the last collocation
         node on the finest level at the moment.
         """
-        if self.extrapolation_estimate:
+        if self.params.use_extrapolation_estimate:
             if len(MS) > 1:
                 raise NotImplementedError('Storage of values for extrapolated estimate only works in serial for now')
             for i in range(len(MS)):
@@ -162,7 +147,7 @@ class ErrorEstimator_nonMPI:
             MS[root].levels[0].status.e_extrapolated = abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
-        if self.params.HotRod:
+        if self.params.use_HotRod:
             for S in MS:
                 if S.status.iter == S.params.maxiter - 1:
                     self.extrapolation_estimate([S])

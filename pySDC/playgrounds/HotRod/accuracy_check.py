@@ -10,7 +10,7 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from controller_nonMPI_resilient import controller_nonMPI_resilient
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 class log_data(hooks):
@@ -68,12 +68,8 @@ def single_run(var='dt', val=1e-1, k=5):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
-
-    # error_estimator stuff
-    error_estimator_params = {
-        'use_extrapolation_estimate': True,
-        'use_embedded_estimate': True,
-    }
+    controller_params['use_extrapolation_estimate'] = True
+    controller_params['use_embedded_estimate'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -83,7 +79,6 @@ def single_run(var='dt', val=1e-1, k=5):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['error_estimator_params'] = error_estimator_params
 
     # set time parameters
     t0 = 0.0
@@ -93,8 +88,7 @@ def single_run(var='dt', val=1e-1, k=5):
         Tend = 2e1
 
     # instantiate controller
-    controller_class = controller_nonMPI_resilient
-    controller = controller_class(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
