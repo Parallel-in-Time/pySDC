@@ -45,7 +45,8 @@
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Controller</span> <span class="kn">import</span> <span class="n">controller</span>
 <span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">Step</span> <span class="k">as</span> <span class="n">stepclass</span>
-<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">ControllerError</span><span class="p">,</span> <span class="n">CommunicationError</span><span class="p">,</span> <span class="n">ParameterError</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.error_estimator</span> <span class="kn">import</span> <span class="n">ErrorEstimator_nonMPI</span>
 
 
 <div class="viewcode-block" id="controller_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI">[docs]</a><span class="k">class</span> <span class="nc">controller_nonMPI</span><span class="p">(</span><span class="n">controller</span><span class="p">):</span>
@@ -112,6 +113,25 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">predict_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;you have specified a predictor type but only a single level.. &#39;</span>
                                 <span class="s1">&#39;predictor will be ignored&#39;</span><span class="p">)</span>
+
+        <span class="c1"># prepare variables to do with error estimation and resilience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_embedded_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_embedded_estimate</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span> <span class="ow">or</span>\
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_embedded_estimate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restart</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_procs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;e_tol&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Please supply &quot;e_tol&quot; in the level parameters&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;restol&#39;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">][</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">][</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;I want to do always maxiter=</span><span class="si">{</span><span class="n">description</span><span class="p">[</span><span class="s2">&quot;step_params&quot;</span><span class="p">][</span><span class="s2">&quot;maxiter&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> iteration</span><span class="se">\</span>
+<span class="s1">s to have a constant order in time for adaptivity. Setting restol=0&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Hot Rod needs a detection threshold, which is now set to infinity, such that a restart</span><span class="se">\</span>
+<span class="s1">is never triggered!&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_estimator</span> <span class="o">=</span> <span class="n">ErrorEstimator_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="controller_nonMPI.check_iteration_estimator"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -203,18 +223,28 @@
             <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
                 <span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pfasst</span><span class="p">(</span><span class="n">MS_active</span><span class="p">)</span>
 
-            <span class="c1"># uend is uend of the last active step in the list</span>
-            <span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uend</span>
+            <span class="c1"># restart the entire block from scratch if a single step needs to be restarted</span>
+            <span class="k">if</span> <span class="kc">True</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">:</span>  <span class="c1"># recompute current block</span>
+                <span class="c1"># restart active steps (reset all values and pass u0 to u0)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;restart only implemented for 1 rank just yet&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">:</span>
-                <span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+=</span> <span class="n">num_procs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># move on to next block</span>
+                <span class="c1"># uend is uend of the last active step in the list</span>
+                <span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uend</span>
 
-            <span class="c1"># determine new set of active steps and compress slots accordingly</span>
-            <span class="n">active</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">]</span>
-            <span class="n">active_slots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="n">active</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_estimator</span><span class="o">.</span><span class="n">store_values</span><span class="p">(</span><span class="n">MS_active</span><span class="p">)</span>
 
-            <span class="c1"># restart active steps (reset all values and pass uend to u0)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">uend</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">active_slots</span><span class="p">:</span>
+                    <span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">+=</span> <span class="n">num_procs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
+
+                <span class="c1"># determine new set of active steps and compress slots accordingly</span>
+                <span class="n">active</span> <span class="o">=</span> <span class="p">[</span><span class="n">time</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">Tend</span> <span class="o">-</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">slots</span><span class="p">]</span>
+                <span class="n">active_slots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="n">active</span><span class="p">))</span>
+
+                <span class="c1"># restart active steps (reset all values and pass uend to u0)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restart_block</span><span class="p">(</span><span class="n">active_slots</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">uend</span><span class="p">)</span>
 
         <span class="c1"># call post-run hook</span>
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">:</span>
@@ -530,6 +560,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_iteration_estimator</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_estimator</span><span class="o">.</span><span class="n">estimate</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptivity</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">resilence</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
 
             <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_convergence</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
@@ -554,7 +591,7 @@
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span><span class="p">:</span>
                     <span class="c1"># store pervious iterate to compute difference later on</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span>
 
@@ -751,7 +788,67 @@
 <span class="sd">        Args:</span>
 <span class="sd">            local_MS_running (list): list of currently running steps</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span><span class="s1">&#39;Unknown stage, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>  <span class="c1"># TODO</span></div></div>
+        <span class="k">raise</span> <span class="n">ControllerError</span><span class="p">(</span><span class="s1">&#39;Unknown stage, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>  <span class="c1"># TODO</span></div>
+
+<div class="viewcode-block" id="controller_nonMPI.resilence"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilence">[docs]</a>    <span class="k">def</span> <span class="nf">resilence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call various functions that are supposed to provide some sort of resilience from here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hotrod</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="controller_nonMPI.hotrod"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod">[docs]</a>    <span class="k">def</span> <span class="nf">hotrod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        See for the reference:</span>
+<span class="sd">        Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,</span>
+<span class="sd">        Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)):</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="n">local_MS_running</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                    <span class="c1"># throw away the final sweep to match the error estimates</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span>
+
+                    <span class="c1"># check if a fault is detected</span>
+                    <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="p">]:</span>
+                        <span class="n">diff</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">-</span> <span class="n">l</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span>
+                        <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="controller_nonMPI.adaptivity"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity">[docs]</a>    <span class="k">def</span> <span class="nf">adaptivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to compute time step size adaptively based on embedded error estimate</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># loop through steps and compute local error and optimal step size from there</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)):</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="c1"># check if we performed the desired amount of sweeps</span>
+            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&lt;</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># compute next step size</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span>  <span class="c1"># embedded error estimate is same order as time marching</span>
+            <span class="k">assert</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Make sure to estimate the embedded error before call</span><span class="se">\</span>
+<span class="s1">ing adaptivity!&#39;</span>
+            <span class="n">h_opt</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span> <span class="o">/</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">order</span><span class="p">)</span>
+
+            <span class="c1"># distribute step sizes</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Adaptivity only implemented for 1 rank just yet&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">h_opt</span>
+
+            <span class="c1"># check whether to move on or restart</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">&gt;=</span> <span class="n">L</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">e_tol</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -218,6 +218,12 @@ stats object containing statistics for each step, each level and each iteration<
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Controller.controller</span></code></p>
 <p>PFASST controller, running serialized version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity">
+<span class="sig-name descname"><span class="pre">adaptivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.adaptivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to compute time step size adaptively based on embedded error estimate</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">
 <span class="sig-name descname"><span class="pre">check_iteration_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.check_iteration_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to check the iteration estimator</p>
@@ -237,6 +243,14 @@ stats object containing statistics for each step, each level and each iteration<
 <dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod">
+<span class="sig-name descname"><span class="pre">hotrod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.hotrod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod" title="Permalink to this definition">¶</a></dt>
+<dd><p>See for the reference:
+Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
+Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47</p>
 </dd></dl>
 
 <dl class="py method">
@@ -334,6 +348,12 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilence">
+<span class="sig-name descname"><span class="pre">resilence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.resilence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call various functions that are supposed to provide some sort of resilience from here</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">
 <span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper routine to reset/restart block of (active) steps</p>
@@ -395,6 +415,67 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 </section>
+<section id="module-implementations.controller_classes.error_estimator">
+<span id="implementations-controller-classes-error-estimator-module"></span><h2>implementations.controller_classes.error_estimator module<a class="headerlink" href="#module-implementations.controller_classes.error_estimator" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.controller_classes.error_estimator.</span></span><span class="sig-name descname"><span class="pre">ErrorEstimator_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.embedded_estimate">
+<span class="sig-name descname"><span class="pre">embedded_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.embedded_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.embedded_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute embedded error estimate on the last node of each level</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.estimate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.extrapolation_estimate">
+<span class="sig-name descname"><span class="pre">extrapolation_estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.extrapolation_estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.extrapolation_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
+solution obtained by the time marching scheme. As, in PinT, we might prefer to save memory by computing the
+error only on the last step in a block for instance, we don’t automatically compute this error on all steps,
+but only on the root step.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.get_extrapolation_coefficients">
+<span class="sig-name descname"><span class="pre">get_extrapolation_coefficients</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.get_extrapolation_coefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.get_extrapolation_coefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function solves a linear system where in the matrix A, the row index reflects the order of the derivative
+in the Taylor expansion and the column index reflects the particular step and whether its u or f from that
+step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to
+compute the value itself and all the derivatives should vanish after combining the Taylor expansions. This
+works to the order the number of rows and since we want a square matrix for solving, we need the same amount of
+colums, which determines the memory overhead, since it is equal to the solutions / rhs that we need in memory
+at the time of evaluation.
+This is enough to get the extrapolated solution, but if we want to compute the local error, we have to compute
+a prefactor. This is based on error accumulation between steps (first step’s solution is exact plus 1 LTE,
+second solution is exact plus 2 LTE and so on), which can be computed for adaptive step sizes as well, but its
+wonky in time-parallel versions to say the least (it’s not cared for and hence wrong, but it might be wrong in
+the same way as the embedded method and work for Hot Rod regardless…)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.setup_extrapolation">
+<span class="sig-name descname"><span class="pre">setup_extrapolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.setup_extrapolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.setup_extrapolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving
+a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are
+initialized which are needed for this process.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.store_values">
+<span class="sig-name descname"><span class="pre">store_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#ErrorEstimator_nonMPI.store_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.store_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the required attributes of the step to do the extrapolation. We only care about the last collocation
+node on the finest level at the moment.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-implementations.controller_classes">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.controller_classes" title="Permalink to this headline">¶</a></h2>
 </section>
@@ -414,6 +495,7 @@ stats object containing statistics for each step, each level and each iteration<
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI module</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI module</a></li>
+<li><a class="reference internal" href="#module-implementations.controller_classes.error_estimator">implementations.controller_classes.error_estimator module</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes">Module contents</a></li>
 </ul>
 </li>

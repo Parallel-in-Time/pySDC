@@ -41,6 +41,7 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">Hooks</span> <span class="k">as</span> <span class="n">hookclass</span>
 <span class="kn">from</span> <span class="nn">pySDC.core.BaseTransfer</span> <span class="kn">import</span> <span class="n">base_transfer</span>
@@ -58,6 +59,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dump_setup</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;run_pid&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_adaptivity</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_HotRod</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HotRod_tol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_embedded_estimate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>

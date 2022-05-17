@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>implementations.controller_classes.error_estimator &#8212; pySDC 4.2.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.error_estimator</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for implementations.controller_classes.error_estimator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">factorial</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.implementations.datatype_classes.mesh</span> <span class="kn">import</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">imex_mesh</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">DataError</span>
+
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI">[docs]</a><span class="k">class</span> <span class="nc">ErrorEstimator_nonMPI</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">params</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">restol</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Extrapolation based error estimate so far only with fixed order&#39;</span><span class="p">)</span>
+            <span class="n">maxiter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">)):</span>
+                <span class="n">maxiter</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">maxiter</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">maxiter</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">maxiter</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;All steps need to have the same order in time so far&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_extrapolation</span><span class="p">(</span><span class="n">controller</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.setup_extrapolation"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.setup_extrapolation">[docs]</a>    <span class="k">def</span> <span class="nf">setup_extrapolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving</span>
+<span class="sd">        a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are</span>
+<span class="sd">        initialized which are needed for this process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># determine the order of the Taylor expansion to be higher than that of the time marching scheme</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">+</span> <span class="mi">2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>  <span class="c1"># since we store u and f, we need only half of each (the +1 is for rounding)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_per_proc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">)))</span>  <span class="c1"># number of steps that each step needs to store</span>
+
+        <span class="c1"># create variables to store u, f, t and dt from previous steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_per_proc</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_per_proc</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_per_proc</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_per_proc</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_coeff</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span></div>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.get_extrapolation_coefficients"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.get_extrapolation_coefficients">[docs]</a>    <span class="k">def</span> <span class="nf">get_extrapolation_coefficients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function solves a linear system where in the matrix A, the row index reflects the order of the derivative</span>
+<span class="sd">        in the Taylor expansion and the column index reflects the particular step and whether its u or f from that</span>
+<span class="sd">        step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to</span>
+<span class="sd">        compute the value itself and all the derivatives should vanish after combining the Taylor expansions. This</span>
+<span class="sd">        works to the order the number of rows and since we want a square matrix for solving, we need the same amount of</span>
+<span class="sd">        colums, which determines the memory overhead, since it is equal to the solutions / rhs that we need in memory</span>
+<span class="sd">        at the time of evaluation.</span>
+<span class="sd">        This is enough to get the extrapolated solution, but if we want to compute the local error, we have to compute</span>
+<span class="sd">        a prefactor. This is based on error accumulation between steps (first step&#39;s solution is exact plus 1 LTE,</span>
+<span class="sd">        second solution is exact plus 2 LTE and so on), which can be computed for adaptive step sizes as well, but its</span>
+<span class="sd">        wonky in time-parallel versions to say the least (it&#39;s not cared for and hence wrong, but it might be wrong in</span>
+<span class="sd">        the same way as the embedded method and work for Hot Rod regardless...)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># construct A matrix</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">))</span>
+        <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">inv_facs</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">steps_from_now</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">):</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">steps_from_now</span><span class="o">**</span><span class="n">j</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">]</span> <span class="o">=</span> <span class="n">steps_from_now</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">:]</span><span class="o">**</span><span class="p">(</span><span class="n">j</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># prepare rhs</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+        <span class="c1"># solve linear system for the coefficients</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_coeff</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">:]</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">]</span>
+
+        <span class="c1"># determine prefactor</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">inv_prefactor</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="mf">1.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span><span class="p">)):</span>
+            <span class="n">inv_prefactor</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefactor</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">inv_prefactor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.store_values"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.store_values">[docs]</a>    <span class="k">def</span> <span class="nf">store_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store the required attributes of the step to do the extrapolation. We only care about the last collocation</span>
+<span class="sd">        node on the finest level at the moment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Storage of values for extrapolated estimate only works in serial for now&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)):</span>
+                <span class="n">S</span> <span class="o">=</span> <span class="n">MS</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">imex_mesh</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">mesh</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DataError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to store f from datatype </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s1">, extrapolation based error estimate only</span><span class="se">\</span>
+<span class="s1">                    works with types imex_mesh and mesh&#39;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="o">+</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span></div>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.embedded_estimate"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.embedded_estimate">[docs]</a>    <span class="k">def</span> <span class="nf">embedded_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute embedded error estimate on the last node of each level</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                <span class="c1"># order rises by one between sweeps, making this so ridiculously easy</span>
+                <span class="n">L</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_embedded_estimate</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uold</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.extrapolation_estimate"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.extrapolation_estimate">[docs]</a>    <span class="k">def</span> <span class="nf">extrapolation_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the</span>
+<span class="sd">        solution obtained by the time marching scheme. As, in PinT, we might prefer to save memory by computing the</span>
+<span class="sd">        error only on the last step in a block for instance, we don&#39;t automatically compute this error on all steps,</span>
+<span class="sd">        but only on the root step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">:</span>
+            <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_extrapolation_coefficients</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Extrapolated estimate only works in serial for now&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Extrapolated estimate only works on the finest level for now&#39;</span><span class="p">)</span>
+
+            <span class="n">u_ex</span> <span class="o">=</span> <span class="n">MS</span><span class="p">[</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">u_ex</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u_coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_coeff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="n">MS</span><span class="p">[</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">error_extrapolation_estimate</span> <span class="o">=</span> \
+                <span class="nb">abs</span><span class="p">(</span><span class="n">u_ex</span> <span class="o">-</span> <span class="n">MS</span><span class="p">[</span><span class="n">root</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefactor</span></div>
+
+<div class="viewcode-block" id="ErrorEstimator_nonMPI.estimate"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.estimate">[docs]</a>    <span class="k">def</span> <span class="nf">estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">extrapolation_estimate</span><span class="p">([</span><span class="n">S</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">embedded_estimate</span><span class="p">([</span><span class="n">S</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
+                <span class="c1"># only estimate errors when last sweep is performed and not when doing Hot Rod</span>
+                <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">maxiter</span><span class="p">:</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_extrapolation_estimate</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">extrapolation_estimate</span><span class="p">([</span><span class="n">S</span><span class="p">])</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_embedded_estimate</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_adaptivity</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">embedded_estimate</span><span class="p">([</span><span class="n">S</span><span class="p">])</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">implementations.controller_classes.error_estimator</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Robert Speck.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>
