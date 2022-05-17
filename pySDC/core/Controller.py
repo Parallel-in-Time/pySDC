@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import numpy as np
 
 from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
@@ -18,6 +19,12 @@ class _Pars(FrozenClass):
         self.dump_setup = True
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
         self.use_iteration_estimator = False
+        self.use_adaptivity = False
+        self.use_HotRod = False
+        self.HotRod_tol = np.inf
+        self.store_uold = False
+        self.use_embedded_estimate = False
+        self.use_extrapolation_estimate = False
 
         for k, v in params.items():
             setattr(self, k, v)
