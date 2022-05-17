@@ -29,9 +29,9 @@ class log_data(hooks):
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='dt', value=L.dt)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.e_embedded)
+                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.e_extrapolated)
+                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
 
 
 def single_run(var='dt', val=1e-1, k=5):
@@ -112,7 +112,7 @@ def mulitple_runs(ax, k=5):
     """
 
     # assemble list of dt
-    dt_list = 0.05 * 10.**-(np.arange(20) / 10.)
+    dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
 
     # perform first test
     res = single_run(var='dt', val=dt_list[0], k=k)
@@ -132,14 +132,19 @@ def mulitple_runs(ax, k=5):
 def plot(res, ax, k):
     keys = ['e_embedded', 'e_extrapolated']
     ls = ['-', '--']
-    color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 3]
+    color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
         order = get_accuracy_order(res, key=keys[i], order=k)
         if i == 0:
             label = rf'$k={{{np.mean(order):.2f}}}$'
+            assert abs(np.mean(order) - k) < 1e-1, f'Expected embedded error estimate to have order {k} \
+but got {np.mean(order):.2f}'
+
         else:
             label = None
+            assert abs(np.mean(order) - k - 1) < 1e-1, f'Expected extrapolation error estimate to have order {k+1} \
+but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')
@@ -167,13 +172,14 @@ def get_accuracy_order(results, key='e_embedded', order=5):
     for i in range(1, len(dt_list)):
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
         tmp = np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1])
-        order.append(tmp)
+        if results[key][i] > 1e-14 and results[key][i - 1] > 1e-14:
+            order.append(tmp)
 
     return order
 
 
 def main():
-    ks = [5, 4, 3, 2]
+    ks = [4, 3, 2]
     fig, ax = plt.subplots(1, 1)
     for i in range(len(ks)):
         k = ks[i]

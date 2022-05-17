@@ -86,8 +86,11 @@ class controller_nonMPI(controller):
             if 'restol' in description['level_params'].keys():
                 if description['level_params']['restol'] > 0:
                     description['level_params']['restol'] = 0
-                    print(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to have a consta\
-nt order in time for adaptivity. Setting restol=0')
+                    self.logger.warning(f'I want to do always maxiter={description["step_params"]["maxiter"]} iteration\
+s to have a constant order in time for adaptivity. Setting restol=0')
+        if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
+            self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
+is never triggered!')
         self.error_estimator = ErrorEstimator_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
@@ -769,8 +772,8 @@ nt order in time for adaptivity. Setting restol=0')
                     l.u[:] = l.uold[:]
 
                     # check if a fault is detected
-                    if None not in [l.status.e_extrapolated, l.status.e_embedded]:
-                        diff = l.status.e_extrapolated - l.status.e_embedded
+                    if None not in [l.status.error_extrapolation_estimate, l.status.error_embedded_estimate]:
+                        diff = l.status.error_extrapolation_estimate - l.status.error_embedded_estimate
                         if diff > self.params.HotRod_tol:
                             self.restart[i] = True
 
@@ -791,7 +794,9 @@ nt order in time for adaptivity. Setting restol=0')
 
             # compute next step size
             order = S.status.iter  # embedded error estimate is same order as time marching
-            h_opt = L.params.dt * 0.9 * (L.params.e_tol / L.status.e_embedded)**(1. / order)
+            assert L.status.error_embedded_estimate is not None, 'Make sure to estimate the embedded error before call\
+ing adaptivity!'
+            h_opt = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
             # distribute step sizes
             if len(MS) > 1:
@@ -800,7 +805,7 @@ nt order in time for adaptivity. Setting restol=0')
                 L.params.dt = h_opt
 
             # check whether to move on or restart
-            if L.status.e_embedded >= L.params.e_tol:
+            if L.status.error_embedded_estimate >= L.params.e_tol:
                 self.restart[i] = True
             else:
                 self.restart[i] = False

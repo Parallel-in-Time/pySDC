@@ -122,7 +122,7 @@ class ErrorEstimator_nonMPI:
         for S in MS:
             for L in S.levels:
                 # order rises by one between sweeps, making this so ridiculously easy
-                L.status.e_embedded = abs(L.uold[-1] - L.u[-1])
+                L.status.error_embedded_estimate = abs(L.uold[-1] - L.u[-1])
 
     def extrapolation_estimate(self, MS, root=0):
         """
@@ -144,7 +144,8 @@ class ErrorEstimator_nonMPI:
             for i in range(self.n):
                 u_ex += self.u_coeff[i] * self.u[i] + self.f_coeff[i] * self.f[i]
 
-            MS[root].levels[0].status.e_extrapolated = abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
+            MS[root].levels[0].status.error_extrapolation_estimate = \
+                abs(u_ex - MS[root].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
         if self.params.use_HotRod:
