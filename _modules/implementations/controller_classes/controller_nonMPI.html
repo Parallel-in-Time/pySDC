@@ -130,7 +130,7 @@
 <span class="s1">s to have a constant order in time for adaptivity. Setting restol=0&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_HotRod</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">HotRod_tol</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Hot Rod needs a detection threshold, which is now set to infinity, such that a restart</span><span class="se">\</span>
-<span class="s1">is never triggered!&#39;</span><span class="p">)</span>
+<span class="s1"> is never triggered!&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_estimator</span> <span class="o">=</span> <span class="n">ErrorEstimator_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="controller_nonMPI.check_iteration_estimator"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
