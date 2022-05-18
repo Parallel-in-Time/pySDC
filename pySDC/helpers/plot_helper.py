@@ -2,6 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from distutils.spawn import find_executable
 
+default_mpl_params = mpl.rcParams.copy()
+
 
 def figsize(textwidth, scale, ratio):
     fig_width_pt = textwidth                            # Get this from LaTeX using \the\textwidth
@@ -12,7 +14,10 @@ def figsize(textwidth, scale, ratio):
     return fig_size
 
 
-def setup_mpl(font_size=8):
+def setup_mpl(font_size=8, reset=False):
+    if reset:
+        mpl.rcParams.update(default_mpl_params)
+
     # Set up plotting parameters
     style_options = {  # setup matplotlib to use latex for output
         "font.family": "serif",
