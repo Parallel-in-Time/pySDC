@@ -1,6 +1,6 @@
-import matplotlib
+import matplotlib as mpl
 
-matplotlib.use('Agg')
+mpl.use('Agg')
 
 import matplotlib.pylab as plt
 import numpy as np
@@ -11,6 +11,20 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+
+import pySDC.helpers.plot_helper as plt_helper
+
+
+def setup_mpl(font_size=8):
+    plt_helper.setup_mpl(reset=True)
+    # Set up plotting parameters
+    style_options = {
+        "axes.labelsize": 12,  # LaTeX default is 10pt font.
+        "legend.fontsize": 13,  # Make the legend/label fonts a little smaller
+        "axes.xmargin": 0.03,
+        "axes.ymargin": 0.03,
+    }
+    mpl.rcParams.update(style_options)
 
 
 class log_data(hooks):
@@ -131,7 +145,7 @@ def mulitple_runs(ax, k=5):
 
 def plot(res, ax, k):
     keys = ['e_embedded', 'e_extrapolated']
-    ls = ['-', '--']
+    ls = ['-', ':']
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
@@ -149,7 +163,7 @@ but got {np.mean(order):.2f}'
 
     ax.set_xlabel(r'$\Delta t$')
     ax.set_ylabel(r'$\epsilon$')
-    ax.legend(frameon=False)
+    ax.legend(frameon=False, loc='lower right')
 
 
 def get_accuracy_order(results, key='e_embedded', order=5):
@@ -179,15 +193,16 @@ def get_accuracy_order(results, key='e_embedded', order=5):
 
 
 def main():
+    setup_mpl()
     ks = [4, 3, 2]
-    fig, ax = plt.subplots(1, 1)
+    fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
     for i in range(len(ks)):
         k = ks[i]
         mulitple_runs(k=k, ax=ax)
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
-    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
-    ax.legend(frameon=False)
-    fig.savefig('error_order.pdf', bbox_inches='tight')
+    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
+    ax.legend(frameon=False, loc='lower right')
+    fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
