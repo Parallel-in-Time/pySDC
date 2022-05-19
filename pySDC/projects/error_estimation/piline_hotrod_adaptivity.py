@@ -118,9 +118,10 @@ def plot(stats, use_adaptivity):
         'Solution is wrong!'
 
     if use_adaptivity:
-        assert np.isclose(e_em[-1], 6.48866205210652e-09), 'Embedded error estimate when using adaptivity is wrong!'
-        assert np.isclose(e_ex[-1], 6.565837120935149e-09), 'Extrapolation error when using adaptivity estimate is wro\
-            ng!'
+        assert np.isclose(e_em[-1], 6.48866205210652e-09), f'Embedded error estimate when using adaptivity is wrong!\
+Expected {6.5e-9:.1e}, got {e_em[-1]:.1e}'
+        assert np.isclose(e_ex[-1], 6.565837120935149e-09), f'Extrapolation error when using adaptivity estimate is wro\
+ng! Expected {6.6e-9:.1e}, got {e_ex[-1]:.1e}.'
         assert np.isclose(dt[-1], 0.0535436291079129), 'Time step size is wrong!'
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
         ax.plot(t, v1, label='v1', ls='-')
@@ -160,7 +161,7 @@ def plot(stats, use_adaptivity):
 
 
 def main():
-    for use_adaptivity in [True, False]:
+    for use_adaptivity in [False, True]:
         stats = run(use_adaptivity)
         plot(stats, use_adaptivity)
 

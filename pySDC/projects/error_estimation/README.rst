@@ -67,9 +67,9 @@ The last plot was made without Hot Rod, meaning the last sweep is taken to be th
 
 .. image:: ../../../data/piline_solution_adaptive.png
     :width: 20%
-.. image:: ../../../data/piline_hotrod.png
-    :width: 24%
 .. image:: ../../../data/piline_hotrod_adaptive.png
+    :width: 24%
+.. image:: ../../../data/piline_hotrod.png
     :width: 24%
 .. image:: ../../../data/error_estimate_order.png
     :width: 23%
