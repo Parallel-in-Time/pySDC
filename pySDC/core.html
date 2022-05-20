@@ -630,6 +630,27 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="core.Hooks.hooks.increment_stats">
+<span class="sig-name descname"><span class="pre">increment_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.increment_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.increment_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
+initialize if applicable and to value otherwise</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> – the current process recording this data</p></li>
+<li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – the current level index</p></li>
+<li><p><strong>iter</strong> (<em>int</em>) – the current iteration count</p></li>
+<li><p><strong>sweep</strong> (<em>int</em>) – the current sweep count</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – string to describe the type of value</p></li>
+<li><p><strong>value</strong> – the actual data</p></li>
+<li><p><strong>initialize</strong> – if supplied and data does not exist already, this will be used over value</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="core.Hooks.hooks.post_comm">
 <span class="sig-name descname"><span class="pre">post_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each communication</p>

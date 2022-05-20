@@ -109,6 +109,29 @@
         <span class="c1"># create named tuple for the key and add to dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__entry</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span></div>
 
+<div class="viewcode-block" id="hooks.increment_stats"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.increment_stats">[docs]</a>    <span class="k">def</span> <span class="nf">increment_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">initialize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to</span>
+<span class="sd">        initialize if applicable and to value otherwise</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            process: the current process recording this data</span>
+<span class="sd">            time (float): the current simulation time</span>
+<span class="sd">            level (int): the current level index</span>
+<span class="sd">            iter (int): the current iteration count</span>
+<span class="sd">            sweep (int): the current sweep count</span>
+<span class="sd">            type (str): string to describe the type of value</span>
+<span class="sd">            value: the actual data</span>
+<span class="sd">            initialize: if supplied and data does not exist already, this will be used over value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entry</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">process</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="n">initialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">initialize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
 <div class="viewcode-block" id="hooks.return_stats"><a class="viewcode-back" href="../../pySDC/core.html#core.Hooks.hooks.return_stats">[docs]</a>    <span class="k">def</span> <span class="nf">return_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Getter for the stats</span>
