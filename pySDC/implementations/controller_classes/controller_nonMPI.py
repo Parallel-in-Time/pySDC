@@ -6,7 +6,8 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
-from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI
+#from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI as ErrorEst
+from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI_no_memory_overhead as ErrorEst
 
 
 class controller_nonMPI(controller):
@@ -91,7 +92,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        self.error_estimator = ErrorEstimator_nonMPI(self)
+        self.error_estimator = ErrorEst(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -340,7 +341,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             # call predictor from sweeper
             S.levels[0].sweep.predict()
 
-            if self.params.use_iteration_estimator:
+            if self.store_uold:
                 # store pervious iterate to compute difference later on
                 S.levels[0].uold[:] = S.levels[0].u[:]
 
@@ -552,7 +553,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                 self.hooks.pre_iteration(step=S, level_number=0)
 
                 if self.store_uold:
-                    # store pervious iterate to compute difference later on
+                    # store previous iterate to compute difference later on
                     S.levels[0].uold[:] = S.levels[0].u[:]
 
                 if len(S.levels) > 1:  # MLSDC or PFASST
