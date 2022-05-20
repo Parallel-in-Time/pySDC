@@ -55,8 +55,8 @@ class particles(object):
                 elif isinstance(init[0], int):
                     self.q = np.zeros(init[0])
                     self.m = np.zeros(init[0])
-                self.q[:] = val
-                self.m[:] = val
+                self.q[:] = 1.0
+                self.m[:] = 1.0
             elif isinstance(val, tuple) and len(val) == 4:
                 self.pos = particles.position(init, val=val[0])
                 self.vel = particles.velocity(init, val=val[1])
