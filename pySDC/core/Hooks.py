@@ -69,6 +69,29 @@ class hooks(object):
         # create named tuple for the key and add to dict
         self.__stats[self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)] = value
 
+    def increment_stats(self, process, time, level, iter, sweep, type, value, initialize=None):
+        """
+        Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
+        initialize if applicable and to value otherwise
+
+        Args:
+            process: the current process recording this data
+            time (float): the current simulation time
+            level (int): the current level index
+            iter (int): the current iteration count
+            sweep (int): the current sweep count
+            type (str): string to describe the type of value
+            value: the actual data
+            initialize: if supplied and data does not exist already, this will be used over value
+        """
+        key = self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)
+        if key in self.__stats.keys():
+            self.__stats[key] += value
+        elif initialize is not None:
+            self.__stats[key] = initialize
+        else:
+            self.__stats[key] = value
+
     def return_stats(self):
         """
         Getter for the stats
@@ -83,18 +106,6 @@ class hooks(object):
         Function to reset the stats for multiple runs
         """
         self.__stats = {}
-
-    def count_restarts(self, step, level_number):
-        """
-        Function that counts restarts, take care to call it only once per step to avoid malfunction
-        """
-        level = step.levels[level_number]
-        entry = self.__entry(process=step.status.slot, time=level.time, level=level.level_index, iter=0,
-                             sweep=level.status.sweep, type='restart')
-        if entry in self.__stats.keys():
-            self.__stats[entry] += 1
-        else:
-            self.__stats[entry] = 0
 
     def pre_setup(self, step, level_number):
         """

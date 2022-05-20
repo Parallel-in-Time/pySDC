@@ -22,8 +22,6 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.count_restarts(step, level_number)
-
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
@@ -36,6 +34,10 @@ class log_data(hooks):
                           sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
+        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+                             sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
 def run(use_adaptivity=True):
@@ -115,6 +117,7 @@ def plot(stats, use_adaptivity):
     e_em = np.array(sort_stats(filter_stats(stats, type='e_embedded'), sortby='time'))[:, 1]
     e_ex = np.array(sort_stats(filter_stats(stats, type='e_extrapolated'), sortby='time'))[:, 1]
     restarts = np.array(sort_stats(filter_stats(stats, type='restart'), sortby='time'))[:, 1]
+    sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps'), sortby='time'))[:, 1]
     ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
 
     assert np.allclose([v1[-1], v2[-2], p3[-1]], [83.88431516810506, 80.62596592922169, 16.134334413301595], rtol=1),\
@@ -126,6 +129,7 @@ def plot(stats, use_adaptivity):
             ng!'
         assert np.isclose(dt[-1], 0.0535436291079129), 'Time step size is wrong!'
         assert np.isclose(restarts.sum(), 1), f'Expected 1 restart, got {restarts.sum()}'
+        assert np.isclose(sweeps.sum(), 4296), f'Expected 4296 sweeps, got {sweeps.sum()}'
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
         ax.plot(t, v1, label='v1', ls='-')
         ax.plot(t, v2, label='v2', ls='--')
@@ -138,6 +142,7 @@ def plot(stats, use_adaptivity):
         assert np.isclose(e_ex[-1], 6.541069907939809e-10), 'Extrapolation error estimate is wrong!'
         assert np.isclose(dt[-1], 3e-2), 'Time step size is wrong!'
         assert np.isclose(restarts.sum(), 0), f'Expected 0 restarts, got {restarts.sum()}'
+        assert np.isclose(sweeps.sum(), 2668), f'Expected 2668 sweeps, got {sweeps.sum()}'
 
     fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
     ax.plot(t, dt, color='black')
