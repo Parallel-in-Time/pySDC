@@ -2,7 +2,7 @@ import numpy as np
 from scipy.special import factorial
 
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-from pySDC.core.Errors import DataError
+from pySDC.core.Errors import DataError, ParameterError
 
 
 class ErrorEstimator:
@@ -27,12 +27,15 @@ class ErrorEstimator:
 
         # important: the variables to store the solutions etc. are defined in the children classes
         self.n = (self.order + 1) // 2  # since we store u and f, we need only half of each (the +1 is for rounding)
-        self.n_per_proc = int(np.ceil(self.n / size))  # number of steps that each step needs to store
+        self.n_per_proc = max([int(np.ceil(self.n / size)),2])  # number of steps that each step needs to store
         self.u_coeff = [None] * self.n
         self.f_coeff = [0.] * self.n
 
     def communicate_time(self):
         raise NotImplementedError('Please implement a function to communicate the time and step sizes!')
+
+    def communicate(self):
+        raise NotImplementedError('Please implement a function to communicates the solution etc.!')
 
     def get_extrapolation_coefficients(self):
         """
@@ -57,7 +60,7 @@ class ErrorEstimator:
         j = np.arange(self.order)
         inv_facs = 1. / factorial(j)
         idx = np.argsort(t)
-        steps_from_now = -np.cumsum([dt[idx[i]] for i in range(len(t))][::-1])[::-1]
+        steps_from_now = -np.cumsum([dt[idx[i]] for i in range(len(t)-self.n,len(t),1)][::-1])[::-1]
         for i in range(1, self.order):
             A[i, :self.n] = steps_from_now**j[i] * inv_facs[i]
             A[i, self.n:self.order] = steps_from_now[2 * self.n - self.order:]**(j[i] - 1) * inv_facs[i - 1]
@@ -100,7 +103,7 @@ class ErrorEstimator:
                 works with types imex_mesh and mesh')
 
             self.u[oldest_val] = S.levels[0].u[-1]
-            self.t[oldest_val] = S.levels[0].time + S.levels[0].dt
+            self.t[oldest_val] = float(S.levels[0].time) + float(S.levels[0].dt)
             self.dt[oldest_val] = S.levels[0].dt
 
     def embedded_estimate(self, S):
@@ -120,13 +123,20 @@ class ErrorEstimator:
             if None in self.u_coeff or self.params.use_adaptivity:
                 self.get_extrapolation_coefficients()
 
+            self.communicate()
+
             if len(S.levels) > 1:
                 raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
 
             u_ex = S.levels[0].u[-1] * 0.
             idx = np.argsort(self.t)
+            if (abs(S.levels[0].time - self.t) < 10. * np.finfo(float).eps).any() and False:
+                idx_step = idx[np.argmin(abs(self.t-S.levels[0].time))]
+            else:
+                idx_step = max(idx)+1
+            mask = np.logical_and(idx < idx_step, idx >= idx_step-self.n)
             for i in range(self.n):
-                u_ex += self.u_coeff[i] * self.u[idx[i]] + self.f_coeff[i] * self.f[idx[i]]
+                u_ex += self.u_coeff[i] * self.u[idx[mask][i]] + self.f_coeff[i] * self.f[idx[mask][i]]
 
             S.levels[0].status.error_extrapolation_estimate = \
                 abs(u_ex - S.levels[0].u[-1]) * self.prefactor
@@ -171,6 +181,9 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
     def communicate_time(self):
         return self.t, self.dt
 
+    def communicate(self):
+        pass
+
     def estimate(self, MS):
         for S in MS:
             super(ErrorEstimator_nonMPI, self).estimate(S)
@@ -182,3 +195,78 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         self.f = [None] * self.n_per_proc * size
         self.t = np.array([None] * self.n_per_proc * size)
         self.dt = np.array([None] * self.n_per_proc * size)
+
+
+class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
+    def __init__(self, controller):
+        super(ErrorEstimator_nonMPI_no_memory_overhead, self).__init__(controller)
+
+    def store_values(self, MS):
+        """
+        Store the required attributes of the step to do the extrapolation. We only care about the last collocation
+        node on the finest level at the moment.
+        """
+        for S in MS:
+            if self.params.use_extrapolation_estimate:
+                # figure out which values are to be replaced by the new ones
+                if None in self.t:
+                    oldest_val = len(self.t) - len(self.t[self.t == [None]])
+                else:
+                    oldest_val = np.argmin(self.t)
+
+                self.t[oldest_val] = float(S.levels[0].time) + float(S.levels[0].dt)
+                self.dt[oldest_val] = S.levels[0].dt
+
+    def setup_extrapolation(self, controller, order, size):
+        super(ErrorEstimator_nonMPI_no_memory_overhead, self).setup_extrapolation(controller, order, size)
+        if len(controller.MS) < self.n + 1:
+            raise ParameterError(f'Error estimation for order {self.order} Taylor expansion without overhead only works with at least\
+ {self.n+1} processes, not {size} processes.')
+
+    def extrapolation_estimate(self, MS):
+        """
+        The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
+        solution obtained by the time marching scheme.
+        """
+        self.dt = np.array([S.levels[0].dt for S in MS])
+        self.t = np.array([S.levels[0].time for S in MS]) + self.dt
+
+        if len(MS) > self.n:
+            if None in self.u_coeff or self.params.use_adaptivity:
+                self.get_extrapolation_coefficients()
+
+            if len(MS[-1].levels) > 1:
+                raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
+
+            for j in range(1, len(MS) - self.n + 1):
+                u_ex = MS[-1].levels[0].u[-1] * 0.
+                for i in range(1,self.n+1):
+                    L = MS[-i-j].levels[0]
+                    if type(L.f[-1]) == imex_mesh:
+                        u_ex += self.u_coeff[-i] * L.u[-1] + self.f_coeff[-i] * (L.f[-1].impl + L.f[-1].expl)
+                    elif type(L.f[-1]) == mesh:
+                        u_ex += self.u_coeff[-i] * L.u[-1] + self.f_coeff[-i] * L.f[-1]
+                    else:
+                        raise DataError(f'Datatype {type(L.f[-1])} not supported by parallel extrapolation error estimate!')
+                MS[-j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[-j].levels[0].u[-1]) * self.prefactor
+
+    def estimate(self, MS):
+        if self.params.use_HotRod:
+            if MS[0].status.iter == MS[0].params.maxiter - 1:
+                self.extrapolation_estimate(MS)
+            elif MS[0].status.iter == MS[0].params.maxiter:
+                for i in range(len(MS)):
+                    S = MS[i]
+                    self.embedded_estimate(S)
+                    S.levels[0].status.error_embedded_estimate /= float(i+1)
+
+        else:
+            # only estimate errors when last sweep is performed and not when doing Hot Rod
+            if MS[0].status.iter == MS[0].params.maxiter:
+
+                if self.params.use_extrapolation_estimate:
+                    self.extrapolation_estimate(MS)
+
+                if self.params.use_embedded_estimate or self.params.use_adaptivity:
+                    for S in MS:
+                        self.embedded_estimate(S)
