@@ -1,5 +1,8 @@
 import numpy as np
 
+from scipy.interpolate import interp1d
+from scipy.optimize import fsolve
+
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
@@ -34,6 +37,52 @@ class battery(ptype):
                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
                                              
         self.A = np.zeros((2, 2))
+        
+        
+    #def switch_estimator(t, u, t_guess, Vref, t_next):
+    #    """
+    #        Function to estimate a discrete event (switch)
+        
+    #        Args:
+    #            t:          time subinterval to use for interpolation
+    #            u:          y-values to use for interpolation
+    #            t_guess:    (scalar) initial guess to find the root (the discrete event)
+    #            Vref:       reference value which initiales 
+    #            t_next:     time subinterval to check for discrete event
+            
+    #        Return:
+    #            t_switch:   time point of the switch
+    #            flag_event: True, when an event occurs, and False, when not
+    #    """
+    
+    #    p = interp1d(t, u, 'cubic')
+    
+    #    def switch_examiner(x):
+    #        """
+    #        	Routine to define root problem
+            
+    #        	Args:
+    #           	    x:      Value to be evaluated on
+                
+    #        	Return:
+    #                Function for predict the switch as root problem
+    #        """
+    
+    #   	    return Vref - p(x)
+        
+    #    t_switch = fsolve(switch_examiner, t_guess)
+    
+    #	# Looking for the event
+    #    flag_event = []    
+    #    for m in range(len(t_next)-1):
+    #        if t_next[m] <= root <= t_next[m+1]:
+    #            flag_event.append(True)
+            
+    #        else:
+    #            flag_event.append(False)
+    
+    #    return t_switch, any(flag_event)
+    
         
     def eval_f(self, u, t):
         """
