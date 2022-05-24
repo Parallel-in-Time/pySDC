@@ -1,11 +1,9 @@
 import numpy as np
 
-from scipy.interpolate import interp1d
-from scipy.optimize import fsolve
-
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
+
 
 class battery(ptype):
     """
@@ -13,7 +11,7 @@ class battery(ptype):
     Attributes:
         A: system matrix, representing the 2 ODEs
     """
-    
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
@@ -24,66 +22,20 @@ class battery(ptype):
         """
 
         problem_params['nvars'] = 2
-        
+
         # these parameters will be used later, so assert their existence
         essential_keys = ['Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
-                
+
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(battery, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
-                                             
+                                      dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+
         self.A = np.zeros((2, 2))
-        
-        
-    #def switch_estimator(t, u, t_guess, Vref, t_next):
-    #    """
-    #        Function to estimate a discrete event (switch)
-        
-    #        Args:
-    #            t:          time subinterval to use for interpolation
-    #            u:          y-values to use for interpolation
-    #            t_guess:    (scalar) initial guess to find the root (the discrete event)
-    #            Vref:       reference value which initiales 
-    #            t_next:     time subinterval to check for discrete event
-            
-    #        Return:
-    #            t_switch:   time point of the switch
-    #            flag_event: True, when an event occurs, and False, when not
-    #    """
-    
-    #    p = interp1d(t, u, 'cubic')
-    
-    #    def switch_examiner(x):
-    #        """
-    #        	Routine to define root problem
-            
-    #        	Args:
-    #           	    x:      Value to be evaluated on
-                
-    #        	Return:
-    #                Function for predict the switch as root problem
-    #        """
-    
-    #   	    return Vref - p(x)
-        
-    #    t_switch = fsolve(switch_examiner, t_guess)
-    
-    #	# Looking for the event
-    #    flag_event = []    
-    #    for m in range(len(t_next)-1):
-    #        if t_next[m] <= root <= t_next[m+1]:
-    #            flag_event.append(True)
-            
-    #        else:
-    #            flag_event.append(False)
-    
-    #    return t_switch, any(flag_event)
-    
-        
+
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -93,18 +45,18 @@ class battery(ptype):
         Returns:
             dtype_f: the RHS
         """
-        
+
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
-        
+
         if u[1] <= self.params.V_ref:
             f.expl[0] = self.params.Vs / self.params.L
-        
+
         else:
             f.expl[0] = 0
-            
+
         return f
-        
+
     def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-factor*A)u = rhs
@@ -117,17 +69,17 @@ class battery(ptype):
             dtype_u: solution as mesh
         """
         self.A = np.zeros((2, 2))
-        
+
         if rhs[1] <= self.params.V_ref:
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-        
+
         else:
             self.A[1, 1] = -1 / (self.params.C * self.params.R)
-            
+
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
         return me
-        
+
     def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
@@ -136,7 +88,7 @@ class battery(ptype):
         Returns:
             dtype_u: exact solution
         """
-        
+
         me = self.dtype_u(self.init)
 
         me[0] = 0.0  # cL
