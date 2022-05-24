@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import namedtuple
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -21,6 +22,7 @@ class log_data(hooks):
         L = step.levels[level_number]
 
         L.sweep.compute_end_point()
+
 
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
@@ -47,7 +49,7 @@ def run(use_adaptivity=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['dt'] = 3e-2
+    level_params['dt'] = 3e+2
     level_params['e_tol'] = 1e-8
 
     # initialize sweeper parameters
@@ -89,7 +91,7 @@ def run(use_adaptivity=True):
 
     # set time parameters
     t0 = 0.0
-    Tend = 2e1
+    Tend = 2e0
 
     # instantiate controller
     controller_class = controller_nonMPI
@@ -119,6 +121,8 @@ def plot(stats, use_adaptivity):
     restarts = np.array(sort_stats(filter_stats(stats, type='restart'), sortby='time'))[:, 1]
     sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps'), sortby='time'))[:, 1]
     ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
+    restarts = np.array(sort_stats(filter_stats(stats, type='restart'), sortby='time'))[:, 1]
+    print(restarts)
 
     assert np.allclose([v1[-1], v2[-2], p3[-1]], [83.88431516810506, 80.62596592922169, 16.134334413301595], rtol=1),\
         'Solution is wrong!'
@@ -171,10 +175,9 @@ ng! Expected {6.6e-9:.1e}, got {e_ex[-1]:.1e}.'
 
 
 def main():
-    for use_adaptivity in [False, True]:
+    for use_adaptivity in [True, False]:
         stats = run(use_adaptivity)
         plot(stats, use_adaptivity)
-
 
 if __name__ == "__main__":
     main()
