@@ -20,7 +20,8 @@ def main():
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-10
-    level_params['dt'] = 1e-3
+    level_params['e_tol'] = 1e-5
+    level_params['dt'] = 1e-4
     
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -38,7 +39,7 @@ def main():
     problem_params['C'] = 1
     problem_params['R'] = 1
     problem_params['L'] = 1
-    problem_params['alpha'] = 5
+    problem_params['alpha'] = 10
     problem_params['V_ref'] = 1
     
     # initialize step parameters
@@ -47,6 +48,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
+    controller_params['use_adaptivity'] = True
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data_battery
     
@@ -61,7 +63,7 @@ def main():
     
     # set time parameters
     t0 = 0.0
-    Tend = 3
+    Tend = 2.33
     
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
