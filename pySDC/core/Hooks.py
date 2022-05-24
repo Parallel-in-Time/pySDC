@@ -107,6 +107,14 @@ class hooks(object):
         """
         self.__stats = {}
 
+    def count_restarts(self, step, level_number):
+        level = step.levels[level_number]
+        entry = self.__entry(process=step.status.slot, time=level.time, level=level.level_index, iter=0, sweep=level.status.sweep, type='restart')
+        if entry in self.__stats.keys():
+            self.__stats[entry] += 1
+        else:
+            self.__stats[entry] = 0
+
     def pre_setup(self, step, level_number):
         """
         Default routine called before setup starts

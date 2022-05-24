@@ -6,8 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
-#from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI as ErrorEst
-from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI_no_memory_overhead as ErrorEst
+from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI, ErrorEstimator_nonMPI_no_memory_overhead
 
 
 class controller_nonMPI(controller):
@@ -92,7 +91,12 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        self.error_estimator = ErrorEst(self)
+        if len(self.MS) == (description['step_params']['maxiter'] + 4) // 2:
+            self.error_estimator = ErrorEstimator_nonMPI_no_memory_overhead(self)
+        elif len(self.MS) == 1:
+            self.error_estimator = ErrorEstimator_nonMPI(self)
+        else:
+            raise NotImplementedError
 
     def check_iteration_estimator(self, MS):
         """

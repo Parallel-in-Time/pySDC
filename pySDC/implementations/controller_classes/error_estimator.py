@@ -258,7 +258,6 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
                 for i in range(len(MS)):
                     S = MS[i]
                     self.embedded_estimate(S)
-                    S.levels[0].status.error_embedded_estimate /= float(i+1)
 
         else:
             # only estimate errors when last sweep is performed and not when doing Hot Rod
