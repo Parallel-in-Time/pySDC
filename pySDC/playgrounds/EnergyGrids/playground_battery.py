@@ -2,7 +2,7 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.helpers.visualization_tools import show_residual_across_simulation
+#from pySDC.helpers.visualization_tools import show_residual_across_simulation
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
@@ -21,7 +21,7 @@ def main():
     level_params = dict()
     level_params['restol'] = 1E-10
     level_params['e_tol'] = 1e-5
-    level_params['dt'] = 1e-4
+    level_params['dt'] = 1e-3
     
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -63,7 +63,7 @@ def main():
     
     # set time parameters
     t0 = 0.0
-    Tend = 2.33
+    Tend = 4
     
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -138,4 +138,4 @@ def plot_residuals(cwd='./'):
 if __name__ == "__main__":
     main()
     plot_voltages()
-    plot_residuals()
+    #plot_residuals()
