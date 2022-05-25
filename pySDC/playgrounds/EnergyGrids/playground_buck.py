@@ -3,7 +3,7 @@ import dill
 from scipy.integrate import solve_ivp
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -24,7 +24,9 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['collocation_class'] = Collocation
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
