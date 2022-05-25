@@ -185,8 +185,24 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         pass
 
     def estimate(self, MS):
-        for S in MS:
-            super(ErrorEstimator_nonMPI, self).estimate(S)
+        for i in range(len(MS)-1, -1, -1):
+            S = MS[i]
+            if self.params.use_HotRod:
+                if S.status.iter == S.params.maxiter - 1:
+                    self.extrapolation_estimate(S)
+                elif S.status.iter == S.params.maxiter:
+                    self.embedded_estimate_local_error(MS[:i+1])
+                    break
+
+            else:
+                # only estimate errors when last sweep is performed and not when doing Hot Rod
+                if S.status.iter == S.params.maxiter:
+
+                    if self.params.use_extrapolation_estimate:
+                        self.extrapolation_estimate(S)
+
+                    if self.params.use_embedded_estimate or self.params.use_adaptivity:
+                        self.embedded_estimate_local_error(MS[:i+1])
 
     def setup_extrapolation(self, controller, order, size):
         super(ErrorEstimator_nonMPI, self).setup_extrapolation(controller, order, size)
@@ -195,6 +211,23 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         self.f = [None] * self.n_per_proc * size
         self.t = np.array([None] * self.n_per_proc * size)
         self.dt = np.array([None] * self.n_per_proc * size)
+
+    def embedded_estimate_local_error(self, MS):
+        """
+        In block Gauss-Seidel SDC, the embedded estimate actually estimates sort of the global error within the block,
+        since the second to last sweep is from an entirely k-1 order method so to speak. This means the regular
+        embedded method here yields this semi-global error and we get the local error as the difference of consecutive
+        semi-global errors.
+        """
+        # prepare a list to store all errors in
+        semi_global_errors = np.array([[0.] * len(MS[0].levels)] * (len(MS)+1))
+
+        for i in range(len(MS)):
+            S = MS[i]
+            for j in range(len(S.levels)):
+                L = S.levels[j]
+                semi_global_errors[i][j] = max([abs(L.uold[-1] - L.u[-1]), np.finfo(float).eps])
+                L.status.error_embedded_estimate = abs(semi_global_errors[i][j] - semi_global_errors[i - 1][j])
 
 
 class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
@@ -251,21 +284,20 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
                 MS[-j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[-j].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
-        if self.params.use_HotRod:
-            if MS[0].status.iter == MS[0].params.maxiter - 1:
-                self.extrapolation_estimate(MS)
-            elif MS[0].status.iter == MS[0].params.maxiter:
-                for i in range(len(MS)):
-                    S = MS[i]
-                    self.embedded_estimate(S)
+        for i in range(len(MS)):
+            S = MS[i]
+            if self.params.use_HotRod:
+                if S.status.iter == S.params.maxiter - 1:
+                    self.extrapolation_estimate(MS[:i+1])
+                elif S.status.iter == S.params.maxiter:
+                    self.embedded_estimate_local_error(MS[:i+1])
 
-        else:
-            # only estimate errors when last sweep is performed and not when doing Hot Rod
-            if MS[0].status.iter == MS[0].params.maxiter:
+            else:
+                # only estimate errors when last sweep is performed and not when doing Hot Rod
+                if S.status.iter == S.params.maxiter:
 
-                if self.params.use_extrapolation_estimate:
-                    self.extrapolation_estimate(MS)
+                    if self.params.use_extrapolation_estimate:
+                        self.extrapolation_estimate(MS[:i+1])
 
-                if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                    for S in MS:
-                        self.embedded_estimate(S)
+                    if self.params.use_embedded_estimate or self.params.use_adaptivity:
+                        self.embedded_estimate_local_error(MS[:i+1])
