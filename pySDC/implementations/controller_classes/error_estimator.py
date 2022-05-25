@@ -27,7 +27,7 @@ class ErrorEstimator:
 
         # important: the variables to store the solutions etc. are defined in the children classes
         self.n = (self.order + 1) // 2  # since we store u and f, we need only half of each (the +1 is for rounding)
-        self.n_per_proc = max([int(np.ceil(self.n / size)),2])  # number of steps that each step needs to store
+        self.n_per_proc = max([int(np.ceil(self.n / size)), 2])  # number of steps that each step needs to store
         self.u_coeff = [None] * self.n
         self.f_coeff = [0.] * self.n
 
@@ -60,7 +60,7 @@ class ErrorEstimator:
         j = np.arange(self.order)
         inv_facs = 1. / factorial(j)
         idx = np.argsort(t)
-        steps_from_now = -np.cumsum([dt[idx[i]] for i in range(len(t)-self.n,len(t),1)][::-1])[::-1]
+        steps_from_now = -np.cumsum([dt[idx[i]] for i in range(len(t) - self.n, len(t), 1)][::-1])[::-1]
         for i in range(1, self.order):
             A[i, :self.n] = steps_from_now**j[i] * inv_facs[i]
             A[i, self.n:self.order] = steps_from_now[2 * self.n - self.order:]**(j[i] - 1) * inv_facs[i - 1]
@@ -131,10 +131,10 @@ class ErrorEstimator:
             u_ex = S.levels[0].u[-1] * 0.
             idx = np.argsort(self.t)
             if (abs(S.levels[0].time - self.t) < 10. * np.finfo(float).eps).any() and False:
-                idx_step = idx[np.argmin(abs(self.t-S.levels[0].time))]
+                idx_step = idx[np.argmin(abs(self.t - S.levels[0].time))]
             else:
-                idx_step = max(idx)+1
-            mask = np.logical_and(idx < idx_step, idx >= idx_step-self.n)
+                idx_step = max(idx) + 1
+            mask = np.logical_and(idx < idx_step, idx >= idx_step - self.n)
             for i in range(self.n):
                 u_ex += self.u_coeff[i] * self.u[idx[mask][i]] + self.f_coeff[i] * self.f[idx[mask][i]]
 
@@ -185,13 +185,13 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         pass
 
     def estimate(self, MS):
-        for i in range(len(MS)-1, -1, -1):
+        for i in range(len(MS) - 1, -1, -1):
             S = MS[i]
             if self.params.use_HotRod:
                 if S.status.iter == S.params.maxiter - 1:
                     self.extrapolation_estimate(S)
                 elif S.status.iter == S.params.maxiter:
-                    self.embedded_estimate_local_error(MS[:i+1])
+                    self.embedded_estimate_local_error(MS[:i + 1])
                     break
 
             else:
@@ -202,7 +202,7 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
                         self.extrapolation_estimate(S)
 
                     if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                        self.embedded_estimate_local_error(MS[:i+1])
+                        self.embedded_estimate_local_error(MS[:i + 1])
 
     def setup_extrapolation(self, controller, order, size):
         super(ErrorEstimator_nonMPI, self).setup_extrapolation(controller, order, size)
@@ -220,7 +220,7 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         semi-global errors.
         """
         # prepare a list to store all errors in
-        semi_global_errors = np.array([[0.] * len(MS[0].levels)] * (len(MS)+1))
+        semi_global_errors = np.array([[0.] * len(MS[0].levels)] * (len(MS) + 1))
 
         for i in range(len(MS)):
             S = MS[i]
@@ -253,8 +253,8 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
     def setup_extrapolation(self, controller, order, size):
         super(ErrorEstimator_nonMPI_no_memory_overhead, self).setup_extrapolation(controller, order, size)
         if len(controller.MS) < self.n + 1:
-            raise ParameterError(f'Error estimation for order {self.order} Taylor expansion without overhead only works with at least\
- {self.n+1} processes, not {size} processes.')
+            raise ParameterError(f'Error estimation for order {self.order} Taylor expansion without overhead only work\
+ with at least {self.n+1} processes, not {size} processes.')
 
     def extrapolation_estimate(self, MS):
         """
@@ -273,31 +273,33 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
 
             for j in range(1, len(MS) - self.n + 1):
                 u_ex = MS[-1].levels[0].u[-1] * 0.
-                for i in range(1,self.n+1):
-                    L = MS[-i-j].levels[0]
+                for i in range(1, self.n + 1):
+                    L = MS[-i - j].levels[0]
                     if type(L.f[-1]) == imex_mesh:
                         u_ex += self.u_coeff[-i] * L.u[-1] + self.f_coeff[-i] * (L.f[-1].impl + L.f[-1].expl)
                     elif type(L.f[-1]) == mesh:
                         u_ex += self.u_coeff[-i] * L.u[-1] + self.f_coeff[-i] * L.f[-1]
                     else:
-                        raise DataError(f'Datatype {type(L.f[-1])} not supported by parallel extrapolation error estimate!')
-                MS[-j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[-j].levels[0].u[-1]) * self.prefactor
+                        raise DataError(f'Datatype {type(L.f[-1])} not supported by parallel extrapolation error estim\
+ate!')
+                MS[-j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[-j].levels[0].u[-1]) *\
+                    self.prefactor
 
     def estimate(self, MS):
         for i in range(len(MS)):
             S = MS[i]
             if self.params.use_HotRod:
                 if S.status.iter == S.params.maxiter - 1:
-                    self.extrapolation_estimate(MS[:i+1])
+                    self.extrapolation_estimate(MS[:i + 1])
                 elif S.status.iter == S.params.maxiter:
-                    self.embedded_estimate_local_error(MS[:i+1])
+                    self.embedded_estimate_local_error(MS[:i + 1])
 
             else:
                 # only estimate errors when last sweep is performed and not when doing Hot Rod
                 if S.status.iter == S.params.maxiter:
 
                     if self.params.use_extrapolation_estimate:
-                        self.extrapolation_estimate(MS[:i+1])
+                        self.extrapolation_estimate(MS[:i + 1])
 
                     if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                        self.embedded_estimate_local_error(MS[:i+1])
+                        self.embedded_estimate_local_error(MS[:i + 1])
