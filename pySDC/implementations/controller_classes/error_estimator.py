@@ -75,7 +75,7 @@ class ErrorEstimator:
         self.f_coeff[self.n * 2 - self.order:] = coeff[self.n:self.order]
 
         # determine prefactor
-        r = abs(self.dt / self.dt[-1])**(self.order - 1)
+        r = abs(self.dt[len(self.dt) - len(self.u_coeff):] / self.dt[-1])**(self.order - 1)
         inv_prefactor = -sum(r[1:]) - 1.
         for i in range(len(self.u_coeff)):
             inv_prefactor += sum(r[1: i + 1]) * self.u_coeff[i]
@@ -112,7 +112,7 @@ class ErrorEstimator:
         """
         for L in S.levels:
             # order rises by one between sweeps, making this so ridiculously easy
-            L.status.error_embedded_estimate = abs(L.uold[-1] - L.u[-1])
+            L.status.error_embedded_estimate = max([abs(L.uold[-1] - L.u[-1]), np.finfo(float).eps])
 
     def extrapolation_estimate(self, S):
         """

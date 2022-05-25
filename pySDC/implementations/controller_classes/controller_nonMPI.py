@@ -91,7 +91,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        if len(self.MS) == (description['step_params']['maxiter'] + 4) // 2:
+        if len(self.MS) == (description['step_params']['maxiter'] + 4) // 2 or len(self.MS)>1: # change later!!!!!!
             self.error_estimator = ErrorEstimator_nonMPI_no_memory_overhead(self)
         elif len(self.MS) == 1:
             self.error_estimator = ErrorEstimator_nonMPI(self)
