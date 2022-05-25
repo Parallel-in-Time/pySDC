@@ -13,27 +13,40 @@
         <h1>Coverage report:
             <span class="pc_cov">67%</span>
         </h1>
-        <div id="help_panel_wrapper">
+        <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
             <label for="help_panel_state">
                 <img id="keyboard_icon" src="keybd_closed.png" alt="Show/hide keyboard shortcuts" />
             </label>
             <div id="help_panel">
                 <p class="legend">Shortcuts on this page</p>
-                <div>
-                    <p class="keyhelp">
+                <div class="keyhelp">
+                    <p>
                         <kbd>n</kbd>
                         <kbd>s</kbd>
                         <kbd>m</kbd>
                         <kbd>x</kbd>
-                        <kbd>c</kbd> &nbsp; change column sorting
+                        <kbd>c</kbd>
+                        &nbsp; change column sorting
+                    </p>
+                    <p>
+                        <kbd>[</kbd>
+                        <kbd>]</kbd>
+                        &nbsp; prev/next file
+                    </p>
+                    <p>
+                        <kbd>?</kbd> &nbsp; show/hide this help
                     </p>
                 </div>
             </div>
-        </div>
+        </aside>
         <form id="filter_container">
             <input id="filter" type="text" value="" placeholder="filter..." />
         </form>
+        <p class="text">
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.4</a>,
+            created at 2022-05-25 06:11 +0000
+        </p>
     </div>
 </header>
 <main id="index">
@@ -348,6 +361,13 @@
                 <td>1</td>
                 <td>3</td>
                 <td class="right" data-ratio="39 40">98%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_91faa57f8583c837_Battery_py.html">pySDC/implementations/problem_classes/Battery.py</a></td>
+                <td>33</td>
+                <td>33</td>
+                <td>2</td>
+                <td class="right" data-ratio="0 33">0%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_91faa57f8583c837_Boussinesq_2D_FD_imex_py.html">pySDC/implementations/problem_classes/Boussinesq_2D_FD_imex.py</a></td>
@@ -1522,10 +1542,10 @@
         <tfoot>
             <tr class="total">
                 <td class="name left">Total</td>
-                <td>16696</td>
-                <td>5520</td>
-                <td>1051</td>
-                <td class="right" data-ratio="11176 16696">67%</td>
+                <td>16729</td>
+                <td>5553</td>
+                <td>1053</td>
+                <td class="right" data-ratio="11176 16729">67%</td>
             </tr>
         </tfoot>
     </table>
@@ -1537,10 +1557,17 @@
 <footer>
     <div class="content">
         <p>
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.3.3</a>,
-            created at 2022-05-20 17:09 +0000
+            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.4</a>,
+            created at 2022-05-25 06:11 +0000
         </p>
     </div>
+    <aside class="hidden">
+        <a id="prevFileLink" class="nav" href="d_37e09edbaf161c0a_HookClass_error_output_py.html"/>
+        <a id="nextFileLink" class="nav" href="d_8d0d803e4e125e5c_BaseTransfer_py.html"/>
+        <button type="button" class="button_prev_file" data-shortcut="["/>
+        <button type="button" class="button_next_file" data-shortcut="]"/>
+        <button type="button" class="button_show_hide_help" data-shortcut="?"/>
+    </aside>
 </footer>
 </body>
 </html>
