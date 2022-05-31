@@ -107,14 +107,6 @@ class hooks(object):
         """
         self.__stats = {}
 
-    def count_restarts(self, step, level_number):
-        level = step.levels[level_number]
-        entry = self.__entry(process=step.status.slot, time=level.time, level=level.level_index, iter=0, sweep=level.status.sweep, type='restart')
-        if entry in self.__stats.keys():
-            self.__stats[entry] += 1
-        else:
-            self.__stats[entry] = 0
-
     def pre_setup(self, step, level_number):
         """
         Default routine called before setup starts
@@ -273,6 +265,8 @@ class hooks(object):
                           sweep=L.status.sweep, type='niter', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
                           sweep=L.status.sweep, type='residual_post_step', value=L.status.residual)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
+                          sweep=L.status.sweep, type='recomputed', value=step.status.restart)
 
     def post_predict(self, step, level_number):
         """
