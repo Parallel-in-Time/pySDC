@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=False):
+def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -33,7 +33,7 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
                 (k.type == type or type is None):
 
             if k.time in restarts[:, 0]:
-                if restarts[restarts[:, 0] == k.time][0, 1] == 0:
+                if restarts[restarts[:, 0] == k.time][0, 1] == float(recomputed):
                     result[k] = v
             else:
                 result[k] = v
