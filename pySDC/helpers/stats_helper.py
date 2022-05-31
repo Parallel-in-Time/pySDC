@@ -1,5 +1,7 @@
+import numpy as np
 
-def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None):
+
+def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=False):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -13,8 +15,15 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
     Returns:
         dict: dictionary containing only the entries corresponding to the filter
     """
-
     result = {}
+
+    # check which steps have been recomputed
+    if recomputed is not None:
+        restarts = np.array(sort_stats(filter_stats(stats, process=None, time=None, iter=None, type='recomputed',
+                            recomputed=None), sortby='time'))
+    else:
+        restarts = np.array([[None, None]])
+
     for k, v in stats.items():
         # get data if key matches the filter (if specified)
         if (k.time == time or time is None) and \
@@ -22,7 +31,12 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
                 (k.level == level or level is None) and \
                 (k.iter == iter or iter is None) and \
                 (k.type == type or type is None):
-            result[k] = v
+
+            if k.time in restarts[:, 0]:
+                if restarts[restarts[:, 0] == k.time][0, 1] == 0:
+                    result[k] = v
+            else:
+                result[k] = v
 
     return result
 
