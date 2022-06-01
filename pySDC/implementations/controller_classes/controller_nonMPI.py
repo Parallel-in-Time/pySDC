@@ -6,8 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
-from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI, \
-    ErrorEstimator_nonMPI_no_memory_overhead
+from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI
 
 
 class controller_nonMPI(controller):
@@ -92,12 +91,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        if len(self.MS) >= (description['step_params']['maxiter'] + 4) // 2:
-            self.error_estimator = ErrorEstimator_nonMPI_no_memory_overhead(self)
-        elif len(self.MS) == 1:
-            self.error_estimator = ErrorEstimator_nonMPI(self)
-        else:
-            raise NotImplementedError(f'No error estimator for {len(self.MS)} processes!')
+        self.error_estimator = ErrorEstimator_nonMPI().get_estimator(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -271,6 +265,8 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         for p in active_slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
+
+        self.restart = [False] * len(self.MS)
 
     @staticmethod
     def recv(target, source, tag=None):
@@ -776,7 +772,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
 
         # make sure controller and steps are on the same page about restarting
         for p in range(len(local_MS_running)):
-            local_MS_running[p].status.restart = local_MS_running[p].status.restart or any(self.restart[:p])
+            local_MS_running[p].status.restart = local_MS_running[p].status.restart or any(self.restart[:p + 1])
             self.restart[p] = local_MS_running[p].status.restart
 
     def hotrod(self, local_MS_running):
@@ -830,12 +826,10 @@ ing adaptivity!'
             if L.status.error_embedded_estimate >= L.params.e_tol:
                 self.restart[i] = True
                 S.status.restart = True
-            else:
-                self.restart[i] = False
 
     def adaptivity_update_step_sizes(self, active_slots):
         """
-        Update the step sizes computed in adaptivity here, since this is different for different versions of PinT
+        Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate
         """
         # figure out where the block is restarted
         if True in self.restart:
@@ -849,6 +843,7 @@ ing adaptivity!'
             l = self.MS[restart_at].levels[i]
             new_steps[i] = l.status.dt_new if l.status.dt_new is not None else l.params.dt
 
+        # spread the step sizes to all levels
         for j in range(len(active_slots)):
             # get slot number
             p = active_slots[j]
