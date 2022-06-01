@@ -2,10 +2,16 @@ import numpy as np
 from scipy.special import factorial
 
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-from pySDC.core.Errors import DataError, ParameterError
+from pySDC.core.Errors import DataError
 
 
-class ErrorEstimator:
+class _ErrorEstimatorBase:
+    """
+
+    This class should be the parent of all error estimator classes, MPI and nonMPI and provide all functions that can
+    be shared.
+
+    """
 
     def __init__(self, controller, order, size):
         self.params = controller.params
@@ -19,6 +25,10 @@ class ErrorEstimator:
         a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are
         initialized which are needed for this process.
         """
+        # check if we can handle the parameters
+        if not controller.MS[0].levels[0].sweep.coll.right_is_node:
+            raise NotImplementedError('I don\'t know what to do if the last collocation node is not the end point')
+
         # determine the order of the Taylor expansion to be higher than that of the time marching scheme
         if self.params.use_HotRod:
             self.order = order - 1 + 2
@@ -27,7 +37,7 @@ class ErrorEstimator:
 
         # important: the variables to store the solutions etc. are defined in the children classes
         self.n = (self.order + 1) // 2  # since we store u and f, we need only half of each (the +1 is for rounding)
-        self.n_per_proc = max([int(np.ceil(self.n / size)), 2])  # number of steps that each step needs to store
+        self.n_per_proc = int(np.ceil(self.n / size))  # number of steps that each step needs to store
         self.u_coeff = [None] * self.n
         self.f_coeff = [0.] * self.n
 
@@ -54,18 +64,25 @@ class ErrorEstimator:
         """
         t, dt = self.communicate_time()
 
-        # construct A matrix
+        # prepare A matrix
         A = np.zeros((self.order, self.order))
         A[0, 0:self.n] = 1.
         j = np.arange(self.order)
         inv_facs = 1. / factorial(j)
+
+        # get the steps backwards from the point of evaluation
         idx = np.argsort(t)
         if t_eval is None:
             steps_from_now = -np.cumsum(dt[idx][::-1])[self.n - 1::-1]
         else:
             steps_from_now = t[idx] - t_eval
+
+        # fill A matrix
         for i in range(1, self.order):
+            # Taylor expansions of the solutions
             A[i, :self.n] = steps_from_now**j[i] * inv_facs[i]
+
+            # Taylor expansions of the first derivatives a.k.a. right hand side evaluations
             A[i, self.n:self.order] = steps_from_now[2 * self.n - self.order:]**(j[i] - 1) * inv_facs[i - 1]
 
         # prepare rhs
@@ -75,7 +92,7 @@ class ErrorEstimator:
         # solve linear system for the coefficients
         coeff = np.linalg.solve(A, b)
         self.u_coeff = coeff[:self.n]
-        self.f_coeff[self.n * 2 - self.order:] = coeff[self.n:self.order]
+        self.f_coeff[self.n * 2 - self.order:] = coeff[self.n:self.order]  # indexing takes care of uneven order
 
         # determine prefactor
         r = abs(self.dt[len(self.dt) - len(self.u_coeff):] / self.dt[-1])**(self.order - 1)
@@ -112,6 +129,7 @@ class ErrorEstimator:
     def embedded_estimate(self, S):
         """
         Compute embedded error estimate on the last node of each level
+        In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block
         """
         for L in S.levels:
             # order rises by one between sweeps, making this so ridiculously easy
@@ -164,24 +182,20 @@ class ErrorEstimator:
                     self.embedded_estimate(S)
 
 
-class ErrorEstimator_nonMPI(ErrorEstimator):
+class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
+    """
+
+    Error estimator that works with the non-MPI controller in block Gauss-Seidel mode
+
+    """
 
     def __init__(self, controller):
-        super(ErrorEstimator_nonMPI, self).__init__(controller, order=controller.MS[0].params.maxiter,
-                                                    size=len(controller.MS))
-
-        if self.params.use_extrapolation_estimate:
-            if not controller.MS[0].levels[0].params.restol == 0:
-                raise NotImplementedError('Extrapolation based error estimate so far only with fixed order')
-            maxiter = [0] * len(controller.MS)
-            for i in range(len(controller.MS)):
-                maxiter[i] = controller.MS[i].params.maxiter
-            if not maxiter.count(maxiter[0]) == len(maxiter):
-                raise NotImplementedError('All steps need to have the same order in time so far')
+        super(_ErrorEstimator_nonMPI_BlockGS, self).__init__(controller, order=controller.MS[0].params.maxiter,
+                                                             size=len(controller.MS))
 
     def store_values(self, MS):
         for S in MS:
-            super(ErrorEstimator_nonMPI, self).store_values(S)
+            super(_ErrorEstimator_nonMPI_BlockGS, self).store_values(S)
 
     def communicate_time(self):
         return self.t, self.dt
@@ -190,6 +204,7 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
         pass
 
     def estimate(self, MS):
+        # loop in reverse through the block since later steps lag behind with iterations
         for i in range(len(MS) - 1, -1, -1):
             S = MS[i]
             if self.params.use_HotRod:
@@ -210,7 +225,24 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
                         self.embedded_estimate_local_error(MS[:i + 1])
 
     def setup_extrapolation(self, controller, order, size):
-        super(ErrorEstimator_nonMPI, self).setup_extrapolation(controller, order, size)
+        super(_ErrorEstimator_nonMPI_BlockGS, self).setup_extrapolation(controller, order, size)
+
+        # check if we fixed the order by fixing the iteration number
+        if not controller.MS[0].levels[0].params.restol == 0:
+            raise NotImplementedError('Extrapolation based error estimate so far only with fixed order!')
+
+        # check if we have the same order everywhere
+        maxiter = [controller.MS[i].params.maxiter for i in range(len(controller.MS))]
+        if not maxiter.count(maxiter[0]) == len(maxiter):
+            raise NotImplementedError('All steps need to have the same order in time!')
+        if controller.params.mssdc_jac:
+            raise NotImplementedError('Extrapolation error only implemented in block Gauss-Seidel!')
+
+        # check if we can deal with the supplied number of processes
+        if len(controller.MS) > 1 and len(controller.MS) < self.n + 1:
+            raise NotImplementedError(f'Extrapolation error estimate only works in serial, or in a no-overhead version\
+ which requires at least {self.n+1} processes for order {self.order} Taylor expansion. You gave {size} processes.')
+
         # create variables to store u, f, t and dt from previous steps
         self.u = [None] * self.n_per_proc * size
         self.f = [None] * self.n_per_proc * size
@@ -220,7 +252,7 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
     def embedded_estimate_local_error(self, MS):
         """
         In block Gauss-Seidel SDC, the embedded estimate actually estimates sort of the global error within the block,
-        since the second to last sweep is from an entirely k-1 order method so to speak. This means the regular
+        since the second to last sweep is from an entirely k-1 order method, so to speak. This means the regular
         embedded method here yields this semi-global error and we get the local error as the difference of consecutive
         semi-global errors.
         """
@@ -235,37 +267,31 @@ class ErrorEstimator_nonMPI(ErrorEstimator):
                 L.status.error_embedded_estimate = abs(semi_global_errors[i][j] - semi_global_errors[i - 1][j])
 
 
-class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
+class _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(_ErrorEstimator_nonMPI_BlockGS):
+    """
+
+    Error estimator that works with the non-MPI controller in block Gauss-Seidel mode and does not feature memory
+    overhead due to extrapolation error estimates, since the required values are in memory of other "processes"
+    anyways.
+
+    """
+
     def __init__(self, controller):
-        super(ErrorEstimator_nonMPI_no_memory_overhead, self).__init__(controller)
+        super(_ErrorEstimator_nonMPI_no_memory_overhead_BlockGS, self).__init__(controller)
 
     def store_values(self, MS):
         """
-        Store the required attributes of the step to do the extrapolation. We only care about the last collocation
-        node on the finest level at the moment.
+        No overhead means nothing to store!
         """
-        for S in MS:
-            if self.params.use_extrapolation_estimate:
-                # figure out which values are to be replaced by the new ones
-                if None in self.t:
-                    oldest_val = len(self.t) - len(self.t[self.t == [None]])
-                else:
-                    oldest_val = np.argmin(self.t)
-
-                self.t[oldest_val] = S.time + S.dt
-                self.dt[oldest_val] = S.dt
-
-    def setup_extrapolation(self, controller, order, size):
-        super(ErrorEstimator_nonMPI_no_memory_overhead, self).setup_extrapolation(controller, order, size)
-        if len(controller.MS) < self.n + 1:
-            raise ParameterError(f'Error estimation for order {self.order} Taylor expansion without overhead only work\
- with at least {self.n+1} processes, not {size} processes.')
+        pass
 
     def extrapolation_estimate(self, MS):
         """
         The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
         solution obtained by the time marching scheme.
         """
+
+        # this is needed since we don't store anything
         self.dt = np.array([S.dt for S in MS])
         self.t = np.array([S.time for S in MS]) + self.dt
 
@@ -276,10 +302,13 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
             if len(MS[-1].levels) > 1:
                 raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
 
-            for j in range(1, len(MS) - self.n + 1):
+            # loop to go through all steps which we can extrapolate to
+            for j in range(self.n, len(MS)):
                 u_ex = MS[-1].levels[0].u[-1] * 0.
+
+                # loop to sum up contributions from previous steps
                 for i in range(1, self.n + 1):
-                    L = MS[-i - j].levels[0]
+                    L = MS[j - i].levels[0]
                     if type(L.f[-1]) == imex_mesh:
                         u_ex += self.u_coeff[-i] * L.u[-1] + self.f_coeff[-i] * (L.f[-1].impl + L.f[-1].expl)
                     elif type(L.f[-1]) == mesh:
@@ -287,17 +316,18 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
                     else:
                         raise DataError(f'Datatype {type(L.f[-1])} not supported by parallel extrapolation error estim\
 ate!')
-                MS[-j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[-j].levels[0].u[-1]) *\
-                    self.prefactor
+                MS[j].levels[0].status.error_extrapolation_estimate = abs(u_ex - MS[j].levels[0].u[-1]) * self.prefactor
 
     def estimate(self, MS):
-        for i in range(len(MS)):
+        # loop in reverse through the block since later steps lag behind with iterations
+        for i in range(len(MS) - 1, -1, -1):
             S = MS[i]
             if self.params.use_HotRod:
                 if S.status.iter == S.params.maxiter - 1:
                     self.extrapolation_estimate(MS[:i + 1])
                 elif S.status.iter == S.params.maxiter:
                     self.embedded_estimate_local_error(MS[:i + 1])
+                    break
 
             else:
                 # only estimate errors when last sweep is performed and not when doing Hot Rod
@@ -308,3 +338,21 @@ ate!')
 
                     if self.params.use_embedded_estimate or self.params.use_adaptivity:
                         self.embedded_estimate_local_error(MS[:i + 1])
+
+
+class ErrorEstimator_nonMPI:
+    """
+
+    This class should be imported from the controller and return the correct version of the error estimator based on
+    the chosen parameters.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def get_estimator(self, controller):
+        if len(controller.MS) >= (controller.MS[0].params.maxiter + 4) // 2:
+            return _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(controller)
+        else:
+            return _ErrorEstimator_nonMPI_BlockGS(controller)
