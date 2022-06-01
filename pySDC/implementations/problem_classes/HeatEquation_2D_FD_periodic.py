@@ -4,7 +4,7 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
-from pySDC.core.Problem import ptype
+from pySDC.core.Problem import ptype, get_finite_difference_stencil
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -44,6 +44,8 @@ class heat2d_periodic(ptype):
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
         if problem_params['nvars'][0] % 2 != 0:
             raise ProblemError('the setup requires nvars = 2^p per dimension')
+        if 'order' not in problem_params:
+            problem_params['order'] = 2
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heat2d_periodic, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
@@ -51,10 +53,10 @@ class heat2d_periodic(ptype):
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
-        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx)
+        self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.order)
 
     @staticmethod
-    def __get_A(N, nu, dx):
+    def __get_A(N, nu, dx, order):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -67,16 +69,13 @@ class heat2d_periodic(ptype):
             scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
-        stencil = [1, -2, 1]
-        zero_pos = 2
+        stencil, zero_pos, _ = get_finite_difference_stencil(derivative=2, order=order, type='center')
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
         offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
                                   [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
 
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        # stencil = [1, -2, 1]
-        # A = sp.diags(stencil, [-1, 0, 1], shape=(N[0], N[0]), format='csc')
 
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= nu / (dx ** 2)
