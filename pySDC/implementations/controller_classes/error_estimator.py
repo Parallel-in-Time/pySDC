@@ -37,7 +37,7 @@ class ErrorEstimator:
     def communicate(self):
         raise NotImplementedError('Please implement a function to communicates the solution etc.!')
 
-    def get_extrapolation_coefficients(self):
+    def get_extrapolation_coefficients(self, t_eval=None):
         """
         This function solves a linear system where in the matrix A, the row index reflects the order of the derivative
         in the Taylor expansion and the column index reflects the particular step and whether its u or f from that
@@ -60,7 +60,10 @@ class ErrorEstimator:
         j = np.arange(self.order)
         inv_facs = 1. / factorial(j)
         idx = np.argsort(t)
-        steps_from_now = -np.cumsum([dt[idx[i]] for i in range(len(t) - self.n, len(t), 1)][::-1])[::-1]
+        if t_eval is None:
+            steps_from_now = -np.cumsum(dt[idx][::-1])[self.n - 1::-1]
+        else:
+            steps_from_now = t[idx] - t_eval
         for i in range(1, self.order):
             A[i, :self.n] = steps_from_now**j[i] * inv_facs[i]
             A[i, self.n:self.order] = steps_from_now[2 * self.n - self.order:]**(j[i] - 1) * inv_facs[i - 1]
@@ -103,8 +106,8 @@ class ErrorEstimator:
                 works with types imex_mesh and mesh')
 
             self.u[oldest_val] = S.levels[0].u[-1]
-            self.t[oldest_val] = float(S.levels[0].time) + float(S.levels[0].dt)
-            self.dt[oldest_val] = S.levels[0].dt
+            self.t[oldest_val] = S.time + S.dt
+            self.dt[oldest_val] = S.dt
 
     def embedded_estimate(self, S):
         """
@@ -121,7 +124,7 @@ class ErrorEstimator:
         """
         if None not in self.dt:
             if None in self.u_coeff or self.params.use_adaptivity:
-                self.get_extrapolation_coefficients()
+                self.get_extrapolation_coefficients(t_eval=S.time + S.dt)
 
             self.communicate()
 
@@ -130,16 +133,18 @@ class ErrorEstimator:
 
             u_ex = S.levels[0].u[-1] * 0.
             idx = np.argsort(self.t)
-            if (abs(S.levels[0].time - self.t) < 10. * np.finfo(float).eps).any() and False:
-                idx_step = idx[np.argmin(abs(self.t - S.levels[0].time))]
+
+            # see if we need to leave out any values because we are doing something in a block
+            if (abs(S.time + S.dt - self.t) < 10. * np.finfo(float).eps).any():
+                idx_step = idx[np.argmin(abs(self.t - S.time - S.dt))]
             else:
                 idx_step = max(idx) + 1
             mask = np.logical_and(idx < idx_step, idx >= idx_step - self.n)
+
             for i in range(self.n):
                 u_ex += self.u_coeff[i] * self.u[idx[mask][i]] + self.f_coeff[i] * self.f[idx[mask][i]]
 
-            S.levels[0].status.error_extrapolation_estimate = \
-                abs(u_ex - S.levels[0].u[-1]) * self.prefactor
+            S.levels[0].status.error_extrapolation_estimate = abs(u_ex - S.levels[0].u[-1]) * self.prefactor
 
     def estimate(self, S):
         if self.params.use_HotRod:
@@ -247,8 +252,8 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
                 else:
                     oldest_val = np.argmin(self.t)
 
-                self.t[oldest_val] = float(S.levels[0].time) + float(S.levels[0].dt)
-                self.dt[oldest_val] = S.levels[0].dt
+                self.t[oldest_val] = S.time + S.dt
+                self.dt[oldest_val] = S.dt
 
     def setup_extrapolation(self, controller, order, size):
         super(ErrorEstimator_nonMPI_no_memory_overhead, self).setup_extrapolation(controller, order, size)
@@ -261,8 +266,8 @@ class ErrorEstimator_nonMPI_no_memory_overhead(ErrorEstimator_nonMPI):
         The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
         solution obtained by the time marching scheme.
         """
-        self.dt = np.array([S.levels[0].dt for S in MS])
-        self.t = np.array([S.levels[0].time for S in MS]) + self.dt
+        self.dt = np.array([S.dt for S in MS])
+        self.t = np.array([S.time for S in MS]) + self.dt
 
         if len(MS) > self.n:
             if None in self.u_coeff or self.params.use_adaptivity:

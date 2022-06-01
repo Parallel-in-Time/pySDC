@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from collections import namedtuple
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -23,7 +22,6 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
@@ -42,15 +40,15 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run(use_adaptivity=True):
+def run(use_adaptivity, num_procs):
     """
     A simple test program to do PFASST runs for the heat equation
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['dt'] = 3e+2
-    level_params['e_tol'] = 1e-8
+    level_params['dt'] = 5e-2
+    level_params['e_tol'] = 1e-7
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -79,6 +77,7 @@ def run(use_adaptivity=True):
     controller_params['hook_class'] = log_data
     controller_params['use_HotRod'] = True
     controller_params['use_adaptivity'] = use_adaptivity
+    controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -91,11 +90,11 @@ def run(use_adaptivity=True):
 
     # set time parameters
     t0 = 0.0
-    Tend = 2e0
+    Tend = 2e+1
 
     # instantiate controller
     controller_class = controller_nonMPI
-    controller = controller_class(num_procs=1, controller_params=controller_params,
+    controller = controller_class(num_procs=num_procs, controller_params=controller_params,
                                   description=description)
 
     # get initial values on finest level
@@ -107,34 +106,95 @@ def run(use_adaptivity=True):
     return stats
 
 
-def plot(stats, use_adaptivity):
+def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     setup_mpl()
+    recomputed = False
 
     # convert filtered statistics to list of iterations count, sorted by process
-    v1 = np.array(sort_stats(filter_stats(stats, type='v1'), sortby='time'))[:, 1]
-    v2 = np.array(sort_stats(filter_stats(stats, type='v2'), sortby='time'))[:, 1]
-    p3 = np.array(sort_stats(filter_stats(stats, type='p3'), sortby='time'))[:, 1]
-    t = np.array(sort_stats(filter_stats(stats, type='p3'), sortby='time'))[:, 0]
-    dt = np.array(sort_stats(filter_stats(stats, type='dt'), sortby='time'))[:, 1]
-    e_em = np.array(sort_stats(filter_stats(stats, type='e_embedded'), sortby='time'))[:, 1]
-    e_ex = np.array(sort_stats(filter_stats(stats, type='e_extrapolated'), sortby='time'))[:, 1]
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart'), sortby='time'))[:, 1]
-    sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps'), sortby='time'))[:, 1]
+    v1 = np.array(sort_stats(filter_stats(stats, type='v1', recomputed=recomputed), sortby='time'))[:, 1]
+    v2 = np.array(sort_stats(filter_stats(stats, type='v2', recomputed=recomputed), sortby='time'))[:, 1]
+    p3 = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 1]
+    t = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 0]
+    dt = np.array(sort_stats(filter_stats(stats, type='dt', recomputed=recomputed), sortby='time'))[:, 1]
+    e_em = np.array(sort_stats(filter_stats(stats, type='e_embedded', recomputed=recomputed), sortby='time'))[:, 1]
+    e_ex = np.array(sort_stats(filter_stats(stats, type='e_extrapolated', recomputed=recomputed), sortby='time'))[:, 1]
+    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
+    sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps', recomputed=recomputed), sortby='time'))[:, 1]
     ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart'), sortby='time'))[:, 1]
-    print(restarts)
+    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
 
-    assert np.allclose([v1[-1], v2[-2], p3[-1]], [83.88431516810506, 80.62596592922169, 16.134334413301595], rtol=1),\
-        'Solution is wrong!'
+    if use_adaptivity and num_procs == 1:
+        error_msg = 'Error when using adaptivity in serial:'
+        expected = {
+            'v1': 83.88240785649039,
+            'v2': 80.62744370831926,
+            'p3': 16.137248067563256,
+            'e_em': 6.236525251779312e-08,
+            'e_ex': 6.33675177461887e-08,
+            'dt': 0.09607389421085785,
+            'restarts': 1.0,
+            'sweeps': 2416.0,
+        }
+    elif use_adaptivity and num_procs == 4:
+        error_msg = 'Error when using adaptivity in parallel:'
+        expected = {
+            'v1': 83.88317481237193,
+            'v2': 80.62700122995363,
+            'p3': 16.136136147445036,
+            'e_em': 2.9095385656319195e-08,
+            'e_ex': 5.666752074991754e-08,
+            'dt': 0.09347348421862582,
+            'restarts': 8.0,
+            'sweeps': 2400.0,
+        }
+    elif not use_adaptivity and num_procs == 4:
+        error_msg = 'Error with fixed step size in parallel:'
+        expected = {
+            'v1': 83.88400149770143,
+            'v2': 80.62656173487008,
+            'p3': 16.134849851184736,
+            'e_em': 4.977994905175365e-09,
+            'e_ex': 5.048084913047097e-09,
+            'dt': 0.05,
+            'restarts': 0.0,
+            'sweeps': 1600.0,
+        }
+    elif not use_adaptivity and num_procs == 1:
+        error_msg = 'Error with fixed step size in serial:'
+        expected = {
+            'v1': 83.88400149770143,
+            'v2': 80.62656173487008,
+            'p3': 16.134849851184736,
+            'e_em': 4.977994905175365e-09,
+            'e_ex': 5.048084913047097e-09,
+            'dt': 0.05,
+            'restarts': 0.0,
+            'sweeps': 1600.0,
+        }
 
-    if use_adaptivity:
-        assert np.isclose(e_em[-1], 6.48866205210652e-09), f'Embedded error estimate when using adaptivity is wrong!\
-Expected {6.5e-9:.1e}, got {e_em[-1]:.1e}'
-        assert np.isclose(e_ex[-1], 6.565837120935149e-09), f'Extrapolation error when using adaptivity estimate is wro\
-ng! Expected {6.6e-9:.1e}, got {e_ex[-1]:.1e}.'
-        assert np.isclose(dt[-1], 0.0535436291079129), 'Time step size is wrong!'
-        assert np.isclose(restarts.sum(), 1), f'Expected 1 restart, got {restarts.sum()}'
-        assert np.isclose(sweeps.sum(), 4296), f'Expected 4296 sweeps, got {sweeps.sum()}'
+    got = {
+        'v1': v1[-1],
+        'v2': v2[-1],
+        'p3': p3[-1],
+        'e_em': e_em[-1],
+        'e_ex': e_ex[e_ex != [None]][-1],
+        'dt': dt[-1],
+        'restarts': restarts.sum(),
+        'sweeps': sweeps.sum(),
+    }
+
+    if generate_reference:
+        print(f'Adaptivity: {use_adaptivity}, num_procs={num_procs}')
+        print('expected = {')
+        for k in got.keys():
+            v = got[k]
+            if type(v) in [list, np.ndarray]:
+                print(f'\t\'{k}\': {v[v!=[None]][-1]},')
+            else:
+                print(f'\t\'{k}\': {v},')
+        print('}')
+
+    if use_adaptivity and num_procs == 4:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
         ax.plot(t, v1, label='v1', ls='-')
         ax.plot(t, v2, label='v2', ls='--')
@@ -142,16 +202,9 @@ ng! Expected {6.6e-9:.1e}, got {e_ex[-1]:.1e}.'
         ax.legend(frameon=False)
         ax.set_xlabel('Time')
         fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
-    else:
-        assert np.isclose(e_em[-1], 6.510703087769798e-10), 'Embedded error estimate is wrong!'
-        assert np.isclose(e_ex[-1], 6.541069907939809e-10), 'Extrapolation error estimate is wrong!'
-        assert np.isclose(dt[-1], 3e-2), 'Time step size is wrong!'
-        assert np.isclose(restarts.sum(), 0), f'Expected 0 restarts, got {restarts.sum()}'
-        assert np.isclose(sweeps.sum(), 2668), f'Expected 2668 sweeps, got {sweeps.sum()}'
 
     fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
     ax.plot(t, dt, color='black')
-    ax.ticklabel_format(axis='y', style='sci', scilimits=(-3, -3))
     e_ax = ax.twinx()
     e_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
     e_ax.plot(t, e_ex, label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
@@ -162,22 +215,29 @@ ng! Expected {6.6e-9:.1e}, got {e_ex[-1]:.1e}.'
         e_ax.legend(frameon=False, loc='upper left')
     else:
         e_ax.legend(frameon=False, loc='upper right')
-    e_ax.set_ylim((1e-13, 5e-6))
-    ax.set_ylim((8e-3, 58e-3))
+    e_ax.set_ylim((7.367539795147197e-12, 1.109667868425781e-05))
+    ax.set_ylim((0.012574322653781072, 0.10050387672423527))
 
     ax.set_xlabel('Time')
     ax.set_ylabel(r'$\Delta t$')
 
     if use_adaptivity:
-        fig.savefig('data/piline_hotrod_adaptive.png', bbox_inches='tight', dpi=300)
+        fig.savefig(f'data/piline_hotrod_adaptive_{num_procs}procs.png', bbox_inches='tight', dpi=300)
     else:
-        fig.savefig('data/piline_hotrod.png', bbox_inches='tight', dpi=300)
+        fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
+
+    for k in expected.keys():
+        assert np.isclose(expected[k], got[k], rtol=1e-3),\
+               f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
 
 
 def main():
-    for use_adaptivity in [True, False]:
-        stats = run(use_adaptivity)
-        plot(stats, use_adaptivity)
+    generate_reference = False
+    for use_adaptivity in [False, True]:
+        for num_procs in [1, 4]:
+            stats = run(use_adaptivity, num_procs=num_procs)
+            plot(stats, use_adaptivity, num_procs=num_procs, generate_reference=generate_reference)
+
 
 if __name__ == "__main__":
     main()
