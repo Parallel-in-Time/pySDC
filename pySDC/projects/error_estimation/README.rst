@@ -67,9 +67,62 @@ The last plot was made without Hot Rod, meaning the last sweep is taken to be th
 
 .. image:: ../../../data/piline_solution_adaptive.png
     :width: 20%
-.. image:: ../../../data/piline_hotrod_adaptive.png
+.. image:: ../../../data/piline_hotrod_adaptive_1procs.png
     :width: 24%
-.. image:: ../../../data/piline_hotrod.png
+.. image:: ../../../data/piline_hotrod_1procs.png
     :width: 24%
 .. image:: ../../../data/error_estimate_order.png
+    :width: 23%
+
+
+Parallel-in-Time Versions with Block Gauss-Seidel
+-------------------------------------------------
+
+Extending these schemes to parallel-in-time opens a whole new rabbit hole.
+Since we need a place to start, we start with a block Gauss-Seidel flavor of multi-step SDC.
+We stay on a single level for now, but we integrate multiple steps at the same time in a Gauss-Seidel fashion, which means forward substitution after each iteration.
+Consequently, each process only starts after receiving the result of the first iteration of the previous process.
+Compared to Jacobi, where all steps start simultaneously, we lose some parallel efficiency, but all steps have the same order, which is convenient for us here.
+For Jacobi, you get order k on process p after k+p iterations, whereas the Gauss-Seidel variant has order k after k iterations.
+While this sounds infinitely better, keep in mind that we need to wait for p "global iterations" to obtain intial conditions for process p in Gauss-Seidel, so we didn't gain anything.
+The advantage of Jacobi is that earlier steps in the block can perform more iterations in the same amount of "global iterations".
+But since we want to have the same order everywhere for now, that doesn't mean any advantage to us and we restrict the discussion to Gauss-Seidel, even though everything can easily be implemented in other versions of multi-step SDC as well.
+
+Embedded Error Estimate
+-----------------------
+The embedded error estimate changes its nature a bit when it is not modified and gives an estimate of a sort of global error within the block, which we call semi-global error.
+In fact, block Gauss-Seidel is equivalent to solving the entire block with a first order method, then with a second order method and so on.
+Consequently, if we take the familiar difference between successive iterates on any step, we are comparing an entirely order k-1 method to an entirely order k method, rather than an order k-1 and order k solution to a single step in an order k scheme.
+So actually, when taking this difference, we compute the accumulated errors within the block, analogous to the global error.
+Going along with the global error analogy, we compute the local error as the difference between successive semi-global errors.
+
+Extrapolation Error Estimate
+----------------------------
+It turns out that this needs little conceptual change to work in parallel-in-time.
+A disadvantage that we were considering earlier is that we need additional memory to store solutions of previous time steps.
+In parallel, this is no longer necessary, since the solutions to multiple time steps are in memory anyways, while they are being solved on different processes.
+By generating blocks at least one step larger than the number of steps needed to extrapolate, we always have enough steps to perform the extrapolation and one more to compare to the extrapolation.
+
+Adaptivity
+----------
+This is tricky.
+We want to compute the optimal step size for the next step, but the next step is already being solved on a different process.
+The simplest thing we can do is to have all steps in the block have the same size and when computing the step sizes, we just take the value computed on the last step to be the step size for the entire next block.
+We only need to worry a bit about restarting.
+In the current implementation, all steps determine independently if they need restarting and only steps after a corrupted one are restarted.
+
+Tests
+-----
+We basically try to reproduce the serial tests in parallel, since we don't want anything to change but the efficiency.
+We skip the plot of the solution, since there is no discernable difference to the naked eye there.
+Otherwise the plots show the same as for the serial case above.
+The order of the error estimates has been tested with the last step in a block of 30 steps and the other two plots show the Piline equation solved with blocks of four steps.
+Notice the steps in the time step size in the adaptive version, which appear as a consequence of all steps in the block having the same size.
+While the difference between the error estimates is still somewhat smaller than the error estimates themselves, it is noticably larger than in the serial case, suggesting the performance of the Hot Rod detector would be significantly worse in parallel-in-time.
+ 
+.. image:: ../../../data/piline_hotrod_adaptive_4procs.png
+    :width: 24%
+.. image:: ../../../data/piline_hotrod_4procs.png
+    :width: 24%
+.. image:: ../../../data/error_estimate_order_parallel.png
     :width: 23%
