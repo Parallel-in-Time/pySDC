@@ -40,6 +40,8 @@
             
   <h1>Source code for core.Problem</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">factorial</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
 
@@ -98,6 +100,45 @@
 <span class="sd">        Abstract interface to apply mass matrix (only needed for FEM)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;ERROR: if you want a mass matrix, implement apply_mass_matrix(u)&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_finite_difference_stencil"><a class="viewcode-back" href="../../pySDC/core.html#core.Problem.get_finite_difference_stencil">[docs]</a><span class="k">def</span> <span class="nf">get_finite_difference_stencil</span><span class="p">(</span><span class="n">derivative</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Derive general finite difference stencils from Taylor expansions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span> <span class="o">-</span> <span class="p">(</span><span class="n">derivative</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">//</span> <span class="mi">1</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;forward&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;backward&#39;</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">order</span> <span class="o">+</span> <span class="n">derivative</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Stencil must be of type &quot;center&quot;, &quot;forward&quot; or &quot;backward&quot;, not </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s1">. If you want something</span><span class="se">\</span>
+<span class="s1">else, you can also give specific steps.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># the index of the position around which we Taylor expand</span>
+    <span class="n">zero_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">steps</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># make a matrix that contains the Taylor coefficients</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">inv_facs</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">steps</span><span class="o">**</span><span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">inv_facs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="c1"># make a right hand side vector that is zero everywhere except at the postition of the desired derivative</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">sol</span><span class="p">[</span><span class="n">derivative</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="c1"># solve the linear system for the finite difference coefficients</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">sol</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">zero_pos</span><span class="p">,</span> <span class="n">steps</span></div>
 </pre></div>
 
             <div class="clearer"></div>
