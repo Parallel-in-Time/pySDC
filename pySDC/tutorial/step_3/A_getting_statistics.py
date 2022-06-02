@@ -1,4 +1,4 @@
-from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_list_of_types
+from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_list_of_types, get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -33,7 +33,8 @@ def main():
     filtered_stats = filter_stats(stats, type='niter')
 
     # convert filtered statistics to list of iterations count, sorted by time
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    # the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     for item in iter_counts:
         out = 'Number of iterations at time %4.2f: %2i' % item
