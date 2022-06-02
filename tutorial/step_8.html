@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Step-8: Advanced topics &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,11 +47,11 @@
           <div class="body" role="main">
             
   <section id="step-8-advanced-topics">
-<h1>Step-8: Advanced topics<a class="headerlink" href="#step-8-advanced-topics" title="Permalink to this headline">¶</a></h1>
+<h1>Step-8: Advanced topics<a class="headerlink" href="#step-8-advanced-topics" title="Permalink to this heading">¶</a></h1>
 <p>Since we now have explored the basic features of pySDC, we are actually ready to do some serious science (e.g. in the projects).
 However, we gather here further interesting cases, e.g. special flags or more alternative implementations of components.</p>
 <section id="part-a-visualizing-residuals">
-<h2>Part A: Visualizing Residuals<a class="headerlink" href="#part-a-visualizing-residuals" title="Permalink to this headline">¶</a></h2>
+<h2>Part A: Visualizing Residuals<a class="headerlink" href="#part-a-visualizing-residuals" title="Permalink to this heading">¶</a></h2>
 <p>In this part, we briefly introduce the visualization of residuals, built in into pySDC’s plugins.
 The application is (supposed) to be simple: merely put the <code class="docutils literal notranslate"><span class="pre">stats</span></code> object into the function <code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation</span></code> and look at the resulting figure.</p>
 <p>Important things to note:</p>
@@ -139,7 +140,7 @@ The application is (supposed) to be simple: merely put the <code class="docutils
 <a class="reference internal image-reference" href="../_images/step_8_residuals.png"><img alt="../_images/step_8_residuals.png" src="../_images/step_8_residuals.png" style="width: 590.5px; height: 434.5px;" /></a>
 </section>
 <section id="part-b-multi-step-sdc">
-<h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Permalink to this headline">¶</a></h2>
+<h2>Part B: Multi-step SDC<a class="headerlink" href="#part-b-multi-step-sdc" title="Permalink to this heading">¶</a></h2>
 <p>One interesting question when playing around with the different configurations is this: what happens, if we want parallel time-steps but only a single level?
 The result is called multi-step SDC. Here, after each sweep the result is sent forward, but is picked up in the next (and not current) iteration.
 This corresponds to performing only the smoother stage in a multigrid scheme.
@@ -334,7 +335,7 @@ To prevent this, information can be sent forward immediately, but then this is n
 <a class="reference internal image-reference" href="../_images/step_8_residuals_mssdc_gs.png"><img alt="../_images/step_8_residuals_mssdc_gs.png" src="../_images/step_8_residuals_mssdc_gs.png" style="width: 590.5px; height: 434.5px;" /></a>
 </section>
 <section id="part-c-iteration-estimator">
-<h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Permalink to this headline">¶</a></h2>
+<h2>Part C: Iteration estimator<a class="headerlink" href="#part-c-iteration-estimator" title="Permalink to this heading">¶</a></h2>
 <p>One may ask when to stop the SDC, MLSDC, PFASST iterations. So far, we have used a residual threshold or a fixed number of iterations to stop the process.
 Another option is to estimate the number of iterations it takes to reach a given error w.r.t. the exact collocation solution.
 This can be done by using two consecutive iterates to estimate the Lipschitz constant of the iteration procedure.
@@ -643,7 +644,7 @@ This example takes three different test cases and checks how well the iteration 
    Errors after step   0.8750 with 6 iterations: 3.6531e-08 / 8.5568e-09
    Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5247e-09
 
-...done, took 1.250209103999623 seconds!
+...done, took 1.4186646779999137 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
@@ -657,7 +658,7 @@ Running diffusion in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 9.4215e-09
    Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.0487e-08
 
-...done, took 3.3564742420003313 seconds!
+...done, took 3.722284854999998 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -671,7 +672,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
    Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
 
-...done, took 0.26621876099989095 seconds!
+...done, took 0.28118827900016186 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
@@ -685,7 +686,7 @@ Running advection in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
 
-...done, took 0.7732725589999063 seconds!
+...done, took 0.8132623480000802 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -699,7 +700,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
 
-...done, took 0.5519781329999205 seconds!
+...done, took 0.5620631400001912 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -713,13 +714,13 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
 
-...done, took 1.0420088840000972 seconds!
+...done, took 0.9658681569999317 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
 </section>
 <section id="part-x-to-be-continued">
-<h2>Part X: To be continued…<a class="headerlink" href="#part-x-to-be-continued" title="Permalink to this headline">¶</a></h2>
+<h2>Part X: To be continued…<a class="headerlink" href="#part-x-to-be-continued" title="Permalink to this heading">¶</a></h2>
 <p>We shall see what comes next…</p>
 </section>
 </section>
@@ -770,7 +771,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -796,7 +797,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

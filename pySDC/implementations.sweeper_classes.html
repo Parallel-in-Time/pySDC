@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>implementations.sweeper_classes package &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -47,16 +48,16 @@
           <div class="body" role="main">
             
   <section id="implementations-sweeper-classes-package">
-<h1>implementations.sweeper_classes package<a class="headerlink" href="#implementations-sweeper-classes-package" title="Permalink to this headline">¶</a></h1>
+<h1>implementations.sweeper_classes package<a class="headerlink" href="#implementations-sweeper-classes-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-implementations.sweeper_classes.boris_2nd_order">
-<span id="implementations-sweeper-classes-boris-2nd-order-module"></span><h2>implementations.sweeper_classes.boris_2nd_order module<a class="headerlink" href="#module-implementations.sweeper_classes.boris_2nd_order" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-boris-2nd-order-module"></span><h2>implementations.sweeper_classes.boris_2nd_order module<a class="headerlink" href="#module-implementations.sweeper_classes.boris_2nd_order" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.boris_2nd_order.</span></span><span class="sig-name descname"><span class="pre">boris_2nd_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <p>Second-order sweeper using velocity-Verlet with Boris scheme as base integrator</p>
 <dl class="py attribute">
@@ -89,7 +90,7 @@
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation (always!)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -100,10 +101,10 @@
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -114,7 +115,7 @@
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -124,11 +125,11 @@
 
 </section>
 <section id="module-implementations.sweeper_classes.explicit">
-<span id="implementations-sweeper-classes-explicit-module"></span><h2>implementations.sweeper_classes.explicit module<a class="headerlink" href="#module-implementations.sweeper_classes.explicit" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-explicit-module"></span><h2>implementations.sweeper_classes.explicit module<a class="headerlink" href="#module-implementations.sweeper_classes.explicit" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.explicit.</span></span><span class="sig-name descname"><span class="pre">explicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.explicit.explicit.QE">
@@ -142,7 +143,7 @@
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -153,10 +154,10 @@
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -167,7 +168,7 @@
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/explicit.html#explicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.explicit.explicit.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -177,21 +178,21 @@
 
 </section>
 <section id="module-implementations.sweeper_classes.generic_LU">
-<span id="implementations-sweeper-classes-generic-lu-module"></span><h2>implementations.sweeper_classes.generic_LU module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_LU" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-generic-lu-module"></span><h2>implementations.sweeper_classes.generic_LU module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_LU" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_LU.generic_LU">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.generic_LU.</span></span><span class="sig-name descname"><span class="pre">generic_LU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_LU.html#generic_LU"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_LU.generic_LU" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.sweeper_classes.generic_implicit.generic_implicit</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">generic_implicit</span></code></p>
 <p>LU sweeper using LU decomposition of the Q matrix for the base integrator, special type of generic implicit sweeper</p>
 </dd></dl>
 
 </section>
 <section id="module-implementations.sweeper_classes.generic_implicit">
-<span id="implementations-sweeper-classes-generic-implicit-module"></span><h2>implementations.sweeper_classes.generic_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_implicit" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-generic-implicit-module"></span><h2>implementations.sweeper_classes.generic_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.generic_implicit" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.generic_implicit.</span></span><span class="sig-name descname"><span class="pre">generic_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Generic implicit sweeper, expecting lower triangular matrix type as input</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.generic_implicit.generic_implicit.QI">
@@ -205,7 +206,7 @@
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -216,10 +217,10 @@
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -230,7 +231,7 @@
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/generic_implicit.html#generic_implicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -240,11 +241,11 @@
 
 </section>
 <section id="module-implementations.sweeper_classes.imex_1st_order">
-<span id="implementations-sweeper-classes-imex-1st-order-module"></span><h2>implementations.sweeper_classes.imex_1st_order module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-imex-1st-order-module"></span><h2>implementations.sweeper_classes.imex_1st_order module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order.imex_1st_order">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.imex_1st_order.</span></span><span class="sig-name descname"><span class="pre">imex_1st_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <p>First-order IMEX sweeper using implicit/explicit Euler as base integrator</p>
 <dl class="py attribute">
@@ -265,7 +266,7 @@
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -276,7 +277,7 @@
 <span class="sig-name descname"><span class="pre">get_scalar_problems_manysweep_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.get_scalar_problems_manysweep_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat" title="Permalink to this definition">¶</a></dt>
 <dd><p>For a scalar problem, K sweeps of IMEX-SDC can be written in matrix form.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
 <li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is lambda_fast, the second is lambda_slow.</p></li>
@@ -291,7 +292,7 @@
 <dd><p>This function returns the corresponding matrices of an IMEX-SDC sweep in matrix formulation.</p>
 <p>See Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave slow-wave splitting, 2016 for the derivation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is lambda_fast, the second is lambda_slow.</p>
 </dd>
 </dl>
@@ -310,10 +311,10 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side (here impl + expl)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -324,7 +325,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order.html#imex_1st_order.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -334,11 +335,11 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 
 </section>
 <section id="module-implementations.sweeper_classes.imex_1st_order_mass">
-<span id="implementations-sweeper-classes-imex-1st-order-mass-module"></span><h2>implementations.sweeper_classes.imex_1st_order_mass module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order_mass" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-imex-1st-order-mass-module"></span><h2>implementations.sweeper_classes.imex_1st_order_mass module<a class="headerlink" href="#module-implementations.sweeper_classes.imex_1st_order_mass" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.imex_1st_order_mass.</span></span><span class="sig-name descname"><span class="pre">imex_1st_order_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.implementations.sweeper_classes.imex_1st_order.imex_1st_order</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">imex_1st_order</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <p>First-order IMEX sweeper using implicit/explicit Euler as base integrator, with mass or weighting matrix</p>
 <dl class="py method">
@@ -347,7 +348,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -364,7 +365,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/imex_1st_order_mass.html#imex_1st_order_mass.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -374,11 +375,11 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 
 </section>
 <section id="module-implementations.sweeper_classes.multi_implicit">
-<span id="implementations-sweeper-classes-multi-implicit-module"></span><h2>implementations.sweeper_classes.multi_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.multi_implicit" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-multi-implicit-module"></span><h2>implementations.sweeper_classes.multi_implicit module<a class="headerlink" href="#module-implementations.sweeper_classes.multi_implicit" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.multi_implicit.multi_implicit">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.multi_implicit.</span></span><span class="sig-name descname"><span class="pre">multi_implicit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <p>First-order multi-implicit sweeper for two components</p>
 <dl class="py attribute">
@@ -399,7 +400,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation unless do_full_update==False</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -410,10 +411,10 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side (two components)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -424,7 +425,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/multi_implicit.html#multi_implicit.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -434,11 +435,11 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 
 </section>
 <section id="module-implementations.sweeper_classes.verlet">
-<span id="implementations-sweeper-classes-verlet-module"></span><h2>implementations.sweeper_classes.verlet module<a class="headerlink" href="#module-implementations.sweeper_classes.verlet" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-sweeper-classes-verlet-module"></span><h2>implementations.sweeper_classes.verlet module<a class="headerlink" href="#module-implementations.sweeper_classes.verlet" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.sweeper_classes.verlet.verlet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.sweeper_classes.verlet.</span></span><span class="sig-name descname"><span class="pre">verlet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Sweeper.sweeper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sweeper</span></code></p>
 <p>Custom sweeper class, implements Sweeper.py</p>
 <p>Second-order sweeper using velocity-Verlet as base integrator</p>
 <dl class="py attribute">
@@ -471,7 +472,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <dd><p>Compute u at the right point of the interval</p>
 <p>The value uend computed here is a full evaluation of the Picard formulation (always!)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -482,10 +483,10 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet.integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.integrate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrates the right-hand side</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>containing the integral as values</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -496,7 +497,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 <span class="sig-name descname"><span class="pre">update_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/verlet.html#verlet.update_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.verlet.verlet.update_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the u- and f-values at the collocation nodes -&gt; corresponds to a single sweep over all nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -506,7 +507,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
 
 </section>
 <section id="module-implementations.sweeper_classes">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.sweeper_classes" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations.sweeper_classes" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -562,7 +563,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -589,7 +590,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

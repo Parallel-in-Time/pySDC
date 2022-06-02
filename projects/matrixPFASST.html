@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Matrix-based versions of PFASST &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,13 +47,13 @@
           <div class="body" role="main">
             
   <section id="matrix-based-versions-of-pfasst">
-<h1>Matrix-based versions of PFASST<a class="headerlink" href="#matrix-based-versions-of-pfasst" title="Permalink to this headline">¶</a></h1>
+<h1>Matrix-based versions of PFASST<a class="headerlink" href="#matrix-based-versions-of-pfasst" title="Permalink to this heading">¶</a></h1>
 <p>In this project, we use and test two matrix-based version of PFASST for linear problems:
 we write PFASST as a standard twogrid method and we derive the propagaton matrix of PFASST.
 Both approaches are compared to the standard multigrid controller of PFASST and with each other.
 This includes tests with the heat, the advection as well as the test equation.</p>
 <section id="matrix-based-pfasst">
-<h2>Matrix-based PFASST<a class="headerlink" href="#matrix-based-pfasst" title="Permalink to this headline">¶</a></h2>
+<h2>Matrix-based PFASST<a class="headerlink" href="#matrix-based-pfasst" title="Permalink to this heading">¶</a></h2>
 <p>When written as a multigrid method for a linear composite collocation problem, PFASST can be compactly defined via a
 smoothing and a coarse-grid correction step, just as a standard two-grid method. In the new (and very specialized)
 controller <code class="docutils literal notranslate"><span class="pre">allinclusive_matrix_nonMPI.py</span></code>, this concept is exploited to obtain a PFASST (and MLSDC and SDC)
@@ -386,7 +387,7 @@ against the standard PFASST implementation.</p>
 </div>
 </section>
 <section id="propagator-based-pfasst">
-<h2>Propagator-based PFASST<a class="headerlink" href="#propagator-based-pfasst" title="Permalink to this headline">¶</a></h2>
+<h2>Propagator-based PFASST<a class="headerlink" href="#propagator-based-pfasst" title="Permalink to this heading">¶</a></h2>
 <p>The second approach follows directly from the matrix formulation: instead of writing PFASST as an iterative scheme,
 we now derive the full propagation matrix, which takes the initial value u0 and produces the final value uend,
 over all steps, iterations and sweeps. This matrix can be used to analyze PFASST in yet another exciting way.</p>
@@ -747,7 +748,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -773,7 +774,7 @@ over all steps, iterations and sweeps. This matrix can be used to analyze PFASST
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

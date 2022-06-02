@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Welcome to pySDC! &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
@@ -42,12 +43,12 @@
           <div class="body" role="main">
             
   <section id="welcome-to-pysdc">
-<h1>Welcome to pySDC!<a class="headerlink" href="#welcome-to-pysdc" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to pySDC!<a class="headerlink" href="#welcome-to-pysdc" title="Permalink to this heading">¶</a></h1>
 <p>The <cite>pySDC</cite> project is a Python implementation of the spectral deferred correction (SDC) approach and its flavors,
 esp. the multilevel extension MLSDC and PFASST. It is intended for rapid prototyping and educational purposes.
 New ideas like e.g. sweepers or predictors can be tested and first toy problems can be easily implemented.</p>
 <section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Variants of SDC: explicit, implicit, IMEX, multi-implicit, Verlet, multi-level, diagonal, multi-step</p></li>
 <li><p>Variants of PFASST: virtual parallel or MPI-based parallel, classical of multigrid perspective</p></li>
@@ -60,7 +61,7 @@ New ideas like e.g. sweepers or predictors can be tested and first toy problems 
 </ul>
 </section>
 <section id="getting-started">
-<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h2>
 <p>The code is hosted on GitHub, see <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC">https://github.com/Parallel-in-Time/pySDC</a>, and PyPI, see <a class="reference external" href="https://pypi.python.org/pypi/pySDC">https://pypi.python.org/pypi/pySDC</a>.
 Use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pySDC
@@ -100,7 +101,7 @@ When using <cite>fenics</cite> or <cite>petsc4py</cite>, a C++ compiler is requi
 <p>For more details on <cite>pySDC</cite>, check out <a class="reference external" href="http://www.parallel-in-time.org/pySDC">http://www.parallel-in-time.org/pySDC</a>.</p>
 </section>
 <section id="how-to-cite">
-<h2>How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this headline">¶</a></h2>
+<h2>How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this heading">¶</a></h2>
 <p>If you use pySDC or parts of it for your work, great! Let us know if we can help you with this. Also, we would greatly appreciate a citation of <a class="reference external" href="https://doi.org/10.1145/3310410">this paper</a>:</p>
 <blockquote>
 <div><p>Robert Speck, <strong>Algorithm 997: pySDC - Prototyping Spectral Deferred Corrections</strong>,
@@ -110,7 +111,7 @@ ACM Transactions on Mathematical Software (TOMS), Volume 45 Issue 3, August 2019
 <p>The current software release can be cited using Zenodo: <a class="reference external" href="https://zenodo.org/badge/latestdoi/26165004"><img alt="zenodo" src="https://zenodo.org/badge/26165004.svg" /></a></p>
 </section>
 <section id="acknowledgements">
-<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<h2>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this heading">¶</a></h2>
 <p>This project has received funding from the <a class="reference external" href="https://eurohpc-ju.europa.eu/">European High-Performance Computing Joint Undertaking</a>  (JU) under grant agreement No 955701 (<a class="reference external" href="https://www.time-x-eurohpc.eu/">TIME-X</a>).
 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the <a class="reference external" href="https://www.bmbf.de/bmbf/en/home/home_node.html">German Federal Ministry of Education and Research</a> (BMBF) grant 16HPC047.</p>
@@ -119,7 +120,7 @@ This project also received funding from the <a class="reference external" href="
 <a class="reference internal image-reference" href="docs/source/logo/BMBF.jpg"><img alt="docs/source/logo/BMBF.jpg" src="docs/source/logo/BMBF.jpg" style="width: 20%;" /></a>
 </section>
 <section id="changelog">
-<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
 <ul>
 <li><p>December 13, 2021: Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
 suite seems to run faster now, since sorting out the dependencies is faster. Tested <a class="reference external" href="https://github.com/mamba-org/mamba">mamba</a>,
@@ -224,7 +225,7 @@ Most of the code is supported by tests, mainly realized by using the tutorial as
 </ul>
 </section>
 <section id="tutorial">
-<h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h2>
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this heading">¶</a></h2>
 <p>To flatten the steep learning curve of SDC and the likes, this tutorial contains eight steps to introduce, demonstrate and briefly discuss the main features of pySDC.
 We start with a simple problem setup, add the collocation problem, solve this via SDC, MLSDC and finally PFASST and discuss further extensions.
 Along the way we highlight special features of pySDC and explain how different features or implementations can be used (or disabled).</p>
@@ -244,14 +245,14 @@ The results are shown within the description and can be found here (yes, yes, Ju
 </div>
 </section>
 <section id="playgrounds">
-<h2>Playgrounds<a class="headerlink" href="#playgrounds" title="Permalink to this headline">¶</a></h2>
+<h2>Playgrounds<a class="headerlink" href="#playgrounds" title="Permalink to this heading">¶</a></h2>
 <p>This folder gathers various small to medium experiments done with pySDC. They are for example grouped by application (e.g. <code class="docutils literal notranslate"><span class="pre">Boris</span></code>) or by problem type (e.g. <code class="docutils literal notranslate"><span class="pre">ODEs</span></code>).
 Also, the <code class="docutils literal notranslate"><span class="pre">deprecated</span></code> folder lists a few old applications which have not been ported to the current version of <cite>pySDC</cite>.
 Experiments which become more complex or which eventually evolve into a publication of any form should go to the <code class="docutils literal notranslate"><span class="pre">projects</span></code> folder and should receive proper documentation and description.
 The playground codes are supposed to be cleaned up, but there is no detailed documentation available.</p>
 </section>
 <section id="projects">
-<h2>Projects<a class="headerlink" href="#projects" title="Permalink to this headline">¶</a></h2>
+<h2>Projects<a class="headerlink" href="#projects" title="Permalink to this heading">¶</a></h2>
 <p>In the <code class="docutils literal notranslate"><span class="pre">projects</span></code> folder we gather focussed experiments with pySDC which go beyond simple toy problems or feature tests.
 In particular, projects are structured and documented codes which form the basis for publications or presentations.
 All projects are expected to contain a README file describing the intention and content of the work.
@@ -273,12 +274,12 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
 </div>
 </section>
 <section id="tests">
-<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">¶</a></h2>
 <p>Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.</p>
 <p>Github Action reports: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml"><img alt="badge" src="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg" /></a>, test coverage results can be found <a class="reference external" href="test_coverage/index.html">here</a>.</p>
 </section>
 <section id="api-documentation">
-<h2>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h2>
 <p>The Python files contained in <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">implementations</span></code> and <code class="docutils literal notranslate"><span class="pre">helpers</span></code> are fully documented and their API is generated automatically with sphinx-apidoc after each update:</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -289,7 +290,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
 </div>
 </section>
 <section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -346,7 +347,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -369,7 +370,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

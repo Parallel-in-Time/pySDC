@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>&lt;no title&gt; &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -38,7 +39,7 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
@@ -73,7 +74,8 @@
     <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
 
     <span class="c1"># convert filtered statistics to list of iterations count, sorted by time</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="c1"># the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations at time </span><span class="si">%4.2f</span><span class="s1">: </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
@@ -192,7 +194,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -212,7 +214,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

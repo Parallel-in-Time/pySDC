@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>implementations package &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,9 +47,9 @@
           <div class="body" role="main">
             
   <section id="implementations-package">
-<h1>implementations package<a class="headerlink" href="#implementations-package" title="Permalink to this headline">¶</a></h1>
+<h1>implementations package<a class="headerlink" href="#implementations-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="implementations.collocation_classes.html">implementations.collocation_classes package</a><ul>
@@ -180,14 +181,14 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-implementations.collocations">
-<span id="implementations-collocations-module"></span><h2>implementations.collocations module<a class="headerlink" href="#module-implementations.collocations" title="Permalink to this headline">¶</a></h2>
+<span id="implementations-collocations-module"></span><h2>implementations.collocations module<a class="headerlink" href="#module-implementations.collocations" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="implementations.collocations.Collocation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.collocations.</span></span><span class="sig-name descname"><span class="pre">Collocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useSpline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/collocations.html#Collocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.collocations.Collocation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.core.Collocation.CollBase</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CollBase</span></code></p>
 <p>Generic collocation class alowing to produce many kind of quadrature nodes
 from various distribution.
 It is based on the two main parameters that define the nodes :</p>
@@ -210,12 +211,6 @@ spline interpolation when computing the weights.</p>
 <p>Here is the equivalency table with the original classes implemented in
 pySDC :</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 42%" />
-<col style="width: 18%" />
-<col style="width: 22%" />
-<col style="width: 18%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Original Class</p></th>
 <th class="head"><p>node_type</p></th>
@@ -270,7 +265,7 @@ pySDC :</p>
 
 </section>
 <section id="module-implementations">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementations" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -320,7 +315,7 @@ pySDC :</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -346,7 +341,7 @@ pySDC :</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

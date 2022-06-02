@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>What is the fastest SDC variant? &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="what-is-the-fastest-sdc-variant">
-<h1>What is the fastest SDC variant?<a class="headerlink" href="#what-is-the-fastest-sdc-variant" title="Permalink to this headline">¶</a></h1>
+<h1>What is the fastest SDC variant?<a class="headerlink" href="#what-is-the-fastest-sdc-variant" title="Permalink to this heading">¶</a></h1>
 <p>In this project, we test different variants of SDC for a particular problem to see which one is the fastest.
 More precisely, we run SDC for the 1D Fisher equation and the 2D Gray-Scott problem with PETSc data types and solvers, using fully implicit, semi-implicit and multi-implicit time-stepping.
 We also test exact spatial solves vs. inexact ones (aka inexact SDC, ISDC)</p>
 <section id="fisher-and-gray-scott-equations">
-<h2>Fisher and Gray-Scott equations<a class="headerlink" href="#fisher-and-gray-scott-equations" title="Permalink to this headline">¶</a></h2>
+<h2>Fisher and Gray-Scott equations<a class="headerlink" href="#fisher-and-gray-scott-equations" title="Permalink to this heading">¶</a></h2>
 <p>The two run scripts simply test all variants of SDC after the other, each of them exact and then inexact.
 The results are gathered, stored and shown in comparison.
 Note that on standard machines the inexact semi-implicit variant wins each time (may be different for the CI testing).</p>
@@ -644,7 +645,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -670,7 +671,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

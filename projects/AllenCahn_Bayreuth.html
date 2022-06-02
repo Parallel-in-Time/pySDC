@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Allen-Cahn problems from Bayreuth &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="allen-cahn-problems-from-bayreuth">
-<h1>Allen-Cahn problems from Bayreuth<a class="headerlink" href="#allen-cahn-problems-from-bayreuth" title="Permalink to this headline">¶</a></h1>
+<h1>Allen-Cahn problems from Bayreuth<a class="headerlink" href="#allen-cahn-problems-from-bayreuth" title="Permalink to this heading">¶</a></h1>
 <p>This project provides code for running, testing, benchmarking and playing with Allen-Cahn-type problems in material science.
 The setups come from <a class="reference external" href="http://paraphase.de">ParaPhase</a> partner <a class="reference external" href="https://www.metalle.uni-bayreuth.de">Bayreuth</a> and the codes should demonstrate correctness, parallelization and flexibility of the implementation with pySDC.
 Many (possibly all) codes in this project need <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a> which can be installed via pip or conda.</p>
 <section id="verification">
-<h2>Verification<a class="headerlink" href="#verification" title="Permalink to this headline">¶</a></h2>
+<h2>Verification<a class="headerlink" href="#verification" title="Permalink to this heading">¶</a></h2>
 <p>The script <code class="docutils literal notranslate"><span class="pre">run_simple_forcing_verification.py</span></code> tests various 2D test problems and compares the results against known values.
 This is done by setting up a circle of value 1, which then shrinks. The speed of this process is known for different setups.
 In detail, the code checks:</p>
@@ -66,18 +67,18 @@ Verification is done using a numerical simulation created with <code class="docu
 They run serial or parallel in space (although testing for the temperature setup only works in serial), but serial in time (mimicking PFASST, though).</p>
 </section>
 <section id="benchmark">
-<h2>Benchmark<a class="headerlink" href="#benchmark" title="Permalink to this headline">¶</a></h2>
+<h2>Benchmark<a class="headerlink" href="#benchmark" title="Permalink to this heading">¶</a></h2>
 <p>The script <code class="docutils literal notranslate"><span class="pre">run_simple_forcing_verification.py</span></code> can be used to benchmark the code for simple driving forces on larger HPC machines.
 It takes the number of processes in space as well as the setup type (as in the verification code) as input parameters.
 It can be run serial/parallel in space and/or time.</p>
 <p>These larger-scale codes are not tested with CI.</p>
 </section>
 <section id="application">
-<h2>Application<a class="headerlink" href="#application" title="Permalink to this headline">¶</a></h2>
+<h2>Application<a class="headerlink" href="#application" title="Permalink to this heading">¶</a></h2>
 <p>None yet.</p>
 </section>
 <section id="further-related-files">
-<h2>Further/related files<a class="headerlink" href="#further-related-files" title="Permalink to this headline">¶</a></h2>
+<h2>Further/related files<a class="headerlink" href="#further-related-files" title="Permalink to this heading">¶</a></h2>
 <p>The following files are also listed under this project:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">AllenCahn_monitor_and_dump.py</span></code>: computes the radii for the verification problems and dumps the solution via MPI I/O</p></li>
@@ -142,7 +143,7 @@ It can be run serial/parallel in space and/or time.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -168,7 +169,7 @@ It can be run serial/parallel in space and/or time.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

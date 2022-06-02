@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>core package &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="core-package">
-<h1>core package<a class="headerlink" href="#core-package" title="Permalink to this headline">¶</a></h1>
+<h1>core package<a class="headerlink" href="#core-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-core.BaseTransfer">
-<span id="core-basetransfer-module"></span><h2>core.BaseTransfer module<a class="headerlink" href="#module-core.BaseTransfer" title="Permalink to this headline">¶</a></h2>
+<span id="core-basetransfer-module"></span><h2>core.BaseTransfer module<a class="headerlink" href="#module-core.BaseTransfer" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.BaseTransfer.base_transfer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.BaseTransfer.</span></span><span class="sig-name descname"><span class="pre">base_transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/BaseTransfer.html#base_transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.BaseTransfer.base_transfer" title="Permalink to this definition">¶</a></dt>
@@ -68,7 +69,7 @@
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.BaseTransfer.base_transfer.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameter object containing the custom parameters passed by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -79,7 +80,7 @@
 <span class="sig-name descname"><span class="pre">fine</span></span><a class="headerlink" href="#core.BaseTransfer.base_transfer.fine" title="Permalink to this definition">¶</a></dt>
 <dd><p>reference to the fine level</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pySDC.Level.level</p>
 </dd>
 </dl>
@@ -90,7 +91,7 @@
 <span class="sig-name descname"><span class="pre">coarse</span></span><a class="headerlink" href="#core.BaseTransfer.base_transfer.coarse" title="Permalink to this definition">¶</a></dt>
 <dd><p>reference to the coarse level</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pySDC.Level.level</p>
 </dd>
 </dl>
@@ -103,7 +104,7 @@
 :param f_nodes: fine nodes
 :param c_nodes: coarse nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>matrix containing the interpolation weights</p>
 </dd>
 </dl>
@@ -139,7 +140,7 @@ fine level are restricted as well.</p>
 
 </section>
 <section id="module-core.Collocation">
-<span id="core-collocation-module"></span><h2>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this headline">¶</a></h2>
+<span id="core-collocation-module"></span><h2>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Collocation.CollBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
@@ -152,7 +153,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.num_nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of collocation nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -163,7 +164,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">tleft</span></span><a class="headerlink" href="#core.Collocation.CollBase.tleft" title="Permalink to this definition">¶</a></dt>
 <dd><p>left interval point</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -174,7 +175,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">tright</span></span><a class="headerlink" href="#core.Collocation.CollBase.tright" title="Permalink to this definition">¶</a></dt>
 <dd><p>right interval point</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -185,7 +186,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#core.Collocation.CollBase.nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>array of quadrature nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -196,7 +197,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.Collocation.CollBase.weights" title="Permalink to this definition">¶</a></dt>
 <dd><p>array of quadrature weights for the full interval</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -207,7 +208,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">Qmat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Qmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>matrix containing the weights for tleft to node</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -218,7 +219,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">Smat</span></span><a class="headerlink" href="#core.Collocation.CollBase.Smat" title="Permalink to this definition">¶</a></dt>
 <dd><p>matrix containing the weights for node to node</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -229,7 +230,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">delta_m</span></span><a class="headerlink" href="#core.Collocation.CollBase.delta_m" title="Permalink to this definition">¶</a></dt>
 <dd><p>array of distances between nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -240,7 +241,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">right_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.right_is_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>flag to indicate whether right point is collocation node</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -251,7 +252,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">left_is_node</span></span><a class="headerlink" href="#core.Collocation.CollBase.left_is_node" title="Permalink to this definition">¶</a></dt>
 <dd><p>flag to indicate whether left point is collocation node</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -262,16 +263,16 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the quadrature over the full interval</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>weights</strong> (<em>numpy.ndarray</em>) – array of quadrature weights for the full interval</p></li>
 <li><p><strong>data</strong> (<em>numpy.ndarray</em>) – f(x) to be integrated</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>integral over f(x) between tleft and tright</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
@@ -282,7 +283,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Collocation.StableBarycentricInterpolator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">StableBarycentricInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#StableBarycentricInterpolator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.StableBarycentricInterpolator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.interpolate._polyint.BarycentricInterpolator</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BarycentricInterpolator</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Collocation.StableBarycentricInterpolator.dtype">
 <span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#core.Collocation.StableBarycentricInterpolator.dtype" title="Permalink to this definition">¶</a></dt>
@@ -292,7 +293,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 
 </section>
 <section id="module-core.Controller">
-<span id="core-controller-module"></span><h2>core.Controller module<a class="headerlink" href="#module-core.Controller" title="Permalink to this headline">¶</a></h2>
+<span id="core-controller-module"></span><h2>core.Controller module<a class="headerlink" href="#module-core.Controller" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Controller.controller">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Controller.</span></span><span class="sig-name descname"><span class="pre">controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller" title="Permalink to this definition">¶</a></dt>
@@ -303,13 +304,13 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.check_convergence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>S</strong> (<em>pySDC.Step.step</em>) – current step</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>converged, true or false</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
@@ -320,7 +321,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">dump_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.dump_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.dump_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to dump the setup used for this controller</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the step instance (will/should be the first one only)</p></li>
 <li><p><strong>controller_params</strong> (<em>dict</em>) – controller parameters</p></li>
@@ -335,10 +336,10 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hooks</span></span><a class="headerlink" href="#core.Controller.controller.hooks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for the hooks</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>hooks</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pySDC.Hooks.hooks</p>
 </dd>
 </dl>
@@ -349,7 +350,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract interface to the run() method</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>u0</strong> – initial values</p></li>
 <li><p><strong>t0</strong> (<em>float</em>) – starting time</p></li>
@@ -363,7 +364,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 
 </section>
 <section id="module-core.Errors">
-<span id="core-errors-module"></span><h2>core.Errors module<a class="headerlink" href="#module-core.Errors" title="Permalink to this headline">¶</a></h2>
+<span id="core-errors-module"></span><h2>core.Errors module<a class="headerlink" href="#module-core.Errors" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="core.Errors.CollocationError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Errors.</span></span><span class="sig-name descname"><span class="pre">CollocationError</span></span><a class="reference internal" href="../_modules/core/Errors.html#CollocationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Errors.CollocationError" title="Permalink to this definition">¶</a></dt>
@@ -422,7 +423,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 
 </section>
 <section id="module-core.Hooks">
-<span id="core-hooks-module"></span><h2>core.Hooks module<a class="headerlink" href="#module-core.Hooks" title="Permalink to this headline">¶</a></h2>
+<span id="core-hooks-module"></span><h2>core.Hooks module<a class="headerlink" href="#module-core.Hooks" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Hooks.hooks">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Hooks.</span></span><span class="sig-name descname"><span class="pre">hooks</span></span><a class="reference internal" href="../_modules/core/Hooks.html#hooks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks" title="Permalink to this definition">¶</a></dt>
@@ -433,7 +434,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_setup</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of setup</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -444,7 +445,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_run</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -455,7 +456,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_predict</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the predictor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -466,7 +467,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_step</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -477,7 +478,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_iteration</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the iteration</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -488,7 +489,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_sweep</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the sweep</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -499,7 +500,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t0_comm</span></span><a class="headerlink" href="#core.Hooks.hooks.__t0_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get starting time of the communication</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -510,7 +511,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_run</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of the run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -521,7 +522,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_predict</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of the predictor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -532,7 +533,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_step</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of the step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -543,7 +544,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_iteration</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of the iteration</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -554,7 +555,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_sweep</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of the sweep</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -565,7 +566,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_setup</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to get end time of setup</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
@@ -576,7 +577,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__t1_comm</span></span><a class="headerlink" href="#core.Hooks.hooks.__t1_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>private variable to hold timing of the communication (!)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -593,7 +594,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__stats</span></span><a class="headerlink" href="#core.Hooks.hooks.__stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>dictionary for gathering the statistics of a run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
@@ -604,7 +605,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">__entry</span></span><a class="headerlink" href="#core.Hooks.hooks.__entry" title="Permalink to this definition">¶</a></dt>
 <dd><p>statistics entry containign all information to identify the value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>namedtuple</p>
 </dd>
 </dl>
@@ -615,7 +616,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span class="sig-name descname"><span class="pre">add_to_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.add_to_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.add_to_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine to add data to the statistics dict</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>process</strong> – the current process recording this data</p></li>
 <li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
@@ -635,7 +636,7 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <dd><p>Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
 initialize if applicable and to value otherwise</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>process</strong> – the current process recording this data</p></li>
 <li><p><strong>time</strong> (<em>float</em>) – the current simulation time</p></li>
@@ -655,7 +656,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each communication</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -670,7 +671,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each iteration</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -684,7 +685,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each predictor</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -698,7 +699,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -712,7 +713,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after setup</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -726,7 +727,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each step or block</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -740,7 +741,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">post_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.post_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.post_sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called after each sweep</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -754,7 +755,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_comm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before communication starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -768,7 +769,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_iteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_iteration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before iteration starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -782,7 +783,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before predictor starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -796,7 +797,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before time-loop starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -810,7 +811,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before setup starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -824,7 +825,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hook called before each step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -838,7 +839,7 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">pre_sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.pre_sweep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.pre_sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default routine called before sweep starts</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>step</strong> (<em>pySDC.Step.step</em>) – the current step</p></li>
 <li><p><strong>level_number</strong> (<em>int</em>) – the current level number</p></li>
@@ -858,10 +859,10 @@ initialize if applicable and to value otherwise</p>
 <span class="sig-name descname"><span class="pre">return_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Hooks.html#hooks.return_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Hooks.hooks.return_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for the stats</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>stats</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict</p>
 </dd>
 </dl>
@@ -871,11 +872,11 @@ initialize if applicable and to value otherwise</p>
 
 </section>
 <section id="module-core.Level">
-<span id="core-level-module"></span><h2>core.Level module<a class="headerlink" href="#module-core.Level" title="Permalink to this headline">¶</a></h2>
+<span id="core-level-module"></span><h2>core.Level module<a class="headerlink" href="#module-core.Level" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Level.level">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Level.</span></span><span class="sig-name descname"><span class="pre">level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problem_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sweeper_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Level.html#level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Level.level" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.pysdc_helper.FrozenClass</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenClass</span></code></p>
 <p>Level class containing all management functionality for a single level</p>
 <p>A level contains all data structures, types and objects to perform sweeps on this particular level. It does not
 know about other levels.</p>
@@ -884,7 +885,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Level.level.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameter object containing the custom parameters passed by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -895,7 +896,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#core.Level.level.status" title="Permalink to this definition">¶</a></dt>
 <dd><p>status object</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Status</p>
 </dd>
 </dl>
@@ -906,7 +907,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">level_index</span></span><a class="headerlink" href="#core.Level.level.level_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>custom string naming this level</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
 </dd>
 </dl>
@@ -923,7 +924,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">u</span></span><a class="headerlink" href="#core.Level.level.u" title="Permalink to this definition">¶</a></dt>
 <dd><p>dof values at the nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -934,7 +935,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">uold</span></span><a class="headerlink" href="#core.Level.level.uold" title="Permalink to this definition">¶</a></dt>
 <dd><p>copy of dof values for saving data during restriction)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -945,7 +946,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#core.Level.level.f" title="Permalink to this definition">¶</a></dt>
 <dd><p>RHS values at the nodes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dtype_f</p>
 </dd>
 </dl>
@@ -956,7 +957,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">fold</span></span><a class="headerlink" href="#core.Level.level.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>copy of RHS values for saving data during restriction</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dtype_f</p>
 </dd>
 </dl>
@@ -967,7 +968,7 @@ know about other levels.</p>
 <span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#core.Level.level.tau" title="Permalink to this definition">¶</a></dt>
 <dd><p>FAS correction, allocated via step class if necessary</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dtype_u</p>
 </dd>
 </dl>
@@ -978,10 +979,10 @@ know about other levels.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#core.Level.level.dt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meta-getter for the time-step size</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>referencing dt from parameters for convenience</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
@@ -992,10 +993,10 @@ know about other levels.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prob</span></span><a class="headerlink" href="#core.Level.level.prob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for the problem</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the problem associated to this level</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pySDC.Problem.ptype</p>
 </dd>
 </dl>
@@ -1012,10 +1013,10 @@ know about other levels.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sweep</span></span><a class="headerlink" href="#core.Level.level.sweep" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for the sweeper</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the sweeper associated to this level</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pySDC.Sweeper.sweeper</p>
 </dd>
 </dl>
@@ -1026,7 +1027,7 @@ know about other levels.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tag</span></span><a class="headerlink" href="#core.Level.level.tag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for tag</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tag for sending/receiving</p>
 </dd>
 </dl>
@@ -1037,10 +1038,10 @@ know about other levels.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Level.level.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meta-getter for the current time</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>referencing status time for convenience</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
@@ -1050,7 +1051,7 @@ know about other levels.</p>
 
 </section>
 <section id="module-core.Nodes">
-<span id="core-nodes-module"></span><h2>core.Nodes module<a class="headerlink" href="#module-core.Nodes" title="Permalink to this headline">¶</a></h2>
+<span id="core-nodes-module"></span><h2>core.Nodes module<a class="headerlink" href="#module-core.Nodes" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
 <dt class="sig sig-object py" id="core.Nodes.NodesError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Nodes.</span></span><span class="sig-name descname"><span class="pre">NodesError</span></span><a class="reference internal" href="../_modules/core/Nodes.html#NodesError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesError" title="Permalink to this definition">¶</a></dt>
@@ -1070,7 +1071,7 @@ Its implementation is fully inspired from a book of W. Gautschi <a href="#id5"><
 <span class="sig-name descname"><span class="pre">node_type</span></span><a class="headerlink" href="#core.Nodes.NodesGenerator.node_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of node distribution</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
@@ -1081,7 +1082,7 @@ Its implementation is fully inspired from a book of W. Gautschi <a href="#id5"><
 <span class="sig-name descname"><span class="pre">quad_type</span></span><a class="headerlink" href="#core.Nodes.NodesGenerator.quad_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The quadrature type</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
@@ -1131,14 +1132,14 @@ taking into account the quadrature type.</p>
 <dd><p>Evaluates the two higher order orthogonal polynomials corresponding
 to the given (alpha,beta) coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>float</em><em> or </em><em>np.1darray</em>) – The point where to evaluate the orthogonal polynomials.</p></li>
 <li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
 <li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>pi[0]</strong> (<em>float or np.1darray</em>) – The second higher order orthogonal polynomial evaluation.</p></li>
 <li><p><strong>pi[1]</strong> (<em>float or np.1darray</em>) – The higher oder orthogonal polynomial evaluation.</p></li>
@@ -1153,13 +1154,13 @@ to the given (alpha,beta) coefficients.</p>
 <span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a given number of quadrature nodes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes to compute.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>nodes</strong> – Nodes located in [-1, 1], in increasing order.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>np.1darray</p>
 </dd>
 </dl>
@@ -1170,10 +1171,10 @@ to the given (alpha,beta) coefficients.</p>
 <span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_coeff</strong> (<em>int</em>) – Number of coefficients to compute.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
 <li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
@@ -1189,10 +1190,10 @@ to the given (alpha,beta) coefficients.</p>
 <dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
 taking into account the quadrature type.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes that should be computed from those coefficients.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>alpha</strong> (<em>np.1darray</em>) – The modified alpha coefficients of the three-term recurrence.</p></li>
 <li><p><strong>beta</strong> (<em>np.1darray</em>) – The modified beta coefficients of the three-term recurrence.</p></li>
@@ -1206,7 +1207,7 @@ taking into account the quadrature type.</p>
 
 </section>
 <section id="module-core.Problem">
-<span id="core-problem-module"></span><h2>core.Problem module<a class="headerlink" href="#module-core.Problem" title="Permalink to this headline">¶</a></h2>
+<span id="core-problem-module"></span><h2>core.Problem module<a class="headerlink" href="#module-core.Problem" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Problem.ptype">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Problem.</span></span><span class="sig-name descname"><span class="pre">ptype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype" title="Permalink to this definition">¶</a></dt>
@@ -1223,7 +1224,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Problem.ptype.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameter object containing the custom parameters passed by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -1263,7 +1264,7 @@ taking into account the quadrature type.</p>
 
 </section>
 <section id="module-core.SpaceTransfer">
-<span id="core-spacetransfer-module"></span><h2>core.SpaceTransfer module<a class="headerlink" href="#module-core.SpaceTransfer" title="Permalink to this headline">¶</a></h2>
+<span id="core-spacetransfer-module"></span><h2>core.SpaceTransfer module<a class="headerlink" href="#module-core.SpaceTransfer" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.SpaceTransfer.space_transfer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.SpaceTransfer.</span></span><span class="sig-name descname"><span class="pre">space_transfer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fine_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_prob</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer" title="Permalink to this definition">¶</a></dt>
@@ -1274,7 +1275,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.SpaceTransfer.space_transfer.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameters given by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -1291,7 +1292,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">fine_prob</span></span><a class="headerlink" href="#core.SpaceTransfer.space_transfer.fine_prob" title="Permalink to this definition">¶</a></dt>
 <dd><p>reference to the fine problem</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pySDC.Problem.ptype</p>
 </dd>
 </dl>
@@ -1302,7 +1303,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">coarse_prob</span></span><a class="headerlink" href="#core.SpaceTransfer.space_transfer.coarse_prob" title="Permalink to this definition">¶</a></dt>
 <dd><p>reference to the coarse problem</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pySDC.Problem.ptype</p>
 </dd>
 </dl>
@@ -1313,7 +1314,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">prolong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer.prolong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer.prolong" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract interface for prolongation in space</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>G</strong> – the coarse level data (easier to access than via the coarse attribute)</p>
 </dd>
 </dl>
@@ -1324,7 +1325,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">restrict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/SpaceTransfer.html#space_transfer.restrict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.SpaceTransfer.space_transfer.restrict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract interface for restriction in space</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>F</strong> – the fine level data (easier to access than via the fine attribute)</p>
 </dd>
 </dl>
@@ -1334,11 +1335,11 @@ taking into account the quadrature type.</p>
 
 </section>
 <section id="module-core.Step">
-<span id="core-step-module"></span><h2>core.Step module<a class="headerlink" href="#module-core.Step" title="Permalink to this headline">¶</a></h2>
+<span id="core-step-module"></span><h2>core.Step module<a class="headerlink" href="#module-core.Step" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Step.step">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Step.</span></span><span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pySDC.helpers.pysdc_helper.FrozenClass</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FrozenClass</span></code></p>
 <p>Step class, referencing most of the structure needed for the time-stepping</p>
 <p>This class bundles multiple levels and the corresponding transfer operators and is used by the controller
 (e.g. SDC and MLSDC). Status variables like the current time are hidden via properties and setters methods.</p>
@@ -1347,7 +1348,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Step.step.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameters given by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -1358,7 +1359,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#core.Step.step.status" title="Permalink to this definition">¶</a></dt>
 <dd><p>status class for the step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Status</p>
 </dd>
 </dl>
@@ -1375,7 +1376,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">levels</span></span><a class="headerlink" href="#core.Step.step.levels" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of levels</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -1386,7 +1387,7 @@ taking into account the quadrature type.</p>
 <span class="sig-name descname"><span class="pre">connect_levels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_transfer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fine_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coarse_level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Step.html#step.connect_levels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Step.step.connect_levels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Routine to couple levels with base_transfer operators</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>base_transfer_class</strong> – the class which can do transfer between the two space-time levels</p></li>
 <li><p><strong>base_transfer_params</strong> (<em>dict</em>) – parameters for the space_transfer class</p></li>
@@ -1404,10 +1405,10 @@ taking into account the quadrature type.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#core.Step.step.dt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for current time-step size</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dt of level[0]</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
@@ -1419,7 +1420,7 @@ taking into account the quadrature type.</p>
 <dd><p>Initialization routine for a new step.</p>
 <p>This routine uses initial values u0 to set up the u[0] values at the finest level</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>u0</strong> (<em>dtype_u</em>) – initial values</p>
 </dd>
 </dl>
@@ -1430,7 +1431,7 @@ taking into account the quadrature type.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><a class="headerlink" href="#core.Step.step.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for next step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>prev</p>
 </dd>
 </dl>
@@ -1441,7 +1442,7 @@ taking into account the quadrature type.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prev</span></span><a class="headerlink" href="#core.Step.step.prev" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for previous step</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>prev</p>
 </dd>
 </dl>
@@ -1458,10 +1459,10 @@ taking into account the quadrature type.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#core.Step.step.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Getter for current time</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>time of level[0]</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
@@ -1475,7 +1476,7 @@ taking into account the quadrature type.</p>
 Using the transfer dictionary, the calling stepper does not need to specify whether to use restrict of
 prolong.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>source</strong> (<em>pySDC.Level.level</em>) – source level</p></li>
 <li><p><strong>target</strong> (<em>pySDC.Level.level</em>) – target level</p></li>
@@ -1488,7 +1489,7 @@ prolong.</p>
 
 </section>
 <section id="module-core.Sweeper">
-<span id="core-sweeper-module"></span><h2>core.Sweeper module<a class="headerlink" href="#module-core.Sweeper" title="Permalink to this headline">¶</a></h2>
+<span id="core-sweeper-module"></span><h2>core.Sweeper module<a class="headerlink" href="#module-core.Sweeper" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Sweeper.sweeper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Sweeper.</span></span><span class="sig-name descname"><span class="pre">sweeper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Sweeper.html#sweeper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Sweeper.sweeper" title="Permalink to this definition">¶</a></dt>
@@ -1505,7 +1506,7 @@ prolong.</p>
 <span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#core.Sweeper.sweeper.params" title="Permalink to this definition">¶</a></dt>
 <dd><p>parameter object containing the custom parameters passed by the user</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>__Pars</p>
 </dd>
 </dl>
@@ -1516,7 +1517,7 @@ prolong.</p>
 <span class="sig-name descname"><span class="pre">coll</span></span><a class="headerlink" href="#core.Sweeper.sweeper.coll" title="Permalink to this definition">¶</a></dt>
 <dd><p>collocation object</p>
 <dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pySDC.Collocation.CollBase</p>
 </dd>
 </dl>
@@ -1555,10 +1556,10 @@ prolong.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">level</span></span><a class="headerlink" href="#core.Sweeper.sweeper.level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current level</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the current level</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pySDC.Level.level</p>
 </dd>
 </dl>
@@ -1582,7 +1583,7 @@ and evaluates the RHS of the ODE there</p>
 
 </section>
 <section id="module-core">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -1641,7 +1642,7 @@ and evaluates the RHS of the ODE there</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1667,7 +1668,7 @@ and evaluates the RHS of the ODE there</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

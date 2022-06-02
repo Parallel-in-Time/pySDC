@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Step-5: PFASST &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,10 +47,10 @@
           <div class="body" role="main">
             
   <section id="step-5-pfasst">
-<h1>Step-5: PFASST<a class="headerlink" href="#step-5-pfasst" title="Permalink to this headline">¶</a></h1>
+<h1>Step-5: PFASST<a class="headerlink" href="#step-5-pfasst" title="Permalink to this heading">¶</a></h1>
 <p>In this step, we will show how pySDC can do PFASST runs (virtually parallel for now).</p>
 <section id="part-a-multistep-multilevel-hierarchy">
-<h2>Part A: Multistep multilevel hierarchy<a class="headerlink" href="#part-a-multistep-multilevel-hierarchy" title="Permalink to this headline">¶</a></h2>
+<h2>Part A: Multistep multilevel hierarchy<a class="headerlink" href="#part-a-multistep-multilevel-hierarchy" title="Permalink to this heading">¶</a></h2>
 <p>In this first part, we create a controller and demonstrate how pySDC’s data structures represent multiple time-steps.
 While for SDC the <code class="docutils literal notranslate"><span class="pre">step</span></code> data structure is the key part, we now have simply a list of steps, bundled in the <code class="docutils literal notranslate"><span class="pre">MS</span></code> attribute of the controller.
 The nice thing about going form MLSDC to PFASST is that only the number of processes in the <code class="docutils literal notranslate"><span class="pre">num_procs</span></code> variable has to be changed.
@@ -143,7 +144,7 @@ Also, the instantiation of (the list of) steps via the controllers is implemente
 </div>
 </section>
 <section id="part-b-my-first-pfasst-run">
-<h2>Part B: My first PFASST run<a class="headerlink" href="#part-b-my-first-pfasst-run" title="Permalink to this headline">¶</a></h2>
+<h2>Part B: My first PFASST run<a class="headerlink" href="#part-b-my-first-pfasst-run" title="Permalink to this heading">¶</a></h2>
 <p>After we have created our multistep-multilevel hierarchy, we are now ready to run PFASST.
 We choose the simple heat equation for our first test.
 One of the most important characteristics of a parallel-in-time algorithm is its behavior for increasing number of parallel time-steps for a given problem (i.e. with <code class="docutils literal notranslate"><span class="pre">dt</span></code> and <code class="docutils literal notranslate"><span class="pre">Tend</span></code> fixed).
@@ -410,7 +411,7 @@ Making the problem more complicated, less/more stiff, changing the order of the 
 </div>
 </section>
 <section id="part-c-advection-and-pfasst">
-<h2>Part C: Advection and PFASST<a class="headerlink" href="#part-c-advection-and-pfasst" title="Permalink to this headline">¶</a></h2>
+<h2>Part C: Advection and PFASST<a class="headerlink" href="#part-c-advection-and-pfasst" title="Permalink to this heading">¶</a></h2>
 <p>We saw in the last part that PFASST does perform very well for certain parabolic problems. Now, we test PFASST for an advection test case to see how things go then.
 The basic setup is the same, but now using only an implicit sweeper and periodic boundary conditions.
 To make things more interesting, we choose two different sweepers: the LU-trick as well as the implicit Euler and check how these are performing for this kind of problem.
@@ -701,7 +702,7 @@ Mean number of iterations went up from 6.00 to 9.44 for QI = IE!
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -727,7 +728,7 @@ Mean number of iterations went up from 6.00 to 9.44 for QI = IE!
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

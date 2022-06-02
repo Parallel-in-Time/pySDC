@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Performance analysis of pySDC &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,20 +47,20 @@
           <div class="body" role="main">
             
   <section id="performance-analysis-of-pysdc">
-<h1>Performance analysis of pySDC<a class="headerlink" href="#performance-analysis-of-pysdc" title="Permalink to this headline">¶</a></h1>
+<h1>Performance analysis of pySDC<a class="headerlink" href="#performance-analysis-of-pysdc" title="Permalink to this heading">¶</a></h1>
 <p>In this project, benchmark and analyze pySDC using tools like JUBE, Score-P, VAMPIR and CUBE.
 The goal is to verify the controllers and to understand the parallel performance of space-time parallel runs.
 This code is in parts used for the publication “Performance tools for parallel-in-time integration with pySDC”.
 Warning: This project is not tested during CI/CD, since it relies on the HPC system JURECA at JSC.</p>
 <section id="python-codes">
-<h2>Python codes<a class="headerlink" href="#python-codes" title="Permalink to this headline">¶</a></h2>
+<h2>Python codes<a class="headerlink" href="#python-codes" title="Permalink to this heading">¶</a></h2>
 <p>The main code used for the analysis is the script <code class="docutils literal notranslate"><span class="pre">run_simple_forcing_benchmark.py</span></code>, taken from the Allen-Cahn project.
 It can run parallel in space (with FFTs) and parallel in time.
 For tracing with manual instrumentation, we modify the MPI-based controller so that regions of interest are defined (fine sweep, coarse sweep, transfer etc.).
 In addition, the script <code class="docutils literal notranslate"><span class="pre">visualize.py</span></code> helps to show the results of the benchmarks using matplotlib.</p>
 </section>
 <section id="jobscripts">
-<h2>Jobscripts<a class="headerlink" href="#jobscripts" title="Permalink to this headline">¶</a></h2>
+<h2>Jobscripts<a class="headerlink" href="#jobscripts" title="Permalink to this heading">¶</a></h2>
 <p>In order to run the code, JUBE is primarily used.
 For this, xml-files are needed to specify the parameter spaces for JUBE to run (number of processes, type of implementation etc.).
 These are given by <code class="docutils literal notranslate"><span class="pre">jube_run_pySDC_AC_space.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">jube_run_pySDC_AC_spacetime.xml</span></code>.
@@ -68,7 +69,7 @@ There is also a stand-alone jobscript (<code class="docutils literal notranslate
 The use of Score-P and JUBE on JURECA is described in the two howto-files.</p>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading">¶</a></h2>
 <p>The project already contains some output files, where traces have been visualized using VAMPIR.
 For this, there is also a VAMPIR settings file available to help reproducing the pictures.</p>
 <p>Full codes: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Performance">pySDC/projects/Performance/</a></p>
@@ -126,7 +127,7 @@ For this, there is also a VAMPIR settings file available to help reproducing the
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -152,7 +153,7 @@ For this, there is also a VAMPIR settings file available to help reproducing the
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

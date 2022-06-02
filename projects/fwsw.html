@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Fast-Wave-Slow-Wave SDC &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,7 +47,7 @@
           <div class="body" role="main">
             
   <section id="fast-wave-slow-wave-sdc">
-<h1>Fast-Wave-Slow-Wave SDC<a class="headerlink" href="#fast-wave-slow-wave-sdc" title="Permalink to this headline">¶</a></h1>
+<h1>Fast-Wave-Slow-Wave SDC<a class="headerlink" href="#fast-wave-slow-wave-sdc" title="Permalink to this heading">¶</a></h1>
 <p>In this project, we explore semi-implicit spectral deferred corrections (SISDC) in which the stiff, fast dynamics correspond to fast propagating waves.
 We study the performance of the method compared to standard integrators like RK-IMEX or DIRK schemes and analyze the convergence properties for scalar test problems.
 This project contains the code for the publication <a class="reference external" href="http://dx.doi.org/10.1137/16M1060078">Spectral deferred corrections with fast-wave-slow-wave splitting</a> of pySDC v2,
@@ -55,7 +56,7 @@ Note that due to the long runtime, not all results are generated via CI.
 For the Boussinesq example and the convergence test of the acoustic-advection equation, only the visualization (and therefore the existence of the data files) is tested.
 We omit the codes in this documentation, since they are rather long and slightly complex.</p>
 <section id="theoretical-results">
-<h2>Theoretical results<a class="headerlink" href="#theoretical-results" title="Permalink to this headline">¶</a></h2>
+<h2>Theoretical results<a class="headerlink" href="#theoretical-results" title="Permalink to this heading">¶</a></h2>
 <p>Here, we review FWSW-SDC from two different viewpoints: as a split method with a fixed order set by a fixed number of iterations K for a sufficiently large number of nodes M,
 or as an iterative solver for the collocation problem where iterations are performed until the norm of the residual reaches a prescribed tolerance.
 We investigate fwsw-SDC from both viewpoints for the scalar test problem and analyze:</p>
@@ -75,7 +76,7 @@ We investigate fwsw-SDC from both viewpoints for the scalar test problem and ana
 <a class="reference internal image-reference" href="../_images/ampfactor-K3-M3.png"><img alt="../_images/ampfactor-K3-M3.png" src="../_images/ampfactor-K3-M3.png" style="width: 19%;" /></a>
 </section>
 <section id="acoustic-advection-example">
-<h2>Acoustic-advection example<a class="headerlink" href="#acoustic-advection-example" title="Permalink to this headline">¶</a></h2>
+<h2>Acoustic-advection example<a class="headerlink" href="#acoustic-advection-example" title="Permalink to this heading">¶</a></h2>
 <p>In a first more complex example, we consider the 1D acoustic-advection example. We show:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/runconvergence_acoustic.py">convergence</a> of FWSW-SDC with orders 3, 4, and 5 versus number of time steps (Fig. 5, left)</p></li>
@@ -88,7 +89,7 @@ We investigate fwsw-SDC from both viewpoints for the scalar test problem and ana
 <a class="reference internal image-reference" href="../_images/multiscale-K2-M2.png"><img alt="../_images/multiscale-K2-M2.png" src="../_images/multiscale-K2-M2.png" style="width: 19%;" /></a>
 </section>
 <section id="boussinesq-example">
-<h2>Boussinesq example<a class="headerlink" href="#boussinesq-example" title="Permalink to this headline">¶</a></h2>
+<h2>Boussinesq example<a class="headerlink" href="#boussinesq-example" title="Permalink to this heading">¶</a></h2>
 <p>In a second, even more complex example, we test FWSW-SDC for the 2D Boussinesq equation.
 In particular, we are interested in the number of <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/rungmrescounter_boussinesq.py">GMRES iterations</a> each time integrator needs to achieve a certain error.</p>
 <p>Results (generated with <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/FastWaveSlowWave/plotgmrescounter_boussinesq.py">plotgmrescounter_boussinesq.py</a>):</p>
@@ -141,7 +142,7 @@ In particular, we are interested in the number of <a class="reference external" 
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -167,7 +168,7 @@ In particular, we are interested in the number of <a class="reference external" 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>RDC: Rational Deferred Corrections &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,19 +47,19 @@
           <div class="body" role="main">
             
   <section id="rdc-rational-deferred-corrections">
-<h1>RDC: Rational Deferred Corrections<a class="headerlink" href="#rdc-rational-deferred-corrections" title="Permalink to this headline">¶</a></h1>
+<h1>RDC: Rational Deferred Corrections<a class="headerlink" href="#rdc-rational-deferred-corrections" title="Permalink to this heading">¶</a></h1>
 <p>In this project, we integrate the rational deferred correction (RDC) method by Guettel &amp; Klein from <a class="reference external" href="http://etna.mcs.kent.edu/volumes/2011-2020/vol41/abstract.php?vol=41&amp;pages=443-464">this paper</a>.
 This is done by deriving from the equidistant collocation class, but replacing Scipy’s standard BarycentricInterpolator with a custom <code class="docutils literal notranslate"><span class="pre">MyBarycentricInterpolator</span></code>, where the blended nodes are used.
 The rest is standard pySDC and all features are available.</p>
 <section id="testing-rdc-convergence">
-<h2>Testing RDC convergence<a class="headerlink" href="#testing-rdc-convergence" title="Permalink to this headline">¶</a></h2>
+<h2>Testing RDC convergence<a class="headerlink" href="#testing-rdc-convergence" title="Permalink to this heading">¶</a></h2>
 <p>In a first test we try to reproduce parts of Figure 4.5 (left) of the original paper.
 We compute a high-resolution reference for Van der Pol’s oscillator with SDC, see <code class="docutils literal notranslate"><span class="pre">vanderpol_reference.py</span></code>.
 Then, for RDC we use <code class="docutils literal notranslate"><span class="pre">d=15</span></code> for the blending parameter and vary the number of maximum iterations from 1 to 10.
 The results can be found in <code class="docutils literal notranslate"><span class="pre">vanderpol_error_test.py</span></code></p>
 </section>
 <section id="multi-level-rdc-and-pfasst-with-rdc">
-<h2>Multi-level RDC and PFASST with RDC<a class="headerlink" href="#multi-level-rdc-and-pfasst-with-rdc" title="Permalink to this headline">¶</a></h2>
+<h2>Multi-level RDC and PFASST with RDC<a class="headerlink" href="#multi-level-rdc-and-pfasst-with-rdc" title="Permalink to this heading">¶</a></h2>
 <p>The obvious next step is to try the multi-level variant of RDC as well as a PFASST-version of RDC.
 Both are not straightforward and it seems that only for smaller numbers of nodes multi-level RDC does actually converge,
 at least if collocation-based coarsening is used. Yet, in <code class="docutils literal notranslate"><span class="pre">vanderpol_MLSDC_PFASST_test.py</span></code> we show one example where the errors as well as the mean number of iterations look fine.
@@ -110,7 +111,7 @@ Note that we use very aggressive node coarsening here, going from 20 to 2 nodes.
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -136,7 +137,7 @@ Note that we use very aggressive node coarsening here, going from 20 to 2 nodes.
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

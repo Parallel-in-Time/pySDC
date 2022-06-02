@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Step-3: Statistics and a new sweeper &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="step-3-statistics-and-a-new-sweeper">
-<h1>Step-3: Statistics and a new sweeper<a class="headerlink" href="#step-3-statistics-and-a-new-sweeper" title="Permalink to this headline">¶</a></h1>
+<h1>Step-3: Statistics and a new sweeper<a class="headerlink" href="#step-3-statistics-and-a-new-sweeper" title="Permalink to this heading">¶</a></h1>
 <p>In this step, we will show how to work with the statistics pySDC
 generates. We will also introduce a new problem as well as a new
 sweeper.</p>
 <section id="part-a-getting-statistics">
-<h2>Part A: Getting statistics<a class="headerlink" href="#part-a-getting-statistics" title="Permalink to this headline">¶</a></h2>
+<h2>Part A: Getting statistics<a class="headerlink" href="#part-a-getting-statistics" title="Permalink to this heading">¶</a></h2>
 <p>In the first part, we run our standard heat equation problem again, but
 focus on the <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary the controller returns in addition to
 the final solution. This <code class="docutils literal notranslate"><span class="pre">stats</span></code> dictionary is a little bit complex,
@@ -83,7 +84,7 @@ values are registered in the statistics. This can be helpful, if
 users register their own types, see below.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
@@ -118,7 +119,8 @@ users register their own types, see below.</p></li>
     <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
 
     <span class="c1"># convert filtered statistics to list of iterations count, sorted by time</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="c1"># the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Number of iterations at time </span><span class="si">%4.2f</span><span class="s1">: </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
@@ -215,7 +217,7 @@ users register their own types, see below.</p></li>
 </div>
 </section>
 <section id="part-b-adding-statistics">
-<h2>Part B: Adding statistics<a class="headerlink" href="#part-b-adding-statistics" title="Permalink to this headline">¶</a></h2>
+<h2>Part B: Adding statistics<a class="headerlink" href="#part-b-adding-statistics" title="Permalink to this heading">¶</a></h2>
 <p>We now extend the statistics of pySDC by user-defined entries. To make
 things much more interesting (and complicated), we introduce a new
 problem class (<code class="docutils literal notranslate"><span class="pre">PenningTrap_3D</span></code>) as well a new sweeper
@@ -343,8 +345,8 @@ using the level.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-05-25 06:07:24,468 - controller - Controller - dump_setup - 116 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2022-05-25 06:07:24,468 - controller - Controller - dump_setup - 179 - INFO: ----------------------------------------------------------------------------------------------------
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-06-02 06:14:37,744 - controller - Controller - dump_setup - 116 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2022-06-02 06:14:37,745 - controller - Controller - dump_setup - 179 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -385,27 +387,27 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
 --&gt;                 num_nodes = 3
 --&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
 
-2022-05-25 06:07:24,468 - controller - Controller - dump_setup - 181 - INFO: ----------------------------------------------------------------------------------------------------
-2022-05-25 06:07:24,468 - controller - Controller - dump_setup - 183 - INFO: Setup overview (--&gt; user-defined) -- END
+2022-06-02 06:14:37,745 - controller - Controller - dump_setup - 181 - INFO: ----------------------------------------------------------------------------------------------------
+2022-06-02 06:14:37,745 - controller - Controller - dump_setup - 183 - INFO: Setup overview (--&gt; user-defined) -- END
 
-2022-05-25 06:07:25,214 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2022-05-25 06:07:25,221 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2022-05-25 06:07:25,228 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2022-05-25 06:07:25,235 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2022-05-25 06:07:25,242 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2022-05-25 06:07:25,249 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2022-05-25 06:07:25,255 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2022-05-25 06:07:25,262 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534548e-06
-2022-05-25 06:07:25,269 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2022-05-25 06:07:25,276 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408029e-08
-2022-05-25 06:07:25,283 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2022-06-02 06:14:38,445 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2022-06-02 06:14:38,452 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2022-06-02 06:14:38,458 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2022-06-02 06:14:38,465 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2022-06-02 06:14:38,471 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2022-06-02 06:14:38,477 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2022-06-02 06:14:38,485 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2022-06-02 06:14:38,491 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534548e-06
+2022-06-02 06:14:38,497 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2022-06-02 06:14:38,504 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09408029e-08
+2022-06-02 06:14:38,510 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
 </div>
 </section>
 <section id="part-c-studying-collocation-node-types">
-<h2>Part C: Studying collocation node types<a class="headerlink" href="#part-c-studying-collocation-node-types" title="Permalink to this headline">¶</a></h2>
+<h2>Part C: Studying collocation node types<a class="headerlink" href="#part-c-studying-collocation-node-types" title="Permalink to this heading">¶</a></h2>
 <p>Having first experience with the Boris-SDC solver, we see that the
 energy deviates quite a bit already for this simple setup. We now test
 this for three different collocation classes to demonstrate how a
@@ -593,7 +595,7 @@ the relevant information can be stored.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -619,7 +621,7 @@ the relevant information can be stored.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

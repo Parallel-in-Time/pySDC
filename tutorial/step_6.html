@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Step-6: Advanced PFASST controllers &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,10 +47,10 @@
           <div class="body" role="main">
             
   <section id="step-6-advanced-pfasst-controllers">
-<h1>Step-6: Advanced PFASST controllers<a class="headerlink" href="#step-6-advanced-pfasst-controllers" title="Permalink to this headline">¶</a></h1>
+<h1>Step-6: Advanced PFASST controllers<a class="headerlink" href="#step-6-advanced-pfasst-controllers" title="Permalink to this heading">¶</a></h1>
 <p>We discuss controller implementations, features and parallelization of PFASST controllers in this step.</p>
 <section id="part-a-the-nonmpi-controller">
-<h2>Part A: The nonMPI controller<a class="headerlink" href="#part-a-the-nonmpi-controller" title="Permalink to this headline">¶</a></h2>
+<h2>Part A: The nonMPI controller<a class="headerlink" href="#part-a-the-nonmpi-controller" title="Permalink to this heading">¶</a></h2>
 <p>pySDC comes with (at least) two controllers: the standard, non-MPI controller we have used so far and the MPI_parallel one.
 The nonMPI controller can be used to run simulations without having to worry about parallelization and MPI installations.
 By monitoring the convergence, this controller can already give a detailed idea of how PFASST will work for a given problem.</p>
@@ -308,7 +309,7 @@ By monitoring the convergence, this controller can already give a detailed idea 
 </div>
 </section>
 <section id="part-b-odd-temporal-distribution">
-<h2>Part B: Odd temporal distribution<a class="headerlink" href="#part-b-odd-temporal-distribution" title="Permalink to this headline">¶</a></h2>
+<h2>Part B: Odd temporal distribution<a class="headerlink" href="#part-b-odd-temporal-distribution" title="Permalink to this heading">¶</a></h2>
 <p>Accidentally, the numbers of parallel processes used in Part A are always dividers of the number of steps.
 Yet, this does not need to be the case. All controllers are capable of handling odd distributions, e.g. too few or too many processes for the steps (or for the las block).
 This is demonstrated here, where the code from Part A is called again with odd number of parallel steps.</p>
@@ -381,7 +382,7 @@ This is demonstrated here, where the code from Part A is called again with odd n
 </div>
 </section>
 <section id="part-c-mpi-parallelization">
-<h2>Part C: MPI parallelization<a class="headerlink" href="#part-c-mpi-parallelization" title="Permalink to this headline">¶</a></h2>
+<h2>Part C: MPI parallelization<a class="headerlink" href="#part-c-mpi-parallelization" title="Permalink to this heading">¶</a></h2>
 <p>Since PFASST is actually a parallel algorithm, executing it in parallel e.g. using MPI might be an interesting exercise.
 To do this, pySDC comes with the MPI-parallelized controller, namely <code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code>.
 It is supposed to yield the same results as the non-MPI counterpart and this is what we are demonstrating here (at least for one particular example).
@@ -681,7 +682,7 @@ We can use the results of Parts A and B to compare with and we expect the same n
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -707,7 +708,7 @@ We can use the results of Parts A and B to compare with and we expect the same n
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>

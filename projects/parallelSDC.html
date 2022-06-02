@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Attempts to parallelize SDC &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -13,6 +13,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -46,12 +47,12 @@
           <div class="body" role="main">
             
   <section id="attempts-to-parallelize-sdc">
-<h1>Attempts to parallelize SDC<a class="headerlink" href="#attempts-to-parallelize-sdc" title="Permalink to this headline">¶</a></h1>
+<h1>Attempts to parallelize SDC<a class="headerlink" href="#attempts-to-parallelize-sdc" title="Permalink to this heading">¶</a></h1>
 <p>In this project, we test different strategies to parallelize SDC beyond PFASST.
 More precisely, the goal is to find a robust parallelization strategy <em>within</em> each iteration, i.e. parallelization across the collocation nodes.
 This code is used for the publication “Parallelizing SDC across the method”.</p>
 <section id="different-preconditioners-for-sdc">
-<h2>Different preconditioners for SDC<a class="headerlink" href="#different-preconditioners-for-sdc" title="Permalink to this headline">¶</a></h2>
+<h2>Different preconditioners for SDC<a class="headerlink" href="#different-preconditioners-for-sdc" title="Permalink to this heading">¶</a></h2>
 <p>The easiest approach for a parallel SDC run is to parallelize the preconditioner, i.e. to find a diagonal Q-delta matrix.
 So far, this matrix is a lower triangular matrix, containing e.g. the Euler scheme or parts of the LU-decomposition of Q.
 Here, we study different ideas to work with a diagonal matrix and compare them to the standard schemes:</p>
@@ -315,7 +316,7 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 <a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_fisher.png"><img alt="../_images/parallelSDC_preconditioner_fisher.png" src="../_images/parallelSDC_preconditioner_fisher.png" style="width: 272.0px; height: 184.0px;" /></a>
 </section>
 <section id="node-parallel-sdc-with-mpi">
-<h2>Node-parallel SDC with MPI<a class="headerlink" href="#node-parallel-sdc-with-mpi" title="Permalink to this headline">¶</a></h2>
+<h2>Node-parallel SDC with MPI<a class="headerlink" href="#node-parallel-sdc-with-mpi" title="Permalink to this heading">¶</a></h2>
 <p>The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
 We test again the aforementioned ideas, but now add the <code class="docutils literal notranslate"><span class="pre">MIN3</span></code> approach: These values have been obtained using Indie Solver,
 a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
@@ -575,7 +576,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 <a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 266.0px; height: 180.0px;" /></a>
 </section>
 <section id="simplified-newton-for-nonlinear-problems">
-<h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Permalink to this headline">¶</a></h2>
+<h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Permalink to this heading">¶</a></h2>
 <p>The main idea here is to work with a diagonalization of the Q matrix.
 While this works well for non-equidistant and non-symmetri nodes like Gauss-Radau, this can only be applied for linear problem, where space and time is separated via Kronecker products.
 In order to apply this also for nonlinear problems, we apply an outer Newton iteration to the nonlinear collocation problem and use the diagonalized SDC approach for the linear problem.
@@ -966,7 +967,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 <a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 286.0px; height: 184.0px;" /></a>
 </section>
 <section id="id1">
-<h2>Node-parallel SDC with MPI<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>Node-parallel SDC with MPI<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
 <p>The project also contains a sweeper (and a transfer class) to allow real, MPI-based parallelism of diagonal preconditioners.
 We test again the aforementioned ideas, but now add the <code class="docutils literal notranslate"><span class="pre">MIN3</span></code> approach: These values have been obtained using Indie Solver,
 a commercial solver for black-box optimization which aggregates several state-of-the-art optimization methods (free academic subscription plan).
@@ -1273,7 +1274,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1299,7 +1300,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
     </div>
   </body>
 </html>
