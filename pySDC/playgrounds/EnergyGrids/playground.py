@@ -2,7 +2,7 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -22,7 +22,9 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['collocation_class'] = Collocation
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 3
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
@@ -69,14 +71,14 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    fname = 'data/piline.dat'
+    fname = 'piline.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
 
 
 def plot_voltages(cwd='./'):
-    f = open(cwd + 'data/piline.dat', 'rb')
+    f = open(cwd + 'piline.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
