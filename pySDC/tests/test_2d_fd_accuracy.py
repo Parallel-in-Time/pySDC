@@ -23,15 +23,18 @@ def test_spatial_accuracy():
     nvars_list = [(2 ** p, 2 ** p) for p in range(4, 12)]
 
     # run accuracy test for all nvars
-    results = run_accuracy_check(nvars_list=nvars_list,problem_params=problem_params)
+    for order_stencil in [2, 4, 8]:
+        results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params, order_stencil=order_stencil)
 
-    # compute order of accuracy
-    order = get_accuracy_order(results)
+        # compute order of accuracy
+        order = get_accuracy_order(results)
+        print(order_stencil, order)
 
-    assert (all(np.isclose(order, 2, rtol=0.005))), "ERROR: spatial order of accuracy is not as expected, got %s" %order
+        assert all(np.isclose(order, order_stencil, atol=5e-2)), f"ERROR: expected spatial order to be \
+{order_stencil} but got {np.mean(order):.2f}"
 
 
-def run_accuracy_check(nvars_list,problem_params):
+def run_accuracy_check(nvars_list, problem_params, order_stencil):
     """
     Routine to check the error of the Laplacian vs. its FD discretization
 
@@ -49,6 +52,7 @@ def run_accuracy_check(nvars_list,problem_params):
 
         # setup problem
         problem_params['nvars'] = nvars
+        problem_params['order'] = order_stencil
         prob = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
@@ -97,7 +101,8 @@ def get_accuracy_order(results):
         id_prev = ID(nvars=nvars_list[i-1])
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
-        order.append(np.log(results[id_prev]/results[id])/np.log(nvars_list[i][0]/nvars_list[i-1][0]))
+        if results[id] > 1e-8 and results[id_prev] > 1e-8:
+            order.append(np.log(results[id_prev]/results[id])/np.log(nvars_list[i][0]/nvars_list[i-1][0]))
 
     return order
 

@@ -80,3 +80,7 @@ def get_list_of_types(stats):
         if k.type not in type_list:
             type_list.append(k.type)
     return type_list
+
+
+def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, sortby='time'):
+    return sort_stats(filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type), sortby=sortby)
