@@ -263,8 +263,9 @@ class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
             S = MS[i]
             for j in range(len(S.levels)):
                 L = S.levels[j]
-                semi_global_errors[i][j] = max([abs(L.uold[-1] - L.u[-1]), np.finfo(float).eps])
-                L.status.error_embedded_estimate = abs(semi_global_errors[i][j] - semi_global_errors[i - 1][j])
+                semi_global_errors[i][j] = abs(L.uold[-1] - L.u[-1])
+                L.status.error_embedded_estimate = max([abs(semi_global_errors[i][j] - semi_global_errors[i - 1][j]),
+                                                       np.finfo(float).eps])
 
 
 class _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(_ErrorEstimator_nonMPI_BlockGS):
@@ -340,19 +341,15 @@ ate!')
                         self.embedded_estimate_local_error(MS[:i + 1])
 
 
-class ErrorEstimator_nonMPI:
+def get_ErrorEstimator_nonMPI(controller):
     """
 
-    This class should be imported from the controller and return the correct version of the error estimator based on
+    This function should be called from the controller and return the correct version of the error estimator based on
     the chosen parameters.
 
     """
 
-    def __init__(self):
-        pass
-
-    def get_estimator(self, controller):
-        if len(controller.MS) >= (controller.MS[0].params.maxiter + 4) // 2:
-            return _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(controller)
-        else:
-            return _ErrorEstimator_nonMPI_BlockGS(controller)
+    if len(controller.MS) >= (controller.MS[0].params.maxiter + 4) // 2:
+        return _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(controller)
+    else:
+        return _ErrorEstimator_nonMPI_BlockGS(controller)

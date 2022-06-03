@@ -6,7 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
-from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI
+from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
 
 
 class controller_nonMPI(controller):
@@ -79,7 +79,6 @@ class controller_nonMPI(controller):
             self.params.use_HotRod
         self.params.use_extrapolation_estimate = self.params.use_extrapolation_estimate or self.params.use_HotRod
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
-        self.restart = [False] * num_procs
         if self.params.use_adaptivity:
             if 'e_tol' not in description['level_params'].keys():
                 raise ParameterError('Please supply "e_tol" in the level parameters')
@@ -91,7 +90,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        self.error_estimator = ErrorEstimator_nonMPI().get_estimator(self)
+        self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -183,9 +182,10 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             while not done:
                 done = self.pfasst(MS_active)
 
-            if True in self.restart:  # restart part of the block
+            restarts = [S.status.restart for S in MS_active]
+            if True in restarts:  # restart part of the block
                 # find the place after which we need to restart
-                restart_at = np.where(self.restart)[0][0]
+                restart_at = np.where(restarts)[0][0]
 
                 # store values in the current block that don't need restarting
                 if restart_at > 0:
@@ -265,8 +265,6 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         for p in active_slots:
             for lvl in self.MS[p].levels:
                 lvl.status.time = time[p]
-
-        self.restart = [False] * len(self.MS)
 
     @staticmethod
     def recv(target, source, tag=None):
@@ -537,7 +535,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_adaptivity:
             self.adaptivity(local_MS_running)
 
-        self.resilence(local_MS_running)
+        self.resilience(local_MS_running)
 
         for S in local_MS_running:
 
@@ -762,7 +760,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         """
         raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
 
-    def resilence(self, local_MS_running):
+    def resilience(self, local_MS_running):
         """
         Call various functions that are supposed to provide some sort of resilience from here
         """
@@ -770,10 +768,11 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod:
             self.hotrod(local_MS_running)
 
-        # make sure controller and steps are on the same page about restarting
+        # a step gets restarted because it wants to or because any earlier step wants to
+        restart = False
         for p in range(len(local_MS_running)):
-            local_MS_running[p].status.restart = local_MS_running[p].status.restart or any(self.restart[:p + 1])
-            self.restart[p] = local_MS_running[p].status.restart
+            restart = restart or local_MS_running[p].status.restart
+            local_MS_running[p].status.restart = restart
 
     def hotrod(self, local_MS_running):
         """
@@ -792,7 +791,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                     if None not in [l.status.error_extrapolation_estimate, l.status.error_embedded_estimate]:
                         diff = l.status.error_extrapolation_estimate - l.status.error_embedded_estimate
                         if diff > self.params.HotRod_tol:
-                            self.restart[i] = True
+                            S.status.restart = True
 
     def adaptivity(self, MS):
         """
@@ -817,14 +816,11 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             order = S.status.iter  # embedded error estimate is same order as time marching
             assert L.status.error_embedded_estimate is not None, 'Make sure to estimate the embedded error before call\
 ing adaptivity!'
-            h_opt = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
-            # distribute step sizes
-            L.status.dt_new = h_opt
+            L.status.dt_new = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
             # check whether to move on or restart
             if L.status.error_embedded_estimate >= L.params.e_tol:
-                self.restart[i] = True
                 S.status.restart = True
 
     def adaptivity_update_step_sizes(self, active_slots):
@@ -832,10 +828,11 @@ ing adaptivity!'
         Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate
         """
         # figure out where the block is restarted
-        if True in self.restart:
-            restart_at = np.where(self.restart)[0][0]
+        restarts = [self.MS[p].status.restart for p in active_slots]
+        if True in restarts:
+            restart_at = np.where(restarts)[0][0]
         else:
-            restart_at = len(self.restart) - 1
+            restart_at = len(restarts) - 1
 
         # record the step sizes to restart with
         new_steps = [None] * len(self.MS[restart_at].levels)
