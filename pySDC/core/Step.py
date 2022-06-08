@@ -31,6 +31,7 @@ class _Status(FrozenClass):
         self.time_size = None
         self.diff_old_loc = None
         self.diff_first_loc = None
+        self.restart = False
         # freeze class, no further attributes allowed from this point
         self._freeze()
 
