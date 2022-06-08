@@ -48,7 +48,7 @@ class log_data(hooks):
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
 
 
-def single_run(var='dt', val=1e-1, k=5):
+def single_run(var='dt', val=1e-1, k=5, serial=True):
     """
     A simple test program to do PFASST runs for the heat equation
     """
@@ -84,6 +84,7 @@ def single_run(var='dt', val=1e-1, k=5):
     controller_params['hook_class'] = log_data
     controller_params['use_extrapolation_estimate'] = True
     controller_params['use_embedded_estimate'] = True
+    controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -97,12 +98,17 @@ def single_run(var='dt', val=1e-1, k=5):
     # set time parameters
     t0 = 0.0
     if var == 'dt':
-        Tend = 20 * val
+        Tend = 30 * val
     else:
         Tend = 2e1
 
+    if serial:
+        num_procs = 1
+    else:
+        num_procs = 30
+
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -110,17 +116,18 @@ def single_run(var='dt', val=1e-1, k=5):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    e_extrapolated = np.array(sort_stats(filter_stats(stats, type='e_extrapolated'), sortby='time'))[:, 1]
 
     results = {
         'e_embedded': sort_stats(filter_stats(stats, type='e_embedded'), sortby='time')[-1][1],
-        'e_extrapolated': sort_stats(filter_stats(stats, type='e_extrapolated'), sortby='time')[-1][1],
+        'e_extrapolated': e_extrapolated[e_extrapolated != [None]][-1],
         var: val,
     }
 
     return results
 
 
-def mulitple_runs(ax, k=5):
+def multiple_runs(ax, k=5, serial=True):
     """
     A simple test program to compute the order of accuracy in time
     """
@@ -129,13 +136,13 @@ def mulitple_runs(ax, k=5):
     dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
 
     # perform first test
-    res = single_run(var='dt', val=dt_list[0], k=k)
+    res = single_run(var='dt', val=dt_list[0], k=k, serial=serial)
     for key in res.keys():
         res[key] = [res[key]]
 
     # perform rest of the tests
     for i in range(1, len(dt_list)):
-        res_ = single_run(var='dt', val=dt_list[i], k=k)
+        res_ = single_run(var='dt', val=dt_list[i], k=k, serial=serial)
         for key in res_.keys():
             res[key].append(res_[key])
 
@@ -152,12 +159,12 @@ def plot(res, ax, k):
         order = get_accuracy_order(res, key=keys[i], order=k)
         if i == 0:
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            assert abs(np.mean(order) - k) < 1e-1, f'Expected embedded error estimate to have order {k} \
+            assert np.isclose(np.mean(order), k, atol=3e-1), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
         else:
             label = None
-            assert abs(np.mean(order) - k - 1) < 1e-1, f'Expected extrapolation error estimate to have order {k+1} \
+            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order {k+1} \
 but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
@@ -185,9 +192,12 @@ def get_accuracy_order(results, key='e_embedded', order=5):
     # loop over two consecutive errors/dt pairs
     for i in range(1, len(dt_list)):
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
-        tmp = np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1])
-        if results[key][i] > 1e-14 and results[key][i - 1] > 1e-14:
-            order.append(tmp)
+        try:
+            tmp = np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1])
+            if results[key][i] > 1e-14 and results[key][i - 1] > 1e-14:
+                order.append(tmp)
+        except TypeError:
+            print('Type Warning', results[key])
 
     return order
 
@@ -195,14 +205,18 @@ def get_accuracy_order(results, key='e_embedded', order=5):
 def main():
     setup_mpl()
     ks = [4, 3, 2]
-    fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-    for i in range(len(ks)):
-        k = ks[i]
-        mulitple_runs(k=k, ax=ax)
-    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
-    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
-    ax.legend(frameon=False, loc='lower right')
-    fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
+    for serial in [True, False]:
+        fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
+        for i in range(len(ks)):
+            k = ks[i]
+            multiple_runs(k=k, ax=ax, serial=serial)
+        ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
+        ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
+        ax.legend(frameon=False, loc='lower right')
+        if serial:
+            fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
+        else:
+            fig.savefig('data/error_estimate_order_parallel.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
