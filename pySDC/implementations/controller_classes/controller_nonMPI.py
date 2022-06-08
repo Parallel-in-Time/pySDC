@@ -202,7 +202,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                 uend = self.MS[active_slots[-1]].levels[0].uend
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
-            self.adaptivity_update_step_sizes(active_slots)
+            self.update_step_sizes(active_slots)
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
@@ -823,9 +823,9 @@ ing adaptivity!'
             if L.status.error_embedded_estimate >= L.params.e_tol:
                 S.status.restart = True
 
-    def adaptivity_update_step_sizes(self, active_slots):
+    def update_step_sizes(self, active_slots):
         """
-        Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate
+        Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate
         """
         # figure out where the block is restarted
         restarts = [self.MS[p].status.restart for p in active_slots]
