@@ -162,6 +162,8 @@
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity">adaptivity() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity_update_step_sizes">adaptivity_update_step_sizes() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">add() (implementations.problem_classes.boussinesq_helpers.helper_classes.logging method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.add_to_stats">add_to_stats() (core.Hooks.hooks method)</a>
@@ -532,8 +534,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.fields.elec">elec (implementations.datatype_classes.particles.fields attribute)</a>
 </li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.embedded_estimate">embedded_estimate() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
-</li>
       <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant.Equidistant">Equidistant (class in implementations.collocation_classes.equidistant)</a>
 </li>
       <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_inner.EquidistantInner">EquidistantInner (class in implementations.collocation_classes.equidistant_inner)</a>
@@ -541,10 +541,6 @@
       <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft">EquidistantNoLeft (class in implementations.collocation_classes.equidistant_right)</a>
 </li>
       <li><a href="pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_spline_right.EquidistantSpline_Right">EquidistantSpline_Right (class in implementations.collocation_classes.equidistant_spline_right)</a>
-</li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI">ErrorEstimator_nonMPI (class in implementations.controller_classes.error_estimator)</a>
-</li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.estimate">estimate() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Problem.ptype.eval_f">eval_f() (core.Problem.ptype method)</a>
 
@@ -701,8 +697,6 @@
 </li>
       </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.explicit.explicit">explicit (class in implementations.sweeper_classes.explicit)</a>
-</li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.extrapolation_estimate">extrapolation_estimate() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -876,7 +870,7 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix">get2DUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.get_extrapolation_coefficients">get_extrapolation_coefficients() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.get_ErrorEstimator_nonMPI">get_ErrorEstimator_nonMPI() (in module implementations.controller_classes.error_estimator)</a>
 </li>
       <li><a href="pySDC/core.html#core.Problem.get_finite_difference_stencil">get_finite_difference_stencil() (in module core.Problem)</a>
 </li>
@@ -2383,7 +2377,7 @@
 </li>
       <li><a href="pySDC/core.html#core.Step.step.reset_step">reset_step() (core.Step.step method)</a>
 </li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilence">resilence() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
+      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilience">resilience() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">restart_block() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 
@@ -2475,8 +2469,6 @@
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.send">(implementations.datatype_classes.particles.particles method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.setup_extrapolation">setup_extrapolation() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
-</li>
       <li><a href="pySDC/helpers.html#helpers.plot_helper.setup_mpl">setup_mpl() (in module helpers.plot_helper)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.visualization_tools.show_residual_across_simulation">show_residual_across_simulation() (in module helpers.visualization_tools)</a>
@@ -2636,8 +2628,6 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.Step.step">step (class in core.Step)</a>
-</li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI.store_values">store_values() (implementations.controller_classes.error_estimator.ErrorEstimator_nonMPI method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Level.level.sweep">sweep (core.Level.level property)</a>
 </li>
@@ -2947,7 +2937,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>
