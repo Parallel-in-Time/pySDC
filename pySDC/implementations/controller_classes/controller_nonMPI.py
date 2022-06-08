@@ -6,7 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
-from pySDC.implementations.controller_classes.error_estimator import ErrorEstimator_nonMPI
+from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
 
 
 class controller_nonMPI(controller):
@@ -79,7 +79,6 @@ class controller_nonMPI(controller):
             self.params.use_HotRod
         self.params.use_extrapolation_estimate = self.params.use_extrapolation_estimate or self.params.use_HotRod
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
-        self.restart = [False] * num_procs
         if self.params.use_adaptivity:
             if 'e_tol' not in description['level_params'].keys():
                 raise ParameterError('Please supply "e_tol" in the level parameters')
@@ -91,7 +90,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
-        self.error_estimator = ErrorEstimator_nonMPI(self)
+        self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -183,28 +182,38 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             while not done:
                 done = self.pfasst(MS_active)
 
-            # restart the entire block from scratch if a single step needs to be restarted
-            if True in self.restart:  # recompute current block
-                # restart active steps (reset all values and pass u0 to u0)
-                if len(self.MS) > 1:
-                    raise NotImplementedError('restart only implemented for 1 rank just yet')
-                self.restart_block(active_slots, time, self.MS[active_slots[0]].levels[0].u[0])
+            restarts = [S.status.restart for S in MS_active]
+            if True in restarts:  # restart part of the block
+                # find the place after which we need to restart
+                restart_at = np.where(restarts)[0][0]
+
+                # store values in the current block that don't need restarting
+                if restart_at > 0:
+                    self.error_estimator.store_values(MS_active[:restart_at])
+
+                # initial condition to next block is initial condition of step that needs restarting
+                uend = self.MS[restart_at].levels[0].u[0]
+                time[active_slots[0]] = time[restart_at]
 
             else:  # move on to next block
-                # uend is uend of the last active step in the list
-                uend = self.MS[active_slots[-1]].levels[0].uend
-
                 self.error_estimator.store_values(MS_active)
 
-                for p in active_slots:
-                    time[p] += num_procs * self.MS[p].dt
+                # initial condition for next block is last solution of current block
+                uend = self.MS[active_slots[-1]].levels[0].uend
+                time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
-                # determine new set of active steps and compress slots accordingly
-                active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
-                active_slots = list(itertools.compress(slots, active))
+            self.adaptivity_update_step_sizes(active_slots)
 
-                # restart active steps (reset all values and pass uend to u0)
-                self.restart_block(active_slots, time, uend)
+            # setup the times of the steps for the next block
+            for i in range(1, len(active_slots)):
+                time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
+
+            # determine new set of active steps and compress slots accordingly
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active_slots = list(itertools.compress(slots, active))
+
+            # restart active steps (reset all values and pass uend to u0)
+            self.restart_block(active_slots, time, uend)
 
         # call post-run hook
         for S in self.MS:
@@ -247,6 +256,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             self.MS[p].status.stage = 'SPREAD'
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
+            self.MS[p].status.restart = False
 
             for l in self.MS[p].levels:
                 l.tag = None
@@ -340,7 +350,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             # call predictor from sweeper
             S.levels[0].sweep.predict()
 
-            if self.params.use_iteration_estimator:
+            if self.store_uold:
                 # store pervious iterate to compute difference later on
                 S.levels[0].uold[:] = S.levels[0].u[:]
 
@@ -525,7 +535,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         if self.params.use_adaptivity:
             self.adaptivity(local_MS_running)
 
-        self.resilence(local_MS_running)
+        self.resilience(local_MS_running)
 
         for S in local_MS_running:
 
@@ -552,7 +562,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                 self.hooks.pre_iteration(step=S, level_number=0)
 
                 if self.store_uold:
-                    # store pervious iterate to compute difference later on
+                    # store previous iterate to compute difference later on
                     S.levels[0].uold[:] = S.levels[0].u[:]
 
                 if len(S.levels) > 1:  # MLSDC or PFASST
@@ -750,13 +760,19 @@ s to have a constant order in time for adaptivity. Setting restol=0')
         """
         raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
 
-    def resilence(self, local_MS_running):
+    def resilience(self, local_MS_running):
         """
         Call various functions that are supposed to provide some sort of resilience from here
         """
 
         if self.params.use_HotRod:
             self.hotrod(local_MS_running)
+
+        # a step gets restarted because it wants to or because any earlier step wants to
+        restart = False
+        for p in range(len(local_MS_running)):
+            restart = restart or local_MS_running[p].status.restart
+            local_MS_running[p].status.restart = restart
 
     def hotrod(self, local_MS_running):
         """
@@ -775,12 +791,16 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                     if None not in [l.status.error_extrapolation_estimate, l.status.error_embedded_estimate]:
                         diff = l.status.error_extrapolation_estimate - l.status.error_embedded_estimate
                         if diff > self.params.HotRod_tol:
-                            self.restart[i] = True
+                            S.status.restart = True
 
     def adaptivity(self, MS):
         """
-        Method to compute time step size adaptively based on embedded error estimate
+        Method to compute time step size adaptively based on embedded error estimate.
+        Adaptivity requires you to know the order of the scheme, which you can also know for Jacobi, but it works
+        differently.
         """
+        if len(MS) > 1 and self.params.mssdc_jac:
+            raise NotImplementedError('Adaptivity for multi step SDC only implemented for block Gauss-Seidel')
 
         # loop through steps and compute local error and optimal step size from there
         for i in range(len(MS)):
@@ -796,16 +816,34 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             order = S.status.iter  # embedded error estimate is same order as time marching
             assert L.status.error_embedded_estimate is not None, 'Make sure to estimate the embedded error before call\
 ing adaptivity!'
-            h_opt = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
-            # distribute step sizes
-            if len(MS) > 1:
-                raise NotImplementedError('Adaptivity only implemented for 1 rank just yet')
-            else:
-                L.params.dt = h_opt
+            L.status.dt_new = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
             # check whether to move on or restart
             if L.status.error_embedded_estimate >= L.params.e_tol:
-                self.restart[i] = True
-            else:
-                self.restart[i] = False
+                S.status.restart = True
+
+    def adaptivity_update_step_sizes(self, active_slots):
+        """
+        Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate
+        """
+        # figure out where the block is restarted
+        restarts = [self.MS[p].status.restart for p in active_slots]
+        if True in restarts:
+            restart_at = np.where(restarts)[0][0]
+        else:
+            restart_at = len(restarts) - 1
+
+        # record the step sizes to restart with
+        new_steps = [None] * len(self.MS[restart_at].levels)
+        for i in range(len(self.MS[restart_at].levels)):
+            l = self.MS[restart_at].levels[i]
+            new_steps[i] = l.status.dt_new if l.status.dt_new is not None else l.params.dt
+
+        # spread the step sizes to all levels
+        for j in range(len(active_slots)):
+            # get slot number
+            p = active_slots[j]
+
+            for i in range(len(self.MS[p].levels)):
+                self.MS[p].levels[i].params.dt = new_steps[i]

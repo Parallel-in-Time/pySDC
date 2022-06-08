@@ -21,6 +21,7 @@ class _Status(FrozenClass):
         self.unlocked = False
         self.updated = False
         self.time = None
+        self.dt_new = None
         self.sweep = None
         self.error_embedded_estimate = None
         self.error_extrapolation_estimate = None
