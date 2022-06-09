@@ -36,47 +36,6 @@ class battery(ptype):
 
         self.A = np.zeros((2, 2))
 
-    def switch_estimator(self, u):
-        """
-            Method to estimate a discrete event (switch)
-        """
-
-        L = S.levels[0]
-
-        t_interp = [L.time + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
-            
-        vC = []
-        for m in range(1, len(u)):
-            vC.append(u[m])
-
-        p = scipy.interpolate.interp1d(t_interp, vC, 'cubic', bounds_error=False)
-
-        def switch_examiner(x):
-            """
-                Routine to define root problem
-            """
-
-            return L.prob.params.V_ref - p(x)
-            
-        t_switch = scipy.optimize.fsolve(switch_examiner, t_interp[2])
-            
-        # next subinterval
-        t_next = [t_interp[-1] + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
-
-        # Looking for the event
-        flag_event = []    
-        for m in range(len(t_next)-1):
-            if t_next[m] <= t_switch <= t_next[m+1]:
-                flag_event.append(True)
-            
-            else:
-                flag_event.append(False)
-                    
-        print(t_switch)
-        print(t_interp)
-        print(t_next)
-        return t_switch, flag_event
-
     def eval_f(self, u, t):
         """
         Routine to evaluate the RHS
@@ -109,18 +68,13 @@ class battery(ptype):
         Returns:
             dtype_u: solution as mesh
         """
-
         self.A = np.zeros((2, 2))
-        
-        #t_switch, flag_event = switch_estimator(self, rhs[1])
 
         if rhs[1] <= self.params.V_ref:
             self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-            #print("Below reference!")
 
         else:
             self.A[1, 1] = -1 / (self.params.C * self.params.R)
-            #print("Over reference!")
 
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
