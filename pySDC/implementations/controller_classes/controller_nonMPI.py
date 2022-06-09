@@ -834,9 +834,8 @@ ing adaptivity!'
         else:
             restart_at = len(restarts) - 1
 
-        # Compute the maximum allowed step size based on Tend. The final step will be computed with the original
-        # step size to reach the same final time regardless of step size control
-        dt_max = (Tend-self.MS[restart_at].levels[0].params.dt_initial - time[0]) / len(active_slots)
+        # Compute the maximum allowed step size based on Tend.
+        dt_max = (Tend - time[0]) / len(active_slots)
 
         # record the step sizes to restart with from all the levels of the step
         new_steps = [None] * len(self.MS[restart_at].levels)
