@@ -1,5 +1,7 @@
+import numpy as np
 
-def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None):
+
+def filter_stats(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None):
     """
     Helper function to extract data from the dictrionary of statistics
 
@@ -10,11 +12,22 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
         level (int): the requested level index
         iter (int): the requested iteration count
         type (str): string to describe the requested type of value
+        recomputed (bool): filter out intermediate values that have no impact on the solution because the associated
+                           step was restarted if True. (Or filter the restarted if False. Use None to get both.)
     Returns:
         dict: dictionary containing only the entries corresponding to the filter
     """
-
     result = {}
+
+    # check which steps have been recomputed
+    if recomputed is not None:
+        # this will contain a 2d array with all times and whether they have been recomputed
+        restarts = np.array(get_sorted(stats, process=None, time=None, iter=None, type='recomputed',
+                            recomputed=None, sortby='time'))
+    else:
+        # dummy values for when no filtering of restarts is desired
+        restarts = np.array([[None, None]])
+
     for k, v in stats.items():
         # get data if key matches the filter (if specified)
         if (k.time == time or time is None) and \
@@ -22,7 +35,15 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
                 (k.level == level or level is None) and \
                 (k.iter == iter or iter is None) and \
                 (k.type == type or type is None):
-            result[k] = v
+
+            if k.time in restarts[:, 0]:
+                # we know there is only one entry for each time, so we make a mask for the time and take the first and
+                # only entry and then take the second entry of this, which contains whether a restart was performed at
+                # this time as a float and compare it to the value we specified for recomputed
+                if restarts[restarts[:, 0] == k.time][0][1] == float(recomputed):
+                    result[k] = v
+            else:
+                result[k] = v
 
     return result
 
@@ -68,5 +89,5 @@ def get_list_of_types(stats):
     return type_list
 
 
-def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, sortby='time'):
+def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, sortby='time'):
     return sort_stats(filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type), sortby=sortby)
