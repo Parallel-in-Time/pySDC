@@ -7,7 +7,6 @@ Switching processes
 -------------------
 In our microgrid, buck converters emulate the power consumption behavior of a household. They convert a large input voltage into a smaller target output voltage, which is done by multiple switchings. In each step, the actual output value will be compared with a target output voltage. Based in the error, the duty cycle is recalculated to control the switching process. 
 The battery drain model as the another challenging component in microgrid, energy will provided by a capacitor for the first time. The capacitor discharge after time and when its voltage drops below a reference value, the battery switches to another voltage source. Here, only one switch occurs and it is perfectly to investigate it in SDC and PFASST.
-In order to get more familiar with this electrotechnical stuff, we refer the interesting reader to the website `PinTSimE https://lisawim.github.io/PinTSimE/`_.
 Looking at the switching processes, an interesting question arises: How can SDC (and PFASST) deal with switching? Recent investigations yield that it does not matter which time step is used. Switching on a time step leads to no complications. Switching inside a time subinterval results in a lower residual after the switch. In power system engineering, good accuracy is crucial to simulate energy grids. Therefore, a detection and handling must be found.  
 
 The pi-line test case
