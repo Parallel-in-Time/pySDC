@@ -22,17 +22,17 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='p3', value=L.uend[2])
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
         self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='restart', value=1, initialize=0)
@@ -115,7 +115,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     v2 = np.array(sort_stats(filter_stats(stats, type='v2', recomputed=recomputed), sortby='time'))[:, 1]
     p3 = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 1]
     t = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 0]
-    dt = np.array(sort_stats(filter_stats(stats, type='dt', recomputed=recomputed), sortby='time'))[:, 1]
+    dt = np.array(sort_stats(filter_stats(stats, type='dt', recomputed=recomputed), sortby='time'))
     e_em = np.array(sort_stats(filter_stats(stats, type='e_embedded', recomputed=recomputed), sortby='time'))[:, 1]
     e_ex = np.array(sort_stats(filter_stats(stats, type='e_extrapolated', recomputed=recomputed), sortby='time'))[:, 1]
     restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
@@ -126,39 +126,45 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
         expected = {
-            'v1': 83.88240785649039,
-            'v2': 80.62744370831926,
-            'p3': 16.137248067563256,
-            'e_em': 6.236525251779312e-08,
-            'e_ex': 6.33675177461887e-08,
-            'dt': 0.09607389421085785,
+            'v1': 83.88330442715265,
+            'v2': 80.62692930055763,
+            'p3': 16.13594155613822,
+            'e_em': 4.922608098922865e-09,
+            'e_ex': 4.4120077421613226e-08,
+            'dt': 0.05,
             'restarts': 1.0,
             'sweeps': 2416.0,
+            't': 20.03656747407325,
         }
+
     elif use_adaptivity and num_procs == 4:
         error_msg = 'Error when using adaptivity in parallel:'
         expected = {
-            'v1': 83.88317481237193,
-            'v2': 80.62700122995363,
-            'p3': 16.136136147445036,
-            'e_em': 2.9095385656319195e-08,
-            'e_ex': 5.666752074991754e-08,
-            'dt': 0.09347348421862582,
+            'v1': 83.88400082289273,
+            'v2': 80.62656229801286,
+            'p3': 16.134850400599763,
+            'e_em': 2.3681899108396465e-08,
+            'e_ex': 3.6491178375304526e-08,
+            'dt': 0.08265581329617167,
             'restarts': 8.0,
-            'sweeps': 2400.0,
+            'sweeps': 2432.0,
+            't': 19.999999999999996,
         }
+
     elif not use_adaptivity and num_procs == 4:
         error_msg = 'Error with fixed step size in parallel:'
         expected = {
-            'v1': 83.88400149770143,
-            'v2': 80.62656173487008,
-            'p3': 16.134849851184736,
-            'e_em': 4.977994905175365e-09,
-            'e_ex': 5.048084913047097e-09,
+            'v1': 83.88400128006428,
+            'v2': 80.62656202423844,
+            'p3': 16.134849781053525,
+            'e_em': 4.277040943634347e-09,
+            'e_ex': 4.9707053288253756e-09,
             'dt': 0.05,
             'restarts': 0.0,
             'sweeps': 1600.0,
+            't': 20.00000000000015,
         }
+
     elif not use_adaptivity and num_procs == 1:
         error_msg = 'Error with fixed step size in serial:'
         expected = {
@@ -170,6 +176,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
             'dt': 0.05,
             'restarts': 0.0,
             'sweeps': 1600.0,
+            't': 20.00000000000015,
         }
 
     got = {
@@ -178,9 +185,10 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         'p3': p3[-1],
         'e_em': e_em[-1],
         'e_ex': e_ex[e_ex != [None]][-1],
-        'dt': dt[-1],
+        'dt': dt[-1][1],
         'restarts': restarts.sum(),
         'sweeps': sweeps.sum(),
+        't': t[-1],
     }
 
     if generate_reference:
@@ -189,9 +197,9 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         for k in got.keys():
             v = got[k]
             if type(v) in [list, np.ndarray]:
-                print(f'\t\'{k}\': {v[v!=[None]][-1]},')
+                print(f'    \'{k}\': {v[v!=[None]][-1]},')
             else:
-                print(f'\t\'{k}\': {v},')
+                print(f'    \'{k}\': {v},')
         print('}')
 
     if use_adaptivity and num_procs == 4:
@@ -204,7 +212,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
 
     fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-    ax.plot(t, dt, color='black')
+    ax.plot(dt[:, 0], dt[:, 1], color='black')
     e_ax = ax.twinx()
     e_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
     e_ax.plot(t, e_ex, label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')

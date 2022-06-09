@@ -90,4 +90,5 @@ def get_list_of_types(stats):
 
 
 def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, sortby='time'):
-    return sort_stats(filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type), sortby=sortby)
+    return sort_stats(filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type,
+                      recomputed=recomputed), sortby=sortby)
