@@ -2,6 +2,7 @@ import itertools
 import copy as cp
 import numpy as np
 import dill
+import scipy
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
@@ -91,6 +92,11 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
+
+        # prepare variable for switch estimation
+        if self.params.use_switch_estimator:
+            if 'V_ref' not in description['problem_params'].keys():
+                raise ParameterError('Please supply "V_ref" in the problem parameters')
 
     def check_iteration_estimator(self, MS):
         """
@@ -537,6 +543,9 @@ s to have a constant order in time for adaptivity. Setting restol=0')
 
         self.resilience(local_MS_running)
 
+        if self.params.use_switch_estimator:
+            self.switch_estimator(local_MS_running)
+
         for S in local_MS_running:
 
             S.status.done = self.check_convergence(S)
@@ -821,6 +830,7 @@ ing adaptivity!'
 
             # check whether to move on or restart
             if L.status.error_embedded_estimate >= L.params.e_tol:
+<<<<<<< Updated upstream
                 S.status.restart = True
 
     def adaptivity_update_step_sizes(self, active_slots):
@@ -847,3 +857,56 @@ ing adaptivity!'
 
             for i in range(len(self.MS[p].levels)):
                 self.MS[p].levels[i].params.dt = new_steps[i]
+=======
+                self.restart[i] = True
+            else:
+                self.restart[i] = False
+                
+    def switch_estimator(self, MS):
+        """
+            Method to estimate a discrete event (switch)
+        """
+        
+        for i in range(len(MS)):
+            S = MS[i]
+            L = S.levels[0]
+            switch_detected = False
+            for m in range(len(L.u)):
+                #print(S.status.iter, m, L.u[m][1]-L.prob.params.V_ref)
+                if L.u[m][1]-L.prob.params.V_ref < 0:
+                    m_guess = m-1
+                    switch_detected = True
+                    break
+            if switch_detected:
+                t_interp = [L.time + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
+            
+                vC = []
+                for m in range(1, len(L.u)):
+                    vC.append(L.u[m][1])
+
+                p = scipy.interpolate.interp1d(t_interp, vC, 'cubic', bounds_error=False)
+
+                def switch_examiner(x):
+                    """
+                        Routine to define root problem
+                    """
+
+                    return L.prob.params.V_ref - p(x)
+            
+                t_switch = scipy.optimize.fsolve(switch_examiner, t_interp[m_guess])
+                print(S.status.iter, m, L.u[m_guess][1]-L.prob.params.V_ref, t_switch)
+                if L.time < t_switch < L.time + L.dt:
+                    S.status.restart = True
+                    L.status.dt_new = t_switch - L.time
+            # next subinterval
+            #t_next = [t_interp[-1] + L.dt * L.sweep.coll.nodes[m] for m in range(len(L.sweep.coll.nodes))]
+
+            # Looking for the event
+            #flag_event = []    
+            #for m in range(len(t_next)-1):
+            #    if t_next[m] <= t_switch <= t_next[m+1]:
+            #        flag_event.append(True)
+            
+            #    else:
+            #        flag_event.append(False)
+>>>>>>> Stashed changes
