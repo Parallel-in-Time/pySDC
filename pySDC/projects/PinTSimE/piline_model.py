@@ -86,8 +86,7 @@ def main():
     Tend = 20
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -128,6 +127,7 @@ def main():
 
     plot_voltages()
 
+
 def plot_voltages(cwd='./'):
     f = open(cwd + 'piline.dat', 'rb')
     stats = dill.load(f)
@@ -152,26 +152,26 @@ def plot_voltages(cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    #ax.show()
-    #fig.savefig('data/piline_model_solution.png', dpi=300, bbox_inches='tight')
-    fig.savefig('piline_model_solution.png', dpi=300, bbox_inches='tight')
-    
+    fig.savefig('data/piline_model_solution.png', dpi=300, bbox_inches='tight')
+
+
 def setup_mpl(fontsize=8):
     plt_helper.setup_mpl(reset=True)
-    
+
     style_options = {
         "font.family": "sans-serif",
-        "font.serif": "Computer Modern Sans Serif", 
+        "font.serif": "Computer Modern Sans Serif",
         "font.sans-serif": "Computer Modern Sans Serif",
         "font.monospace": "Computer Modern Sans Serif",
         "axes.labelsize": 12,  # LaTeX default is 10pt font.
         "legend.fontsize": 13,  # Make the legend/label fonts a little smaller
         "axes.xmargin": 0.03,
         "axes.ymargin": 0.03,
-        "lines.linewidth": 1, # Make the plot lines a little smaller
+        "lines.linewidth": 1,  # Make the plot lines a little smaller
     }
-    
+
     mpl.rcParams.update(style_options)
+
 
 if __name__ == "__main__":
     main()
