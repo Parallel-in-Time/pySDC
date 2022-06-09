@@ -92,11 +92,6 @@ s to have a constant order in time for adaptivity. Setting restol=0')
  is never triggered!')
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
-        # prepare variable for switch estimation
-        if self.params.use_switch_estimator:
-            if 'V_ref' not in description['problem_params'].keys():
-                raise ParameterError('Please supply "V_ref" in the problem parameters')
-
     def check_iteration_estimator(self, MS):
         """
         Method to check the iteration estimator
@@ -541,9 +536,6 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             self.adaptivity(local_MS_running)
 
         self.resilience(local_MS_running)
-
-        if self.params.use_switch_estimator:
-            self.switch_estimator(local_MS_running)
 
         for S in local_MS_running:
 
