@@ -265,6 +265,8 @@ class hooks(object):
                           sweep=L.status.sweep, type='niter', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
                           sweep=L.status.sweep, type='residual_post_step', value=L.status.residual)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
+                          sweep=L.status.sweep, type='recomputed', value=step.status.restart)
 
     def post_predict(self, step, level_number):
         """
