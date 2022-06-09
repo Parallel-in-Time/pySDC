@@ -227,12 +227,6 @@ differently.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity_update_step_sizes">
-<span class="sig-name descname"><span class="pre">adaptivity_update_step_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.adaptivity_update_step_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity_update_step_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">
 <span class="sig-name descname"><span class="pre">check_iteration_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.check_iteration_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to check the iteration estimator</p>
@@ -419,6 +413,12 @@ stats object containing statistics for each step, each level and each iteration<
 <dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.update_step_sizes">
+<span class="sig-name descname"><span class="pre">update_step_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.update_step_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.update_step_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate</p>
 </dd></dl>
 
 </dd></dl>

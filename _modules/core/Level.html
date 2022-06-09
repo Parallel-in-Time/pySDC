@@ -46,6 +46,7 @@
 <span class="k">class</span> <span class="nc">_Pars</span><span class="p">(</span><span class="n">FrozenClass</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_initial</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">restol</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nsweeps</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_type</span> <span class="o">=</span> <span class="s1">&#39;full_abs&#39;</span>
@@ -53,6 +54,8 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
         <span class="c1"># freeze class, no further attributes allowed from this point</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_freeze</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt_initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="mf">1.</span>
 
 
 <span class="c1"># short helper class to bundle all status variables</span>
