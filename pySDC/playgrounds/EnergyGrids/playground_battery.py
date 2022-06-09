@@ -1,7 +1,7 @@
 import numpy as np
 import dill
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_sorted
 #from pySDC.helpers.visualization_tools import show_residual_across_simulation
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -19,9 +19,9 @@ def main():
     
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = -1E-10
     level_params['e_tol'] = 1e-5
-    level_params['dt'] = 1e-3
+    level_params['dt'] = 2e-2
     
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -30,7 +30,7 @@ def main():
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['initial_guess'] = 'zero'
+    sweeper_params['initial_guess'] = 'spread'
     
     # initialize problem parameters
     problem_params = dict()
@@ -44,11 +44,12 @@ def main():
     
     # initialize step parameters
     step_params = dict()
-    step_params['maxiter'] = 20
+    step_params['maxiter'] = 5
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['use_adaptivity'] = True
+    controller_params['use_adaptivity'] = False
+    controller_params['use_switch_estimator'] = True
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data_battery
     
@@ -63,7 +64,7 @@ def main():
     
     # set time parameters
     t0 = 0.0
-    Tend = 4
+    Tend = 2.4
     
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
