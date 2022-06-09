@@ -126,61 +126,69 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
         expected = {
-            'v1': 83.88240785649039,
-            'v2': 80.62744370831926,
-            'p3': 16.137248067563256,
-            'e_em': 6.236525251779312e-08,
-            'e_ex': 6.33675177461887e-08,
-            'dt': 0.09607389421085785,
+            'v1': 83.88400120208927,
+            'v2': 80.62656174446846,
+            'p3': 16.134850636244856,
+            'e_em': 9.535710887575988e-09,
+            'e_ex': 5.203249735635934e-08,
+            'dt': 0.0587195170595578,
             'restarts': 1.0,
             'sweeps': 2416.0,
+            't': 19.95,
         }
+
     elif use_adaptivity and num_procs == 4:
         error_msg = 'Error when using adaptivity in parallel:'
         expected = {
-            'v1': 83.88317481237193,
-            'v2': 80.62700122995363,
-            'p3': 16.136136147445036,
-            'e_em': 2.9095385656319195e-08,
-            'e_ex': 5.666752074991754e-08,
-            'dt': 0.09347348421862582,
+            'v1': 83.88400085600999,
+            'v2': 80.62656228348706,
+            'p3': 16.134850343534808,
+            'e_em': 1.5352657811718018e-08,
+            'e_ex': 5.685289098759357e-08,
+            'dt': 0.07015581329617149,
             'restarts': 8.0,
-            'sweeps': 2400.0,
+            'sweeps': 2404.0,
+            't': 19.95,
         }
+
     elif not use_adaptivity and num_procs == 4:
         error_msg = 'Error with fixed step size in parallel:'
         expected = {
-            'v1': 83.88400149770143,
-            'v2': 80.62656173487008,
-            'p3': 16.134849851184736,
-            'e_em': 4.977994905175365e-09,
-            'e_ex': 5.048084913047097e-09,
+            'v1': 83.88400128006428,
+            'v2': 80.62656202423844,
+            'p3': 16.134849781053525,
+            'e_em': 4.7536339309317555e-09,
+            'e_ex': 5.372188915941894e-09,
             'dt': 0.05,
             'restarts': 0.0,
             'sweeps': 1600.0,
+            't': 19.95000000000015,
         }
+
     elif not use_adaptivity and num_procs == 1:
         error_msg = 'Error with fixed step size in serial:'
         expected = {
             'v1': 83.88400149770143,
             'v2': 80.62656173487008,
             'p3': 16.134849851184736,
-            'e_em': 4.977994905175365e-09,
-            'e_ex': 5.048084913047097e-09,
+            'e_em': 5.034856087604567e-09,
+            'e_ex': 5.114154137212804e-09,
             'dt': 0.05,
             'restarts': 0.0,
             'sweeps': 1600.0,
+            't': 19.95000000000015,
         }
 
     got = {
         'v1': v1[-1],
         'v2': v2[-1],
         'p3': p3[-1],
-        'e_em': e_em[-1],
-        'e_ex': e_ex[e_ex != [None]][-1],
-        'dt': dt[-1],
+        'e_em': e_em[-2],
+        'e_ex': e_ex[e_ex != [None]][-2],
+        'dt': dt[-2],
         'restarts': restarts.sum(),
         'sweeps': sweeps.sum(),
+        't': t[-1],
     }
 
     if generate_reference:
