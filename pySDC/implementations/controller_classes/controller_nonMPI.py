@@ -2,7 +2,6 @@ import itertools
 import copy as cp
 import numpy as np
 import dill
-import scipy
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass

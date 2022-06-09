@@ -30,7 +30,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['duty'] = 0.5 # duty cycle
+    problem_params['duty'] = 0.5  # duty cycle
     problem_params['fsw'] = 1e3  # switching freqency
     problem_params['Vs'] = 10.0
     problem_params['Rs'] = 0.5
@@ -110,6 +110,7 @@ def main():
 
     plot_voltages()
 
+
 def plot_voltages(cwd='./'):
     f = open(cwd + 'buck.dat', 'rb')
     stats = dill.load(f)
@@ -132,9 +133,8 @@ def plot_voltages(cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    #ax.show()
-    #fig.savefig('data/buck_model_solution.png', dpi=300, bbox_inches='tight')
-    fig.savefig('buck_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/buck_model_solution.png', dpi=300, bbox_inches='tight')
+
 
 if __name__ == "__main__":
     main()
