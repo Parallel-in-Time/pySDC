@@ -29,10 +29,8 @@ In the test case of the buck converter there are multiple switches in the consid
 
 The battery drain model test case
 ---------------------------------
-This model is a simple example for system internal switching. This means that switching depends on system dynamics. 
+This model is a simple example for system internal switching, which means switching depends on system dynamics. When the capacitor voltage drops below the reference value, the circuit switches to the voltage source. An illustration of the process is clarified in the plot below: The capacitor voltage drops down, and after switching the voltage value along the capacitor no longer changes. 
 
 .. image:: ../../../data/battery_model_solution.png
     :width: 35%
     :align: center
-
-
