@@ -41,7 +41,7 @@ Projects
    projects/SDC_showdown.rst
    projects/AllenCahn_Bayreuth.rst
    projects/performance.rst
-   projects/error_estimation.rst
+   projects/Resilience/Resilience.rst
 
 
 Tests
