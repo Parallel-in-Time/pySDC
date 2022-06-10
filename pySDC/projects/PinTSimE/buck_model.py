@@ -62,6 +62,8 @@ def main():
     assert 'duty' in description['problem_params'].keys(), 'Please supply "duty" in the problem parameters'
     assert 'fsw' in description['problem_params'].keys(), 'Please supply "fsw" in the problem parameters'
 
+    assert 0 <= problem_params['duty'] <= 1, 'Please set "duty" greater than or equal to 0 and less than or equal to 1'
+
     # set time parameters
     t0 = 0.0
     Tend = 2e-2
