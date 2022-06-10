@@ -1,7 +1,7 @@
 import numpy as np
 import dill
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_sorted
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
@@ -85,11 +85,8 @@ def main():
     dill.dump(stats, f)
     f.close()
 
-    # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    # filter statistics by number of iterations
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     min_iter = 20
