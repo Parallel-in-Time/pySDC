@@ -76,6 +76,9 @@ def main():
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
+    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
+    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
+
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
     assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
