@@ -4,7 +4,7 @@ import dill
 
 mpl.use('Agg')
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_sorted
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
@@ -134,11 +134,9 @@ def plot_voltages(cwd='./'):
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    v1 = sort_stats(filter_stats(stats, type='v1'), sortby='time')
-    v2 = sort_stats(filter_stats(stats, type='v2'), sortby='time')
-    p3 = sort_stats(filter_stats(stats, type='p3'), sortby='time')
-
-    times = [v[0] for v in v1]
+    v1 = get_sorted(stats, type='v1', sortby='time')
+    v2 = get_sorted(stats, type='v2', sortby='time')
+    p3 = get_sorted(stats, type='p3', sortby='time')
 
     times = [v[0] for v in v1]
 

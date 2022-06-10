@@ -1,11 +1,11 @@
 import numpy as np
 import dill
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import sort_stats, filter_stats, get_sorted
 from pySDC.implementations.collocations import Collocation
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 
@@ -64,6 +64,7 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
+    controller_params['use_switch_estimator'] = True
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data
 
@@ -88,7 +89,7 @@ def main():
     Tend = 2.4
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = switch_controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -141,8 +142,8 @@ def plot_voltages(cwd='./'):
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = sort_stats(filter_stats(stats, type='current L'), sortby='time')
-    vC = sort_stats(filter_stats(stats, type='voltage C'), sortby='time')
+    cL = get_sorted(stats, type='current L', sortby='time')
+    vC = get_sorted(stats, type='voltage C', sortby='time')
 
     times = [v[0] for v in cL]
 
