@@ -1,7 +1,7 @@
 import numpy as np
 import dill
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_sorted
+from pySDC.helpers.stats_helper import get_sorted
 #from pySDC.helpers.visualization_tools import show_residual_across_simulation
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -92,8 +92,8 @@ def plot_voltages(cwd='./'):
     f.close()
     
     # convert filtered statistics to list of iterations count, sorted by process
-    cL = sort_stats(filter_stats(stats, type='current L'), sortby='time')
-    vC = sort_stats(filter_stats(stats, type='voltage C'), sortby='time')
+    cL = get_sorted(stats, type='current L', sortby='time')
+    vC = get_sorted(stats, type='voltage C', sortby='time')
     
     times = [v[0] for v in cL]
 
@@ -113,11 +113,8 @@ def plot_residuals(cwd='./'):
     stats = dill.load(f)
     f.close()
     
-    # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    # filter statistics by number of iterations
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
     
     # compute and print statistics
     min_iter = 20
