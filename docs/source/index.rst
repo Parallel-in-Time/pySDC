@@ -41,6 +41,7 @@ Projects
    projects/SDC_showdown.rst
    projects/AllenCahn_Bayreuth.rst
    projects/performance.rst
+   projects/PinTSimE.rst
    projects/Resilience/Resilience.rst
 
 
