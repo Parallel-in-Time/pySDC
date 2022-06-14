@@ -82,14 +82,13 @@ class controller_nonMPI(controller):
         if self.params.use_adaptivity:
             if 'e_tol' not in description['level_params'].keys():
                 raise ParameterError('Please supply "e_tol" in the level parameters')
-            if 'restol' in description['level_params'].keys():
-                if description['level_params']['restol'] > 0:
-                    description['level_params']['restol'] = 0
-                    self.logger.warning(f'I want to do always maxiter={description["step_params"]["maxiter"]} iteration\
-s to have a constant order in time for adaptivity. Setting restol=0')
+            if description['level_params'].get('restol', -1.) > 0:
+                description['level_params']['restol'] = -1.
+                self.logger.warning(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to\
+ have a constant order in time for adaptivity. Setting restol=-1')
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
- is never triggered!')
+ is never triggered! Set controller_params[\'HotRod_tol\'}] to something sensible!')
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
