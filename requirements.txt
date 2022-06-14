@@ -21,3 +21,4 @@ pytest-cov
 sphinx
 nbsphinx
 nbconvert
+flake8-nb
