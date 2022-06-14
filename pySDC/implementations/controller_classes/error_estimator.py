@@ -228,7 +228,7 @@ class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
         super(_ErrorEstimator_nonMPI_BlockGS, self).setup_extrapolation(controller, order, size)
 
         # check if we fixed the order by fixing the iteration number
-        if not controller.MS[0].levels[0].params.restol == 0:
+        if not controller.MS[0].levels[0].params.restol < 0:
             raise NotImplementedError('Extrapolation based error estimate so far only with fixed order!')
 
         # check if we have the same order everywhere
