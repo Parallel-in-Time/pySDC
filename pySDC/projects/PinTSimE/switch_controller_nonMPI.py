@@ -140,8 +140,8 @@ class switch_controller_nonMPI(controller_nonMPI):
 
                 t_switch, info, _, _ = sp.optimize.fsolve(switch_examiner, t_interp[m_guess], full_output=True)
                 t_switch = t_switch[0]
-                print('Switch located at time: {}'.format(t_switch))
                 if L.time < t_switch < L.time + L.dt and not np.isclose(t_switch - L.time, L.dt, atol=1e-2):
+                    print('Switch located at time: {}'.format(t_switch))
                     S.status.restart = True
                     L.status.dt_new = t_switch - L.time
                     S.status.force_done = True
