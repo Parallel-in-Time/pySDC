@@ -52,6 +52,7 @@ jobs:
       - name: Install dependencies
         run: |
           mamba install --yes --override-channel -c conda-forge --file requirements.txt
+          pip install flake8_nb
 
       - name: Lint with flake8
         run: |
@@ -60,6 +61,10 @@ jobs:
       - name: Run pytest
         run: |
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+
+      - name: Convert notebooks
+        run: |
+          python convert_notebooks.py
 
       - name: Build documentation
         run: |
