@@ -1,26 +1,24 @@
 import numpy as np
 import dill
-from scipy.integrate import solve_ivp
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-# from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
-from pySDC.playgrounds.EnergyGrids.log_data import log_data
+from pySDC.projects.PinTSimE.piline_model import log_data, setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 
 
 def main():
     """
-    A simple test program to do PFASST runs for the heat equation
+    A simple test program to do SDC/PFASST runs for the buck converter model
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-12
-    level_params['dt'] = 1e-5
+    level_params['dt'] = 1E-5
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -32,8 +30,8 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['duty'] = 0.5
-    problem_params['fsw'] = 1e3
+    problem_params['duty'] = 0.5  # duty cycle
+    problem_params['fsw'] = 1e3  # switching freqency
     problem_params['Vs'] = 10.0
     problem_params['Rs'] = 0.5
     problem_params['C1'] = 1e-3
@@ -53,12 +51,18 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = buck_converter  # pass problem class
+    description['problem_class'] = buck_converter   # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_class'] = imex_1st_order   # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
+    description['level_params'] = level_params      # pass level parameters
     description['step_params'] = step_params
+
+    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
+    assert 'duty' in description['problem_params'].keys(), 'Please supply "duty" in the problem parameters'
+    assert 'fsw' in description['problem_params'].keys(), 'Please supply "fsw" in the problem parameters'
+
+    assert 0 <= problem_params['duty'] <= 1, 'Please set "duty" greater than or equal to 0 and less than or equal to 1'
 
     # set time parameters
     t0 = 0.0
@@ -75,11 +79,35 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/piline.dat'
+    # fname = 'data/buck.dat'
     fname = 'buck.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
+
+    # filter statistics by number of iterations
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
+
+    # compute and print statistics
+    min_iter = 20
+    max_iter = 0
+
+    f = open('buck_out.txt', 'w')
+    niters = np.array([item[1] for item in iter_counts])
+    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
+    f.write(out + '\n')
+    print(out)
+    for item in iter_counts:
+        out = 'Number of iterations for time %4.2f: %1i' % item
+        f.write(out + '\n')
+        print(out)
+        min_iter = min(min_iter, item[1])
+        max_iter = max(max_iter, item[1])
+
+    assert np.mean(niters) <= 8, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    f.close()
+
+    plot_voltages()
 
 
 def plot_voltages(cwd='./'):
@@ -94,15 +122,18 @@ def plot_voltages(cwd='./'):
 
     times = [v[0] for v in v1]
 
-    # plt_helper.setup_mpl()
-    plt_helper.plt.plot(times, [v[1] for v in v1], label='v1')
-    plt_helper.plt.plot(times, [v[1] for v in v2], label='v2')
-    plt_helper.plt.plot(times, [v[1] for v in p3], label='p3')
-    plt_helper.plt.legend()
+    setup_mpl()
+    fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
+    ax.plot(times, [v[1] for v in v1], linewidth=1, label='$v_{C_1}$')
+    ax.plot(times, [v[1] for v in v2], linewidth=1, label='$v_{C_2}$')
+    ax.plot(times, [v[1] for v in p3], linewidth=1, label='$i_{L_\pi}$')
+    ax.legend(frameon=False, fontsize=12, loc='upper right')
 
-    plt_helper.plt.show()
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Energy')
+
+    fig.savefig('data/buck_model_solution.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
     main()
-    plot_voltages()
