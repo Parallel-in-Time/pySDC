@@ -82,7 +82,7 @@ class controller_nonMPI(controller):
         if self.params.use_adaptivity:
             if 'e_tol' not in description['level_params'].keys():
                 raise ParameterError('Please supply "e_tol" in the level parameters')
-            if description['level_params'].get('restol', -1.) > 0:
+            if description['level_params'].get('restol', -1.) >= 0:
                 description['level_params']['restol'] = -1.
                 self.logger.warning(f'I want to do always maxiter={description["step_params"]["maxiter"]} iterations to\
  have a constant order in time for adaptivity. Setting restol=-1')
