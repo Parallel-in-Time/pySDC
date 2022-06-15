@@ -5,7 +5,7 @@ import dill
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
-from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
+from pySDC.core.Errors import ControllerError, CommunicationError
 from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
 
 
@@ -30,7 +30,7 @@ class controller_nonMPI(controller):
             raise ControllerError('predict flag is ignored, use predict_type instead')
 
         # call parent's initialization routine
-        super(controller_nonMPI, self).__init__(controller_params)
+        super(controller_nonMPI, self).__init__(controller_params, description)
 
         self.MS = [stepclass.step(description)]
 
@@ -79,14 +79,7 @@ class controller_nonMPI(controller):
             self.params.use_HotRod
         self.params.use_extrapolation_estimate = self.params.use_extrapolation_estimate or self.params.use_HotRod
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
-        if self.params.use_adaptivity:
-            if 'e_tol' not in description['level_params'].keys():
-                raise ParameterError('Please supply "e_tol" in the level parameters')
-            if 'restol' in description['level_params'].keys():
-                if description['level_params']['restol'] > 0:
-                    description['level_params']['restol'] = 0
-                    self.logger.warning(f'I want to do always maxiter={description["step_params"]["maxiter"]} iteration\
-s to have a constant order in time for adaptivity. Setting restol=0')
+
         if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
             self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
  is never triggered!')
@@ -532,14 +525,12 @@ s to have a constant order in time for adaptivity. Setting restol=0')
 
         self.error_estimator.estimate(local_MS_running)
 
-        if self.params.use_adaptivity:
-            self.adaptivity(local_MS_running)
-
         self.resilience(local_MS_running)
 
         for S in local_MS_running:
 
-            S.status.done = self.check_convergence(S)
+            # decide if the step is done, needs to be restarted and other things convergence related
+            self.convergence_control(S)
 
             if S.status.iter > 0:
                 self.hooks.post_iteration(step=S, level_number=0)
@@ -576,6 +567,11 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                 S.levels[0].sweep.compute_end_point()
                 self.hooks.post_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
+
+        for C in self.convergence_controllers:
+            C.reset_global_variables(self)
+            for S in local_MS_running:
+                C.post_iteration_processing(self, S)
 
     def it_fine(self, local_MS_running):
         """
@@ -792,36 +788,6 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                         diff = l.status.error_extrapolation_estimate - l.status.error_embedded_estimate
                         if diff > self.params.HotRod_tol:
                             S.status.restart = True
-
-    def adaptivity(self, MS):
-        """
-        Method to compute time step size adaptively based on embedded error estimate.
-        Adaptivity requires you to know the order of the scheme, which you can also know for Jacobi, but it works
-        differently.
-        """
-        if len(MS) > 1 and self.params.mssdc_jac:
-            raise NotImplementedError('Adaptivity for multi step SDC only implemented for block Gauss-Seidel')
-
-        # loop through steps and compute local error and optimal step size from there
-        for i in range(len(MS)):
-            S = MS[i]
-
-            # check if we performed the desired amount of sweeps
-            if S.status.iter < S.params.maxiter:
-                continue
-
-            L = S.levels[0]
-
-            # compute next step size
-            order = S.status.iter  # embedded error estimate is same order as time marching
-            assert L.status.error_embedded_estimate is not None, 'Make sure to estimate the embedded error before call\
-ing adaptivity!'
-
-            L.status.dt_new = L.params.dt * 0.9 * (L.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
-
-            # check whether to move on or restart
-            if L.status.error_embedded_estimate >= L.params.e_tol:
-                S.status.restart = True
 
     def update_step_sizes(self, active_slots, time, Tend):
         """
