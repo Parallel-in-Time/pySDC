@@ -80,9 +80,6 @@ class controller_nonMPI(controller):
         self.params.use_extrapolation_estimate = self.params.use_extrapolation_estimate or self.params.use_HotRod
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
 
-        if self.params.use_HotRod and self.params.HotRod_tol == np.inf:
-            self.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
- is never triggered!')
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
@@ -525,14 +522,14 @@ class controller_nonMPI(controller):
 
         self.error_estimator.estimate(local_MS_running)
 
-        self.resilience(local_MS_running)
-
         for S in local_MS_running:
 
             # decide if the step is done, needs to be restarted and other things convergence related
             self.convergence_control(S)
 
             if S.status.iter > 0:
+                for C in self.convergence_controllers:
+                    C.post_iteration_processing(self, S)
                 self.hooks.post_iteration(step=S, level_number=0)
 
         for S in local_MS_running:
@@ -570,8 +567,6 @@ class controller_nonMPI(controller):
 
         for C in self.convergence_controllers:
             C.reset_global_variables(self)
-            for S in local_MS_running:
-                C.post_iteration_processing(self, S)
 
     def it_fine(self, local_MS_running):
         """
@@ -755,39 +750,6 @@ class controller_nonMPI(controller):
             local_MS_running (list): list of currently running steps
         """
         raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
-
-    def resilience(self, local_MS_running):
-        """
-        Call various functions that are supposed to provide some sort of resilience from here
-        """
-
-        if self.params.use_HotRod:
-            self.hotrod(local_MS_running)
-
-        # a step gets restarted because it wants to or because any earlier step wants to
-        restart = False
-        for p in range(len(local_MS_running)):
-            restart = restart or local_MS_running[p].status.restart
-            local_MS_running[p].status.restart = restart
-
-    def hotrod(self, local_MS_running):
-        """
-        See for the reference:
-        Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
-        Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47
-        """
-        for i in range(len(local_MS_running)):
-            S = local_MS_running[i]
-            if S.status.iter == S.params.maxiter:
-                for l in S.levels:
-                    # throw away the final sweep to match the error estimates
-                    l.u[:] = l.uold[:]
-
-                    # check if a fault is detected
-                    if None not in [l.status.error_extrapolation_estimate, l.status.error_embedded_estimate]:
-                        diff = l.status.error_extrapolation_estimate - l.status.error_embedded_estimate
-                        if diff > self.params.HotRod_tol:
-                            S.status.restart = True
 
     def update_step_sizes(self, active_slots, time, Tend):
         """

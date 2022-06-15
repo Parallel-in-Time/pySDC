@@ -8,6 +8,7 @@ from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
 
 # short helper class to add params as attributes
@@ -23,7 +24,6 @@ class _Pars(FrozenClass):
         self.use_iteration_estimator = False
         self.use_adaptivity = False
         self.use_HotRod = False
-        self.HotRod_tol = np.inf
         self.store_uold = False
         self.use_embedded_estimate = False
         self.use_extrapolation_estimate = False
@@ -237,6 +237,9 @@ class controller(object):
 
         if self.params.use_adaptivity:
             convergence_controller_classes.append(Adaptivity)
+
+        if self.params.use_HotRod:
+            convergence_controller_classes.append(HotRod)
 
         if 'convergence_controllers' in description.keys():
             for convergence_controller_class in description['convergence_controllers']:

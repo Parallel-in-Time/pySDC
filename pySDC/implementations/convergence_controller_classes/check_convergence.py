@@ -1,4 +1,4 @@
-from pySDC.core.Convergence_Controller import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController
 
 
 class CheckConvergence(ConvergenceController):

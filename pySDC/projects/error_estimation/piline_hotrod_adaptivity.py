@@ -48,7 +48,12 @@ def run(use_adaptivity, num_procs):
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 5e-2
-    level_params['e_tol'] = 1e-7
+
+    # initialize convergence control parameters
+    convergence_control_params = {
+        'e_tol': 1e-7,
+        'HotRod_tol': 1.,
+    }
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -87,6 +92,7 @@ def run(use_adaptivity, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description['convergence_control_params'] = convergence_control_params
 
     # set time parameters
     t0 = 0.0
@@ -215,7 +221,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     ax.plot(dt[:, 0], dt[:, 1], color='black')
     e_ax = ax.twinx()
     e_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
-    e_ax.plot(t, e_ex, label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
+    e_ax.plot(t[ready], e_ex[ready], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
     e_ax.plot(t[ready], abs(e_em[ready] - e_ex[ready]), label='difference', ls='-.')
     e_ax.plot([None, None], label=r'$\Delta t$', color='black')
     e_ax.set_yscale('log')
@@ -241,7 +247,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
 
 def main():
     generate_reference = False
-    for use_adaptivity in [False, True]:
+    for use_adaptivity in [True, False]:
         for num_procs in [1, 4]:
             stats = run(use_adaptivity, num_procs=num_procs)
             plot(stats, use_adaptivity, num_procs=num_procs, generate_reference=generate_reference)
