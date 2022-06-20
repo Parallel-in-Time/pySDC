@@ -35,7 +35,7 @@ class log_data(FaultInjector):
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
 
 
-def run(use_adaptivity=True):
+def run_advection(use_adaptivity=True):
     """
     A simple test program to do PFASST runs for the heat equation
     """
@@ -67,7 +67,7 @@ def run(use_adaptivity=True):
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['logger_level'] = 20
+    controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
     controller_params['use_HotRod'] = True
     controller_params['use_adaptivity'] = use_adaptivity
@@ -149,7 +149,7 @@ def plot(stats, use_adaptivity, controller):
 
 def main():
     for use_adaptivity in [False]:
-        stats, controller = run(use_adaptivity)
+        stats, controller = run_advection(use_adaptivity)
         plot(stats, use_adaptivity, controller)
 
 

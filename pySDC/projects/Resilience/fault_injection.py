@@ -11,7 +11,7 @@ class FaultInjector(hooks):
         super(FaultInjector, self).__init__()
         self.fault_frequency_time = np.inf
         self.fault_frequency_iter = np.inf
-        self.random_generator = np.random.RandomState(0)
+        self.random_generator = np.random.RandomState(2187)  # number of the cell in which Princess Leia is held
 
     def generate_random_fault(self):
         level = self.random_generator.randint(low=0, high=self.num_levels)
@@ -31,7 +31,7 @@ class FaultInjector(hooks):
 
     def pre_run(self, step, level_number):
         '''
-        Store useful quanties for generating random faults here
+        Store useful quantities for generating random faults here
         '''
 
         super(FaultInjector, self).pre_run(step, level_number)
@@ -57,7 +57,7 @@ class FaultInjector(hooks):
 
     def pre_iteration(self, step, level_number):
         '''
-        Check we want to flip a bit here
+        Check if we want to flip a bit here
         '''
         super(FaultInjector, self).pre_iteration(step, level_number)
 
