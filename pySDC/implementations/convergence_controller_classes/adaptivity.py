@@ -34,11 +34,6 @@ _params\'][\'e_tol\']!'
         return True, ''
 
     def get_new_step_size(self, controller, S):
-        '''
-        This function allows to set a step size with arbitrary criteria. Make sure to give an order if you give
-        multiple criteria. The order is a scalar, the higher, the later it is called meaning the highest order has the
-        final word.
-        '''
         # check if we performed the desired amount of sweeps
         if S.status.iter == S.params.maxiter:
             L = S.levels[0]
@@ -48,12 +43,8 @@ _params\'][\'e_tol\']!'
             L.status.dt_new = L.params.dt * 0.9 * (self.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
 
     def determine_restart(self, controller, S):
-        '''
-        Determine for each step separately if it wants to be restarted for whatever reason. All steps after this one
-        will be recomputed also.
-        '''
         if S.status.iter == S.params.maxiter:
             if S.levels[0].status.error_embedded_estimate >= self.params.e_tol:
                 S.status.restart = True
 
-        super(Adaptivity, self).determine_restart(controller, S)
+        super(Adaptivity, self).determine_restart(controller, S)  # restart all steps after the 'broken' one
