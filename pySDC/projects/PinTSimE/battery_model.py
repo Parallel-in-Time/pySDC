@@ -5,11 +5,12 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
-
 from pySDC.core.Hooks import hooks
+
+from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 class log_data(hooks):
@@ -23,9 +24,9 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='voltage C', value=L.uend[1])
 
 
@@ -64,7 +65,6 @@ def main():
 
     # initialize controller parameters
     controller_params = dict()
-    controller_params['use_switch_estimator'] = True
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data
 
@@ -76,6 +76,7 @@ def main():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description['convergence_controllers'] = [SwitchEstimator]
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
@@ -89,7 +90,7 @@ def main():
     Tend = 2.4
 
     # instantiate controller
-    controller = switch_controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
