@@ -74,10 +74,6 @@ class controller_nonMPI(controller):
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
 
-        # prepare variables to do with error estimation and resilience
-        self.params.use_embedded_estimate = self.params.use_embedded_estimate or self.params.use_adaptivity or\
-            self.params.use_HotRod
-        self.params.use_extrapolation_estimate = self.params.use_extrapolation_estimate or self.params.use_HotRod
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
 
         self.error_estimator = get_ErrorEstimator_nonMPI(self)

@@ -34,6 +34,12 @@ smaller than 0!'
         if controller.params.mssdc_jac:
             return False, 'Hot Rod needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
 
+        if not controller.params.use_embedded_estimate:
+            return False, 'Hot Rod needs embedded estimate, please turn it on!'
+
+        if not controller.params.use_extrapolation_estimate:
+            return False, 'Hot Rod needs extrapolation estimate, please turn it on!'
+
         return True, ''
 
     def determine_restart(self, controller, S):
