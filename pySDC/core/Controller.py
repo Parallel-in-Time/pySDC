@@ -22,8 +22,6 @@ class _Pars(FrozenClass):
         self.dump_setup = True
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
         self.use_iteration_estimator = False
-        self.use_adaptivity = False
-        self.use_HotRod = False
         self.store_uold = False
         self.use_embedded_estimate = False
         self.use_extrapolation_estimate = False
@@ -232,20 +230,8 @@ class controller(object):
         return self.__hooks
 
     def setup_convergence_controllers(self, description):
-        convergence_controller_classes = [CheckConvergence]
         self.convergence_controllers = []
-
-        if self.params.use_adaptivity:
-            convergence_controller_classes.append(Adaptivity)
-
-        if self.params.use_HotRod:
-            convergence_controller_classes.append(HotRod)
-
-        if 'convergence_controllers' in description.keys():
-            for convergence_controller_class in description['convergence_controllers']:
-                convergence_controller_classes.append(convergence_controller_class)
-
-        for convergence_controller_class in convergence_controller_classes:
+        for convergence_controller_class in [CheckConvergence] + description.get('convergence_controllers', []):
             self.convergence_controllers.append(convergence_controller_class(self, description))
 
     def convergence_control(self, S):

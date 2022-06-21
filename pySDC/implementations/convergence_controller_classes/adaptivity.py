@@ -27,9 +27,13 @@ smaller than 0!'
         if controller.params.mssdc_jac:
             return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
 
+        if not controller.params.use_embedded_estimate:
+            return False, 'Adaptivity needs the embedded error estimate, please turn it on!'
+
         if 'e_tol' not in description.get('convergence_control_params', {}).keys():
             return False, 'Adaptivity needs a local tolerance! Please set some up in description[\'convergence_control\
 _params\'][\'e_tol\']!'
+
 
         return True, ''
 

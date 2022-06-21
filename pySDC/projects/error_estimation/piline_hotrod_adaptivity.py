@@ -7,6 +7,8 @@ from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.error_estimation.accuracy_check import setup_mpl
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
 from pySDC.core.Hooks import hooks
 
@@ -83,6 +85,8 @@ def run(use_adaptivity, num_procs):
     controller_params['use_HotRod'] = True
     controller_params['use_adaptivity'] = use_adaptivity
     controller_params['mssdc_jac'] = False
+    controller_params['use_embedded_estimate'] = True
+    controller_params['use_extrapolation_estimate'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -93,6 +97,7 @@ def run(use_adaptivity, num_procs):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
     description['convergence_control_params'] = convergence_control_params
+    description['convergence_controllers'] = [Adaptivity, HotRod]
 
     # set time parameters
     t0 = 0.0
