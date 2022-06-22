@@ -39,7 +39,7 @@ def main():
     problem_params['C'] = 1
     problem_params['R'] = 1
     problem_params['L'] = 1
-    problem_params['alpha'] = 10
+    problem_params['alpha'] = 3#10
     problem_params['V_ref'] = 1
 
     # initialize step parameters

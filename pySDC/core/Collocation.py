@@ -13,6 +13,7 @@ class StableBarycentricInterpolator(BarycentricInterpolator):
         super(BarycentricInterpolator, self).__init__(xi, yi, axis)
         self.xi = np.asfarray(xi)
         self.set_yi(yi)
+        self.fi = yi
         self.n = len(self.xi)
 
         self._inv_capacity = 4.0 / (np.max(self.xi) - np.min(self.xi))
