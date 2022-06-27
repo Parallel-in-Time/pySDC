@@ -25,11 +25,11 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='p3', value=L.uend[2])
 
 

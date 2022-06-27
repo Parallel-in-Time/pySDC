@@ -1,3 +1,4 @@
+import itertools
 import numpy as np
 import scipy as sp
 
@@ -7,7 +8,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 class switch_controller_nonMPI(controller_nonMPI):
     """
-        Controller class including switch handling
+        Controller class including switch handling. Local version to use for own purposes.
     """
 
     def __init__(self, num_procs, controller_params, description):
@@ -26,6 +27,101 @@ class switch_controller_nonMPI(controller_nonMPI):
         if self.params.use_switch_estimator:
             if 'V_ref' not in description['problem_params'].keys():
                 raise ParameterError('Please supply "V_ref" in the problem parameters')
+
+    def run(self, u0, t0, Tend):
+        """
+        Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)
+
+        Args:
+           u0: initial values
+           t0: starting time
+           Tend: ending time
+
+        Returns:
+            end values on the finest level
+            stats object containing statistics for each step, each level and each iteration
+        """
+
+        # some initializations and reset of statistics
+        uend = None
+        num_procs = len(self.MS)
+        self.hooks.reset_stats()
+
+        # initial ordering of the steps: 0,1,...,Np-1
+        slots = list(range(num_procs))
+
+        # initialize time variables of each step
+        time = [t0 + sum(self.MS[j].dt for j in range(p)) for p in slots]
+
+        # determine which steps are still active (time < Tend)
+        active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+
+        if not any(active):
+            raise ControllerError('Nothing to do, check t0, dt and Tend.')
+
+        # compress slots according to active steps, i.e. remove all steps which have times above Tend
+        active_slots = list(itertools.compress(slots, active))
+
+        # initialize block of steps with u0
+        self.restart_block(active_slots, time, u0)
+
+        self.hooks.post_setup(step=None, level_number=None)
+
+        # call pre-run hook
+        for S in self.MS:
+            self.hooks.pre_run(step=S, level_number=0)
+
+        # main loop: as long as at least one step is still active (time < Tend), do something
+        while any(active):
+
+            MS_active = [self.MS[p] for p in active_slots]
+            done = False
+            while not done:
+                done = self.pfasst(MS_active)
+                
+            # only implemented for num_procs = 1 for the first time
+            if not self.params.use_adaptivity:
+                if self.MS[0].levels[0].prob.params.dt_rest is not None and self.MS[0].levels[0].time == t0:
+                    self.change_step_size()
+
+            restarts = [S.status.restart for S in MS_active]
+            if True in restarts:  # restart part of the block
+                # find the place after which we need to restart
+                restart_at = np.where(restarts)[0][0]
+
+                # store values in the current block that don't need restarting
+                if restart_at > 0:
+                    self.error_estimator.store_values(MS_active[:restart_at])
+
+                # initial condition to next block is initial condition of step that needs restarting
+                uend = self.MS[restart_at].levels[0].u[0]
+                time[active_slots[0]] = time[restart_at]
+
+            else:  # move on to next block
+                self.error_estimator.store_values(MS_active)
+
+                # initial condition for next block is last solution of current block
+                uend = self.MS[active_slots[-1]].levels[0].uend
+                time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
+
+            self.update_step_sizes(active_slots, time, Tend)
+
+            # setup the times of the steps for the next block
+            for i in range(1, len(active_slots)):
+                time[active_slots[i]] = time[active_slots[i] - 1] + self.MS[active_slots[i] - 1].dt
+
+            # determine new set of active steps and compress slots accordingly
+            active = [time[p] < Tend - 10 * np.finfo(float).eps for p in slots]
+            active_slots = list(itertools.compress(slots, active))
+
+            # restart active steps (reset all values and pass uend to u0)
+            self.restart_block(active_slots, time, uend)
+
+        # call post-run hook
+        for S in self.MS:
+            self.hooks.post_run(step=S, level_number=0)
+
+        return uend, self.hooks.return_stats()
 
     def it_check(self, local_MS_running):
         """
@@ -145,3 +241,7 @@ class switch_controller_nonMPI(controller_nonMPI):
                     S.status.restart = True
                     L.status.dt_new = t_switch - L.time
                     S.status.force_done = True
+                    
+    def change_step_size(self):
+        L = self.MS[0].levels[0]
+        L.status.dt_new = L.prob.params.dt_rest
