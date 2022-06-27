@@ -25,6 +25,7 @@ class _Pars(FrozenClass):
         self.store_uold = False
         self.use_embedded_estimate = False
         self.use_extrapolation_estimate = False
+        self.use_switch_estimator = False
 
         for k, v in params.items():
             setattr(self, k, v)
