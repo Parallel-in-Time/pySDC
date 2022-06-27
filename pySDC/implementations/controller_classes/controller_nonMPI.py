@@ -202,7 +202,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
                 uend = self.MS[active_slots[-1]].levels[0].uend
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
-            self.adaptivity_update_step_sizes(active_slots)
+            self.update_step_sizes(active_slots, time, Tend)
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
@@ -823,9 +823,9 @@ ing adaptivity!'
             if L.status.error_embedded_estimate >= L.params.e_tol:
                 S.status.restart = True
 
-    def adaptivity_update_step_sizes(self, active_slots):
+    def update_step_sizes(self, active_slots, time, Tend):
         """
-        Update the step sizes computed in adaptivity here, since this can get arbitrarily elaborate
+        Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate
         """
         # figure out where the block is restarted
         restarts = [self.MS[p].status.restart for p in active_slots]
@@ -834,11 +834,16 @@ ing adaptivity!'
         else:
             restart_at = len(restarts) - 1
 
-        # record the step sizes to restart with
+        # Compute the maximum allowed step size based on Tend.
+        dt_max = (Tend - time[0]) / len(active_slots)
+
+        # record the step sizes to restart with from all the levels of the step
         new_steps = [None] * len(self.MS[restart_at].levels)
         for i in range(len(self.MS[restart_at].levels)):
             l = self.MS[restart_at].levels[i]
-            new_steps[i] = l.status.dt_new if l.status.dt_new is not None else l.params.dt
+            # overrule the step size control to reach Tend if needed
+            new_steps[i] = min([l.status.dt_new if l.status.dt_new is not None else l.params.dt,
+                                max([dt_max, l.params.dt_initial])])
 
         # spread the step sizes to all levels
         for j in range(len(active_slots)):
