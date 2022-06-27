@@ -182,7 +182,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             while not done:
                 done = self.pfasst(MS_active)
 
-            restarts = [S.status.restart for S in MS_active]
+            restarts = [S.status.restart and not S.status.restarted for S in MS_active]
             if True in restarts:  # restart part of the block
                 # find the place after which we need to restart
                 restart_at = np.where(restarts)[0][0]
@@ -238,6 +238,8 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             # get slot number
             p = active_slots[j]
 
+            # record whether the step has been restarted already at the same point
+            restarted = self.MS[p].time == time[p]
             # store current slot number for diagnostics
             self.MS[p].status.slot = p
             # store link to previous step
@@ -257,6 +259,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
             self.MS[p].status.restart = False
+            self.MS[p].status.restarted = restarted
 
             for l in self.MS[p].levels:
                 l.tag = None
@@ -828,14 +831,14 @@ ing adaptivity!'
         Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate
         """
         # figure out where the block is restarted
-        restarts = [self.MS[p].status.restart for p in active_slots]
+        restarts = [self.MS[p].status.restart and not self.MS[p].status.restarted for p in active_slots]
         if True in restarts:
             restart_at = np.where(restarts)[0][0]
         else:
             restart_at = len(restarts) - 1
 
         # Compute the maximum allowed step size based on Tend.
-        dt_max = (Tend - time[0]) / len(active_slots)
+        dt_max = (Tend - time[active_slots[0]]) / len(active_slots)
 
         # record the step sizes to restart with from all the levels of the step
         new_steps = [None] * len(self.MS[restart_at].levels)
