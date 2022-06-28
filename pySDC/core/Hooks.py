@@ -69,6 +69,29 @@ class hooks(object):
         # create named tuple for the key and add to dict
         self.__stats[self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)] = value
 
+    def increment_stats(self, process, time, level, iter, sweep, type, value, initialize=None):
+        """
+        Routine to increment data to the statistics dict. If the data is not yet created, it will be initialized to
+        initialize if applicable and to value otherwise
+
+        Args:
+            process: the current process recording this data
+            time (float): the current simulation time
+            level (int): the current level index
+            iter (int): the current iteration count
+            sweep (int): the current sweep count
+            type (str): string to describe the type of value
+            value: the actual data
+            initialize: if supplied and data does not exist already, this will be used over value
+        """
+        key = self.__entry(process=process, time=time, level=level, iter=iter, sweep=sweep, type=type)
+        if key in self.__stats.keys():
+            self.__stats[key] += value
+        elif initialize is not None:
+            self.__stats[key] = initialize
+        else:
+            self.__stats[key] = value
+
     def return_stats(self):
         """
         Getter for the stats
@@ -242,6 +265,12 @@ class hooks(object):
                           sweep=L.status.sweep, type='niter', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
                           sweep=L.status.sweep, type='residual_post_step', value=L.status.residual)
+
+        # record the recomputed quantities at weird positions to make sure there is only one value for each step
+        self.add_to_stats(process=-1, time=L.time + L.dt, level=-1, iter=-1,
+                          sweep=-1, type='recomputed', value=step.status.restart)
+        self.add_to_stats(process=-1, time=L.time, level=-1, iter=-1,
+                          sweep=-1, type='recomputed', value=step.status.restart)
 
     def post_predict(self, step, level_number):
         """

@@ -44,6 +44,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
+    controller_params['predict_type'] = 'pfasst_burnin'
 
     # fill description dictionary for easy step instantiation
     description = dict()

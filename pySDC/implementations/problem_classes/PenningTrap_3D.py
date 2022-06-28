@@ -31,7 +31,7 @@ class penningtrap(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(penningtrap, self).__init__((problem_params['nparts'], None, np.dtype('float64')),
+        super(penningtrap, self).__init__(((3, problem_params['nparts']), None, np.dtype('float64')),
                                           dtype_u, dtype_f, problem_params)
 
     @staticmethod
@@ -86,7 +86,7 @@ class penningtrap(ptype):
         N = self.params.nparts
 
         Emat = np.diag([1, 1, -2])
-        f = self.dtype_f(((3, self.params.nparts), self.init[1], self.init[2]))
+        f = self.dtype_f(self.init)
 
         f.elec[:] = self.get_interactions(part)
 
@@ -107,7 +107,7 @@ class penningtrap(ptype):
         u0 = self.params.u0
         N = self.params.nparts
 
-        u = self.dtype_u(((3, N), self.init[1], self.init[2]))
+        u = self.dtype_u(self.init)
 
         if u0[2][0] != 1 or u0[3][0] != 1:
             raise ProblemError('so far only q = m = 1 is implemented')
@@ -220,8 +220,7 @@ class penningtrap(ptype):
 
         N = self.params.nparts
 
-        rhs = acceleration(((3, self.params.nparts), self.init[1], self.init[2]))
-
+        rhs = acceleration(self.init)
         for n in range(N):
             rhs[:, n] = part.q[n] / part.m[n] * (f.elec[:, n] + np.cross(part.vel[:, n], f.magn[:, n]))
 
@@ -243,7 +242,7 @@ class penningtrap(ptype):
         """
 
         N = self.params.nparts
-        vel = particles.velocity(((3, N), self.init[1], self.init[2]))
+        vel = particles.velocity(self.init)
 
         Emean = 0.5 * (old_fields.elec + new_fields.elec)
 
