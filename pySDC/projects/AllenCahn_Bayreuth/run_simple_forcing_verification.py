@@ -173,24 +173,24 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
         # Testing the output
         if name == 'AC-test-noforce':
             if spectral:
-                exp_iters = 7.0
+                exp_iters = 6.59375
                 exp_err = 7.821e-02
             else:
-                exp_iters = 8.25
+                exp_iters = 7.8125
                 exp_err = 7.85e-02
         elif name == 'AC-test-constforce':
             if spectral:
-                exp_iters = 3.90625
+                exp_iters = 2.875
                 exp_err = 4.678e-04
             else:
-                exp_iters = 5.21875
+                exp_iters = 4.3125
                 exp_err = 6.2384e-04
         elif name == 'AC-test-timeforce':
             if spectral:
-                exp_iters = 2.03125
+                exp_iters = 1.65625
                 exp_err = 6.2345e-04
             else:
-                exp_iters = 3.15625
+                exp_iters = 2.40625
                 exp_err = 6.2345e-04
         else:
             raise NotImplementedError(f'{name} is not implemented')
