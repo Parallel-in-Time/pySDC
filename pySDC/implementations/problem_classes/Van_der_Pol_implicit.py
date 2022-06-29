@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import solve_ivp
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -38,7 +39,7 @@ class vanderpol(ptype):
 
     def u_exact(self, t):
         """
-        Dummy routine for the exact solution, currently only passes the initial values
+        Compute an "exact" solution with scipy.integrate.solve_ivp
 
         Args:
             t (float): current time
@@ -46,10 +47,17 @@ class vanderpol(ptype):
             dtype_u: mesh type containing the initial values
         """
 
-        # thou shall not call this at time > 0
-
         me = self.dtype_u(self.init)
-        me[:] = self.params.u0[:]
+
+        if t > 0.:
+
+            def rhs(t, u):
+                return self.eval_f(u, t)
+
+            tol = 100 * np.finfo(float).eps
+            me[:] = solve_ivp(rhs, (0., t), self.params.u0, rtol=tol, atol=tol).y[:, -1]
+        else:
+            me[:] = self.params.u0[:]
         return me
 
     def eval_f(self, u, t):
