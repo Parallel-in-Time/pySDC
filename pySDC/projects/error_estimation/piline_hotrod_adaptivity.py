@@ -100,7 +100,7 @@ def run(use_adaptivity, num_procs):
     description['convergence_controllers'] = {-80: HotRod}
 
     if use_adaptivity:
-        description['convergence_controllers'][-90] = Adaptivity 
+        description['convergence_controllers'][-90] = Adaptivity
 
     # set time parameters
     t0 = 0.0
