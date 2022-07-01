@@ -232,7 +232,10 @@ class controller(object):
         conv_classes = description.get('convergence_controllers', {})
         conv_classes[-100] = CheckConvergence
         for order, conv_class in conv_classes.items():
-            self.convergence_controllers.append(conv_class(self, description, order))
+            self.add_convergence_controller(conv_class, order, description)
+
+    def add_convergence_controller(self, convergence_controller, order, description):
+        self.convergence_controllers.append(convergence_controller(self, description, order))
 
     def convergence_control(self, S):
         # get order of convergence controllers

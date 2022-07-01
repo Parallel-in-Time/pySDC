@@ -23,7 +23,7 @@ class ConvergenceController(object):
         self.order = order
         params_ok, msg = self.check_parameters(controller, description)
         assert params_ok, msg
-        self.reset_global_variables(controller)
+        self.reset_global_variables_nonMPI(controller)
 
     def check_parameters(self, controller, description):
         '''
@@ -50,22 +50,38 @@ class ConvergenceController(object):
 
     def determine_restart(self, controller, S):
         '''
-        Determine for each step separately if it wants to be restarted for whatever reason. All steps after this one
-        will be recomputed also.
+        Determine for each step separately if it wants to be restarted for whatever reason.
         '''
-        S.status.restart = S.status.restart or self.restart
-        self.restart = self.restart or S.status.restart
+        pass
 
-    def reset_global_variables(self, controller):
+    def reset_global_variables_nonMPI(self, controller):
         '''
         Global variables refer to variables used accross multiple steps that are stored in the convergence controller
         classes to immitate communication in non mpi versions. These have to be resetted in order to replicate
         avalability of variables in mpi versions.
         '''
-        self.restart = False
+        pass
 
     def post_iteration_processing(self, controller, S):
         '''
         Do whatever after the iteration here.
+        '''
+        pass
+
+    def prepare_next_block(self, controller, S, size, time, Tend):
+        '''
+        You should take care here that two things happen:
+          -  Every step after a step which wants to be restarted also needs to know it wants to be restarted
+          -  Every step should somehow receive a new step size
+        Of course not every convergence controller needs to implement this, just one
+        '''
+        pass
+
+    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
+        '''
+        This is an extension to the function `prepare_next_block`, which is only called in the non MPI controller and
+        is needed because there is no chance to communicate backwards otherwise. While you should not do this in the
+        first place, the first step in the new block comes after the last step in the last block, such that is still in
+        fact forwards communication, even though it looks backwards.
         '''
         pass
