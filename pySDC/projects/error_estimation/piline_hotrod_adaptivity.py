@@ -135,7 +135,6 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
     sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps', recomputed=recomputed), sortby='time'))[:, 1]
     ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
 
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'

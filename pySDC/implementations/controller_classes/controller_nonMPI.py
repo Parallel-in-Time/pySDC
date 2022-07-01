@@ -7,6 +7,7 @@ from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
 from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
 
 
 class controller_nonMPI(controller):
@@ -77,6 +78,8 @@ class controller_nonMPI(controller):
         self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
 
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
+
+        self.add_convergence_controller(BasicRestartingNonMPI, 100, description)
 
     def check_iteration_estimator(self, MS):
         """
@@ -188,7 +191,8 @@ class controller_nonMPI(controller):
                 uend = self.MS[active_slots[-1]].levels[0].uend
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
-            self.update_step_sizes(active_slots, time, Tend)
+            for C in self.convergence_controllers:
+                C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
 
             # setup the times of the steps for the next block
             for i in range(1, len(active_slots)):
@@ -562,7 +566,7 @@ class controller_nonMPI(controller):
                 S.status.stage = 'DONE'
 
         for C in self.convergence_controllers:
-            C.reset_global_variables(self)
+            C.reset_global_variables_nonMPI(self)
 
     def it_fine(self, local_MS_running):
         """
@@ -746,33 +750,3 @@ class controller_nonMPI(controller):
             local_MS_running (list): list of currently running steps
         """
         raise ControllerError('Unknown stage, got %s' % local_MS_running[0].status.stage)  # TODO
-
-    def update_step_sizes(self, active_slots, time, Tend):
-        """
-        Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate
-        """
-        # figure out where the block is restarted
-        restarts = [self.MS[p].status.restart for p in active_slots]
-        if True in restarts:
-            restart_at = np.where(restarts)[0][0]
-        else:
-            restart_at = len(restarts) - 1
-
-        # Compute the maximum allowed step size based on Tend.
-        dt_max = (Tend - time[0]) / len(active_slots)
-
-        # record the step sizes to restart with from all the levels of the step
-        new_steps = [None] * len(self.MS[restart_at].levels)
-        for i in range(len(self.MS[restart_at].levels)):
-            l = self.MS[restart_at].levels[i]
-            # overrule the step size control to reach Tend if needed
-            new_steps[i] = min([l.status.dt_new if l.status.dt_new is not None else l.params.dt,
-                                max([dt_max, l.params.dt_initial])])
-
-        # spread the step sizes to all levels
-        for j in range(len(active_slots)):
-            # get slot number
-            p = active_slots[j]
-
-            for i in range(len(self.MS[p].levels)):
-                self.MS[p].levels[i].params.dt = new_steps[i]
