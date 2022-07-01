@@ -18,8 +18,9 @@ class ConvergenceController(object):
     count and time step size.
     """
 
-    def __init__(self, controller, description):
+    def __init__(self, controller, description, order=0):
         self.params = _Pars(description.get('convergence_control_params', {}))
+        self.order = order
         params_ok, msg = self.check_parameters(controller, description)
         assert params_ok, msg
         self.reset_global_variables(controller)

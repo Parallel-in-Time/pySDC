@@ -7,8 +7,6 @@ from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
 from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
-from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
 
 # short helper class to add params as attributes
@@ -231,8 +229,10 @@ class controller(object):
 
     def setup_convergence_controllers(self, description):
         self.convergence_controllers = []
-        for convergence_controller_class in [CheckConvergence] + description.get('convergence_controllers', []):
-            self.convergence_controllers.append(convergence_controller_class(self, description))
+        conv_classes = description.get('convergence_controllers', {})
+        conv_classes[-100] = CheckConvergence
+        for order, conv_class in conv_classes.items():
+            self.convergence_controllers.append(conv_class(self, description, order))
 
     def convergence_control(self, S):
         # get order of convergence controllers

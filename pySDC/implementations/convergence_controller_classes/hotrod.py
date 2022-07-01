@@ -10,11 +10,10 @@ class HotRod(ConvergenceController):
     Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47
     """
 
-    def __init__(self, controller, description):
+    def __init__(self, controller, description, order):
         convergence_control_params = description.get('convergence_control_params', {})
         convergence_control_params['HotRod_tol'] = convergence_control_params.get('HotRod_tol', np.inf)
-        super(HotRod, self).__init__(controller, description)
-        self.order = -80
+        super(HotRod, self).__init__(controller, description, order)
 
     def check_parameters(self, controller, description):
         '''
