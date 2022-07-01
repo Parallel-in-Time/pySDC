@@ -82,9 +82,9 @@ def run(use_adaptivity, num_procs):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
+    controller_params['mssdc_jac'] = False
     controller_params['use_HotRod'] = True
     controller_params['use_adaptivity'] = use_adaptivity
-    controller_params['mssdc_jac'] = False
     controller_params['use_embedded_estimate'] = True
     controller_params['use_extrapolation_estimate'] = True
 
@@ -97,7 +97,10 @@ def run(use_adaptivity, num_procs):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
     description['convergence_control_params'] = convergence_control_params
-    description['convergence_controllers'] = [Adaptivity, HotRod]
+    description['convergence_controllers'] = {-80: HotRod}
+
+    if use_adaptivity:
+        description['convergence_controllers'][-90] = Adaptivity 
 
     # set time parameters
     t0 = 0.0

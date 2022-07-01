@@ -8,10 +8,6 @@ class Adaptivity(ConvergenceController):
     differently.
     """
 
-    def __init__(self, controller, description):
-        super(Adaptivity, self).__init__(controller, description)
-        self.params.order = -90
-
     def check_parameters(self, controller, description):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
@@ -33,7 +29,6 @@ smaller than 0!'
         if 'e_tol' not in description.get('convergence_control_params', {}).keys():
             return False, 'Adaptivity needs a local tolerance! Please set some up in description[\'convergence_control\
 _params\'][\'e_tol\']!'
-
 
         return True, ''
 
