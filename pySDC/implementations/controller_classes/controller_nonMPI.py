@@ -5,7 +5,7 @@ import dill
 
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
-from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError
+from pySDC.core.Errors import ControllerError, CommunicationError, ParameterError, ProblemError
 from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
 
 
@@ -259,7 +259,7 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             self.MS[p].status.force_done = False
             self.MS[p].status.time_size = len(active_slots)
             self.MS[p].status.restart = False
-            self.MS[p].status.restarted = restarted
+            self.MS[p].status.restarted = restarted and True
 
             for l in self.MS[p].levels:
                 l.tag = None
@@ -614,7 +614,15 @@ s to have a constant order in time for adaptivity. Setting restol=0')
             for S in local_MS_running:
                 # standard sweep workflow: update nodes, compute residual, log progress
                 self.hooks.pre_sweep(step=S, level_number=0)
-                S.levels[0].sweep.update_nodes()
+                try:
+                    S.levels[0].sweep.update_nodes()
+                except ProblemError as err:
+                    if S.status.restarted:
+                        raise err
+                    else:
+                        self.logger.info(f'Encountered ProblemError, but I retry once before giving up: {err}')
+                        S.status.restart = True
+                        S.status.force_done = True
                 S.levels[0].sweep.compute_residual()
                 self.hooks.post_sweep(step=S, level_number=0)
 

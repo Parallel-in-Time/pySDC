@@ -25,24 +25,26 @@ class log_data(FaultInjector):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='u', value=L.uend)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                             sweep=L.status.sweep, type='k', value=step.status.iter)
 
 
-def run_advection(use_adaptivity=True):
+def run_advection(strategy, rng, faults, force_params=None):
     """
     A simple test program to do PFASST runs for the heat equation
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['dt'] = 5e-3
+    level_params['dt'] = 0.0127
     level_params['e_tol'] = 1e-8
 
     # initialize sweeper parameters
@@ -69,10 +71,16 @@ def run_advection(use_adaptivity=True):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
-    controller_params['use_HotRod'] = True
-    controller_params['use_adaptivity'] = use_adaptivity
     controller_params['mssdc_jac'] = False
     controller_params['HotRod_tol'] = np.inf
+
+    if strategy == 'adaptivity':
+        controller_params['use_adaptivity'] = True
+    elif strategy == 'HotRod':
+        controller_params['use_HotRod'] = True
+    elif strategy == 'iterate':
+        step_params['maxiter'] = 100
+        level_params['restol'] = 9.13e-10
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -83,15 +91,29 @@ def run_advection(use_adaptivity=True):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
+    # check if we want to change some parameters
+    if force_params:
+        for k in force_params.keys():
+            for j in force_params[k].keys():
+                if k == 'controller_params':
+                    controller_params[j] = force_params[k][j]
+                else:
+                    description[k][j] = force_params[k][j]
+
     # set time parameters
     t0 = 0.0
     Tend = 2.5e-1
+    Tend = 10 * level_params['dt']
 
     # instantiate controller
     controller_class = controller_nonMPI
     controller = controller_class(num_procs=num_procs, controller_params=controller_params,
                                   description=description)
-    controller.hooks.fault_frequency_iter = 14
+
+    controller.hooks.random_generator = rng
+
+    if faults:
+        controller.hooks.add_random_fault(timestep=5, rnd_args={'iteration': 5})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -99,10 +121,10 @@ def run_advection(use_adaptivity=True):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    return stats, controller
+    return stats, controller, Tend
 
 
-def plot(stats, use_adaptivity, controller):
+def plot(stats, controller, strategy):
     setup_mpl()
 
     # convert filtered statistics to list of iterations count, sorted by process
@@ -122,35 +144,34 @@ def plot(stats, use_adaptivity, controller):
     sol_ax.set_xlabel(r'$x$')
     sol_ax.set_ylabel(r'$u$')
     sol_ax.legend(frameon=False)
-    sol_fig.savefig('data/sol.pdf', bbox_inches='tight')
+    sol_fig.savefig(f'data/advection-sol-{strategy}.pdf', bbox_inches='tight')
 
-    # plot Hot Rod
-    HR_fig, HR_ax = plt.subplots(1, 1, figsize=(3.5, 3))
-    HR_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
-    HR_ax.plot(t[e_ex != [None]], e_ex[e_ex != [None]], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--', marker='*')
-    HR_ax.plot(t[ready], abs(e_em[ready] - e_ex[ready]), label=r'$\Delta$', ls='-.')
+    if strategy in ['HotRod']:
+        # plot Hot Rod
+        HR_fig, HR_ax = plt.subplots(1, 1, figsize=(3.5, 3))
+        HR_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
+        HR_ax.plot(t[e_ex != [None]], e_ex[e_ex != [None]], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--',
+                   marker='*')
+        HR_ax.plot(t[ready], abs(e_em[ready] - e_ex[ready]), label=r'$\Delta$', ls='-.')
 
-    # plot the faults
-    for i in range(len(bitflips)):
-        HR_ax.axvline(bitflips[i][0], color='grey', alpha=0.5)
+        # plot the faults
+        for i in range(len(bitflips)):
+            HR_ax.axvline(bitflips[i][0], color='grey', alpha=0.5)
 
-    HR_ax.set_yscale('log')
-    HR_ax.legend(frameon=False)
-    HR_ax.set_yscale('log')
+        HR_ax.set_yscale('log')
+        HR_ax.legend(frameon=False)
+        HR_ax.set_yscale('log')
 
-    HR_ax.set_xlabel('Time')
-    HR_ax.set_ylabel(r'$\Delta t$')
+        HR_ax.set_xlabel('Time')
+        HR_ax.set_ylabel(r'$\Delta t$')
 
-    if use_adaptivity:
-        HR_fig.savefig('data/advection_hotrod_adaptive.png', bbox_inches='tight', dpi=300)
-    else:
-        HR_fig.savefig('data/advection_hotrod.png', bbox_inches='tight', dpi=300)
+        HR_fig.savefig(f'data/advection_hotrod_{strategy}.png', bbox_inches='tight', dpi=300)
 
 
 def main():
-    for use_adaptivity in [False]:
-        stats, controller = run_advection(use_adaptivity)
-        plot(stats, use_adaptivity, controller)
+    for strategy in ['adaptivity', 'nothing', 'iterate']:
+        stats, controller, Tend = run_advection(strategy, None, False)
+        plot(stats, controller, strategy)
 
 
 if __name__ == "__main__":
