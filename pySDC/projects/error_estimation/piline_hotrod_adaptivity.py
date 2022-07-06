@@ -51,12 +51,6 @@ def run(use_adaptivity, num_procs):
     level_params = dict()
     level_params['dt'] = 5e-2
 
-    # initialize convergence control parameters
-    convergence_control_params = {
-        'e_tol': 1e-7,
-        'HotRod_tol': 1.,
-    }
-
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
@@ -96,11 +90,10 @@ def run(use_adaptivity, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['convergence_control_params'] = convergence_control_params
-    description['convergence_controllers'] = {-80: HotRod}
+    description['convergence_controllers'] = {HotRod: {'HotRod_tol': 1.}}
 
     if use_adaptivity:
-        description['convergence_controllers'][-90] = Adaptivity
+        description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
 
     # set time parameters
     t0 = 0.0
@@ -114,6 +107,13 @@ def run(use_adaptivity, num_procs):
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+
+    # # print the convergence controllers
+    # conv_conts = controller.convergence_controllers
+    # order = [me.params.control_order for me in conv_conts]
+    # index = np.arange(len(conv_conts))[np.argsort(order)]
+    # for i in range(len(order)):
+    #     print(i, order[index[i]], conv_conts[index[i]])
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)

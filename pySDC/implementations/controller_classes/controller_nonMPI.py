@@ -79,7 +79,7 @@ class controller_nonMPI(controller):
 
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
-        self.add_convergence_controller(BasicRestartingNonMPI, 100, description)
+        self.add_convergence_controller(BasicRestartingNonMPI, {}, description)
 
     def check_iteration_estimator(self, MS):
         """
@@ -524,13 +524,12 @@ class controller_nonMPI(controller):
 
         for S in local_MS_running:
 
+            if S.status.iter > 0:
+                self.convergence_controllers_post_iteration_processing(S)
+                self.hooks.post_iteration(step=S, level_number=0)
+
             # decide if the step is done, needs to be restarted and other things convergence related
             self.convergence_control(S)
-
-            if S.status.iter > 0:
-                for C in self.convergence_controllers:
-                    C.post_iteration_processing(self, S)
-                self.hooks.post_iteration(step=S, level_number=0)
 
         for S in local_MS_running:
             if not S.status.first:
