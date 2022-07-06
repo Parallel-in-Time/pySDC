@@ -126,15 +126,6 @@ class _ErrorEstimatorBase:
             self.t[oldest_val] = S.time + S.dt
             self.dt[oldest_val] = S.dt
 
-    def embedded_estimate(self, S):
-        """
-        Compute embedded error estimate on the last node of each level
-        In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block
-        """
-        for L in S.levels:
-            # order rises by one between sweeps, making this so ridiculously easy
-            L.status.error_embedded_estimate = max([abs(L.uold[-1] - L.u[-1]), np.finfo(float).eps])
-
     def extrapolation_estimate(self, S):
         """
         The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
@@ -168,8 +159,6 @@ class _ErrorEstimatorBase:
         if self.params.use_HotRod:
             if S.status.iter == S.params.maxiter - 1:
                 self.extrapolation_estimate(S)
-            elif S.status.iter == S.params.maxiter:
-                self.embedded_estimate(S)
 
         else:
             # only estimate errors when last sweep is performed and not when doing Hot Rod
@@ -177,9 +166,6 @@ class _ErrorEstimatorBase:
 
                 if self.params.use_extrapolation_estimate:
                     self.extrapolation_estimate(S)
-
-                if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                    self.embedded_estimate(S)
 
 
 class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
@@ -211,7 +197,6 @@ class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
                 if S.status.iter == S.params.maxiter - 1:
                     self.extrapolation_estimate(S)
                 elif S.status.iter == S.params.maxiter:
-                    self.embedded_estimate_local_error(MS[:i + 1])
                     break
 
             else:
@@ -220,9 +205,6 @@ class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
 
                     if self.params.use_extrapolation_estimate:
                         self.extrapolation_estimate(S)
-
-                    if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                        self.embedded_estimate_local_error(MS[:i + 1])
 
     def setup_extrapolation(self, controller, order, size):
         super(_ErrorEstimator_nonMPI_BlockGS, self).setup_extrapolation(controller, order, size)
@@ -248,24 +230,6 @@ class _ErrorEstimator_nonMPI_BlockGS(_ErrorEstimatorBase):
         self.f = [None] * self.n_per_proc * size
         self.t = np.array([None] * self.n_per_proc * size)
         self.dt = np.array([None] * self.n_per_proc * size)
-
-    def embedded_estimate_local_error(self, MS):
-        """
-        In block Gauss-Seidel SDC, the embedded estimate actually estimates sort of the global error within the block,
-        since the second to last sweep is from an entirely k-1 order method, so to speak. This means the regular
-        embedded method here yields this semi-global error and we get the local error as the difference of consecutive
-        semi-global errors.
-        """
-        # prepare a list to store all errors in
-        semi_global_errors = np.array([[0.] * len(MS[0].levels)] * (len(MS) + 1))
-
-        for i in range(len(MS)):
-            S = MS[i]
-            for j in range(len(S.levels)):
-                L = S.levels[j]
-                semi_global_errors[i][j] = abs(L.uold[-1] - L.u[-1])
-                L.status.error_embedded_estimate = max([abs(semi_global_errors[i][j] - semi_global_errors[i - 1][j]),
-                                                       np.finfo(float).eps])
 
 
 class _ErrorEstimator_nonMPI_no_memory_overhead_BlockGS(_ErrorEstimator_nonMPI_BlockGS):
@@ -327,7 +291,6 @@ ate!')
                 if S.status.iter == S.params.maxiter - 1:
                     self.extrapolation_estimate(MS[:i + 1])
                 elif S.status.iter == S.params.maxiter:
-                    self.embedded_estimate_local_error(MS[:i + 1])
                     break
 
             else:
@@ -336,9 +299,6 @@ ate!')
 
                     if self.params.use_extrapolation_estimate:
                         self.extrapolation_estimate(MS[:i + 1])
-
-                    if self.params.use_embedded_estimate or self.params.use_adaptivity:
-                        self.embedded_estimate_local_error(MS[:i + 1])
 
 
 def get_ErrorEstimator_nonMPI(controller):

@@ -3,6 +3,9 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 class CheckConvergence(ConvergenceController):
 
+    def setup(self, controller, params, description):
+        return {'control_order': -100} | params
+
     def check_iteration_status(self, controller, S):
         """
         Routine to determine whether to stop iterating (currently testing the residual + the max. number of iterations)

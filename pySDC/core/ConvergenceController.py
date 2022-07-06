@@ -4,7 +4,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 # short helper class to add params as attributes
 class _Pars(FrozenClass):
     def __init__(self, params):
-        self.order = 0
+        self.control_order = 0
 
         for k, v in params.items():
             setattr(self, k, v)
@@ -18,14 +18,26 @@ class ConvergenceController(object):
     count and time step size.
     """
 
-    def __init__(self, controller, description, order=0):
-        self.params = _Pars(description.get('convergence_control_params', {}))
-        self.order = order
-        params_ok, msg = self.check_parameters(controller, description)
+    def __init__(self, controller, params, description):
+        self.params = _Pars(self.setup(controller, params, description))
+        params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
+        self.dependencies(controller, description)
         self.reset_global_variables_nonMPI(controller)
 
-    def check_parameters(self, controller, description):
+    def setup(self, controller, params, description):
+        '''
+        Setup various variables that only need to be set once in the beginning
+        '''
+        return params
+
+    def dependencies(self, controller, description):
+        '''
+        Add dependencies in the form of other convergence controllers here
+        '''
+        pass
+
+    def check_parameters(self, controller, params, description):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 

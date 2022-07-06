@@ -229,22 +229,28 @@ class controller(object):
 
     def setup_convergence_controllers(self, description):
         self.convergence_controllers = []
+        self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
-        conv_classes[-100] = CheckConvergence
-        for order, conv_class in conv_classes.items():
-            self.add_convergence_controller(conv_class, order, description)
+        conv_classes[CheckConvergence] = {}
+        for conv_class, params in conv_classes.items():
+            self.add_convergence_controller(conv_class, params, description)
 
-    def add_convergence_controller(self, convergence_controller, order, description):
-        self.convergence_controllers.append(convergence_controller(self, description, order))
+    def add_convergence_controller(self, convergence_controller, params, description, allow_double=False):
+        c = convergence_controller(self, params, description)
+        if not type(c) in [type(me) for me in self.convergence_controllers] or allow_double:
+            self.convergence_controllers.append(c)
+            orders = [C.params.control_order for C in self.convergence_controllers]
+            self.convergence_controller_order = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
 
-    def convergence_control(self, S):
-        # get order of convergence controllers
-        orders = [C.params.order for C in self.convergence_controllers]
-        index = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
-
+    def convergence_controllers_post_iteration_processing(self, S):
         # perform the convergence control operations for each controller
         for i in range(len(self.convergence_controllers)):
-            C = self.convergence_controllers[index[i]]
+            self.convergence_controllers[self.convergence_controller_order[i]].post_iteration_processing(self, S)
+
+    def convergence_control(self, S):
+        # perform the convergence control operations for each controller
+        for i in range(len(self.convergence_controllers)):
+            C = self.convergence_controllers[self.convergence_controller_order[i]]
 
             C.check_iteration_status(self, S)
             C.get_new_step_size(self, S)
