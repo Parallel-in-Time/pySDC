@@ -23,7 +23,6 @@ class ConvergenceController(object):
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
         self.dependencies(controller, description)
-        self.reset_global_variables_nonMPI(controller)
 
     def setup(self, controller, params, description):
         '''
@@ -77,6 +76,12 @@ class ConvergenceController(object):
     def post_iteration_processing(self, controller, S):
         '''
         Do whatever after the iteration here.
+        '''
+        pass
+
+    def post_step_processing(self, controller, S):
+        '''
+        Do whatever after the step here.
         '''
         pass
 

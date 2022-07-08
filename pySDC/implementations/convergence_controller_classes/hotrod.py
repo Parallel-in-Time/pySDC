@@ -1,8 +1,10 @@
 import numpy as np
 
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import \
+    EstimateExtrapolationErrorNonMPI
 
 
 class HotRod(ConvergenceController):
@@ -22,8 +24,9 @@ class HotRod(ConvergenceController):
     def dependencies(self, controller, description):
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, {}, description=description)
+            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI, {}, description=description)
         else:
-            raise NotImplementedError
+            raise NotImplementedError("Don\'t know how to estimate errors with MPI")
 
     def check_parameters(self, controller, params, description):
         '''
@@ -42,9 +45,6 @@ smaller than 0!'
 
         if controller.params.mssdc_jac:
             return False, 'Hot Rod needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
-
-        if not controller.params.use_extrapolation_estimate:
-            return False, 'Hot Rod needs extrapolation estimate, please turn it on!'
 
         return True, ''
 

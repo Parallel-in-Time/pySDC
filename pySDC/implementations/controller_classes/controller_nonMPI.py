@@ -75,11 +75,14 @@ class controller_nonMPI(controller):
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
 
-        self.store_uold = self.params.use_iteration_estimator or self.params.use_embedded_estimate
+        self.store_uold = self.params.use_iteration_estimator
 
         self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
         self.add_convergence_controller(BasicRestartingNonMPI, {}, description)
+
+        for C in self.convergence_controllers:
+            C.reset_global_variables_nonMPI(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -172,26 +175,26 @@ class controller_nonMPI(controller):
                 done = self.pfasst(MS_active)
 
             restarts = [S.status.restart for S in MS_active]
+            restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
+            # store values in the current block that don't need restarting
+            if restart_at > 0:
+                self.error_estimator.store_values(MS_active[:restart_at])
+
             if True in restarts:  # restart part of the block
-                # find the place after which we need to restart
-                restart_at = np.where(restarts)[0][0]
-
-                # store values in the current block that don't need restarting
-                if restart_at > 0:
-                    self.error_estimator.store_values(MS_active[:restart_at])
-
                 # initial condition to next block is initial condition of step that needs restarting
                 uend = self.MS[restart_at].levels[0].u[0]
                 time[active_slots[0]] = time[restart_at]
 
             else:  # move on to next block
-                self.error_estimator.store_values(MS_active)
-
                 # initial condition for next block is last solution of current block
                 uend = self.MS[active_slots[-1]].levels[0].uend
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
+            for S in MS_active[:restart_at]:
+                self.convergence_controllers_post_step_processing(S)
+
             for C in self.convergence_controllers:
+                [C.prepare_next_block(self, S, len(active_slots), time, Tend) for S in self.MS]
                 C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
 
             # setup the times of the steps for the next block
@@ -341,7 +344,7 @@ class controller_nonMPI(controller):
             S.levels[0].sweep.predict()
 
             if self.store_uold:
-                # store pervious iterate to compute difference later on
+                # store previous iterate to compute difference later on
                 S.levels[0].uold[:] = S.levels[0].u[:]
 
             # update stage
