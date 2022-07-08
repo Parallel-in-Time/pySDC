@@ -21,7 +21,6 @@ class _Pars(FrozenClass):
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
         self.use_iteration_estimator = False
         self.store_uold = False
-        self.use_embedded_estimate = False
         self.use_extrapolation_estimate = False
 
         for k, v in params.items():
@@ -241,6 +240,11 @@ class controller(object):
             self.convergence_controllers.append(c)
             orders = [C.params.control_order for C in self.convergence_controllers]
             self.convergence_controller_order = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
+
+    def convergence_controllers_post_step_processing(self, S):
+        # perform the convergence control operations for each controller
+        for i in range(len(self.convergence_controllers)):
+            self.convergence_controllers[self.convergence_controller_order[i]].post_step_processing(self, S)
 
     def convergence_controllers_post_iteration_processing(self, S):
         # perform the convergence control operations for each controller
