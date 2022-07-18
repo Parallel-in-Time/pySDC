@@ -18,13 +18,15 @@ class HotRod(ConvergenceController):
         default_params = {
             'HotRod_tol': np.inf,
             'control_order': -45,
+            'no_storage': False
         }
         return default_params | params
 
     def dependencies(self, controller, description):
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, {}, description=description)
-            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI, {}, description=description)
+            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI,
+                                                  {'no_storage': self.params.no_storage}, description=description)
         else:
             raise NotImplementedError("Don\'t know how to estimate errors with MPI")
 
@@ -36,8 +38,8 @@ class HotRod(ConvergenceController):
             Whether the parameters are compatible
         '''
         if self.params.HotRod_tol == np.inf:
-            controller.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a restart\
- is never triggered!')
+            controller.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a \
+restart is never triggered!')
 
         if description['step_params'].get('restol', -1.) >= 0:
             return False, 'Hot Rod needs constant order in time and hence restol in the step parameters has to be \
