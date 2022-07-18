@@ -5,6 +5,12 @@ from pySDC.implementations.convergence_controller_classes.store_uold import Stor
 
 
 class EstimateEmbeddedError(ConvergenceController):
+    '''
+    The embedded error is obtained by computing two solutions of different accuracy and pretending the more accurate
+    one is an exact solution from the point of view of the less accurate solution. In practice, we like to compute the
+    solutions with different order methods, meaning that in SDC we can just subtract two consecutive sweeps, as long as
+    you make sure your preconditioner is compatible, which you have to just try out...
+    '''
 
     def setup(self, controller, params, description):
         return {'control_order': -80} | params
@@ -27,9 +33,10 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
             raise NotImplementedError('Embedded error estimate only works for serial multi-level or parallel single \
 level')
 
-        for L in S.levels:
-            # order rises by one between sweeps, making this so ridiculously easy
-            temp = abs(L.uold[-1] - L.u[-1])
-            L.status.error_embedded_estimate = max([abs(temp - self.e_em_last), np.finfo(float).eps])
+        if S.status.iter > 1:
+            for L in S.levels:
+                # order rises by one between sweeps, making this so ridiculously easy
+                temp = abs(L.uold[-1] - L.u[-1])
+                L.status.error_embedded_estimate = max([abs(temp - self.e_em_last), np.finfo(float).eps])
 
-        self.e_em_last = temp * 1.
+            self.e_em_last = temp * 1.

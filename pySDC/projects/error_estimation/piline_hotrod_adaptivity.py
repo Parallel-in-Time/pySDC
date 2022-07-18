@@ -42,7 +42,7 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run(use_adaptivity, num_procs):
+def run(custom_description, num_procs):
     """
     A simple test program to do PFASST runs for the heat equation
     """
@@ -77,10 +77,6 @@ def run(use_adaptivity, num_procs):
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
     controller_params['mssdc_jac'] = False
-    controller_params['use_HotRod'] = True
-    controller_params['use_adaptivity'] = use_adaptivity
-    controller_params['use_embedded_estimate'] = True
-    controller_params['use_extrapolation_estimate'] = True
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -90,10 +86,7 @@ def run(use_adaptivity, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['convergence_controllers'] = {HotRod: {'HotRod_tol': 1.}}
-
-    if use_adaptivity:
-        description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+    description.update(custom_description)
 
     # set time parameters
     t0 = 0.0
@@ -248,15 +241,21 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
 
     for k in expected.keys():
-        assert np.isclose(expected[k], got[k], rtol=1e-3),\
+        assert np.isclose(expected[k], got[k], rtol=1e-4),\
                f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
 
 
 def main():
     generate_reference = False
+
     for use_adaptivity in [True, False]:
+        custom_description = {'convergence_controllers': {}}
+        if use_adaptivity:
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+
         for num_procs in [1, 4]:
-            stats = run(use_adaptivity, num_procs=num_procs)
+            custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
+            stats = run(custom_description, num_procs=num_procs)
             plot(stats, use_adaptivity, num_procs=num_procs, generate_reference=generate_reference)
 
 

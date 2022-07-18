@@ -6,7 +6,6 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
-from pySDC.implementations.controller_classes.error_estimator import get_ErrorEstimator_nonMPI
 from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
 
 
@@ -76,8 +75,6 @@ class controller_nonMPI(controller):
                                 'predictor will be ignored')
 
         self.store_uold = self.params.use_iteration_estimator
-
-        self.error_estimator = get_ErrorEstimator_nonMPI(self)
 
         self.add_convergence_controller(BasicRestartingNonMPI, {}, description)
 
@@ -176,10 +173,6 @@ class controller_nonMPI(controller):
 
             restarts = [S.status.restart for S in MS_active]
             restart_at = np.where(restarts)[0][0] if True in restarts else len(MS_active)
-            # store values in the current block that don't need restarting
-            if restart_at > 0:
-                self.error_estimator.store_values(MS_active[:restart_at])
-
             if True in restarts:  # restart part of the block
                 # initial condition to next block is initial condition of step that needs restarting
                 uend = self.MS[restart_at].levels[0].u[0]
@@ -522,8 +515,6 @@ class controller_nonMPI(controller):
 
         if self.params.use_iteration_estimator:
             self.check_iteration_estimator(local_MS_running)
-
-        self.error_estimator.estimate(local_MS_running)
 
         for S in local_MS_running:
 
