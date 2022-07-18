@@ -20,8 +20,8 @@ class EstimateExtrapolationError(ConvergenceController):
 
         default_params = {
             'control_order': -75,
-            'use_adaptivity': type(Adaptivity) in [type(me) for me in description.get('convergence_controllers', {})],
-            'use_HotRod': type(HotRod) in [type(me) for me in description.get('convergence_controllers', {})],
+            'use_adaptivity': any([me == Adaptivity for me in description.get('convergence_controllers', {})]),
+            'use_HotRod': any([me == HotRod for me in description.get('convergence_controllers', {})]),
             'order_time_marching': description['step_params']['maxiter'],
         }
 
@@ -29,8 +29,8 @@ class EstimateExtrapolationError(ConvergenceController):
         default_params['Taylor_order'] = default_params['order_time_marching'] + 2
 
         # Estimate and store values from this iteration
-        default_params['estimate_iter'] = default_params['order_time_marching'] - 1 if default_params['use_HotRod']\
-            else 0
+        default_params['estimate_iter'] = default_params['order_time_marching'] - (1 if default_params['use_HotRod']
+                                                                                   else 0)
 
         # Store n values. Since we store u and f, we need only half of each (the +1 is for rounding)
         default_params['n'] = (default_params['Taylor_order'] + 1) // 2
