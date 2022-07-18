@@ -9,10 +9,9 @@ class SwitchEstimator(ConvergenceController):
         Method to estimate a discrete event (switch)
     """
 
-    def __init__(self, controller, description):
-        super(SwitchEstimator, self).__init__(controller, description)
-
+    def setup(self, controller, params, description):
         self.switch_detected = False
+        return {'control_order': 100} | params
 
     def get_new_step_size(self, controller, S):
         self.switch_detected = False  # reset between steps
