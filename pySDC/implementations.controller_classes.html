@@ -219,14 +219,6 @@ stats object containing statistics for each step, each level and each iteration<
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">controller</span></code></p>
 <p>PFASST controller, running serialized version of PFASST in blocks (MG-style)</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity">
-<span class="sig-name descname"><span class="pre">adaptivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.adaptivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to compute time step size adaptively based on embedded error estimate.
-Adaptivity requires you to know the order of the scheme, which you can also know for Jacobi, but it works
-differently.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">
 <span class="sig-name descname"><span class="pre">check_iteration_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MS</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.check_iteration_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to check the iteration estimator</p>
@@ -246,14 +238,6 @@ differently.</p>
 <dd class="field-odd"><p><strong>local_MS_running</strong> (<em>list</em>) – list of currently running steps</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod">
-<span class="sig-name descname"><span class="pre">hotrod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.hotrod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod" title="Permalink to this definition">¶</a></dt>
-<dd><p>See for the reference:
-Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
-Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47</p>
 </dd></dl>
 
 <dl class="py method">
@@ -351,12 +335,6 @@ Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilience">
-<span class="sig-name descname"><span class="pre">resilience</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_MS_running</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.resilience"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilience" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call various functions that are supposed to provide some sort of resilience from here</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block">
 <span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper routine to reset/restart block of (active) steps</p>
@@ -415,22 +393,6 @@ stats object containing statistics for each step, each level and each iteration<
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.update_step_sizes">
-<span class="sig-name descname"><span class="pre">update_step_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.update_step_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.update_step_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the step sizes computed in adaptivity or wherever here, since this can get arbitrarily elaborate</p>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-implementations.controller_classes.error_estimator">
-<span id="implementations-controller-classes-error-estimator-module"></span><h2>implementations.controller_classes.error_estimator module<a class="headerlink" href="#module-implementations.controller_classes.error_estimator" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="implementations.controller_classes.error_estimator.get_ErrorEstimator_nonMPI">
-<span class="sig-prename descclassname"><span class="pre">implementations.controller_classes.error_estimator.</span></span><span class="sig-name descname"><span class="pre">get_ErrorEstimator_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/error_estimator.html#get_ErrorEstimator_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.error_estimator.get_ErrorEstimator_nonMPI" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function should be called from the controller and return the correct version of the error estimator based on
-the chosen parameters.</p>
 </dd></dl>
 
 </section>
@@ -453,7 +415,6 @@ the chosen parameters.</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI module</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI module</a></li>
-<li><a class="reference internal" href="#module-implementations.controller_classes.error_estimator">implementations.controller_classes.error_estimator module</a></li>
 <li><a class="reference internal" href="#module-implementations.controller_classes">Module contents</a></li>
 </ul>
 </li>

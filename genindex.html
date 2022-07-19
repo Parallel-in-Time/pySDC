@@ -168,9 +168,9 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AcousticAdvection_1D_FD_imex.acoustic_1d_imex">acoustic_1d_imex (class in implementations.problem_classes.AcousticAdvection_1D_FD_imex)</a>
 </li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.adaptivity">adaptivity() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
-</li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add">add() (implementations.problem_classes.boussinesq_helpers.helper_classes.logging method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Controller.controller.add_convergence_controller">add_convergence_controller() (core.Controller.controller method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.add_to_stats">add_to_stats() (core.Hooks.hooks method)</a>
 </li>
@@ -286,6 +286,10 @@
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">check_iteration_estimator() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.check_iteration_status">check_iteration_status() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.check_parameters">check_parameters() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.check_residual">check_residual() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 </li>
       <li><a href="pySDC/core.html#core.BaseTransfer.base_transfer.coarse">coarse (core.BaseTransfer.base_transfer attribute)</a>
@@ -348,12 +352,12 @@
       </ul></li>
       <li><a href="pySDC/core.html#core.Lagrange.computeFejerRule">computeFejerRule() (in module core.Lagrange)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Step.step.connect_levels">connect_levels() (core.Step.step method)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.transfer_helper.continue_periodic_array">continue_periodic_array() (in module helpers.transfer_helper)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Controller.controller">controller (class in core.Controller)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI">controller_MPI (class in implementations.controller_classes.controller_MPI)</a>
@@ -361,6 +365,14 @@
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI">controller_nonMPI (class in implementations.controller_classes.controller_nonMPI)</a>
 </li>
       <li><a href="pySDC/core.html#core.Errors.ControllerError">ControllerError</a>
+</li>
+      <li><a href="pySDC/core.html#core.Controller.controller.convergence_control">convergence_control() (core.Controller.controller method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Controller.controller.convergence_controllers_post_iteration_processing">convergence_controllers_post_iteration_processing() (core.Controller.controller method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Controller.controller.convergence_controllers_post_step_processing">convergence_controllers_post_step_processing() (core.Controller.controller method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController">ConvergenceController (class in core.ConvergenceController)</a>
 </li>
       <li>
     core
@@ -388,6 +400,13 @@
 
       <ul>
         <li><a href="pySDC/core.html#module-core.Controller">module</a>
+</li>
+      </ul></li>
+      <li>
+    core.ConvergenceController
+
+      <ul>
+        <li><a href="pySDC/core.html#module-core.ConvergenceController">module</a>
 </li>
       </ul></li>
       <li>
@@ -470,6 +489,10 @@
 </li>
       </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.delta_m">delta_m (core.Collocation.CollBase attribute)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.dependencies">dependencies() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.determine_restart">determine_restart() (core.ConvergenceController.ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.standard_integrators.dirk">dirk (class in implementations.problem_classes.acoustic_helpers.standard_integrators)</a>
 
@@ -889,13 +912,13 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix">get2DUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.error_estimator.get_ErrorEstimator_nonMPI">get_ErrorEstimator_nonMPI() (in module implementations.controller_classes.error_estimator)</a>
-</li>
       <li><a href="pySDC/core.html#core.Problem.get_finite_difference_stencil">get_finite_difference_stencil() (in module core.Problem)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.PenningTrap_3D.penningtrap.get_interactions">get_interactions() (implementations.problem_classes.PenningTrap_3D.penningtrap method)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.stats_helper.get_list_of_types">get_list_of_types() (in module helpers.stats_helper)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.get_new_step_size">get_new_step_size() (core.ConvergenceController.ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Sweeper.sweeper.get_Qdelta_explicit">get_Qdelta_explicit() (core.Sweeper.sweeper method)</a>
 </li>
@@ -1075,8 +1098,6 @@
         <li><a href="pySDC/core.html#core.Controller.controller.hooks">(core.Controller.controller property)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.hotrod">hotrod() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -1201,13 +1222,6 @@
 
       <ul>
         <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes.controller_nonMPI">module</a>
-</li>
-      </ul></li>
-      <li>
-    implementations.controller_classes.error_estimator
-
-      <ul>
-        <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes.error_estimator">module</a>
 </li>
       </ul></li>
       <li>
@@ -1462,8 +1476,6 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.GeneralizedFisher_1D_PETSc">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_1D_FEniCS_implicit
 
@@ -1471,6 +1483,8 @@
         <li><a href="pySDC/implementations.problem_classes.html#module-implementations.problem_classes.GrayScott_1D_FEniCS_implicit">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     implementations.problem_classes.GrayScott_2D_PETSc_periodic
 
@@ -1963,6 +1977,8 @@
 </li>
         <li><a href="pySDC/core.html#module-core.Controller">core.Controller</a>
 </li>
+        <li><a href="pySDC/core.html#module-core.ConvergenceController">core.ConvergenceController</a>
+</li>
         <li><a href="pySDC/core.html#module-core.Errors">core.Errors</a>
 </li>
         <li><a href="pySDC/core.html#module-core.Hooks">core.Hooks</a>
@@ -2020,8 +2036,6 @@
         <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI</a>
 </li>
         <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI</a>
-</li>
-        <li><a href="pySDC/implementations.controller_classes.html#module-implementations.controller_classes.error_estimator">implementations.controller_classes.error_estimator</a>
 </li>
         <li><a href="pySDC/implementations.datatype_classes.html#module-implementations.datatype_classes">implementations.datatype_classes</a>
 </li>
@@ -2314,15 +2328,19 @@
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_iteration">post_iteration() (core.Hooks.hooks method)</a>
 </li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.post_iteration_processing">post_iteration_processing() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_predict">post_predict() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_run">post_run() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_setup">post_setup() (core.Hooks.hooks method)</a>
 </li>
+      <li><a href="pySDC/core.html#core.Hooks.hooks.post_step">post_step() (core.Hooks.hooks method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pySDC/core.html#core.Hooks.hooks.post_step">post_step() (core.Hooks.hooks method)</a>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.post_step_processing">post_step_processing() (core.ConvergenceController.ConvergenceController method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_sweep">post_sweep() (core.Hooks.hooks method)</a>
 </li>
@@ -2348,6 +2366,10 @@
         <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">(implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block">prepare_next_block() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI">prepare_next_block_nonMPI() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/core.html#core.Step.step.prev">prev (core.Step.step property)</a>
 </li>
       <li><a href="pySDC/core.html#core.Level.level.prob">prob (core.Level.level property)</a>
@@ -2450,13 +2472,13 @@
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.recv">(implementations.datatype_classes.particles.particles method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.reset_global_variables_nonMPI">reset_global_variables_nonMPI() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
       <li><a href="pySDC/core.html#core.Level.level.reset_level">reset_level() (core.Level.level method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.reset_stats">reset_stats() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Step.step.reset_step">reset_step() (core.Step.step method)</a>
-</li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.resilience">resilience() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.restart_block">restart_block() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 
@@ -2548,6 +2570,10 @@
         <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.send">(implementations.datatype_classes.particles.particles method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.ConvergenceController.ConvergenceController.setup">setup() (core.ConvergenceController.ConvergenceController method)</a>
+</li>
+      <li><a href="pySDC/core.html#core.Controller.controller.setup_convergence_controllers">setup_convergence_controllers() (core.Controller.controller method)</a>
+</li>
       <li><a href="pySDC/helpers.html#helpers.plot_helper.setup_mpl">setup_mpl() (in module helpers.plot_helper)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.visualization_tools.show_residual_across_simulation">show_residual_across_simulation() (in module helpers.visualization_tools)</a>
@@ -2896,8 +2922,6 @@
         <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.update_nodes">(implementations.sweeper_classes.verlet.verlet method)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.update_step_sizes">update_step_sizes() (implementations.controller_classes.controller_nonMPI.controller_nonMPI method)</a>
-</li>
   </ul></td>
 </tr></table>
 

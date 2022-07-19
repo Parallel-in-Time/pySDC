@@ -297,9 +297,14 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 <span id="core-controller-module"></span><h2>core.Controller module<a class="headerlink" href="#module-core.Controller" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Controller.controller">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Controller.</span></span><span class="sig-name descname"><span class="pre">controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Controller.</span></span><span class="sig-name descname"><span class="pre">controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Base abstract controller class</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.add_convergence_controller">
+<span class="sig-name descname"><span class="pre">add_convergence_controller</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">convergence_controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_double</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.add_convergence_controller"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.add_convergence_controller" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Controller.controller.check_convergence">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.check_convergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.check_convergence" title="Permalink to this definition">¶</a></dt>
@@ -316,6 +321,21 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.convergence_control">
+<span class="sig-name descname"><span class="pre">convergence_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.convergence_control"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.convergence_control" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.convergence_controllers_post_iteration_processing">
+<span class="sig-name descname"><span class="pre">convergence_controllers_post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.convergence_controllers_post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.convergence_controllers_post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.convergence_controllers_post_step_processing">
+<span class="sig-name descname"><span class="pre">convergence_controllers_post_step_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.convergence_controllers_post_step_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.convergence_controllers_post_step_processing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Controller.controller.dump_setup">
@@ -359,6 +379,107 @@ provide the set of nodes, the rest is done here (awesome!)</p>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.Controller.controller.setup_convergence_controllers">
+<span class="sig-name descname"><span class="pre">setup_convergence_controllers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Controller.html#controller.setup_convergence_controllers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Controller.controller.setup_convergence_controllers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.ConvergenceController">
+<span id="core-convergencecontroller-module"></span><h2>core.ConvergenceController module<a class="headerlink" href="#module-core.ConvergenceController" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.ConvergenceController.</span></span><span class="sig-name descname"><span class="pre">ConvergenceController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
+count and time step size.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_iteration_status">
+<span class="sig-name descname"><span class="pre">check_iteration_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_iteration_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_iteration_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine whether to keep iterating or not in this function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.check_parameters">
+<span class="sig-name descname"><span class="pre">check_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.check_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.check_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether parameters are compatible with whatever assumptions went into the step size functions etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether the parameters are compatible</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add dependencies in the form of other convergence controllers here</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.determine_restart">
+<span class="sig-name descname"><span class="pre">determine_restart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.determine_restart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.determine_restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine for each step separately if it wants to be restarted for whatever reason.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.get_new_step_size">
+<span class="sig-name descname"><span class="pre">get_new_step_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.get_new_step_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.get_new_step_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows to set a step size with arbitrary criteria. Make sure to give an order if you give
+multiple criteria. The order is a scalar, the higher, the later it is called meaning the highest order has the
+final word.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_iteration_processing">
+<span class="sig-name descname"><span class="pre">post_iteration_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_iteration_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do whatever after the iteration here.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.post_step_processing">
+<span class="sig-name descname"><span class="pre">post_step_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.post_step_processing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.post_step_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do whatever after the step here.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block">
+<span class="sig-name descname"><span class="pre">prepare_next_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>You should take care here that two things happen:</dt><dd><ul class="simple">
+<li><p>Every step after a step which wants to be restarted also needs to know it wants to be restarted</p></li>
+<li><p>Every step should somehow receive a new step size</p></li>
+</ul>
+</dd>
+</dl>
+<p>Of course not every convergence controller needs to implement this, just one</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI">
+<span class="sig-name descname"><span class="pre">prepare_next_block_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_slots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Tend</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.prepare_next_block_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an extension to the function <cite>prepare_next_block</cite>, which is only called in the non MPI controller and
+is needed because there is no chance to communicate backwards otherwise. While you should not do this in the
+first place, the first step in the new block comes after the last step in the last block, such that is still in
+fact forwards communication, even though it looks backwards.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.reset_global_variables_nonMPI">
+<span class="sig-name descname"><span class="pre">reset_global_variables_nonMPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.reset_global_variables_nonMPI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.reset_global_variables_nonMPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global variables refer to variables used accross multiple steps that are stored in the convergence controller
+classes to immitate communication in non mpi versions. These have to be resetted in order to replicate
+avalability of variables in mpi versions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.ConvergenceController.ConvergenceController.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/ConvergenceController.html#ConvergenceController.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.ConvergenceController.ConvergenceController.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup various variables that only need to be set once in the beginning</p>
 </dd></dl>
 
 </dd></dl>
@@ -2081,6 +2202,7 @@ taking into account the quadrature type.</p>
 <li><a class="reference internal" href="#module-core.BaseTransfer">core.BaseTransfer module</a></li>
 <li><a class="reference internal" href="#module-core.Collocation">core.Collocation module</a></li>
 <li><a class="reference internal" href="#module-core.Controller">core.Controller module</a></li>
+<li><a class="reference internal" href="#module-core.ConvergenceController">core.ConvergenceController module</a></li>
 <li><a class="reference internal" href="#module-core.Errors">core.Errors module</a></li>
 <li><a class="reference internal" href="#module-core.Hooks">core.Hooks module</a></li>
 <li><a class="reference internal" href="#module-core.Lagrange">core.Lagrange module</a></li>
