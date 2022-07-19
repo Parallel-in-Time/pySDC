@@ -1,33 +1,9 @@
 import logging
 
 import numpy as np
-from scipy.interpolate import BarycentricInterpolator
-from scipy.special import roots_legendre
 
 from pySDC.core.Errors import CollocationError
-
-
-class StableBarycentricInterpolator(BarycentricInterpolator):
-
-    def __init__(self, xi, yi=None, axis=0):
-        super(BarycentricInterpolator, self).__init__(xi, yi, axis)
-        self.xi = np.asfarray(xi)
-        self.set_yi(yi)
-        self.n = len(self.xi)
-
-        self._inv_capacity = 4.0 / (np.max(self.xi) - np.min(self.xi))
-
-        self.wi = np.zeros(self.n)
-
-        diffs = self.xi[:, None] - self.xi[None, :]
-        diffs[np.diag_indices_from(diffs)] = 1
-        sign = np.sign(diffs).prod(axis=1)
-        wLog = -np.log(np.abs(diffs)).sum(axis=1)
-        wScale = wLog.max()
-        invProd = np.exp(wLog - wScale)
-        invProd *= sign
-
-        np.copyto(self.wi, invProd)
+from pySDC.core import LagrangeApproximation
 
 
 class CollBase(object):
@@ -112,20 +88,15 @@ class CollBase(object):
         if self.nodes is None:
             raise CollocationError(f"Need nodes before computing weights, got {self.nodes}")
 
-        circ_one = np.zeros(self.num_nodes)
-        circ_one[0] = 1.0
-        tcks = []
-        for i in range(self.num_nodes):
-            tcks.append(StableBarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
+        # Instantiate the Lagrange interpolator object
+        approx = LagrangeApproximation(self.nodes, weightComputation='AUTO')
 
-        # Generate evaluation points for quadrature
-        tau, omega = roots_legendre((self.num_nodes + 1) // 2)
-        phi = (b - a) / 2 * tau + (b + a) / 2
+        # Compute weights
+        tLeft = np.ravel(self.tleft)[0]
+        tRight = np.ravel(self.tright)[0]
+        weights = approx.getIntegrationMatrix([(tLeft, tRight)], numQuad='FEJER')
 
-        weights = [np.sum((b - a) / 2 * omega * p(phi)) for p in tcks]
-        weights = np.array(weights)
-
-        return weights
+        return np.ravel(weights)
 
     def _getNodes(self):
         """
@@ -146,24 +117,16 @@ class CollBase(object):
         M = self.num_nodes
         Q = np.zeros([M + 1, M + 1])
 
-        # Generate Lagrange polynomials associated to the nodes
-        circ_one = np.zeros(self.num_nodes)
-        circ_one[0] = 1.0
-        tcks = []
-        for i in range(M):
-            tcks.append(StableBarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
+        # Instantiate the Lagrange interpolator object
+        approx = LagrangeApproximation(self.nodes, weightComputation='AUTO')
 
-        # Generate evaluation points for quadrature
-        a, b = self.tleft, self.nodes[:, None]
-        tau, omega = roots_legendre((self.num_nodes + 1) // 2)
-        tau, omega = tau[None, :], omega[None, :]
-        phi = (b - a) / 2 * tau + (b + a) / 2
-
-        # Compute quadrature
-        intQ = np.array([np.sum((b - a) / 2 * omega * p(phi), axis=-1) for p in tcks])
+        # Compute tleft-to-node integration matrix
+        tLeft = np.ravel(self.tleft)[0]
+        intervals = [(tLeft, tau) for tau in self.nodes]
+        intQ = approx.getIntegrationMatrix(intervals, numQuad='FEJER')
 
         # Store into Q matrix
-        Q[1:, 1:] = intQ.T
+        Q[1:, 1:] = intQ
 
         return Q
 
