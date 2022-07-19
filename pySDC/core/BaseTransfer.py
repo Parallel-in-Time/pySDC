@@ -5,6 +5,7 @@ import scipy.sparse as sp
 
 from pySDC.core.Errors import UnlockError
 from pySDC.helpers.pysdc_helper import FrozenClass
+from pySDC.core import LagrangeApproximation
 
 
 # short helper class to add params as attributes
@@ -74,25 +75,8 @@ class base_transfer(object):
         Returns:
             matrix containing the interpolation weights
         """
-        nnodes_f = len(f_nodes)
-        nnodes_c = len(c_nodes)
-
-        tmat = np.zeros((nnodes_f, nnodes_c))
-
-        for i in range(nnodes_f):
-            xi = f_nodes[i]
-            for j in range(nnodes_c):
-                den = 1.0
-                num = 1.0
-                for k in range(nnodes_c):
-                    if k == j:
-                        continue
-                    else:
-                        den *= c_nodes[j] - c_nodes[k]
-                        num *= xi - c_nodes[k]
-                tmat[i, j] = num / den
-
-        return tmat
+        approx = LagrangeApproximation(f_nodes)
+        return approx.getInterpolationMatrix(c_nodes)
 
     def restrict(self):
         """
