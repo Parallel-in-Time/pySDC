@@ -35,7 +35,7 @@ classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocati
 t_start = np.random.rand(1) * 0.2
 t_end = 0.8 + np.random.rand(1) * 0.2
 
-tolQuad = 5e-13
+tolQuad = 1e-13
 
 def testEquivalencies():
 
