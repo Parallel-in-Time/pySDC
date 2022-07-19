@@ -13,10 +13,10 @@ class EstimateEmbeddedError(ConvergenceController):
     '''
 
     def setup(self, controller, params, description):
-        return {'control_order': -80} | params
+        return {'control_order': -80, **params}
 
     def dependencies(self, controller, description):
-        controller.add_convergence_controller(StoreUOld, {}, description=description)
+        controller.add_convergence_controller(StoreUOld, description=description)
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):

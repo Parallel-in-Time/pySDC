@@ -11,7 +11,7 @@ class SwitchEstimator(ConvergenceController):
 
     def setup(self, controller, params, description):
         self.switch_detected = False
-        return {'control_order': 100} | params
+        return {'control_order': 100, **params}
 
     def get_new_step_size(self, controller, S):
         self.switch_detected = False  # reset between steps

@@ -76,7 +76,7 @@ class controller_nonMPI(controller):
 
         self.store_uold = self.params.use_iteration_estimator
 
-        self.add_convergence_controller(BasicRestartingNonMPI, {}, description)
+        self.add_convergence_controller(BasicRestartingNonMPI, description)
 
         for C in self.convergence_controllers:
             C.reset_global_variables_nonMPI(self)

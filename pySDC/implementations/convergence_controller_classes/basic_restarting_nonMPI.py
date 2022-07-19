@@ -5,7 +5,7 @@ from pySDC.core.ConvergenceController import ConvergenceController
 class BasicRestartingNonMPI(ConvergenceController):
 
     def setup(self, controller, params, description):
-        return {'control_order': 100} | params
+        return {'control_order': 100, **params}
 
     def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
         """

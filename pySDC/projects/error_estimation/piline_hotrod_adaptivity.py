@@ -101,10 +101,11 @@ def run(custom_description, num_procs):
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
-    # # print the convergence controllers
+    # print the convergence controllers
     # conv_conts = controller.convergence_controllers
     # order = [me.params.control_order for me in conv_conts]
     # index = np.arange(len(conv_conts))[np.argsort(order)]
+    # print('active convergence controllers')
     # for i in range(len(order)):
     #     print(i, order[index[i]], conv_conts[index[i]])
 

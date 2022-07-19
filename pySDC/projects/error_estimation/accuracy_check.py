@@ -169,8 +169,8 @@ but got {np.mean(order):.2f}'
 
         else:
             label = None
-            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order {k+1} \
-but got {np.mean(order):.2f}'
+            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
+{k+1} but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')

@@ -63,6 +63,10 @@ def main():
     step_params = dict()
     step_params['maxiter'] = 20
 
+    # convergence controllers
+    switch_estimator_params = {}
+    convergence_controllers = {SwitchEstimator: switch_estimator_params}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
@@ -76,7 +80,7 @@ def main():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['convergence_controllers'] = {SwitchEstimator: {}}
+    description['convergence_controllers'] = convergence_controllers
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
