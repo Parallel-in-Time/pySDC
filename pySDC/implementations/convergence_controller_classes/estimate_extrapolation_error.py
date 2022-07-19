@@ -39,7 +39,7 @@ class EstimateExtrapolationError(ConvergenceController):
         self.u_coeff = [None] * default_params['n']
         self.f_coeff = [0.] * default_params['n']
 
-        return default_params | params
+        return {**default_params, **params}
 
     def check_parameters(self, controller, params, description):
         '''
@@ -151,7 +151,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationError):
         self.u = [None] * default_params['n']
         self.f = [None] * default_params['n']
 
-        return non_mpi_defaults | default_params
+        return {**non_mpi_defaults, **default_params}
 
     def post_iteration_processing(self, controller, S):
         if S.status.iter == self.params.estimate_iter:

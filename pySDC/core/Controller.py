@@ -230,14 +230,19 @@ class controller(object):
         self.convergence_controllers = []
         self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
-        conv_classes[CheckConvergence] = {}
+        conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
         for conv_class, params in conv_classes.items():
-            self.add_convergence_controller(conv_class, params, description)
+            self.add_convergence_controller(conv_class, description=description, params=params)
 
-    def add_convergence_controller(self, convergence_controller, params, description, allow_double=False):
-        c = convergence_controller(self, params, description)
-        if not type(c) in [type(me) for me in self.convergence_controllers] or allow_double:
-            self.convergence_controllers.append(c)
+    def add_convergence_controller(self, convergence_controller, description, params=None, allow_double=False):
+        # check if we passed any sort of special params
+        params = {} if params is None else params
+
+        # check if we already have it or if we want to have it multiple times
+        if convergence_controller not in [type(me) for me in self.convergence_controllers] or allow_double:
+            self.convergence_controllers.append(convergence_controller(self, params, description))
+
+            # update ordering
             orders = [C.params.control_order for C in self.convergence_controllers]
             self.convergence_controller_order = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
 

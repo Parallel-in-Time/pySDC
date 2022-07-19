@@ -20,13 +20,13 @@ class HotRod(ConvergenceController):
             'control_order': -45,
             'no_storage': False
         }
-        return default_params | params
+        return {**default_params, **params}
 
     def dependencies(self, controller, description):
         if type(controller) == controller_nonMPI:
-            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, {}, description=description)
-            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI,
-                                                  {'no_storage': self.params.no_storage}, description=description)
+            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
+            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI, description=description,
+                                                  params={'no_storage': self.params.no_storage})
         else:
             raise NotImplementedError("Don\'t know how to estimate errors with MPI")
 

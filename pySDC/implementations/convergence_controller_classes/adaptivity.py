@@ -11,11 +11,11 @@ class Adaptivity(ConvergenceController):
     """
 
     def setup(self, controller, params, description):
-        return {'control_order': -50} | params
+        return {'control_order': -50, **params}
 
     def dependencies(self, controller, description):
         if type(controller) == controller_nonMPI:
-            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, {}, description=description)
+            controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
         else:
             raise NotImplementedError('Don\'t have an implementation to estimate the embedded error with MPI')
 

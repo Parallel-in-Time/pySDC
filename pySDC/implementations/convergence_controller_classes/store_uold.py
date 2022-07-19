@@ -4,7 +4,7 @@ from pySDC.core.ConvergenceController import ConvergenceController
 class StoreUOld(ConvergenceController):
 
     def setup(self, controller, params, description):
-        return {'control_order': +90} | params
+        return {'control_order': +90, **params}
 
     def post_iteration_processing(self, controller, S):
         '''
