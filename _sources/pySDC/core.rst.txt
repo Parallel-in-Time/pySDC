@@ -44,6 +44,14 @@ core.Hooks module
    :undoc-members:
    :show-inheritance:
 
+core.Lagrange module
+--------------------
+
+.. automodule:: core.Lagrange
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 core.Level module
 -----------------
 

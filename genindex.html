@@ -72,8 +72,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__entry">__entry (core.Hooks.hooks attribute)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.__init__">__init__() (core.Nodes.NodesGenerator method)</a>
+      <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.__init__">__init__() (core.Lagrange.LagrangeApproximation method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.__init__">(core.LagrangeApproximation method)</a>
 </li>
+        <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.__init__">(core.Nodes.NodesGenerator method)</a>
+</li>
+        <li><a href="pySDC/core.html#core.NodesGenerator.__init__">(core.NodesGenerator method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/helpers.html#helpers.pysdc_helper.FrozenClass.__isfrozen">__isfrozen (helpers.pysdc_helper.FrozenClass attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__stats">__stats (core.Hooks.hooks attribute)</a>
@@ -86,10 +94,10 @@
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_run">__t0_run (core.Hooks.hooks attribute)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_setup">__t0_setup (core.Hooks.hooks attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_setup">__t0_setup (core.Hooks.hooks attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_step">__t0_step (core.Hooks.hooks attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.__t0_sweep">__t0_sweep (core.Hooks.hooks attribute)</a>
@@ -338,6 +346,8 @@
         <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual">(implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass method)</a>
 </li>
       </ul></li>
+      <li><a href="pySDC/core.html#core.Lagrange.computeFejerRule">computeFejerRule() (in module core.Lagrange)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/core.html#core.Step.step.connect_levels">connect_levels() (core.Step.step method)</a>
@@ -392,6 +402,13 @@
 
       <ul>
         <li><a href="pySDC/core.html#module-core.Hooks">module</a>
+</li>
+      </ul></li>
+      <li>
+    core.Lagrange
+
+      <ul>
+        <li><a href="pySDC/core.html#module-core.Lagrange">module</a>
 </li>
       </ul></li>
       <li>
@@ -680,8 +697,12 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou.eval_mode_energy">eval_mode_energy() (implementations.problem_classes.FermiPastaUlamTsingou.fermi_pasta_ulam_tsingou method)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.evalOrthogPoly">evalOrthogPoly() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id0">[1]</a>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.evalOrthogPoly">evalOrthogPoly() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id4">[1]</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.evalOrthogPoly">(core.NodesGenerator method)</a>, <a href="pySDC/core.html#id12">[1]</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.evaluate">evaluate() (core.Collocation.CollBase static method)</a>
 </li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh.expl">expl (implementations.datatype_classes.fenics_mesh.rhs_fenics_mesh attribute)</a>
@@ -906,12 +927,12 @@
         <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight">(in module implementations.problem_classes.boussinesq_helpers.buildFDMatrix)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical">getBCVertical() (in module implementations.problem_classes.boussinesq_helpers.build2DFDMatrix)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix">getBoussinesq2DMatrix() (in module implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix">getBoussinesq2DUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal">getBoussinesqBCHorizontal() (in module implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix)</a>
@@ -922,20 +943,44 @@
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getHorizontalDx">getHorizontalDx() (in module implementations.problem_classes.acoustic_helpers.buildFDMatrix)</a>
 </li>
+      <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.getIntegrationMatrix">getIntegrationMatrix() (core.Lagrange.LagrangeApproximation method)</a>, <a href="pySDC/core.html#id0">[1]</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.getIntegrationMatrix">(core.LagrangeApproximation method)</a>, <a href="pySDC/core.html#id9">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.getInterpolationMatrix">getInterpolationMatrix() (core.Lagrange.LagrangeApproximation method)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.getInterpolationMatrix">(core.LagrangeApproximation method)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildFDMatrix.getMatrix">getMatrix() (in module implementations.problem_classes.acoustic_helpers.buildFDMatrix)</a>
 
       <ul>
         <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix">(in module implementations.problem_classes.boussinesq_helpers.buildFDMatrix)</a>
 </li>
       </ul></li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getNodes">getNodes() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id2">[1]</a>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getNodes">getNodes() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id5">[1]</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.getNodes">(core.NodesGenerator method)</a>, <a href="pySDC/core.html#id13">[1]</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getOrthogPolyCoefficients">getOrthogPolyCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id3">[1]</a>
+      </ul></li>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getOrthogPolyCoefficients">getOrthogPolyCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id6">[1]</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.getOrthogPolyCoefficients">(core.NodesGenerator method)</a>, <a href="pySDC/core.html#id14">[1]</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual">getresidual() (implementations.problem_classes.boussinesq_helpers.helper_classes.Callback method)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getTridiagCoefficients">getTridiagCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id4">[1]</a>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.getTridiagCoefficients">getTridiagCoefficients() (core.Nodes.NodesGenerator method)</a>, <a href="pySDC/core.html#id7">[1]</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.getTridiagCoefficients">(core.NodesGenerator method)</a>, <a href="pySDC/core.html#id15">[1]</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix">getUpwindMatrix() (in module implementations.problem_classes.boussinesq_helpers.buildFDMatrix)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.acoustic_helpers.html#implementations.problem_classes.acoustic_helpers.buildWave1DMatrix.getWave1DAdvectionMatrix">getWave1DAdvectionMatrix() (in module implementations.problem_classes.acoustic_helpers.buildWave1DMatrix)</a>
@@ -1818,6 +1863,12 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.LagrangeApproximation">LagrangeApproximation (class in core)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation">(class in core.Lagrange)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex.lap">lap (implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT.advectiondiffusion1d_imex attribute)</a>
 
       <ul>
@@ -1836,10 +1887,10 @@
       </ul></li>
       <li><a href="pySDC/core.html#core.Level.level.level_index">level_index (core.Level.level attribute)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Step.step.levels">levels (core.Step.step attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Step.step.levels">levels (core.Step.step attribute)</a>
+</li>
       <li><a href="pySDC/core.html#core.BaseTransfer.base_transfer.logger">logger (core.BaseTransfer.base_transfer attribute)</a>
 
       <ul>
@@ -1915,6 +1966,8 @@
         <li><a href="pySDC/core.html#module-core.Errors">core.Errors</a>
 </li>
         <li><a href="pySDC/core.html#module-core.Hooks">core.Hooks</a>
+</li>
+        <li><a href="pySDC/core.html#module-core.Lagrange">core.Lagrange</a>
 </li>
         <li><a href="pySDC/core.html#module-core.Level">core.Level</a>
 </li>
@@ -2135,6 +2188,16 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.n">n (core.Lagrange.LagrangeApproximation attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#id2">(core.Lagrange.LagrangeApproximation property)</a>
+</li>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.n">(core.LagrangeApproximation attribute)</a>
+</li>
+        <li><a href="pySDC/core.html#id10">(core.LagrangeApproximation property)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion.ndim">ndim (implementations.problem_classes.GrayScott_MPIFFT.grayscott_imex_diffusion attribute)</a>
 </li>
       <li><a href="pySDC/helpers.html#helpers.plot_helper.newfig">newfig() (in module helpers.plot_helper)</a>
@@ -2145,16 +2208,24 @@
 </li>
       <li><a href="pySDC/helpers.html#helpers.transfer_helper.next_neighbors_periodic">next_neighbors_periodic() (in module helpers.transfer_helper)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.node_type">node_type (core.Nodes.NodesGenerator attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.node_type">node_type (core.Nodes.NodesGenerator attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.node_type">(core.NodesGenerator attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.nodes">nodes (core.Collocation.CollBase attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Nodes.NodesError">NodesError</a>
 </li>
-      <li><a href="pySDC/core.html#core.Nodes.NodesGenerator">NodesGenerator (class in core.Nodes)</a>
+      <li><a href="pySDC/core.html#core.NodesGenerator">NodesGenerator (class in core)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.Nodes.NodesGenerator">(class in core.Nodes)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.nonlinear_ODE_1.nonlinear_ODE_1">nonlinear_ODE_1 (class in implementations.problem_classes.nonlinear_ODE_1)</a>
 </li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.NonlinearSchroedinger_MPIFFT.nonlinearschroedinger_imex">nonlinearschroedinger_imex (class in implementations.problem_classes.NonlinearSchroedinger_MPIFFT)</a>
@@ -2231,6 +2302,12 @@
       </ul></li>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.Piline.piline">piline (class in implementations.problem_classes.Piline)</a>
 </li>
+      <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.points">points (core.Lagrange.LagrangeApproximation attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.points">(core.LagrangeApproximation attribute)</a>
+</li>
+      </ul></li>
       <li><a href="pySDC/implementations.datatype_classes.html#implementations.datatype_classes.particles.particles.pos">pos (implementations.datatype_classes.particles.particles attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_comm">post_comm() (core.Hooks.hooks method)</a>
@@ -2243,10 +2320,10 @@
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_setup">post_setup() (core.Hooks.hooks method)</a>
 </li>
-      <li><a href="pySDC/core.html#core.Hooks.hooks.post_step">post_step() (core.Hooks.hooks method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pySDC/core.html#core.Hooks.hooks.post_step">post_step() (core.Hooks.hooks method)</a>
+</li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.post_sweep">post_sweep() (core.Hooks.hooks method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Hooks.hooks.pre_comm">pre_comm() (core.Hooks.hooks method)</a>
@@ -2352,7 +2429,11 @@
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.QT">QT (implementations.sweeper_classes.verlet.verlet attribute)</a>
 </li>
       <li><a href="pySDC/core.html#core.Nodes.NodesGenerator.quad_type">quad_type (core.Nodes.NodesGenerator attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.NodesGenerator.quad_type">(core.NodesGenerator attribute)</a>
 </li>
+      </ul></li>
       <li><a href="pySDC/implementations.sweeper_classes.html#implementations.sweeper_classes.verlet.verlet.Qx">Qx (implementations.sweeper_classes.verlet.verlet attribute)</a>
 </li>
   </ul></td>
@@ -2861,16 +2942,22 @@
         <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex.w">(implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced.fenics_heat_weak_imex attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w1">w1 (implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pySDC/implementations.problem_classes.html#implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott.w2">w2 (implementations.problem_classes.GrayScott_1D_FEniCS_implicit.fenics_grayscott attribute)</a>
 </li>
       <li><a href="pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt">wait_with_interrupt() (implementations.controller_classes.controller_MPI.controller_MPI method)</a>
 </li>
       <li><a href="pySDC/core.html#core.Collocation.CollBase.weights">weights (core.Collocation.CollBase attribute)</a>
+
+      <ul>
+        <li><a href="pySDC/core.html#core.Lagrange.LagrangeApproximation.weights">(core.Lagrange.LagrangeApproximation attribute)</a>
 </li>
+        <li><a href="pySDC/core.html#core.LagrangeApproximation.weights">(core.LagrangeApproximation attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -2937,7 +3024,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2021, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>
