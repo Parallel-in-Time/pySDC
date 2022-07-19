@@ -7,6 +7,8 @@ from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.error_estimation.accuracy_check import setup_mpl
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
 from pySDC.core.Hooks import hooks
 
@@ -40,7 +42,7 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run(use_adaptivity, num_procs):
+def run(custom_description, num_procs):
     """
     A simple test program to do PFASST runs for the heat equation
     """
@@ -48,7 +50,6 @@ def run(use_adaptivity, num_procs):
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 5e-2
-    level_params['e_tol'] = 1e-7
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -75,8 +76,6 @@ def run(use_adaptivity, num_procs):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
-    controller_params['use_HotRod'] = True
-    controller_params['use_adaptivity'] = use_adaptivity
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -87,6 +86,7 @@ def run(use_adaptivity, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description.update(custom_description)
 
     # set time parameters
     t0 = 0.0
@@ -100,6 +100,14 @@ def run(use_adaptivity, num_procs):
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+
+    # print the convergence controllers
+    # conv_conts = controller.convergence_controllers
+    # order = [me.params.control_order for me in conv_conts]
+    # index = np.arange(len(conv_conts))[np.argsort(order)]
+    # print('active convergence controllers')
+    # for i in range(len(order)):
+    #     print(i, order[index[i]], conv_conts[index[i]])
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -121,7 +129,6 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
     sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps', recomputed=recomputed), sortby='time'))[:, 1]
     ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
 
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
@@ -215,7 +222,7 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
     ax.plot(dt[:, 0], dt[:, 1], color='black')
     e_ax = ax.twinx()
     e_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
-    e_ax.plot(t, e_ex, label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
+    e_ax.plot(t[ready], e_ex[ready], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
     e_ax.plot(t[ready], abs(e_em[ready] - e_ex[ready]), label='difference', ls='-.')
     e_ax.plot([None, None], label=r'$\Delta t$', color='black')
     e_ax.set_yscale('log')
@@ -235,15 +242,21 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
 
     for k in expected.keys():
-        assert np.isclose(expected[k], got[k], rtol=1e-3),\
+        assert np.isclose(expected[k], got[k], rtol=1e-4),\
                f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
 
 
 def main():
     generate_reference = False
-    for use_adaptivity in [False, True]:
+
+    for use_adaptivity in [True, False]:
+        custom_description = {'convergence_controllers': {}}
+        if use_adaptivity:
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+
         for num_procs in [1, 4]:
-            stats = run(use_adaptivity, num_procs=num_procs)
+            custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
+            stats = run(custom_description, num_procs=num_procs)
             plot(stats, use_adaptivity, num_procs=num_procs, generate_reference=generate_reference)
 
 
