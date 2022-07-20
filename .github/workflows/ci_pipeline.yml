@@ -61,10 +61,6 @@ jobs:
         run: |
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
 
-      - name: Convert notebooks
-        run: |
-          python convert_notebooks.py
-
       - name: Build documentation
         run: |
           chmod u+x ./docs/update_apidocs.sh
