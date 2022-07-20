@@ -264,3 +264,13 @@ class controller(object):
             C.check_iteration_status(self, S)
             C.get_new_step_size(self, S)
             C.determine_restart(self, S)
+
+    def print_convergence_controllers(self):
+        '''
+        This function is for debugging purposes to keep track of the different convergence controllers and their order
+        '''
+        print('    | order | convergence controller')
+        print('----+-------+-------------------------------------------------------------------')
+        for i in range(len(self.convergence_controllers)):
+            C = self.convergence_controllers[self.convergence_controller_order[i]]
+            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}')
