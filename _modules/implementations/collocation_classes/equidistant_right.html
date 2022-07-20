@@ -39,10 +39,10 @@
           <div class="body" role="main">
             
   <h1>Source code for implementations.collocation_classes.equidistant_right</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pySDC.implementations.collocations</span> <span class="kn">import</span> <span class="n">Collocation</span>
+<span></span><span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">CollBase</span>
 
 
-<div class="viewcode-block" id="EquidistantNoLeft"><a class="viewcode-back" href="../../../pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft">[docs]</a><span class="k">class</span> <span class="nc">EquidistantNoLeft</span><span class="p">(</span><span class="n">Collocation</span><span class="p">):</span>
+<div class="viewcode-block" id="EquidistantNoLeft"><a class="viewcode-back" href="../../../pySDC/implementations.collocation_classes.html#implementations.collocation_classes.equidistant_right.EquidistantNoLeft">[docs]</a><span class="k">class</span> <span class="nc">EquidistantNoLeft</span><span class="p">(</span><span class="n">CollBase</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span class="n">tleft</span><span class="p">,</span> <span class="n">tright</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EquidistantNoLeft</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>

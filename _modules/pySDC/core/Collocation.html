@@ -5,31 +5,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>core.Collocation &#8212; pySDC 4.2.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
+    <title>pySDC.core.Collocation &#8212; pySDC 4.2.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
     
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">core.Collocation</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pySDC.core.Collocation</a></li> 
       </ul>
     </div>  
 
@@ -38,7 +38,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for core.Collocation</h1><div class="highlight"><pre>
+  <h1>Source code for pySDC.core.Collocation</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
-<div class="viewcode-block" id="CollBase"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase">[docs]</a><span class="k">class</span> <span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CollBase"><a class="viewcode-back" href="../../../pySDC/core.html#core.CollBase">[docs]</a><span class="k">class</span> <span class="nc">CollBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generic collocation class, that contains everything to do integration over</span>
 <span class="sd">    intervals and between nodes.</span>
@@ -158,7 +158,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">left_is_node</span> <span class="o">=</span> <span class="n">quad_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-LEFT&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right_is_node</span> <span class="o">=</span> <span class="n">quad_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">,</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="CollBase.evaluate"><a class="viewcode-back" href="../../pySDC/core.html#core.Collocation.CollBase.evaluate">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CollBase.evaluate"><a class="viewcode-back" href="../../../pySDC/core.html#core.CollBase.evaluate">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluates the quadrature over the full interval</span>
@@ -333,7 +333,7 @@
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
+    <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
@@ -348,14 +348,14 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">core.Collocation</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">pySDC.core.Collocation</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -41,11 +41,11 @@
   <h1>Source code for core.BaseTransfer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">UnlockError</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
+<span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
@@ -107,33 +107,17 @@
 <div class="viewcode-block" id="base_transfer.get_transfer_matrix_Q"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.get_transfer_matrix_Q">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">,</span> <span class="n">c_nodes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Helper routine to quickly define transfer matrices between sets of nodes (fully Lagrangian)</span>
+<span class="sd">        Helper routine to quickly define transfer matrices from a coarse set</span>
+<span class="sd">        to a fine set of nodes (fully Lagrangian)</span>
 <span class="sd">        Args:</span>
-<span class="sd">            f_nodes: fine nodes</span>
-<span class="sd">            c_nodes: coarse nodes</span>
+<span class="sd">            f_nodes: fine nodes (size nF)</span>
+<span class="sd">            c_nodes: coarse nodes (size nC)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            matrix containing the interpolation weights</span>
+<span class="sd">            matrix containing the interpolation weights (shape (nF, nC))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nnodes_f</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">)</span>
-        <span class="n">nnodes_c</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_nodes</span><span class="p">)</span>
-
-        <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nnodes_f</span><span class="p">,</span> <span class="n">nnodes_c</span><span class="p">))</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nnodes_f</span><span class="p">):</span>
-            <span class="n">xi</span> <span class="o">=</span> <span class="n">f_nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nnodes_c</span><span class="p">):</span>
-                <span class="n">den</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="n">num</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nnodes_c</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
-                        <span class="k">continue</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">den</span> <span class="o">*=</span> <span class="n">c_nodes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">c_nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                        <span class="n">num</span> <span class="o">*=</span> <span class="n">xi</span> <span class="o">-</span> <span class="n">c_nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                <span class="n">tmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
-
-        <span class="k">return</span> <span class="n">tmat</span></div>
+        <span class="n">approx</span> <span class="o">=</span> <span class="n">LagrangeApproximation</span><span class="p">(</span><span class="n">c_nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">approx</span><span class="o">.</span><span class="n">getInterpolationMatrix</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="base_transfer.restrict"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.restrict">[docs]</a>    <span class="k">def</span> <span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
