@@ -88,8 +88,8 @@ el multistep mode!'
         in the Taylor expansion and the column index reflects the particular step and whether its u or f from that
         step. The vector b on the other hand, contains a 1 in the first entry and zeros elsewhere, since we want to
         compute the value itself and all the derivatives should vanish after combining the Taylor expansions. This
-        works to the order the number of rows and since we want a square matrix for solving, we need the same amount of
-        colums, which determines the memory overhead, since it is equal to the solutions / rhs that we need in memory
+        works to the order of the number of rows and since we want a square matrix for solving, we need the same amount
+        of colums, which determines the memory overhead, since it is equal to the solutions / rhs that we need in memory
         at the time of evaluation.
         This is enough to get the extrapolated solution, but if we want to compute the local error, we have to compute
         a prefactor. This is based on error accumulation between steps (first step's solution is exact plus 1 LTE,
