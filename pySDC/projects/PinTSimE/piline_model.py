@@ -5,7 +5,7 @@ import dill
 mpl.use('Agg')
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
