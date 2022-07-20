@@ -1,7 +1,7 @@
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase
 
 
-class CollGaussRadau_Left(Collocation):
+class CollGaussRadau_Left(CollBase):
 
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussRadau_Left, self).__init__(

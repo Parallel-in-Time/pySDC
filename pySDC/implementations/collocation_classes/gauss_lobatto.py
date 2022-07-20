@@ -1,7 +1,7 @@
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase
 
 
-class CollGaussLobatto(Collocation):
+class CollGaussLobatto(CollBase):
 
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussLobatto, self).__init__(
