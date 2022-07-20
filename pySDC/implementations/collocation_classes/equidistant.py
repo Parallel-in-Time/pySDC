@@ -1,7 +1,7 @@
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase
 
 
-class Equidistant(Collocation):
+class Equidistant(CollBase):
 
     def __init__(self, num_nodes, tleft, tright):
         super(Equidistant, self).__init__(

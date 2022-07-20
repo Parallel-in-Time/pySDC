@@ -1,7 +1,7 @@
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase
 
 
-class CollGaussLegendre(Collocation):
+class CollGaussLegendre(CollBase):
 
     def __init__(self, num_nodes, tleft, tright):
         super(CollGaussLegendre, self).__init__(

@@ -2,7 +2,7 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
