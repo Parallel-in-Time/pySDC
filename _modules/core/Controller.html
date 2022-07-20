@@ -304,7 +304,17 @@
 
             <span class="n">C</span><span class="o">.</span><span class="n">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
             <span class="n">C</span><span class="o">.</span><span class="n">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div></div>
+            <span class="n">C</span><span class="o">.</span><span class="n">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="controller.print_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.print_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">print_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    | order | convergence controller&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;----+-------+-------------------------------------------------------------------&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">)):</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s1">3</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span><span class="si">:</span><span class="s1">5</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
