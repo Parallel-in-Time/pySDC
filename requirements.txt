@@ -19,6 +19,3 @@ flake8-bugbear
 pytest
 pytest-cov
 sphinx
-nbsphinx
-nbconvert
-flake8-nb
