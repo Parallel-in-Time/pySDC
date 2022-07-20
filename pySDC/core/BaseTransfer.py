@@ -66,16 +66,17 @@ class base_transfer(object):
     @staticmethod
     def get_transfer_matrix_Q(f_nodes, c_nodes):
         """
-        Helper routine to quickly define transfer matrices between sets of nodes (fully Lagrangian)
+        Helper routine to quickly define transfer matrices from a coarse set
+        to a fine set of nodes (fully Lagrangian)
         Args:
-            f_nodes: fine nodes
-            c_nodes: coarse nodes
+            f_nodes: fine nodes (size nF)
+            c_nodes: coarse nodes (size nC)
 
         Returns:
-            matrix containing the interpolation weights
+            matrix containing the interpolation weights (shape (nF, nC))
         """
-        approx = LagrangeApproximation(f_nodes)
-        return approx.getInterpolationMatrix(c_nodes)
+        approx = LagrangeApproximation(c_nodes)
+        return approx.getInterpolationMatrix(f_nodes)
 
     def restrict(self):
         """
