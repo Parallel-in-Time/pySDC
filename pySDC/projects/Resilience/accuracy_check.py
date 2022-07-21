@@ -1,16 +1,16 @@
 import matplotlib as mpl
-
-mpl.use('Agg')
-
 import matplotlib.pylab as plt
 import numpy as np
 
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.core.Hooks import hooks
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import\
+    EstimateExtrapolationErrorNonMPI
 
 import pySDC.helpers.plot_helper as plt_helper
 
@@ -82,8 +82,6 @@ def single_run(var='dt', val=1e-1, k=5, serial=True):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
-    controller_params['use_extrapolation_estimate'] = True
-    controller_params['use_embedded_estimate'] = True
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -94,6 +92,10 @@ def single_run(var='dt', val=1e-1, k=5, serial=True):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description['convergence_controllers'] = {
+        EstimateEmbeddedErrorNonMPI: {},
+        EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
+    }
 
     # set time parameters
     t0 = 0.0
@@ -116,10 +118,10 @@ def single_run(var='dt', val=1e-1, k=5, serial=True):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    e_extrapolated = np.array(sort_stats(filter_stats(stats, type='e_extrapolated'), sortby='time'))[:, 1]
+    e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
 
     results = {
-        'e_embedded': sort_stats(filter_stats(stats, type='e_embedded'), sortby='time')[-1][1],
+        'e_embedded': get_sorted(stats, type='e_embedded')[-1][1],
         'e_extrapolated': e_extrapolated[e_extrapolated != [None]][-1],
         var: val,
     }
@@ -164,8 +166,8 @@ but got {np.mean(order):.2f}'
 
         else:
             label = None
-            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order {k+1} \
-but got {np.mean(order):.2f}'
+            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
+{k+1} but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')

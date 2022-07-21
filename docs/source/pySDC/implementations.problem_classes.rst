@@ -101,6 +101,14 @@ implementations.problem\_classes.Auzinger\_implicit module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.Battery module
+-----------------------------------------------
+
+.. automodule:: implementations.problem_classes.Battery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.Boussinesq\_2D\_FD\_imex module
 ----------------------------------------------------------------
 
