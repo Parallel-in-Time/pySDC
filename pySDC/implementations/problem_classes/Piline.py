@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import solve_ivp
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
@@ -84,19 +85,28 @@ class piline(ptype):
 
     def u_exact(self, t):
         """
-        Routine to compute the exact solution at time t
+        Routine to approximate the exact solution at time t by scipy
 
         Args:
             t (float): current time
 
         Returns:
-            dtype_u: exact solution
+            dtype_u: exact solution (kind of)
         """
 
         me = self.dtype_u(self.init)
 
+        # fill initial conditions
         me[0] = 0.0  # v1
         me[1] = 0.0  # v2
         me[2] = 0.0  # p3
+
+        if t > 0.:
+            def rhs(t, u):
+                f = self.eval_f(u, t)
+                return f.impl + f.expl  # evaluate only explicitly rather than IMEX
+
+            tol = 100 * np.finfo(float).eps
+            me[:] = solve_ivp(rhs, (0., t), me, rtol=tol, atol=tol).y[:, -1]
 
         return me

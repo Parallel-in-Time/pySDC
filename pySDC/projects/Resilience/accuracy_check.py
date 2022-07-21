@@ -2,17 +2,33 @@ import matplotlib as mpl
 import matplotlib.pylab as plt
 import numpy as np
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.problem_classes.Piline import piline
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import\
     EstimateExtrapolationErrorNonMPI
+from pySDC.core.Hooks import hooks
 
 import pySDC.helpers.plot_helper as plt_helper
+from pySDC.projects.Resilience.piline import run_piline
+
+
+class log_errors(hooks):
+
+    def post_step(self, step, level_number):
+
+        super(log_errors, self).post_step(step, level_number)
+
+        # some abbreviations
+        L = step.levels[level_number]
+
+        L.sweep.compute_end_point()
+
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, sweep=L.status.sweep,
+                          type='e_glob', value=abs(L.prob.u_exact(t=L.time + L.dt) - L.u[-1]))
 
 
 def setup_mpl(font_size=8):
@@ -27,102 +43,15 @@ def setup_mpl(font_size=8):
     mpl.rcParams.update(style_options)
 
 
-class log_data(hooks):
-
-    def post_step(self, step, level_number):
-
-        super(log_data, self).post_step(step, level_number)
-
-        # some abbreviations
-        L = step.levels[level_number]
-
-        L.sweep.compute_end_point()
-
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='u', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
-
-
-def single_run(var='dt', val=1e-1, k=5, serial=True):
-    """
-    A simple test program to do PFASST runs for the heat equation
-    """
-
-    # initialize level parameters
-    level_params = dict()
-    level_params[var] = val
-
-    # initialize sweeper parameters
-    sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['QE'] = 'PIC'
-
-    problem_params = {
-        'Vs': 100.,
-        'Rs': 1.,
-        'C1': 1.,
-        'Rpi': 0.2,
-        'C2': 1.,
-        'Lpi': 1.,
-        'Rl': 5.,
-    }
-
-    # initialize step parameters
-    step_params = dict()
-    step_params['maxiter'] = k
-
-    # initialize controller parameters
-    controller_params = dict()
-    controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
-    controller_params['mssdc_jac'] = False
-
-    # fill description dictionary for easy step instantiation
-    description = dict()
-    description['problem_class'] = piline  # pass problem class
-    description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order  # pass sweeper
-    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params  # pass level parameters
-    description['step_params'] = step_params
-    description['convergence_controllers'] = {
-        EstimateEmbeddedErrorNonMPI: {},
-        EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
-    }
-
-    # set time parameters
-    t0 = 0.0
-    if var == 'dt':
-        Tend = 30 * val
-    else:
-        Tend = 2e1
-
-    if serial:
-        num_procs = 1
-    else:
-        num_procs = 30
-
-    # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
-
-    # get initial values on finest level
-    P = controller.MS[0].levels[0].prob
-    uinit = P.u_exact(t0)
-
-    # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+def get_results_from_stats(stats, var, val):
     e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
+
+    e_glob = np.array(get_sorted(stats, type='e_glob'))[:, 1]
 
     results = {
         'e_embedded': get_sorted(stats, type='e_embedded')[-1][1],
         'e_extrapolated': e_extrapolated[e_extrapolated != [None]][-1],
+        'e': max([abs(e_glob[-1] - e_glob[-2]), np.finfo(float).eps]),
         var: val,
     }
 
@@ -137,14 +66,32 @@ def multiple_runs(ax, k=5, serial=True):
     # assemble list of dt
     dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
 
+    num_procs = 1 if serial else 30
+
     # perform first test
-    res = single_run(var='dt', val=dt_list[0], k=k, serial=serial)
+    desc = {
+        'level_params': {'dt': dt_list[0]},
+        'step_params': {'maxiter': k},
+        'convergence_controllers': {
+            EstimateEmbeddedErrorNonMPI: {},
+            EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
+        }
+    }
+    res = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[0], log_errors), 'dt', dt_list[0])
     for key in res.keys():
         res[key] = [res[key]]
 
     # perform rest of the tests
     for i in range(1, len(dt_list)):
-        res_ = single_run(var='dt', val=dt_list[i], k=k, serial=serial)
+        desc = {
+            'level_params': {'dt': dt_list[i]},
+            'step_params': {'maxiter': k},
+            'convergence_controllers': {
+                EstimateEmbeddedErrorNonMPI: {},
+                EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
+            }
+        }
+        res_ = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[i], log_errors), 'dt', dt_list[i])
         for key in res_.keys():
             res[key].append(res_[key])
 
@@ -153,18 +100,18 @@ def multiple_runs(ax, k=5, serial=True):
 
 
 def plot(res, ax, k):
-    keys = ['e_embedded', 'e_extrapolated']
-    ls = ['-', ':']
+    keys = ['e_embedded', 'e_extrapolated', 'e']
+    ls = ['-', ':', '-.']
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
         order = get_accuracy_order(res, key=keys[i], order=k)
-        if i == 0:
+        if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
             assert np.isclose(np.mean(order), k, atol=3e-1), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
-        else:
+        elif keys[i] == 'e_extrapolated':
             label = None
             assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
 {k+1} but got {np.mean(order):.2f}'
@@ -204,17 +151,22 @@ def get_accuracy_order(results, key='e_embedded', order=5):
     return order
 
 
+def plot_all_errors(ax, ks, serial):
+    for i in range(len(ks)):
+        k = ks[i]
+        multiple_runs(k=k, ax=ax, serial=serial)
+    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
+    ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
+    ax.plot([None, None], color='black', label=r'$e$', ls='-.')
+    ax.legend(frameon=False, loc='lower right')
+
+
 def main():
     setup_mpl()
     ks = [4, 3, 2]
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-        for i in range(len(ks)):
-            k = ks[i]
-            multiple_runs(k=k, ax=ax, serial=serial)
-        ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
-        ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
-        ax.legend(frameon=False, loc='lower right')
+        plot_all_errors(ax, ks, serial)
         if serial:
             fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
         else:
