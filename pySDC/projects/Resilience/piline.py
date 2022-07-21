@@ -6,7 +6,6 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.Resilience.accuracy_check import setup_mpl
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
@@ -42,7 +41,7 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run_piline(custom_description, num_procs):
+def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
     """
     A simple test program to do SDC runs for Piline problem
     """
@@ -75,7 +74,7 @@ def run_piline(custom_description, num_procs):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
+    controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -90,7 +89,6 @@ def run_piline(custom_description, num_procs):
 
     # set time parameters
     t0 = 0.0
-    Tend = 2e+1
 
     # instantiate controller
     controller_class = controller_nonMPI
@@ -124,7 +122,7 @@ def get_data(stats, recomputed=False):
 
 
 def plot_error(data, ax, use_adaptivity=True):
-    setup_mpl()
+    setup_mpl_from_accuracy_check()
     ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
 
     e_ax = ax.twinx()
@@ -147,8 +145,13 @@ def plot_error(data, ax, use_adaptivity=True):
     ax.set_xlabel('Time')
 
 
-def plot_solution(data, ax):
+def setup_mpl_from_accuracy_check():
+    from pySDC.projects.Resilience.accuracy_check import setup_mpl
     setup_mpl()
+
+
+def plot_solution(data, ax):
+    setup_mpl_from_accuracy_check()
     ax.plot(data['t'], data['v1'], label='v1', ls='-')
     ax.plot(data['t'], data['v2'], label='v2', ls='--')
     ax.plot(data['t'], data['p3'], label='p3', ls='-.')
