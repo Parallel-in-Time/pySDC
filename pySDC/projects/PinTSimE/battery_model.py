@@ -23,10 +23,13 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='voltage C', value=L.uend[1])
+        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index,
+                          iter=step.status.iter, sweep=L.status.sweep, type='residuals',
+                          value=L.status.residual)
 
 
 def main():
