@@ -29,7 +29,7 @@ class boris_2nd_order(sweeper):
         super(boris_2nd_order, self).__init__(params)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
-        [self.S, self.ST, self.SQ, self.Sx, self.QQ] = self.__get_Qd()
+        [self.S, self.ST, self.SQ, self.Sx, self.QQ, self.QT, self.Qx, self.Q] = self.__get_Qd()
 
         self.qQ = np.dot(self.coll.weights, self.coll.Qmat[1:, 1:])
 
@@ -72,7 +72,7 @@ class boris_2nd_order(sweeper):
         # QQ-matrix via product of Q
         QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
-        return [S, ST, SQ, Sx, QQ]
+        return [S, ST, SQ, Sx, QQ, QT, Qx, self.coll.Qmat]
 
     def update_nodes(self):
         """
@@ -190,3 +190,104 @@ class boris_2nd_order(sweeper):
             L.uend += L.tau[-1]
 
         return None
+    def get_sweeper_mats(self):
+        """
+        Returns the matrices Q, QQ, Qx, QT which define the sweeper.
+        """
+        
+        Q=self.Q[1:,1:]
+        QQ=self.QQ[1:,1:]
+        Qx=self.Qx[1:,1:]
+        QT=self.QT[1:,1:]
+        
+        return Q, QQ, Qx, QT
+
+
+    def get_scalar_problems_sweeper_mats(self, lambdas=None):
+        """
+        This function returns the corresponding matrices of an SDC sweep matrix formulation
+        
+        Args:
+            lambdas (numpy.narray): the first entry in lambdas is k-spring constant and the second is mu friction.
+        """
+        
+        Q, QQ, Qx, QT=self.get_sweeper_mats()
+        
+        if lambdas is None:
+            pass
+            # should use lambdas from attached problem and make sure it is scalar SDC
+            raise NotImplementedError("At the moment, the values for the lambda have to be provided")
+        else:
+            k=lambdas[0]
+            mu=lambdas[1]
+        
+        nnodes=self.coll.num_nodes
+        dt=self.level.dt
+        
+        F=np.block([[-k*np.eye(nnodes), -mu*np.eye(nnodes)],[-k*np.eye(nnodes), -mu*np.eye(nnodes)]])
+        
+        
+        C_coll=np.block([[np.eye(nnodes),dt*Q],[np.zeros([nnodes, nnodes]), np.eye(nnodes)]])
+        Q_coll=np.block([[dt**2*QQ, np.zeros([nnodes, nnodes])],[np.zeros([nnodes,nnodes]),dt*Q]])
+        Q_vv=np.block([[dt**2*Qx, np.zeros([nnodes, nnodes])],[ np.zeros([nnodes, nnodes]), dt*QT]])
+        M_vv=np.eye(2*nnodes)-np.dot(Q_vv, F)
+       
+        return C_coll, Q_coll, Q_vv, M_vv, F
+    
+    def get_scalar_problems_manysweep_mats(self, nsweeps, lambdas=None):
+        
+        """
+        For a scalar problem, K sweeps of SDC can be written in matrix form.
+        
+        Args:
+            nsweeps (int): number of sweeps
+            lambdas (numpy.ndarray): the first entry in lambdas is k-spring constant and the second is mu friction.
+        """
+        nnodes=self.coll.num_nodes
+        
+        C_coll, Q_coll, Q_vv, M_vv, F=self.get_scalar_problems_sweeper_mats(lambdas=lambdas)
+        
+        K_sdc=np.dot(np.linalg.inv(M_vv),Q_coll-Q_vv)@F
+        
+        Keig, Kvec=np.linalg.eig(K_sdc)
+        
+        Kp_sdc=np.linalg.matrix_power(K_sdc, nsweeps)
+        Kinv_sdc=np.linalg.inv(np.eye(2*nnodes)-K_sdc)
+        
+        Kdot_sdc=np.dot(np.eye(2*nnodes)-Kp_sdc, Kinv_sdc)
+        MC=np.dot(np.linalg.inv(M_vv), C_coll)
+        
+        Mat_sweep=Kp_sdc+np.dot(Kdot_sdc, MC)
+        
+        return Mat_sweep, np.max(np.abs(Keig))
+    
+    def get_scalar_problems_picardsweep_mats(self, nsweeps, lambdas=None):
+        
+        """
+        For a scalar problem, K sweeps of SDC can be written in matrix form.
+        
+        Args:
+            nsweeps (int): number of sweeps
+            lambdas (numpy.ndarray): the first entry in lambdas is k-spring constant and the second is mu friction.
+        """
+        nnodes=self.coll.num_nodes
+        
+        C_coll, Q_coll, Q_vv, M_vv, F=self.get_scalar_problems_sweeper_mats(lambdas=lambdas)
+        
+        K_sdc=np.dot(Q_coll,F)
+        
+        Keig, Kvec=np.linalg.eig(K_sdc)
+        
+        Kp_sdc=np.linalg.matrix_power(K_sdc, nsweeps)
+        Kinv_sdc=np.linalg.inv(np.eye(2*nnodes)-K_sdc)
+        
+        Kdot_sdc=np.dot(np.eye(2*nnodes)-Kp_sdc, Kinv_sdc)
+        
+        
+        Mat_sweep=Kp_sdc+np.dot(Kdot_sdc, C_coll)
+        
+        return Mat_sweep, np.max(np.abs(Keig))
+        
+        
+
+
