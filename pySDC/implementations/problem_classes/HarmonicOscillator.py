@@ -15,7 +15,7 @@ class harmonic_oscillator(ptype):
     def __init__(self, problem_params, dtype_u=particles, dtype_f=acceleration):
         """
         Initialization routine
-        
+
         TODO : add mu and u0 as initial parameter
 
         Args:
