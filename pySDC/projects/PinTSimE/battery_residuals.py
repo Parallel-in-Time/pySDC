@@ -2,45 +2,47 @@ import numpy as np
 import dill
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.implementations.collocations import Collocation
+from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+#from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.core.Hooks import hooks
 
-from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+from pySDC.core.Hooks import hooks
 
 
 class log_data(hooks):
 
-    def post_step(self, step, level_number):
+    def post_iteration(self, step, level_number):
 
-        super(log_data, self).post_step(step, level_number)
+        super(log_data, self).post_iteration(step, level_number)
 
         # some abbreviations
         L = step.levels[level_number]
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='voltage C', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index,
-                          iter=step.status.iter, sweep=L.status.sweep, type='residuals',
-                          value=L.status.residual)
+        #self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index,
+        #                  iter=step.status.iter, sweep=L.status.sweep, type='residuals',
+        #                  value=L.status.residual)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
+                          sweep=L.status.sweep, type='residual_post_iteration', value=L.status.residual)
 
 
 def main():
     """
-    A simple test program to do SDC/PFASST runs for the battery drain model
+        Test program to present residuals for the battery drain model for each time and each iteration
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-13
     level_params['dt'] = 1E-3
 
     # initialize sweeper parameters
@@ -66,12 +68,9 @@ def main():
     step_params = dict()
     step_params['maxiter'] = 20
 
-    # convergence controllers
-    switch_estimator_params = {}
-    convergence_controllers = {SwitchEstimator: switch_estimator_params}
-
     # initialize controller parameters
     controller_params = dict()
+    controller_params['use_switch_estimator'] = False
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data
 
@@ -83,7 +82,6 @@ def main():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['convergence_controllers'] = convergence_controllers
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
@@ -94,7 +92,7 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.4
+    Tend = 4.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -106,62 +104,77 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    # fname = 'data/battery_residuals.dat'
+    fname = 'battery_residuals.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
 
-    # filter statistics by number of iterations
-    iter_counts = get_sorted(stats, type='niter', sortby='time')
-
-    # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
-    f = open('battery_out.txt', 'w')
-    niters = np.array([item[1] for item in iter_counts])
-    out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-    f.write(out + '\n')
-    print(out)
-    for item in iter_counts:
-        out = 'Number of iterations for time %4.2f: %1i' % item
-        f.write(out + '\n')
-        print(out)
-        min_iter = min(min_iter, item[1])
-        max_iter = max(max_iter, item[1])
-
-    assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
-    f.close()
-
-    plot_voltages()
-
-
-def plot_voltages(cwd='./'):
+    plot_residuals(problem_params)
+    
+def plot_residuals(problem_params, cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+        Routine to plot residuals for battery drain model in area of the switch
     """
 
-    f = open(cwd + 'battery.dat', 'rb')
+    f = open(cwd + 'battery_residuals.dat', 'rb')
     stats = dill.load(f)
     f.close()
+    
+    # filter residuals by time
+    res = get_sorted(stats, type='residual_post_iteration', sortby='time')
 
-    # convert filtered statistics to list of iterations count, sorted by process
-    cL = get_sorted(stats, type='current L', sortby='time')
+    # filter iteration statistics by time
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
+    times = [item[0] for item in iter_counts]
+    
+    # dictionary with times as key and (niter, residual) as value
+    res_dict = dict()
+    for iter_item in iter_counts:
+        for res_item in res:
+            res_dict.setdefault(res_item[0], [])
+            if res_item[0] == iter_item[0]:
+                res_dict[res_item[0]].append(np.array([iter_item[1], res_item[1]]))
+    
     vC = get_sorted(stats, type='voltage C', sortby='time')
-
-    times = [v[0] for v in cL]
-
+    vC_val = [v[1] for v in vC]
+            
+    # looking for switch
+    restored_keys = []
+    i = 0
+    for iter_item in iter_counts:
+        print(i)
+        if problem_params['V_ref'] < vC_val[i] < problem_params['V_ref'] + 0.5:
+            print(len(vC_val), i)
+            restored_keys.append(iter_item[0])
+         
+        elif np.isclose(vC_val[i], problem_params['V_ref'], atol=1e-6) == True:
+            print("second if:", i)
+            restored_keys.append(iter_item[0])
+            i_switch = i
+            key_switch = iter_item[0]
+            break
+         
+        i += 1
+    
+    #k = 0 
+    #resasarray = np.zeros((len(restored_keys), 2))    
+    #for key_item in restored_keys:
+    #    resasarray[k, :] = res_dict[key_item]
+    #    k += 1
+    
+    for key_item in restored_keys:
+        element = res_dict[key_item]
+        print(element, type(element))
+        
+        #for item in element:
+            
+         
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in cL], label='$i_L$')
-    ax.plot(times, [v[1] for v in vC], label='$v_C$')
-    ax.legend(frameon=False, fontsize=12, loc='upper right')
-
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Energy')
-
-    fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    ax.plot(resasarray[:, 1], resasarray[:, 0])
+    ax.set_yscale('log', base=10)
+    fig.savefig('battery_residuals.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
