@@ -4,7 +4,6 @@ import numpy as np
 from pySDC.core.Collocation import CollBase
 from pySDC.tests.test_helpers import get_derived_from_in_package
 
-from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.collocation_classes.equidistant import \
     Equidistant
 from pySDC.implementations.collocation_classes.equidistant_inner import \
@@ -35,7 +34,7 @@ classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocati
 t_start = np.random.rand(1) * 0.2
 t_end = 0.8 + np.random.rand(1) * 0.2
 
-tolQuad = 5e-13
+tolQuad = 1e-13
 
 def testEquivalencies():
 
@@ -50,7 +49,7 @@ def testEquivalencies():
     # Compare each original class with their equivalent generic implementation
     for params, CollClass in EQUIV.items():
         cOrig = CollClass(M, tLeft, tRight)
-        cNew = Collocation(M, tLeft, tRight, *params)
+        cNew = CollBase(M, tLeft, tRight, *params)
         for attr in lAttrVect:
             assert norm(getattr(cOrig, attr)-getattr(cNew, attr)) < tol
         for attr in lAttrScalar:

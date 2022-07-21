@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.projects.error_estimation.accuracy_check import setup_mpl
+from pySDC.projects.Resilience.accuracy_check import setup_mpl
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
 from pySDC.core.Hooks import hooks
 
@@ -40,15 +42,14 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run(use_adaptivity, num_procs):
+def run_piline(custom_description, num_procs):
     """
-    A simple test program to do PFASST runs for the heat equation
+    A simple test program to do SDC runs for Piline problem
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 5e-2
-    level_params['e_tol'] = 1e-7
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -75,8 +76,6 @@ def run(use_adaptivity, num_procs):
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['hook_class'] = log_data
-    controller_params['use_HotRod'] = True
-    controller_params['use_adaptivity'] = use_adaptivity
     controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
@@ -87,6 +86,7 @@ def run(use_adaptivity, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
+    description.update(custom_description)
 
     # set time parameters
     t0 = 0.0
@@ -106,23 +106,57 @@ def run(use_adaptivity, num_procs):
     return stats
 
 
-def plot(stats, use_adaptivity, num_procs, generate_reference=False):
-    setup_mpl()
-    recomputed = False
-
+def get_data(stats, recomputed=False):
     # convert filtered statistics to list of iterations count, sorted by process
-    v1 = np.array(sort_stats(filter_stats(stats, type='v1', recomputed=recomputed), sortby='time'))[:, 1]
-    v2 = np.array(sort_stats(filter_stats(stats, type='v2', recomputed=recomputed), sortby='time'))[:, 1]
-    p3 = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 1]
-    t = np.array(sort_stats(filter_stats(stats, type='p3', recomputed=recomputed), sortby='time'))[:, 0]
-    dt = np.array(sort_stats(filter_stats(stats, type='dt', recomputed=recomputed), sortby='time'))
-    e_em = np.array(sort_stats(filter_stats(stats, type='e_embedded', recomputed=recomputed), sortby='time'))[:, 1]
-    e_ex = np.array(sort_stats(filter_stats(stats, type='e_extrapolated', recomputed=recomputed), sortby='time'))[:, 1]
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
-    sweeps = np.array(sort_stats(filter_stats(stats, type='sweeps', recomputed=recomputed), sortby='time'))[:, 1]
-    ready = np.logical_and(e_ex != np.array(None), e_em != np.array(None))
-    restarts = np.array(sort_stats(filter_stats(stats, type='restart', recomputed=recomputed), sortby='time'))[:, 1]
+    data = {
+        'v1': np.array(get_sorted(stats, type='v1', recomputed=recomputed))[:, 1],
+        'v2': np.array(get_sorted(stats, type='v2', recomputed=recomputed))[:, 1],
+        'p3': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 1],
+        't': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 0],
+        'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
+        'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
+        'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
+        'restarts': np.array(get_sorted(stats, type='restart', recomputed=recomputed))[:, 1],
+        'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=recomputed))[:, 1],
+    }
+    data['ready'] = np.logical_and(data['e_ex'] != np.array(None), data['e_em'] != np.array(None))
+    return data
 
+
+def plot_error(data, ax, use_adaptivity=True):
+    setup_mpl()
+    ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
+
+    e_ax = ax.twinx()
+    e_ax.plot(data['t'], data['e_em'], label=r'$\epsilon_\mathrm{embedded}$')
+    e_ax.plot(data['t'][data['ready']], data['e_ex'][data['ready']], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
+    e_ax.plot(data['t'][data['ready']], abs(data['e_em'][data['ready']] - data['e_ex'][data['ready']]),
+              label='difference', ls='-.')
+
+    e_ax.plot([None, None], label=r'$\Delta t$', color='black')
+    e_ax.set_yscale('log')
+    if use_adaptivity:
+        e_ax.legend(frameon=False, loc='upper left')
+    else:
+        e_ax.legend(frameon=False, loc='upper right')
+    e_ax.set_ylim((7.367539795147197e-12, 1.109667868425781e-05))
+    ax.set_ylim((0.012574322653781072, 0.10050387672423527))
+
+    ax.set_xlabel('Time')
+    ax.set_ylabel(r'$\Delta t$')
+    ax.set_xlabel('Time')
+
+
+def plot_solution(data, ax):
+    setup_mpl()
+    ax.plot(data['t'], data['v1'], label='v1', ls='-')
+    ax.plot(data['t'], data['v2'], label='v2', ls='--')
+    ax.plot(data['t'], data['p3'], label='p3', ls='-.')
+    ax.legend(frameon=False)
+    ax.set_xlabel('Time')
+
+
+def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
     if use_adaptivity and num_procs == 1:
         error_msg = 'Error when using adaptivity in serial:'
         expected = {
@@ -180,15 +214,15 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
         }
 
     got = {
-        'v1': v1[-1],
-        'v2': v2[-1],
-        'p3': p3[-1],
-        'e_em': e_em[-1],
-        'e_ex': e_ex[e_ex != [None]][-1],
-        'dt': dt[-1][1],
-        'restarts': restarts.sum(),
-        'sweeps': sweeps.sum(),
-        't': t[-1],
+        'v1': data['v1'][-1],
+        'v2': data['v2'][-1],
+        'p3': data['p3'][-1],
+        'e_em': data['e_em'][-1],
+        'e_ex': data['e_ex'][data['e_ex'] != [None]][-1],
+        'dt': data['dt'][-1][1],
+        'restarts': data['restarts'].sum(),
+        'sweeps': data['sweeps'].sum(),
+        't': data['t'][-1],
     }
 
     if generate_reference:
@@ -202,49 +236,34 @@ def plot(stats, use_adaptivity, num_procs, generate_reference=False):
                 print(f'    \'{k}\': {v},')
         print('}')
 
-    if use_adaptivity and num_procs == 4:
-        fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-        ax.plot(t, v1, label='v1', ls='-')
-        ax.plot(t, v2, label='v2', ls='--')
-        ax.plot(t, p3, label='p3', ls='-.')
-        ax.legend(frameon=False)
-        ax.set_xlabel('Time')
-        fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
-
-    fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-    ax.plot(dt[:, 0], dt[:, 1], color='black')
-    e_ax = ax.twinx()
-    e_ax.plot(t, e_em, label=r'$\epsilon_\mathrm{embedded}$')
-    e_ax.plot(t, e_ex, label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
-    e_ax.plot(t[ready], abs(e_em[ready] - e_ex[ready]), label='difference', ls='-.')
-    e_ax.plot([None, None], label=r'$\Delta t$', color='black')
-    e_ax.set_yscale('log')
-    if use_adaptivity:
-        e_ax.legend(frameon=False, loc='upper left')
-    else:
-        e_ax.legend(frameon=False, loc='upper right')
-    e_ax.set_ylim((7.367539795147197e-12, 1.109667868425781e-05))
-    ax.set_ylim((0.012574322653781072, 0.10050387672423527))
-
-    ax.set_xlabel('Time')
-    ax.set_ylabel(r'$\Delta t$')
-
-    if use_adaptivity:
-        fig.savefig(f'data/piline_hotrod_adaptive_{num_procs}procs.png', bbox_inches='tight', dpi=300)
-    else:
-        fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
-
     for k in expected.keys():
-        assert np.isclose(expected[k], got[k], rtol=1e-3),\
+        assert np.isclose(expected[k], got[k], rtol=1e-4),\
                f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
 
 
 def main():
     generate_reference = False
-    for use_adaptivity in [False, True]:
+
+    for use_adaptivity in [True, False]:
+        custom_description = {'convergence_controllers': {}}
+        if use_adaptivity:
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+
         for num_procs in [1, 4]:
-            stats = run(use_adaptivity, num_procs=num_procs)
-            plot(stats, use_adaptivity, num_procs=num_procs, generate_reference=generate_reference)
+            custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
+            stats = run_piline(custom_description, num_procs=num_procs)
+            data = get_data(stats)
+            check_solution(data, use_adaptivity, num_procs, generate_reference)
+            fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
+            plot_error(data, ax, use_adaptivity)
+            if use_adaptivity:
+                fig.savefig(f'data/piline_hotrod_adaptive_{num_procs}procs.png', bbox_inches='tight', dpi=300)
+            else:
+                fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
+            if use_adaptivity and num_procs == 4:
+                sol_fig, sol_ax = plt.subplots(1, 1, figsize=(3.5, 3))
+                plot_solution(data, sol_ax)
+                sol_fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":

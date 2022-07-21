@@ -20,10 +20,26 @@ implementations.controller\_classes.controller\_nonMPI module
    :undoc-members:
    :show-inheritance:
 
+implementations.controller\_classes.controller\_nonMPI\_adaptive module
+-----------------------------------------------------------------------
+
+.. automodule:: implementations.controller_classes.controller_nonMPI_adaptive
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.controller\_classes.error\_estimator module
 -----------------------------------------------------------
 
 .. automodule:: implementations.controller_classes.error_estimator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementations.controller\_classes.resilience module
+-----------------------------------------------------
+
+.. automodule:: implementations.controller_classes.resilience
    :members:
    :undoc-members:
    :show-inheritance:
