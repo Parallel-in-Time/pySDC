@@ -9,7 +9,7 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
 from pySDC.core.Hooks import hooks
 
 import pySDC.helpers.plot_helper as plt_helper
-from piline import run_piline
+from pySDC.projects.Resilience.piline import run_piline
 
 
 class log_errors(hooks):
