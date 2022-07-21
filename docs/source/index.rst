@@ -42,7 +42,7 @@ Projects
    projects/AllenCahn_Bayreuth.rst
    projects/performance.rst
    projects/PinTSimE.rst
-   projects/Resilience/Resilience.rst
+   projects/Resilience.rst
 
 
 Tests
