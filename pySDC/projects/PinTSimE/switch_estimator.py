@@ -1,8 +1,5 @@
 import numpy as np
 import scipy as sp
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.core.Lagrange import LagrangeApproximation
