@@ -54,6 +54,7 @@ class SwitchEstimator(ConvergenceController):
                             print('Switch located at time: {}'.format(self.t_switch))
                             L.status.dt_new = self.t_switch - L.time
                             self.dt_adapted = True
+                            break
 
                 else:
                     self.switch_detected = False
