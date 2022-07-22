@@ -99,6 +99,8 @@ def main():
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
+    
+    #controller.print_convergence_controllers() 
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
@@ -158,7 +160,8 @@ def plot_voltages(cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('battery_model_solution.png', dpi=300, bbox_inches='tight')
+    #fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
