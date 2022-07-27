@@ -32,6 +32,8 @@ class vanderpol(ptype):
 
         if 'stop_at_nan' not in problem_params:
             problem_params['stop_at_nan'] = True
+        if 'crash_at_maxiter' not in problem_params:
+            problem_params['crash_at_maxiter'] = True
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super(vanderpol, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
@@ -43,8 +45,9 @@ class vanderpol(ptype):
 
         Args:
             t (float): current time
+
         Returns:
-            dtype_u: mesh type containing the initial values
+            dtype_u: mesh type containing the initial values or the approximation to the exact solution
         """
 
         me = self.dtype_u(self.init)
@@ -130,7 +133,7 @@ class vanderpol(ptype):
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.params.newton_maxiter and self.params.crash_at_maxiter:
             raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u

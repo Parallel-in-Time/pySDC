@@ -1,17 +1,17 @@
-import types
 import numpy as np
 import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
+from pySDC.core.Hooks import hooks
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
 
-from pySDC.projects.Resilience.fault_injection import FaultInjector
 
-
-class log_data(FaultInjector):
+class log_data(hooks):
 
     def post_step(self, step, level_number):
 
@@ -22,10 +22,6 @@ class log_data(FaultInjector):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='k', value=step.status.iter)
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
@@ -39,20 +35,20 @@ class log_data(FaultInjector):
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
         self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=int(step.status.restart))
+                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
         self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run_piline(strategy, rng, faults, force_params=types.MappingProxyType({}), num_procs=1):
+def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_data, fault_stuff=None,
+               custom_controller_params=None, custom_problem_params=None):
     """
-    A simple test program to do PFASST runs for the Pi-line equation
+    A simple test program to do SDC runs for Piline problem
     """
 
     # initialize level parameters
     level_params = dict()
     level_params['dt'] = 5e-2
-    level_params['e_tol'] = 5e-7
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -71,6 +67,9 @@ def run_piline(strategy, rng, faults, force_params=types.MappingProxyType({}), n
         'Rl': 5.,
     }
 
+    if custom_problem_params is not None:
+        problem_params = {**problem_params, **custom_problem_params}
+
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 4
@@ -78,10 +77,11 @@ def run_piline(strategy, rng, faults, force_params=types.MappingProxyType({}), n
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
-    controller_params['use_HotRod'] = False
-    controller_params['use_adaptivity'] = False
+    controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
+
+    if custom_controller_params is not None:
+        controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -92,34 +92,22 @@ def run_piline(strategy, rng, faults, force_params=types.MappingProxyType({}), n
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
+    if custom_description is not None:
+        for k in custom_description.keys():
+            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
+
     # set time parameters
     t0 = 0.0
-    Tend = 2e+1
-
-    if strategy == 'adaptivity':
-        controller_params['use_adaptivity'] = True
-    elif strategy == 'HotRod':
-        controller_params['use_HotRod'] = True
-    elif strategy == 'iterate':
-        step_params['maxiter'] = 99
-        level_params['restol'] = 2.3e-8
-
-    # check if we want to change some parameters
-    for k in force_params.keys():
-        for j in force_params[k].keys():
-            if k == 'controller_params':
-                controller_params[j] = force_params[k][j]
-            else:
-                description[k][j] = force_params[k][j]
 
     # instantiate controller
-    controller_class = controller_nonMPI
-    controller = controller_class(num_procs=num_procs, controller_params=controller_params,
-                                  description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                   description=description)
 
-    controller.hooks.random_generator = rng
-    if faults:
-        controller.hooks.add_random_fault(time=2.5, rnd_args={'iteration': 4}, args={'target': 0})
+    # insert faults
+    if fault_stuff is not None:
+        controller.hooks.random_generator = fault_stuff['rng']
+        controller.hooks.add_random_fault(rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
+                                          args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -130,38 +118,170 @@ def run_piline(strategy, rng, faults, force_params=types.MappingProxyType({}), n
     return stats, controller, Tend
 
 
-def plot(stats, controller):
-    v1 = [me[1] for me in get_sorted(stats, type='v1', recomputed=False)]
-    v2 = [me[1] for me in get_sorted(stats, type='v2', recomputed=False)]
-    p3 = [me[1] for me in get_sorted(stats, type='p3', recomputed=False)]
-    t = [me[0] for me in get_sorted(stats, type='v1', recomputed=False)]
-    k = get_sorted(stats, type='k', recomputed=False)
-    dt = get_sorted(stats, type='dt', recomputed=False)
-    restarts = get_sorted(stats, type='restart')
+def get_data(stats, recomputed=False):
+    # convert filtered statistics to list of iterations count, sorted by process
+    data = {
+        'v1': np.array(get_sorted(stats, type='v1', recomputed=recomputed))[:, 1],
+        'v2': np.array(get_sorted(stats, type='v2', recomputed=recomputed))[:, 1],
+        'p3': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 1],
+        't': np.array(get_sorted(stats, type='p3', recomputed=recomputed))[:, 0],
+        'dt': np.array(get_sorted(stats, type='dt', recomputed=recomputed)),
+        'e_em': np.array(get_sorted(stats, type='e_embedded', recomputed=recomputed))[:, 1],
+        'e_ex': np.array(get_sorted(stats, type='e_extrapolated', recomputed=recomputed))[:, 1],
+        'restarts': np.array(get_sorted(stats, type='restart', recomputed=recomputed))[:, 1],
+        'sweeps': np.array(get_sorted(stats, type='sweeps', recomputed=recomputed))[:, 1],
+    }
+    data['ready'] = np.logical_and(data['e_ex'] != np.array(None), data['e_em'] != np.array(None))
+    return data
 
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(t, v1, label=r'$v_1$')
-    ax.plot(t, v2, label=r'$v_2$')
-    ax.plot(t, p3, label=r'$p_3$')
+
+def plot_error(data, ax, use_adaptivity=True):
+    setup_mpl_from_accuracy_check()
+    ax.plot(data['dt'][:, 0], data['dt'][:, 1], color='black')
+
+    e_ax = ax.twinx()
+    e_ax.plot(data['t'], data['e_em'], label=r'$\epsilon_\mathrm{embedded}$')
+    e_ax.plot(data['t'][data['ready']], data['e_ex'][data['ready']], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
+    e_ax.plot(data['t'][data['ready']], abs(data['e_em'][data['ready']] - data['e_ex'][data['ready']]),
+              label='difference', ls='-.')
+
+    e_ax.plot([None, None], label=r'$\Delta t$', color='black')
+    e_ax.set_yscale('log')
+    if use_adaptivity:
+        e_ax.legend(frameon=False, loc='upper left')
+    else:
+        e_ax.legend(frameon=False, loc='upper right')
+    e_ax.set_ylim((7.367539795147197e-12, 1.109667868425781e-05))
+    ax.set_ylim((0.012574322653781072, 0.10050387672423527))
+
+    ax.set_xlabel('Time')
+    ax.set_ylabel(r'$\Delta t$')
+    ax.set_xlabel('Time')
+
+
+def setup_mpl_from_accuracy_check():
+    from pySDC.projects.Resilience.accuracy_check import setup_mpl
+    setup_mpl()
+
+
+def plot_solution(data, ax):
+    setup_mpl_from_accuracy_check()
+    ax.plot(data['t'], data['v1'], label='v1', ls='-')
+    ax.plot(data['t'], data['v2'], label='v2', ls='--')
+    ax.plot(data['t'], data['p3'], label='p3', ls='-.')
     ax.legend(frameon=False)
+    ax.set_xlabel('Time')
 
-    k_ax = ax.twinx()
-    k_ax.axhline(4, color='grey')
-    k_ax.plot([me[0] for me in k], [me[1] for me in k])
-    k_ax.plot([me[0] for me in dt], [me[1] / dt[0][1] for me in dt])
 
-    for t_r in [me[0] for me in restarts if me[1]]:
-        k_ax.axvline(t_r, color='grey', ls=':')
-    fig.savefig('data/Piline_sol.pdf', transparent=True)
+def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
+    if use_adaptivity and num_procs == 1:
+        error_msg = 'Error when using adaptivity in serial:'
+        expected = {
+            'v1': 83.88330442715265,
+            'v2': 80.62692930055763,
+            'p3': 16.13594155613822,
+            'e_em': 4.922608098922865e-09,
+            'e_ex': 4.4120077421613226e-08,
+            'dt': 0.05,
+            'restarts': 1.0,
+            'sweeps': 2416.0,
+            't': 20.03656747407325,
+        }
 
-    exact = controller.MS[0].levels[0].prob.u_exact(t=t[-1])
-    e = abs(exact - np.array([v1[-1], v2[-1], p3[-1]]))
-    k_tot = sum([me[1] for me in k])
-    print(f'e={e:.2e} (2e-8), k_tot={k_tot} (1600)')
+    elif use_adaptivity and num_procs == 4:
+        error_msg = 'Error when using adaptivity in parallel:'
+        expected = {
+            'v1': 83.88400082289273,
+            'v2': 80.62656229801286,
+            'p3': 16.134850400599763,
+            'e_em': 2.3681899108396465e-08,
+            'e_ex': 3.6491178375304526e-08,
+            'dt': 0.08265581329617167,
+            'restarts': 8.0,
+            'sweeps': 2432.0,
+            't': 19.999999999999996,
+        }
+
+    elif not use_adaptivity and num_procs == 4:
+        error_msg = 'Error with fixed step size in parallel:'
+        expected = {
+            'v1': 83.88400128006428,
+            'v2': 80.62656202423844,
+            'p3': 16.134849781053525,
+            'e_em': 4.277040943634347e-09,
+            'e_ex': 4.9707053288253756e-09,
+            'dt': 0.05,
+            'restarts': 0.0,
+            'sweeps': 1600.0,
+            't': 20.00000000000015,
+        }
+
+    elif not use_adaptivity and num_procs == 1:
+        error_msg = 'Error with fixed step size in serial:'
+        expected = {
+            'v1': 83.88400149770143,
+            'v2': 80.62656173487008,
+            'p3': 16.134849851184736,
+            'e_em': 4.977994905175365e-09,
+            'e_ex': 5.048084913047097e-09,
+            'dt': 0.05,
+            'restarts': 0.0,
+            'sweeps': 1600.0,
+            't': 20.00000000000015,
+        }
+
+    got = {
+        'v1': data['v1'][-1],
+        'v2': data['v2'][-1],
+        'p3': data['p3'][-1],
+        'e_em': data['e_em'][-1],
+        'e_ex': data['e_ex'][data['e_ex'] != [None]][-1],
+        'dt': data['dt'][-1][1],
+        'restarts': data['restarts'].sum(),
+        'sweeps': data['sweeps'].sum(),
+        't': data['t'][-1],
+    }
+
+    if generate_reference:
+        print(f'Adaptivity: {use_adaptivity}, num_procs={num_procs}')
+        print('expected = {')
+        for k in got.keys():
+            v = got[k]
+            if type(v) in [list, np.ndarray]:
+                print(f'    \'{k}\': {v[v!=[None]][-1]},')
+            else:
+                print(f'    \'{k}\': {v},')
+        print('}')
+
+    for k in expected.keys():
+        assert np.isclose(expected[k], got[k], rtol=1e-4),\
+               f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
+
+
+def main():
+    generate_reference = False
+
+    for use_adaptivity in [True, False]:
+        custom_description = {'convergence_controllers': {}}
+        if use_adaptivity:
+            custom_description['convergence_controllers'][Adaptivity] = {'e_tol': 1e-7}
+
+        for num_procs in [1, 4]:
+            custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
+            stats, _, _ = run_piline(custom_description, num_procs=num_procs)
+            data = get_data(stats)
+            check_solution(data, use_adaptivity, num_procs, generate_reference)
+            fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
+            plot_error(data, ax, use_adaptivity)
+            if use_adaptivity:
+                fig.savefig(f'data/piline_hotrod_adaptive_{num_procs}procs.png', bbox_inches='tight', dpi=300)
+            else:
+                fig.savefig(f'data/piline_hotrod_{num_procs}procs.png', bbox_inches='tight', dpi=300)
+            if use_adaptivity and num_procs == 4:
+                sol_fig, sol_ax = plt.subplots(1, 1, figsize=(3.5, 3))
+                plot_solution(data, sol_ax)
+                sol_fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
 
 
 if __name__ == "__main__":
-    strategy = 'iterate'
-    force_params = {'controller_params': {'logger_level': 20}}
-    stats, controller, Tend = run_piline(strategy, np.random.RandomState(16), False, force_params)
-    plot(stats, controller)
+    main()
