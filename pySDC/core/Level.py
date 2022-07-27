@@ -6,7 +6,7 @@ class _Pars(FrozenClass):
     def __init__(self, params):
         self.dt = None
         self.dt_initial = None
-        self.restol = 0.0
+        self.restol = -1.0
         self.nsweeps = 1
         self.residual_type = 'full_abs'
         for k, v in params.items():
