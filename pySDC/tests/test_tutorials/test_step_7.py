@@ -11,10 +11,9 @@ def test_A():
 
     main_A()
 
-
+@pytest.mark.parallel
 def test_B():
     main_B()
-
 
 @pytest.mark.parallel
 def test_C_1x1():
