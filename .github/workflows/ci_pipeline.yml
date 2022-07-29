@@ -12,9 +12,23 @@ jobs:
   lint:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 4
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-lint.yml') }}
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
