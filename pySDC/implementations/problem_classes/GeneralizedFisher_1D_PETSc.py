@@ -10,6 +10,7 @@ class Fisher_full(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
+
     def __init__(self, da, params, factor, dx):
         """
         Initialization routine
@@ -56,8 +57,8 @@ class Fisher_full(object):
                 u = x[i]  # center
                 u_e = x[i + 1]  # east
                 u_w = x[i - 1]  # west
-                u_xx = (u_e - 2 * u + u_w) / self.dx ** 2
-                f[i] = x[i] - self.factor * (u_xx + self.params.lambda0 ** 2 * x[i] * (1 - x[i] ** self.params.nu))
+                u_xx = (u_e - 2 * u + u_w) / self.dx**2
+                f[i] = x[i] - self.factor * (u_xx + self.params.lambda0**2 * x[i] * (1 - x[i] ** self.params.nu))
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -82,13 +83,14 @@ class Fisher_full(object):
             if i == 0 or i == self.mx - 1:
                 P.setValueStencil(self.row, self.row, 1.0)
             else:
-                diag = 1.0 -\
-                    self.factor * (-2.0 / self.dx ** 2 +
-                                   self.params.lambda0 ** 2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu))
+                diag = 1.0 - self.factor * (
+                    -2.0 / self.dx**2
+                    + self.params.lambda0**2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu)
+                )
                 for index, value in [
-                    (i - 1, -self.factor / self.dx ** 2),
+                    (i - 1, -self.factor / self.dx**2),
                     (i, diag),
-                    (i + 1, -self.factor / self.dx ** 2),
+                    (i + 1, -self.factor / self.dx**2),
                 ]:
                     self.col.i = index
                     self.col.field = 0
@@ -103,6 +105,7 @@ class Fisher_reaction(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
+
     def __init__(self, da, params, factor):
         """
         Initialization routine
@@ -142,7 +145,7 @@ class Fisher_reaction(object):
             if i == 0 or i == mx - 1:
                 f[i] = x[i]
             else:
-                f[i] = x[i] - self.factor * self.params.lambda0 ** 2 * x[i] * (1 - x[i] ** self.params.nu)
+                f[i] = x[i] - self.factor * self.params.lambda0**2 * x[i] * (1 - x[i] ** self.params.nu)
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -169,8 +172,9 @@ class Fisher_reaction(object):
             if i == 0 or i == mx - 1:
                 P.setValueStencil(row, row, 1.0)
             else:
-                diag = 1.0 - \
-                    self.factor * self.params.lambda0 ** 2 * (1.0 - (self.params.nu + 1) * x[i] ** self.params.nu)
+                diag = 1.0 - self.factor * self.params.lambda0**2 * (
+                    1.0 - (self.params.nu + 1) * x[i] ** self.params.nu
+                )
                 P.setValueStencil(row, row, diag)
         P.assemble()
         if J != P:
@@ -182,6 +186,7 @@ class petsc_fisher_multiimplicit(ptype):
     """
     Problem class implementing the multi-implicit 1D generalized Fisher equation with periodic BC and PETSc
     """
+
     def __init__(self, problem_params, dtype_u=petsc_vec, dtype_f=petsc_vec_comp2):
         """
         Initialization routine
@@ -196,9 +201,9 @@ class petsc_fisher_multiimplicit(ptype):
         if 'comm' not in problem_params:
             problem_params['comm'] = PETSc.COMM_WORLD
         if 'lsol_tol' not in problem_params:
-            problem_params['lsol_tol'] = 1E-10
+            problem_params['lsol_tol'] = 1e-10
         if 'nlsol_tol' not in problem_params:
-            problem_params['nlsol_tol'] = 1E-10
+            problem_params['nlsol_tol'] = 1e-10
         if 'lsol_maxiter' not in problem_params:
             problem_params['lsol_maxiter'] = None
         if 'nlsol_maxiter' not in problem_params:
@@ -214,8 +219,9 @@ class petsc_fisher_multiimplicit(ptype):
         da = PETSc.DMDA().create([problem_params['nvars']], dof=1, stencil_width=1, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_multiimplicit, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f,
-                                                         params=problem_params)
+        super(petsc_fisher_multiimplicit, self).__init__(
+            init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         # compute dx and get local ranges
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars - 1)
@@ -233,8 +239,7 @@ class petsc_fisher_multiimplicit(ptype):
         pc.setType('ilu')
         self.ksp.setInitialGuessNonzero(True)
         self.ksp.setFromOptions()
-        self.ksp.setTolerances(rtol=self.params.lsol_tol, atol=self.params.lsol_tol,
-                               max_it=self.params.lsol_maxiter)
+        self.ksp.setTolerances(rtol=self.params.lsol_tol, atol=self.params.lsol_tol, max_it=self.params.lsol_maxiter)
         self.ksp_itercount = 0
         self.ksp_ncalls = 0
 
@@ -248,8 +253,12 @@ class petsc_fisher_multiimplicit(ptype):
         pc.setType('ilu')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
-        self.snes.setTolerances(rtol=self.params.nlsol_tol, atol=self.params.nlsol_tol, stol=self.params.nlsol_tol,
-                                max_it=self.params.nlsol_maxiter)
+        self.snes.setTolerances(
+            rtol=self.params.nlsol_tol,
+            atol=self.params.nlsol_tol,
+            stol=self.params.nlsol_tol,
+            max_it=self.params.nlsol_maxiter,
+        )
         self.snes_itercount = 0
         self.snes_ncalls = 0
         self.F = self.init.createGlobalVec()
@@ -281,11 +290,11 @@ class petsc_fisher_multiimplicit(ptype):
             if i == 0 or i == mx - 1:
                 A.setValueStencil(row, row, 1.0)
             else:
-                diag = -2.0 / self.dx ** 2
+                diag = -2.0 / self.dx**2
                 for index, value in [
-                    (i - 1, 1.0 / self.dx ** 2),
+                    (i - 1, 1.0 / self.dx**2),
                     (i, diag),
-                    (i + 1, 1.0 / self.dx ** 2),
+                    (i + 1, 1.0 / self.dx**2),
                 ]:
                     col.i = index
                     col.field = 0
@@ -320,11 +329,11 @@ class petsc_fisher_multiimplicit(ptype):
             if i == 0 or i == mx - 1:
                 A.setValueStencil(row, row, 1.0)
             else:
-                diag = 1.0 + factor * 2.0 / self.dx ** 2
+                diag = 1.0 + factor * 2.0 / self.dx**2
                 for index, value in [
-                    (i - 1, -factor / self.dx ** 2),
+                    (i - 1, -factor / self.dx**2),
                     (i, diag),
-                    (i + 1, -factor / self.dx ** 2),
+                    (i + 1, -factor / self.dx**2),
                 ]:
                     col.i = index
                     col.field = 0
@@ -353,7 +362,7 @@ class petsc_fisher_multiimplicit(ptype):
         fa2 = self.init.getVecArray(f.comp2)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] = self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] = self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -425,13 +434,15 @@ class petsc_fisher_multiimplicit(ptype):
         """
 
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
+        sig1 = lam1 - np.sqrt(lam1**2 - self.params.lambda0**2)
         me = self.dtype_u(self.init)
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
-            xa[i] = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-                     np.exp(-self.params.nu / 2.0 * sig1 *
-                            (self.params.interval[0] + (i + 1) * self.dx + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+            xa[i] = (
+                1
+                + (2 ** (self.params.nu / 2.0) - 1)
+                * np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + (i + 1) * self.dx + 2 * lam1 * t))
+            ) ** (-2.0 / self.params.nu)
 
         return me
 
@@ -452,8 +463,9 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_fullyimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
-                                                         dtype_f=dtype_f)
+        super(petsc_fisher_fullyimplicit, self).__init__(
+            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
+        )
 
     def eval_f(self, u, t):
         """
@@ -473,7 +485,7 @@ class petsc_fisher_fullyimplicit(petsc_fisher_multiimplicit):
         fa2 = self.init.getVecArray(f)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] += self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] += self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
         fa2[-1] = 0
 
@@ -525,8 +537,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_fisher_semiimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
-                                                        dtype_f=dtype_f)
+        super(petsc_fisher_semiimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
 
     def eval_f(self, u, t):
         """
@@ -549,7 +560,7 @@ class petsc_fisher_semiimplicit(petsc_fisher_multiimplicit):
         fa2 = self.init.getVecArray(f.expl)
         xa = self.init.getVecArray(u)
         for i in range(self.xs, self.xe):
-            fa2[i] = self.params.lambda0 ** 2 * xa[i] * (1 - xa[i] ** self.params.nu)
+            fa2[i] = self.params.lambda0**2 * xa[i] * (1 - xa[i] ** self.params.nu)
         fa2[0] = 0
         fa2[-1] = 0
 

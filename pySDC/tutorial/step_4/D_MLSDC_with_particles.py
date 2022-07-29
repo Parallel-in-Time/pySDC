@@ -23,8 +23,11 @@ def main():
     stats_mlsdc_finter, time_mlsdc_finter = run_penning_trap_simulation(mlsdc=True, finter=True)
 
     f = open('step_4_D_out.txt', 'w')
-    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % \
-          (time_sdc, time_mlsdc, time_mlsdc_finter)
+    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % (
+        time_sdc,
+        time_mlsdc,
+        time_mlsdc_finter,
+    )
     f.write(out + '\n')
     print(out)
 
@@ -41,28 +44,41 @@ def main():
     # get base energy and show differences
     base_energy = energy_sdc[0][1]
     for item in energy_sdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc_finter:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     f.close()
 
-    assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6E-10, \
-        'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
-        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy)
-    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 8E-10, \
-        'ERROR: energy deviated too much after using finter, got %s' % (
-        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy)
+    assert (
+        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6e-10
+    ), 'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
+        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy
+    )
+    assert (
+        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 8e-10
+    ), 'ERROR: energy deviated too much after using finter, got %s' % (
+        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy
+    )
 
 
 def run_penning_trap_simulation(mlsdc, finter=False):
@@ -71,7 +87,7 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
+    level_params['restol'] = 1e-07
     level_params['dt'] = 1.0 / 8
 
     # initialize sweeper parameters

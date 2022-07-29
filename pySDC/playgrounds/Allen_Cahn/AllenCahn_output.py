@@ -3,7 +3,6 @@ from pySDC.core.Hooks import hooks
 
 
 class output(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -38,5 +37,3 @@ class output(hooks):
             self.ax.imshow(L.uend)
             fname = 'data/AC_' + L.prob.params.init_type + '_output_' + str(self.counter).zfill(8)
             plt_helper.savefig(fname, save_pgf=False, save_pdf=False, save_png=False)
-
-

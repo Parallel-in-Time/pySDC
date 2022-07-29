@@ -31,6 +31,5 @@ def main():
     print(pfft.forward(u))
 
 
-
 if __name__ == '__main__':
     main()

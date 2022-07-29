@@ -12,7 +12,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.5
 
     # initialize sweeper parameters

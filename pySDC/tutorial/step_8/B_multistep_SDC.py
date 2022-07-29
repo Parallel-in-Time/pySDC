@@ -16,7 +16,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
@@ -75,12 +75,15 @@ def main():
     num_proc = 8
 
     # instantiate controllers
-    controller_mssdc_jac = controller_nonMPI(num_procs=num_proc, controller_params=controller_params_jac,
-                                             description=description_mssdc)
-    controller_mssdc_gs = controller_nonMPI(num_procs=num_proc, controller_params=controller_params_gs,
-                                            description=description_mssdc)
-    controller_pfasst = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                          description=description_pfasst)
+    controller_mssdc_jac = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params_jac, description=description_mssdc
+    )
+    controller_mssdc_gs = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params_gs, description=description_mssdc
+    )
+    controller_pfasst = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params, description=description_pfasst
+    )
 
     # get initial values on finest level
     P = controller_mssdc_jac.MS[0].levels[0].prob
@@ -132,10 +135,15 @@ def main():
     iter_counts_mssdc_gs = sort_stats(filtered_stats_mssdc_gs, sortby='time')
 
     # compute and print statistics
-    for item_pfasst, item_mssdc_jac, item_mssdc_gs in \
-            zip(iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs):
-        out = 'Number of iterations for time %4.2f (PFASST/parMSSDC/serMSSDC): %2i / %2i / %2i' % \
-              (item_pfasst[0], item_pfasst[1], item_mssdc_jac[1], item_mssdc_gs[1])
+    for item_pfasst, item_mssdc_jac, item_mssdc_gs in zip(
+        iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs
+    ):
+        out = 'Number of iterations for time %4.2f (PFASST/parMSSDC/serMSSDC): %2i / %2i / %2i' % (
+            item_pfasst[0],
+            item_pfasst[1],
+            item_mssdc_jac[1],
+            item_mssdc_gs[1],
+        )
         f.write(out + '\n')
         print(out)
 
@@ -147,12 +155,15 @@ def main():
 
     assert os.path.isfile('step_8_residuals_mssdc_jac.png')
     assert os.path.isfile('step_8_residuals_mssdc_gs.png')
-    assert diff_jac < 3.1E-10, \
+    assert diff_jac < 3.1e-10, (
         "ERROR: difference between PFASST and parallel MSSDC controller is too large, got %s" % diff_jac
-    assert diff_gs < 3.1E-10, \
+    )
+    assert diff_gs < 3.1e-10, (
         "ERROR: difference between PFASST and serial MSSDC controller is too large, got %s" % diff_gs
-    assert diff_jac_gs < 3.1E-10, \
+    )
+    assert diff_jac_gs < 3.1e-10, (
         "ERROR: difference between parallel and serial MSSDC controller is too large, got %s" % diff_jac_gs
+    )
 
 
 if __name__ == "__main__":

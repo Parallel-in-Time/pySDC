@@ -12,6 +12,7 @@ class allencahn2d_dedalus(ptype):
     """
     Example implementing the 2D Allen-Cahn equation with periodic BC in [-L/2,L/2]^2, discretized using Dedalus
     """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -37,13 +38,12 @@ class allencahn2d_dedalus(ptype):
                 raise ParameterError(msg)
 
         L = problem_params['L']
-        xbasis = de.Fourier('x', problem_params['nvars'][0], interval=(-L/2, L/2), dealias=1)
-        ybasis = de.Fourier('y', problem_params['nvars'][1], interval=(-L/2, L/2), dealias=1)
+        xbasis = de.Fourier('x', problem_params['nvars'][0], interval=(-L / 2, L / 2), dealias=1)
+        ybasis = de.Fourier('y', problem_params['nvars'][1], interval=(-L / 2, L / 2), dealias=1)
         domain = de.Domain([xbasis, ybasis], grid_dtype=np.float64, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn2d_dedalus, self).__init__(init=domain, dtype_u=dtype_u, dtype_f=dtype_f,
-                                                  params=problem_params)
+        super(allencahn2d_dedalus, self).__init__(init=domain, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         self.x = self.init.grid(0, scales=1)
         self.y = self.init.grid(1, scales=1)
@@ -53,8 +53,9 @@ class allencahn2d_dedalus(ptype):
         self.solver = linear_problem.build_solver(de.timesteppers.SBDF1)
         self.u = self.solver.state['u']
         self.f = domain.new_field()
-        self.fxx = xbasis.Differentiate(xbasis.Differentiate(self.f)) + \
-            ybasis.Differentiate(ybasis.Differentiate(self.f))
+        self.fxx = xbasis.Differentiate(xbasis.Differentiate(self.f)) + ybasis.Differentiate(
+            ybasis.Differentiate(self.f)
+        )
 
         self.dx = L / len(self.x)
         self.nvars = (len(self.x), len(self.y))
@@ -77,7 +78,7 @@ class allencahn2d_dedalus(ptype):
         f.impl.values = self.fxx.evaluate()
 
         if self.params.eps > 0:
-            f.expl.values['g'] = 1.0 / self.params.eps ** 2 * u.values['g'] * (1.0 - u.values['g'] ** self.params.nu)
+            f.expl.values['g'] = 1.0 / self.params.eps**2 * u.values['g'] * (1.0 - u.values['g'] ** self.params.nu)
         else:
             raise NotImplementedError()
         return f
@@ -124,8 +125,9 @@ class allencahn2d_dedalus(ptype):
         me = self.dtype_u(self.init, val=0.0)
         if self.params.init_type == 'circle':
             # xv, yv = np.meshgrid(self.x, self.y, indexing='ij')
-            me.values['g'] = np.tanh((self.params.radius - np.sqrt(self.x ** 2 + self.y ** 2))
-                                     / (np.sqrt(2) * self.params.eps))
+            me.values['g'] = np.tanh(
+                (self.params.radius - np.sqrt(self.x**2 + self.y**2)) / (np.sqrt(2) * self.params.eps)
+            )
         elif self.params.init_type == 'checkerboard':
             me.values['g'] = np.sin(2.0 * np.pi * self.x) * np.sin(2.0 * np.pi * self.y)
         elif self.params.init_type == 'random':

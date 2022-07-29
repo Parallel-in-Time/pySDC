@@ -12,7 +12,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
@@ -56,10 +56,12 @@ def main():
         out = 'Level %2i: nvars = %4i -- nnodes = %2i' % (l, L.prob.params.nvars, L.sweep.coll.num_nodes)
         f.write(out + '\n')
         print(out)
-        assert L.prob.params.nvars == problem_params['nvars'][min(l, len(problem_params['nvars']) - 1)], \
+        assert L.prob.params.nvars == problem_params['nvars'][min(l, len(problem_params['nvars']) - 1)], (
             "ERROR: number of DOFs is not correct on this level, got %s" % L.prob.params.nvars
-        assert L.sweep.coll.num_nodes == sweeper_params['num_nodes'][min(l, len(sweeper_params['num_nodes']) - 1)], \
+        )
+        assert L.sweep.coll.num_nodes == sweeper_params['num_nodes'][min(l, len(sweeper_params['num_nodes']) - 1)], (
             "ERROR: number of nodes is not correct on this level, got %s" % L.sweep.coll.num_nodes
+        )
     f.close()
 
 

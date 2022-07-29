@@ -3,6 +3,7 @@ from pySDC.core.Sweeper import sweeper
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def iteration_vs_estimate():
 
     M = 5
@@ -12,12 +13,12 @@ def iteration_vs_estimate():
     Qd = swee.get_Qdelta_implicit(swee.coll, 'IE')[1:, 1:]
     # Qd = swee.get_Qdelta_implicit(swee.coll, 'LU')[1:, 1:]
     # Qd = swee.get_Qdelta_explicit(swee.coll, 'EE')[1:, 1:]
-    print(np.linalg.norm(Q-Qd, np.inf))
+    print(np.linalg.norm(Q - Qd, np.inf))
     exit()
     I = np.eye(M)
 
     lam = -0.7
-    print(1/np.linalg.norm(Qd, np.inf), np.linalg.norm(np.linalg.inv(Qd), np.inf))
+    print(1 / np.linalg.norm(Qd, np.inf), np.linalg.norm(np.linalg.inv(Qd), np.inf))
     C = I - lam * Q
     P = I - lam * Qd
     Pinv = np.linalg.inv(P)
@@ -45,11 +46,17 @@ def iteration_vs_estimate():
     plt.figure()
     plt.semilogy(range(K), err, 'o-', color='red', label='error')
     plt.semilogy(range(K), resnorm, 'd-', color='orange', label='residual')
-    plt.semilogy(range(K), [err[0] * rho ** k for k in range(K)], '--', color='green', label='spectral')
-    plt.semilogy(range(K), [err[0] * infnorm ** k for k in range(K)], '--', color='blue', label='infnorm')
-    plt.semilogy(range(K), [err[0] * twonorm ** k for k in range(K)], '--', color='cyan', label='twonorm')
-    plt.semilogy(range(K), [err[0] * ((-1/lam) ** (1/M)) ** k for k in range(K)], 'x--', color='black', label='est')
-    plt.semilogy(range(K), [err[0] * (abs(lam) * np.linalg.norm(Q-Qd)) ** k for k in range(K)], 'x-.', color='black', label='est')
+    plt.semilogy(range(K), [err[0] * rho**k for k in range(K)], '--', color='green', label='spectral')
+    plt.semilogy(range(K), [err[0] * infnorm**k for k in range(K)], '--', color='blue', label='infnorm')
+    plt.semilogy(range(K), [err[0] * twonorm**k for k in range(K)], '--', color='cyan', label='twonorm')
+    plt.semilogy(range(K), [err[0] * ((-1 / lam) ** (1 / M)) ** k for k in range(K)], 'x--', color='black', label='est')
+    plt.semilogy(
+        range(K),
+        [err[0] * (abs(lam) * np.linalg.norm(Q - Qd)) ** k for k in range(K)],
+        'x-.',
+        color='black',
+        label='est',
+    )
     # plt.semilogy(range(K), [err[0] * (1/abs(lam) + np.linalg.norm((I-np.linalg.inv(Qd).dot(Q)) ** k)) for k in range(K)], 'x-.', color='black', label='est')
     plt.grid()
     plt.legend()
@@ -94,7 +101,7 @@ def estimates_over_lambda():
         # est.append(0.71*(-1/lam) ** (1/(M-1.5)))  # M = 7
         # est.append(0.92*(-1/lam) ** (1/(M-2.5)))  # M = 9
         # est.append((-1/lam) ** (1/(M)))
-        est.append(1000*(1/abs(lam)) ** (1/(1)))
+        est.append(1000 * (1 / abs(lam)) ** (1 / (1)))
         # est.append(abs(lam))
         # est.append(np.linalg.norm((I-Qdinv.dot(Q)) ** M) + 1/abs(lam))
         # est.append(np.linalg.norm(np.linalg.inv(I - lam * Qd), np.inf))
@@ -116,6 +123,7 @@ def estimates_over_lambda():
     plt.grid()
     plt.legend()
     plt.show()
+
 
 if __name__ == '__main__':
     # iteration_vs_estimate()

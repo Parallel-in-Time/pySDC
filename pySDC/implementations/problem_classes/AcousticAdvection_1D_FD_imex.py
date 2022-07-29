@@ -4,8 +4,10 @@ from scipy.sparse.linalg import spsolve
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
-from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import getWave1DMatrix, \
-    getWave1DAdvectionMatrix
+from pySDC.implementations.problem_classes.acoustic_helpers.buildWave1DMatrix import (
+    getWave1DMatrix,
+    getWave1DAdvectionMatrix,
+)
 
 
 # noinspection PyUnusedLocal
@@ -40,8 +42,9 @@ class acoustic_1d_imex(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(acoustic_1d_imex, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                               dtype_u, dtype_f, problem_params)
+        super(acoustic_1d_imex, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
         self.mesh = np.linspace(0.0, 1.0, self.params.nvars[1], endpoint=False)
         self.dx = self.mesh[1] - self.mesh[0]
@@ -147,8 +150,10 @@ class acoustic_1d_imex(ptype):
             return np.sin(k * 2.0 * np.pi * x) + np.sin(2.0 * np.pi * x)
 
         me = self.dtype_u(self.init)
-        me[0, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) - \
-            0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
-        me[1, :] = 0.5 * u_initial(self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno) + \
-            0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
+        me[0, :] = 0.5 * u_initial(
+            self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno
+        ) - 0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
+        me[1, :] = 0.5 * u_initial(
+            self.mesh - (self.params.cadv + self.params.cs) * t, self.params.waveno
+        ) + 0.5 * u_initial(self.mesh - (self.params.cadv - self.params.cs) * t, self.params.waveno)
         return me

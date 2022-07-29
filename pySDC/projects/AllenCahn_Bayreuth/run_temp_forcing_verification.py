@@ -46,7 +46,7 @@ def run_simulation(name='', spectral=None, nprocs_time=None, nprocs_space=None, 
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = dt
     level_params['nsweeps'] = [1]
 
@@ -158,33 +158,33 @@ def main(nprocs_space=None, cwd='.'):
     """
     name = 'AC-test-tempforce'
 
-    nsteps = [2 ** i for i in range(4)]
+    nsteps = [2**i for i in range(4)]
 
     errors = [1]
     orders = []
     for n in nsteps:
-        err = run_simulation(name=name, spectral=False, nprocs_time=n, nprocs_space=nprocs_space, dt=1E-03 / n, cwd=cwd)
+        err = run_simulation(name=name, spectral=False, nprocs_time=n, nprocs_space=nprocs_space, dt=1e-03 / n, cwd=cwd)
         errors.append(err)
         orders.append(np.log(errors[-1] / errors[-2]) / np.log(0.5))
         print(f'Error: {errors[-1]:6.4e}')
         print(f'Order of accuracy: {orders[-1]:4.2f}\n')
 
-    assert errors[2 + 1] < 8E-10, f'Errors are too high, got {errors[2 + 1]}'
-    assert np.isclose(orders[3], 5.3, rtol=2E-02), f'Order of accuracy is not within tolerance, got {orders[3]}'
+    assert errors[2 + 1] < 8e-10, f'Errors are too high, got {errors[2 + 1]}'
+    assert np.isclose(orders[3], 5.3, rtol=2e-02), f'Order of accuracy is not within tolerance, got {orders[3]}'
 
     print()
 
     errors = [1]
     orders = []
     for n in nsteps:
-        err = run_simulation(name=name, spectral=True, nprocs_time=n, nprocs_space=nprocs_space, dt=1E-03 / n, cwd=cwd)
+        err = run_simulation(name=name, spectral=True, nprocs_time=n, nprocs_space=nprocs_space, dt=1e-03 / n, cwd=cwd)
         errors.append(err)
         orders.append(np.log(errors[-1] / errors[-2]) / np.log(0.5))
         print(f'Error: {errors[-1]:6.4e}')
         print(f'Order of accuracy: {orders[-1]:4.2f}\n')
 
-    assert errors[2 + 1] < 8E-10, f'Errors are too high, got {errors[2 + 1]}'
-    assert np.isclose(orders[1], 4.6, rtol=7E-02), f'Order of accuracy is not within tolerance, got {orders[1]}'
+    assert errors[2 + 1] < 8e-10, f'Errors are too high, got {errors[2 + 1]}'
+    assert np.isclose(orders[1], 4.6, rtol=7e-02), f'Order of accuracy is not within tolerance, got {orders[1]}'
 
 
 if __name__ == "__main__":

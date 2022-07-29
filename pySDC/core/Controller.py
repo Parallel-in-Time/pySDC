@@ -74,7 +74,8 @@ class controller(object):
         # specify formats and handlers
         if log_to_file:
             file_formatter = logging.Formatter(
-                fmt='%(asctime)s - %(name)s - %(module)s - %(funcName)s - %(lineno)d - %(levelname)s: %(message)s')
+                fmt='%(asctime)s - %(name)s - %(module)s - %(funcName)s - %(lineno)d - %(levelname)s: %(message)s'
+            )
             if os.path.isfile(fname):
                 file_handler = logging.FileHandler(fname, mode='a')
             else:

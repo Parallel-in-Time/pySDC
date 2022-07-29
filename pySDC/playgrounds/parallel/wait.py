@@ -1,4 +1,5 @@
 import mpi4py
+
 mpi4py.rc.threaded = True
 mpi4py.rc.thread_level = "multiple"
 
@@ -26,6 +27,7 @@ def isend(sbuf, comm):
     # req.Wait()
     print('done')
 
+
 def main():
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -38,7 +40,7 @@ def main():
         sbuf = np.empty(4000000)
         sbuf[0] = 0
         sbuf[1:4] = np.random.rand(3)
-        p = Process(target=isend, args=(sbuf,comm))
+        p = Process(target=isend, args=(sbuf, comm))
         p.start()
         sleep(100000000)
         p.join()
@@ -56,6 +58,7 @@ def main():
     comm.Barrier()
 
     print(f'Rank: {rank} -- Time: {t1-t0}')
+
 
 if __name__ == '__main__':
     main()

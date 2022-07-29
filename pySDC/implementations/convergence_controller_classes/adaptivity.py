@@ -27,16 +27,22 @@ class Adaptivity(ConvergenceController):
             Whether the parameters are compatible
             The error message
         '''
-        if description['step_params'].get('restol', -1.) >= 0:
-            return False, 'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!'
+        if description['step_params'].get('restol', -1.0) >= 0:
+            return (
+                False,
+                'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!',
+            )
 
         if controller.params.mssdc_jac:
             return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
 
         if 'e_tol' not in params.keys():
-            return False, 'Adaptivity needs a local tolerance! Please set some up in description[\'convergence_control\
-_params\'][\'e_tol\']!'
+            return (
+                False,
+                'Adaptivity needs a local tolerance! Please set some up in description[\'convergence_control\
+_params\'][\'e_tol\']!',
+            )
 
         return True, ''
 
@@ -47,7 +53,9 @@ _params\'][\'e_tol\']!'
 
             # compute next step size
             order = S.status.iter  # embedded error estimate is same order as time marching
-            L.status.dt_new = L.params.dt * 0.9 * (self.params.e_tol / L.status.error_embedded_estimate)**(1. / order)
+            L.status.dt_new = (
+                L.params.dt * 0.9 * (self.params.e_tol / L.status.error_embedded_estimate) ** (1.0 / order)
+            )
 
     def determine_restart(self, controller, S):
         if S.status.iter == S.params.maxiter:

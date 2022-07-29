@@ -24,8 +24,8 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-01 / 2
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-01 / 2
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -94,15 +94,19 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         iter_counts = sort_stats(filtered_stats, sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
-        out = f'   Min/Mean/Max number of iterations: ' \
-              f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        out = (
+            f'   Min/Mean/Max number of iterations: '
+            f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        )
         f.write(out + '\n')
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -118,7 +122,7 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         f.write(out + '\n')
         print(out)
 
-        assert err <= 1.133E-05, 'Error is too high, got %s' % err
+        assert err <= 1.133e-05, 'Error is too high, got %s' % err
         if ml:
             if num_procs > 1:
                 maxmean = 12.5

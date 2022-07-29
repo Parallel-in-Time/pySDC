@@ -33,9 +33,14 @@ class fft_to_fft(space_transfer):
         self.ratio = [int(nf / nc) for nf, nc in zip(Nf, Nc)]
         axes = tuple(range(len(Nf)))
 
-        self.fft_pad = PFFT(self.coarse_prob.params.comm, Nc, padding=self.ratio, axes=axes,
-                            dtype=self.coarse_prob.fft.dtype(False),
-                            slab=True)
+        self.fft_pad = PFFT(
+            self.coarse_prob.params.comm,
+            Nc,
+            padding=self.ratio,
+            axes=axes,
+            dtype=self.coarse_prob.fft.dtype(False),
+            slab=True,
+        )
 
     def restrict(self, F):
         """
@@ -51,15 +56,15 @@ class fft_to_fft(space_transfer):
                     for i in range(self.fine_prob.ncomp):
                         tmpF = newDistArray(self.fine_prob.fft, False)
                         tmpF = self.fine_prob.fft.backward(F[..., i], tmpF)
-                        tmpG = tmpF[::int(self.ratio[0]), ::int(self.ratio[1])]
+                        tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
                         G[..., i] = self.coarse_prob.fft.forward(tmpG, G[..., i])
                 else:
                     tmpF = self.fine_prob.fft.backward(F)
-                    tmpG = tmpF[::int(self.ratio[0]), ::int(self.ratio[1])]
+                    tmpG = tmpF[:: int(self.ratio[0]), :: int(self.ratio[1])]
                     G[:] = self.coarse_prob.fft.forward(tmpG, G)
             else:
                 G = self.coarse_prob.dtype_u(self.coarse_prob.init)
-                G[:] = F[::int(self.ratio[0]), ::int(self.ratio[1])]
+                G[:] = F[:: int(self.ratio[0]), :: int(self.ratio[1])]
         else:
             raise TransferError('Unknown data type, got %s' % type(F))
 

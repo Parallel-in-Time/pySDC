@@ -9,8 +9,8 @@ from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_deda
 
 
 class dynamogp_2d_dedalus(ptype):
-    """
-    """
+    """ """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -36,8 +36,9 @@ class dynamogp_2d_dedalus(ptype):
         domain = de.Domain([ybasis, zbasis], grid_dtype=np.complex128, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(dynamogp_2d_dedalus, self).__init__(init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f,
-                                                  params=problem_params)
+        super(dynamogp_2d_dedalus, self).__init__(
+            init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         self.y = self.init[0].grid(0, scales=1)
         self.z = self.init[0].grid(1, scales=1)
@@ -72,8 +73,8 @@ class dynamogp_2d_dedalus(ptype):
 
         f = self.dtype_f(self.init)
 
-        A = np.sqrt(3/2)
-        C = np.sqrt(3/2)
+        A = np.sqrt(3 / 2)
+        C = np.sqrt(3 / 2)
 
         self.u['g'] = A * np.sin(self.z + np.sin(t)) + C * np.cos(self.y + np.cos(t))
         self.v['g'] = A * np.cos(self.z + np.sin(t))
@@ -86,15 +87,23 @@ class dynamogp_2d_dedalus(ptype):
         bz_y = u.values[1].differentiate(y=1)
         bz_z = u.values[1].differentiate(z=1)
 
-        f.expl.values[0] = (-self.u * u.values[0] * 1j * self.params.kx - self.v * by_y - self.w * by_z +
-                            u.values[1] * self.v_z).evaluate()
-        f.expl.values[1] = (-self.u * u.values[1] * 1j * self.params.kx - self.v * bz_y - self.w * bz_z +
-                            u.values[0] * self.w_y).evaluate()
+        f.expl.values[0] = (
+            -self.u * u.values[0] * 1j * self.params.kx - self.v * by_y - self.w * by_z + u.values[1] * self.v_z
+        ).evaluate()
+        f.expl.values[1] = (
+            -self.u * u.values[1] * 1j * self.params.kx - self.v * bz_y - self.w * bz_z + u.values[0] * self.w_y
+        ).evaluate()
 
-        f.impl.values[0] = (1.0 / self.params.Rm * (u.values[0].differentiate(z=2) + u.values[0].differentiate(y=2) -
-                                                    self.params.kx ** 2 * u.values[0])).evaluate()
-        f.impl.values[1] = (1.0 / self.params.Rm * (u.values[1].differentiate(z=2) + u.values[1].differentiate(y=2) -
-                                                    self.params.kx ** 2 * u.values[1])).evaluate()
+        f.impl.values[0] = (
+            1.0
+            / self.params.Rm
+            * (u.values[0].differentiate(z=2) + u.values[0].differentiate(y=2) - self.params.kx**2 * u.values[0])
+        ).evaluate()
+        f.impl.values[1] = (
+            1.0
+            / self.params.Rm
+            * (u.values[1].differentiate(z=2) + u.values[1].differentiate(y=2) - self.params.kx**2 * u.values[1])
+        ).evaluate()
 
         return f
 

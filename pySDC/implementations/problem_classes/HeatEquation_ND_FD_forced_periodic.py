@@ -17,6 +17,7 @@ class heatNd_periodic(ptype):
         A: second-order FD discretization of the ND laplace operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
@@ -32,7 +33,7 @@ class heatNd_periodic(ptype):
         if 'order' not in problem_params:
             problem_params['order'] = 2
         if 'lintol' not in problem_params:
-            problem_params['lintol'] = 1E-12
+            problem_params['lintol'] = 1e-12
         if 'liniter' not in problem_params:
             problem_params['liniter'] = 10000
         if 'direct_solver' not in problem_params:
@@ -61,8 +62,12 @@ class heatNd_periodic(ptype):
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heatNd_periodic, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(heatNd_periodic, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
@@ -101,8 +106,12 @@ class heatNd_periodic(ptype):
         else:
             raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        offsets = np.concatenate(
+            (
+                [N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
+            )
+        )
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
 
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
@@ -111,9 +120,12 @@ class heatNd_periodic(ptype):
         if ndim == 2:
             A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         elif ndim == 3:
-            A = sp.kron(A, sp.eye(N[1] * N[0])) + sp.kron(sp.eye(N[2] * N[1]), A) + \
-                sp.kron(sp.kron(sp.eye(N[2]), A), sp.eye(N[0]))
-        A *= nu / (dx ** 2)
+            A = (
+                sp.kron(A, sp.eye(N[1] * N[0]))
+                + sp.kron(sp.eye(N[2] * N[1]), A)
+                + sp.kron(sp.kron(sp.eye(N[2]), A), sp.eye(N[0]))
+            )
+        A *= nu / (dx**2)
 
         return A
 
@@ -132,17 +144,22 @@ class heatNd_periodic(ptype):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         if self.params.ndim == 1:
-            f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+            f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
+                self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t)
+            )
         elif self.params.ndim == 2:
-            f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                np.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+            f.expl[:] = (
+                np.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+            )
         elif self.params.ndim == 3:
-            f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                np.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                np.sin(np.pi * self.params.freq[2] * self.xv[2]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+            f.expl[:] = (
+                np.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * np.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+            )
 
         return f
 
@@ -165,8 +182,13 @@ class heatNd_periodic(ptype):
         if self.params.direct_solver:
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         else:
-            me[:] = gmres(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
-                          tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
+            me[:] = gmres(
+                self.Id - factor * self.A,
+                rhs.flatten(),
+                x0=u0.flatten(),
+                tol=self.params.lintol,
+                maxiter=self.params.liniter,
+            )[0].reshape(self.params.nvars)
         return me
 
     def u_exact(self, t):
@@ -184,10 +206,16 @@ class heatNd_periodic(ptype):
         if self.params.ndim == 1:
             me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * np.cos(t)
         elif self.params.ndim == 2:
-            me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                np.sin(np.pi * self.params.freq[1] * self.xv[1]) * np.cos(t)
+            me[:] = (
+                np.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * np.cos(t)
+            )
         elif self.params.ndim == 3:
-            me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                np.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                np.sin(np.pi * self.params.freq[2] * self.xv[2]) * np.cos(t)
+            me[:] = (
+                np.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * np.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * np.cos(t)
+            )
         return me

@@ -40,7 +40,7 @@ def create_animation(cwd=''):
     iter_count_blocks = []
     for p in range(int((maxstep - minstep) / nprocs)):
         step = p * nprocs
-        iter_count_blocks.append(int(max(iter_count[step:step + nprocs])))
+        iter_count_blocks.append(int(max(iter_count[step : step + nprocs])))
 
     residual = np.where(residual > 0, np.log10(residual), -99)
     vmin = -9
@@ -95,22 +95,28 @@ def create_animation(cwd=''):
         iter = index - int(csum_blocks[block])
 
         res = np.zeros((maxiter_full, maxstep - minstep))
-        res[0:maxiter, 0:step - minstep] = data['residual'][0:maxiter, minstep:step]
-        res[0:iter, 0:step + nprocs - minstep] = data['residual'][0:iter, minstep:step + nprocs]
+        res[0:maxiter, 0 : step - minstep] = data['residual'][0:maxiter, minstep:step]
+        res[0:iter, 0 : step + nprocs - minstep] = data['residual'][0:iter, minstep : step + nprocs]
         res = np.where(res > 0, np.log10(res), -99)
         plot.set_array(res.ravel())
 
         return plot
 
-    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=sum(iter_count_blocks) + 1, interval=1,
-                                   blit=False, repeat=False)
+    anim = animation.FuncAnimation(
+        fig, animate, init_func=init, frames=sum(iter_count_blocks) + 1, interval=1, blit=False, repeat=False
+    )
 
     if "NOFAULT" not in ref:
         stats = data['hard_stats']
         for item in stats:
             if item[0] in range(minstep, maxstep):
-                plt.text(item[0] + 0.5 - (maxstep - nsteps), item[1] - 1 + 0.5, 'x', horizontalalignment='center',
-                         verticalalignment='center')
+                plt.text(
+                    item[0] + 0.5 - (maxstep - nsteps),
+                    item[1] - 1 + 0.5,
+                    'x',
+                    horizontalalignment='center',
+                    verticalalignment='center',
+                )
 
     # fig.subplots_adjust(left=0.01, bottom=0.01, right=1.2, top=1, wspace=None, hspace=None)
 

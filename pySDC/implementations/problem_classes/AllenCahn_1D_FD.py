@@ -1,4 +1,3 @@
-
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
@@ -43,8 +42,9 @@ class allencahn_front_fullyimplicit(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_front_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                                            dtype_u, dtype_f, problem_params)
+        super(allencahn_front_fullyimplicit, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
@@ -73,7 +73,7 @@ class allencahn_front_fullyimplicit(ptype):
 
         stencil = [1, -2, 1]
         A = sp.diags(stencil, [-1, 0, 1], shape=(N + 2, N + 2), format='lil')
-        A *= 1.0 / (dx ** 2)
+        A *= 1.0 / (dx**2)
 
         return A
 
@@ -92,7 +92,7 @@ class allencahn_front_fullyimplicit(ptype):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps ** 2
+        eps2 = self.params.eps**2
         dw = self.params.dw
 
         Id = sp.eye(self.params.nvars)
@@ -109,9 +109,16 @@ class allencahn_front_fullyimplicit(ptype):
             # print(n)
             # form the function g with g(u) = 0
             self.uext[1:-1] = u[:]
-            g = u - rhs \
-                - factor * (self.A.dot(self.uext)[1:-1] - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
-                            6.0 * dw * u * (1.0 - u))
+            g = (
+                u
+                - rhs
+                - factor
+                * (
+                    self.A.dot(self.uext)[1:-1]
+                    - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+                    - 6.0 * dw * u * (1.0 - u)
+                )
+            )
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -120,9 +127,13 @@ class allencahn_front_fullyimplicit(ptype):
                 break
 
             # assemble dg
-            dg = Id - factor * (A - 2.0 / eps2 * sp.diags(
-                (1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0) - 6.0 * dw * sp.diags(
-                (1.0 - u) - u, offsets=0))
+            dg = Id - factor * (
+                A
+                - 2.0
+                / eps2
+                * sp.diags((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0)
+                - 6.0 * dw * sp.diags((1.0 - u) - u, offsets=0)
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
@@ -165,9 +176,11 @@ class allencahn_front_fullyimplicit(ptype):
         self.uext[1:-1] = u[:]
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(self.uext)[1:-1] - \
-            2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
-            6.0 * self.params.dw * u * (1.0 - u)
+        f[:] = (
+            self.A.dot(self.uext)[1:-1]
+            - 2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
+            - 6.0 * self.params.dw * u * (1.0 - u)
+        )
         return f
 
     def u_exact(self, t):
@@ -244,8 +257,7 @@ class allencahn_front_semiimplicit(allencahn_front_fullyimplicit):
 
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(self.uext)[1:-1]
-        f.expl[:] = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
-            6.0 * self.params.dw * u * (1.0 - u)
+        f.expl[:] = -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * self.params.dw * u * (1.0 - u)
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -309,7 +321,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
             # print(n)
             # form the function g with g(u) = 0
             self.uext[1:-1] = u[:]
-            gprim = 1.0 / self.dx ** 2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) * (2.0 * u - 1.0)
+            gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) * (2.0 * u - 1.0)
             g = u - rhs - factor * (self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * dw * u * (1.0 - u))
 
             # if g is close to 0, then we are done
@@ -319,9 +331,14 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
                 break
 
             # assemble dg
-            dgprim = 1.0 / self.dx ** 2 * \
-                (2.0 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0) +
-                 (2.0 * u - 1) ** 2 * (1.0 - a2) * 4 * a2 / (1.0 - a2 * (2.0 * u - 1.0) ** 2) ** 2)
+            dgprim = (
+                1.0
+                / self.dx**2
+                * (
+                    2.0 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1.0)
+                    + (2.0 * u - 1) ** 2 * (1.0 - a2) * 4 * a2 / (1.0 - a2 * (2.0 * u - 1.0) ** 2) ** 2
+                )
+            )
 
             dg = Id - factor * (A - 1.0 * sp.diags(dgprim, offsets=0) - 6.0 * dw * sp.diags((1.0 - u) - u, offsets=0))
 
@@ -367,8 +384,7 @@ class allencahn_front_finel(allencahn_front_fullyimplicit):
         self.uext[1:-1] = u[:]
 
         a2 = np.tanh(self.dx / (np.sqrt(2) * self.params.eps)) ** 2
-        gprim = 1.0 / self.dx ** 2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1) \
-            * (2.0 * u - 1.0)
+        gprim = 1.0 / self.dx**2 * ((1.0 - a2) / (1.0 - a2 * (2.0 * u - 1.0) ** 2) - 1) * (2.0 * u - 1.0)
         f = self.dtype_f(self.init)
         f[:] = self.A.dot(self.uext)[1:-1] - 1.0 * gprim - 6.0 * self.params.dw * u * (1.0 - u)
         return f
@@ -409,8 +425,9 @@ class allencahn_periodic_fullyimplicit(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(allencahn_periodic_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                                               dtype_u, dtype_f, problem_params)
+        super(allencahn_periodic_fullyimplicit, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / self.params.nvars
@@ -439,12 +456,16 @@ class allencahn_periodic_fullyimplicit(ptype):
         stencil = [1, -2, 1]
         zero_pos = 2
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        offsets = np.concatenate(
+            (
+                [N - i - 1 for i in reversed(range(zero_pos - 1))],
+                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
+            )
+        )
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= 1.0 / (dx ** 2)
+        A *= 1.0 / (dx**2)
 
         return A
 
@@ -463,7 +484,7 @@ class allencahn_periodic_fullyimplicit(ptype):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps ** 2
+        eps2 = self.params.eps**2
         dw = self.params.dw
 
         Id = sp.eye(self.params.nvars)
@@ -474,8 +495,11 @@ class allencahn_periodic_fullyimplicit(ptype):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            g = u - rhs - factor * (self.A.dot(u) - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
-                                    6.0 * dw * u * (1.0 - u))
+            g = (
+                u
+                - rhs
+                - factor * (self.A.dot(u) - 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * dw * u * (1.0 - u))
+            )
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -484,9 +508,13 @@ class allencahn_periodic_fullyimplicit(ptype):
                 break
 
             # assemble dg
-            dg = Id - factor * (self.A - 2.0 / eps2 * sp.diags(
-                (1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0) - 6.0 * dw * sp.diags(
-                (1.0 - u) - u, offsets=0))
+            dg = Id - factor * (
+                self.A
+                - 2.0
+                / eps2
+                * sp.diags((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0)
+                - 6.0 * dw * sp.diags((1.0 - u) - u, offsets=0)
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
@@ -522,8 +550,11 @@ class allencahn_periodic_fullyimplicit(ptype):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u) - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - \
-            6.0 * self.params.dw * u * (1.0 - u)
+        f[:] = (
+            self.A.dot(u)
+            - 2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u)
+            - 6.0 * self.params.dw * u * (1.0 - u)
+        )
         return f
 
     def u_exact(self, t):
@@ -576,7 +607,7 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_periodic_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
 
-        self.A -= sp.eye(self.init) * 0.0 / self.params.eps ** 2
+        self.A -= sp.eye(self.init) * 0.0 / self.params.eps**2
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -609,8 +640,11 @@ class allencahn_periodic_semiimplicit(allencahn_periodic_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u)
-        f.expl[:] = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
-            6.0 * self.params.dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u
+        f.expl[:] = (
+            -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+            - 6.0 * self.params.dw * u * (1.0 - u)
+            + 0.0 / self.params.eps**2 * u
+        )
         return f
 
 
@@ -647,7 +681,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_periodic_multiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
 
-        self.A -= sp.eye(self.init[0]) * 0.0 / self.params.eps ** 2
+        self.A -= sp.eye(self.init[0]) * 0.0 / self.params.eps**2
 
     def solve_system_1(self, rhs, factor, u0, t):
         """
@@ -680,8 +714,11 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         f.comp1[:] = self.A.dot(u)
-        f.comp2[:] = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
-            6.0 * self.params.dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u
+        f.comp2[:] = (
+            -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+            - 6.0 * self.params.dw * u * (1.0 - u)
+            + 0.0 / self.params.eps**2 * u
+        )
         return f
 
     def solve_system_2(self, rhs, factor, u0, t):
@@ -699,7 +736,7 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         """
 
         u = self.dtype_u(u0)
-        eps2 = self.params.eps ** 2
+        eps2 = self.params.eps**2
         dw = self.params.dw
 
         Id = sp.eye(self.params.nvars)
@@ -710,8 +747,16 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
         while n < self.params.newton_maxiter:
             # print(n)
             # form the function g with g(u) = 0
-            g = u - rhs - factor * (- 2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u) -
-                                    6.0 * dw * u * (1.0 - u) + 0.0 / self.params.eps ** 2 * u)
+            g = (
+                u
+                - rhs
+                - factor
+                * (
+                    -2.0 / eps2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+                    - 6.0 * dw * u * (1.0 - u)
+                    + 0.0 / self.params.eps**2 * u
+                )
+            )
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -720,9 +765,11 @@ class allencahn_periodic_multiimplicit(allencahn_periodic_fullyimplicit):
                 break
 
             # assemble dg
-            dg = Id - factor * (- 2.0 / eps2 * sp.diags(
-                (1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0) - 6.0 * dw * sp.diags(
-                (1.0 - u) - u, offsets=0) + 0.0 / self.params.eps ** 2 * Id)
+            dg = Id - factor * (
+                -2.0 / eps2 * sp.diags((1.0 - u) * (1.0 - 2.0 * u) - u * ((1.0 - 2.0 * u) + 2.0 * (1.0 - u)), offsets=0)
+                - 6.0 * dw * sp.diags((1.0 - u) - u, offsets=0)
+                + 0.0 / self.params.eps**2 * Id
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)

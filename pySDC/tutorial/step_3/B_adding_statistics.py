@@ -24,15 +24,19 @@ def main():
     base_energy = energy[0][1]
     f = open('step_3_B_out.txt', 'a')
     for item in energy:
-        out = 'Total energy and deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]))
+        out = 'Total energy and deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]),
+        )
         f.write(out + '\n')
         print(out)
     f.close()
 
-    assert abs(base_energy - energy[-1][1]) < 15, 'ERROR: energy deviated too much, got %s' % \
-                                                  (base_energy - energy[-1][1])
-    assert err < 5E-04, "ERROR: solution is not as exact as expected, got %s" % err
+    assert abs(base_energy - energy[-1][1]) < 15, 'ERROR: energy deviated too much, got %s' % (
+        base_energy - energy[-1][1]
+    )
+    assert err < 5e-04, "ERROR: solution is not as exact as expected, got %s" % err
 
 
 def run_penning_trap_simulation():
@@ -41,7 +45,7 @@ def run_penning_trap_simulation():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 1.0 / 16
 
     # initialize sweeper parameters

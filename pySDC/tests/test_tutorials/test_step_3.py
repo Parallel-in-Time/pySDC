@@ -7,8 +7,10 @@ from pySDC.tutorial.step_3.C_study_collocations import main as main_C
 def test_A():
     main_A()
 
+
 def test_B():
     main_B()
+
 
 def test_C():
     main_C()

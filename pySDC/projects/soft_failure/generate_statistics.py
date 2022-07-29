@@ -11,8 +11,11 @@ from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.projects.soft_failure.FaultHooks import fault_hook
 from pySDC.projects.soft_failure.implicit_sweeper_faults import implicit_sweeper_faults
-from pySDC.projects.soft_failure.visualization_helper import show_residual_across_simulation, \
-    show_min_max_residual_across_simulation, show_iter_hist
+from pySDC.projects.soft_failure.visualization_helper import (
+    show_residual_across_simulation,
+    show_min_max_residual_across_simulation,
+    show_iter_hist,
+)
 
 
 def diffusion_setup():
@@ -21,7 +24,7 @@ def diffusion_setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
     level_params['nsweeps'] = 1
 
@@ -31,7 +34,7 @@ def diffusion_setup():
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
-    sweeper_params['detector_threshold'] = 1E-10
+    sweeper_params['detector_threshold'] = 1e-10
 
     # initialize problem parameters
     problem_params = dict()
@@ -65,7 +68,7 @@ def reaction_setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
     level_params['nsweeps'] = 1
 
@@ -75,14 +78,14 @@ def reaction_setup():
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
-    sweeper_params['detector_threshold'] = 1E-10
+    sweeper_params['detector_threshold'] = 1e-10
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 1.0
     problem_params['lambda0'] = 2.0
     problem_params['newton_maxiter'] = 20
-    problem_params['newton_tol'] = 1E-10
+    problem_params['newton_tol'] = 1e-10
     problem_params['stop_at_nan'] = False
     problem_params['interval'] = (-5, 5)
     problem_params['nvars'] = 127
@@ -113,7 +116,7 @@ def vanderpol_setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
     level_params['nsweeps'] = 1
 
@@ -122,11 +125,11 @@ def vanderpol_setup():
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
-    sweeper_params['detector_threshold'] = 1E-10
+    sweeper_params['detector_threshold'] = 1e-10
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1E-10
+    problem_params['newton_tol'] = 1e-10
     problem_params['newton_maxiter'] = 50
     problem_params['stop_at_nan'] = False
     problem_params['mu'] = 18
@@ -311,8 +314,9 @@ def process_statistics(type=None, cwd=''):
     # call helper routine to produce residual plot of minres, maxres, meanres and medianres
     # fname = 'min_max_residuals.png'
     fname = cwd + 'data/' + type + '_' + str(nruns) + '_' + 'runs' + '_' + 'min_max_residuals.png'
-    show_min_max_residual_across_simulation(fname=fname, minres=minres, maxres=maxres, meanres=meanres,
-                                            medianres=medianres, maxiter=minlen)
+    show_min_max_residual_across_simulation(
+        fname=fname, minres=minres, maxres=maxres, meanres=meanres, medianres=medianres, maxiter=minlen
+    )
 
     # calculate maximum number of iterations per test run
     maxiter = []

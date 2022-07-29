@@ -22,7 +22,7 @@ def set_parameters_ml():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125 / 2.0
 
     # initialize sweeper parameters
@@ -133,4 +133,3 @@ if __name__ == "__main__":
 
         f.write('\n')
         print()
-

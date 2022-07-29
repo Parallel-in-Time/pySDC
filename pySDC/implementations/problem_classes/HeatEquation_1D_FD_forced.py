@@ -10,6 +10,7 @@ class heat1d_forced(heat1d):
     Example implementing the forced 1D heat equation with Dirichlet-0 BC in [0,1],
     discretized using central finite differences
     """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
@@ -57,8 +58,9 @@ class heat1d_forced(heat1d):
         """
 
         fexpl = self.dtype_u(self.init)
-        fexpl[:] = -np.sin(np.pi * self.params.freq * self.xvalues) * \
-            (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        fexpl[:] = -np.sin(np.pi * self.params.freq * self.xvalues) * (
+            np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t)
+        )
         return fexpl
 
     def __eval_fimpl(self, u, t):

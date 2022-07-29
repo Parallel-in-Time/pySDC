@@ -43,12 +43,14 @@ def main():
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.0001
     level_params['nsweeps'] = [1]
 
@@ -62,7 +64,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['Ra'] = 1E+05
+    problem_params['Ra'] = 1e05
     problem_params['Pr'] = 1.0
     problem_params['initial'] = 'random'
     problem_params['nvars'] = [(64, 32)]  # number of degrees of freedom for each level
@@ -115,6 +117,7 @@ def main():
     #     plt.figure(3)
     #     plt.semilogy(times, [item[1] for item in bx_maxes])
     #     plt.pause(0.1)
+
 
 if __name__ == "__main__":
     main()

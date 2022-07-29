@@ -30,8 +30,8 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -129,8 +129,7 @@ def run_SDC_variant(variant=None):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)

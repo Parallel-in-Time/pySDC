@@ -15,7 +15,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-09
+    level_params['restol'] = 1e-09
     level_params['dt'] = 0.0625
 
     # initialize sweeper parameters
@@ -62,7 +62,7 @@ def main():
 
     # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend / level_params['dt'])
-    num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
+    num_proc_list = [2**i for i in range(int(np.log2(nsteps) + 1))]
 
     # set up list of types of implicit SDC sweepers: LU and implicit Euler here
     QI_list = ['LU', 'IE']
@@ -87,8 +87,9 @@ def main():
             f.write(out + '\n')
             print(out)
             # instantiate controller
-            controller = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=num_proc, controller_params=controller_params, description=description
+            )
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -117,12 +118,16 @@ def main():
             out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
             f.write(out + '\n')
             print(out)
-            out = '   Position of max/min number of iterations: %2i -- %2i' % \
-                  (int(np.argmax(niters)), int(np.argmin(niters)))
+            out = '   Position of max/min number of iterations: %2i -- %2i' % (
+                int(np.argmax(niters)),
+                int(np.argmin(niters)),
+            )
             f.write(out + '\n')
             print(out)
-            out = '   Std and var for number of iterations: %4.2f -- %4.2f' % \
-                  (float(np.std(niters)), float(np.var(niters)))
+            out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (
+                float(np.std(niters)),
+                float(np.var(niters)),
+            )
             f.write(out + '\n')
             f.write(out + '\n')
             print(out)
@@ -132,8 +137,11 @@ def main():
 
             assert err < 5.0716135e-04, "ERROR: error is too high, got %s" % err
 
-        out = 'Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' % \
-              (niters_min_all[QI], niters_max_all[QI], QI)
+        out = 'Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' % (
+            niters_min_all[QI],
+            niters_max_all[QI],
+            QI,
+        )
         f.write(out + '\n')
         print(out)
 

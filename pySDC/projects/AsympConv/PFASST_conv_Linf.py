@@ -40,7 +40,7 @@ def run_diffusion(QI):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -94,7 +94,7 @@ def run_diffusion(QI):
 
     for i in range(0, 13):
 
-        num_proc = 2 ** i
+        num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
 
@@ -143,7 +143,7 @@ def run_advection(QI):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -199,7 +199,7 @@ def run_advection(QI):
 
     for i in range(0, 7):
 
-        num_proc = 2 ** i
+        num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
 
@@ -271,14 +271,15 @@ def plot_results(cwd=''):
         file.close()
 
         # set up plotting parameters
-        params = {'legend.fontsize': 20,
-                  'figure.figsize': (12, 8),
-                  'axes.labelsize': 20,
-                  'axes.titlesize': 20,
-                  'xtick.labelsize': 16,
-                  'ytick.labelsize': 16,
-                  'lines.linewidth': 3
-                  }
+        params = {
+            'legend.fontsize': 20,
+            'figure.figsize': (12, 8),
+            'axes.labelsize': 20,
+            'axes.titlesize': 20,
+            'xtick.labelsize': 16,
+            'ytick.labelsize': 16,
+            'lines.linewidth': 3,
+        }
         plt.rcParams.update(params)
 
         # set up figure

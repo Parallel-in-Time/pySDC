@@ -72,10 +72,16 @@ class fenics_grayscott(ptype):
 
         self.w1, self.w2 = df.split(self.w)
 
-        self.F1 = (-self.params.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1)) -
-                   self.w1 * (self.w2 ** 2) * q1 + self.params.A * (1 - self.w1) * q1) * df.dx
-        self.F2 = (-self.params.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2)) +
-                   self.w1 * (self.w2 ** 2) * q2 - self.params.B * self.w2 * q2) * df.dx
+        self.F1 = (
+            -self.params.Du * df.inner(df.nabla_grad(self.w1), df.nabla_grad(q1))
+            - self.w1 * (self.w2**2) * q1
+            + self.params.A * (1 - self.w1) * q1
+        ) * df.dx
+        self.F2 = (
+            -self.params.Dv * df.inner(df.nabla_grad(self.w2), df.nabla_grad(q2))
+            + self.w1 * (self.w2**2) * q2
+            - self.params.B * self.w2 * q2
+        ) * df.dx
         self.F = self.F1 + self.F2
 
         # mass matrix
@@ -138,8 +144,8 @@ class fenics_grayscott(ptype):
         solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
-        prm['newton_solver']['absolute_tolerance'] = 1E-09
-        prm['newton_solver']['relative_tolerance'] = 1E-08
+        prm['newton_solver']['absolute_tolerance'] = 1e-09
+        prm['newton_solver']['relative_tolerance'] = 1e-08
         prm['newton_solver']['maximum_iterations'] = 100
         prm['newton_solver']['relaxation_parameter'] = 1.0
 
@@ -192,7 +198,7 @@ class fenics_grayscott(ptype):
                 values[1] = 0.25 * np.power(np.sin(np.pi * x[0] / 100), 100)
 
             def value_shape(self):
-                return 2,
+                return (2,)
 
         uinit = InitialConditions()
 

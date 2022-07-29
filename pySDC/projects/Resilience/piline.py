@@ -13,7 +13,6 @@ from pySDC.core.Hooks import hooks
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -23,25 +22,82 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='p3', value=L.uend[2])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='sweeps', value=step.status.iter)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v1',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v2',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='p3',
+            value=L.uend[2],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_extrapolated',
+            value=L.status.error_extrapolation_estimate,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=1,
+            initialize=0,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='sweeps',
+            value=step.status.iter,
+        )
 
 
-def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
+def run_piline(custom_description, num_procs, Tend=20.0, hook_class=log_data):
     """
     A simple test program to do SDC runs for Piline problem
     """
@@ -58,13 +114,13 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
     sweeper_params['QE'] = 'PIC'
 
     problem_params = {
-        'Vs': 100.,
-        'Rs': 1.,
-        'C1': 1.,
+        'Vs': 100.0,
+        'Rs': 1.0,
+        'C1': 1.0,
         'Rpi': 0.2,
-        'C2': 1.,
-        'Lpi': 1.,
-        'Rl': 5.,
+        'C2': 1.0,
+        'Lpi': 1.0,
+        'Rl': 5.0,
     }
 
     # initialize step parameters
@@ -92,8 +148,7 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
 
     # instantiate controller
     controller_class = controller_nonMPI
-    controller = controller_class(num_procs=num_procs, controller_params=controller_params,
-                                  description=description)
+    controller = controller_class(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -128,8 +183,12 @@ def plot_error(data, ax, use_adaptivity=True):
     e_ax = ax.twinx()
     e_ax.plot(data['t'], data['e_em'], label=r'$\epsilon_\mathrm{embedded}$')
     e_ax.plot(data['t'][data['ready']], data['e_ex'][data['ready']], label=r'$\epsilon_\mathrm{extrapolated}$', ls='--')
-    e_ax.plot(data['t'][data['ready']], abs(data['e_em'][data['ready']] - data['e_ex'][data['ready']]),
-              label='difference', ls='-.')
+    e_ax.plot(
+        data['t'][data['ready']],
+        abs(data['e_em'][data['ready']] - data['e_ex'][data['ready']]),
+        label='difference',
+        ls='-.',
+    )
 
     e_ax.plot([None, None], label=r'$\Delta t$', color='black')
     e_ax.set_yscale('log')
@@ -147,6 +206,7 @@ def plot_error(data, ax, use_adaptivity=True):
 
 def setup_mpl_from_accuracy_check():
     from pySDC.projects.Resilience.accuracy_check import setup_mpl
+
     setup_mpl()
 
 
@@ -240,8 +300,9 @@ def check_solution(data, use_adaptivity, num_procs, generate_reference=False):
         print('}')
 
     for k in expected.keys():
-        assert np.isclose(expected[k], got[k], rtol=1e-4),\
-               f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
+        assert np.isclose(
+            expected[k], got[k], rtol=1e-4
+        ), f'{error_msg} Expected {k}={expected[k]:.2e}, got {k}={got[k]:.2e}'
 
 
 def main():

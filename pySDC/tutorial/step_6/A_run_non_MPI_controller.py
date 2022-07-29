@@ -19,8 +19,9 @@ def main(num_proc_list=None, fname=None, multi_level=True):
     if multi_level:
         description, controller_params, t0, Tend = set_parameters_ml()
     else:
-        assert all(num_proc == 1 for num_proc in num_proc_list), \
+        assert all(num_proc == 1 for num_proc in num_proc_list), (
             'ERROR: single-level run can only use 1 processor, got %s' % num_proc_list
+        )
         description, controller_params, t0, Tend = set_parameters_sl()
 
     f = open(fname, 'w')
@@ -81,7 +82,7 @@ def set_parameters_ml():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
@@ -98,7 +99,7 @@ def set_parameters_ml():
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-05
+    step_params['errtol'] = 1e-05
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -142,7 +143,7 @@ def set_parameters_sl():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters

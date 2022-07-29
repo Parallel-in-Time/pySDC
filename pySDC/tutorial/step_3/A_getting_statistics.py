@@ -43,8 +43,9 @@ def main():
 
     f.close()
 
-    assert all([item[1] == 12 for item in iter_counts]), \
+    assert all([item[1] == 12 for item in iter_counts]), (
         'ERROR: number of iterations are not as expected, got %s' % iter_counts
+    )
 
 
 def run_simulation():
@@ -53,7 +54,7 @@ def run_simulation():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters

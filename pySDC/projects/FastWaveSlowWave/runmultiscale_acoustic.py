@@ -29,7 +29,7 @@ def compute_and_plot_solutions():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt
 
     # This comes as read-in for the step class
@@ -64,8 +64,7 @@ def compute_and_plot_solutions():
     description['level_params'] = level_params
 
     # instantiate the controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -136,10 +135,10 @@ def compute_and_plot_solutions():
     p_slow = np.exp(-np.square(np.mod(P.mesh - problem_params['cadv'] * Tend, 1.0) - x_0) / (sigma_0 * sigma_0))
     plt.plot(P.mesh, p_slow, '--', color='k', markersize=fs - 2, label='Slow mode', dashes=(10, 2))
     if np.linalg.norm(pnew_imex, np.inf) <= 2:
-        plt.plot(P.mesh, pnew_imex, '+-', color='r', label='IMEX(' + str(rkimex.order) + ')', markevery=(1, 75),
-                 mew=1.0)
-    plt.plot(P.mesh, uend[1, :], 'o-', color='b', label='SDC(' + str(step_params['maxiter']) + ')',
-             markevery=(25, 75))
+        plt.plot(
+            P.mesh, pnew_imex, '+-', color='r', label='IMEX(' + str(rkimex.order) + ')', markevery=(1, 75), mew=1.0
+        )
+    plt.plot(P.mesh, uend[1, :], 'o-', color='b', label='SDC(' + str(step_params['maxiter']) + ')', markevery=(25, 75))
     plt.plot(P.mesh, pnew_dirk, '-', color='g', label='DIRK(' + str(dirk_m.order) + ')')
 
     plt.xlabel('x', fontsize=fs, labelpad=0)

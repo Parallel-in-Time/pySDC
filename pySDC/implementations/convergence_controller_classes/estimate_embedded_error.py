@@ -20,9 +20,8 @@ class EstimateEmbeddedError(ConvergenceController):
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
-
     def reset_global_variables_nonMPI(self, controller):
-        self.e_em_last = 0.
+        self.e_em_last = 0.0
 
     def post_iteration_processing(self, controller, S):
         """
@@ -30,8 +29,10 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
         In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block
         """
         if len(S.levels) > 1 and len(controller.MS) > 1:
-            raise NotImplementedError('Embedded error estimate only works for serial multi-level or parallel single \
-level')
+            raise NotImplementedError(
+                'Embedded error estimate only works for serial multi-level or parallel single \
+level'
+            )
 
         if S.status.iter > 1:
             for L in S.levels:
@@ -39,4 +40,4 @@ level')
                 temp = abs(L.uold[-1] - L.u[-1])
                 L.status.error_embedded_estimate = max([abs(temp - self.e_em_last), np.finfo(float).eps])
 
-            self.e_em_last = temp * 1.
+            self.e_em_last = temp * 1.0

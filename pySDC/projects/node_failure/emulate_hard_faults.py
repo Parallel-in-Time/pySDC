@@ -45,8 +45,7 @@ def hard_fault_injection(S):
     # if we set step and iter, inject and recover (if faults are supposed to occur)
     if ((hard_step == S.status.slot and hard_iter == S.status.iter) or doit) and strategy != 'NOFAULT':
 
-        print('things went wrong here: step %i -- iteration %i -- time %e' %
-              (S.status.slot, S.status.iter, S.time))
+        print('things went wrong here: step %i -- iteration %i -- time %e' % (S.status.slot, S.status.iter, S.time))
 
         # add incident to statistics data type
         hard_stats.append((S.status.slot, S.status.iter, S.time))
@@ -80,15 +79,16 @@ def hard_fault_injection(S):
 
 # Here come the recovery strategies
 
+
 def hard_fault_correction_spread(S):
     """
-        do nothing, just get new initial conditions and do sweep predict (copy)
-        strategy '1-sided'
+    do nothing, just get new initial conditions and do sweep predict (copy)
+    strategy '1-sided'
 
-        Args:
-            S: the current step (no data available)
-        Returns:
-            S: recovered step
+    Args:
+        S: the current step (no data available)
+    Returns:
+        S: recovered step
     """
 
     # get new initial data, either from previous processes or "from scratch"
@@ -114,13 +114,13 @@ def hard_fault_correction_spread(S):
 
 def hard_fault_correction_interp(S):
     """
-        get new initial conditions from left and uend from right, then interpolate
-        strategy '2-sided'
+    get new initial conditions from left and uend from right, then interpolate
+    strategy '2-sided'
 
-        Args:
-            S: the current step (no data available)
-        Returns:
-            S: recovered step
+    Args:
+        S: the current step (no data available)
+    Returns:
+        S: recovered step
     """
 
     # get new initial data, either from previous processes or "from scratch"
@@ -159,15 +159,15 @@ def hard_fault_correction_interp(S):
 
 def hard_fault_correction_spread_predict(S, res, niter):
     """
-        get new initial conditions from left, copy data to nodes and correct on coarse level
-        strategy '1-sided+corr'
+    get new initial conditions from left, copy data to nodes and correct on coarse level
+    strategy '1-sided+corr'
 
-        Args:
-            S: the current step (no data available)
-            res: the target residual
-            niter: the max. number of iteration
-        Returns:
-            S: recovered step
+    Args:
+        S: the current step (no data available)
+        res: the target residual
+        niter: the max. number of iteration
+    Returns:
+        S: recovered step
     """
 
     # get new initial data, either from previous processes or "from scratch"
@@ -214,15 +214,15 @@ def hard_fault_correction_spread_predict(S, res, niter):
 
 def hard_fault_correction_interp_predict(S, res, niter):
     """
-        get new initial conditions from left and uend from right, interpolate data to nodes and correct on coarse level
-        strategy '2-sided+corr'
+    get new initial conditions from left and uend from right, interpolate data to nodes and correct on coarse level
+    strategy '2-sided+corr'
 
-        Args:
-            S: the current step (no data available)
-            res: the target residual
-            niter: the max. number of iteration
-        Returns:
-            S: recovered step
+    Args:
+        S: the current step (no data available)
+        res: the target residual
+        niter: the max. number of iteration
+    Returns:
+        S: recovered step
     """
 
     # get new initial data, either from previous processes or "from scratch"

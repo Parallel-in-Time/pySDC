@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
@@ -75,8 +76,10 @@ def compute_specrad():
 
         for j in range(0, 2):
             LHS = np.eye(nnodes) - dt * (P.params.lambda_f[j] * QI + P.params.lambda_s[0] * QE)
-            RHS = dt * ((P.params.lambda_f[j] + P.params.lambda_s[0]) * Q -
-                        (P.params.lambda_f[j] * QI + P.params.lambda_s[0] * QE))
+            RHS = dt * (
+                (P.params.lambda_f[j] + P.params.lambda_s[0]) * Q
+                - (P.params.lambda_f[j] * QI + P.params.lambda_s[0] * QE)
+            )
             evals, evecs = np.linalg.eig(np.linalg.inv(LHS).dot(RHS))
             specrad[j + 1, i] = np.linalg.norm(evals, np.inf)
             norm[j + 1, i] = np.linalg.norm(np.linalg.inv(LHS).dot(RHS), np.inf)
@@ -115,10 +118,8 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
     rcParams['pgf.rcfonts'] = False
     fig = plt.figure()
     plt.plot(nodes_v, specrad[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{fast} = \infty$')
-    plt.plot(nodes_v, specrad[1, :], 'bo-', markersize=fs - 2,
-             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
-    plt.plot(nodes_v, specrad[2, :], 'gs-', markersize=fs - 2,
-             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
+    plt.plot(nodes_v, specrad[1, :], 'bo-', markersize=fs - 2, label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
+    plt.plot(nodes_v, specrad[2, :], 'gs-', markersize=fs - 2, label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Spectral radius  $\sigma\left( \mathbf{E} \right)$', fontsize=fs, labelpad=2)
     plt.legend(loc='lower right', fontsize=fs, prop={'size': fs})
@@ -131,10 +132,8 @@ def plot_specrad(nodes_v, lambda_f, specrad, norm):
 
     fig = plt.figure()
     plt.plot(nodes_v, norm[0, :], 'rd-', markersize=fs - 2, label=r'$\lambda_{fast} = \infty$')
-    plt.plot(nodes_v, norm[1, :], 'bo-', markersize=fs - 2,
-             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
-    plt.plot(nodes_v, norm[2, :], 'gs-', markersize=fs - 2,
-             label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
+    plt.plot(nodes_v, norm[1, :], 'bo-', markersize=fs - 2, label=r'$\lambda_{fast} = %2.0f $' % lambda_f[0].imag)
+    plt.plot(nodes_v, norm[2, :], 'gs-', markersize=fs - 2, label=r'$\lambda_{fast} = %2.0f $' % lambda_f[1].imag)
     plt.xlabel(r'Number of nodes $M$', fontsize=fs)
     plt.ylabel(r'Norm  $\left|| \mathbf{E} \right||_{\infty}$', fontsize=fs, labelpad=2)
     plt.legend(loc='lower right', fontsize=fs, prop={'size': fs})

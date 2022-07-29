@@ -35,7 +35,7 @@ def main():
     print(out)
     f.close()
 
-    assert err <= 4E-04, "ERROR: did not get collocation error as expected, got %s" % err
+    assert err <= 4e-04, "ERROR: did not get collocation error as expected, got %s" % err
 
 
 def solve_collocation_problem(prob, coll, dt):
@@ -68,7 +68,7 @@ def solve_collocation_problem(prob, coll, dt):
     u_coll = sp.linalg.spsolve(M, u0_coll)
 
     # compute error
-    err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend, np.inf)
+    err = np.linalg.norm(u_coll[-prob.params.nvars :] - uend, np.inf)
 
     return err
 

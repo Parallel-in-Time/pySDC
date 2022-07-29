@@ -21,7 +21,7 @@ def diffusion_setup(par=0.0):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -75,7 +75,7 @@ def advection_setup(par=0.0):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -132,7 +132,7 @@ def testequation_setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -241,7 +241,7 @@ def compare_controllers(type=None, par=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
-    assert diff < 2.3E-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
+    assert diff < 2.3e-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
 
     # filter statistics by type (number of iterations)
     filtered_stats_mat = filter_stats(stats_mat, type='niter')
@@ -258,13 +258,14 @@ def compare_controllers(type=None, par=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
-    assert iter_counts_nomat == iter_counts_mat, \
-        'ERROR: number of iterations differ between matrix-based and matrix-free controller'
+    assert (
+        iter_counts_nomat == iter_counts_mat
+    ), 'ERROR: number of iterations differ between matrix-based and matrix-free controller'
 
 
 def main():
 
-    par_list = [1E-02, 1.0, 1E+02]
+    par_list = [1e-02, 1.0, 1e02]
 
     f = open('comparison_matrix_vs_nomat_detail.txt', 'w')
     for par in par_list:

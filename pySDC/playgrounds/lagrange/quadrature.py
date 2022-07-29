@@ -17,8 +17,8 @@ from pySDC.core.Errors import CollocationError
 from scipy.integrate import quad
 from scipy.interpolate import BarycentricInterpolator
 
-class OriginCollocation(Collocation):
 
+class OriginCollocation(Collocation):
     def _getWeights(self, a, b):
         """
         Computes weights using barycentric interpolation
@@ -29,15 +29,13 @@ class OriginCollocation(Collocation):
             numpy.ndarray: weights of the collocation formula given by the nodes
         """
         if self.nodes is None:
-            raise CollocationError(
-                "Need nodes before computing weights, got %s" % self.nodes)
+            raise CollocationError("Need nodes before computing weights, got %s" % self.nodes)
 
         circ_one = np.zeros(self.num_nodes)
         circ_one[0] = 1.0
         tcks = []
         for i in range(self.num_nodes):
-            tcks.append(BarycentricInterpolator(
-                self.nodes, np.roll(circ_one, i)))
+            tcks.append(BarycentricInterpolator(self.nodes, np.roll(circ_one, i)))
 
         weights = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
@@ -83,26 +81,25 @@ QMatrixOrder = lambda n: n - 1 - (n % 2)
 
 weightsOrder = {
     'EQUID': lambda n: n - 1 - (n % 2),
-    'LEGENDRE' : {
-        'LOBATTO' : lambda n: 2 * n - 3,
-        'RADAU-LEFT' : lambda n: 2 * n - 2,
-        'RADAU-RIGHT' : lambda n: 2 * n - 2,
-        'GAUSS' : lambda n: 2 * n - 1
-        }
-    }
+    'LEGENDRE': {
+        'LOBATTO': lambda n: 2 * n - 3,
+        'RADAU-LEFT': lambda n: 2 * n - 2,
+        'RADAU-RIGHT': lambda n: 2 * n - 2,
+        'GAUSS': lambda n: 2 * n - 1,
+    },
+}
 
 
 def testWeights(weights, nodes, orderFunc, tBeg, tEnd):
     deg = orderFunc(np.size(nodes))
     err = np.zeros(nPolyTest)
     for i in range(nPolyTest):
-        poly_coeff = np.random.rand(deg+1)
-        poly_vals  = np.polyval(poly_coeff, nodes)
+        poly_coeff = np.random.rand(deg + 1)
+        poly_vals = np.polyval(poly_coeff, nodes)
         poly_int_coeff = np.polyint(poly_coeff)
-        int_ex = np.polyval(poly_int_coeff, tEnd) \
-            - np.polyval(poly_int_coeff, tBeg)
+        int_ex = np.polyval(poly_int_coeff, tEnd) - np.polyval(poly_int_coeff, tBeg)
         int_coll = np.sum(weights * poly_vals)
-        err[i] = abs(int_ex-int_coll)
+        err[i] = abs(int_ex - int_coll)
     return err
 
 
@@ -112,13 +109,13 @@ def testQMatrix(QMatrix, nodes, tBeg):
     err = np.zeros((nPolyTest, n))
     for i in range(nPolyTest):
         poly_coeff = np.random.rand(deg + 1)
-        poly_vals  = np.polyval(poly_coeff, nodes)
+        poly_vals = np.polyval(poly_coeff, nodes)
         poly_int_coeff = np.polyint(poly_coeff)
         for j in range(n):
             int_ex = np.polyval(poly_int_coeff, nodes[j])
             int_ex -= np.polyval(poly_int_coeff, tBeg)
-            int_coll = np.sum(poly_vals * QMatrix[j,:])
-            err[i, j] = abs(int_ex-int_coll)
+            int_coll = np.sum(poly_vals * QMatrix[j, :])
+            err[i, j] = abs(int_ex - int_coll)
     return err
 
 
@@ -163,14 +160,11 @@ def computeQuadratureErrors(nodeType, quadType, numQuad):
                 nodes *= b - a
                 nodes += a
                 # Set-up Lagrange interpolation polynomial
-                approx = LagrangeApproximation(
-                    nodes, weightComputation=baryWeightComputation)
+                approx = LagrangeApproximation(nodes, weightComputation=baryWeightComputation)
                 # Compute quadrature weights for the whole interval
-                weights = approx.getIntegrationMatrix(
-                    [[tLeft, tRight]], numQuad=numQuad)
+                weights = approx.getIntegrationMatrix([[tLeft, tRight]], numQuad=numQuad)
                 # Compute quadrature weights for the Q matrix
-                QMatrix = approx.getIntegrationMatrix(
-                    [[tLeft, tau] for tau in approx.points], numQuad=numQuad)
+                QMatrix = approx.getIntegrationMatrix([[tLeft, tau] for tau in approx.points], numQuad=numQuad)
 
             tComp[l] += time() - tBeg
 
@@ -199,7 +193,6 @@ def computeQuadratureErrors(nodeType, quadType, numQuad):
 
 
 def plotQuadErrors(nodesType, numQuad, figTitle=False):
-
     def setFig(title, err=True):
         plt.title(title)
         plt.grid(True)
@@ -234,23 +227,20 @@ def plotQuadErrors(nodesType, numQuad, figTitle=False):
         plt.semilogy(nNodes - 1, tComp, sym + '-', label=qType)
         setFig('Computation time', err=False)
 
-    textArgs = dict(
-        bbox=dict(boxstyle="round",
-                  ec=(0.5, 0.5, 0.5),
-                  fc=(0.8, 0.8, 0.8)))
+    textArgs = dict(bbox=dict(boxstyle="round", ec=(0.5, 0.5, 0.5), fc=(0.8, 0.8, 0.8)))
     plt.subplot(1, 3, 1)
     plt.hlines(maxWeigts, 2, nMax, linestyles='--', colors='gray')
-    plt.text(7, 1.5*maxWeigts, f'{maxWeigts:1.2e}', **textArgs)
+    plt.text(7, 1.5 * maxWeigts, f'{maxWeigts:1.2e}', **textArgs)
 
     plt.subplot(1, 3, 2)
     plt.hlines(maxQMatrix, 2, nMax, linestyles='--', colors='gray')
-    plt.text(7, 1.5*maxQMatrix, f'{maxQMatrix:1.2e}', **textArgs)
+    plt.text(7, 1.5 * maxQMatrix, f'{maxQMatrix:1.2e}', **textArgs)
 
     if figTitle:
-        plt.suptitle(f'node distribution : {nodesType}; '
-                      f'numQuad : {numQuad}')
+        plt.suptitle(f'node distribution : {nodesType}; ' f'numQuad : {numQuad}')
     plt.gcf().set_size_inches(17, 5)
     plt.tight_layout()
+
 
 if __name__ == '__main__':
     nodesType = 'EQUID'

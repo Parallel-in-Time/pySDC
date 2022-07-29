@@ -1,5 +1,6 @@
 from mpi4py import MPI
 import matplotlib
+
 matplotlib.use("TkAgg")
 
 from dedalus import public as de
@@ -74,11 +75,11 @@ y = domain.grid(1, scales=1)
 
 dt = 0.1 / 32
 Tend = 1.0
-nsteps = int(Tend/dt)
+nsteps = int(Tend / dt)
 
 
 uex = domain.new_field()
-uex['g'] = np.sin(2*np.pi*x) * np.sin(2*np.pi*y) * np.cos(Tend)
+uex['g'] = np.sin(2 * np.pi * x) * np.sin(2 * np.pi * y) * np.cos(Tend)
 
 problem = de.IVP(domain=domain, variables=['u'])
 problem.add_equation("dt(u) - dx(dx(u)) - dy(dy(u)) = 0")
@@ -103,7 +104,7 @@ for n in range(nsteps):
     exit()
 # print(t, nsteps)
 
-local_norm = np.amax(abs(u['g']-uex['g']))
+local_norm = np.amax(abs(u['g'] - uex['g']))
 if space_size == 1:
     global_norm = local_norm
 else:

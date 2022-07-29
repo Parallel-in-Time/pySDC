@@ -24,7 +24,7 @@ def main(comm=None):
 
     # initialize level parameters (part I)
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
 
     # initialize sweeper parameters (part I)
     sweeper_params = dict()
@@ -42,10 +42,12 @@ def main(comm=None):
 
     # set up list of Q-delta types and setups
     qd_list = ['IEpar', 'Qpar', 'MIN', 'MIN3']
-    setup_list = [('heat', 63, [10.0 ** i for i in range(-3, 3)]),
-                  ('advection', 64, [10.0 ** i for i in range(-3, 3)]),
-                  ('vanderpol', 2, [0.1 * 2 ** i for i in range(0, 10)]),
-                  ('fisher', 63, [2 ** i for i in range(-2, 3)])]
+    setup_list = [
+        ('heat', 63, [10.0**i for i in range(-3, 3)]),
+        ('advection', 64, [10.0**i for i in range(-3, 3)]),
+        ('vanderpol', 2, [0.1 * 2**i for i in range(0, 10)]),
+        ('fisher', 63, [2**i for i in range(-2, 3)]),
+    ]
     # setup_list = [('fisher', 63, [2 * i for i in range(1, 6)])]
 
     # pre-fill results with lists of  setups
@@ -104,7 +106,7 @@ def main(comm=None):
 
                 elif setup == 'vanderpol':
 
-                    problem_params['newton_tol'] = 1E-09
+                    problem_params['newton_tol'] = 1e-09
                     problem_params['newton_maxiter'] = 20
                     problem_params['mu'] = param
                     problem_params['u0'] = np.array([2.0, 0])
@@ -120,7 +122,7 @@ def main(comm=None):
                     problem_params['nu'] = 1
                     problem_params['lambda0'] = param
                     problem_params['newton_maxiter'] = 20
-                    problem_params['newton_tol'] = 1E-10
+                    problem_params['newton_tol'] = 1e-10
                     problem_params['interval'] = (-5, 5)
 
                     level_params['dt'] = 0.01
@@ -134,8 +136,9 @@ def main(comm=None):
                     exit()
 
                 # instantiate controller
-                controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+                controller = controller_nonMPI(
+                    num_procs=1, controller_params=controller_params, description=description
+                )
 
                 # get initial values on finest level
                 P = controller.MS[0].levels[0].prob
@@ -208,8 +211,16 @@ def plot_iterations():
                         niter[xvalue] = results[key]
             ls = '-'
             lw = 1
-            plt_helper.plt.semilogx(results[setup][1], niter, label=qd_type, lw=lw, linestyle=ls, color=color,
-                                    marker=marker, markeredgecolor='k')
+            plt_helper.plt.semilogx(
+                results[setup][1],
+                niter,
+                label=qd_type,
+                lw=lw,
+                linestyle=ls,
+                color=color,
+                marker=marker,
+                markeredgecolor='k',
+            )
 
         if setup == 'heat':
             xlabel = r'$\nu$'

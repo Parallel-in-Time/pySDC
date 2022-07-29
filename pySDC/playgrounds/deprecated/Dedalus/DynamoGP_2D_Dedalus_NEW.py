@@ -9,8 +9,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class dynamogp_2d_dedalus(ptype):
-    """
-    """
+    """ """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
@@ -38,9 +38,12 @@ class dynamogp_2d_dedalus(ptype):
         nvars = tuple(self.domain.local_grid_shape()) + (2,)
 
         # invoke super init, passing number of dofs (and more), dtype_u and dtype_f
-        super(dynamogp_2d_dedalus, self).__init__(init=(nvars, self.domain.dist.comm, ybasis.grid_dtype),
-                                                  dtype_u=dtype_u, dtype_f=dtype_f,
-                                                  params=problem_params)
+        super(dynamogp_2d_dedalus, self).__init__(
+            init=(nvars, self.domain.dist.comm, ybasis.grid_dtype),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.y = self.domain.grid(0, scales=1)
         self.z = self.domain.grid(1, scales=1)
@@ -74,8 +77,8 @@ class dynamogp_2d_dedalus(ptype):
 
         f = self.dtype_f(self.init)
 
-        A = np.sqrt(3/2)
-        C = np.sqrt(3/2)
+        A = np.sqrt(3 / 2)
+        C = np.sqrt(3 / 2)
 
         self.u['g'] = A * np.sin(self.z + np.sin(t)) + C * np.cos(self.y + np.cos(t))
         self.v['g'] = A * np.cos(self.z + np.sin(t))
@@ -91,17 +94,19 @@ class dynamogp_2d_dedalus(ptype):
         bz_y = self.bz.differentiate(y=1)
         bz_z = self.bz.differentiate(z=1)
 
-        tmpfy = (-self.u * self.by * 1j * self.params.kx - self.v * by_y - self.w * by_z +
-                 self.bz * self.v_z).evaluate()
+        tmpfy = (
+            -self.u * self.by * 1j * self.params.kx - self.v * by_y - self.w * by_z + self.bz * self.v_z
+        ).evaluate()
         f.expl[..., 0] = tmpfy['g']
-        tmpfz = (-self.u * self.bz * 1j * self.params.kx - self.v * bz_y - self.w * bz_z +
-                 self.by * self.w_y).evaluate()
+        tmpfz = (
+            -self.u * self.bz * 1j * self.params.kx - self.v * bz_y - self.w * bz_z + self.by * self.w_y
+        ).evaluate()
         f.expl[..., 1] = tmpfz['g']
 
         self.by['g'] = u[..., 0]
         self.bz['g'] = u[..., 1]
 
-        pseudo_dt = 1E-05
+        pseudo_dt = 1e-05
         self.solver.step(pseudo_dt)
 
         f.impl[..., 0] = 1.0 / pseudo_dt * (self.by['g'] - u[..., 0])

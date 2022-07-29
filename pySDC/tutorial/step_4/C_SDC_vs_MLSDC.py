@@ -13,7 +13,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-09
+    level_params['restol'] = 1e-09
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
@@ -71,8 +71,9 @@ def main():
 
     # instantiate the controller (no controller parameters used here)
     controller_sdc = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description_sdc)
-    controller_mlsdc = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                         description=description_mlsdc)
+    controller_mlsdc = controller_nonMPI(
+        num_procs=1, controller_params=controller_params, description=description_mlsdc
+    )
 
     # set time parameters
     t0 = 0.0
@@ -110,7 +111,7 @@ def main():
     f.write(out + '\n')
     print(out)
 
-    assert diff < 6E-10, "ERROR: difference between MLSDC and SDC is higher than expected, got %s" % diff
+    assert diff < 6e-10, "ERROR: difference between MLSDC and SDC is higher than expected, got %s" % diff
     assert niter_sdc - niter_mlsdc <= 6, "ERROR: MLSDC required more iterations than expected, got %s" % niter_mlsdc
 
 

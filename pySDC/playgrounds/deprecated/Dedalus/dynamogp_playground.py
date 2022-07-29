@@ -9,6 +9,7 @@ from pySDC.implementations.controller_classes.controller_MPI import controller_M
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.Dedalus.TransferDedalusFields import dedalus_field_transfer
+
 # from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus import dynamogp_2d_dedalus
 from pySDC.playgrounds.Dedalus.DynamoGP_2D_Dedalus_NEW import dynamogp_2d_dedalus
 from pySDC.playgrounds.Dedalus.Dynamo_monitor import monitor
@@ -43,12 +44,14 @@ def main():
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [1]
 
@@ -117,6 +120,7 @@ def main():
         plt.figure(3)
         plt.semilogy(times, [item[1] for item in bx_maxes])
         plt.pause(0.1)
+
 
 if __name__ == "__main__":
     main()

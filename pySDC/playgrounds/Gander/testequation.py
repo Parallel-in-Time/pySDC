@@ -76,8 +76,12 @@ def compare_preconditioners(f=None, list_of_k=None):
         print(out)
 
         # instantiate controller
-        controller_IE = controller_nonMPI(num_procs=1, controller_params=controller_params_IE, description=description_IE)
-        controller_LU = controller_nonMPI(num_procs=1, controller_params=controller_params_LU, description=description_LU)
+        controller_IE = controller_nonMPI(
+            num_procs=1, controller_params=controller_params_IE, description=description_IE
+        )
+        controller_LU = controller_nonMPI(
+            num_procs=1, controller_params=controller_params_LU, description=description_LU
+        )
 
         # get initial values on finest level
         P = controller_IE.MS[0].levels[0].prob

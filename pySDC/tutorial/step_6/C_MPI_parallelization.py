@@ -34,8 +34,10 @@ def main(cwd):
         #     print(line)
         #     if not line: break
         p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
-                                  (p.returncode, num_procs)
+        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
+            p.returncode,
+            num_procs,
+        )
 
     # set list of number of parallel steps (odd)
     num_procs_list = [3, 5, 7, 9]
@@ -55,8 +57,10 @@ def main(cwd):
         #     print(line)
         #     if not line: break
         p.wait()
-        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % \
-                                  (p.returncode, num_procs)
+        assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (
+            p.returncode,
+            num_procs,
+        )
 
 
 if __name__ == "__main__":

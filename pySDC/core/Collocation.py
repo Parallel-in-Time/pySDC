@@ -70,8 +70,7 @@ class CollBase(object):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes, tleft=0, tright=1,
-                 node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False):
+    def __init__(self, num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False):
         """
         Initialization routine for an collocation object
 
@@ -258,7 +257,8 @@ class CollBase(object):
         tcks = []
         for i in range(self.num_nodes):
             tcks.append(
-                intpl.splrep(self.nodes, np.roll(circ_one, i), xb=self.tleft, xe=self.tright, k=self.order, s=0.0))
+                intpl.splrep(self.nodes, np.roll(circ_one, i), xb=self.tleft, xe=self.tright, k=self.order, s=0.0)
+            )
 
         weights = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):

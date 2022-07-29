@@ -8,20 +8,22 @@ from pylab import rcParams
 
 def create_plots(setup, cwd=''):
     """
-        Function to create heatmaps for faults at different steps and iterations
+    Function to create heatmaps for faults at different steps and iterations
 
-        Args:
-            setup (str): name of the setup (heat or advection)
-            cwd: current working directory
-        """
+    Args:
+        setup (str): name of the setup (heat or advection)
+        cwd: current working directory
+    """
 
     axis_font = {'fontname': 'Arial', 'size': '8', 'family': 'serif'}
     fs = 8
 
-    fields = [(setup + '_results_hf_SPREAD.npz', 'SPREAD'),
-              (setup + '_results_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT'),
-              (setup + '_results_hf_INTERP.npz', 'INTERP'),
-              (setup + '_results_hf_INTERP_PREDICT.npz', 'INTERP_PREDICT')]
+    fields = [
+        (setup + '_results_hf_SPREAD.npz', 'SPREAD'),
+        (setup + '_results_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT'),
+        (setup + '_results_hf_INTERP.npz', 'INTERP'),
+        (setup + '_results_hf_INTERP_PREDICT.npz', 'INTERP_PREDICT'),
+    ]
 
     vmin = 99
     vmax = 0

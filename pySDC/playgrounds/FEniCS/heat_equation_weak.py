@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-12
+    level_params['restol'] = 5e-12
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     description = dict()
     description['problem_class'] = fenics_heat_weak_imex
     description['problem_params'] = problem_params
-    description['sweeper_class'] = imex_1st_order # pass sweeper (see part B)
+    description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters

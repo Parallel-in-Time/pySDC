@@ -46,8 +46,8 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -141,8 +141,7 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
                 errv = 1.0
             if cr[0] == 0.025:
                 err_test = errr
-            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
-                  f'{cr[1]:8.6f} / {exrad:8.6f} / {errr:6.4e}'
+            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' f'{cr[1]:8.6f} / {exrad:8.6f} / {errr:6.4e}'
             print(out)
             results[cr[0]] = (cr[1], exrad, errr, cv[1], exvol, errv)
         fname = f'./data/{name}_results.json'

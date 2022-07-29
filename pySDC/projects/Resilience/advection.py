@@ -21,14 +21,20 @@ def plot_embedded(stats, ax):
 
 
 class log_data(hooks):
-
     def post_iteration(self, step, level_number):
         super(log_data, self).post_iteration(step, level_number)
         if step.status.iter == step.params.maxiter - 1:
             L = step.levels[level_number]
             L.sweep.compute_end_point()
-            self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                              sweep=L.status.sweep, type='uold', value=L.uold[-1])
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time + L.dt,
+                level=L.level_index,
+                iter=0,
+                sweep=L.status.sweep,
+                type='uold',
+                value=L.uold[-1],
+            )
 
     def post_step(self, step, level_number):
 
@@ -39,14 +45,42 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_extrapolated',
+            value=L.status.error_extrapolation_estimate,
+        )
 
 
 def run_advection(custom_description, num_procs):
@@ -62,13 +96,7 @@ def run_advection(custom_description, num_procs):
     sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['QE'] = 'PIC'
 
-    problem_params = {
-        'freq': 2,
-        'nvars': 2**9,
-        'c': 1.,
-        'type': 'upwind',
-        'order': 5
-    }
+    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'upwind', 'order': 5}
 
     # initialize step parameters
     step_params = dict()
@@ -96,8 +124,7 @@ def run_advection(custom_description, num_procs):
 
     # instantiate controller
     controller_class = controller_nonMPI
-    controller = controller_class(num_procs=num_procs, controller_params=controller_params,
-                                  description=description)
+    controller = controller_class(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

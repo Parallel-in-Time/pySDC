@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from pySDC.core.Errors import ParameterError
@@ -61,8 +60,8 @@ class auzinger(ptype):
         x1 = u[0]
         x2 = u[1]
         f = self.dtype_f(self.init)
-        f[0] = -x2 + x1 * (1 - x1 ** 2 - x2 ** 2)
-        f[1] = x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)
+        f[0] = -x2 + x1 * (1 - x1**2 - x2**2)
+        f[1] = x1 + 3 * x2 * (1 - x1**2 - x2**2)
         return f
 
     def solve_system(self, rhs, dt, u0, t):
@@ -89,8 +88,12 @@ class auzinger(ptype):
         while n < self.params.newton_maxiter:
 
             # form the function g with g(u) = 0
-            g = np.array([x1 - dt * (-x2 + x1 * (1 - x1 ** 2 - x2 ** 2)) - rhs[0],
-                          x2 - dt * (x1 + 3 * x2 * (1 - x1 ** 2 - x2 ** 2)) - rhs[1]])
+            g = np.array(
+                [
+                    x1 - dt * (-x2 + x1 * (1 - x1**2 - x2**2)) - rhs[0],
+                    x2 - dt * (x1 + 3 * x2 * (1 - x1**2 - x2**2)) - rhs[1],
+                ]
+            )
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -99,8 +102,12 @@ class auzinger(ptype):
                 break
 
             # assemble dg and invert the matrix (yeah, I know)
-            dg = np.array([[1 - dt * (1 - 3 * x1 ** 2 - x2 ** 2), -dt * (-1 - 2 * x1 * x2)],
-                           [-dt * (1 - 6 * x1 * x2), 1 - dt * (3 - 3 * x1 ** 2 - 9 * x2 ** 2)]])
+            dg = np.array(
+                [
+                    [1 - dt * (1 - 3 * x1**2 - x2**2), -dt * (-1 - 2 * x1 * x2)],
+                    [-dt * (1 - 6 * x1 * x2), 1 - dt * (3 - 3 * x1**2 - 9 * x2**2)],
+                ]
+            )
 
             idg = np.linalg.inv(dg)
 

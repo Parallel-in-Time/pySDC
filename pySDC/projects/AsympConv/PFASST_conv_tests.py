@@ -42,7 +42,7 @@ def run_diffusion(nsweeps):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [nsweeps, 1]
 
@@ -94,7 +94,7 @@ def run_diffusion(nsweeps):
     for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
 
-        problem_params['nu'] = 10.0 ** i / ratio  # diffusion coefficient
+        problem_params['nu'] = 10.0**i / ratio  # diffusion coefficient
         description['problem_params'] = problem_params  # pass problem parameters
 
         out = 'Working on c = %6.4e' % problem_params['nu']
@@ -125,8 +125,9 @@ def run_diffusion(nsweeps):
         print(out)
 
         if nsweeps == 3 and (i == -3 or i == 9):
-            assert np.mean(niters) <= 2, 'ERROR: too much iterations for diffusive asymptotics, got %s' \
-                                         % np.mean(niters)
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for diffusive asymptotics, got %s' % np.mean(
+                niters
+            )
 
         results[cfl] = np.mean(niters)
 
@@ -148,7 +149,7 @@ def run_advection(nsweeps):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [nsweeps, 1]
 
@@ -202,7 +203,7 @@ def run_advection(nsweeps):
     for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1))
 
-        problem_params['c'] = 10.0 ** i / ratio  # diffusion coefficient
+        problem_params['c'] = 10.0**i / ratio  # diffusion coefficient
         description['problem_params'] = problem_params  # pass problem parameters
 
         out = 'Working on nu = %6.4e' % problem_params['c']
@@ -233,8 +234,9 @@ def run_advection(nsweeps):
         print(out)
 
         if nsweeps == 3 and (i == -3 or i == 9):
-            assert np.mean(niters) <= 2, 'ERROR: too much iterations for advective asymptotics, got %s' \
-                                         % np.mean(niters)
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for advective asymptotics, got %s' % np.mean(
+                niters
+            )
 
         results[cfl] = np.mean(niters)
 
@@ -275,14 +277,15 @@ def plot_results(nsweeps):
         niter_adv.append(results_adv[x])
 
     # set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # set up figure

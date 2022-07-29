@@ -7,7 +7,7 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 
 class switch_controller_nonMPI(controller_nonMPI):
     """
-        Controller class including switch handling
+    Controller class including switch handling
     """
 
     def __init__(self, num_procs, controller_params, description):
@@ -40,14 +40,17 @@ class switch_controller_nonMPI(controller_nonMPI):
             # send updated values forward
             self.hooks.pre_comm(step=S, level_number=0)
             if not S.status.last:
-                self.logger.debug('Process %2i provides data on level %2i with tag %s'
-                                  % (S.status.slot, 0, S.status.iter))
+                self.logger.debug(
+                    'Process %2i provides data on level %2i with tag %s' % (S.status.slot, 0, S.status.iter)
+                )
                 self.send(S.levels[0], tag=(0, S.status.iter, S.status.slot))
 
             # receive values
             if not S.status.prev_done and not S.status.first:
-                self.logger.debug('Process %2i receives from %2i on level %2i with tag %s' %
-                                  (S.status.slot, S.prev.status.slot, 0, S.status.iter))
+                self.logger.debug(
+                    'Process %2i receives from %2i on level %2i with tag %s'
+                    % (S.status.slot, S.prev.status.slot, 0, S.status.iter)
+                )
                 self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
             self.hooks.post_comm(step=S, level_number=0)
 
@@ -108,7 +111,7 @@ class switch_controller_nonMPI(controller_nonMPI):
 
     def switch_estimator(self, MS):
         """
-            Method to estimate a discrete event (switch)
+        Method to estimate a discrete event (switch)
         """
 
         for i in range(len(MS)):
@@ -133,7 +136,7 @@ class switch_controller_nonMPI(controller_nonMPI):
 
                 def switch_examiner(x):
                     """
-                        Routine to define root problem
+                    Routine to define root problem
                     """
 
                     return L.prob.params.V_ref - p(x)

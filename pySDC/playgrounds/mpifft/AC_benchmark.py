@@ -46,8 +46,8 @@ def run_simulation(name=''):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -91,7 +91,7 @@ def run_simulation(name=''):
 
     # set time parameters
     t0 = 0.0
-    Tend = 32*0.001
+    Tend = 32 * 0.001
 
     # instantiate controller
     controller = controller_MPI(controller_params=controller_params, description=description, comm=time_comm)
@@ -134,11 +134,10 @@ def run_simulation(name=''):
         # print radii and error over time
         for cr, er in zip(computed_radii, exact_radii):
             if er[1] > 0:
-                err = abs(cr[1] - er[1])/er[1]
+                err = abs(cr[1] - er[1]) / er[1]
             else:
                 err = 1.0
-            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' \
-                  f'{cr[1]:6.4f} / {er[1]:6.4f} / {err:6.4e}'
+            out = f'Computed/exact/error radius for time {cr[0]:6.4f}: ' f'{cr[1]:6.4f} / {er[1]:6.4f} / {err:6.4e}'
             print(out)
 
 

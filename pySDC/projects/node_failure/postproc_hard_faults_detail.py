@@ -1,9 +1,11 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
 import matplotlib.pyplot as plt
 from pylab import rcParams
+
 # import os
 
 
@@ -21,13 +23,13 @@ def create_plots(setup, cwd=''):
     fs = 8  # fontsize
 
     # assemble list of setups
-    setup_list = [(setup + '_steps_vs_iteration_hf_NOFAULT.npz', 'NOFAULT', 'no fault', 'k', '^'),
-                  (setup + '_steps_vs_iteration_hf_SPREAD.npz', 'SPREAD', '1-sided', 'red', 'v'),
-                  (setup + '_steps_vs_iteration_hf_INTERP.npz', 'INTERP', '2-sided', 'orange', 'o'),
-                  (setup + '_steps_vs_iteration_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT',
-                   '1-sided + corr', 'blue', 's'),
-                  (setup + '_steps_vs_iteration_hf_INTERP_PREDICT.npz', 'INTERP_PREDICT',
-                   '2-sided + corr', 'green', 'd')]
+    setup_list = [
+        (setup + '_steps_vs_iteration_hf_NOFAULT.npz', 'NOFAULT', 'no fault', 'k', '^'),
+        (setup + '_steps_vs_iteration_hf_SPREAD.npz', 'SPREAD', '1-sided', 'red', 'v'),
+        (setup + '_steps_vs_iteration_hf_INTERP.npz', 'INTERP', '2-sided', 'orange', 'o'),
+        (setup + '_steps_vs_iteration_hf_SPREAD_PREDICT.npz', 'SPREAD_PREDICT', '1-sided + corr', 'blue', 's'),
+        (setup + '_steps_vs_iteration_hf_INTERP_PREDICT.npz', 'INTERP_PREDICT', '2-sided + corr', 'green', 'd'),
+    ]
 
     maxres = -1
     minres = -11
@@ -52,7 +54,7 @@ def create_plots(setup, cwd=''):
         step = infile['ft_step']
         iter = infile['ft_iter']
 
-        residual[0:len(input[:, 0]), 0:len(input[0, :])] = input
+        residual[0 : len(input[:, 0]), 0 : len(input[0, :])] = input
 
         rcParams['figure.figsize'] = 3.0, 2.5
         fig, ax = plt.subplots()
@@ -112,11 +114,29 @@ def create_plots(setup, cwd=''):
         maxiter = max(maxiter, len(yvals))
         xvals = range(1, len(yvals) + 1)
 
-        plt.plot(xvals[0:iter], yvals[0:iter], color=color, linewidth=lw, linestyle='-', markersize=ms, marker=marker,
-                 markeredgecolor='k', markerfacecolor=color, label=label)
-        plt.plot(xvals[iter:len(yvals)], yvals[iter:], color=color, linewidth=lw, linestyle='-', markersize=ms,
-                 marker=marker,
-                 markeredgecolor='k', markerfacecolor=color)
+        plt.plot(
+            xvals[0:iter],
+            yvals[0:iter],
+            color=color,
+            linewidth=lw,
+            linestyle='-',
+            markersize=ms,
+            marker=marker,
+            markeredgecolor='k',
+            markerfacecolor=color,
+            label=label,
+        )
+        plt.plot(
+            xvals[iter : len(yvals)],
+            yvals[iter:],
+            color=color,
+            linewidth=lw,
+            linestyle='-',
+            markersize=ms,
+            marker=marker,
+            markeredgecolor='k',
+            markerfacecolor=color,
+        )
 
     xvals = range(1, maxiter + 1)
     plt.plot(xvals, [-9 for _ in range(maxiter)], 'k--')
@@ -129,8 +149,16 @@ def create_plots(setup, cwd=''):
     right = left + width
     top = bottom + height
     rect = plt.Rectangle(xy=(left, bottom), width=width, height=height, color='lightgrey')
-    plt.text(0.5 * (left + right), 0.5 * (bottom + top), 'node failure', horizontalalignment='center',
-             verticalalignment='center', rotation=90, color='k', fontsize=fs)
+    plt.text(
+        0.5 * (left + right),
+        0.5 * (bottom + top),
+        'node failure',
+        horizontalalignment='center',
+        verticalalignment='center',
+        rotation=90,
+        color='k',
+        fontsize=fs,
+    )
     fig.gca().add_artist(rect)
 
     plt.xlim(1 - 0.25, maxiter + 0.25)

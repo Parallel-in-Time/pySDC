@@ -20,7 +20,7 @@ def diffusion_setup(par=0.0):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -73,7 +73,7 @@ def advection_setup(par=0.0):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -129,7 +129,7 @@ def scalar_equation_setup():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [3, 1]
 
@@ -249,13 +249,14 @@ def compare_controllers(type=None, par=0.0, f=None):
     f.write(out + '\n')
     print(out)
 
-    assert err_mat_prop < 2.0E-14, \
+    assert err_mat_prop < 2.0e-14, (
         'ERROR: difference between matrix-based and propagator result is too large, got %s' % err_mat_prop
+    )
 
 
 def main():
 
-    par_list = [1E-02, 1.0, 1E+02]
+    par_list = [1e-02, 1.0, 1e02]
 
     f = open('comparison_matrix_vs_propagator_detail.txt', 'w')
     for par in par_list:

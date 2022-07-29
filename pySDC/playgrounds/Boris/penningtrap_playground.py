@@ -16,7 +16,7 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.015625
 
     # initialize sweeper parameters
@@ -77,7 +77,7 @@ def main():
     plt.xlabel('Time')
     plt.ylabel('Energy')
 
-    plt.savefig('penningtrap_energy.png',  transparent=True, bbox_inches='tight')
+    plt.savefig('penningtrap_energy.png', transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":

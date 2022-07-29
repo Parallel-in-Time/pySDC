@@ -12,6 +12,7 @@ class heat2d_dedalus_forced(ptype):
     """
     Example implementing the forced 2D heat equation with periodic BC in [0,1], discretized using Dedalus
     """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -41,8 +42,9 @@ class heat2d_dedalus_forced(ptype):
         domain = de.Domain([xbasis, ybasis], grid_dtype=np.float64, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat2d_dedalus_forced, self).__init__(init=domain, dtype_u=dtype_u, dtype_f=dtype_f,
-                                                    params=problem_params)
+        super(heat2d_dedalus_forced, self).__init__(
+            init=domain, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         self.x = self.init.grid(0, scales=1)
         self.y = self.init.grid(1, scales=1)
@@ -66,10 +68,15 @@ class heat2d_dedalus_forced(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.impl.values = (self.params.nu * de.operators.differentiate(u.values, x=2) +
-                         self.params.nu * de.operators.differentiate(u.values, y=2)).evaluate()
-        f.expl.values['g'] = -np.sin(np.pi * self.params.freq * self.x) * np.sin(np.pi * self.params.freq * self.y) * \
-                             (np.sin(t) - 2.0 * self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        f.impl.values = (
+            self.params.nu * de.operators.differentiate(u.values, x=2)
+            + self.params.nu * de.operators.differentiate(u.values, y=2)
+        ).evaluate()
+        f.expl.values['g'] = (
+            -np.sin(np.pi * self.params.freq * self.x)
+            * np.sin(np.pi * self.params.freq * self.y)
+            * (np.sin(t) - 2.0 * self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        )
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -109,6 +116,7 @@ class heat2d_dedalus_forced(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me.values['g'] = np.sin(np.pi * self.params.freq * self.x) * np.sin(np.pi * self.params.freq * self.y) * \
-            np.cos(t)
+        me.values['g'] = (
+            np.sin(np.pi * self.params.freq * self.x) * np.sin(np.pi * self.params.freq * self.y) * np.cos(t)
+        )
         return me

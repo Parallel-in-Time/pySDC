@@ -1,4 +1,3 @@
-
 import logging
 
 import dolfin as df
@@ -36,20 +35,22 @@ class fenics_vortex_2d(ptype):
             # Left boundary is "target domain" G
             def inside(self, x, on_boundary):
                 # return True if on left or bottom boundary AND NOT on one of the two corners (0, 1) and (1, 0)
-                return bool((df.near(x[0], 0) or df.near(x[1], 0)) and
-                            (not ((df.near(x[0], 0) and df.near(x[1], 1)) or
-                                  (df.near(x[0], 1) and df.near(x[1], 0)))) and on_boundary)
+                return bool(
+                    (df.near(x[0], 0) or df.near(x[1], 0))
+                    and (not ((df.near(x[0], 0) and df.near(x[1], 1)) or (df.near(x[0], 1) and df.near(x[1], 0))))
+                    and on_boundary
+                )
 
             def map(self, x, y):
                 if df.near(x[0], 1) and df.near(x[1], 1):
-                    y[0] = x[0] - 1.
-                    y[1] = x[1] - 1.
+                    y[0] = x[0] - 1.0
+                    y[1] = x[1] - 1.0
                 elif df.near(x[0], 1):
-                    y[0] = x[0] - 1.
+                    y[0] = x[0] - 1.0
                     y[1] = x[1]
                 else:  # near(x[1], 1)
                     y[0] = x[0]
-                    y[1] = x[1] - 1.
+                    y[1] = x[1] - 1.0
 
         # these parameters will be used later, so assert their existence
         essential_keys = ['c_nvars', 'family', 'order', 'refinements', 'nu', 'rho', 'delta']
@@ -74,8 +75,9 @@ class fenics_vortex_2d(ptype):
         self.mesh = df.Mesh(mesh)
 
         # define function space for future reference
-        self.V = df.FunctionSpace(mesh, problem_params['family'], problem_params['order'],
-                                  constrained_domain=PeriodicBoundary())
+        self.V = df.FunctionSpace(
+            mesh, problem_params['family'], problem_params['order'], constrained_domain=PeriodicBoundary()
+        )
         tmp = df.Function(self.V)
         print('DoFs on this level:', len(tmp.vector().vector()[:]))
 
@@ -134,8 +136,9 @@ class fenics_vortex_2d(ptype):
         df.solve(A, psi.values.vector(), b.values.vector())
 
         fexpl = self.dtype_u(self.V)
-        fexpl.values = df.project(df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1),
-                                  self.V)
+        fexpl.values = df.project(
+            df.Dx(psi.values, 1) * df.Dx(u.values, 0) - df.Dx(psi.values, 0) * df.Dx(u.values, 1), self.V
+        )
 
         return fexpl
 
@@ -221,7 +224,8 @@ class fenics_vortex_2d(ptype):
             dtype_u: exact solution
         """
 
-        w = df.Expression('r*(1-pow(tanh(r*((0.75-4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-4))),2)) - \
+        w = df.Expression(
+            'r*(1-pow(tanh(r*((0.75-4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-4))),2)) - \
                            r*(1-pow(tanh(r*((0.75-3) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-3))),2)) - \
                            r*(1-pow(tanh(r*((0.75-2) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-2))),2)) - \
                            r*(1-pow(tanh(r*((0.75-1) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-1))),2)) - \
@@ -231,7 +235,11 @@ class fenics_vortex_2d(ptype):
                            r*(1-pow(tanh(r*((0.75+3) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+3))),2)) - \
                            r*(1-pow(tanh(r*((0.75+4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25+4))),2)) - \
                            d*2*a*cos(2*a*(x[0]+0.25))',
-                          d=self.params.delta, r=self.params.rho, a=np.pi, degree=self.params.order)
+            d=self.params.delta,
+            r=self.params.rho,
+            a=np.pi,
+            degree=self.params.order,
+        )
 
         me = self.dtype_u(self.V)
         me.values = df.interpolate(w, self.V)

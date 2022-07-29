@@ -2,7 +2,7 @@ import numpy as np
 from petsc4py import PETSc
 
 n = 4
-dx = 1.0/(n + 1)
+dx = 1.0 / (n + 1)
 
 da = PETSc.DMDA().create([n, n], stencil_width=1, comm=PETSc.COMM_WORLD)
 
@@ -27,23 +27,31 @@ x.assemblyEnd()
 A = da.createMatrix()
 A.setType('aij')  # sparse
 A.setFromOptions()
-A.setPreallocationNNZ((5,5))
+A.setPreallocationNNZ((5, 5))
 A.setUp()
 
 
-diagv = -2.0 / dx ** 2 - 2.0 / dx ** 2
-offdx = (1.0 / dx ** 2)
-offdy = (1.0 / dx ** 2)
+diagv = -2.0 / dx**2 - 2.0 / dx**2
+offdx = 1.0 / dx**2
+offdy = 1.0 / dx**2
 
 Istart, Iend = A.getOwnershipRange()
 for I in range(Istart, Iend):
     A.setValue(I, I, diagv)
     i = I // n  # map row number to
     j = I - i * n  # grid coordinates
-    if i > 0: J = I - n; A.setValues(I, J, offdx)
-    if i < n - 1: J = I + n; A.setValues(I, J, offdx)
-    if j > 0: J = I - 1; A.setValues(I, J, offdy)
-    if j < n - 1: J = I + 1; A.setValues(I, J, offdy)
+    if i > 0:
+        J = I - n
+        A.setValues(I, J, offdx)
+    if i < n - 1:
+        J = I + n
+        A.setValues(I, J, offdx)
+    if j > 0:
+        J = I - 1
+        A.setValues(I, J, offdy)
+    if j < n - 1:
+        J = I + 1
+        A.setValues(I, J, offdy)
 A.assemblyBegin()
 A.assemblyEnd()
 
@@ -51,5 +59,4 @@ A.mult(x, b)
 
 rank = PETSc.COMM_WORLD.getRank()
 print(rank, b.getArray())
-print((b-y).norm(PETSc.NormType.NORM_INFINITY))
-
+print((b - y).norm(PETSc.NormType.NORM_INFINITY))

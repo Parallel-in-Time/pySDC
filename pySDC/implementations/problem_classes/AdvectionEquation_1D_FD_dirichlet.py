@@ -45,8 +45,12 @@ class advection1d_dirichlet(ptype):
             problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection1d_dirichlet, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                                    dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(advection1d_dirichlet, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / (self.params.nvars + 1)

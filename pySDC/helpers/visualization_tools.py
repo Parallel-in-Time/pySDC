@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 from pySDC.helpers.stats_helper import filter_stats

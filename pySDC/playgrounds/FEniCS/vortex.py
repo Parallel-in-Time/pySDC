@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-09
+    level_params['restol'] = 5e-09
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -54,8 +54,7 @@ if __name__ == "__main__":
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # quickly generate block of steps
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                             description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

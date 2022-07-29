@@ -7,6 +7,7 @@ def test_main():
     main()
     plot_graphs()
 
+
 def test_newton_vs_sdc():
     main_newton_vs_sdc()
     plot_graphs_newton_vs_sdc()

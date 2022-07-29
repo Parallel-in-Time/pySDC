@@ -20,7 +20,7 @@ def set_parameters_ml():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
@@ -38,7 +38,7 @@ def set_parameters_ml():
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-05
+    step_params['errtol'] = 1e-05
 
     # initialize space transfer parameters
     space_transfer_params = dict()

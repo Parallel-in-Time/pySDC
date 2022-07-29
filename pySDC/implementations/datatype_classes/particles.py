@@ -44,8 +44,11 @@ class particles(object):
             self.q = init.q.copy()
             self.m = init.m.copy()
         # if init is a number, create particles object and pick the corresponding initial values
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], np.dtype)
+        ):
             if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.pos = particles.position(init, val=val)
                 self.vel = particles.velocity(init, val=val)
@@ -241,8 +244,11 @@ class fields(object):
             self.elec = fields.electric(init.elec)
             self.magn = fields.magnetic(init.magn)
         # if init is a number, create fields object and pick the corresponding initial values
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], np.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], np.dtype)
+        ):
             if isinstance(val, int) or isinstance(val, float) or val is None:
                 self.elec = fields.electric(init, val=val)
                 self.magn = fields.magnetic(init, val=val)

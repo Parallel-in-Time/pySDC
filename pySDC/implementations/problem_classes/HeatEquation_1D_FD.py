@@ -40,8 +40,12 @@ class heat1d(ptype):
             raise ProblemError('setup requires nvars = 2^p - 1')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                     dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(heat1d, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / (self.params.nvars + 1)
@@ -63,7 +67,7 @@ class heat1d(ptype):
 
         stencil = [1, -2, 1]
         A = sp.diags(stencil, [-1, 0, 1], shape=(N, N), format='csc')
-        A *= nu / (dx ** 2)
+        A *= nu / (dx**2)
         return A
 
     def eval_f(self, u, t):
@@ -114,9 +118,8 @@ class heat1d(ptype):
         me = self.dtype_u(self.init)
         if self.params.freq >= 0:
             xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars)])
-            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx ** 2
-            me[:] = np.sin(np.pi * self.params.freq * xvalues) * \
-                np.exp(-t * self.params.nu * rho)
+            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx**2
+            me[:] = np.sin(np.pi * self.params.freq * xvalues) * np.exp(-t * self.params.nu * rho)
         else:
             np.random.seed(1)
             me[:] = np.random.rand(self.params.nvars)

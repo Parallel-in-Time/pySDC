@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from pySDC.core.Problem import ptype
@@ -48,8 +47,8 @@ class planewave_single(ptype):
         f = self.dtype_f(((3, self.nparts), self.init[1], self.init[2]))
 
         R = np.linalg.norm(part.pos[:, 0], 2)
-        f.elec[0, 0] = self.params.a0 / (R ** 3) * part.pos[0, 0]
-        f.elec[1, 0] = self.params.a0 / (R ** 3) * part.pos[1, 0]
+        f.elec[0, 0] = self.params.a0 / (R**3) * part.pos[0, 0]
+        f.elec[1, 0] = self.params.a0 / (R**3) * part.pos[1, 0]
         f.elec[2, 0] = 0
 
         f.magn[0, 0] = 0
@@ -97,8 +96,7 @@ class planewave_single(ptype):
 
         assert isinstance(part, particles)
         rhs = acceleration(((3, self.nparts), self.init[1], self.init[2]))
-        rhs[:, 0] = part.q[:] / part.m[:] * \
-            (f.elec[:, 0] + np.cross(part.vel[:, 0], f.magn[:, 0]))
+        rhs[:, 0] = part.q[:] / part.m[:] * (f.elec[:, 0] + np.cross(part.vel[:, 0], f.magn[:, 0]))
 
         return rhs
 
@@ -124,8 +122,7 @@ class planewave_single(ptype):
         for n in range(N):
             a = old_parts.q[n] / old_parts.m[n]
 
-            c[:, n] += dt / 2 * a * \
-                np.cross(old_parts.vel[:, n], old_fields.magn[:, n] - new_fields.magn[:, n])
+            c[:, n] += dt / 2 * a * np.cross(old_parts.vel[:, n], old_fields.magn[:, n] - new_fields.magn[:, n])
 
             # pre-velocity, separated by the electric forces (and the c term)
             vm = old_parts.vel[:, n] + dt / 2 * a * Emean[:, n] + c[:, n] / 2

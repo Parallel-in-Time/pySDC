@@ -17,7 +17,7 @@ from pySDC.projects.parallelSDC.linearized_implicit_parallel import linearized_i
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.01
 
     # This comes as read-in for the step class (this is optional!)
@@ -30,7 +30,7 @@ def main():
     problem_params['nvars'] = 255
     problem_params['lambda0'] = 5.0
     problem_params['newton_maxiter'] = 50
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['interval'] = (-5, 5)
 
     # This comes as read-in for the sweeper class
@@ -52,8 +52,12 @@ def main():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
-    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel_prec, linearized_implicit_fixed_parallel,
-                    linearized_implicit_parallel]
+    sweeper_list = [
+        generic_implicit,
+        linearized_implicit_fixed_parallel_prec,
+        linearized_implicit_fixed_parallel,
+        linearized_implicit_parallel,
+    ]
 
     f = open('parallelSDC_nonlinear_out.txt', 'w')
     uinit = None
@@ -99,12 +103,13 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
-        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % \
-              (float(np.std(niters)), float(np.var(niters)))
+        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         f.write(out + '\n')
         print(out)
@@ -113,8 +118,9 @@ def main():
         print()
 
         assert err < 3.686e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
-        assert np.mean(niters) == 7.5 or np.mean(niters) == 4.0, \
-            'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
+        assert (
+            np.mean(niters) == 7.5 or np.mean(niters) == 4.0
+        ), 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
 
     f.close()
 

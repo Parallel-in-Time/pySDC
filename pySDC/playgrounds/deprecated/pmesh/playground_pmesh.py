@@ -1,5 +1,6 @@
 from mpi4py import MPI
 import matplotlib
+
 matplotlib.use("TkAgg")
 import numpy as np
 import time
@@ -13,22 +14,25 @@ from pySDC.playgrounds.pmesh.PMESH_datatype import pmesh_datatype, rhs_imex_pmes
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
     # xx, yy = np.meshgrid(r[0], r[1])
-    return np.sin(2*np.pi*r[0]) * np.sin(2*np.pi*r[1])
+    return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
+
 
 def Lap_doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
     # xx, yy = np.meshgrid(r[0], r[1])
-    return -2.0 * (2.0 * np.pi) ** 2 * np.sin(2*np.pi*r[0]) * np.sin(2*np.pi*r[1])
+    return -2.0 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
+
 
 def Laplacian(k, v):
-    k2 = sum(ki ** 2 for ki in k)
+    k2 = sum(ki**2 for ki in k)
     # print([type(ki[0][0]) for ki in k])
     # k2[k2 == 0] = 1.0
     return -k2 * v
 
+
 def circle(i, v):
     r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
-    r2 = sum(ri ** 2 for ri in r)
+    r2 = sum(ri**2 for ri in r)
     return np.tanh((0.25 - np.sqrt(r2)) / (np.sqrt(2) * 0.04))
 
 
@@ -93,7 +97,7 @@ t0 = time.perf_counter()
 # exit()
 
 pmf = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, comm=comm)
-pmc = ParticleMesh(BoxSize=1.0, Nmesh=[nvars//2] * 2, comm=comm)
+pmc = ParticleMesh(BoxSize=1.0, Nmesh=[nvars // 2] * 2, comm=comm)
 
 uexf = pmf.create(type='real')
 uexf = uexf.apply(doublesine, kind='index')
@@ -104,17 +108,17 @@ uexc = uexc.apply(doublesine, kind='index')
 # uc = pmc.upsample(uexf, keep_mean=True)
 uc = pmc.create(type='real')
 uexf.resample(uc)
-print(uc.preview().shape, np.amax(abs(uc-uexc)))
+print(uc.preview().shape, np.amax(abs(uc - uexc)))
 
 uf = pmf.create(type='real')
 # uf = pmf.upsample(uexc, keep_mean=True)
 
 uexc.resample(uf)
-print(uf.preview().shape, np.amax(abs(uf-uexf)))
+print(uf.preview().shape, np.amax(abs(uf - uexf)))
 print()
 
 pmf = ParticleMesh(BoxSize=1.0, Nmesh=[nvars] * 2, comm=comm)
-pmc = ParticleMesh(BoxSize=1.0, Nmesh=[nvars//2] * 2, comm=comm)
+pmc = ParticleMesh(BoxSize=1.0, Nmesh=[nvars // 2] * 2, comm=comm)
 
 uexf = pmf.create(type='real')
 uexf = uexf.apply(doublesine, kind='index')
@@ -127,13 +131,13 @@ uexc = uexc.r2c()
 # uc = pmc.upsample(uexf, keep_mean=True)
 uc = pmc.create(type='complex')
 uexf.resample(uc)
-print(uc.value.shape, np.amax(abs(uc-uexc)))
+print(uc.value.shape, np.amax(abs(uc - uexc)))
 
 uf = pmf.create(type='complex')
 # uf = pmf.upsample(uexc, keep_mean=True)
 
 uexc.resample(uf)
-print(uf.preview().shape, np.amax(abs(uf-uexf)))
+print(uf.preview().shape, np.amax(abs(uf - uexf)))
 print()
 
 t1 = time.perf_counter()

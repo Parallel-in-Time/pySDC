@@ -47,8 +47,12 @@ class advection1d(ptype):
             problem_params['type'] = 'upwind'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection1d, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                          dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(advection1d, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars
@@ -121,8 +125,12 @@ class advection1d(ptype):
                 raise ProblemError("Order " + str(order) + " not implemented.")
 
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        offsets = np.concatenate(
+            (
+                [N - i - 1 for i in reversed(range(zero_pos - 1))],
+                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
+            )
+        )
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')

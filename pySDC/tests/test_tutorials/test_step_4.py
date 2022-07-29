@@ -7,11 +7,14 @@ from pySDC.tutorial.step_4.D_MLSDC_with_particles import main as main_D
 def test_A():
     main_A()
 
+
 def test_B():
     main_B()
 
+
 def test_C():
     main_C()
+
 
 def test_D():
     main_D()

@@ -27,7 +27,7 @@ def compute_and_plot_itererror():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = Tend
 
     # This comes as read-in for the step class
@@ -77,8 +77,9 @@ def compute_and_plot_itererror():
             description['sweeper_params'] = sweeper_params
 
             # instantiate the controller
-            controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=num_procs, controller_params=controller_params, description=description
+            )
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
             uinit = P.u_exact(t0)
@@ -101,11 +102,13 @@ def compute_and_plot_itererror():
                 if residual[cs_ind, nodes_ind, iter] < level_params['restol']:
                     lastiter[cs_ind, nodes_ind] = iter
                 else:
-                    convrate[cs_ind, nodes_ind, iter] = residual[cs_ind, nodes_ind, iter + 1] / \
-                        residual[cs_ind, nodes_ind, iter]
+                    convrate[cs_ind, nodes_ind, iter] = (
+                        residual[cs_ind, nodes_ind, iter + 1] / residual[cs_ind, nodes_ind, iter]
+                    )
                 print(lastiter[cs_ind, nodes_ind])
-                avg_convrate[cs_ind, nodes_ind] = np.sum(convrate[cs_ind, nodes_ind, :]) / \
-                    float(lastiter[cs_ind, nodes_ind])
+                avg_convrate[cs_ind, nodes_ind] = np.sum(convrate[cs_ind, nodes_ind, :]) / float(
+                    lastiter[cs_ind, nodes_ind]
+                )
 
     # Plot the results
     fs = 8
@@ -116,9 +119,16 @@ def compute_and_plot_itererror():
     fig = plt.figure()
     for ii in range(0, np.size(cs_v)):
         x = np.arange(1, lastiter[ii, 0] - 1)
-        y = convrate[ii, 0, 0:int(lastiter[ii, 0]) - 2]
-        plt.plot(x, y, linestyle='-', marker=shape[ii], markersize=fs - 2, color=color[ii],
-                 label=r'$C_{fast}$=%4.2f' % (cs_v[ii] * level_params['dt'] / P.dx))
+        y = convrate[ii, 0, 0 : int(lastiter[ii, 0]) - 2]
+        plt.plot(
+            x,
+            y,
+            linestyle='-',
+            marker=shape[ii],
+            markersize=fs - 2,
+            color=color[ii],
+            label=r'$C_{fast}$=%4.2f' % (cs_v[ii] * level_params['dt'] / P.dx),
+        )
 
     plt.legend(loc='upper right', fontsize=fs, prop={'size': fs - 2})
     plt.xlabel('Iteration', fontsize=fs)

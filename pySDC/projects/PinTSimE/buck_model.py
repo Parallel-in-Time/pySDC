@@ -17,8 +17,8 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-5
+    level_params['restol'] = 1e-12
+    level_params['dt'] = 1e-5
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -51,11 +51,11 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = buck_converter   # pass problem class
+    description['problem_class'] = buck_converter  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order   # pass sweeper
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params      # pass level parameters
+    description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
@@ -69,8 +69,7 @@ def main():
     Tend = 2e-2
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

@@ -28,8 +28,8 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-11
-    level_params['dt'] = 1E-05
+    level_params['restol'] = 1e-11
+    level_params['dt'] = 1e-05
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -45,8 +45,8 @@ def setup_parameters():
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-12
-    problem_params['lin_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
+    problem_params['lin_tol'] = 1e-12
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -84,8 +84,8 @@ def setup_parameters_FFT():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-11
-    level_params['dt'] = 1E-04
+    level_params['restol'] = 1e-11
+    level_params['dt'] = 1e-04
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
@@ -101,8 +101,8 @@ def setup_parameters_FFT():
     problem_params['nvars'] = [(128, 128)]
     problem_params['eps'] = [0.04]
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-12
-    problem_params['lin_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
+    problem_params['lin_tol'] = 1e-12
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -142,8 +142,7 @@ def run_reference(Tend):
     t0 = 0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -164,8 +163,7 @@ def run_reference(Tend):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
@@ -198,7 +196,6 @@ def main(cwd=''):
 
     loaded = np.load(fname)
     uend = loaded['uend']
-
 
 
 if __name__ == "__main__":
