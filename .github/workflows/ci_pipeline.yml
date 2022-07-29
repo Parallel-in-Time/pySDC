@@ -23,7 +23,7 @@ jobs:
       - name: Cache conda
         uses: actions/cache@v2
         env:
-          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          # Increase this value to reset cache if file has not changed
           CACHE_NUMBER: 4
         with:
           path: ~/conda_pkgs_dir
@@ -64,12 +64,12 @@ jobs:
       - name: Cache conda
         uses: actions/cache@v2
         env:
-          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          # Increase this value to reset cache if file has not changed
           CACHE_NUMBER: 4
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('requirements.txt') }}
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment.yml') }}
 
       - name: act workarounds
         if: ${{ env.ACT }}
