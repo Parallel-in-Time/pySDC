@@ -1,4 +1,7 @@
 name: pySDC
+channels:
+  - conda-forge
+  - defaults
 dependencies:
   - numpy>=1.15.4
   - scipy>=0.17.1
