@@ -48,14 +48,16 @@ jobs:
           mamba-version: "*"
           channels: conda-forge,defaults
           channel-priority: true
+          activate-environment: pySDC
+          environment-file: etc/environment.yml
 
-      - name: Install dependencies
-        run: |
-          mamba install --yes --override-channel -c conda-forge --file requirements.txt
+#      - name: Install dependencies
+#        run: |
+#          mamba install --yes --override-channel -c conda-forge --file requirements.txt
 
-      - name: Lint with flake8
+      - name: Lint with flakeheaven
         run: |
-          flake8 pySDC
+          flakeheaven lint pySDC
 
       - name: Run pytest
         run: |
