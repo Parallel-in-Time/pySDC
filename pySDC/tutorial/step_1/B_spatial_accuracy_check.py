@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 from collections import namedtuple
@@ -24,7 +25,7 @@ def main():
     problem_params['freq'] = 4  # frequency for the test value
 
     # create list of nvars to do the accuracy test with
-    nvars_list = [2 ** p - 1 for p in range(4, 15)]
+    nvars_list = [2**p - 1 for p in range(4, 15)]
 
     # run accuracy test for all nvars
     results = run_accuracy_check(nvars_list=nvars_list, problem_params=problem_params)
@@ -44,7 +45,7 @@ def main():
 
     assert os.path.isfile('step_1_accuracy_test_space.png'), 'ERROR: plotting did not create file'
 
-    assert (all(np.isclose(order, 2, rtol=0.06))), "ERROR: spatial order of accuracy is not as expected, got %s" % order
+    assert all(np.isclose(order, 2, rtol=0.06)), "ERROR: spatial order of accuracy is not as expected, got %s" % order
 
 
 def run_accuracy_check(nvars_list, problem_params):
@@ -74,7 +75,7 @@ def run_accuracy_check(nvars_list, problem_params):
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap[:] = -(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
+        u_lap[:] = -((np.pi * prob.params.freq) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
 
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
@@ -131,14 +132,15 @@ def plot_accuracy(results):
     nvars_list = sorted(results['nvars_list'])
 
     # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # create new figure
@@ -157,8 +159,8 @@ def plot_accuracy(results):
     order_guide_space = [base_error / (2 ** (2 * i)) for i in range(0, len(nvars_list))]
     plt.loglog(nvars_list, order_guide_space, color='k', ls='--', label='2nd order')
 
-    min_err = 1E99
-    max_err = 0E00
+    min_err = 1e99
+    max_err = 0e00
     err_list = []
     # loop over nvars, get errors and find min/max error for y-axis limits
     for nvars in nvars_list:

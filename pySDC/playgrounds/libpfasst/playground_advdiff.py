@@ -16,7 +16,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = 0.9 / 32
     level_params['nsweeps'] = 1
 
@@ -31,10 +31,10 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.02  # diffusion coefficient
-    problem_params['c'] = 1.0   # advection speed
+    problem_params['c'] = 1.0  # advection speed
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [256, 128]  # number of degrees of freedom for each level
-    problem_params['L'] = 1.0   # length of the interval [-L/2, L/2]
+    problem_params['L'] = 1.0  # length of the interval [-L/2, L/2]
 
     # initialize step parameters
     step_params = dict()
@@ -49,7 +49,7 @@ def main():
     # fill description dictionary for easy step instantiation
     description = dict()
     # description['problem_class'] = advectiondiffusion1d_imex # pass problem class
-    description['problem_class'] = advectiondiffusion1d_implicit # pass problem class
+    description['problem_class'] = advectiondiffusion1d_implicit  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     # description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_class'] = generic_implicit  # pass sweeper
@@ -98,8 +98,7 @@ def main():
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)

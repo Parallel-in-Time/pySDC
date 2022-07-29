@@ -14,7 +14,6 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -24,10 +23,24 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C', value=L.uend[1])
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C',
+            value=L.uend[1],
+        )
 
 
 def main():
@@ -37,8 +50,8 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
-    level_params['dt'] = 1E-3
+    level_params['restol'] = 1e-10
+    level_params['dt'] = 1e-3
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -136,7 +149,7 @@ def main():
 
 def plot_voltages(cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
     f = open(cwd + 'battery.dat', 'rb')

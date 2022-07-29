@@ -21,7 +21,7 @@ def main(ft_setups, ft_strategies):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-09
+    level_params['restol'] = 1e-09
 
     # initialize step parameters
     step_params = dict()
@@ -116,8 +116,9 @@ def main(ft_setups, ft_strategies):
             ft.hard_step = ft_step
             ft.hard_iter = ft_iter
 
-            controller = controller_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
-                                                       description=description)
+            controller = controller_nonMPI_hard_faults(
+                num_procs=num_procs, controller_params=controller_params, description=description
+            )
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -143,8 +144,12 @@ def main(ft_setups, ft_strategies):
                 if iter != -1:
                     residual[iter - 1, step] = np.log10(v)
             print('')
-            np.savez('data/' + setup + '_steps_vs_iteration_hf_' + strategy, residual=residual, ft_step=ft.hard_step,
-                     ft_iter=ft.hard_iter)
+            np.savez(
+                'data/' + setup + '_steps_vs_iteration_hf_' + strategy,
+                residual=residual,
+                ft_step=ft.hard_step,
+                ft_iter=ft.hard_iter,
+            )
 
 
 if __name__ == "__main__":

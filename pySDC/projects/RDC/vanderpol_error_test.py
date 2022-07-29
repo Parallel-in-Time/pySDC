@@ -33,7 +33,7 @@ def compute_RDC_errors():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1E-14
+    problem_params['newton_tol'] = 1e-14
     problem_params['newton_maxiter'] = 50
     problem_params['mu'] = 10
     problem_params['u0'] = (2.0, 0)
@@ -109,14 +109,15 @@ def plot_RDC_results(cwd=''):
     maxiter_list = sorted(results['maxiter_list'])
 
     # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # create new figure
@@ -127,8 +128,8 @@ def plot_RDC_results(cwd=''):
     plt.ylabel('rel. error')
     plt.grid()
 
-    min_err = 1E99
-    max_err = 0E00
+    min_err = 1e99
+    max_err = 0e00
     err_list = []
     # loop over nvars, get errors and find min/max error for y-axis limits
     for maxiter in maxiter_list:

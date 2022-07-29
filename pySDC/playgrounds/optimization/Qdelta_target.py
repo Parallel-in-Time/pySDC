@@ -1,4 +1,3 @@
-
 import indiesolver
 import numpy as np
 
@@ -13,7 +12,7 @@ def evaluate(solution):
     coll = CollGaussRadau_Right(num_nodes=m, tleft=0.0, tright=1.0)
     Q = coll.Qmat[1:, 1:]
 
-    var = [x['x'+str(j)] for j in range(1, m + 1)]
+    var = [x['x' + str(j)] for j in range(1, m + 1)]
 
     Qd = np.diag(var)
 
@@ -37,9 +36,11 @@ params['x3'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 
 params['x4'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 params['x5'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_target',
-           'parameters': params,
-           'metrics': { 'rho' : { 'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_target',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")
@@ -54,9 +55,9 @@ for iteration in range(0, 10000):
     reply = worker.ask_new_solutions(1)
     solutions = {}
     solutions["solutions"] = []
-    if (reply["status"] == "success"):
+    if reply["status"] == "success":
         for solution in reply["solutions"]:
-            solutions["solutions"].append( evaluate(solution) )
+            solutions["solutions"].append(evaluate(solution))
         worker.tell_metrics(solutions)
         rho = reply["solutions"][0]["metrics"]["rho"]
         curr_min = min(curr_min, rho)
@@ -64,4 +65,3 @@ for iteration in range(0, 10000):
     else:
         print(reply)
         exit()
-

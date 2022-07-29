@@ -40,8 +40,8 @@ def run_simulation(name='', spectral=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-06
+    level_params['restol'] = 1e-12
+    level_params['dt'] = 1e-06
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters

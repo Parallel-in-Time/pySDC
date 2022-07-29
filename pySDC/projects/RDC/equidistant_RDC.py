@@ -10,6 +10,7 @@ class MyBarycentricInterpolator(BarycentricInterpolator):
     """
     Overwrite BarycentricInterolator to inject custom weights
     """
+
     def __init__(self, xi, yi=None, weights=None, axis=0):
         super(MyBarycentricInterpolator, self).__init__(xi, yi, axis)
         self.wi = weights

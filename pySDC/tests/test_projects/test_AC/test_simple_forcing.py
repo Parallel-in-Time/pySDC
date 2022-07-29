@@ -3,9 +3,11 @@ import subprocess
 
 from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
 
+
 def test_main_serial():
     main()
     visualize_radii()
+
 
 @pytest.mark.slow
 @pytest.mark.parallel

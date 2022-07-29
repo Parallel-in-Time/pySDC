@@ -2,7 +2,6 @@ from pySDC.core.Hooks import hooks
 
 
 class stop_at_error_hook(hooks):
-
     def post_sweep(self, step, level_number):
         """
         Overwrite standard post iteration hook
@@ -22,7 +21,7 @@ class stop_at_error_hook(hooks):
         uex = P.u_exact(L.time + L.dt)
         # print(abs(uex - L.uend))
 
-        if abs(uex - L.uend) < 1E-02:
+        if abs(uex - L.uend) < 1e-02:
             print('Stop iterating at %s' % step.status.iter)
             step.status.force_done = True
 

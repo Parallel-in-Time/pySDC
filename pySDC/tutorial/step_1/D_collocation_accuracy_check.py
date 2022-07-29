@@ -34,7 +34,7 @@ def main():
     coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
 
     # assemble list of dt
-    dt_list = [0.1 / 2 ** p for p in range(0, 4)]
+    dt_list = [0.1 / 2**p for p in range(0, 4)]
 
     # run accuracy test for all dt
     results = run_accuracy_check(prob=prob, coll=coll, dt_list=dt_list)
@@ -54,8 +54,9 @@ def main():
 
     assert os.path.isfile('step_1_accuracy_test_coll.png')
 
-    assert all(np.isclose(order, 2 * coll.num_nodes - 1,
-                          rtol=0.4)), "ERROR: did not get order of accuracy as expected, got %s" % order
+    assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), (
+        "ERROR: did not get order of accuracy as expected, got %s" % order
+    )
 
 
 def run_accuracy_check(prob, coll, dt_list):
@@ -91,7 +92,7 @@ def run_accuracy_check(prob, coll, dt_list):
         u_coll = sp.linalg.spsolve(M, u0_coll)
 
         # compute error
-        err = np.linalg.norm(u_coll[-prob.params.nvars:] - uend, np.inf)
+        err = np.linalg.norm(u_coll[-prob.params.nvars :] - uend, np.inf)
         # get id for this dt and store error in results
         id = ID(dt=dt)
         results[id] = err
@@ -143,14 +144,15 @@ def plot_accuracy(results):
     dt_list = sorted(results['dt_list'])
 
     # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # create new figure
@@ -169,8 +171,8 @@ def plot_accuracy(results):
     order_guide_space = [base_error * (2 ** (5 * i)) for i in range(0, len(dt_list))]
     plt.loglog(dt_list, order_guide_space, color='k', ls='--', label='5th order')
 
-    min_err = 1E99
-    max_err = 0E00
+    min_err = 1e99
+    max_err = 0e00
     err_list = []
     # loop over nvars, get errors and find min/max error for y-axis limits
     for dt in dt_list:

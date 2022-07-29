@@ -1,4 +1,3 @@
-
 import indiesolver
 import numpy as np
 
@@ -16,7 +15,7 @@ def evaluate(solution):
 
     Q = coll.Qmat[1:, 1:]
 
-    var = [x['x'+str(j)] for j in range(1, m + 1)]
+    var = [x['x' + str(j)] for j in range(1, m + 1)]
     # var = [x['x' + str(j) + 'r'] + 1j * x['x' + str(j) + 'i'] for j in range(1, m + 1)]
 
     Qd = np.diag(var)
@@ -27,7 +26,7 @@ def evaluate(solution):
     for i in range(-8, 8):
         for l in range(-8, 8):
             k += 1
-            lamdt = -10 ** i + 1j * 10 ** l
+            lamdt = -(10**i) + 1j * 10**l
             R = lamdt * np.linalg.inv(np.eye(m) - lamdt * Qd).dot(Q - Qd)
             rhoR = max(abs(np.linalg.eigvals(np.linalg.matrix_power(R, 1))))
             obj_val += rhoR
@@ -66,9 +65,11 @@ params['x3'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 
 # params['x8'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 # params['x9'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_sum',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

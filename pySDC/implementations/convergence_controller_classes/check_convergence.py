@@ -2,7 +2,6 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 
 class CheckConvergence(ConvergenceController):
-
     def setup(self, controller, params, description):
         return {'control_order': -100, **params}
 

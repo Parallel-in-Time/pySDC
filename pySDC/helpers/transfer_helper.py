@@ -22,7 +22,8 @@ def next_neighbors_periodic(p, ps, k):
     p_bar = p - np.floor(p / 1.0) * 1.0
     ps = ps - ps[0]
     distance_to_p = np.asarray(
-        list(map(lambda tk: min([np.abs(tk + 1 - p_bar), np.abs(tk - p_bar), np.abs(tk - 1 - p_bar)]), ps)))
+        list(map(lambda tk: min([np.abs(tk + 1 - p_bar), np.abs(tk - p_bar), np.abs(tk - 1 - p_bar)]), ps))
+    )
 
     # zip it
     value_index = []
@@ -78,7 +79,7 @@ def continue_periodic_array(arr, nn):
         return arr[nn]
     else:
         cont_arr = [arr[nn[0]]]
-        shift = 0.
+        shift = 0.0
         for n, d in zip(nn[1:], d_nn):
             if d != 1:
                 shift = -1
@@ -271,5 +272,5 @@ def border_padding(grid, l, r, pad_type='mirror'):
             padded_arr[i] = 2 * grid[0] - grid[l - i]
         for j in range(r):
             padded_arr[-j - 1] = 2 * grid[-1] - grid[-r + j - 1]
-    padded_arr[l:l + grid.size] = grid
+    padded_arr[l : l + grid.size] = grid
     return padded_arr

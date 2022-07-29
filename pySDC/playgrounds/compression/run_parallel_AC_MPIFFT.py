@@ -46,8 +46,8 @@ def run_simulation(name=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -144,10 +144,15 @@ if __name__ == "__main__":
     # Run this file via `mpirun -np N python run_parallel_AC_MPIFFT.py -n P`,
     # where N is the overall number of processors and P is the number of processors used for spatial parallelization.
     parser = ArgumentParser()
-    parser.add_argument("-s", "--setup", help='Specifies the setup', type=str, default='AC-bench-noforce',
-                        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'])
+    parser.add_argument(
+        "-s",
+        "--setup",
+        help='Specifies the setup',
+        type=str,
+        default='AC-bench-noforce',
+        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'],
+    )
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     args = parser.parse_args()
 
     run_simulation(name=args.setup, nprocs_space=args.nprocs_space)
-

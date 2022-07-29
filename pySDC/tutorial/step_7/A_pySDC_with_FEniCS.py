@@ -23,7 +23,7 @@ def setup(t0=None, ml=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.2
 
     # initialize step parameters
@@ -136,8 +136,7 @@ def run_variants(variant=None, ml=None, num_procs=None):
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     f.write(out + '\n')
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -151,10 +150,10 @@ def run_variants(variant=None, ml=None, num_procs=None):
 
     if num_procs == 1:
         assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.1E-08, 'Error is too high, got %s' % err
+        assert err <= 4.1e-08, 'Error is too high, got %s' % err
     else:
         assert np.mean(niters) <= 11.6, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.0E-08, 'Error is too high, got %s' % err
+        assert err <= 4.0e-08, 'Error is too high, got %s' % err
 
     f.write('\n')
     print()

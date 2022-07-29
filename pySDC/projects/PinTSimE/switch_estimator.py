@@ -6,7 +6,7 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 class SwitchEstimator(ConvergenceController):
     """
-        Method to estimate a discrete event (switch)
+    Method to estimate a discrete event (switch)
     """
 
     def setup(self, controller, params, description):
@@ -35,7 +35,7 @@ class SwitchEstimator(ConvergenceController):
 
             def switch_examiner(x):
                 """
-                    Routine to define root problem
+                Routine to define root problem
                 """
 
                 return L.prob.params.V_ref - p(x)

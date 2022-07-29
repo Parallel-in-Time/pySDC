@@ -40,7 +40,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.125
     level_params['nsweeps'] = [1]
 
@@ -58,7 +58,7 @@ def main():
     problem_params['cnvars'] = [(65, 65)]  # number of degrees of freedom for the coarsest level
     problem_params['refine'] = [1, 0]  # number of refinements
     problem_params['comm'] = space_comm  # pass space-communicator to problem class
-    problem_params['sol_tol'] = 1E-12  # set tolerance to PETSc' linear solver
+    problem_params['sol_tol'] = 1e-12  # set tolerance to PETSc' linear solver
 
     # initialize step parameters
     step_params = dict()
@@ -136,8 +136,10 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -155,7 +157,7 @@ def main():
 
         f.close()
 
-    assert err < 2E-04, 'ERROR: did not match error tolerance, got %s' % err
+    assert err < 2e-04, 'ERROR: did not match error tolerance, got %s' % err
     assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
 

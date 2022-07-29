@@ -15,7 +15,7 @@ from pySDC.projects.parallelSDC.linearized_implicit_fixed_parallel_prec import l
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
 
     # This comes as read-in for the step class (this is optional!)
     step_params = dict()
@@ -27,7 +27,7 @@ def main():
     problem_params['nvars'] = 2047
     problem_params['lambda0'] = 5.0
     problem_params['newton_maxiter'] = 50
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['interval'] = (-5, 5)
 
     # This comes as read-in for the sweeper class
@@ -54,7 +54,7 @@ def main():
     Tend = 0.1
 
     sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel, linearized_implicit_fixed_parallel_prec]
-    dt_list = [Tend / 2 ** i for i in range(1, 5)]
+    dt_list = [Tend / 2**i for i in range(1, 5)]
 
     results = dict()
     results['sweeper_list'] = [sweeper.__name__ for sweeper in sweeper_list]
@@ -132,12 +132,14 @@ def plot_graphs(cwd=''):
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
     for sweeper, color, marker, label in setups:
-        plt_helper.plt.loglog(dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker,
-                              markeredgecolor='k', label=label)
+        plt_helper.plt.loglog(
+            dt_list, results[sweeper], lw=1, ls='-', color=color, marker=marker, markeredgecolor='k', label=label
+        )
 
     plt_helper.plt.loglog(dt_list, [dt * 2 for dt in dt_list], lw=0.5, ls='--', color='k', label='linear')
-    plt_helper.plt.loglog(dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=0.5, ls='-.', color='k',
-                          label='quadratic')
+    plt_helper.plt.loglog(
+        dt_list, [dt * dt / dt_list[0] * 2 for dt in dt_list], lw=0.5, ls='-.', color='k', label='quadratic'
+    )
 
     plt_helper.plt.xlabel('dt')
     plt_helper.plt.ylabel('error reduction')
@@ -150,7 +152,7 @@ def plot_graphs(cwd=''):
 
     plt_helper.plt.gca().invert_xaxis()
     plt_helper.plt.xlim([dt_list[0] * 1.1, dt_list[-1] / 1.1])
-    plt_helper.plt.ylim([4E-03, 1E0])
+    plt_helper.plt.ylim([4e-03, 1e0])
 
     # save plot, beautify
     fname = 'data/parallelSDC_fisher_newton'

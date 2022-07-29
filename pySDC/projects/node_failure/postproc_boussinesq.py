@@ -1,7 +1,9 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
+
 # import os
 import matplotlib.pyplot as plt
 from pylab import rcParams
@@ -23,11 +25,13 @@ def create_plots(cwd=''):
     ref = 'PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz'
 
     # noinspection PyShadowingBuiltins
-    list = [('PFASST_BOUSSINESQ_stats_hf_SPREAD_P16.npz', 'SPREAD', '1-sided', 'red', 's'),
-            ('PFASST_BOUSSINESQ_stats_hf_INTERP_P16.npz', 'INTERP', '2-sided', 'orange', 'o'),
-            ('PFASST_BOUSSINESQ_stats_hf_SPREAD_PREDICT_P16.npz', 'SPREAD_PREDICT', '1-sided+corr', 'blue', '^'),
-            ('PFASST_BOUSSINESQ_stats_hf_INTERP_PREDICT_P16.npz', 'INTERP_PREDICT', '2-sided+corr', 'green', 'd'),
-            ('PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz', 'NOFAULT', 'no fault', 'black', 'v')]
+    list = [
+        ('PFASST_BOUSSINESQ_stats_hf_SPREAD_P16.npz', 'SPREAD', '1-sided', 'red', 's'),
+        ('PFASST_BOUSSINESQ_stats_hf_INTERP_P16.npz', 'INTERP', '2-sided', 'orange', 'o'),
+        ('PFASST_BOUSSINESQ_stats_hf_SPREAD_PREDICT_P16.npz', 'SPREAD_PREDICT', '1-sided+corr', 'blue', '^'),
+        ('PFASST_BOUSSINESQ_stats_hf_INTERP_PREDICT_P16.npz', 'INTERP_PREDICT', '2-sided+corr', 'green', 'd'),
+        ('PFASST_BOUSSINESQ_stats_hf_NOFAULT_P16.npz', 'NOFAULT', 'no fault', 'black', 'v'),
+    ]
 
     nprocs = 16
 
@@ -51,7 +55,7 @@ def create_plots(cwd=''):
         iter_count = data['iter_count'][minstep:maxstep]
         residual = data['residual'][:, minstep:maxstep]
 
-        residual[residual <= 0] = 1E-99
+        residual[residual <= 0] = 1e-99
         residual = np.log10(residual)
         vmax = max(vmax, int(np.amax(residual)))
 
@@ -60,7 +64,7 @@ def create_plots(cwd=''):
 
     print(vmin, vmax)
     data = np.load(cwd + 'data/' + ref)
-    ref_iter_count = data['iter_count'][nprocs - 1::nprocs]
+    ref_iter_count = data['iter_count'][nprocs - 1 :: nprocs]
 
     rcParams['figure.figsize'] = 6.0, 2.5
     fig, ax = plt.subplots()
@@ -73,13 +77,21 @@ def create_plots(cwd=''):
 
         if file is not ref:
             data = np.load(cwd + 'data/' + file)
-            iter_count = data['iter_count'][nprocs - 1::nprocs]
+            iter_count = data['iter_count'][nprocs - 1 :: nprocs]
 
             ymin = min(ymin, min(iter_count - ref_iter_count))
             ymax = max(ymax, max(iter_count - ref_iter_count))
 
-            plt.plot(range(nblocks), iter_count - ref_iter_count, color=color, label=label, marker=marker, linestyle='',
-                     linewidth=lw, markersize=ms)
+            plt.plot(
+                range(nblocks),
+                iter_count - ref_iter_count,
+                color=color,
+                label=label,
+                marker=marker,
+                linestyle='',
+                linewidth=lw,
+                markersize=ms,
+            )
 
     plt.xlabel('block', **axis_font)
     plt.ylabel('$K_\\mathrm{add}$', **axis_font)
@@ -103,7 +115,7 @@ def create_plots(cwd=''):
         residual = data['residual'][:, minstep:maxstep]
         stats = data['hard_stats']
 
-        residual[residual <= 0] = 1E-99
+        residual[residual <= 0] = 1e-99
         residual = np.log10(residual)
 
         rcParams['figure.figsize'] = 6.0, 2.5
@@ -116,8 +128,13 @@ def create_plots(cwd=''):
         if file is not ref:
             for item in stats:
                 if item[0] in range(minstep, maxstep):
-                    plt.text(item[0] + 0.5 - (maxstep - nsteps), item[1] - 1 + 0.5, 'x', horizontalalignment='center',
-                             verticalalignment='center')
+                    plt.text(
+                        item[0] + 0.5 - (maxstep - nsteps),
+                        item[1] - 1 + 0.5,
+                        'x',
+                        horizontalalignment='center',
+                        verticalalignment='center',
+                    )
 
         plt.axis([0, nsteps, 0, maxiter])
 

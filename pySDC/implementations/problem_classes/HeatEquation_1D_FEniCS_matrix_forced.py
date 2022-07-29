@@ -1,4 +1,3 @@
-
 import logging
 
 import dolfin as df
@@ -77,8 +76,13 @@ class fenics_heat(ptype):
         self.K = df.assemble(a_K)
 
         # set forcing term as expression
-        self.g = df.Expression('-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
-                               degree=self.params.order)
+        self.g = df.Expression(
+            '-cos(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+            a=np.pi,
+            b=self.params.nu,
+            t=self.params.t0,
+            degree=self.params.order,
+        )
         # self.g = df.Expression('0', a=np.pi, b=self.params.nu, t=self.params.t0,
         #                        degree=self.params.order)
         # set boundary values

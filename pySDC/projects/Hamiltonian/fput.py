@@ -25,7 +25,7 @@ def setup_fput():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = 2.0
 
     # initialize sweeper parameters
@@ -83,8 +83,7 @@ def run_simulation():
     print(out)
 
     # instantiate the controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -112,8 +111,7 @@ def run_simulation():
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     f.write(out + '\n')
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))

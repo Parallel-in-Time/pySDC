@@ -7,7 +7,6 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class EstimateExtrapolationError(ConvergenceController):
-
     def setup(self, controller, params, description):
         """
         The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving
@@ -29,15 +28,16 @@ class EstimateExtrapolationError(ConvergenceController):
         default_params['Taylor_order'] = default_params['order_time_marching'] + 2
 
         # Estimate and store values from this iteration
-        default_params['estimate_iter'] = default_params['order_time_marching'] - (1 if default_params['use_HotRod']
-                                                                                   else 0)
+        default_params['estimate_iter'] = default_params['order_time_marching'] - (
+            1 if default_params['use_HotRod'] else 0
+        )
 
         # Store n values. Since we store u and f, we need only half of each (the +1 is for rounding)
         default_params['n'] = (default_params['Taylor_order'] + 1) // 2
         default_params['n_per_proc'] = default_params['n'] * 1
 
         self.u_coeff = [None] * default_params['n']
-        self.f_coeff = [0.] * default_params['n']
+        self.f_coeff = [0.0] * default_params['n']
 
         return {**default_params, **params}
 
@@ -48,13 +48,19 @@ class EstimateExtrapolationError(ConvergenceController):
         Returns:
             Whether the parameters are compatible and an error text if not
         '''
-        if description['step_params'].get('restol', -1.) >= 0:
-            return False, 'Extrapolation error needs constant order in time and hence restol in the step parameters \
-has to be smaller than 0!'
+        if description['step_params'].get('restol', -1.0) >= 0:
+            return (
+                False,
+                'Extrapolation error needs constant order in time and hence restol in the step parameters \
+has to be smaller than 0!',
+            )
 
         if controller.params.mssdc_jac:
-            return False, 'Extrapolation error estimator needs the same order on all steps, please activate Gauss-Seid\
-el multistep mode!'
+            return (
+                False,
+                'Extrapolation error estimator needs the same order on all steps, please activate Gauss-Seid\
+el multistep mode!',
+            )
 
         return True, ''
 
@@ -75,8 +81,10 @@ el multistep mode!'
         elif type(f) == mesh:
             self.f[oldest_val] = f
         else:
-            raise DataError(f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
-            works with types imex_mesh and mesh')
+            raise DataError(
+                f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
+            works with types imex_mesh and mesh'
+            )
 
         self.u[oldest_val] = S.levels[0].u[-1]
         self.t[oldest_val] = S.time + S.dt
@@ -100,9 +108,9 @@ el multistep mode!'
 
         # prepare A matrix
         A = np.zeros((self.params.Taylor_order, self.params.Taylor_order))
-        A[0, 0:self.params.n] = 1.
+        A[0, 0 : self.params.n] = 1.0
         j = np.arange(self.params.Taylor_order)
-        inv_facs = 1. / factorial(j)
+        inv_facs = 1.0 / factorial(j)
 
         # get the steps backwards from the point of evaluation
         idx = np.argsort(t)
@@ -111,27 +119,28 @@ el multistep mode!'
         # fill A matrix
         for i in range(1, self.params.Taylor_order):
             # Taylor expansions of the solutions
-            A[i, :self.params.n] = steps_from_now**j[i] * inv_facs[i]
+            A[i, : self.params.n] = steps_from_now ** j[i] * inv_facs[i]
 
             # Taylor expansions of the first derivatives a.k.a. right hand side evaluations
-            A[i, self.params.n:self.params.Taylor_order] =\
-                steps_from_now[2 * self.params.n - self.params.Taylor_order:]**(j[i] - 1) * inv_facs[i - 1]
+            A[i, self.params.n : self.params.Taylor_order] = (
+                steps_from_now[2 * self.params.n - self.params.Taylor_order :] ** (j[i] - 1) * inv_facs[i - 1]
+            )
 
         # prepare rhs
         b = np.zeros(self.params.Taylor_order)
-        b[0] = 1.
+        b[0] = 1.0
 
         # solve linear system for the coefficients
         coeff = np.linalg.solve(A, b)
-        self.u_coeff = coeff[:self.params.n]
-        self.f_coeff[self.params.n * 2 - self.params.Taylor_order:] = coeff[self.params.n:self.params.Taylor_order]
+        self.u_coeff = coeff[: self.params.n]
+        self.f_coeff[self.params.n * 2 - self.params.Taylor_order :] = coeff[self.params.n : self.params.Taylor_order]
 
         # determine prefactor
-        r = abs(dt[len(dt) - len(self.u_coeff):] / dt[-1])**(self.params.Taylor_order - 1)
-        inv_prefactor = -sum(r[1:]) - 1.
+        r = abs(dt[len(dt) - len(self.u_coeff) :] / dt[-1]) ** (self.params.Taylor_order - 1)
+        inv_prefactor = -sum(r[1:]) - 1.0
         for i in range(len(self.u_coeff)):
-            inv_prefactor += sum(r[1: i + 1]) * self.u_coeff[i]
-        self.prefactor = 1. / abs(inv_prefactor)
+            inv_prefactor += sum(r[1 : i + 1]) * self.u_coeff[i]
+        self.prefactor = 1.0 / abs(inv_prefactor)
 
 
 class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationError):
@@ -158,8 +167,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationError):
             t_eval = S.time + S.dt
 
             # compute the extrapolation coefficients if needed
-            if (None in self.u_coeff or self.params.use_adaptivity) and\
-                    None not in self.t and t_eval > max(self.t):
+            if (None in self.u_coeff or self.params.use_adaptivity) and None not in self.t and t_eval > max(self.t):
                 self.get_extrapolation_coefficients(self.t, self.dt, t_eval)
 
             # compute the error if we can
@@ -199,11 +207,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationError):
             raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
 
         # prepare variables
-        u_ex = S.levels[0].u[-1] * 0.
+        u_ex = S.levels[0].u[-1] * 0.0
         idx = np.argsort(self.t)
 
         # see if we have a solution for the current step already stored
-        if (abs(S.time + S.dt - self.t) < 10. * np.finfo(float).eps).any():
+        if (abs(S.time + S.dt - self.t) < 10.0 * np.finfo(float).eps).any():
             idx_step = idx[np.argmin(abs(self.t - S.time - S.dt))]
         else:
             idx_step = max(idx) + 1

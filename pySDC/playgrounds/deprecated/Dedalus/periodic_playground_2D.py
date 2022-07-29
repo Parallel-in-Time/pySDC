@@ -17,7 +17,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 1.0 / 4
     level_params['nsweeps'] = [1]
 
@@ -74,7 +74,6 @@ def main():
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
-
     # filter statistics by type (number of iterations)
     filtered_stats = filter_stats(stats, type='niter')
 
@@ -91,8 +90,7 @@ def main():
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)

@@ -34,8 +34,8 @@ def main():
     # set expected differences and check
     ediff_expect = dict()
     ediff_expect['CollGaussRadau_Right'] = 15
-    ediff_expect['CollGaussLobatto'] = 1E-05
-    ediff_expect['CollGaussLegendre'] = 3E-05
+    ediff_expect['CollGaussLobatto'] = 1e-05
+    ediff_expect['CollGaussLegendre'] = 3e-05
     for k, v in ediff.items():
         assert v < ediff_expect[k], "ERROR: energy deviated too much, got %s" % ediff[k]
 
@@ -46,7 +46,7 @@ def run_simulation():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-06
+    level_params['restol'] = 1e-06
     level_params['dt'] = 1.0 / 16
 
     # initialize sweeper parameters

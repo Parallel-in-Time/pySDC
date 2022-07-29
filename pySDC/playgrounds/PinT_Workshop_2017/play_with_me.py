@@ -15,7 +15,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
@@ -45,13 +45,13 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d_forced                  # pass problem class
-    description['problem_params'] = problem_params                # pass problem parameters
-    description['sweeper_class'] = imex_1st_order                 # pass sweeper
-    description['sweeper_params'] = sweeper_params                # pass sweeper parameters
-    description['level_params'] = level_params                    # pass level parameters
-    description['step_params'] = step_params                      # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh            # pass spatial transfer class
+    description['problem_class'] = heat1d_forced  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # set time parameters
@@ -59,8 +59,7 @@ def main():
     Tend = 4.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

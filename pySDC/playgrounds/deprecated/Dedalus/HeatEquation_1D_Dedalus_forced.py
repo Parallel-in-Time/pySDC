@@ -12,6 +12,7 @@ class heat1d_dedalus_forced(ptype):
     """
     Example implementing the forced 1D heat equation with periodic BC in [0,1], discretized using Dedalus
     """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -40,8 +41,9 @@ class heat1d_dedalus_forced(ptype):
         domain = de.Domain([xbasis], grid_dtype=np.float64, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d_dedalus_forced, self).__init__(init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f,
-                                                    params=problem_params)
+        super(heat1d_dedalus_forced, self).__init__(
+            init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         self.x = self.init[0].grid(0, scales=1)
         self.rhs = self.dtype_u(self.init, val=0.0)
@@ -68,8 +70,12 @@ class heat1d_dedalus_forced(ptype):
         f = self.dtype_f(self.init)
         f.impl.values[0] = (self.params.nu * de.operators.differentiate(u.values[0], x=2)).evaluate()
         f.impl.values[1] = (self.params.nu * de.operators.differentiate(u.values[1], x=2)).evaluate()
-        f.expl.values[0]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
-        f.expl.values[1]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        f.expl.values[0]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (
+            np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t)
+        )
+        f.expl.values[1]['g'] = -np.sin(np.pi * self.params.freq * self.x) * (
+            np.sin(t) - self.params.nu * (np.pi * self.params.freq) ** 2 * np.cos(t)
+        )
         return f
 
     def solve_system(self, rhs, factor, u0, t):

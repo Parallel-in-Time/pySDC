@@ -25,7 +25,7 @@ class error_output(hooks):
         # This is a bit black magic: we are going to run pySDC within the hook to check the error against the "exact"
         # solution of the collocation problem
         description = step.params.description
-        description['level_params']['restol'] = 1E-14
+        description['level_params']['restol'] = 1e-14
         description['problem_params']['direct_solver'] = True
 
         controller_params = step.params.controller_params
@@ -57,7 +57,21 @@ class error_output(hooks):
         pde_err = abs(upde - L.uend)
         coll_err = abs(self.uex - L.uend)
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='PDE_error_after_step', value=pde_err)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='coll_error_after_step', value=coll_err)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='PDE_error_after_step',
+            value=pde_err,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='coll_error_after_step',
+            value=coll_err,
+        )

@@ -15,7 +15,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
@@ -61,7 +61,7 @@ def main():
 
     # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend / level_params['dt'])
-    num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
+    num_proc_list = [2**i for i in range(int(np.log2(nsteps) + 1))]
 
     f = open('step_5_B_out.txt', 'w')
     # loop over different number of processes and check results
@@ -103,8 +103,10 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -115,7 +117,7 @@ def main():
         print()
         print()
 
-        assert err < 1.3505E-04, "ERROR: error is too high, got %s" % err
+        assert err < 1.3505e-04, "ERROR: error is too high, got %s" % err
         assert np.ptp(niters) <= 1, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
         assert np.mean(niters) <= 5.0, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
 

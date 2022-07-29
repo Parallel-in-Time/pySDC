@@ -2,12 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
 from pySDC.core.Hooks import hooks
 
 
 class monitor(hooks):
-
     def __init__(self):
         super(monitor, self).__init__()
         self.imshow = None

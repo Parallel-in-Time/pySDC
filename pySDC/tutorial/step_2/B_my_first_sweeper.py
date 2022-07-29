@@ -10,7 +10,7 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
@@ -44,7 +44,7 @@ def main():
     err, res, niter = run_imex_sdc(S)
     print('Error and residual: %12.8e -- %12.8e' % (err, res))
 
-    assert err <= 1E-5, "ERROR: IMEX SDC iteration did not reduce the error enough, got %s" % err
+    assert err <= 1e-5, "ERROR: IMEX SDC iteration did not reduce the error enough, got %s" % err
     assert res <= level_params['restol'], "ERROR: IMEX SDC iteration did not reduce the residual enough, got %s" % res
     assert niter <= 12, "ERROR: IMEX SDC took too many iterations, got %s" % niter
 
@@ -87,8 +87,12 @@ def run_imex_sdc(S):
         L.sweep.compute_residual()
         # increment the iteration counter
         S.status.iter += 1
-        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' \
-              % (L.time, L.level_index, S.status.iter, L.status.residual)
+        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (
+            L.time,
+            L.level_index,
+            S.status.iter,
+            L.status.residual,
+        )
         f.write(out + '\n')
         print(out)
     f.close()

@@ -17,7 +17,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt  # time-step size
     level_params['nsweeps'] = 1
 
@@ -44,7 +44,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
+    step_params['errtol'] = 1e-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -77,7 +77,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt  # time-step size
     level_params['nsweeps'] = 1
 
@@ -105,7 +105,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
+    step_params['errtol'] = 1e-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -138,7 +138,7 @@ def setup_auzinger(dt=None, ml=False):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt  # time-step size
     level_params['nsweeps'] = 1
 
@@ -154,13 +154,13 @@ def setup_auzinger(dt=None, ml=False):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['newton_maxiter'] = 10
 
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
+    step_params['errtol'] = 1e-07
 
     # initialize controller parameters
     controller_params = dict()
@@ -223,8 +223,9 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
             description['step_params']['controller_params'] = controller_params
 
             # instantiate controller
-            controller = controller_nonMPI(num_procs=nprocs, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=nprocs, controller_params=controller_params, description=description
+            )
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -246,8 +247,10 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
             coll_errors = sort_stats(filter_stats(stats, type='coll_error_after_step'), sortby='time')
             for iters, PDE_err, coll_err in zip(iter_counts, PDE_errors, coll_errors):
                 assert coll_err[1] < description['step_params']['errtol'], f'Error too high, got {coll_err[1]:8.4e}'
-                out = f'   Errors after step {PDE_err[0]:8.4f} with {iters[1]} iterations: ' \
-                      f'{PDE_err[1]:8.4e} / {coll_err[1]:8.4e}'
+                out = (
+                    f'   Errors after step {PDE_err[0]:8.4f} with {iters[1]} iterations: '
+                    f'{PDE_err[1]:8.4e} / {coll_err[1]:8.4e}'
+                )
                 f.write(out + '\n')
                 print(out)
             f.write('\n')

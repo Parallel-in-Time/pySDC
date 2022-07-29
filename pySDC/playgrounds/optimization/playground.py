@@ -5,6 +5,7 @@ import scipy.optimize as opt
 import numpy as np
 import scipy
 
+
 def rho(x):
     global Q, M
     return np.linalg.norm(Q - np.diag([x[i] for i in range(M)]), np.inf) / np.amin([abs(x[i]) for i in range(M)])
@@ -33,7 +34,9 @@ for prec in prec_list:
     # b = 1 - np.linalg.norm(Q-QDelta, np.inf) * np.linalg.norm(QDL, np.inf)
     # print(prec, np.linalg.norm(np.linalg.matrix_power(np.linalg.inv(QDelta).dot(Q-QDelta), 2), np.inf), np.amin(np.diag(QDD)))
     # print(prec, np.linalg.norm(np.linalg.inv(QDelta), np.inf), 1/np.linalg.norm(QDelta, np.inf))
-    print(prec, np.linalg.norm(np.linalg.matrix_power(A.dot(np.eye(M) - np.linalg.inv(QDelta).dot(Q)).dot(B), 9),np.inf))
+    print(
+        prec, np.linalg.norm(np.linalg.matrix_power(A.dot(np.eye(M) - np.linalg.inv(QDelta).dot(Q)).dot(B), 9), np.inf)
+    )
     # print(prec, a * b)
     # continue
 
@@ -78,4 +81,3 @@ plt.legend()
 
 plt.show()
 exit()
-

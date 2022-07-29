@@ -26,7 +26,7 @@ def main():
     space_transfer_params['rorder'] = 2
     space_transfer_params['iorder'] = 4
 
-    nvars_fine_list = [2 ** p - 1 for p in range(5, 10)]
+    nvars_fine_list = [2**p - 1 for p in range(5, 10)]
 
     # set up dictionary to store results (plus lists)
     results = dict()
@@ -68,13 +68,16 @@ def main():
     orders = get_accuracy_order(results)
     f = open('step_4_A_out.txt', 'w')
     for p in range(len(orders)):
-        out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%' \
-              % (space_transfer_params['iorder'], orders[p],
-                 100 * abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'])
+        out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%' % (
+            space_transfer_params['iorder'],
+            orders[p],
+            100 * abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'],
+        )
         f.write(out + '\n')
         print(out)
-        assert abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'] < 0.05, \
-            'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
+        assert (
+            abs(space_transfer_params['iorder'] - orders[p]) / space_transfer_params['iorder'] < 0.05
+        ), 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
     f.close()
     print('...got what we expected!')
 

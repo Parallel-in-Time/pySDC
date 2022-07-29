@@ -5,7 +5,6 @@ from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaus
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
 
 
-
 def run():
 
     nsteps = 8
@@ -17,7 +16,6 @@ def run():
     dt = 0.2
     t0 = 0.0
     nblocks = nsteps // L
-
 
     # initialize problem (ADVECTION)
     ndim = 1
@@ -68,7 +66,7 @@ def run():
     for nb in range(nblocks):
 
         k = 0
-        restol = 1E-10
+        restol = 1e-10
         res = u0 - C @ u
         while k < maxiter and np.linalg.norm(res, np.inf) > restol:
             k += 1
@@ -82,7 +80,6 @@ def run():
         u0_M = np.kron(np.ones(M), uinit)
         u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
         u = u0.copy()
-
 
     # plt.plot(uex-u[-N:])
     # plt.plot(uinit)

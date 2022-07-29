@@ -4,8 +4,9 @@ import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import\
-    EstimateExtrapolationErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
+    EstimateExtrapolationErrorNonMPI,
+)
 from pySDC.core.Hooks import hooks
 
 import pySDC.helpers.plot_helper as plt_helper
@@ -13,7 +14,6 @@ from pySDC.projects.Resilience.piline import run_piline
 
 
 class log_errors(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_errors, self).post_step(step, level_number)
@@ -23,12 +23,33 @@ class log_errors(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, sweep=L.status.sweep,
-                          type='e_glob', value=abs(L.prob.u_exact(t=L.time + L.dt) - L.u[-1]))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_extrapolated',
+            value=L.status.error_extrapolation_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_glob',
+            value=abs(L.prob.u_exact(t=L.time + L.dt) - L.u[-1]),
+        )
 
 
 def setup_mpl(font_size=8):
@@ -64,7 +85,7 @@ def multiple_runs(ax, k=5, serial=True):
     """
 
     # assemble list of dt
-    dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
+    dt_list = 0.01 * 10.0 ** -(np.arange(20) / 10.0)
 
     num_procs = 1 if serial else 30
 
@@ -75,7 +96,7 @@ def multiple_runs(ax, k=5, serial=True):
         'convergence_controllers': {
             EstimateEmbeddedErrorNonMPI: {},
             EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
-        }
+        },
     }
     res = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[0], log_errors), 'dt', dt_list[0])
     for key in res.keys():
@@ -89,7 +110,7 @@ def multiple_runs(ax, k=5, serial=True):
             'convergence_controllers': {
                 EstimateEmbeddedErrorNonMPI: {},
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
-            }
+            },
         }
         res_ = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[i], log_errors), 'dt', dt_list[i])
         for key in res_.keys():
@@ -108,12 +129,16 @@ def plot(res, ax, k):
         order = get_accuracy_order(res, key=keys[i], order=k)
         if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            assert np.isclose(np.mean(order), k, atol=3e-1), f'Expected embedded error estimate to have order {k} \
+            assert np.isclose(
+                np.mean(order), k, atol=3e-1
+            ), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
         elif keys[i] == 'e_extrapolated':
             label = None
-            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
+            assert np.isclose(
+                np.mean(order), k + 1, rtol=3e-1
+            ), f'Expected extrapolation error estimate to have order \
 {k+1} but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 

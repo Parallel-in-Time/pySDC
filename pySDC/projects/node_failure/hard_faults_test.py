@@ -21,7 +21,7 @@ def main(ft_setups, ft_strategies):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-09
+    level_params['restol'] = 1e-09
 
     # initialize step parameters
     step_params = dict()
@@ -106,8 +106,9 @@ def main(ft_setups, ft_strategies):
         # do a reference run without any faults to see how things would look like (and to get maxiter/ref_niter)
         ft.strategy = 'NOFAULT'
 
-        controller = controller_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
-                                                   description=description)
+        controller = controller_nonMPI_hard_faults(
+            num_procs=num_procs, controller_params=controller_params, description=description
+        )
 
         # get initial values on finest level
         P = controller.MS[0].levels[0].prob
@@ -159,8 +160,13 @@ def main(ft_setups, ft_strategies):
 
             print(iter_count)
 
-            np.savez('data/' + setup + '_results_hf_' + strategy, iter_count=iter_count, description=description,
-                     ft_step=ft_step, ft_iter=ft_iter)
+            np.savez(
+                'data/' + setup + '_results_hf_' + strategy,
+                iter_count=iter_count,
+                description=description,
+                ft_step=ft_step,
+                ft_iter=ft_iter,
+            )
 
 
 if __name__ == "__main__":

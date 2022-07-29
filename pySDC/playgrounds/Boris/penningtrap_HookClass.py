@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 # import progressbar
 
 from pySDC.core.Hooks import hooks
 
 
 class particles_output(hooks):
-
     def __init__(self):
         """
         Initialization of particles output
@@ -49,13 +49,14 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos[:, i] * part.pos[:, i])
+            fpot[i] -= (
+                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+            )
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -64,8 +65,15 @@ class particles_output(hooks):
             epot += part.q[n] * fpot[n]
             ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='etot', value=epot + ekin)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='etot',
+            value=epot + ekin,
+        )
 
     def post_step(self, step, level_number):
         """
@@ -92,13 +100,14 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos[:, i] * part.pos[:, i])
+            fpot[i] -= (
+                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+            )
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -107,8 +116,15 @@ class particles_output(hooks):
             epot += part.q[n] * fpot[n]
             ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='etot', value=epot + ekin)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='etot',
+            value=epot + ekin,
+        )
 
         oldcol = self.sframe
         # # self.sframe = self.ax.scatter(L.uend.pos[0],L.uend.pos[1],L.uend.pos[2])

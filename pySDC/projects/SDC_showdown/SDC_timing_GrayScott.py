@@ -8,8 +8,11 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import petsc_grayscott_multiimplicit, \
-    petsc_grayscott_fullyimplicit, petsc_grayscott_semiimplicit
+from pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic import (
+    petsc_grayscott_multiimplicit,
+    petsc_grayscott_fullyimplicit,
+    petsc_grayscott_semiimplicit,
+)
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
@@ -28,7 +31,7 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 1.0
     level_params['nsweeps'] = [1]
 
@@ -48,9 +51,9 @@ def setup_parameters():
     problem_params['A'] = 0.09
     problem_params['B'] = 0.086
     problem_params['nvars'] = [(128, 128)]
-    problem_params['nlsol_tol'] = 1E-10
+    problem_params['nlsol_tol'] = 1e-10
     problem_params['nlsol_maxiter'] = 100
-    problem_params['lsol_tol'] = 1E-10
+    problem_params['lsol_tol'] = 1e-10
     problem_params['lsol_maxiter'] = 100
 
     # initialize step parameters
@@ -150,15 +153,16 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
     print('Iteration count (nonlinear/linear): %i / %i' % (P.snes_itercount, P.ksp_itercount))
-    print('Mean Iteration count per call: %4.2f / %4.2f' % (P.snes_itercount / max(P.snes_ncalls, 1),
-                                                            P.ksp_itercount / max(P.ksp_ncalls, 1)))
+    print(
+        'Mean Iteration count per call: %4.2f / %4.2f'
+        % (P.snes_itercount / max(P.snes_ncalls, 1), P.ksp_itercount / max(P.ksp_ncalls, 1))
+    )
 
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
@@ -166,7 +170,7 @@ def run_SDC_variant(variant=None, inexact=False, cwd=''):
     print('Error vs. reference solution: %6.4e' % err)
     print()
 
-    assert err < 3E-06, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
+    assert err < 3e-06, 'ERROR: variant %s did not match error tolerance, got %s' % (variant, err)
     assert np.mean(niters) <= 10, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
     return timing[0][1], np.mean(niters)
@@ -247,15 +251,16 @@ def run_reference():
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
     print('Iteration count (nonlinear/linear): %i / %i' % (P.snes_itercount, P.ksp_itercount))
-    print('Mean Iteration count per call: %4.2f / %4.2f' % (P.snes_itercount / max(P.snes_ncalls, 1),
-                                                            P.ksp_itercount / max(P.ksp_ncalls, 1)))
+    print(
+        'Mean Iteration count per call: %4.2f / %4.2f'
+        % (P.snes_itercount / max(P.snes_ncalls, 1), P.ksp_itercount / max(P.ksp_ncalls, 1))
+    )
 
     timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 

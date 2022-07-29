@@ -1,4 +1,3 @@
-
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import splu
@@ -18,6 +17,7 @@ class heat1d_periodic(ptype):
         A: second-order FD discretization of the 1D laplace operator
         dx: distance between two spatial nodes
     """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
@@ -42,8 +42,12 @@ class heat1d_periodic(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat1d_periodic, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(heat1d_periodic, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars
@@ -66,12 +70,16 @@ class heat1d_periodic(ptype):
         stencil = [1, -2, 1]
         zero_pos = 2
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        offsets = np.concatenate(
+            (
+                [N - i - 1 for i in reversed(range(zero_pos - 1))],
+                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
+            )
+        )
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
 
         A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= nu / (dx ** 2)
+        A *= nu / (dx**2)
 
         return A
 
@@ -125,9 +133,8 @@ class heat1d_periodic(ptype):
 
         if self.params.freq >= 0:
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx ** 2
-            me[:] = np.sin(np.pi * self.params.freq * xvalues) * \
-                np.exp(-t * self.params.nu * rho)
+            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq * self.dx)) / self.dx**2
+            me[:] = np.sin(np.pi * self.params.freq * xvalues) * np.exp(-t * self.params.nu * rho)
         else:
             np.random.seed(1)
             me[:] = np.random.rand(self.params.nvars)

@@ -23,7 +23,7 @@ def run_simulation(ml=None, mass=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -93,14 +93,18 @@ def visualize():
 
     plt_helper.newfig(240, 1, ratio=0.8)
 
-    plt_helper.plt.semilogy([err[0] for err in errors_sdc_noM], [err[1] for err in errors_sdc_noM], lw=2,
-                            marker='s',
-                            markersize=6,
-                            color='darkblue',
-                            label='SDC without M')
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_sdc_noM],
+        [err[1] for err in errors_sdc_noM],
+        lw=2,
+        marker='s',
+        markersize=6,
+        color='darkblue',
+        label='SDC without M',
+    )
 
     plt_helper.plt.xlim([0, 11])
-    plt_helper.plt.ylim([6E-09, 2E-03])
+    plt_helper.plt.ylim([6e-09, 2e-03])
     plt_helper.plt.xlabel('iteration')
     plt_helper.plt.ylabel('error')
     plt_helper.plt.legend()
@@ -110,19 +114,27 @@ def visualize():
 
     plt_helper.newfig(240, 1, ratio=0.8)
 
-    plt_helper.plt.semilogy([err[0] for err in errors_sdc_noM], [err[1] for err in errors_sdc_noM], lw=2,
-                            color='darkblue',
-                            marker='s',
-                            markersize=6,
-                            label='SDC without M')
-    plt_helper.plt.semilogy([err[0] for err in errors_sdc_M], [err[1] for err in errors_sdc_M], lw=2,
-                            marker='o',
-                            markersize=6,
-                            color='red',
-                            label='SDC with M')
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_sdc_noM],
+        [err[1] for err in errors_sdc_noM],
+        lw=2,
+        color='darkblue',
+        marker='s',
+        markersize=6,
+        label='SDC without M',
+    )
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_sdc_M],
+        [err[1] for err in errors_sdc_M],
+        lw=2,
+        marker='o',
+        markersize=6,
+        color='red',
+        label='SDC with M',
+    )
 
     plt_helper.plt.xlim([0, 11])
-    plt_helper.plt.ylim([6E-09, 2E-03])
+    plt_helper.plt.ylim([6e-09, 2e-03])
     plt_helper.plt.xlabel('iteration')
     plt_helper.plt.ylabel('error')
     plt_helper.plt.legend()
@@ -132,14 +144,18 @@ def visualize():
 
     plt_helper.newfig(240, 1, ratio=0.8)
 
-    plt_helper.plt.semilogy([err[0] for err in errors_mlsdc_noM], [err[1] for err in errors_mlsdc_noM], lw=2,
-                            marker='s',
-                            markersize=6,
-                            color='darkblue',
-                            label='MLSDC without M')
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_mlsdc_noM],
+        [err[1] for err in errors_mlsdc_noM],
+        lw=2,
+        marker='s',
+        markersize=6,
+        color='darkblue',
+        label='MLSDC without M',
+    )
 
     plt_helper.plt.xlim([0, 11])
-    plt_helper.plt.ylim([6E-09, 2E-03])
+    plt_helper.plt.ylim([6e-09, 2e-03])
     plt_helper.plt.xlabel('iteration')
     plt_helper.plt.ylabel('error')
     plt_helper.plt.legend()
@@ -149,19 +165,27 @@ def visualize():
 
     plt_helper.newfig(240, 1, ratio=0.8)
 
-    plt_helper.plt.semilogy([err[0] for err in errors_mlsdc_noM], [err[1] for err in errors_mlsdc_noM], lw=2,
-                            color='darkblue',
-                            marker='s',
-                            markersize=6,
-                            label='MLSDC without M')
-    plt_helper.plt.semilogy([err[0] for err in errors_mlsdc_M], [err[1] for err in errors_mlsdc_M], lw=2,
-                            marker='o',
-                            markersize=6,
-                            color='red',
-                            label='MLSDC with M')
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_mlsdc_noM],
+        [err[1] for err in errors_mlsdc_noM],
+        lw=2,
+        color='darkblue',
+        marker='s',
+        markersize=6,
+        label='MLSDC without M',
+    )
+    plt_helper.plt.semilogy(
+        [err[0] for err in errors_mlsdc_M],
+        [err[1] for err in errors_mlsdc_M],
+        lw=2,
+        marker='o',
+        markersize=6,
+        color='red',
+        label='MLSDC with M',
+    )
 
     plt_helper.plt.xlim([0, 11])
-    plt_helper.plt.ylim([6E-09, 2E-03])
+    plt_helper.plt.ylim([6e-09, 2e-03])
     plt_helper.plt.xlabel('iteration')
     plt_helper.plt.ylabel('error')
     plt_helper.plt.legend()
@@ -183,7 +207,3 @@ if __name__ == "__main__":
     # np.save('errors_mlsdc_noM.npy',  errors_mlsdc_noM)
 
     visualize()
-
-
-
-

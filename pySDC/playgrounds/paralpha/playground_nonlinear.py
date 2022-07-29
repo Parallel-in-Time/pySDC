@@ -23,8 +23,8 @@ def run():
     problem_params['dw'] = -0.04
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 200
-    problem_params['newton_tol'] = 1E-08
-    problem_params['lin_tol'] = 1E-08
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-08
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.5
     problem_params['interval'] = (-2.0, 2.0)
@@ -69,14 +69,19 @@ def run():
     for nb in range(nblocks):
 
         outer_k = 0
-        outer_restol = 1E-10
-        outer_res = u0 - ((np.kron(np.kron(IL, LM), IN) - np.kron(np.kron(E, H), IN)) @ u - dt * np.kron(np.kron(IL, Q), A) @ u + dt * np.kron(np.kron(IL, Q), IN) @
-                          (- 2.0 / prob.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * prob.params.dw * u * (1.0 - u)))
+        outer_restol = 1e-10
+        outer_res = u0 - (
+            (np.kron(np.kron(IL, LM), IN) - np.kron(np.kron(E, H), IN)) @ u
+            - dt * np.kron(np.kron(IL, Q), A) @ u
+            + dt
+            * np.kron(np.kron(IL, Q), IN)
+            @ (-2.0 / prob.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * prob.params.dw * u * (1.0 - u))
+        )
         inner_iter = 0
 
         while outer_k < maxiter and np.linalg.norm(outer_res, np.inf) > outer_restol:
             outer_k += 1
-            
+
             A_grad = np.zeros((N + 2, N + 2))
             for l in range(L):
                 for m in range(M):
@@ -84,17 +89,24 @@ def run():
                     iend = istart + N + 2
                     # print(istart, iend)
                     tmp = u[istart:iend, 0]
-                    A_grad += A - 2.0 / prob.params.eps ** 2 * np.diag((1.0 - tmp) * (1.0 - 2.0 * tmp) - tmp * ((1.0 - 2.0 * tmp) + 2.0 * (1.0 - tmp))) \
-                     - 6.0 * prob.params.dw * np.diag((1.0 - tmp) - tmp)
+                    A_grad += (
+                        A
+                        - 2.0
+                        / prob.params.eps**2
+                        * np.diag((1.0 - tmp) * (1.0 - 2.0 * tmp) - tmp * ((1.0 - 2.0 * tmp) + 2.0 * (1.0 - tmp)))
+                        - 6.0 * prob.params.dw * np.diag((1.0 - tmp) - tmp)
+                    )
             A_grad /= L * M
             A_grad[0, :] = 0
             A_grad[-1, :] = 0
             C_grad = -(np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A_grad) - np.kron(np.kron(E, H), IN))
-            Calpha_grad = -(np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A_grad) - np.kron(np.kron(Ealpha, H), IN))
+            Calpha_grad = -(
+                np.kron(np.kron(IL, LM), IN) - dt * np.kron(np.kron(IL, Q), A_grad) - np.kron(np.kron(Ealpha, H), IN)
+            )
             Calpha_grad_inv = np.linalg.inv(Calpha_grad)
 
             inner_k = 0
-            inner_restol = 1E-11
+            inner_restol = 1e-11
             e = np.zeros(L * M * (N + 2))[:, None]
 
             inner_res = outer_res - C_grad @ e
@@ -106,11 +118,16 @@ def run():
 
             inner_iter += inner_k
             u -= e
-            outer_res = u0 - ((np.kron(np.kron(IL, LM), IN) - np.kron(np.kron(E, H), IN)) @ u - dt * np.kron(np.kron(IL, Q), A) @ u - dt * np.kron(np.kron(IL, Q), IN) @
-                        (- 2.0 / prob.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * prob.params.dw * u * (1.0 - u)))
+            outer_res = u0 - (
+                (np.kron(np.kron(IL, LM), IN) - np.kron(np.kron(E, H), IN)) @ u
+                - dt * np.kron(np.kron(IL, Q), A) @ u
+                - dt
+                * np.kron(np.kron(IL, Q), IN)
+                @ (-2.0 / prob.params.eps**2 * u * (1.0 - u) * (1.0 - 2 * u) - 6.0 * prob.params.dw * u * (1.0 - u))
+            )
 
-        ures = u[-(N + 2):, 0]
-        uinit = u[-(N + 2):, 0]
+        ures = u[-(N + 2) :, 0]
+        uinit = u[-(N + 2) :, 0]
         u0_M = np.kron(np.ones(M), uinit)
         u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
         u = u0.copy()
@@ -127,7 +144,7 @@ def run():
 
     uinit = prob.u_exact(t=t0)
     # plt.plot(uex)
-    plt.plot(uex[:, None]-ures[:, None])
+    plt.plot(uex[:, None] - ures[:, None])
     # plt.plot(uinit)
     # plt.plot(u[-(N + 2):])
     plt.show()

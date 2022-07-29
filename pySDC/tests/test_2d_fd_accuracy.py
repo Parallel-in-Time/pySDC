@@ -20,7 +20,7 @@ def test_spatial_accuracy():
     problem_params['nu'] = 1.0
 
     # create list of nvars to do the accuracy test with
-    nvars_list = [(2 ** p, 2 ** p) for p in range(4, 12)]
+    nvars_list = [(2**p, 2**p) for p in range(4, 12)]
 
     # run accuracy test for all nvars
     for order_stencil in [2, 4, 8]:
@@ -30,7 +30,9 @@ def test_spatial_accuracy():
         order = get_accuracy_order(results)
         print(order_stencil, order)
 
-        assert all(np.isclose(order, order_stencil, atol=5e-2)), f"ERROR: expected spatial order to be \
+        assert all(
+            np.isclose(order, order_stencil, atol=5e-2)
+        ), f"ERROR: expected spatial order to be \
 {order_stencil} but got {np.mean(order):.2f}"
 
 
@@ -63,7 +65,14 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap[:] = -2*(np.pi * prob.params.freq) ** 2 * prob.params.nu * np.kron(np.sin(np.pi * prob.params.freq * xvalues), np.sin(np.pi * prob.params.freq * xvalues)).reshape(nvars)
+        u_lap[:] = (
+            -2
+            * (np.pi * prob.params.freq) ** 2
+            * prob.params.nu
+            * np.kron(np.sin(np.pi * prob.params.freq * xvalues), np.sin(np.pi * prob.params.freq * xvalues)).reshape(
+                nvars
+            )
+        )
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)
 
@@ -94,15 +103,15 @@ def get_accuracy_order(results):
 
     order = []
     # loop over two consecutive errors/nvars pairs
-    for i in range(1,len(nvars_list)):
+    for i in range(1, len(nvars_list)):
 
         # get ids
         id = ID(nvars=nvars_list[i])
-        id_prev = ID(nvars=nvars_list[i-1])
+        id_prev = ID(nvars=nvars_list[i - 1])
 
         # compute order as log(prev_error/this_error)/log(this_nvars/old_nvars) <-- depends on the sorting of the list!
         if results[id] > 1e-8 and results[id_prev] > 1e-8:
-            order.append(np.log(results[id_prev]/results[id])/np.log(nvars_list[i][0]/nvars_list[i-1][0]))
+            order.append(np.log(results[id_prev] / results[id]) / np.log(nvars_list[i][0] / nvars_list[i - 1][0]))
 
     return order
 

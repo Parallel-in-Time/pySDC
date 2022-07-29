@@ -68,8 +68,9 @@ class verlet(sweeper):
 
             for m in range(self.coll.num_nodes):
                 for n in range(self.coll.num_nodes):
-                    QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] /
-                                                               self.coll.weights[m])
+                    QQ[m + 1, n + 1] = self.coll.weights[n] * (
+                        1.0 - self.coll.Qmat[n + 1, m + 1] / self.coll.weights[m]
+                    )
             QQ = np.dot(self.coll.Qmat, QQ)
 
         # if we do not have Gauss-Lobatto, just multiply Q (will not get a symplectic method, they say)
@@ -192,7 +193,7 @@ class verlet(sweeper):
         P = L.prob
 
         # start with u0 and add integral over the full interval (using coll.weights)
-        if (self.coll.right_is_node and not self.params.do_coll_update):
+        if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
         else:

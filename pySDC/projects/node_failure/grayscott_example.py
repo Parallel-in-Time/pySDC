@@ -25,7 +25,7 @@ def main(ft_strategies):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
+    level_params['restol'] = 1e-07
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -82,8 +82,9 @@ def main(ft_strategies):
 
     ft.hard_random = 0.03
 
-    controller = controller_nonMPI_hard_faults(num_procs=num_procs, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI_hard_faults(
+        num_procs=num_procs, controller_params=controller_params, description=description
+    )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -133,8 +134,12 @@ def main(ft_strategies):
             iter_count[item[0]] = item[1]
         print(iter_count)
 
-        np.savez('data/PFASST_GRAYSCOTT_stats_hf_' + ft.strategy + '_P' + str(num_procs), residual=residual,
-                 iter_count=iter_count, hard_stats=ft.hard_stats)
+        np.savez(
+            'data/PFASST_GRAYSCOTT_stats_hf_' + ft.strategy + '_P' + str(num_procs),
+            residual=residual,
+            iter_count=iter_count,
+            hard_stats=ft.hard_stats,
+        )
 
 
 if __name__ == "__main__":

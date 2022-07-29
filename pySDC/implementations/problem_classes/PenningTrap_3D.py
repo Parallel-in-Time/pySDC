@@ -1,4 +1,3 @@
-
 import numpy as np
 from numba import jit
 
@@ -31,8 +30,9 @@ class penningtrap(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing nparts, dtype_u and dtype_f
-        super(penningtrap, self).__init__(((3, problem_params['nparts']), None, np.dtype('float64')),
-                                          dtype_u, dtype_f, problem_params)
+        super(penningtrap, self).__init__(
+            ((3, problem_params['nparts']), None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
     @staticmethod
     @jit(nopython=True, nogil=True)
@@ -47,9 +47,13 @@ class penningtrap(ptype):
 
             for j in range(N):
 
-                dist2 = (pos[0, i] - pos[0, j]) ** 2 + (pos[1, i] - pos[1, j]) ** 2 + \
-                        (pos[2, i] - pos[2, j]) ** 2 + sig ** 2
-                contrib += q[j] * (pos[:, i] - pos[:, j]) / dist2 ** 1.5
+                dist2 = (
+                    (pos[0, i] - pos[0, j]) ** 2
+                    + (pos[1, i] - pos[1, j]) ** 2
+                    + (pos[2, i] - pos[2, j]) ** 2
+                    + sig**2
+                )
+                contrib += q[j] * (pos[:, i] - pos[:, j]) / dist2**1.5
 
             Efield[:, i] += contrib[:]
 
@@ -91,7 +95,7 @@ class penningtrap(ptype):
         f.elec[:] = self.get_interactions(part)
 
         for n in range(N):
-            f.elec[:, n] += self.params.omega_E ** 2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
+            f.elec[:, n] += self.params.omega_E**2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
             f.magn[:, n] = self.params.omega_B * np.array([0, 0, 1])
 
         return f
@@ -183,8 +187,8 @@ class penningtrap(ptype):
         u.vel[2, 0] = -u0[0][2] * wbar * np.sin(wbar * t) + u0[1][2] * np.cos(wbar * t)
 
         # define temp. variables to compute complex position
-        Op = 1 / 2 * (wB + np.sqrt(wB ** 2 - 4 * wE ** 2))
-        Om = 1 / 2 * (wB - np.sqrt(wB ** 2 - 4 * wE ** 2))
+        Op = 1 / 2 * (wB + np.sqrt(wB**2 - 4 * wE**2))
+        Om = 1 / 2 * (wB - np.sqrt(wB**2 - 4 * wE**2))
         Rm = (Op * u0[0][0] + u0[1][1]) / (Op - Om)
         Rp = u0[0][0] - Rm
         Im = (Op * u0[0][1] - u0[1][0]) / (Op - Om)

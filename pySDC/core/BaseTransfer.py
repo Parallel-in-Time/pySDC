@@ -60,8 +60,9 @@ class base_transfer(object):
             self.Rcoll = self.get_transfer_matrix_Q(coarse_grid, fine_grid)
 
         # set up spatial transfer
-        self.space_transfer = space_transfer_class(fine_prob=self.fine.prob, coarse_prob=self.coarse.prob,
-                                                   params=space_transfer_params)
+        self.space_transfer = space_transfer_class(
+            fine_prob=self.fine.prob, coarse_prob=self.coarse.prob, params=space_transfer_params
+        )
 
     @staticmethod
     def get_transfer_matrix_Q(f_nodes, c_nodes):

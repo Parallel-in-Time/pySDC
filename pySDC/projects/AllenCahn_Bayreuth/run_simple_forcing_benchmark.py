@@ -45,8 +45,8 @@ def run_simulation(name=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
@@ -138,8 +138,14 @@ def run_simulation(name=None, nprocs_space=None):
 if __name__ == "__main__":
     # Add parser to get number of processors in space and setup (have to do this here to enable automatic testing)
     parser = ArgumentParser()
-    parser.add_argument("-s", "--setup", help='Specifies the setup', type=str, default='AC-bench-noforce',
-                        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'])
+    parser.add_argument(
+        "-s",
+        "--setup",
+        help='Specifies the setup',
+        type=str,
+        default='AC-bench-noforce',
+        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'],
+    )
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     args = parser.parse_args()
 

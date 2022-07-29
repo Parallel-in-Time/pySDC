@@ -12,7 +12,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
@@ -57,7 +57,7 @@ def main():
     print(out)
     f.close()
 
-    assert err <= 2E-04, "ERROR: the spatial accuracy is higher than expected, got %s" % err
+    assert err <= 2e-04, "ERROR: the spatial accuracy is higher than expected, got %s" % err
 
 
 if __name__ == "__main__":

@@ -38,12 +38,14 @@ def main(nprocs_space=None):
     time_rank = time_comm.Get_rank()
     time_size = time_comm.Get_size()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.125
     level_params['nsweeps'] = [1]
 
@@ -61,7 +63,7 @@ def main(nprocs_space=None):
     problem_params['cnvars'] = [(127, 127)]  # number of degrees of freedom for each level
     problem_params['refine'] = 1  # number of degrees of freedom for each level
     problem_params['comm'] = space_comm
-    problem_params['sol_tol'] = 1E-12
+    problem_params['sol_tol'] = 1e-12
 
     # initialize step parameters
     step_params = dict()
@@ -128,10 +130,15 @@ def main(nprocs_space=None):
         print(out)
         out = f'   Time-rank {time_rank} -- Range of values for number of iterations: %2i ' % np.ptp(niters)
         print(out)
-        out = f'   Time-rank {time_rank} -- Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = f'   Time-rank {time_rank} -- Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         print(out)
-        out = f'   Time-rank {time_rank} -- Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
+        out = f'   Time-rank {time_rank} -- Std and var for number of iterations: %4.2f -- %4.2f' % (
+            float(np.std(niters)),
+            float(np.var(niters)),
+        )
         print(out)
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')

@@ -55,15 +55,20 @@ class allencahn_imex(ptype):
         # Creating FFT structure
         ndim = len(problem_params['nvars'])
         axes = tuple(range(ndim))
-        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64,
-                        collapse=True)
+        self.fft = PFFT(
+            problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64, collapse=True
+        )
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_imex, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
-                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(allencahn_imex, self).__init__(
+            init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         L = np.array([self.params.L] * ndim, dtype=float)
 
@@ -71,14 +76,14 @@ class allencahn_imex(ptype):
         X = np.ogrid[self.fft.local_slice(False)]
         N = self.fft.global_shape()
         for i in range(len(N)):
-            X[i] = (X[i] * L[i] / N[i])
+            X[i] = X[i] * L[i] / N[i]
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
 
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N[:-1]]
-        k.append(np.fft.rfftfreq(N[-1], 1. / N[-1]).astype(int))
+        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
+        k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
         K = [ki[si] for ki, si in zip(k, s)]
         Ks = np.meshgrid(*K, indexing='ij', sparse=True)
         Lp = 2 * np.pi / L
@@ -112,8 +117,9 @@ class allencahn_imex(ptype):
 
             if self.params.eps > 0:
                 tmp = self.fft.backward(u)
-                tmpf = - 2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp) - \
-                    6.0 * self.params.dw * tmp * (1.0 - tmp)
+                tmpf = -2.0 / self.params.eps**2 * tmp * (1.0 - tmp) * (
+                    1.0 - 2.0 * tmp
+                ) - 6.0 * self.params.dw * tmp * (1.0 - tmp)
                 f.expl[:] = self.fft.forward(tmpf)
 
         else:
@@ -123,8 +129,9 @@ class allencahn_imex(ptype):
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
             if self.params.eps > 0:
-                f.expl = - 2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u) - \
-                    6.0 * self.params.dw * u * (1.0 - u)
+                f.expl = -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u) - 6.0 * self.params.dw * u * (
+                    1.0 - u
+                )
 
         return f
 
@@ -150,7 +157,7 @@ class allencahn_imex(ptype):
 
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs)
-            rhs_hat /= (1.0 + factor * self.K2)
+            rhs_hat /= 1.0 + factor * self.K2
             me[:] = self.fft.backward(rhs_hat)
 
         return me
@@ -233,7 +240,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             tmp[:] = self.fft.backward(u, tmp)
 
             if self.params.eps > 0:
-                tmpf = -2.0 / self.params.eps ** 2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp)
+                tmpf = -2.0 / self.params.eps**2 * tmp * (1.0 - tmp) * (1.0 - 2.0 * tmp)
             else:
                 tmpf = self.dtype_f(self.init, val=0.0)
 
@@ -267,7 +274,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
             f.impl[:] = self.fft.backward(lap_u_hat, f.impl)
 
             if self.params.eps > 0:
-                f.expl = -2.0 / self.params.eps ** 2 * u * (1.0 - u) * (1.0 - 2.0 * u)
+                f.expl = -2.0 / self.params.eps**2 * u * (1.0 - u) * (1.0 - 2.0 * u)
 
             # build sum over RHS without driving force
             Rt_local = float(np.sum(f.impl + f.expl))

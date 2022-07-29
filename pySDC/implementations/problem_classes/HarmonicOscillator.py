@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from pySDC.core.Errors import ParameterError, ProblemError

@@ -38,9 +38,7 @@ def computeFejerRule(n):
     m = n - lN
     K = np.arange(m)
     # -- Build v0
-    v0 = np.concatenate([
-        2 * np.exp(1j * np.pi * K / n) / (1 - 4 * K**2),
-        np.zeros(lN + 1)])
+    v0 = np.concatenate([2 * np.exp(1j * np.pi * K / n) / (1 - 4 * K**2), np.zeros(lN + 1)])
     # -- Build v1 from v0
     v1 = np.empty(len(v0) - 1, dtype=complex)
     np.conjugate(v0[:0:-1], out=v1)
@@ -48,8 +46,7 @@ def computeFejerRule(n):
     # -- Compute inverse fourier transform
     w = np.fft.ifft(v1)
     if max(w.imag) > 1.0e-15:
-        raise ValueError(
-            f'Max imaginary value to important for ifft: {max(w.imag)}')
+        raise ValueError(f'Max imaginary value to important for ifft: {max(w.imag)}')
     # -- Store weights
     weights[:] = w.real
 
@@ -155,7 +152,7 @@ class LagrangeApproximation(object):
             diffs *= 4 / (points.max() - points.min())
             sign = np.sign(diffs).prod(axis=1)
             vv = np.exp(np.log(np.abs(diffs)).sum(axis=1))
-            invProd = (sign * vv)
+            invProd = sign * vv
             invProd **= -1
             invProd /= np.linalg.norm(invProd, np.inf)
             return invProd
@@ -173,8 +170,7 @@ class LagrangeApproximation(object):
         elif weightComputation == 'CHEBFUN':
             invProd = chebfun(diffs)
         else:
-            raise NotImplementedError(
-                f'weightComputation={weightComputation}')
+            raise NotImplementedError(f'weightComputation={weightComputation}')
         weights = invProd
 
         # Store attributes
@@ -295,8 +291,7 @@ class LagrangeApproximation(object):
         tEval = (bj - aj) / 2 * tau + (bj + aj) / 2
 
         # Compute the integrand function on nodes
-        integrand = self.getInterpolationMatrix(tEval.ravel()).T.reshape(
-            (-1,) + tEval.shape)
+        integrand = self.getInterpolationMatrix(tEval.ravel()).T.reshape((-1,) + tEval.shape)
 
         # Apply quadrature rule to integrate
         integrand *= omega

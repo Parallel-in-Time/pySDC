@@ -15,7 +15,6 @@ from mpi4py import MPI
 
 
 class Poisson2D(object):
-
     def __init__(self, da):
         assert da.getDim() == 2
         self.da = da
@@ -44,10 +43,14 @@ class Poisson2D(object):
             for i in range(xs, xe):
                 u = x[i, j]  # center
                 u_e = u_w = u_n = u_s = 0
-                if i > 0:    u_w = x[i - 1, j]  # west
-                if i < mx - 1: u_e = x[i + 1, j]  # east
-                if j > 0:    u_s = x[i, j - 1]  # south
-                if j < my - 1: u_n = x[i, j + 1]  # north
+                if i > 0:
+                    u_w = x[i - 1, j]  # west
+                if i < mx - 1:
+                    u_e = x[i + 1, j]  # east
+                if j > 0:
+                    u_s = x[i, j - 1]  # south
+                if j < my - 1:
+                    u_n = x[i, j + 1]  # north
                 u_xx = (-u_e + 2 * u - u_w) * hy / hx
                 u_yy = (-u_n + 2 * u - u_s) * hx / hy
                 y[i, j] = u_xx + u_yy
@@ -80,8 +83,10 @@ def main():
     time_rank = time_comm.Get_rank()
     time_size = time_comm.Get_size()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     OptDB = PETSc.Options()
 
@@ -96,8 +101,7 @@ def main():
     x = da.createGlobalVec()
     b = da.createGlobalVec()
     # A = da.createMat('python')
-    A = PETSc.Mat().createPython(
-        [x.getSizes(), b.getSizes()], comm=space_comm)
+    A = PETSc.Mat().createPython([x.getSizes(), b.getSizes()], comm=space_comm)
     A.setPythonContext(pde)
     A.setUp()
     # print(da.comm, space_comm)
@@ -135,7 +139,8 @@ def main():
 
     print('Sum of elements of x =', x.sum())
 
-    print(t1-t0, t2-t1, t2-t0)
+    print(t1 - t0, t2 - t1, t2 - t0)
+
 
 if __name__ == "__main__":
     main()

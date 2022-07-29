@@ -45,11 +45,13 @@ class generic_implicit_MPI(sweeper):
         me = P.dtype_u(P.init, val=0.0)
         for m in range(self.coll.num_nodes):
             if m == self.rank:
-                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1],
-                                        me, root=m, op=MPI.SUM)
+                self.params.comm.Reduce(
+                    L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1], me, root=m, op=MPI.SUM
+                )
             else:
-                self.params.comm.Reduce(L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1],
-                                        None, root=m, op=MPI.SUM)
+                self.params.comm.Reduce(
+                    L.dt * self.coll.Qmat[m + 1, self.rank + 1] * L.f[self.rank + 1], None, root=m, op=MPI.SUM
+                )
 
         return me
 
@@ -87,8 +89,12 @@ class generic_implicit_MPI(sweeper):
         # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
 
         # implicit solve with prefactor stemming from the diagonal of Qd
-        L.u[self.rank + 1] = P.solve_system(rhs, L.dt * self.QI[self.rank + 1, self.rank + 1], L.u[self.rank + 1],
-                                            L.time + L.dt * self.coll.nodes[self.rank])
+        L.u[self.rank + 1] = P.solve_system(
+            rhs,
+            L.dt * self.QI[self.rank + 1, self.rank + 1],
+            L.u[self.rank + 1],
+            L.time + L.dt * self.coll.nodes[self.rank],
+        )
         # update function values
         L.f[self.rank + 1] = P.eval_f(L.u[self.rank + 1], L.time + L.dt * self.coll.nodes[self.rank])
 

@@ -14,20 +14,22 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
     def __init__(self, num_procs, controller_params, description):
         """
-       Initialization routine for PFASST controller
+        Initialization routine for PFASST controller
 
-       Args:
-           num_procs: number of parallel time steps (still serial, though), can be 1
-           controller_params: parameter set for the controller and the steps
-           description: all the parameters to set up the rest (levels, problems, transfer, ...)
-       """
+        Args:
+            num_procs: number of parallel time steps (still serial, though), can be 1
+            controller_params: parameter set for the controller and the steps
+            description: all the parameters to set up the rest (levels, problems, transfer, ...)
+        """
 
-        assert description['sweeper_class'] is generic_implicit, \
+        assert description['sweeper_class'] is generic_implicit, (
             'ERROR: matrix version will only work with generic_implicit sweeper, got %s' % description['sweeper_class']
+        )
 
         # call parent's initialization routine
-        super(controller_matrix_nonMPI, self).__init__(num_procs=num_procs, controller_params=controller_params,
-                                                       description=description)
+        super(controller_matrix_nonMPI, self).__init__(
+            num_procs=num_procs, controller_params=controller_params, description=description
+        )
 
         self.nsteps = len(self.MS)
         self.nlevels = len(self.MS[0].levels)
@@ -41,15 +43,18 @@ class controller_matrix_nonMPI(controller_nonMPI):
         prob = self.MS[0].levels[0].prob
 
         assert isinstance(self.nspace, int), 'ERROR: can only handle 1D data, got %s' % self.nspace
-        assert [type(level.sweep.coll) for step in self.MS for level in step.levels].count(CollGaussRadau_Right) == \
-            self.nlevels * self.nsteps, 'ERROR: all collocation nodes have to be of Gauss-Radau type'
+        assert [type(level.sweep.coll) for step in self.MS for level in step.levels].count(
+            CollGaussRadau_Right
+        ) == self.nlevels * self.nsteps, 'ERROR: all collocation nodes have to be of Gauss-Radau type'
         assert self.nlevels <= 2, 'ERROR: cannot use matrix-PFASST with more than 2 levels'  # TODO: fixme
-        assert [level.dt for step in self.MS for level in step.levels].count(self.dt) == self.nlevels * self.nsteps, \
-            'ERROR: dt must be equal for all steps and all levels'
+        assert [level.dt for step in self.MS for level in step.levels].count(
+            self.dt
+        ) == self.nlevels * self.nsteps, 'ERROR: dt must be equal for all steps and all levels'
         # assert [level.sweep.coll.num_nodes for step in self.MS for level in step.levels].count(self.nnodes) == \
         #     self.nlevels * self.nsteps, 'ERROR: nnodes must be equal for all steps and all levels'
-        assert [type(level.prob) for step in self.MS for level in step.levels].count(type(prob)) == \
-            self.nlevels * self.nsteps, 'ERROR: all probem classes have to be the same'
+        assert [type(level.prob) for step in self.MS for level in step.levels].count(
+            type(prob)
+        ) == self.nlevels * self.nsteps, 'ERROR: all probem classes have to be the same'
 
         assert self.params.predict_type is None, 'ERROR: no predictor for matrix controller yet'  # TODO: fixme
 
@@ -65,11 +70,15 @@ class controller_matrix_nonMPI(controller_nonMPI):
         N = np.zeros((self.nnodes, self.nnodes))
         N[:, -1] = 1
 
-        self.C = np.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, A)) - np.kron(E, np.kron(N, np.eye(self.nspace)))
+        self.C = (
+            np.eye(self.nsteps * self.nnodes * self.nspace)
+            - self.dt * np.kron(np.eye(self.nsteps), np.kron(Q, A))
+            - np.kron(E, np.kron(N, np.eye(self.nspace)))
+        )
         self.C = np.array(self.C)
-        self.P = np.eye(self.nsteps * self.nnodes * self.nspace) - \
-            self.dt * np.kron(np.eye(self.nsteps), np.kron(Qd, A))
+        self.P = np.eye(self.nsteps * self.nnodes * self.nspace) - self.dt * np.kron(
+            np.eye(self.nsteps), np.kron(Qd, A)
+        )
         self.P = np.array(self.P)
 
         if self.nlevels > 1:
@@ -96,9 +105,11 @@ class controller_matrix_nonMPI(controller_nonMPI):
             self.Tcf = np.array(np.kron(np.eye(self.nsteps), np.kron(TcfQ, TcfA)))
             self.Tfc = np.array(np.kron(np.eye(self.nsteps), np.kron(TfcQ, TfcA)))
 
-            self.Pc = np.eye(self.nsteps * nnodesc * self.nspace_c) - \
-                self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, Ac)) - \
-                np.kron(E, np.kron(Nc, np.eye(self.nspace_c)))
+            self.Pc = (
+                np.eye(self.nsteps * nnodesc * self.nspace_c)
+                - self.dt * np.kron(np.eye(self.nsteps), np.kron(Qdc, Ac))
+                - np.kron(E, np.kron(Nc, np.eye(self.nspace_c)))
+            )
             self.Pc = np.array(self.Pc)
 
         self.u = np.zeros(self.nsteps * self.nnodes * self.nspace)
@@ -124,8 +135,9 @@ class controller_matrix_nonMPI(controller_nonMPI):
         num_procs = len(self.MS)
         self.hooks.reset_stats()
 
-        assert ((Tend - t0) / self.dt).is_integer(), \
-            'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'
+        assert (
+            (Tend - t0) / self.dt
+        ).is_integer(), 'ERROR: dt, t0, Tend were not chosen correctly, do not divide interval to be computed equally'
 
         assert int((Tend - t0) / self.dt) % num_procs == 0, 'ERROR: num_procs not chosen correctly'
 
@@ -192,8 +204,9 @@ class controller_matrix_nonMPI(controller_nonMPI):
 
         # form span and reduce matrices and add to operator
         Tspread = np.kron(np.concatenate([[1] * (self.nsteps * self.nnodes)]), np.eye(self.nspace)).T
-        Tnospread = np.kron(np.concatenate([[1], [0] * (self.nsteps - 1)]),
-                            np.kron(np.ones(self.nnodes), np.eye(self.nspace))).T
+        Tnospread = np.kron(
+            np.concatenate([[1], [0] * (self.nsteps - 1)]), np.kron(np.ones(self.nnodes), np.eye(self.nspace))
+        ).T
         Treduce = np.kron(np.concatenate([[0] * (self.nsteps * self.nnodes - 1), [1]]), np.eye(self.nspace))
 
         if self.MS[0].levels[0].sweep.params.initial_guess == 'spread':
@@ -309,8 +322,9 @@ class controller_matrix_nonMPI(controller_nonMPI):
                     self.u += self.Tcf.dot(np.linalg.solve(self.Pc, self.Tfc.dot(self.res)))
                     self.res = self.u0 - self.C.dot(self.u)
 
-                    MS = self.update_data(MS=MS, u=self.u, res=self.res, niter=niter, level=1,
-                                          stage='POST_COARSE_SWEEP')
+                    MS = self.update_data(
+                        MS=MS, u=self.u, res=self.res, niter=niter, level=1, stage='POST_COARSE_SWEEP'
+                    )
                     for S in MS:
                         self.hooks.post_sweep(step=S, level_number=1)
 

@@ -18,7 +18,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 1.0 / num_proc
     level_params['nsweeps'] = [1]
 
@@ -66,8 +66,7 @@ def main():
     Tend = 1.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=num_proc, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -96,13 +95,12 @@ def main():
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    print('CFL number: %4.2f' % (level_params['dt'] * problem_params['nu'] / (1.0 / problem_params['nvars'][0])**2))
+    print('CFL number: %4.2f' % (level_params['dt'] * problem_params['nu'] / (1.0 / problem_params['nvars'][0]) ** 2))
     print('Error: %8.4e' % err)
 
 

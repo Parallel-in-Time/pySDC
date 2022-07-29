@@ -11,7 +11,7 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 1.0
 
     # initialize sweeper parameters
@@ -22,7 +22,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['newton_maxiter'] = 50
     problem_params['lam'] = 20
     problem_params['direct'] = True

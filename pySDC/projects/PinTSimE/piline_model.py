@@ -15,7 +15,6 @@ from pySDC.core.Hooks import hooks
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -25,12 +24,33 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='p3', value=L.uend[2])
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v1',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v2',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='p3',
+            value=L.uend[2],
+        )
 
 
 def main():
@@ -40,7 +60,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
@@ -72,12 +92,12 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = piline                         # pass problem class
-    description['problem_params'] = problem_params                # pass problem parameters
-    description['sweeper_class'] = imex_1st_order                 # pass sweeper
-    description['sweeper_params'] = sweeper_params                # pass sweeper parameters
-    description['level_params'] = level_params                    # pass level parameters
-    description['step_params'] = step_params                      # pass step parameters
+    description['problem_class'] = piline  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
 
     assert 'errtol' not in description['step_params'].keys(), "No exact or reference solution known to compute error"
 

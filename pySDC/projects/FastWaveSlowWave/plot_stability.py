@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
@@ -85,8 +86,7 @@ def compute_stability():
                 # Compute stability function of collocation solution
                 Mat_sweep = np.linalg.inv(np.eye(nnodes) - dt * (lambda_fast + lambda_slow) * Q)
             if L.sweep.params.do_coll_update:
-                stab_fh = 1.0 + (lambda_fast + lambda_slow) * L.sweep.coll.weights.dot(
-                    Mat_sweep.dot(np.ones(nnodes)))
+                stab_fh = 1.0 + (lambda_fast + lambda_slow) * L.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
             else:
                 q = np.zeros(nnodes)
                 q[nnodes - 1] = 1.0
@@ -125,8 +125,17 @@ def plot_stability(lambda_s, lambda_f, num_nodes, K, stab):
     manual_locations = [(1.5, 2.5)]
     if K > 0:  # for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason
         plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs - 2, manual=manual_locations)
-    plt.gca().add_patch(Polygon([[0, 0], [lam_s_max, 0], [lam_s_max, lam_s_max]], visible=True, fill=True,
-                                facecolor='.75', edgecolor='k', linewidth=1.0, zorder=11))
+    plt.gca().add_patch(
+        Polygon(
+            [[0, 0], [lam_s_max, 0], [lam_s_max, lam_s_max]],
+            visible=True,
+            fill=True,
+            facecolor='.75',
+            edgecolor='k',
+            linewidth=1.0,
+            zorder=11,
+        )
+    )
     plt.gca().set_xticks(np.arange(0, int(lam_s_max) + 1))
     plt.gca().set_yticks(np.arange(0, int(lam_f_max) + 2, 2))
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)

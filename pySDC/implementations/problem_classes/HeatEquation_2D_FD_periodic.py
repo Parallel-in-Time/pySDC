@@ -1,4 +1,3 @@
-
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
@@ -18,6 +17,7 @@ class heat2d_periodic(ptype):
         A: second-order FD discretization of the 2D laplace operator
         dx: distance between two spatial nodes (here: being the same in both dimensions)
     """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
         """
         Initialization routine
@@ -48,8 +48,12 @@ class heat2d_periodic(ptype):
             problem_params['order'] = 2
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heat2d_periodic, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(heat2d_periodic, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
@@ -71,14 +75,18 @@ class heat2d_periodic(ptype):
 
         stencil, zero_pos, _ = get_finite_difference_stencil(derivative=2, order=order, type='center')
         dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        offsets = np.concatenate(
+            (
+                [N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
+            )
+        )
         doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
 
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
 
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
-        A *= nu / (dx ** 2)
+        A *= nu / (dx**2)
 
         return A
 
@@ -113,8 +121,12 @@ class heat2d_periodic(ptype):
         """
 
         me = self.dtype_u(self.init)
-        me[:] = cg(sp.eye(self.params.nvars[0] * self.params.nvars[1], format='csc') - factor * self.A,
-                   rhs.flatten(), x0=u0.flatten(), tol=1E-12)[0].reshape(self.params.nvars)
+        me[:] = cg(
+            sp.eye(self.params.nvars[0] * self.params.nvars[1], format='csc') - factor * self.A,
+            rhs.flatten(),
+            x0=u0.flatten(),
+            tol=1e-12,
+        )[0].reshape(self.params.nvars)
         return me
 
     def u_exact(self, t):
@@ -131,6 +143,9 @@ class heat2d_periodic(ptype):
         me = self.dtype_u(self.init)
         xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
         xv, yv = np.meshgrid(xvalues, xvalues)
-        me[:] = np.sin(np.pi * self.params.freq * xv) * np.sin(np.pi * self.params.freq * yv) * \
-            np.exp(-t * self.params.nu * 2 * (np.pi * self.params.freq) ** 2)
+        me[:] = (
+            np.sin(np.pi * self.params.freq * xv)
+            * np.sin(np.pi * self.params.freq * yv)
+            * np.exp(-t * self.params.nu * 2 * (np.pi * self.params.freq) ** 2)
+        )
         return me

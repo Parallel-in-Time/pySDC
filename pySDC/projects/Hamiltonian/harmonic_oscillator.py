@@ -88,8 +88,9 @@ def run_simulation():
             description['sweeper_params'] = sweeper_params
 
             # instantiate the controller
-            controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=num_procs, controller_params=controller_params, description=description
+            )
 
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
@@ -149,7 +150,9 @@ def show_results(cwd=''):
 
     plt_helper.plt.xlabel('k')
     plt_helper.plt.ylabel('Number of iterations')
-    plt_helper.plt.legend(loc='upper left', )
+    plt_helper.plt.legend(
+        loc='upper left',
+    )
     plt_helper.plt.ylim([0, 15])
 
     fname = 'data/harmonic_qd_iterations'

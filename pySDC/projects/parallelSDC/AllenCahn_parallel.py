@@ -28,8 +28,8 @@ def run_variant(variant=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
-    level_params['dt'] = 1E-03 / 2
+    level_params['restol'] = 1e-07
+    level_params['dt'] = 1e-03 / 2
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
@@ -44,8 +44,8 @@ def run_variant(variant=None):
 
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-08
-    problem_params['lin_tol'] = 1E-09
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-09
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -136,20 +136,26 @@ def run_variant(variant=None):
 
     if do_print:
         out = '   Mean number of iterations: %4.2f' % np.mean(niters)
-        assert np.mean(niters) <= maxmeaniters, 'ERROR: number of iterations is too high, got %s instead of %s' \
-                                                % (np.mean(niters), maxmeaniters)
+        assert np.mean(niters) <= maxmeaniters, 'ERROR: number of iterations is too high, got %s instead of %s' % (
+            np.mean(niters),
+            maxmeaniters,
+        )
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
 
         print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
-        print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
-                                                                   P.lin_itercount / max(P.lin_ncalls, 1)))
+        print(
+            '   Mean Iteration count per call: %4.2f / %4.2f'
+            % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+        )
 
         timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 
@@ -169,15 +175,19 @@ def main():
     run_variant(variant='ml_serial')
     print()
 
-    cmd = "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; " \
-          "run_variant(\'sl_parallel\');\""
+    cmd = (
+        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
+        "run_variant(\'sl_parallel\');\""
+    )
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
     (output, err) = p.communicate()
     print(output)
 
-    cmd = "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; " \
-          "run_variant(\'ml_parallel\');\""
+    cmd = (
+        "mpirun -np 3 python -c \"from pySDC.projects.parallelSDC.AllenCahn_parallel import *; "
+        "run_variant(\'ml_parallel\');\""
+    )
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
     p.wait()
     (output, err) = p.communicate()
