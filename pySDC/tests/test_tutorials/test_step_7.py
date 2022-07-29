@@ -2,8 +2,6 @@ import os
 import subprocess
 import pytest
 
-from pySDC.tutorial.step_7.B_pySDC_with_mpi4pyfft import main as main_B
-
 
 @pytest.mark.fenics
 def test_A():
@@ -14,6 +12,8 @@ def test_A():
 
 @pytest.mark.parallel
 def test_B():
+    from pySDC.tutorial.step_7.B_pySDC_with_mpi4pyfft import main as main_B
+
     main_B()
 
 

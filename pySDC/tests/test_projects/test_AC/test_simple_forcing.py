@@ -1,10 +1,10 @@
 import pytest
 import subprocess
 
-from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
-
 
 def test_main_serial():
+    from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
+
     main()
     visualize_radii()
 
