@@ -13,6 +13,7 @@ dependencies:
   - mpi4py>=3.0.0
   - fenics>=2019.1.0
   - mpi4py-fft>=2.0.2
+  - black
   - flakeheaven
   - flake8-comprehensions
   - flake8-bugbear

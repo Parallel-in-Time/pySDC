@@ -39,6 +39,10 @@ jobs:
           activate-environment: pySDC
           environment-file: etc/environment-lint.yml
 
+      - name: Code reformatting with black
+        run: |
+          black pySDC  --check --diff --color 
+
       - name: Lint with flakeheaven
         run: |
           flakeheaven lint pySDC          
