@@ -114,11 +114,9 @@ class harmonic_oscillator(ptype):
 
             M=np.array([[1,1],[lam_1, lam_2]], dtype=complex)
             A,B=np.linalg.solve(M, U_0)
-            if np.imag(A)==0.0 and np.imag(B)==0.0:
-                A=np.real(A)
-                B=np.real(B)
-            me.pos[:]=A*np.exp(lam_1*t)+B*np.exp(lam_2*t)
-            me.vel[:]=A*lam_1*np.exp(lam_1*t)+B*lam_2*np.exp(lam_2*t)
+           
+            me.pos[:]=np.real(A*np.exp(lam_1*t)+B*np.exp(lam_2*t))
+            me.vel[:]=np.real(A*lam_1*np.exp(lam_1*t)+B*lam_2*np.exp(lam_2*t))
 
         else:
             pass
