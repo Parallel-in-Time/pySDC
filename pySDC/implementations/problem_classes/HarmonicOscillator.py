@@ -4,8 +4,8 @@ import numpy as np
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.particles import particles, acceleration
-import pdb
-from scipy.optimize import fsolve
+
+
 # noinspection PyUnusedLocal
 class harmonic_oscillator(ptype):
     """
