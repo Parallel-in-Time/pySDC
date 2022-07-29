@@ -7,7 +7,7 @@ from pylab import rcParams
 
 from pySDC.core.Errors import ProblemError
 
-from pySDC.implementations.problem_classes.DampedHarmonicOscillator import dampedharmonicoscillator
+from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.core.Step import step
@@ -52,7 +52,7 @@ lambda_k, lambda_mu, sweeper_params['num_nodes'], K,  dt*stab.real, dt*Kstab.rea
     
     # initialize sweeper parameters
     sweeper_params=dict()
-    sweeper_params['collocation_class']=CollGaussRadau_Left
+    sweeper_params['collocation_class']=CollGaussLegendre
     sweeper_params['num_nodes']=2
     sweeper_params['do_coll_update']=True
     sweeper_params['picard_mats_sweep']=True
@@ -63,7 +63,7 @@ lambda_k, lambda_mu, sweeper_params['num_nodes'], K,  dt*stab.real, dt*Kstab.rea
     
     # fill description dictionary for easy step instantiation
     description=dict()
-    description['problem_class']=dampedharmonicoscillator
+    description['problem_class']=harmonic_oscillator
     description['problem_params']=problem_params
     description['sweeper_class']=boris_2nd_order
     description['sweeper_params']=sweeper_params
@@ -172,8 +172,8 @@ def plot_stability(lambda_k, lambda_mu, num_nodes, K, stab, title):
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([0.0, lam_k_max])
     plt.ylim([0.0, lam_mu_max])
-    plt.xlabel('$\Delta t\cdot \kappa \ (Spring \ pendulum)$', fontsize=fs, labelpad=0.0)
-    plt.ylabel('$\Delta t\cdot \mu \ (Friction)$', fontsize=fs, labelpad=0.0)
+    plt.xlabel(r'$\Delta t\cdot \kappa \ (Spring \ pendulum)$', fontsize=fs, labelpad=0.0)
+    plt.ylabel(r'$\Delta t\cdot \mu \ (Friction)$', fontsize=fs, labelpad=0.0)
     plt.title('{}  M={}'.format(title, num_nodes, K), fontsize=fs)
     filename ='figures/stability-K' + str(K) + '-M' + str(num_nodes) + title + '.png'
     fig.savefig(filename, bbox_inches='tight')
