@@ -45,9 +45,8 @@ lambda_k, lambda_mu, sweeper_params['num_nodes'], K,  dt*stab.real, dt*Kstab.rea
     
     problem_params=dict()
     # set value for k and mu 
-    problem_params['k']=np.array([0.0])
-    problem_params['mu']=np.array([0.0])
-    problem_params['mass']=1.0
+    problem_params['k']=0
+    problem_params['mu']=0
     problem_params['u0']=np.array([1,1])
     
     # initialize sweeper parameters
@@ -175,7 +174,7 @@ def plot_stability(lambda_k, lambda_mu, num_nodes, K, stab, title):
     plt.xlabel(r'$\Delta t\cdot \kappa \ (Spring \ pendulum)$', fontsize=fs, labelpad=0.0)
     plt.ylabel(r'$\Delta t\cdot \mu \ (Friction)$', fontsize=fs, labelpad=0.0)
     plt.title('{}  M={}'.format(title, num_nodes, K), fontsize=fs)
-    filename ='figures/stability-K' + str(K) + '-M' + str(num_nodes) + title + '.png'
+    filename ='stability-K' + str(K) + '-M' + str(num_nodes) + title + '.png'
     fig.savefig(filename, bbox_inches='tight')
 
 

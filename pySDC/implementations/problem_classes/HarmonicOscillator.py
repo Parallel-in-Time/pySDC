@@ -23,7 +23,10 @@ class harmonic_oscillator(ptype):
         """
 
         # these parameters will be used later, so assert their existence
+        problem_params['phase']=1.0
+        problem_params['amp']=0.0
         essential_keys = ['k', 'mu', 'u0', 'phase', 'amp']
+        
         for key in essential_keys:
             if key=='mu' and key not in problem_params:
                 problem_params['mu']=0.0
