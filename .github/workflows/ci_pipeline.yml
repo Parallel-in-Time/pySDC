@@ -19,12 +19,9 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: $PY_VERSION
+          python-version: ${{ env.PY_VERSION }}
           use-only-tar-bz2: true
           mamba-version: "*"
-          channels: conda-forge,defaults
-          channel-priority: true
-          activate-environment: pySDC
           environment-file: etc/environment-lint.yml
 
       - name: Lint with flakeheaven
@@ -72,12 +69,9 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: $PY_VERSION
+          python-version: ${{ env.PY_VERSION }}
           use-only-tar-bz2: true
           mamba-version: "*"
-          channels: conda-forge,defaults
-          channel-priority: true
-          activate-environment: pySDC
           environment-file: etc/environment.yml
 
       - name: Run pytest
