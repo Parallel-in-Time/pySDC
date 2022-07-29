@@ -22,6 +22,7 @@ jobs:
           python-version: ${{ env.PY_VERSION }}
           use-only-tar-bz2: true
           mamba-version: "*"
+          activate-environment: pySDC
           environment-file: etc/environment-lint.yml
 
       - name: Lint with flakeheaven
@@ -72,6 +73,7 @@ jobs:
           python-version: ${{ env.PY_VERSION }}
           use-only-tar-bz2: true
           mamba-version: "*"
+          activate-environment: pySDC
           environment-file: etc/environment.yml
 
       - name: Run pytest
