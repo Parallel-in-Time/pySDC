@@ -31,7 +31,7 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('${{ env.yml }}') }}
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-lint.yml') }}
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -40,7 +40,7 @@ jobs:
           use-only-tar-bz2: true
           mamba-version: "*"
           activate-environment: pySDC
-          environment-file: ${{ env.yml }}
+          environment-file: 'etc/environment-lint.yml'
 
       - name: Code reformatting with black
         run: |
@@ -79,7 +79,7 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles(${{ env.yml }}) }}
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment.yml') }}
 
       - name: act workarounds
         if: ${{ env.ACT }}
@@ -98,7 +98,7 @@ jobs:
           use-only-tar-bz2: true
           mamba-version: "*"
           activate-environment: pySDC
-          environment-file: ${{ env.yml }}
+          environment-file: 'etc/environment.yml'
 
       - name: Run pytest
         run: |
@@ -147,7 +147,7 @@ jobs:
         with:
           path: ~/conda_pkgs_dir
           key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('${{ env.yml }}') }}
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-fenics.yml') }}
 
       - name: act workarounds
         if: ${{ env.ACT }}
@@ -166,7 +166,7 @@ jobs:
           use-only-tar-bz2: true
           mamba-version: "*"
           activate-environment: pySDC
-          environment-file: ${{ env.yml }}
+          environment-file: 'etc/environment-fenics.yml'
 
       - name: Run pytest
         run: |
