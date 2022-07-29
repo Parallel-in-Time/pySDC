@@ -1,12 +1,41 @@
 name: CI pipeline for pySDC
+
 on:
   push:
   pull_request:
 
+env:
+  PY_VERSION: 3.9
+
 jobs:
-  ci:
+
+  lint:
     runs-on: ubuntu-latest
-    
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: $PY_VERSION
+          use-only-tar-bz2: true
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
+          activate-environment: pySDC
+          environment-file: etc/environment-lint.yml
+
+      - name: Lint with flakeheaven
+        run: |
+          flakeheaven lint pySDC          
+
+  test:
+    runs-on: ubuntu-latest
+
+    needs: lint
+
     defaults:
       run:
         shell: bash -l {0}
@@ -43,21 +72,13 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: 3.9
+          python-version: $PY_VERSION
           use-only-tar-bz2: true
           mamba-version: "*"
           channels: conda-forge,defaults
           channel-priority: true
           activate-environment: pySDC
           environment-file: etc/environment.yml
-
-#      - name: Install dependencies
-#        run: |
-#          mamba install --yes --override-channel -c conda-forge --file requirements.txt
-
-      - name: Lint with flakeheaven
-        run: |
-          flakeheaven lint pySDC
 
       - name: Run pytest
         run: |
