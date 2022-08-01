@@ -18,6 +18,7 @@ def test_B():
 
 
 @pytest.mark.parallel
+@pytest.mark.petsc
 def test_C_1x1():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
@@ -46,6 +47,7 @@ def test_C_1x1():
 
 
 @pytest.mark.parallel
+@pytest.mark.petsc
 def test_C_1x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
@@ -73,6 +75,7 @@ def test_C_1x2():
 
 
 @pytest.mark.parallel
+@pytest.mark.petsc
 def test_C_2x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
     import mpi4py
