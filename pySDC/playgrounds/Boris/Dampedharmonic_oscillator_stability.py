@@ -1,6 +1,6 @@
 import matplotlib
 
-matplotlib.use("Agg")
+matplotlib.use("agg")
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -182,7 +182,6 @@ def plot_stability(lambda_k, lambda_mu, num_nodes, K, stab, title):
 
     fs = 12
 
-    fig = plt.figure()
     levels = np.array([0.25, 0.5, 0.75, 0.9, 1.0, 1.1])
 
     CS1 = plt.contour(
@@ -207,8 +206,8 @@ def plot_stability(lambda_k, lambda_mu, num_nodes, K, stab, title):
     )
     plt.ylabel(r"$\Delta t\cdot \mu \ (Friction)$", fontsize=fs, labelpad=0.0)
     plt.title("{}  M={} K={}".format(title, num_nodes, K), fontsize=fs)
-    filename = "stability-K" + str(K) + "-M" + str(num_nodes) + title + ".png"
-    fig.savefig(filename, bbox_inches="tight")
+    # filename = "stability-K" + str(K) + "-M" + str(num_nodes) + title + ".png"
+    # fig.savefig(filename, bbox_inches="tight")
 
 
 def plot_K_sdc(lambda_k, lambda_mu, num_nodes, K, stab, title):
@@ -229,7 +228,6 @@ def plot_K_sdc(lambda_k, lambda_mu, num_nodes, K, stab, title):
 
     fs = 12
 
-    fig = plt.figure()
     levels = np.array([0.25, 0.5, 0.75, 0.9, 1.0, 1.1])
 
     CS1 = plt.contour(
@@ -254,8 +252,8 @@ def plot_K_sdc(lambda_k, lambda_mu, num_nodes, K, stab, title):
     )
     plt.ylabel(r"$\Delta t\cdot \mu \ (Friction)$", fontsize=fs, labelpad=0.0)
     plt.title("{}  M={}".format(title, num_nodes), fontsize=fs)
-    filename = "stability-K" + str(K) + "-M" + str(num_nodes) + title + ".png"
-    fig.savefig(filename, bbox_inches="tight")
+    # filename = "stability-K" + str(K) + "-M" + str(num_nodes) + title + ".png"
+    # fig.savefig(filename, bbox_inches="tight")
 
 
 def main():
