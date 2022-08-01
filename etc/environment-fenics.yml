@@ -10,6 +10,5 @@ dependencies:
   - numba>=0.35
   - dill>=0.2.6
   - fenics>=2019.1.0
-  - petsc4py>=3.10.0
   - pytest
   - pytest-cov
