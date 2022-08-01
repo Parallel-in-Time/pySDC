@@ -49,7 +49,8 @@ markers = [
     'fenics: tests relying on FEniCS',
     'slow: tests taking much longer than bearable',
     'parallel: tests using MPI parallelism',
-    'petsc: tests relying on PETSc/petsc4py'
+    'petsc: tests relying on PETSc/petsc4py',
+    'mpifft: tests relying on mpi4py-fft'
     ]
 
 [tool.flakeheaven]
