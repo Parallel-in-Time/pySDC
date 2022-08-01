@@ -1,9 +1,8 @@
 import os
 
-from pySDC.projects.FastWaveSlowWave.plotgmrescounter_boussinesq import plot_buoyancy
-
 
 def test_plot():
+    from pySDC.projects.FastWaveSlowWave.plotgmrescounter_boussinesq import plot_buoyancy
 
     assert os.path.isfile('pySDC/projects/FastWaveSlowWave/data/xaxis.npy'), 'ERROR: xaxis.npy does not exist'
     assert os.path.isfile('pySDC/projects/FastWaveSlowWave/data/sdc.npy'), 'ERROR: sdc.npy does not exist'
