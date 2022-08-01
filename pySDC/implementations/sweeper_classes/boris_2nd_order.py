@@ -174,8 +174,7 @@ class boris_2nd_order(sweeper):
             for j in range(1, self.coll.num_nodes + 1):
                 f = P.build_f(L.f[j], L.u[j], L.time + L.dt * self.coll.nodes[j - 1])
                 p[-1].pos += (
-                    L.dt * (L.dt * self.QQ[m, j] * f)
-                    + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
+                    L.dt * (L.dt * self.QQ[m, j] * f) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
                 )
                 p[-1].vel += L.dt * self.coll.Qmat[m, j] * f
 
@@ -200,8 +199,7 @@ class boris_2nd_order(sweeper):
         for m in range(self.coll.num_nodes):
             f = P.build_f(L.f[m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
             L.uend.pos += (
-                L.dt * (L.dt * self.qQ[m] * f)
-                + L.dt * self.coll.weights[m] * L.u[0].vel
+                L.dt * (L.dt * self.qQ[m] * f) + L.dt * self.coll.weights[m] * L.u[0].vel
             )
             L.uend.vel += L.dt * self.coll.weights[m] * f
         # add up tau correction of the full interval (last entry)
