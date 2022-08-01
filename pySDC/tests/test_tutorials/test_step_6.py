@@ -1,22 +1,24 @@
 import pkg_resources
 import pytest
 
-from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
-from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
-from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
-
 
 def test_A():
+    from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
+
     main_A(num_proc_list=[1], fname='step_6_A_sl_out.txt', multi_level=False)
     main_A(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)
 
 
 def test_B():
+    from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
+
     main_B()
 
 
 @pytest.mark.parallel
 def test_C():
+    from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
+
     installed_packages = [d for d in pkg_resources.working_set]
     flat_installed_packages = [package.project_name for package in installed_packages]
 
