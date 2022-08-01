@@ -11,6 +11,7 @@ def test_A():
 
 
 @pytest.mark.parallel
+@pytest.mark.mpifft
 def test_B():
     from pySDC.tutorial.step_7.B_pySDC_with_mpi4pyfft import main as main_B
 

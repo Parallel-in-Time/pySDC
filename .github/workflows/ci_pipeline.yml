@@ -102,7 +102,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc"
+          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
 
       - name: Build documentation
         run: |
@@ -226,3 +226,57 @@ jobs:
       - name: Run pytest
         run: |
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m petsc
+
+  test_mpifft:
+    runs-on: ubuntu-latest
+
+    needs: lint
+
+    env:
+      yml: 'etc/environment-mpi4py-fft.yml'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Add packages
+        run: |
+          sudo apt-get update
+          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        env:
+          # Increase this value to reset cache if file has not changed
+          CACHE_NUMBER: 4
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-mpi4py-fft.yml') }}
+
+      - name: act workarounds
+        if: ${{ env.ACT }}
+        run: |
+          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+          wget $MINICONDA_URL
+          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
+          sudo bash $MINICONDA_SH -b -p $CONDA
+          rm $MINICONDA_SH # Clean up after installing
+          mkdir data
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ env.PY_VERSION }}
+          use-only-tar-bz2: true
+          mamba-version: "*"
+          activate-environment: pySDC
+          environment-file: 'etc/environment-mpi4py-fft.yml'
+
+      - name: Run pytest
+        run: |
+          pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m mpifft
