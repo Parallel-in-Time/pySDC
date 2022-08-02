@@ -36,6 +36,7 @@ jobs:
         run: |
           flakeheaven lint --benchmark pySDC          
 
+
   test_base:
     runs-on: ubuntu-latest
 
@@ -140,6 +141,7 @@ jobs:
       - name: Run pytest
         run: |
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m petsc
+
 
   test_mpifft:
     runs-on: ubuntu-latest
