@@ -44,6 +44,10 @@ def test_C_1x1():
     ).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
+    for line in p.stdout:
+        print(line)
+    for line in p.stderr:
+        print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
 
 
@@ -72,6 +76,10 @@ def test_C_1x2():
     ).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
+    for line in p.stdout:
+        print(line)
+    for line in p.stderr:
+        print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
 
 
@@ -100,4 +108,8 @@ def test_C_2x2():
     ).split()
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env, cwd=cwd)
     p.wait()
+    for line in p.stdout:
+        print(line)
+    for line in p.stderr:
+        print(line)
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
