@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      yml: 'etc/environment-lint.yml'
+      YML: 'etc/environment-lint.yml'
 
     defaults:
       run:
@@ -23,24 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          # Increase this value to reset cache if file has not changed
-          CACHE_NUMBER: 5
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-lint.yml') }}
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ env.PY_VERSION }}
-          use-only-tar-bz2: true
-          mamba-version: "*"
-          activate-environment: pySDC
-          environment-file: 'etc/environment-lint.yml'
+          environment-file: ${{ env.YML }}
 
       - name: Code reformatting with black
         run: |
@@ -56,7 +42,7 @@ jobs:
     needs: lint
 
     env:
-      yml: 'etc/environment.yml'
+      YML: 'etc/environment.yml'
 
     defaults:
       run:
@@ -71,34 +57,10 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          # Increase this value to reset cache if file has not changed
-          CACHE_NUMBER: 5
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment.yml') }}
-
-      - name: act workarounds
-        if: ${{ env.ACT }}
-        run: |
-          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-          wget $MINICONDA_URL
-          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-          sudo bash $MINICONDA_SH -b -p $CONDA
-          rm $MINICONDA_SH # Clean up after installing
-          mkdir data
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ env.PY_VERSION }}
-          use-only-tar-bz2: true
-          mamba-version: "*"
-          activate-environment: pySDC
-          environment-file: 'etc/environment.yml'
+          environment-file: ${{ env.YML }}
 
       - name: Run pytest
         run: |
@@ -124,7 +86,7 @@ jobs:
     needs: lint
 
     env:
-      yml: 'etc/environment-fenics.yml'
+      YML: 'etc/environment-fenics.yml'
 
     defaults:
       run:
@@ -139,34 +101,10 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          # Increase this value to reset cache if file has not changed
-          CACHE_NUMBER: 5
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-fenics.yml') }}
-
-      - name: act workarounds
-        if: ${{ env.ACT }}
-        run: |
-          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-          wget $MINICONDA_URL
-          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-          sudo bash $MINICONDA_SH -b -p $CONDA
-          rm $MINICONDA_SH # Clean up after installing
-          mkdir data
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ env.PY_VERSION }}
-          use-only-tar-bz2: true
-          mamba-version: "*"
-          activate-environment: pySDC
-          environment-file: 'etc/environment-fenics.yml'
+          environment-file: ${{ env.YML }}
 
       - name: Run pytest
         run: |
@@ -179,7 +117,7 @@ jobs:
     needs: lint
 
     env:
-      yml: 'etc/environment-petsc.yml'
+      YML: 'etc/environment-petsc.yml'
 
     defaults:
       run:
@@ -194,34 +132,10 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          # Increase this value to reset cache if file has not changed
-          CACHE_NUMBER: 5
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-petsc.yml') }}
-
-      - name: act workarounds
-        if: ${{ env.ACT }}
-        run: |
-          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-          wget $MINICONDA_URL
-          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-          sudo bash $MINICONDA_SH -b -p $CONDA
-          rm $MINICONDA_SH # Clean up after installing
-          mkdir data
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ env.PY_VERSION }}
-          use-only-tar-bz2: true
-          mamba-version: "*"
-          activate-environment: pySDC
-          environment-file: 'etc/environment-petsc.yml'
+          environment-file: ${{ env.YML }}
 
       - name: Run pytest
         run: |
@@ -233,7 +147,7 @@ jobs:
     needs: lint
 
     env:
-      yml: 'etc/environment-mpi4py-fft.yml'
+      YML: 'etc/environment-mpi4py-fft.yml'
 
     defaults:
       run:
@@ -248,34 +162,10 @@ jobs:
           sudo apt-get update
           sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
 
-      - name: Cache conda
-        uses: actions/cache@v2
-        env:
-          # Increase this value to reset cache if file has not changed
-          CACHE_NUMBER: 5
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('etc/environment-mpi4py-fft.yml') }}
-
-      - name: act workarounds
-        if: ${{ env.ACT }}
-        run: |
-          MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-          wget $MINICONDA_URL
-          MINICONDA_SH="Miniconda3-latest-Linux-x86_64.sh"
-          sudo bash $MINICONDA_SH -b -p $CONDA
-          rm $MINICONDA_SH # Clean up after installing
-          mkdir data
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ env.PY_VERSION }}
-          use-only-tar-bz2: true
-          mamba-version: "*"
-          activate-environment: pySDC
-          environment-file: 'etc/environment-mpi4py-fft.yml'
+          environment-file: ${{ env.YML }}
 
       - name: Run pytest
         run: |
