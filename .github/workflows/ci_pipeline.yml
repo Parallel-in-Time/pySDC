@@ -4,9 +4,6 @@ on:
   push:
   pull_request:
 
-env:
-  PY_VERSION: 3.9
-
 jobs:
 
   lint:
@@ -48,6 +45,10 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+
+    strategy:
+      matrix:
+        py: [ 3.7, 3.8, 3.9, 3.0 ]
     
     steps:
       - name: Checkout
@@ -62,6 +63,7 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: ${{ env.YML }}
+          extra-specs: python = ${{ matrix.py }}
 
       - name: Run pytest
         run: |
@@ -93,6 +95,10 @@ jobs:
       run:
         shell: bash -l {0}
 
+    strategy:
+      matrix:
+        py: [ 3.7, 3.8, 3.9, 3.0 ]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -106,6 +112,7 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: ${{ env.YML }}
+          extra-specs: python = ${{ matrix.py }}
 
       - name: Run pytest
         run: |
@@ -124,6 +131,10 @@ jobs:
       run:
         shell: bash -l {0}
 
+    strategy:
+      matrix:
+        py: [ 3.7, 3.8, 3.9, 3.0 ]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -137,6 +148,7 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: ${{ env.YML }}
+          extra-specs: python = ${{ matrix.py }}
 
       - name: Run pytest
         run: |
@@ -155,6 +167,10 @@ jobs:
       run:
         shell: bash -l {0}
 
+    strategy:
+      matrix:
+        py: [ 3.7, 3.8, 3.9, 3.0 ]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -168,6 +184,7 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: ${{ env.YML }}
+          extra-specs: python = ${{ matrix.py }}
 
       - name: Run pytest
         run: |
