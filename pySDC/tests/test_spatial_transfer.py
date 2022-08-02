@@ -2,11 +2,6 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', ('nvars_fine', 'iorder'))
@@ -56,6 +51,9 @@ def test_mesh_to_mesh_1d_dirichlet():
     """
     A simple test program to test dirichlet interpolation order in space
     """
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}
@@ -118,6 +116,10 @@ def test_mesh_to_mesh_1d_periodic():
     """
     A simple test program to test periodic interpolation order in space
     """
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}
@@ -184,6 +186,10 @@ def test_mesh_to_mesh_2d_periodic():
     """
     A simple test program to test periodic interpolation order in 2d
     """
+
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+    from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}

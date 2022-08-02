@@ -2,10 +2,7 @@ import unittest
 
 import numpy as np
 
-from pySDC.core import Step as stepclass
 from pySDC.core.Collocation import CollBase
-from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
-from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 from pySDC.tests.test_helpers import get_derived_from_in_package
 
 classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
@@ -17,6 +14,7 @@ class TestImexSweeper(unittest.TestCase):
     # Some auxiliary functions which are not tests themselves
     #
     def setupLevelStepProblem(self):
+        from pySDC.core import Step as stepclass
 
         self.description['sweeper_params'] = self.swparams
         step = stepclass.step(description=self.description)
@@ -32,6 +30,9 @@ class TestImexSweeper(unittest.TestCase):
     # General setUp function used by all tests
     #
     def setUp(self):
+        from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
+        from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+
         self.pparams = {}
         self.pparams['lambda_s'] = np.array([-0.1 * 1j], dtype='complex')
         self.pparams['lambda_f'] = np.array([-1.0 * 1j], dtype='complex')
@@ -57,6 +58,10 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be instantiated
     #
     def test_caninstantiate(self):
+
+        from pySDC.core import Step as stepclass
+        from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
+
         for type in classes:
             self.swparams['collocation_class'] = type
             self.description['sweeper_params'] = self.swparams
@@ -67,6 +72,9 @@ class TestImexSweeper(unittest.TestCase):
     # Check that a level object can be registered in a step object (needed as prerequiste to execute update_nodes
     #
     def test_canregisterlevel(self):
+
+        from pySDC.core import Step as stepclass
+
         for type in classes:
             self.swparams['collocation_class'] = type
             self.description['sweeper_params'] = self.swparams

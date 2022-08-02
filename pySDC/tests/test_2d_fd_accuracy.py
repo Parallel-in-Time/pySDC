@@ -2,8 +2,6 @@ from collections import namedtuple
 
 import numpy as np
 
-from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
@@ -32,8 +30,7 @@ def test_spatial_accuracy():
 
         assert all(
             np.isclose(order, order_stencil, atol=5e-2)
-        ), f"ERROR: expected spatial order to be \
-{order_stencil} but got {np.mean(order):.2f}"
+        ), f"ERROR: expected spatial order to be {order_stencil} but got {np.mean(order):.2f}"
 
 
 def run_accuracy_check(nvars_list, problem_params, order_stencil):
@@ -47,6 +44,8 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
     Returns:
         a dictionary containing the errors and a header (with nvars_list)
     """
+    from pySDC.implementations.datatype_classes.mesh import mesh
+    from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
 
     results = {}
     # loop over all nvars
@@ -114,7 +113,3 @@ def get_accuracy_order(results):
             order.append(np.log(results[id_prev] / results[id]) / np.log(nvars_list[i][0] / nvars_list[i - 1][0]))
 
     return order
-
-
-# if __name__ == "__main__":
-#     test_spatial_accuracy()
