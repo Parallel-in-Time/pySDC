@@ -250,6 +250,11 @@ class sweeper(object):
             elif self.params.initial_guess == 'zero':
                 L.u[m] = P.dtype_u(init=P.init, val=0.0)
                 L.f[m] = P.dtype_f(init=P.init, val=0.0)
+            # start with random initial guess
+            elif self.params.initial_guess == 'random':
+                
+                L.u[m] = P.dtype_u(init=P.init, val=np.random.rand(1)[0])
+                L.f[m] = P.dtype_f(init=P.init, val=np.random.rand(1)[0])
             else:
                 raise ParameterError(f'initial_guess option {self.params.initial_guess} not implemented')
 

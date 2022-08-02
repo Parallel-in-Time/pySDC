@@ -119,3 +119,57 @@ class particles_output(hooks):
         plt.pause(0.001)
 
         return None
+
+class convergence_data(hooks):
+
+    def __init__(self):
+
+        super(convergence_data, self).__init__()
+
+        self.storage=dict()
+
+        self.values=['position', 'velocity', 'position_exact', 'velocity_exact', 'pos_nodes', 'vel_nodes', 'pos_nodes_ex', 'vel_nodes_ex']
+
+        for ii, jj in enumerate(self.values):
+
+            self.storage[jj]=dict()
+
+
+
+    def post_step(self, step, level_number):
+        """
+        Default runtine called after each iteration
+        Args:
+            step: the current step
+            level_number: the current level number
+        """
+
+        super(convergence_data, self).pre_run(step, level_number)
+
+        # some abbreviations
+        L = step.levels[level_number]
+
+        # self.bar_run.update(L.time)
+
+        L.sweep.compute_end_point()
+
+        nnodes=L.sweep.coll.num_nodes
+        nodes=L.sweep.coll.nodes
+        part=L.uend
+
+
+        self.storage['position'][L.time]=part.pos
+        self.storage['velocity'][L.time]=part.vel
+        self.storage['position_exact'][L.time]=L.prob.u_exact(L.time+L.dt).pos
+        self.storage['velocity_exact'][L.time]=L.prob.u_exact(L.time+L.dt).vel
+
+   
+        if L.time+L.dt>=L.prob.params.Tend:
+            self.add_to_stats(process=step.status.slot, time=L.dt, level=L.level_index, iter=step.status.iter,
+                              sweep=L.status.sweep, type='error', value=self.storage)
+
+
+
+
+        return None
+
