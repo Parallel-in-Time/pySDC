@@ -162,12 +162,12 @@ def run_variants(variant=None, ml=None, num_procs=None):
 
 def main():
     run_variants(variant='mass_inv', ml=False, num_procs=1)
-    run_variants(variant='mass', ml=False, num_procs=1)
-    run_variants(variant='weak', ml=False, num_procs=1)
-    run_variants(variant='mass_inv', ml=True, num_procs=1)
-    run_variants(variant='mass', ml=True, num_procs=1)
-    run_variants(variant='weak', ml=True, num_procs=1)
-    run_variants(variant='mass_inv', ml=True, num_procs=5)
+    # run_variants(variant='mass', ml=False, num_procs=1)
+    # run_variants(variant='weak', ml=False, num_procs=1)
+    # run_variants(variant='mass_inv', ml=True, num_procs=1)
+    # run_variants(variant='mass', ml=True, num_procs=1)
+    # run_variants(variant='weak', ml=True, num_procs=1)
+    # run_variants(variant='mass_inv', ml=True, num_procs=5)
     # WARNING: all other variants do NOT work, either because of FEniCS restrictions (weak forms with different meshes
     # will not work together) or because of inconsistent use of the mass matrix (locality condition for the tau
     # correction is not satisfied, mass matrix does not permute with restriction).
