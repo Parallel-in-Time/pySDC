@@ -13,7 +13,7 @@ from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import a
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-import pdb
+
 def compute_convergence_data(cwd=''):
     """
     Routine to run the 1d acoustic-advection example with different orders
@@ -79,10 +79,10 @@ def compute_convergence_data(cwd=''):
         for ii in range(0, np.shape(nsteps)[1]):
 
             ns = nsteps[order - 3, ii]
-            # if (order == 3) or (order == 4):
-            #     problem_params['nvars'] = [(2, int(2 * ns))]
-            # elif order == 5:
-            #     problem_params['nvars'] = [(2, int(2 * ns))]
+            if (order == 3) or (order == 4):
+                problem_params['nvars'] = [(2, int(2 * ns))]
+            elif order == 5:
+                problem_params['nvars'] = [(2, int(2 * ns))]
 
             description['problem_params'] = problem_params
 
@@ -104,7 +104,7 @@ def compute_convergence_data(cwd=''):
 
             # call main function to get things done...
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-            pdb.set_trace()
+
             # compute exact solution and compare
             uex = P.u_exact(Tend)
 
