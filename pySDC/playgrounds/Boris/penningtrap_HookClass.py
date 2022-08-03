@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 # import progressbar
 
 from pySDC.core.Hooks import hooks
 
 
 class particles_output(hooks):
-
     def __init__(self):
         """
         Initialization of particles output
@@ -14,7 +14,7 @@ class particles_output(hooks):
         super(particles_output, self).__init__()
 
         fig = plt.figure()
-        self.ax = fig.add_subplot(111, projection='3d')
+        self.ax = fig.add_subplot(111, projection="3d")
         self.ax.set_xlim3d([-20, 20])
         self.ax.set_ylim3d([-20, 20])
         self.ax.set_zlim3d([-20, 20])
@@ -49,13 +49,18 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = (
+                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                )
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = (
+                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                )
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos[:, i] * part.pos[:, i])
+            fpot[i] -= (
+                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+            )
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -64,8 +69,15 @@ class particles_output(hooks):
             epot += part.q[n] * fpot[n]
             ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='etot', value=epot + ekin)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type="etot",
+            value=epot + ekin,
+        )
 
     def post_step(self, step, level_number):
         """
@@ -92,13 +104,18 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = (
+                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                )
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig ** 2
+                dist2 = (
+                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
+                )
                 fpot[i] += part.q[j] / np.sqrt(dist2)
-            fpot[i] -= L.prob.params.omega_E ** 2 * part.m[i] / part.q[i] / 2.0 * \
-                np.dot(w, part.pos[:, i] * part.pos[:, i])
+            fpot[i] -= (
+                L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
+            )
 
         # add up kinetic and potntial contributions to total energy
         epot = 0
@@ -107,12 +124,21 @@ class particles_output(hooks):
             epot += part.q[n] * fpot[n]
             ekin += part.m[n] / 2.0 * np.dot(part.vel[:, n], part.vel[:, n])
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='etot', value=epot + ekin)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type="etot",
+            value=epot + ekin,
+        )
 
         oldcol = self.sframe
         # # self.sframe = self.ax.scatter(L.uend.pos[0],L.uend.pos[1],L.uend.pos[2])
-        self.sframe = self.ax.scatter(L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3])
+        self.sframe = self.ax.scatter(
+            L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3]
+        )
         # Remove old line collection before drawing
         if oldcol is not None:
             self.ax.collections.remove(oldcol)
@@ -120,21 +146,28 @@ class particles_output(hooks):
 
         return None
 
-class convergence_data(hooks):
 
+class convergence_data(hooks):
     def __init__(self):
 
         super(convergence_data, self).__init__()
 
-        self.storage=dict()
+        self.storage = dict()
 
-        self.values=['position', 'velocity', 'position_exact', 'velocity_exact', 'pos_nodes', 'vel_nodes', 'pos_nodes_ex', 'vel_nodes_ex']
+        self.values = [
+            "position",
+            "velocity",
+            "position_exact",
+            "velocity_exact",
+            "pos_nodes",
+            "vel_nodes",
+            "pos_nodes_ex",
+            "vel_nodes_ex",
+        ]
 
         for ii, jj in enumerate(self.values):
 
-            self.storage[jj]=dict()
-
-
+            self.storage[jj] = dict()
 
     def post_step(self, step, level_number):
         """
@@ -152,24 +185,22 @@ class convergence_data(hooks):
         # self.bar_run.update(L.time)
 
         L.sweep.compute_end_point()
+        part = L.uend
 
-        nnodes=L.sweep.coll.num_nodes
-        nodes=L.sweep.coll.nodes
-        part=L.uend
+        self.storage["position"][L.time] = part.pos
+        self.storage["velocity"][L.time] = part.vel
+        self.storage["position_exact"][L.time] = L.prob.u_exact(L.time + L.dt).pos
+        self.storage["velocity_exact"][L.time] = L.prob.u_exact(L.time + L.dt).vel
 
-
-        self.storage['position'][L.time]=part.pos
-        self.storage['velocity'][L.time]=part.vel
-        self.storage['position_exact'][L.time]=L.prob.u_exact(L.time+L.dt).pos
-        self.storage['velocity_exact'][L.time]=L.prob.u_exact(L.time+L.dt).vel
-
-   
-        if L.time+L.dt>=L.prob.params.Tend:
-            self.add_to_stats(process=step.status.slot, time=L.dt, level=L.level_index, iter=step.status.iter,
-                              sweep=L.status.sweep, type='error', value=self.storage)
-
-
-
+        if L.time + L.dt >= L.prob.params.Tend:
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.dt,
+                level=L.level_index,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type="error",
+                value=self.storage,
+            )
 
         return None
-
