@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>implementations.sweeper_classes package &#8212; pySDC 4.2.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -94,6 +94,51 @@
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_manysweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_manysweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
+<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_picardsweep_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsweeps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_picardsweep_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a scalar problem, K sweeps of SDC can be written in matrix form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsweeps</strong> (<em>int</em>) – number of sweeps</p></li>
+<li><p><strong>lambdas</strong> (<em>numpy.ndarray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats">
+<span class="sig-name descname"><span class="pre">get_scalar_problems_sweeper_mats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambdas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_scalar_problems_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the corresponding matrices of an SDC sweep matrix formulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lambdas</strong> (<em>numpy.narray</em>) – the first entry in lambdas is k-spring constant and the second is mu friction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats">
+<span class="sig-name descname"><span class="pre">get_sweeper_mats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/sweeper_classes/boris_2nd_order.html#boris_2nd_order.get_sweeper_mats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the matrices Q, QQ, Qx, QT which define the sweeper.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -590,7 +635,7 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
