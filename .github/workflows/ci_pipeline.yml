@@ -234,7 +234,7 @@ jobs:
       - test_base
       - test_fenics
       - test_petsc
-      - test_mpifft
+      - test_mpi
 
     steps:
       - name: Get coverage reports
@@ -245,8 +245,8 @@ jobs:
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpifft.xml # optional
-          name: codecov-pySDC # optional
-          fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
+#        with:
+#          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpi.xml # optional
+#          name: codecov-pySDC # optional
+#          fail_ci_if_error: true # optional (default = false)
+#          verbose: true # optional (default = false)
