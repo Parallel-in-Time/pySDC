@@ -76,14 +76,6 @@ jobs:
           name: coverage_${{ github.job }}
           path: ./coverage_${{ github.job }}.xml
 
-#      - name: Upload coverage reports
-#        uses: codecov/codecov-action@v3
-#        with:
-#          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpifft.xml # optional
-#          name: codecov-pySDC # optional
-#          fail_ci_if_error: true # optional (default = false)
-#          verbose: true # optional (default = false)
-
 #      - name: Build documentation
 #        run: |
 #          chmod u+x ./docs/update_apidocs.sh
@@ -245,8 +237,7 @@ jobs:
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
-#        with:
-#          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpi.xml # optional
-#          name: codecov-pySDC # optional
-#          fail_ci_if_error: true # optional (default = false)
-#          verbose: true # optional (default = false)
+        with:
+          verbose: true # optional (default = false)
+          name: codecov-pySDC # optional
+          fail_ci_if_error: true # optional (default = false)
