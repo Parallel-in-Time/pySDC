@@ -111,5 +111,5 @@ exclude_lines = [
 #[tool.coverage.html]
 #directory = 'docs/build/html/test_coverage'
 
-[tool.coverage.xml]
-directory = '.'
+#[tool.coverage.xml]
+#directory = '.'
