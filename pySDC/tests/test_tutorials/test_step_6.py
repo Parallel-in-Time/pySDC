@@ -15,7 +15,7 @@ def test_B():
     main_B()
 
 
-@pytest.mark.parallel
+@pytest.mark.mpi
 def test_C():
     from pySDC.tutorial.step_6.C_MPI_parallelization import main as main_C
 

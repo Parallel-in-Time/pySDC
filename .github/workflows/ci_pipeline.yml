@@ -67,7 +67,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
+          pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi"
 
       - name: Store coverage results
         if: matrix.py == '3.10'
@@ -184,13 +184,13 @@ jobs:
           path: ./coverage_${{ github.job }}.xml
 
 
-  test_mpifft:
+  test_mpi:
     runs-on: ubuntu-latest
 
     needs: lint
 
     env:
-      YML: 'etc/environment-mpi4py-fft.yml'
+      YML: 'etc/environment-mpi4py.yml'
 
     defaults:
       run:
@@ -217,7 +217,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpifft
+          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpi
 
       - name: Store coverage results
         if: matrix.py == '3.10'
