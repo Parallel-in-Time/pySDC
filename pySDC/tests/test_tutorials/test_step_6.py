@@ -2,6 +2,7 @@ import pkg_resources
 import pytest
 
 
+@pytest.mark.mpi
 def test_A():
     from pySDC.tutorial.step_6.A_run_non_MPI_controller import main as main_A
 
@@ -9,6 +10,7 @@ def test_A():
     main_A(num_proc_list=[1, 2, 4, 8], fname='step_6_A_ml_out.txt', multi_level=True)
 
 
+@pytest.mark.mpi
 def test_B():
     from pySDC.tutorial.step_6.B_odd_temporal_distribution import main as main_B
 
