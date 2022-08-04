@@ -134,7 +134,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m fenics
 
       - name: Store coverage results
-        if: matrix.py == "3.10"
+        if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -177,7 +177,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m petsc
 
       - name: Store coverage results
-        if: matrix.py == "3.10"
+        if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -220,7 +220,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpifft
 
       - name: Store coverage results
-        if: matrix.py == "3.10"
+        if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
