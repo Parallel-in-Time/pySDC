@@ -240,4 +240,4 @@ jobs:
         with:
           verbose: true # optional (default = false)
           name: codecov-pySDC # optional
-          fail_ci_if_error: true # optional (default = false)
+          fail_ci_if_error: false # optional (default = false)
