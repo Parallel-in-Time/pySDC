@@ -67,20 +67,26 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
+          pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
 
-      - name: Build documentation
-        run: |
-          chmod u+x ./docs/update_apidocs.sh
-          ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }} 
+      - name: Store coverage results
+        uses: actions/upload-artifact@v2
         with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: docs/build/html # The folder the action should deploy.
+          name: coverage_${{ github.job }}
+          path: ./coverage_${{ github.job }}.xml
+
+#      - name: Build documentation
+#        run: |
+#          chmod u+x ./docs/update_apidocs.sh
+#          ./docs/update_apidocs.sh
+#          sphinx-build -b html docs/source docs/build/html
+#
+#      - name: Deploy 🚀
+#        uses: JamesIves/github-pages-deploy-action@4.1.4
+#        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
+#        with:
+#          branch: gh-pages # The branch the action should deploy to.
+#          folder: docs/build/html # The folder the action should deploy.
 
 
   test_fenics:
@@ -116,7 +122,13 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m fenics
+          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m fenics
+
+      - name: Store coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage_${{ github.job }}
+          path: ./coverage_${{ github.job }}.xml
 
 
   test_petsc:
@@ -152,7 +164,13 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m petsc
+          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m petsc
+
+      - name: Store coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage_${{ github.job }}
+          path: ./coverage_${{ github.job }}.xml
 
 
   test_mpifft:
@@ -188,4 +206,38 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m mpifft
+          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpifft
+
+      - name: Store coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage_${{ github.job }}
+          path: ./coverage_${{ github.job }}.xml
+
+
+  coverage_report:
+    runs-on: ubuntu-latest
+
+    needs:
+      - test_base
+      - test_fenics
+      - test_petsc
+      - test_mpifft
+
+    steps:
+      - name: Get coverage reports
+        uses: actions/download-artifact@v2
+        with:
+          path: '.'
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage_base.xml,./coverage_petsc.xml,./coverage_fenics.xml,./coverage_mpifft.xml # optional
+#          flags: unittests # optional
+          name: codecov-pySDC # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)

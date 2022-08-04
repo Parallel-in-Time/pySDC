@@ -147,3 +147,4 @@ Temporary Items
 
 ### Spyder ###
 .spyproject
+*.xml
