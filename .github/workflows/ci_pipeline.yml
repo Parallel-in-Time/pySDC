@@ -70,6 +70,7 @@ jobs:
           pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
 
       - name: Store coverage results
+        if: matrix.py == "3.10"
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -125,6 +126,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m fenics
 
       - name: Store coverage results
+        if: matrix.py == "3.10"
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -167,6 +169,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m petsc
 
       - name: Store coverage results
+        if: matrix.py == "3.10"
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -209,6 +212,7 @@ jobs:
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpifft
 
       - name: Store coverage results
+        if: matrix.py == "3.10"
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
@@ -227,8 +231,6 @@ jobs:
     steps:
       - name: Get coverage reports
         uses: actions/download-artifact@v2
-        with:
-          path: '.'
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -236,8 +238,7 @@ jobs:
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage_base.xml,./coverage_petsc.xml,./coverage_fenics.xml,./coverage_mpifft.xml # optional
-#          flags: unittests # optional
+          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpifft.xml # optional
           name: codecov-pySDC # optional
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
