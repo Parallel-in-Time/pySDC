@@ -10,15 +10,13 @@ def test_A():
     main_A()
 
 
-@pytest.mark.parallel
-@pytest.mark.mpifft
+@pytest.mark.mpi
 def test_B():
     from pySDC.tutorial.step_7.B_pySDC_with_mpi4pyfft import main as main_B
 
     main_B()
 
 
-@pytest.mark.parallel
 @pytest.mark.petsc
 def test_C_1x1():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
@@ -51,7 +49,6 @@ def test_C_1x1():
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
 
 
-@pytest.mark.parallel
 @pytest.mark.petsc
 def test_C_1x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
@@ -83,7 +80,6 @@ def test_C_1x2():
     assert p.returncode == 0, 'ERROR: did not get return code 0, got %s with %2i processes' % (p.returncode, num_procs)
 
 
-@pytest.mark.parallel
 @pytest.mark.petsc
 def test_C_2x2():
     # try to import MPI here, will fail if things go wrong (and not in the subprocess part)
