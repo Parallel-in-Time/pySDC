@@ -9,8 +9,7 @@ dependencies:
   - sympy>=1.0
   - numba>=0.35
   - dill>=0.2.6
-  - mpich
-  - mpi4py>=3.0.0
   - pytest
   - pytest-cov
+  - pytest-split
   - sphinx
