@@ -70,11 +70,19 @@ jobs:
           pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
 
       - name: Store coverage results
-        if: matrix.py == "3.10"
+        if: ${{ matrix.py }} == "3.10"
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
           path: ./coverage_${{ github.job }}.xml
+
+#      - name: Upload coverage reports
+#        uses: codecov/codecov-action@v3
+#        with:
+#          files: ./coverage_test_base.xml,./coverage_test_petsc.xml,./coverage_test_fenics.xml,./coverage_test_mpifft.xml # optional
+#          name: codecov-pySDC # optional
+#          fail_ci_if_error: true # optional (default = false)
+#          verbose: true # optional (default = false)
 
 #      - name: Build documentation
 #        run: |
