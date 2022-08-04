@@ -70,7 +70,7 @@ jobs:
           pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpifft"
 
       - name: Store coverage results
-        if: ${{ matrix.py }} == "3.10"
+        if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
