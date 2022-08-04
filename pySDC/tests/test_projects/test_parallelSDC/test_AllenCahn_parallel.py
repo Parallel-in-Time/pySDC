@@ -1,3 +1,7 @@
+import pytest
+
+
+@pytest.mark.mpi
 def test_main():
     from pySDC.projects.parallelSDC.AllenCahn_parallel import main
 
