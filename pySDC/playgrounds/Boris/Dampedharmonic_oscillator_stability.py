@@ -30,10 +30,7 @@ def compute_stability():
             numpy.narray: moduli for the K_{sdc} marrix
             numpy.narray: moduli for the Pircard iteration
             numpy.narray: moduli for the K_{sdc} Picard iteration
-
-    lambda_k, lambda_mu, sweeper_params['num_nodes'], K,  dt*stab.real, dt*Kstab.real, dt*stab_picard.real, dt*KPstab.real
     """
-
     N_k = 400
     N_mu = 400
 
@@ -140,8 +137,7 @@ def compute_stability():
                 if L.sweep.params.picard_mats_sweep:
                     FPicard = np.dot(F, Picard_mats_sweep)
                     R_mat_picard = (
-                        np.array([[1.0, dt], [0, 1.0]])
-                        + np.dot(q_mat, FPicard) @ ones.T
+                        np.array([[1.0, dt], [0, 1.0]]) + np.dot(q_mat, FPicard) @ ones.T
                     )
                     stab_fh_picard, v = np.linalg.eig(R_mat_picard)
             else:
