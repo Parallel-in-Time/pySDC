@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -192,7 +193,8 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
     description = None
     controller_params = None
 
-    f = open('step_8_C_out.txt', 'a')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_8_C_out.txt', 'a')
 
     for ndim in ndim_list:
         for nsteps in nsteps_list:

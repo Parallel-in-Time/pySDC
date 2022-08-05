@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from mpi4py import MPI
 
@@ -46,7 +47,8 @@ if __name__ == "__main__":
         else:
             fname = 'step_6_B_out.txt'
 
-        f = open(fname, 'a')
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/' + fname, 'a')
         out = 'Working with %2i processes...' % size
         f.write(out + '\n')
         print(out)

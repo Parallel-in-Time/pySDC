@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -31,7 +33,7 @@ def main():
     # initialize controller parameters
     controller_params = dict()
     controller_params['log_to_file'] = True
-    controller_params['fname'] = 'step_2_C_out.txt'
+    controller_params['fname'] = 'data/step_2_C_out.txt'
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
@@ -41,6 +43,8 @@ def main():
     description['sweeper_params'] = sweeper_params
     description['level_params'] = level_params
     description['step_params'] = step_params
+
+    Path("data").mkdir(parents=True, exist_ok=True)
 
     # instantiate the controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -60,7 +64,7 @@ def main():
     uex = P.u_exact(Tend)
     err = abs(uex - uend)
 
-    f = open('step_2_C_out.txt', 'a')
+    f = open('data/step_2_C_out.txt', 'a')
     out = 'Error after SDC iterations: %8.6e' % err
     f.write(out)
     print(out)

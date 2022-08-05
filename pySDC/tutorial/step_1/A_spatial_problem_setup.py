@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -21,7 +22,8 @@ def main():
     # run accuracy test, get error back
     err = run_accuracy_check(prob)
 
-    f = open('step_1_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_1_A_out.txt', 'w')
     out = 'Error of the spatial accuracy test: %8.6e' % err
     f.write(out)
     print(out)

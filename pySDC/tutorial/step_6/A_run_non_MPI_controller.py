@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -24,7 +26,8 @@ def main(num_proc_list=None, fname=None, multi_level=True):
         )
         description, controller_params, t0, Tend = set_parameters_sl()
 
-    f = open(fname, 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/' + fname, 'w')
     # loop over different numbers of processes
     for num_proc in num_proc_list:
 

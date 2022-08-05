@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -50,7 +52,8 @@ def main():
     controller = controller_nonMPI(num_procs=10, controller_params={}, description=description)
 
     # check number of levels
-    f = open('step_5_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_5_A_out.txt', 'w')
     for i in range(len(controller.MS)):
         out = "Process %2i has %2i levels" % (i, len(controller.MS[i].levels))
         f.write(out + '\n')

@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
@@ -103,7 +105,8 @@ def main():
     diff_gs = abs(uend_mssdc_gs - uend_pfasst)
     diff_jac_gs = abs(uend_mssdc_gs - uend_mssdc_jac)
 
-    f = open('step_8_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_8_B_out.txt', 'w')
 
     out = 'Error PFASST: %12.8e' % err_pfasst
     f.write(out + '\n')
@@ -150,11 +153,11 @@ def main():
     f.close()
 
     # call helper routine to produce residual plot
-    show_residual_across_simulation(stats_mssdc_jac, 'step_8_residuals_mssdc_jac.png')
-    show_residual_across_simulation(stats_mssdc_gs, 'step_8_residuals_mssdc_gs.png')
+    show_residual_across_simulation(stats_mssdc_jac, 'data/step_8_residuals_mssdc_jac.png')
+    show_residual_across_simulation(stats_mssdc_gs, 'data/step_8_residuals_mssdc_gs.png')
 
-    assert os.path.isfile('step_8_residuals_mssdc_jac.png')
-    assert os.path.isfile('step_8_residuals_mssdc_gs.png')
+    assert os.path.isfile('data/step_8_residuals_mssdc_jac.png')
+    assert os.path.isfile('data/step_8_residuals_mssdc_gs.png')
     assert diff_jac < 3.1e-10, (
         "ERROR: difference between PFASST and parallel MSSDC controller is too large, got %s" % diff_jac
     )

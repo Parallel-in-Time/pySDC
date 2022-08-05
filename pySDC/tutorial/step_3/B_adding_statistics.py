@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -12,6 +13,8 @@ def main():
     """
     A simple tets program to retrieve user-defined statistics from a run
     """
+    Path("data").mkdir(parents=True, exist_ok=True)
+
     err, stats = run_penning_trap_simulation()
 
     # filter statistics type (etot)
@@ -22,7 +25,7 @@ def main():
 
     # get base energy and show difference
     base_energy = energy[0][1]
-    f = open('step_3_B_out.txt', 'a')
+    f = open('data/step_3_B_out.txt', 'a')
     for item in energy:
         out = 'Total energy and deviation in iteration %2i: %12.10f -- %12.8e' % (
             item[0],
@@ -69,7 +72,7 @@ def run_penning_trap_simulation():
     controller_params = dict()
     controller_params['hook_class'] = particle_hook  # specialized hook class for more statistics and output
     controller_params['log_to_file'] = True
-    controller_params['fname'] = 'step_3_B_out.txt'
+    controller_params['fname'] = 'data/step_3_B_out.txt'
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()

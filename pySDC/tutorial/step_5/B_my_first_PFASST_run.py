@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -63,7 +64,8 @@ def main():
     nsteps = int(Tend / level_params['dt'])
     num_proc_list = [2**i for i in range(int(np.log2(nsteps) + 1))]
 
-    f = open('step_5_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_5_B_out.txt', 'w')
     # loop over different number of processes and check results
     for num_proc in num_proc_list:
         out = 'Working with %2i processes...' % num_proc

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_list_of_types, get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -13,7 +15,8 @@ def main():
     # run simulation
     stats = run_simulation()
 
-    f = open('step_3_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_3_A_out.txt', 'w')
     out = 'List of registered statistic types: %s' % get_list_of_types(stats)
     f.write(out + '\n')
     print(out)

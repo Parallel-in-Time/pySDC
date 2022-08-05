@@ -1,4 +1,5 @@
 from collections import namedtuple
+from pathlib import Path
 
 import numpy as np
 
@@ -66,7 +67,8 @@ def main():
     # print out and check
     print('Running order checks...')
     orders = get_accuracy_order(results)
-    f = open('step_4_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_4_A_out.txt', 'w')
     for p in range(len(orders)):
         out = 'Expected order %2i, got order %5.2f, deviation of %5.2f%%' % (
             space_transfer_params['iorder'],

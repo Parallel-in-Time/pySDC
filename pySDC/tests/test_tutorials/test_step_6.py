@@ -29,8 +29,8 @@ def test_C():
         cwd = 'pySDC/tutorial/step_6'
         main_C(cwd)
 
-        with open('step_6_C1_out.txt', 'r') as file1:
-            with open('step_6_A_ml_out.txt', 'r') as file2:
+        with open('data/step_6_C1_out.txt', 'r') as file1:
+            with open('data/step_6_A_ml_out.txt', 'r') as file2:
                 diff = set(file1).difference(file2)
         diff.discard('\n')
         for line in diff:
@@ -38,8 +38,8 @@ def test_C():
                 'ERROR: iteration counts differ between MPI and nonMPI for even ' 'distribution of time-steps'
             )
 
-        with open('step_6_C2_out.txt', 'r') as file1:
-            with open('step_6_B_out.txt', 'r') as file2:
+        with open('data/step_6_C2_out.txt', 'r') as file1:
+            with open('data/step_6_B_out.txt', 'r') as file2:
                 diff = set(file1).difference(file2)
         diff.discard('\n')
         for line in diff:
@@ -48,13 +48,13 @@ def test_C():
             )
 
         diff_MPI = []
-        with open("step_6_C1_out.txt") as f:
+        with open("data/step_6_C1_out.txt") as f:
             for line in f:
                 if "Diff" in line:
                     diff_MPI.append(float(line.split()[1]))
 
         diff_nonMPI = []
-        with open("step_6_A_ml_out.txt") as f:
+        with open("data/step_6_A_ml_out.txt") as f:
             for line in f:
                 if "Diff" in line:
                     diff_nonMPI.append(float(line.split()[1]))
@@ -70,13 +70,13 @@ def test_C():
             )
 
         diff_MPI = []
-        with open("step_6_C2_out.txt") as f:
+        with open("data/step_6_C2_out.txt") as f:
             for line in f:
                 if "Diff" in line:
                     diff_MPI.append(float(line.split()[1]))
 
         diff_nonMPI = []
-        with open("step_6_B_out.txt") as f:
+        with open("data/step_6_B_out.txt") as f:
             for line in f:
                 if "Diff" in line:
                     diff_nonMPI.append(float(line.split()[1]))

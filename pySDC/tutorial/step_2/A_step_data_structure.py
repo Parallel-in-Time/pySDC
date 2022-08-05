@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.core.Step import step
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -51,7 +53,8 @@ def main():
     # now we can do e.g. what we did before with the problem
     err = run_accuracy_check(P)
 
-    f = open('step_2_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_2_A_out.txt', 'w')
     out = 'Error of the spatial accuracy test: %8.6e' % err
     f.write(out)
     print(out)

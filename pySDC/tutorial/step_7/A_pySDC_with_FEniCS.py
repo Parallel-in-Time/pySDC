@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -117,7 +118,8 @@ def run_variants(variant=None, ml=None, num_procs=None):
     uex = P.u_exact(Tend)
     err = abs(uex - uend) / abs(uex)
 
-    f = open('step_7_A_out.txt', 'a')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_7_A_out.txt', 'a')
 
     out = f'Variant {variant} with ml={ml} and num_procs={num_procs} -- error at time {Tend}: {err}'
     f.write(out + '\n')
