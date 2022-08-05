@@ -264,7 +264,7 @@ jobs:
           rm -rf coverage/data_*
           find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
           python -m coverage combine ./coverage/*.dat
-          python -m coveragce xml
+          python -m coverage xml
 
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
