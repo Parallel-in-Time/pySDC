@@ -106,9 +106,3 @@ exclude_lines = [
     '@abc.abstractmethod',
     '__author__*',
     ]
-
-#[tool.coverage.html]
-#directory = 'docs/build/html/test_coverage'
-
-#[tool.coverage.xml]
-#directory = '.'
