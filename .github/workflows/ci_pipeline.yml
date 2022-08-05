@@ -285,7 +285,7 @@ jobs:
       - name: Check files
         run: |
           ls -artl data
-          find . -type f -print0 | xargs -0 -I file mv file .
+          find data -type f -print0 | xargs -0 -I file mv file data
           ls -artl data
 
 #      - name: Build documentation
