@@ -1,0 +1,6 @@
+ignore:
+  - "pySDC/playgrounds"
+  - "pySDC/tests"
+
+fixes:
+  - "::../"'

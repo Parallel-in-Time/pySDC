@@ -219,8 +219,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Creating codecov.yml
-        run: echo 'fixes:\n  - "::../"' > codecov.yml
+#      - name: Creating codecov.yml
+#        run: echo 'fixes:\n  - "::../"' > codecov.yml
 
       - name: Get coverage reports
         uses: actions/download-artifact@v2
