@@ -1,6 +1,6 @@
 ignore:
-  - "pySDC/playgrounds"
-  - "pySDC/tests"
+  - "*/playgrounds/*"
+  - "*/tests/*"
 
 fixes:
   - "::../"
