@@ -25,11 +25,8 @@ def test_C_1x1():
     # Set python path once
     my_env = os.environ.copy()
     my_env['PYTHONPATH'] = '../../..:.'
-    cwd = '.'
-    # set up new/empty file for output
     fname = 'step_7_C_out_1x1.txt'
-    f = open(fname, 'w')
-    f.close()
+    cwd = '.'
     num_procs = 1
     num_procs_space = 1
     cmd = (
@@ -59,8 +56,6 @@ def test_C_1x2():
     my_env['PYTHONPATH'] = '../../..:.'
     cwd = '.'
     fname = 'step_7_C_out_1x2.txt'
-    f = open(fname, 'w')
-    f.close()
     num_procs = 2
     num_procs_space = 2
     cmd = (
@@ -90,8 +85,6 @@ def test_C_2x2():
     my_env['PYTHONPATH'] = '../../..:.'
     cwd = '.'
     fname = 'step_7_C_out_2x2.txt'
-    f = open(fname, 'w')
-    f.close()
     num_procs = 4
     num_procs_space = 2
     cmd = (

@@ -1,3 +1,4 @@
+from pathlib import Path
 import matplotlib
 
 matplotlib.use('Agg')
@@ -42,7 +43,8 @@ def main():
     # get order of accuracy
     order = get_accuracy_order(results)
 
-    f = open('step_1_D_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_1_D_out.txt', 'w')
     for l in range(len(order)):
         out = 'Expected order: %2i -- Computed order %4.3f' % (5, order[l])
         f.write(out + '\n')
@@ -52,7 +54,7 @@ def main():
     # visualize results
     plot_accuracy(results)
 
-    assert os.path.isfile('step_1_accuracy_test_coll.png')
+    assert os.path.isfile('data/step_1_accuracy_test_coll.png')
 
     assert all(np.isclose(order, 2 * coll.num_nodes - 1, rtol=0.4)), (
         "ERROR: did not get order of accuracy as expected, got %s" % order
@@ -188,7 +190,7 @@ def plot_accuracy(results):
     plt.legend(loc=2, ncol=1, numpoints=1)
 
     # save plot as PDF, beautify
-    fname = 'step_1_accuracy_test_coll.png'
+    fname = 'data/step_1_accuracy_test_coll.png'
     plt.savefig(fname, bbox_inches='tight')
 
     return None

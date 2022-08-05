@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -17,7 +18,8 @@ def main():
     stats_dict = run_simulation()
 
     ediff = dict()
-    f = open('step_3_C_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_3_C_out.txt', 'w')
     for cclass, stats in stats_dict.items():
         # filter and convert/sort statistics by etot and iterations
         filtered_stats = filter_stats(stats, type='etot')

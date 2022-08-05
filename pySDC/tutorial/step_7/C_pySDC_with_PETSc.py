@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import numpy as np
 from mpi4py import MPI
@@ -118,7 +119,8 @@ def main():
             fname = str(sys.argv[2])
         else:
             fname = 'step_7_C_out.txt'
-        f = open(fname, 'a+')
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/' + fname, 'a+')
 
         out = 'This is time-rank %i...' % time_rank
         f.write(out + '\n')

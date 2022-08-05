@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -100,7 +102,8 @@ def main():
     diff = abs(uend_mlsdc - uend_sdc)
 
     # print out and check
-    f = open('step_4_C_out.txt', 'a')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_4_C_out.txt', 'a')
     out = 'Error SDC and MLSDC: %12.8e -- %12.8e' % (err_sdc, err_mlsdc)
     f.write(out + '\n')
     print(out)

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
@@ -40,7 +41,8 @@ def main():
     # compute and print statistics
     min_iter = 99
     max_iter = 0
-    f = open('step_8_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_8_A_out.txt', 'w')
     for item in iter_counts:
         out = 'Number of iterations for time %4.2f: %1i' % item
         f.write(out + '\n')
@@ -51,7 +53,7 @@ def main():
 
     # call helper routine to produce residual plot
 
-    fname = 'step_8_residuals.png'
+    fname = 'data/step_8_residuals.png'
     show_residual_across_simulation(stats=stats, fname=fname)
 
     assert err < 6.1555e-05, 'ERROR: error is too large, got %s' % err

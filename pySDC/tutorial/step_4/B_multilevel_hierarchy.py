@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.core.Step import step
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -50,7 +52,8 @@ def main():
     S = step(description=description)
 
     # print out and check
-    f = open('step_4_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_4_B_out.txt', 'w')
     for l in range(len(S.levels)):
         L = S.levels[l]
         out = 'Level %2i: nvars = %4i -- nnodes = %2i' % (l, L.prob.params.nvars, L.sweep.coll.num_nodes)

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pySDC.core.Step import step
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -79,7 +81,8 @@ def run_imex_sdc(S):
     # reset iteration counter
     S.status.iter = 0
     # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
-    f = open('step_2_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_2_B_out.txt', 'w')
     while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
         # this is where the nodes are actually updated according to the SDC formulas
         L.sweep.update_nodes()

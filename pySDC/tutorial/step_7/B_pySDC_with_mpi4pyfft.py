@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -69,7 +70,8 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     f = None
     if rank == 0:
-        f = open('step_7_B_out.txt', 'a')
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/step_7_B_out.txt', 'a')
         out = f'Running with ml={ml} and num_procs={num_procs}...'
         f.write(out + '\n')
         print(out)

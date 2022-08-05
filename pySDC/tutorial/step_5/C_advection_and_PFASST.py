@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -69,7 +70,8 @@ def main():
     niters_min_all = {}
     niters_max_all = {}
 
-    f = open('step_5_C_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_5_C_out.txt', 'w')
     # loop over different types of implicit sweeper types
     for QI in QI_list:
 

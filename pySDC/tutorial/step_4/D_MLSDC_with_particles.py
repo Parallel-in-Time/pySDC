@@ -1,4 +1,5 @@
 import time
+from pathlib import Path
 
 import numpy as np
 
@@ -22,7 +23,8 @@ def main():
     stats_mlsdc, time_mlsdc = run_penning_trap_simulation(mlsdc=True)
     stats_mlsdc_finter, time_mlsdc_finter = run_penning_trap_simulation(mlsdc=True, finter=True)
 
-    f = open('step_4_D_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_4_D_out.txt', 'w')
     out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % (
         time_sdc,
         time_mlsdc,
