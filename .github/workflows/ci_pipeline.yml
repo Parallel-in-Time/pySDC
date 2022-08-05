@@ -274,13 +274,19 @@ jobs:
       - test_mpi
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
       - name: Get data
         uses: actions/download-artifact@v3
         with:
           path: data
 
       - name: Check files
-        run: ls -artl data
+        run: |
+          ls -artl data
+          find . -type f -print0 | xargs -0 -I file mv file .
+          ls -artl data
 
 #      - name: Build documentation
 #        run: |
