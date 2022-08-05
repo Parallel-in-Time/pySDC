@@ -266,6 +266,8 @@ jobs:
           find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
           ls -ratl coverage
           python -m coverage combine ./coverage/*.dat
+          ls -artl
+          ls -ratl coverage
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
@@ -320,6 +322,12 @@ jobs:
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
 
+      - name: Store docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs
+          path: docs/build/html
+          
 #      - name: Deploy 🚀
 #        uses: JamesIves/github-pages-deploy-action@4.1.4
 #        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
