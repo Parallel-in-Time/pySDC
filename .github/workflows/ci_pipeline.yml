@@ -253,7 +253,7 @@ jobs:
       - name: Get coverage reports
         uses: actions/download-artifact@v3
         with:
-          name: coverage_test_base, coverage_test_fenics, coverage_test_mpi, coverage_test_petsc
+          name: coverage_test_base coverage_test_fenics coverage_test_mpi coverage_test_petsc
           path: coverage
 
       - name: Upload coverage reports
@@ -278,7 +278,7 @@ jobs:
       - name: Get data
         uses: actions/download-artifact@v3
         with:
-          name: data_test_base, data_test_fenics, data_test_mpi, data_test_petsc
+          name: data_test_base data_test_fenics data_test_mpi data_test_petsc
           path: data
 
       - name: Check files
