@@ -3,4 +3,4 @@ ignore:
   - "pySDC/tests"
 
 fixes:
-  - "::../"'
+  - "::../"
