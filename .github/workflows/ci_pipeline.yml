@@ -261,21 +261,23 @@ jobs:
 
       - name: Combine coverage reports
         run: |
-          ls -ratl coverage
           rm -rf coverage/data_*
           find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
-          ls -ratl coverage
           python -m coverage combine ./coverage/*.dat
-          ls -artl
-          ls -ratl coverage
+          python -m coveragce xml
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          directory: coverage
-          verbose: true # optional (default = false)
-          name: codecov-pySDC # optional
-          fail_ci_if_error: false # optional (default = false)
+          filename: coverage.xml
+
+#      - name: Upload coverage reports
+#        uses: codecov/codecov-action@v3
+#        with:
+#          directory: coverage
+#          verbose: true # optional (default = false)
+#          name: codecov-pySDC # optional
+#          fail_ci_if_error: false # optional (default = false)
 
 
   doc_and_deploy:
@@ -309,7 +311,7 @@ jobs:
         with:
           path: data
 
-      - name: Check files
+      - name: Prepare files
         run: |
           rm -rf data/coverage_* data/README
           find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
