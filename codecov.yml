@@ -1,5 +1,0 @@
-ignore:
-  - "**/playgrounds/*"
-  - "**/tests/*"
-fixes:
-  - "::../"
