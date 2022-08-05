@@ -67,7 +67,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi"
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi"
 
       - name: Store results
         if: matrix.py == '3.10'
@@ -81,7 +81,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.xml
+          path: ./coverage_${{ github.job }}.dat
 
 
   test_fenics:
@@ -117,7 +117,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m fenics
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m fenics
 
       - name: Store results
         if: matrix.py == '3.10'
@@ -131,7 +131,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.xml
+          path: ./coverage_${{ github.job }}.dat
 
 
   test_petsc:
@@ -167,7 +167,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m petsc
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m petsc
 
       - name: Store results
         if: matrix.py == '3.10'
@@ -181,7 +181,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.xml
+          path: ./coverage_${{ github.job }}.dat
 
 
   test_mpi:
@@ -217,7 +217,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpi
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi
 
       - name: Store results
         if: matrix.py == '3.10'
@@ -231,7 +231,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.xml
+          path: ./coverage_${{ github.job }}.dat
 
 
   coverage_report:
