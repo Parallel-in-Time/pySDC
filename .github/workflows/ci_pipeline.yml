@@ -69,9 +69,16 @@ jobs:
         run: |
           pytest -v --cov=pySDC --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi"
 
+      - name: Store results
+        if: matrix.py == '3.10'
+        uses: actions/upload-artifact@v3
+        with:
+          name: data_${{ github.job }}
+          path: data
+
       - name: Store coverage results
         if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage_${{ github.job }}
           path: ./coverage_${{ github.job }}.xml
@@ -111,6 +118,13 @@ jobs:
       - name: Run pytest
         run: |
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m fenics
+
+      - name: Store results
+        if: matrix.py == '3.10'
+        uses: actions/upload-artifact@v3
+        with:
+          name: data_${{ github.job }}
+          path: data
 
       - name: Store coverage results
         if: matrix.py == '3.10'
@@ -155,6 +169,13 @@ jobs:
         run: |
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m petsc
 
+      - name: Store results
+        if: matrix.py == '3.10'
+        uses: actions/upload-artifact@v3
+        with:
+          name: data_${{ github.job }}
+          path: data
+
       - name: Store coverage results
         if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
@@ -198,6 +219,13 @@ jobs:
         run: |
           pytest --continue-on-collection-errors -v --cov=pySDC --cov-report=xml:coverage_${{ github.job }}.xml --cov-report=term --durations=0 pySDC/tests -m mpi
 
+      - name: Store results
+        if: matrix.py == '3.10'
+        uses: actions/upload-artifact@v3
+        with:
+          name: data_${{ github.job }}
+          path: data
+
       - name: Store coverage results
         if: matrix.py == '3.10'
         uses: actions/upload-artifact@v2
@@ -223,11 +251,15 @@ jobs:
 #        run: echo 'fixes:\n  - "::../"' > codecov.yml
 
       - name: Get coverage reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage_test_base, coverage_test_fenics, coverage_test_mpi, coverage_test_petsc
+          path: coverage
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
+          directory: coverage
           verbose: true # optional (default = false)
           name: codecov-pySDC # optional
           fail_ci_if_error: false # optional (default = false)
@@ -236,11 +268,21 @@ jobs:
   doc_and_deploy:
     runs-on: ubuntu-latest
 
-    needs: coverage_report
+    needs:
+      - test_base
+      - test_fenics
+      - test_petsc
+      - test_mpi
 
     steps:
       - name: Get data
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
+        with:
+          name: data_test_base, data_test_fenics, data_test_mpi, data_test_petsc
+          path: data
+
+      - name: Check files
+        run: ls -artl data
 
 #      - name: Build documentation
 #        run: |
