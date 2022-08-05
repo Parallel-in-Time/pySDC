@@ -97,11 +97,11 @@ This project has received funding from the `European High-Performance Computing 
 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_ (BMBF) grant 16HPC047.
 
-.. image:: docs/source/logo/Time-X.png
+.. image:: source/logo/Time-X.png
    :width: 20%
 
-.. image:: docs/source/logo/EU.png
+.. image:: source/logo/EU.png
    :width: 15%
 
-.. image:: docs/source/logo/BMBF.jpg
+.. image:: source/logo/BMBF.jpg
    :width: 20%
