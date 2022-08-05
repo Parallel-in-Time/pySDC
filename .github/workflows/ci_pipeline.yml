@@ -245,6 +245,7 @@ jobs:
 
     env:
       YML: 'etc/environment-base.yml'
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     defaults:
       run:
@@ -279,6 +280,12 @@ jobs:
           badge: true
           format: 'markdown'
           output: 'both'
+
+      - name: Adding markdown to build summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload to coveralls.io
+        run: coveralls --service=github
 
       - name: Build documentation
         run: |
