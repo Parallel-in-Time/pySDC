@@ -261,9 +261,10 @@ jobs:
 
       - name: Combine coverage reports
         run: |
-          ls -ratl
           ls -ratl coverage
+          rm -rf coverage/data_*
           find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
+          ls -ratl coverage
           python -m coverage combine ./coverage
 
       - name: Upload coverage reports
@@ -274,6 +275,12 @@ jobs:
           name: codecov-pySDC # optional
           fail_ci_if_error: false # optional (default = false)
 
+#
+#ignore:
+#  - "**/playgrounds/*"
+#  - "**/tests/*"
+#fixes:
+#  - "::../"
 
   doc_and_deploy:
     runs-on: ubuntu-latest
@@ -296,7 +303,7 @@ jobs:
       - name: Check files
         run: |
           ls -artl data
-          rm -rf coverage README
+          rm -rf data/coverage_* data/README
           find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
           ls -artl data
 
