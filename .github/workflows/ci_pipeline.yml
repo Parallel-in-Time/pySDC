@@ -234,50 +234,8 @@ jobs:
           path: ./coverage_${{ github.job }}.dat
 
 
-  coverage_report:
+  coverage_and_docs:
     runs-on: ubuntu-latest
-
-    needs:
-      - test_base
-      - test_fenics
-      - test_petsc
-      - test_mpi
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Install coverage.py
-        run: |
-          python -m pip install --upgrade coverage[toml]
-
-      - name: Get coverage reports
-        uses: actions/download-artifact@v3
-        with:
-          path: coverage
-
-      - name: Combine coverage reports
-        run: |
-          rm -rf coverage/data_*
-          find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
-          python -m coverage combine ./coverage/*.dat
-          python -m coverage xml
-
-      - name: Code Coverage Summary Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: coverage.xml
-          badge: true
-          format: 'markdown'
-          output: 'both'
-
-
-  doc_and_deploy:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        shell: bash -l {0}
 
     needs:
       - test_base
@@ -287,6 +245,10 @@ jobs:
 
     env:
       YML: 'etc/environment-base.yml'
+
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - name: Checkout
@@ -298,17 +260,25 @@ jobs:
           environment-file: ${{ env.YML }}
           extra-specs: python = ${{ matrix.py }}
 
-      - name: Get data
+      - name: Get artifacts
         uses: actions/download-artifact@v3
         with:
           path: data
 
-      - name: Prepare files
+      - name: Prepare data
         run: |
-          rm -rf data/coverage_* data/README
+          rm -rf data/README
           find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
-          rm -rf data/README*
-          ls -artl data
+          python -m coverage combine data/coverage_*.dat
+          python -m coverage xml
+
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          badge: true
+          format: 'markdown'
+          output: 'both'
 
       - name: Build documentation
         run: |
