@@ -261,6 +261,9 @@ jobs:
 
       - name: Combine coverage reports
         run: |
+          ls -ratl
+          ls -ratl coverage
+          find coverage -type f -print0 | xargs -0 -I file mv --backup=numbered file coverage
           python -m coverage combine ./coverage
 
       - name: Upload coverage reports
@@ -293,6 +296,7 @@ jobs:
       - name: Check files
         run: |
           ls -artl data
+          rm -rf coverage README
           find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
           ls -artl data
 
