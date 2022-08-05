@@ -90,6 +90,7 @@ class ConvergenceController(object):
         You should take care here that two things happen:
           -  Every step after a step which wants to be restarted also needs to know it wants to be restarted
           -  Every step should somehow receive a new step size
+
         Of course not every convergence controller needs to implement this, just one
         '''
         pass
