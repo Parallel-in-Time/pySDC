@@ -10,5 +10,5 @@ dependencies:
   - numba>=0.35
   - dill>=0.2.6
   - pytest
-  - coverage
+  - coverage[toml]
   - sphinx
