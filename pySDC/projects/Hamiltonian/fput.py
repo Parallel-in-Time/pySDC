@@ -77,7 +77,7 @@ def run_simulation():
     Tend = 1000.0
     num_procs = 1
 
-    f = open('fput_out.txt', 'w')
+    f = open('data/fput_out.txt', 'w')
     out = 'Running fput problem with %s processors...' % num_procs
     f.write(out + '\n')
     print(out)

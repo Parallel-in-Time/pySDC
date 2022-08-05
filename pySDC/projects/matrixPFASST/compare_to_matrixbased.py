@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -267,7 +268,8 @@ def main():
 
     par_list = [1e-02, 1.0, 1e02]
 
-    f = open('comparison_matrix_vs_nomat_detail.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/comparison_matrix_vs_nomat_detail.txt', 'w')
     for par in par_list:
         compare_controllers(type='diffusion', par=par, f=f)
         compare_controllers(type='advection', par=par, f=f)

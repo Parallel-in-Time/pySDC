@@ -134,7 +134,7 @@ def run_simulation(prob=None):
     else:
         raise NotImplementedError('Problem type not implemented, got %s' % prob)
 
-    f = open(prob + '_out.txt', 'w')
+    f = open('data/' + prob + '_out.txt', 'w')
     out = 'Running ' + prob + ' problem with %s processors...' % num_procs
     f.write(out + '\n')
     print(out)

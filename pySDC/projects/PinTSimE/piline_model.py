@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import numpy as np
 import dill
+from pathlib import Path
 
 mpl.use('Agg')
 
@@ -115,7 +116,8 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    fname = 'piline.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/piline.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -127,7 +129,7 @@ def main():
     min_iter = 20
     max_iter = 0
 
-    f = open('piline_out.txt', 'w')
+    f = open('data/piline_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -146,7 +148,7 @@ def main():
 
 
 def plot_voltages(cwd='./'):
-    f = open(cwd + 'piline.dat', 'rb')
+    f = open(cwd + 'data/piline.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
@@ -159,9 +161,9 @@ def plot_voltages(cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in v1], linewidth=1, label='$v_{C_1}$')
-    ax.plot(times, [v[1] for v in v2], linewidth=1, label='$v_{C_2}$')
-    ax.plot(times, [v[1] for v in p3], linewidth=1, label='$i_{L_\pi}$')
+    ax.plot(times, [v[1] for v in v1], linewidth=1, label=r'$v_{C_1}$')
+    ax.plot(times, [v[1] for v in v2], linewidth=1, label=r'$v_{C_2}$')
+    ax.plot(times, [v[1] for v in p3], linewidth=1, label=r'$i_{L_\pi}$')
     ax.legend(frameon=False, fontsize=12, loc='center right')
 
     ax.set_xlabel('Time')

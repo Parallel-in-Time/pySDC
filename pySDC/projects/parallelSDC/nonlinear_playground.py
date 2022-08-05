@@ -59,7 +59,7 @@ def main():
         linearized_implicit_parallel,
     ]
 
-    f = open('parallelSDC_nonlinear_out.txt', 'w')
+    f = open('data/parallelSDC_nonlinear_out.txt', 'w')
     uinit = None
     uex = None
     uend = None

@@ -4,7 +4,7 @@ Full code: `pySDC/projects/parallelSDC/nonlinear_playground.py <https://github.c
 
 Results:
 
-.. literalinclude:: ../../../parallelSDC_nonlinear_out.txt
+.. literalinclude:: ../../../data/parallelSDC_nonlinear_out.txt
 
 Results:
 
