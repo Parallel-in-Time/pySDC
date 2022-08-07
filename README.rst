@@ -96,12 +96,3 @@ Acknowledgements
 This project has received funding from the `European High-Performance Computing Joint Undertaking <https://eurohpc-ju.europa.eu/>`_  (JU) under grant agreement No 955701 (`TIME-X <https://www.time-x-eurohpc.eu/>`_).
 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_ (BMBF) grant 16HPC047.
-
-.. image:: docs/logo/Time-X.png
-   :width: 20%
-
-.. image:: docs/logo/EU.png
-   :width: 15%
-
-.. image:: docs/logo/BMBF.jpg
-   :width: 20%
