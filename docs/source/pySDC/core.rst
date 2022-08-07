@@ -28,6 +28,14 @@ core.Controller module
    :undoc-members:
    :show-inheritance:
 
+core.ConvergenceController module
+---------------------------------
+
+.. automodule:: core.ConvergenceController
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 core.Errors module
 ------------------
 
@@ -40,6 +48,14 @@ core.Hooks module
 -----------------
 
 .. automodule:: core.Hooks
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+core.Lagrange module
+--------------------
+
+.. automodule:: core.Lagrange
    :members:
    :undoc-members:
    :show-inheritance:

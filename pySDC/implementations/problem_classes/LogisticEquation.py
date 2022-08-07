@@ -9,7 +9,7 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 class logistics_equation(ptype):
     """
     Example implementing the logistic equation, taken from
-    <https://www-users.cse.umn.edu/~olver/ln_/odq.pdf> (Example 2.2)
+    <https://www-users.cse.umn.edu/~olver/ln\_/odq.pdf> (Example 2.2)
     """
 
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):

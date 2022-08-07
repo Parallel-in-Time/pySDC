@@ -5,7 +5,7 @@ import scipy.interpolate as intpl
 
 from pySDC.core.Nodes import NodesGenerator
 from pySDC.core.Errors import CollocationError
-from pySDC.core import LagrangeApproximation
+from pySDC.core.Lagrange import LagrangeApproximation
 
 
 class CollBase(object):
