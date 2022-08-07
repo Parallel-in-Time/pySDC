@@ -72,7 +72,7 @@ class LagrangeApproximation(object):
         w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}
 
     are the barycentric weights.
-    The theory and implementation is inspired from [1]_.
+    The theory and implementation is inspired from `this paper <http://dx.doi.org/10.1137/S0036144502417715>`_.
 
     Attributes
     ----------
@@ -80,20 +80,7 @@ class LagrangeApproximation(object):
         The interpolating points
     weights : np.1darray
         The associated barycentric weights
-    n : int (property)
-        The number of points
 
-    Methods
-    -------
-    __init__(self, points, weightComputation='AUTO', scaleRef='MAX')
-        Instanciate the LagrangeApproximation object.
-    getInterpolationMatrix(self, times):
-        Compute the interpolation matrix for a given set of discrete "time" points.
-    getIntegrationMatrix(self, intervals, numQuad='LEGENDRE_NUMPY')
-        Compute the integration matrix for a given set of intervals.
-
-    .. [1] Berrut, J. P., & Trefethen, L. N. (2004).
-           "Barycentric lagrange interpolation." SIAM review, 46(3), 501-517.
     """
 
     def __init__(self, points, weightComputation='AUTO', scaleRef='MAX'):

@@ -1,4 +1,4 @@
-from pySDC.core import CollBase
+from pySDC.core.Collocation import CollBase
 
 
 class CollGaussRadau_Right(CollBase):

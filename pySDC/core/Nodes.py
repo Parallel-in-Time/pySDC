@@ -16,7 +16,7 @@ class NodesGenerator(object):
     """
     Class that can be used to generate generic distribution of nodes derived
     from Gauss quadrature rule.
-    Its implementation is fully inspired from a book of W. Gautschi [1]_.
+    Its implementation is fully inspired from a `book of W. Gautschi <https://doi.org/10.1093/oso/9780198506720.001.0001>`_.
 
     Attributes
     ----------
@@ -25,23 +25,6 @@ class NodesGenerator(object):
     quad_type : str
         The quadrature type
 
-    Methods
-    -------
-    __init__(self, node_type='LEGENDRE', quad_type='LOBATTO')
-        Instanciate the NodesGenerator object.
-    getNodes(self, num_nodes)
-        Computes a given number of quadrature nodes.
-    getOrthogPolyCoefficients(self, num_coeff)
-        Produces a given number of analytic three-term recurrence coefficients.
-    evalOrthogPoly(self, t, alpha, beta)
-        Evaluates the two higher order orthogonal polynomials corresponding
-        to the given (alpha,beta) coefficients.
-    getTridiagCoefficients(self, num_nodes)
-        Computes recurrence coefficients for the tridiagonal Jacobian matrix,
-        taking into account the quadrature type.
-
-    .. [1] W. Gautschi, "Orthogonal polynomials: computation and approximation."
-       OUP Oxford, 2004.
     """
 
     def __init__(self, node_type='LEGENDRE', quad_type='LOBATTO'):
