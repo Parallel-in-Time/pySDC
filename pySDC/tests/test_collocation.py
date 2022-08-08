@@ -24,6 +24,7 @@ EQUIV = {
     ('LEGENDRE', 'RADAU-RIGHT', False): CollGaussRadau_Right,
 }
 
+np.random.seed(42)
 classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 t_start = np.random.rand(1) * 0.2
 t_end = 0.8 + np.random.rand(1) * 0.2
