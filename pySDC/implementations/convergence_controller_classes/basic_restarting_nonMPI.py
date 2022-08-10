@@ -92,7 +92,7 @@ class BasicRestartingNonMPI(ConvergenceController):
         # check if we performed too many restarts
         if S.status.first:
             self.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
-            if self.max_restart_reached:
+            if self.max_restart_reached and S.status.restart:
                 self.log(f'Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...', S)
 

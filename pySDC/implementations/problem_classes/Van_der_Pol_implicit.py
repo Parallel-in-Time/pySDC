@@ -39,15 +39,17 @@ class vanderpol(ptype):
         super(vanderpol, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
                                         dtype_u, dtype_f, problem_params)
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
-        Compute an "exact" solution with scipy.integrate.solve_ivp
+        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0
 
         Args:
             t (float): current time
+            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
+            t_init (float): the starting time
 
         Returns:
-            dtype_u: mesh type containing the initial values or the approximation to the exact solution
+            dtype_u: approximate exact solution
         """
 
         me = self.dtype_u(self.init)
@@ -58,7 +60,16 @@ class vanderpol(ptype):
                 return self.eval_f(u, t)
 
             tol = 100 * np.finfo(float).eps
-            me[:] = solve_ivp(rhs, (0., t), self.params.u0, rtol=tol, atol=tol).y[:, -1]
+
+            if u_init is not None:
+                if t_init is None:
+                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!')
+                me = u_init.copy()
+            else:
+                u_init = self.params.u0
+                t_init = 0.
+            me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
         else:
             me[:] = self.params.u0[:]
         return me
