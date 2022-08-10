@@ -67,7 +67,7 @@ class vanderpol(ptype):
 is not 0!')
                 me = u_init.copy()
             else:
-                u_init = self.params.u0
+                u_init = self.params.u0.copy()
                 t_init = 0.
             me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
         else:
