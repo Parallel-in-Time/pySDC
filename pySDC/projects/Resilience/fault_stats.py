@@ -37,10 +37,28 @@ class log_fault_stats_data(FaultInjector):
                           sweep=L.status.sweep, type='u', value=L.uend)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='dt', value=L.dt)
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
         self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='k', value=step.status.iter)
         self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='restarts', value=int(step.status.restart))
+
+
+class log_local_error(log_fault_stats_data):
+    '''
+    This class stores the "true" local error (may be approximated with scipy reference solution)
+    '''
+
+    def post_step(self, step, level_number):
+
+        super(log_local_error, self).post_step(step, level_number)
+
+        # some abbreviations
+        L = step.levels[level_number]
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_loc',
+                          value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]))
 
 
 class Strategy:
@@ -56,6 +74,7 @@ class Strategy:
         self.linestyle = '-'
         self.marker = '.'
         self.name = ''
+        self.bar_plot_x_label = ''
         self.color = list(cmap.values())[0]
 
         # setup custom descriptions
@@ -116,6 +135,7 @@ class BaseStrategy(Strategy):
         self.color = list(cmap.values())[0]
         self.marker = 'o'
         self.name = 'base'
+        self.bar_plot_x_label = 'base'
 
 
 class AdaptivityStrategy(Strategy):
@@ -130,6 +150,7 @@ class AdaptivityStrategy(Strategy):
         self.color = list(cmap.values())[1]
         self.marker = '*'
         self.name = 'adaptivity'
+        self.bar_plot_x_label = 'adaptivity'
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -146,13 +167,60 @@ class AdaptivityStrategy(Strategy):
             e_tol = 1e-7
             dt_min = 1e-2
         elif problem == run_vdp:
-            e_tol = 3e-5
+            e_tol = 2e-5
             dt_min = 1e-3
         else:
             raise NotImplementedError('I don\'t have a tolerance for adaptivity for your problem. Please add one to the\
  strategy')
 
         custom_description = {'convergence_controllers': {Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min}}}
+
+        return {**custom_description, **self.custom_description}
+
+
+class AdaptiveHotRodStrategy(Strategy):
+    '''
+    Adaptivity + Hot Rod as a resilience strategy
+    '''
+    def __init__(self):
+        '''
+        Initialization routine
+        '''
+        super(AdaptiveHotRodStrategy, self).__init__()
+        self.color = list(cmap.values())[4]
+        self.marker = '.'
+        self.name = 'adaptive Hot Rod'
+        self.bar_plot_x_label = 'adaptive\nHot Rod'
+
+    def get_custom_description(self, problem, num_procs):
+        '''
+        Routine to get a custom description that adds adaptivity and Hot Rod
+
+        Args:
+            problem: A function that runs a pySDC problem, see imports for available problems
+            num_procs (int): Number of processses you intend to run with
+
+        Returns:
+            The custom desciptions you can supply to the problem when running it
+        '''
+        if problem == run_vdp:
+            e_tol = 3e-7
+            dt_min = 1e-3
+            maxiter = 4
+            HotRod_tol = 3e-7
+        else:
+            raise NotImplementedError('I don\'t have a tolerance for adaptive Hot Rod for your problem. Please add one \
+to the strategy')
+
+        no_storage = num_procs > 1
+
+        custom_description = {
+            'convergence_controllers': {
+                Adaptivity: {'e_tol': e_tol, 'dt_min': dt_min},
+                HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage},
+            },
+            'step_params': {'maxiter': maxiter},
+        }
 
         return {**custom_description, **self.custom_description}
 
@@ -169,6 +237,7 @@ class IterateStrategy(Strategy):
         self.color = list(cmap.values())[2]
         self.marker = 'v'
         self.name = 'iterate'
+        self.bar_plot_x_label = 'iterate'
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -209,6 +278,7 @@ class HotRodStrategy(Strategy):
         self.color = list(cmap.values())[3]
         self.marker = '^'
         self.name = 'Hot Rod'
+        self.bar_plot_x_label = 'Hot Rod'
 
     def get_custom_description(self, problem, num_procs):
         '''
@@ -223,13 +293,17 @@ class HotRodStrategy(Strategy):
         '''
         if problem == run_vdp:
             HotRod_tol = 5e-7
+            maxiter = 4
         else:
             raise NotImplementedError('I don\'t have a tolerance for Hot Rod for your problem. Please add one to the\
  strategy')
 
         no_storage = num_procs > 1
 
-        custom_description = {'convergence_controllers': {HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage}}}
+        custom_description = {
+            'convergence_controllers': {HotRod: {'HotRod_tol': HotRod_tol, 'no_storage': no_storage}},
+            'step_params': {'maxiter': maxiter},
+        }
 
         return {**custom_description, **self.custom_description}
 
@@ -409,9 +483,12 @@ class FaultStats:
         if already_completed['runs'] < runs:
             self.store(strategy, faults, dat)
 
+        if faults:
+            self.get_recovered(strategy)
+
         return None
 
-    def single_run(self, strategy, rng, faults, force_params=None):
+    def single_run(self, strategy, rng, faults, force_params=None, hook_class=log_fault_stats_data):
         '''
         Run the problem once with the specified parameters
 
@@ -448,8 +525,87 @@ class FaultStats:
             fault_stuff = None
 
         return self.prob(custom_description=custom_description, num_procs=self.num_procs,
-                         hook_class=log_fault_stats_data, fault_stuff=fault_stuff, Tend=self.get_Tend(),
+                         hook_class=hook_class, fault_stuff=fault_stuff, Tend=self.get_Tend(),
                          custom_controller_params=custom_controller_params, custom_problem_params=custom_problem_params)
+
+    def compare_strategies(self, run=0, faults=False, ax=None):
+        '''
+        Take a closer look at how the strategies compare for a specific run
+
+        Args:
+            run (int): The number of the run to get the appropriate random generator
+            faults (bool): Whether or not to include faults
+            ax (Matplotlib.axes): Somewhere to plot
+
+        Returns:
+            None
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+            store = True
+        else:
+            store = False
+
+        k_ax = ax.twinx()
+        ls = ['-.' if type(strategy) == HotRodStrategy else '-' for strategy in self.strategies]
+        [self.scrutinize_visual(self.strategies[i], run, faults, ax, k_ax, ls[i]) for i in range(len(self.strategies))]
+
+        # make a legend
+        [k_ax.plot([None], [None], label=strategy.name, color=strategy.color) for strategy in self.strategies]
+        k_ax.legend(frameon=True)
+
+        if store:
+            fig.tight_layout()
+            plt.savefig(f'data/{self.get_name()}-comparison.pdf', transparent=True)
+
+    def scrutinize_visual(self, strategy, run, faults, ax=None, k_ax=None, ls='-'):
+        '''
+        Take a closer look at a specific run with a plot
+
+        Args:
+            strategy (Strategy): The resilience strategy you plan on using
+            run (int): The number of the run to get the appropriate random generator
+            faults (bool): Whether or not to include faults
+            ax (Matplotlib.axes): Somewhere to plot the error
+            k_ax (Matplotlib.axes): Somewhere to plot the iterations
+
+        Returns:
+            None
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+            store = True
+        else:
+            store = False
+
+        force_params = dict()
+
+        rng = np.random.RandomState(run)
+        stats, controller, Tend = self.single_run(strategy, rng, faults, force_params, hook_class=log_local_error)
+
+        # plot the embedded error
+        e_loc = get_sorted(stats, type='e_loc', recomputed=False)
+        ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
+
+        # plot the iterations
+        k_ax = ax.twinx() if k_ax is None else k_ax
+        k = get_sorted(stats, type='k')
+        k_ax.plot([me[0] for me in k], np.cumsum([me[1] for me in k]), color=strategy.color, ls='--')
+
+        # plot the faults
+        faults = get_sorted(stats, type='bitflip')
+        for fault_time in [me[0] for me in faults]:
+            ax.axvline(fault_time, color='grey', ls=':')
+
+        # decorate
+        ax.set_yscale('log')
+        ax.set_ylabel(r'$\epsilon$')
+        k_ax.set_ylabel('cumulative iterations (dashed)')
+        ax.set_xlabel(r'$t$')
+
+        if store:
+            fig.tight_layout()
+            plt.savefig(f'data/{self.get_name()}-{strategy.name}-details.pdf', transparent=True)
 
     def scrutinize(self, strategy, run, faults=True):
         '''
@@ -471,7 +627,7 @@ class FaultStats:
         stats, controller, Tend = self.single_run(strategy, rng, faults, force_params)
 
         t, u = get_sorted(stats, type='u')[-1]
-        k_tot = sum([me[1] for me in get_sorted(stats, type='k')])
+        k = [me[1] for me in get_sorted(stats, type='k')]
 
         # see if we can determine if the faults where recovered
         no_faults = self.load(strategy, False)
@@ -479,13 +635,18 @@ class FaultStats:
         error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
         recovery_thresh = e_star * self.recovery_thresh
 
-        print(f'\ne={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
+        print(f'\nOverview for {strategy.name} strategy')
+        print(f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
 {error < recovery_thresh}')
-        print(f'k_tot={k_tot}')
+        print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
 
         # checkout the step size
         dt = [me[1] for me in get_sorted(stats, type='dt')]
         print(f'dt: min: {np.min(dt):.2e}, max: {np.max(dt):.2e}, mean: {np.mean(dt):.2e}')
+
+        # restarts
+        restarts = [me[1] for me in get_sorted(stats, type='restarts')]
+        print(f'restarts: {sum(restarts)}')
 
         # print faults
         faults = get_sorted(stats, type='bitflip')
@@ -601,7 +762,19 @@ class FaultStats:
             return {'runs': 0}
         return dat
 
-    def get_recovered(self, strategy):
+    def get_recovered(self, strategy=None):
+        '''
+        Determine the recovery rate for a specific strategy and store it to disk.
+
+        Args:
+            strategy (Strategy): The resilience strategy you want to get the recovery rate for. If left at None, it will
+                                 be computed for all available strategies
+
+        Returns:
+            None
+        '''
+        if strategy is None:
+            [self.get_recovered(strat) for strat in self.strategies]
         fault_free = self.load(strategy, False)
         with_faults = self.load(strategy, True)
 
@@ -609,6 +782,8 @@ class FaultStats:
 
         with_faults['recovered'] = with_faults['error'] < self.recovery_thresh * fault_free['error'].mean()
         self.store(strategy, True, with_faults)
+
+        return None
 
     def crash_rate(self, dat, no_faults, thingA, mask):
         '''
@@ -630,16 +805,57 @@ class FaultStats:
             return None
 
     def rec_rate(self, dat, no_faults, thingA, mask):
+        '''
+        Operation for plotting which returns the recovery rate for a given mask.
+        Which thingA you apply this to actually does not matter here since we compute a rate.
+
+        Args:
+            dat (dict): The recorded statistics
+            no_faults (dict): The corresponding fault-free stats
+            thingA (str): Some key stored in the stats
+            mask (Numpy.ndarray of shape (n)): Arbitrary mask for filtering
+
+        Returns:
+            float: Recovery rate
+        '''
         if len(dat[thingA][mask]) > 0:
             return len(dat[thingA][mask & dat['recovered']]) / len(dat[thingA][mask])
         else:
             return None
 
     def mean(self, dat, no_faults, thingA, mask):
+        '''
+        Operation for plotting which returns the mean of thingA after applying the mask
+
+        Args:
+            dat (dict): The recorded statistics
+            no_faults (dict): The corresponding fault-free stats
+            thingA (str): Some key stored in the stats
+            mask (Numpy.ndarray of shape (n)): Arbitrary mask for filtering
+
+        Returns:
+            float: Mean of thingA after applying mask
+        '''
         return np.mean(dat[thingA][mask])
 
     def extra_mean(self, dat, no_faults, thingA, mask):
-        return np.mean(dat[thingA][mask]) - np.mean(no_faults[thingA])
+        '''
+        Operation for plotting which returns the difference in mean of thingA between runs with and without faults after
+        applying the mask
+
+        Args:
+            dat (dict): The recorded statistics
+            no_faults (dict): The corresponding fault-free stats
+            thingA (str): Some key stored in the stats
+            mask (Numpy.ndarray of shape (n)): Arbitrary mask for filtering
+
+        Returns:
+            float: Difference in mean of thingA between runs with and without faults after applying mask
+        '''
+        if True in mask or int in [type(me) for me in mask]:
+            return np.mean(dat[thingA][mask]) - np.mean(no_faults[thingA])
+        else:
+            return None
 
     def plot_thingA_per_thingB(self, strategy, thingA, thingB, ax=None, mask=None, recovered=False, op=None):
         '''
@@ -686,8 +902,8 @@ class FaultStats:
         ax.set_ylabel(thingA)
         return None
 
-    def plot_things_per_things(self, thingA, thingB, recovered=False, mask=None, op=None, args=None, strategies=None,
-                               name=None, store=True, ax=None):
+    def plot_things_per_things(self, thingA='bit', thingB='bit', recovered=False, mask=None, op=None, args=None,
+                               strategies=None, name=None, store=True, ax=None):
         '''
         Plot thingA vs thingB for multiple strategies
 
@@ -730,6 +946,17 @@ class FaultStats:
         return None
 
     def plot_recovery_thresholds(self, strategies=None, thresh_range=None, ax=None):
+        '''
+        Plot the recovery rate for a range of thresholds
+
+        Args:
+            strategies (list): List of the strategies you want to plot, if None, all will be plotted
+            thresh_range (list): thresholds for deciding whether to accept as recovered
+            ax (Matplotlib.axes): Somewhere to plot
+
+        Returns:
+            None
+        '''
         # fill default values if nothing is specified
         strategies = self.strategies if strategies is None else strategies
         thresh_range = 1 + np.linspace(-4e-2, 4e-2, 100) if thresh_range is None else thresh_range
@@ -752,24 +979,34 @@ class FaultStats:
         ax.set_ylabel('recovery rate')
         ax.set_xlabel('threshold as ratio to fault-free error')
 
-    def print_stats(self, strategy):
-        dat = self.load(strategy, True)
-        strings = {
-            'iteration': 'iter',
-            'node': 'nodes',
-            'bit': 'bits',
-        }
-        print(f'Stats for {strategy.name}')
-        for k, v in strings.items():
-            me = np.unique(dat[k])
-            for i in range(len(me)):
-                mask = dat[k] == me[i]
-                v = f'{v} {len(dat[k][mask])}'
-            print(v)
+        return None
 
-    def get_mask(self, strategy=None, key=None, val=None, op='eq', old_mask=None):
+    def get_mask(self, strategy=None, key=None, val=None, op='eq', old_mask=None, compare_faults=False):
+        '''
+        Make a mask to apply to stored data to filter out certain things
+
+        Args:
+            strategy (Strategy): The resilience strategy you want to apply the mask to. Most masks are the same for all
+                                 strategies so None is fine
+            key (str): The key in the stored statistics that you want to filter for some value
+            val (str, float, int, bool): A value that you want to use for filtering. Dtype depends on key
+            op (str): Operation that is applied for filtering
+            old_mask (Numpy.ndarray of shape (n)): Apply this mask on top of the filter
+            compare_faults (bool): instead of comparing to val, compare to the mean value for fault free runs
+
+        Returns:
+            Numpy.ndarray with boolean entries that can be used as a mask
+        '''
         strategy = self.strategies[0] if strategy is None else strategy
         dat = self.load(strategy, True)
+
+        if compare_faults:
+            if val is not None:
+                raise ValueError('Can\'t use val and compare_faults in get_mask at the same time!')
+            else:
+                vals = self.load(strategy, False)[key]
+                val = sum(vals) / len(vals)
+
         if None in [key, val]:
             mask = dat['bit'] == dat['bit']
         else:
@@ -786,7 +1023,7 @@ class FaultStats:
             elif op == 'gt':
                 mask = dat[key] > val
             else:
-                raise NotImplementedError
+                raise NotImplementedError(f'Please implement op={op}!')
 
         if old_mask is not None:
             return mask & old_mask
@@ -794,16 +1031,222 @@ class FaultStats:
             return mask
 
     def get_index(self, mask):
+        '''
+        Get the indeces of all runs in mask
+
+        Args:
+            mask (Numpy.ndarray of shape (n)): The mask you want to know the contents of
+
+        Returns:
+            Numpy.ndarray: Array of indeces
+        '''
         return np.arange(len(mask))[mask]
+
+    def get_statistics_info(self, mask=None, strategy=None, print_all=False, ax=None):
+        '''
+        Get information about how many data points for faults we have given a particular mask
+
+        Args:
+            mask (Numpy.ndarray of shape (n)): The mask you want to apply before counting
+            strategy (Strategy): The resilience strategy you want to look at. In normal use it's the same for all
+                                 strategies, so you don't need to supply this argument
+            print_all (bool): Whether to add information that is normally not useful to the table
+            ax (Matplotlib.axes): Somewhere to plot the combinations histogram
+
+        Returns:
+            None
+        '''
+
+        # load some data from which to infer the number occurrences of some event
+        strategy = self.strategies[0] if strategy is None else strategy
+        dat = self.load(strategy, True)
+
+        # make a dummy mask in case none is supplied
+        if mask is None:
+            mask = np.ones_like(dat['error'], dtype=bool)
+
+        # print a header
+        print(f' tot: {len(dat["error"][mask]):6} | avg. counts | mean deviation | unique entries')
+        print('-------------------------------------------------------------')
+
+        # make a list of all keys that you want to look at
+        keys = ['iteration', 'bit', 'node']
+        if print_all:
+            keys += ['problem_pos', 'level', 'target']
+
+        # print the table
+        for key in keys:
+            counts, dev, unique = self.count_occurrences(dat[key][mask])
+            print(f' {key:11} | {counts:11.1f} | {dev:14.2f} | {unique:14}')
+
+        return None
+
+    def combinations_histogram(self, dat=None, keys=None, mask=None, ax=None):
+        '''
+        Make a histogram ouf of the occurrences of combinations
+
+        Args:
+            dat (dict): The data of the recorded statistics
+            keys (list): The keys in dat that you want to know the combinations of
+            mask (Numpy.ndarray of shape (n)): The mask you want to apply before counting
+
+        Returns:
+            Matplotlib.axes: The plot
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+
+        occurrences, bins = self.get_combination_histogram(dat, keys, mask)
+
+        ax.bar(bins[:-1], occurrences)
+
+        ax.set_xlabel('Occurrence of combinations')
+
+        return ax
+
+    def get_combination_histogram(self, dat=None, keys=None, mask=None):
+        '''
+        Check how many combinations of values we expect and how many we find to see if we need to do more experiments.
+        It is assumed that each allowed value for each key appears at least once in dat after the mask was applied
+
+        Args:
+            dat (dict): The data of the recorded statistics
+            keys (list): The keys in dat that you want to know the combinations of
+            mask (Numpy.ndarray of shape (n)): The mask you want to apply before counting
+
+        Returns:
+            Numpy.ndarray: Number of occurrences of combinations
+            Numpy.ndarray: Bins
+        '''
+
+        # load default values
+        dat = self.load(self.strategies[0], True) if dat is None else dat
+        keys = ['iteration', 'bit', 'node'] if keys is None else keys
+        if mask is None:
+            mask = np.ones_like(dat['error'], dtype=bool)
+
+        # get unique values and compute how many combinations you expect
+        num_unique = [len(np.unique(dat[key][mask])) for key in keys]
+        expected_number_of_combinations = np.prod(num_unique)
+
+        # test what you actually get
+        combination_counts = self.get_combination_counts(dat, keys, mask)
+
+        # make a histogram with the result
+        occurrences, bins = np.histogram(combination_counts, bins=np.arange(max(combination_counts) + 1))
+        occurrences[0] = expected_number_of_combinations - len(combination_counts)
+
+        return occurrences, bins
+
+    def get_combination_counts(self, dat, keys, mask):
+        '''
+        Get counts of how often all combinations of values of keys appear. This is done recursively to support arbitrary
+        numbers of keys
+
+        Args:
+            dat (dict): The data of the recorded statistics
+            keys (list): The keys in dat that you want to know the combinations of
+            mask (Numpy.ndarray of shape (n)): The mask you want to apply before counting
+
+        Returns:
+            list: Occurrences of all combinations
+        '''
+        key = keys[0]
+        unique_vals = np.unique(dat[key][mask])
+        res = []
+
+        for i in range(len(unique_vals)):
+            inner_mask = self.get_mask(key=key, val=unique_vals[i], op='eq', old_mask=mask)
+            if len(keys) > 1:
+                res += self.get_combination_counts(dat, keys[1:], inner_mask)
+            else:
+                res += [self.count_occurrences(dat[key][inner_mask])[0]]
+        return res
+
+    def count_occurrences(self, vals):
+        '''
+        Count the occurrences of unique values in vals and compute average deviation from mean
+
+        Args:
+            vals (list): Values you want to check
+
+        Returns:
+            float: Mean of number of occurrences of unique values in vals
+            float: Average deviation from mean number of occurrences
+            int: Number of unique entries
+        '''
+        unique_vals, counts = np.unique(vals, return_counts=True)
+
+        if len(counts) > 0:
+            return counts.mean(), sum(abs(counts - counts.mean())) / len(counts), len(counts)
+        else:
+            return None, None, 0
+
+    def bar_plot_thing(self, x=None, thing=None, ax=None, mask=None, store=False, faults=False, name=None, op=None,
+                       args=None):
+        '''
+        Make a bar plot about something!
+
+        Args:
+            x (Numpy.ndarray of dimension 1): x values for bar plot
+            thing (str): Some key stored in the stats that will go on the y-axis
+            mask (Numpy.ndarray of shape (n)): The mask you want to apply before plotting
+            store (bool): Store the plot at a predefined path or not (for jupyter notebooks)
+            faults (bool): Whether to load stats with faults or whithout
+            name (str): Optional name for the plot
+            op (function): Operation that is applied to thing before plotting default is recovery rate
+            args (dict): Parameters for how the plot should look
+
+        Returns:
+            None
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
+            store = True
+        op = self.mean if op is None else op
+
+        # get the values for the bars
+        height = np.zeros(len(self.strategies))
+        for strategy_idx in range(len(self.strategies)):
+            strategy = self.strategies[strategy_idx]
+
+            # load the values
+            dat = self.load(strategy, faults)
+            no_faults = self.load(strategy, False)
+
+            # check if we have a mask
+            if mask is None:
+                mask = np.ones_like(dat[thing], dtype=bool)
+
+            height[strategy_idx] = op(dat, no_faults, thing, mask)
+
+        # get some x values
+        x = np.arange(len(self.strategies)) if x is None else x
+
+        # prepare labels
+        ticks = [strategy.bar_plot_x_label for strategy in self.strategies]
+
+        ax.bar(x, height, tick_label=ticks)
+
+        # set the parameters
+        ax.set_ylabel(thing)
+        args = {} if args is None else args
+        [plt.setp(ax, k, v) for k, v in args.items()]
+
+        if store:
+            fig.tight_layout()
+            plt.savefig(f'data/{self.get_name()}-{thing if name is None else name}-barplot.pdf', transparent=True)
+            plt.close(fig)
+
+        return None
 
 
 def main():
-    stats_analyser = FaultStats(prob=run_vdp, strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy()],
-                                faults=[False, True], reload=True, recovery_thresh=1 + 2e-2, num_procs=1)
+    stats_analyser = FaultStats(prob=run_vdp, strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(),
+                                HotRodStrategy()], faults=[False, True], reload=True, recovery_thresh=1 + 2e-2,
+                                num_procs=1)
 
-    # stats_analyser.scrutinize(stats_analyser.strategies[2], 0, True)
-
-    stats_analyser.run_stats_generation(runs=1000, step=50)
+    stats_analyser.run_stats_generation(runs=5000, step=50)
     mask = None
 
     stats_analyser.plot_things_per_things('recovered', 'node', False, op=stats_analyser.rec_rate, mask=mask,
@@ -819,13 +1262,8 @@ def main():
     stats_analyser.plot_things_per_things('error', 'bit', True, op=stats_analyser.mean, mask=mask,
                                           args={'yscale': 'log'})
 
-    s = 1
-    mask = stats_analyser.get_mask(stats_analyser.strategies[s], 'iteration', 3, 'lt', mask)
-    mask = stats_analyser.get_mask(stats_analyser.strategies[s], 'node', 0, 'gt', mask)
-    mask = stats_analyser.get_mask(stats_analyser.strategies[s], 'recovered', False, 'eq', mask)
-    print(stats_analyser.get_index(mask))
-
     stats_analyser.plot_recovery_thresholds()
+    stats_analyser.compare_strategies()
 
 
 if __name__ == "__main__":

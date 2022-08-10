@@ -29,7 +29,6 @@ class Fault(FrozenClass):
         self.bit = None
         self.target = 0
         self.when = 'after'  # before or after an iteration?
-        self.happened = False
 
         for k, v in params.items():
             setattr(self, k, v)
@@ -114,21 +113,34 @@ class FaultInjector(hooks):
         Returns:
             None
         '''
-        self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
+        L = step.levels[f.level_number]
+
+        # insert the fault in some target
         if f.target == 0:
-            L = step.levels[f.level_number]
+            '''
+            Target 0 means we flip a bit in the solution.
+
+            To make sure the faults have some impact, we have to reevaluate the right hand side. Otherwise the fault is
+            fixed automatically in this implementation, as the right hand side is assembled only from f(t, u) and u is
+            tempered with after computing f(t, u).
+
+            To be fair to iteration based resilience strategies, we also reevaluate the residual. Otherwise, when a
+            fault happens in the last iteration, it will not show up in the residual and the iteration is wrongly
+            stopped.
+            '''
             L.u[f.node][f.problem_pos] = self.flip_bit(L.u[f.node][f.problem_pos][0], f.bit)
-            # we need to evaluate the rhs here, because it will happen only after the fault was fixed otherwise
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
+            L.sweep.compute_residual()
         else:
             raise NotImplementedError(f'Target {f.target} for faults not impelemted!')
 
-        L = step.levels[f.level_number]
+        # log what happened to stats and screen
+        self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
                           sweep=L.status.sweep, type='bitflip',
                           value=(f.level_number, f.iteration, f.node, f.problem_pos, f.bit, f.target))
 
-        f.happened = True
+        # remove the fault from the list to make sure it happens only once
         self.faults.remove(f)
 
         return None
