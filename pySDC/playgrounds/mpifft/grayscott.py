@@ -2,7 +2,7 @@ import numpy as np
 from mpi4py import MPI
 import matplotlib.pyplot as plt
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -149,10 +149,7 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     if rank == 0:
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
         out = (
@@ -174,7 +171,7 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
         f.write(out + '\n')
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
         out = f'Time to solution: {timing[0][1]:6.4f} sec.'
         f.write(out + '\n')
         print(out)

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats, get_list_of_types, get_sorted
+from pySDC.helpers.stats_helper import get_sorted, get_list_of_types, get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -22,20 +22,14 @@ def main():
     print(out)
 
     # filter statistics by first time intervall and type (residual)
-    filtered_stats = filter_stats(stats, time=0.1, type='residual_post_iteration')
-
-    # sort and convert stats to list, sorted by iteration numbers
-    residuals = sort_stats(filtered_stats, sortby='iter')
+    residuals = get_sorted(stats, time=0.1, type='residual_post_iteration', sortby='iter')
 
     for item in residuals:
         out = 'Residual in iteration %2i: %8.4e' % item
         f.write(out + '\n')
         print(out)
 
-    # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by time
+    # get and convert filtered statistics to list of iterations count, sorted by time
     # the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments
     iter_counts = get_sorted(stats, type='niter', sortby='time')
 

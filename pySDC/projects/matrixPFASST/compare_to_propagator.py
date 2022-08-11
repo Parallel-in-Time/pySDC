@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -223,10 +223,7 @@ def compare_controllers(type=None, par=0.0, f=None):
     uend_mat, stats_mat = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats_mat = filter_stats(stats_mat, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts_mat = sort_stats(filtered_stats_mat, sortby='time')
+    iter_counts_mat = get_sorted(stats_mat, type='niter', sortby='time')
 
     out = '  Iteration counts for matrix-based version: %s' % iter_counts_mat
     f.write(out + '\n')

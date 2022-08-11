@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
@@ -244,13 +244,9 @@ def compare_controllers(type=None, par=0.0, f=None):
 
     assert diff < 2.3e-15, 'ERROR: difference between matrix-based and matrix-free result is too large, got %s' % diff
 
-    # filter statistics by type (number of iterations)
-    filtered_stats_mat = filter_stats(stats_mat, type='niter')
-    filtered_stats_nomat = filter_stats(stats_nomat, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts_mat = sort_stats(filtered_stats_mat, sortby='time')
-    iter_counts_nomat = sort_stats(filtered_stats_nomat, sortby='time')
+    # get and convert statistics to list of iterations count, sorted by process
+    iter_counts_mat = get_sorted(stats_mat, type='niter', sortby='time')
+    iter_counts_nomat = get_sorted(stats_nomat, type='niter', sortby='time')
 
     out = '  Iteration counts for matrix-based version: %s' % iter_counts_mat
     f.write(out + '\n')

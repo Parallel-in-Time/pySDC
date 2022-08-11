@@ -11,7 +11,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 from pySDC.playgrounds.FEniCS.HookClass_FEniCS_output import fenics_output
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 import pySDC.helpers.plot_helper as plt_helper
 
 
@@ -76,8 +76,8 @@ def run_simulation(ml=None, mass=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    errors = sort_stats(filter_stats(stats, type='error'), sortby='iter')
-    residuals = sort_stats(filter_stats(stats, type='residual'), sortby='iter')
+    errors = get_sorted(stats, type='error', sortby='iter')
+    residuals = get_sorted(stats, type='residual', sortby='iter')
 
     return errors, residuals
 

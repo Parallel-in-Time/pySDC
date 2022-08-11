@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -106,11 +106,11 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    timings = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
+    timings = get_sorted(stats, type='timing_run', sortby='time')[0][1]
     print(f'Time it took to run the simulation: {timings:6.3f} seconds')
 
     if space_size == 1:
-        bx_maxes = sort_stats(filter_stats(stats, type='bx_max'), sortby='time')
+        bx_maxes = get_sorted(stats, type='bx_max', sortby='time')
 
         times = [t0 + i * level_params['dt'] for i in range(int((Tend - t0) / level_params['dt']) + 1)]
         half = int(len(times) / 2)

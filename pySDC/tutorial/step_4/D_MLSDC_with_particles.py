@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
@@ -33,15 +33,10 @@ def main():
     f.write(out + '\n')
     print(out)
 
-    # filter statistics type (etot)
-    filtered_stats_sdc = filter_stats(stats_sdc, type='etot')
-    filtered_stats_mlsdc = filter_stats(stats_mlsdc, type='etot')
-    filtered_stats_mlsdc_finter = filter_stats(stats_mlsdc_finter, type='etot')
-
     # sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)
-    energy_sdc = sort_stats(filtered_stats_sdc, sortby='iter')
-    energy_mlsdc = sort_stats(filtered_stats_mlsdc, sortby='iter')
-    energy_mlsdc_finter = sort_stats(filtered_stats_mlsdc_finter, sortby='iter')
+    energy_sdc = get_sorted(stats_sdc, type='etot', sortby='iter')
+    energy_mlsdc = get_sorted(stats_mlsdc, type='etot', sortby='iter')
+    energy_mlsdc_finter = get_sorted(stats_mlsdc_finter, type='etot', sortby='iter')
 
     # get base energy and show differences
     base_energy = energy_sdc[0][1]

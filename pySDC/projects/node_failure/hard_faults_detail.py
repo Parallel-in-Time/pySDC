@@ -1,7 +1,7 @@
 import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
@@ -128,8 +128,7 @@ def main(ft_setups, ft_strategies):
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
             # stats magic: get iteration counts to find maxiter/niter
-            extract_stats = filter_stats(stats, level=-1, type='niter')
-            sortedlist_stats = sort_stats(extract_stats, sortby='process')
+            sortedlist_stats = get_sorted(stats, level=-1, type='niter', sortby='process')
             niter = max([item[1] for item in sortedlist_stats])
             print('Iterations:', niter)
 

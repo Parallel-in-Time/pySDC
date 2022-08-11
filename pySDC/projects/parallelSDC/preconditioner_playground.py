@@ -5,7 +5,7 @@ from collections import namedtuple
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
@@ -142,10 +142,7 @@ def main():
                 uend, stats = controller.run(u0=uinit, t0=0, Tend=level_params['dt'])
 
                 # filter statistics by type (number of iterations)
-                filtered_stats = filter_stats(stats, type='niter')
-
-                # convert filtered statistics to list of iterations count, sorted by process
-                iter_counts = sort_stats(filtered_stats, sortby='time')
+                iter_counts = get_sorted(stats, type='niter', sortby='time')
 
                 # just one time-step, grep number of iteration and store
                 niter = iter_counts[0][1]

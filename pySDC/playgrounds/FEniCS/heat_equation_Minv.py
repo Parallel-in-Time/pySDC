@@ -5,7 +5,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
 from pySDC.playgrounds.FEniCS.HookClass_FEniCS_output import fenics_output
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 
 if __name__ == "__main__":
     num_procs = 1
@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     print('(classical) error at time %s: %s' % (Tend, abs(uex - uend) / abs(uex)))
 
-    errors = sort_stats(filter_stats(stats, type='error'), sortby='iter')
-    residuals = sort_stats(filter_stats(stats, type='residual'), sortby='iter')
+    errors = get_sorted(stats, type='error', sortby='iter')
+    residuals = get_sorted(stats, type='residual', sortby='iter')
 
     for err, res in zip(errors, residuals):
         print(err[0], err[1], res[1])

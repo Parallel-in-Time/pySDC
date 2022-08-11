@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
@@ -66,8 +66,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    extract_stats = filter_stats(stats, type='etot')
-    sortedlist_stats = sort_stats(extract_stats, sortby='time')
+    sortedlist_stats = get_sorted(stats, type='etot', sortby='time')
 
     energy = [entry[1] for entry in sortedlist_stats]
 

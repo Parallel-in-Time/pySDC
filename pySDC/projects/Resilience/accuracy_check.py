@@ -131,15 +131,13 @@ def plot(res, ax, k):
             label = rf'$k={{{np.mean(order):.2f}}}$'
             assert np.isclose(
                 np.mean(order), k, atol=3e-1
-            ), f'Expected embedded error estimate to have order {k} \
-but got {np.mean(order):.2f}'
+            ), f'Expected embedded error estimate to have order {k} but got {np.mean(order):.2f}'
 
         elif keys[i] == 'e_extrapolated':
             label = None
             assert np.isclose(
                 np.mean(order), k + 1, rtol=3e-1
-            ), f'Expected extrapolation error estimate to have order \
-{k+1} but got {np.mean(order):.2f}'
+            ), f'Expected extrapolation error estimate to have order {k+1} but got {np.mean(order):.2f}'
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')

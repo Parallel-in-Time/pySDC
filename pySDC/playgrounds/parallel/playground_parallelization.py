@@ -2,7 +2,7 @@ import sys
 
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
@@ -89,10 +89,7 @@ if __name__ == "__main__":
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # combine statistics into list of statistics
     iter_counts_list = comm.gather(iter_counts, root=0)

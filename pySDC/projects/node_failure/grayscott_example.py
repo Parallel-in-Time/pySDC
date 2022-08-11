@@ -1,7 +1,7 @@
 import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
@@ -127,8 +127,7 @@ def main(ft_strategies):
                 residual[iter - 1, step] = np.log10(v)
 
         # stats magic: get niter (probably redundant with maxiter)
-        extract_stats = filter_stats(stats, level=-1, type='niter')
-        sortedlist_stats = sort_stats(extract_stats, sortby='process')
+        sortedlist_stats = get_sorted(stats, level=-1, type='niter', sortby='process')
         iter_count = np.zeros(Nsteps)
         for item in sortedlist_stats:
             iter_count[item[0]] = item[1]

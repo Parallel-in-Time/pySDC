@@ -2,7 +2,7 @@ import os
 import pickle
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -81,11 +81,9 @@ def main():
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
             # filter statistics
-            filtered_stats = filter_stats(stats, type='error_pre_iteration')
-            error_pre = sort_stats(filtered_stats, sortby='iter')[0][1]
+            error_pre = get_sorted(stats, type='error_pre_iteration', sortby='iter')[0][1]
 
-            filtered_stats = filter_stats(stats, type='error_post_iteration')
-            error_post = sort_stats(filtered_stats, sortby='iter')[0][1]
+            error_post = get_sorted(stats, type='error_post_iteration', sortby='iter')[0][1]
 
             error_reduction.append(error_post / error_pre)
 

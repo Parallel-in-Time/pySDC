@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
@@ -113,10 +113,7 @@ def run_variant(nlevels=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     niters = np.array([item[1] for item in iter_counts])
@@ -129,7 +126,7 @@ def run_variant(nlevels=None):
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
 

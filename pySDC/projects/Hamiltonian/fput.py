@@ -5,7 +5,7 @@ import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.FermiPastaUlamTsingou import fermi_pasta_ulam_tsingou
@@ -93,10 +93,7 @@ def run_simulation():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     # for item in iter_counts:
@@ -119,7 +116,7 @@ def run_simulation():
     print(out)
 
     # get runtime
-    timing_run = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
+    timing_run = get_sorted(stats, type='timing_run', sortby='time')[0][1]
     out = '... took %6.4f seconds to run this.' % timing_run
     f.write(out + '\n')
     print(out)
@@ -185,8 +182,7 @@ def show_results(cwd=''):
 
     # ENERGY PLOTTING #
     # extract error in hamiltonian and prepare for plotting
-    extract_stats = filter_stats(stats, type='energy_step')
-    result = sort_stats(extract_stats, sortby='time')
+    result = get_sorted(stats, type='energy_step', sortby='time')
 
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
@@ -209,8 +205,7 @@ def show_results(cwd=''):
 
     # POSITION PLOTTING #
     # extract positions and prepare for plotting
-    extract_stats = filter_stats(stats, type='position')
-    result = sort_stats(extract_stats, sortby='time')
+    result = get_sorted(stats, type='position', sortby='time')
 
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 

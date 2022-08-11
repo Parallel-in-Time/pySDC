@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
@@ -107,7 +107,7 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # if space_size == 1:
-    #     bx_maxes = sort_stats(filter_stats(stats, type='bx_max'), sortby='time')
+    #     bx_maxes = get_sorted(stats, type='bx_max', sortby='time')
     #
     #     times = [t0 + i * level_params['dt'] for i in range(int((Tend - t0) / level_params['dt']) + 1)]
     #     half = int(len(times) / 2)

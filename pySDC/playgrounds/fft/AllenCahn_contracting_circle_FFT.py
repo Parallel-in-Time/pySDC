@@ -5,7 +5,7 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
@@ -118,10 +118,7 @@ def run_SDC_variant(variant=None):
     # plt_helper.plt.show()
 
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     niters = np.array([item[1] for item in iter_counts])
@@ -134,7 +131,7 @@ def run_SDC_variant(variant=None):
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
     print()
@@ -164,8 +161,8 @@ def show_results(fname, cwd=''):
     timings = {}
     niters = {}
     for key, item in results.items():
-        timings[key] = sort_stats(filter_stats(item, type='timing_run'), sortby='time')[0][1]
-        iter_counts = sort_stats(filter_stats(item, type='niter'), sortby='time')
+        timings[key] = get_sorted(item, type='timing_run', sortby='time')[0][1]
+        iter_counts = get_sorted(item, type='niter', sortby='time')
         niters[key] = np.mean(np.array([item[1] for item in iter_counts]))
 
     xcoords = [i for i in range(len(timings))]
@@ -203,14 +200,14 @@ def show_results(fname, cwd=''):
 
     exact_radii = []
     for key, item in results.items():
-        computed_radii = sort_stats(filter_stats(item, type='computed_radius'), sortby='time')
+        computed_radii = get_sorted(item, type='computed_radius', sortby='time')
 
         xcoords = [item0[0] for item0 in computed_radii]
         radii = [item0[1] for item0 in computed_radii]
         if key[0] + ' ' + key[1] == 'semi-implicit-stab exact':
             ax.plot(xcoords, radii, label=(key[0] + ' ' + key[1]).replace('_v2', ' mod.'))
 
-        exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
+        exact_radii = get_sorted(item, type='exact_radius', sortby='time')
 
         # diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
         # max_pos = int(np.argmax(diff))
@@ -241,7 +238,7 @@ def show_results(fname, cwd=''):
 
     interface_width = []
     for key, item in results.items():
-        interface_width = sort_stats(filter_stats(item, type='interface_width'), sortby='time')
+        interface_width = get_sorted(item, type='interface_width', sortby='time')
         xcoords = [item[0] for item in interface_width]
         width = [item[1] for item in interface_width]
         if key[0] + ' ' + key[1] == 'fully-implicit exact':
