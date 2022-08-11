@@ -255,6 +255,7 @@ class rk_imex:
             tol=self.problem.params.gmres_tol_limit,
             restart=self.problem.params.gmres_restart,
             maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
             callback=cb,
         )
         if alpha != 0.0:
@@ -297,6 +298,7 @@ class trapezoidal:
             tol=self.problem.params.gmres_tol_limit,
             restart=self.problem.params.gmres_restart,
             maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
             callback=cb,
         )
         if alpha != 0.0:
@@ -340,6 +342,7 @@ class bdf2:
             tol=self.problem.params.gmres_tol_limit,
             restart=self.problem.params.gmres_restart,
             maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
             callback=cb,
         )
         if alpha != 0.0:
@@ -628,6 +631,7 @@ class dirk:
             tol=self.problem.params.gmres_tol_limit,
             restart=self.problem.params.gmres_restart,
             maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
             callback=cb,
         )
         if alpha != 0.0:

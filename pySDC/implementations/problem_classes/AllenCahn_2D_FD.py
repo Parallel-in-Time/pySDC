@@ -131,7 +131,7 @@ class allencahn_fullyimplicit(ptype):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -253,6 +253,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             x0=u0.flatten(),
             tol=self.params.lin_tol,
             maxiter=self.params.lin_maxiter,
+            atol=0,
             callback=callback,
         )[0].reshape(self.params.nvars)
 
@@ -339,7 +340,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -424,6 +425,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
             x0=u0.flatten(),
             tol=self.params.lin_tol,
             maxiter=self.params.lin_maxiter,
+            atol=0,
             callback=callback,
         )[0].reshape(self.params.nvars)
 
@@ -472,7 +474,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            u -= cg(dg, g, x0=z, tol=self.params.lin_tol, atol=0)[0]
             # increase iteration count
             n += 1
             # print(n, res)
@@ -566,7 +568,13 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
 
             # newton update: u1 = u0 - g/dg
             # u -= spsolve(dg, g)
-            u -= cg(dg, g, x0=z, tol=self.params.lin_tol)[0]
+            u -= cg(
+                dg,
+                g,
+                x0=z,
+                tol=self.params.lin_tol,
+                atol=0,
+            )[0]
             # increase iteration count
             n += 1
             # print(n, res)

@@ -69,7 +69,7 @@ class acoustic_2d_imex(ptype):
         b = rhs.values.flatten()
         # NOTE: A = -M, therefore solve Id + factor*M here
         sol, info = LA.gmres(
-            self.Id + factor * self.c_s * self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20
+            self.Id + factor * self.c_s * self.M, b, x0=u0.values.flatten(), tol=1e-13, restart=10, maxiter=20, atol=0
         )
         me = mesh(self.nvars)
         me.values = unflatten(sol, 3, self.N[0], self.N[1])

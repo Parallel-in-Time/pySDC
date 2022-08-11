@@ -126,6 +126,7 @@ class heat2d_periodic(ptype):
             rhs.flatten(),
             x0=u0.flatten(),
             tol=1e-12,
+            atol=0,
         )[0].reshape(self.params.nvars)
         return me
 

@@ -188,6 +188,7 @@ class heatNd_periodic(ptype):
                 x0=u0.flatten(),
                 tol=self.params.lintol,
                 maxiter=self.params.liniter,
+                atol=0,
             )[0].reshape(self.params.nvars)
         return me
 
