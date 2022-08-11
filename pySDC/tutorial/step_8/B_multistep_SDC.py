@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -127,15 +127,10 @@ def main():
     f.write(out + '\n')
     print(out)
 
-    # filter statistics by type (number of iterations)
-    filtered_stats_pfasst = filter_stats(stats_pfasst, type='niter')
-    filtered_stats_mssdc_jac = filter_stats(stats_mssdc_jac, type='niter')
-    filtered_stats_mssdc_gs = filter_stats(stats_mssdc_gs, type='niter')
-
     # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts_pfasst = sort_stats(filtered_stats_pfasst, sortby='time')
-    iter_counts_mssdc_jac = sort_stats(filtered_stats_mssdc_jac, sortby='time')
-    iter_counts_mssdc_gs = sort_stats(filtered_stats_mssdc_gs, sortby='time')
+    iter_counts_pfasst = get_sorted(stats_pfasst, type='niter', sortby='time')
+    iter_counts_mssdc_jac = get_sorted(stats_mssdc_jac, type='niter', sortby='time')
+    iter_counts_mssdc_gs = get_sorted(stats_mssdc_gs, type='niter', sortby='time')
 
     # compute and print statistics
     for item_pfasst, item_mssdc_jac, item_mssdc_gs in zip(

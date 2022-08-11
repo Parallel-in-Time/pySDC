@@ -3,7 +3,7 @@ import sys
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
@@ -112,10 +112,7 @@ def main():
     err = abs(uex - uend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     niters = np.array([item[1] for item in iter_counts])
 
@@ -145,7 +142,7 @@ def main():
         print('   Iteration count linear solver: %i' % P.ksp_itercount)
         print('   Mean Iteration count per call: %4.2f' % (P.ksp_itercount / max(P.ksp_ncalls, 1)))
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
 
         out = 'Time to solution: %6.4f sec.' % timing[0][1]
         print(out)

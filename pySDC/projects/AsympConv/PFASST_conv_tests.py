@@ -14,7 +14,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 
 
 def main():
@@ -114,10 +114,7 @@ def run_diffusion(nsweeps):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 
@@ -223,10 +220,7 @@ def run_advection(nsweeps):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 

@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -119,9 +119,9 @@ def run_simulation(name=None, nprocs_space=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    timing = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
+    timing = get_sorted(stats, type='timing_setup', sortby='time')
     max_timing_setup = time_comm.allreduce(timing[0][1], MPI.MAX)
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
     max_timing = time_comm.allreduce(timing[0][1], MPI.MAX)
 
     if space_rank == 0 and time_rank == time_size - 1:
@@ -133,7 +133,7 @@ def run_simulation(name=None, nprocs_space=None):
         out = f'Time to solution: {max_timing:.4f} sec.'
         print(out)
 
-        iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
         niters = np.array([item[1] for item in iter_counts])
         out = f'Mean number of iterations: {np.mean(niters):.4f}'
         print(out)

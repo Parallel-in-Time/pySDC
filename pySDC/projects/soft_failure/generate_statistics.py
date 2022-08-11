@@ -3,7 +3,7 @@ from __future__ import division
 import dill
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
@@ -188,10 +188,7 @@ def run_clean_simulations(type=None):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # print('This clean run took %s iterations!' % iter_counts[0][1])
 
@@ -258,7 +255,7 @@ def process_statistics(type=None, cwd=''):
     minlen = 1000
     nruns = 0
     for stats in results:
-        residuals = sort_stats(filter_stats(stats, type='residual_post_iteration'), sortby='iter')
+        residuals = get_sorted(stats, type='residual_post_iteration', sortby='iter')
         minlen = min(minlen, len(residuals))
         nruns += 1
 
@@ -276,9 +273,9 @@ def process_statistics(type=None, cwd=''):
 
     for stats in results:
         # Some black magic to extract fault stats out of monstrous stats object
-        # fault_stats = sort_stats(filter_stats(stats, type='fault_stats'), sortby='type')[0][1]
+        # fault_stats = get_sorted(stats, type='fault_stats', sortby='type')[0][1]
         # Some black magic to extract residuals dependent on iteration out of monstrous stats object
-        residuals_iter = sort_stats(filter_stats(stats, type='residual_post_iteration'), sortby='iter')
+        residuals_iter = get_sorted(stats, type='residual_post_iteration', sortby='iter')
         # extract residuals ouf of residuals_iter
         residuals = np.array([item[1] for item in residuals_iter])
 
@@ -321,7 +318,7 @@ def process_statistics(type=None, cwd=''):
     # calculate maximum number of iterations per test run
     maxiter = []
     for stats in results:
-        residuals = sort_stats(filter_stats(stats, type='residual_post_iteration'), sortby='iter')
+        residuals = get_sorted(stats, type='residual_post_iteration', sortby='iter')
         maxiters = max(np.array([item[0] for item in residuals]))
         maxiter.append(maxiters)
     # print(maxiter)
@@ -341,7 +338,7 @@ def process_statistics(type=None, cwd=''):
     # calculate sum of nfaults_detected, sum of nfalse_positives, sum of nfaults_missed
     for stats in results:
         # Some black magic to extract fault stats out of monstrous stats object
-        fault_stats = sort_stats(filter_stats(stats, type='fault_stats'), sortby='type')[0][1]
+        fault_stats = get_sorted(stats, type='fault_stats', sortby='type')[0][1]
         nfd += fault_stats.nfaults_detected
         nfp += fault_stats.nfalse_positives
         nfm += fault_stats.nfaults_missed

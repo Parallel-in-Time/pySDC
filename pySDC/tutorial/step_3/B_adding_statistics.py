@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
@@ -18,10 +18,7 @@ def main():
     err, stats = run_penning_trap_simulation()
 
     # filter statistics type (etot)
-    filtered_stats = filter_stats(stats, type='etot')
-
-    # sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)
-    energy = sort_stats(filtered_stats, sortby='iter')
+    energy = get_sorted(stats, type='etot', sortby='iter')
 
     # get base energy and show difference
     base_energy = energy[0][1]

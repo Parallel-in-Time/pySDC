@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.TestEquation_0D import testequation0d
@@ -104,13 +104,9 @@ def compare_preconditioners(f=None, list_of_k=None):
         f.write(out + '\n')
         print(out)
 
-        # filter statistics by type
-        filtered_stats_IE = filter_stats(stats_IE, type='error_after_step')
-        filtered_stats_LU = filter_stats(stats_LU, type='error_after_step')
-
         # convert filtered statistics to list
-        errors_IE = sort_stats(filtered_stats_IE, sortby='time')
-        errors_LU = sort_stats(filtered_stats_LU, sortby='time')
+        errors_IE = get_sorted(stats_IE, type='error_after_step', sortby='time')
+        errors_LU = get_sorted(stats_LU, type='error_after_step', sortby='time')
         print(errors_IE)
         print(errors_LU)
 

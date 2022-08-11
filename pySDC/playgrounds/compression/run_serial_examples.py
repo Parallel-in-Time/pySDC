@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_periodic
@@ -231,15 +231,15 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
             uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
             # filter statistics by type (number of iterations)
-            iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+            iter_counts = get_sorted(stats, type='niter', sortby='time')
 
             niters = np.array([item[1] for item in iter_counts])
             out = f'   Mean number of iterations: {np.mean(niters):4.2f}'
             print(out)
 
             # filter statistics by type (error after time-step)
-            PDE_errors = sort_stats(filter_stats(stats, type='PDE_error_after_step'), sortby='time')
-            coll_errors = sort_stats(filter_stats(stats, type='coll_error_after_step'), sortby='time')
+            PDE_errors = get_sorted(stats, type='PDE_error_after_step', sortby='time')
+            coll_errors = get_sorted(stats, type='coll_error_after_step', sortby='time')
             for iters, PDE_err, coll_err in zip(iter_counts, PDE_errors, coll_errors):
                 out = (
                     f'   Errors after step {PDE_err[0]:8.4f} with {iters[1]} iterations: '
@@ -249,7 +249,7 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
             print()
 
             # filter statistics by type (error after time-step)
-            timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+            timing = get_sorted(stats, type='timing_run', sortby='time')
             out = f'...done, took {timing[0][1]} seconds!'
             print(out)
 

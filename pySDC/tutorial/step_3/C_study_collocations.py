@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -22,8 +22,7 @@ def main():
     f = open('data/step_3_C_out.txt', 'w')
     for cclass, stats in stats_dict.items():
         # filter and convert/sort statistics by etot and iterations
-        filtered_stats = filter_stats(stats, type='etot')
-        energy = sort_stats(filtered_stats, sortby='iter')
+        energy = get_sorted(stats, type='etot', sortby='iter')
         # compare base and final energy
         base_energy = energy[0][1]
         final_energy = energy[-1][1]

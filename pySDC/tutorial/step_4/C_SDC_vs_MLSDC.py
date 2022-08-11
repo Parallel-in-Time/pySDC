@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
@@ -90,10 +90,8 @@ def main():
     uend_mlsdc, stats_mlsdc = controller_mlsdc.run(u0=uinit, t0=t0, Tend=Tend)
 
     # get number of iterations for both
-    filtered_stats_sdc = filter_stats(stats_sdc, type='niter')
-    filtered_stats_mlsdc = filter_stats(stats_mlsdc, type='niter')
-    niter_sdc = sort_stats(filtered_stats_sdc, 'time')[0][1]
-    niter_mlsdc = sort_stats(filtered_stats_mlsdc, 'time')[0][1]
+    niter_sdc = get_sorted(stats_sdc, type='niter', sortby='time')[0][1]
+    niter_mlsdc = get_sorted(stats_mlsdc, type='niter', sortby='time')[0][1]
 
     # compute exact solution and compare both
     uex = P.u_exact(Tend)
