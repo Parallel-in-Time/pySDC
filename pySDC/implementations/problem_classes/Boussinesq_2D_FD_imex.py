@@ -101,6 +101,7 @@ class boussinesq_2d_imex(ptype):
             tol=self.params.gmres_tol_limit,
             restart=self.params.gmres_restart,
             maxiter=self.params.gmres_maxiter,
+            atol=0,
             callback=cb,
         )
         # If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call

@@ -64,11 +64,11 @@ def create_plots(setup, cwd=''):
         plt.tick_params(axis='both', which='major', labelsize=fs)
 
         cax.set_ticklabels(ticks)
-        cax.set_label('$K_\mathrm{add}$', **axis_font)
+        cax.set_label(r'$K_\mathrm{add}$', **axis_font)
         cax.ax.tick_params(labelsize=fs)
 
         ax.set_xlabel('affected step', labelpad=1, **axis_font)
-        ax.set_ylabel('affected iteration ($K_\mathrm{fault}$)', labelpad=1, **axis_font)
+        ax.set_ylabel(r'affected iteration ($K_\mathrm{fault}$)', labelpad=1, **axis_font)
 
         ax.set_xticks(np.arange(len(ft_step)) + 0.5, minor=False)
         ax.set_xticklabels(ft_step, minor=False)

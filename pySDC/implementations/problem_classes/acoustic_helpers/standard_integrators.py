@@ -297,7 +297,7 @@ class dirk:
 
         assert np.shape(M)[0] == np.shape(M)[1], "Matrix M must be quadratic"
         self.Ndof = np.shape(M)[0]
-        self.M = M
+        self.M = sp.csc_matrix(M)
         self.order = order
 
         assert self.order in [2, 22, 3, 4, 5], 'Order must be 2,22,3,4'

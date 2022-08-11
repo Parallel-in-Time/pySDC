@@ -139,7 +139,7 @@ def compute_and_plot_solutions():
             P.mesh, pnew_imex, '+-', color='r', label='IMEX(' + str(rkimex.order) + ')', markevery=(1, 75), mew=1.0
         )
     plt.plot(P.mesh, uend[1, :], 'o-', color='b', label='SDC(' + str(step_params['maxiter']) + ')', markevery=(25, 75))
-    plt.plot(P.mesh, pnew_dirk, '-', color='g', label='DIRK(' + str(dirk_m.order) + ')')
+    plt.plot(P.mesh, np.real(pnew_dirk), '-', color='g', label='DIRK(' + str(dirk_m.order) + ')')
 
     plt.xlabel('x', fontsize=fs, labelpad=0)
     plt.ylabel('Pressure', fontsize=fs, labelpad=0)

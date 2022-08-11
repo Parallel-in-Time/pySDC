@@ -141,8 +141,8 @@ def plot_stability(lambda_s, lambda_f, num_nodes, K, stab):
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([0.0, lam_s_max])
     plt.ylim([0.0, lam_f_max])
-    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
-    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
+    plt.xlabel(r'$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
+    plt.ylabel(r'$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
     plt.title(r'$M=%1i$, $K=%1i$' % (num_nodes, K), fontsize=fs)
     filename = 'data/stability-K' + str(K) + '-M' + str(num_nodes) + '.png'
     fig.savefig(filename, bbox_inches='tight')
