@@ -31,7 +31,7 @@ class ConvergenceController(object):
         Shortcut that has a default level for the logger. 15 is above debug but below info.
 
         Args:
-            msg (str): Meassage yoy want to log
+            msg (str): Meassage you want to log
             S (pySDC.step): The current step
             level (int): the level passed to the logger
 
