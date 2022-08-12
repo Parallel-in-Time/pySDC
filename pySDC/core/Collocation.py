@@ -108,13 +108,14 @@ class CollBase(object):
             elif quad_type == 'LOBATTO':
                 self.order = 2 * num_nodes - 2
 
+        self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
+        self.right_is_node = quad_type in ['LOBATTO', 'RADAU-RIGHT']
+
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
         self.Qmat = self._gen_Qmatrix_spline if useSpline else self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
-        self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
-        self.right_is_node = quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
     @staticmethod
     def evaluate(weights, data):
@@ -171,10 +172,15 @@ class CollBase(object):
         # Scale nodes to [tleft, tright]
         a = self.tleft
         b = self.tright
-        nodes += 1
-        nodes /= 2
+        nodes += 1.0
+        nodes /= 2.0
         nodes *= b - a
         nodes += a
+
+        if self.left_is_node:
+            nodes[0] = self.tleft
+        if self.right_is_node:
+            nodes[-1] = self.tright
 
         return nodes
 
