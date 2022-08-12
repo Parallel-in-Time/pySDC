@@ -126,8 +126,8 @@ def run_vdp(custom_description=None, num_procs=1, Tend=10., hook_class=log_data,
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_random_fault(rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
-                                          args={'time': 1.1, 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
+                                   args={'time': 1., 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
