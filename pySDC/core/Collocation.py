@@ -171,10 +171,15 @@ class CollBase(object):
         # Scale nodes to [tleft, tright]
         a = self.tleft
         b = self.tright
-        nodes += 1
-        nodes /= 2
+        nodes += 1.0
+        nodes /= 2.0
         nodes *= b - a
         nodes += a
+
+        if self.left_is_node:
+            nodes[0] = self.tleft
+        if self.right_is_node:
+            nodes[-1] = self.tright
 
         return nodes
 
