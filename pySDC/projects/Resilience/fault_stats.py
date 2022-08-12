@@ -2,6 +2,8 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 from matplotlib.colors import TABLEAU_COLORS
+from mpi4py import MPI
+import sys
 
 import pySDC.helpers.plot_helper as plot_helper
 from pySDC.helpers.stats_helper import get_sorted
@@ -33,11 +35,11 @@ class log_fault_stats_data(FaultInjector):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=-1,
                           sweep=L.status.sweep, type='u', value=L.uend)
         self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=-1,
                           sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
         self.increment_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='k', value=step.status.iter)
@@ -59,6 +61,22 @@ class log_local_error(log_fault_stats_data):
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='e_loc',
                           value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]))
+
+
+class log_all_iterates(log_fault_stats_data):
+    def post_iteration(self, step, level_number):
+        super(log_all_iterates, self).post_iteration(step, level_number)
+        # some abbreviations
+        L = step.levels[level_number]
+        iter = step.status.iter
+
+        L.sweep.compute_end_point()
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
+                          sweep=L.status.sweep, type='u', value=L.uend)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
+                          sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=iter,
+                          sweep=L.status.sweep, type='e_ex', value=L.status.error_extrapolation_estimate)
 
 
 class Strategy:
@@ -314,7 +332,7 @@ class FaultStats:
     '''
 
     def __init__(self, prob=None, strategies=None, faults=None, reload=True, recovery_thresh=1 + 1e-3,
-                 num_procs=1):
+                 num_procs=1, mode='combination'):
         '''
         Initialization routine
 
@@ -325,6 +343,7 @@ class FaultStats:
             reload (bool): Load previously computed statisitics and continue from there or start from scratch
             recovery_thresh (float): Relative threshold for recovery
             num_procs (int): Number of processes
+            mode (str): Mode for fault generation: Either 'random' or 'combination'
         '''
         self.prob = prob
         self.strategies = [None] if strategies is None else strategies
@@ -332,6 +351,7 @@ class FaultStats:
         self.reload = reload
         self.recovery_thresh = recovery_thresh
         self.num_procs = num_procs
+        self.mode = mode
 
     def get_Tend(self):
         '''
@@ -374,7 +394,7 @@ class FaultStats:
             }
         return custom_params
 
-    def run_stats_generation(self, runs, step=None):
+    def run_stats_generation(self, runs=1000, step=None):
         '''
         Run the generation of stats for all strategies in the `self.strategies` variable
 
@@ -388,11 +408,17 @@ class FaultStats:
         step = runs if step is None else step
         reload = False
 
-        for i in range(step, runs + step, step):
+        max_runs = self.get_max_combinations() if self.mode == 'combination' else runs
+
+        for i in range(step, max_runs + step, step):
             for j in range(len(self.strategies)):
+
+                if j % MPI.COMM_WORLD.size != MPI.COMM_WORLD.rank:
+                    continue
+
                 for f in self.faults:
                     if f:
-                        runs_partial = i
+                        runs_partial = min(i, max_runs)
                     else:
                         runs_partial = min([5, i])
                     self.generate_stats(strategy=self.strategies[j], runs=runs_partial, faults=f,
@@ -413,7 +439,7 @@ class FaultStats:
             strategy (Strategy): Resilience strategy
             runs (int): Number of runs you want to do
             reload (bool): Load previously computed statisitics and continue from there or start from scratch
-            faults (bool): Whether to do stats with faults or whithout
+            faults (bool): Whether to do stats with faults or without
 
         Returns:
             None
@@ -443,16 +469,19 @@ class FaultStats:
 
         if already_completed['runs'] < runs:
             if faults:
-                print(f'Doing {strategy.name} with faults from {already_completed["runs"]} to {runs}')
+                print(f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} with faults from \
+{already_completed["runs"]} to {runs}')
+                sys.stdout.flush()
             else:
-                print(f'Doing {strategy.name} from {already_completed["runs"]} to {runs}')
+                print(f'Processor {MPI.COMM_WORLD.rank} doing {strategy.name} from {already_completed["runs"]} to \
+{runs}')
+                sys.stdout.flush()
 
         # perform the remaining experiments
         for i in range(already_completed['runs'], runs):
 
             # perform a single experiment with the correct random seed
-            rng = np.random.RandomState(i)
-            stats, controller, Tend = self.single_run(strategy, rng, faults)
+            stats, controller, Tend = self.single_run(strategy=strategy, run=i, faults=faults)
 
             # get the data from the stats
             faults_run = get_sorted(stats, type='bitflip')
@@ -476,7 +505,7 @@ class FaultStats:
                 dat['target'][i] = faults_run[0][1][5]
             dat['error'][i] = error
             dat['total_iteration'][i] = total_iteration
-            dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restart')])
+            dat['restarts'][i] = sum([me[1] for me in get_sorted(stats, type='restarts')])
 
         # store the completed stats
         dat['runs'] = runs
@@ -488,13 +517,13 @@ class FaultStats:
 
         return None
 
-    def single_run(self, strategy, rng, faults, force_params=None, hook_class=log_fault_stats_data):
+    def single_run(self, strategy, run=0, faults=False, force_params=None, hook_class=log_fault_stats_data):
         '''
         Run the problem once with the specified parameters
 
         Args:
             strategy (Strategy): The resilience strategy you plan on using
-            rng (np.random.RandomState): Random generator to ensure repeatability
+            run (int): Index for fault generation
             faults (bool): Whether or not to put faults in
             force_params (dict): Change parameters in the description of the problem
 
@@ -505,7 +534,7 @@ class FaultStats:
         '''
         force_params = {} if force_params is None else force_params
 
-        # buid the custom description
+        # build the custom description
         custom_description_prob = self.get_custom_description()
         custom_description_strategy = strategy.get_custom_description(self.prob, self.num_procs)
         custom_description = {**custom_description_prob, **custom_description_strategy}
@@ -516,6 +545,14 @@ class FaultStats:
         custom_problem_params = self.get_custom_problem_params()
 
         if faults:
+            # make parameters for faults:
+            if self.mode == 'random':
+                rng = np.random.RandomState(run)
+            elif self.mode == 'combination':
+                rng = run
+            else:
+                raise NotImplementedError(f'Don\'t know how to add faults in mode {self.mode}')
+
             fault_stuff = {
                 'rng': rng,
                 'args': strategy.get_fault_args(self.prob, self.num_procs),
@@ -558,7 +595,7 @@ class FaultStats:
             fig.tight_layout()
             plt.savefig(f'data/{self.get_name()}-comparison.pdf', transparent=True)
 
-    def scrutinize_visual(self, strategy, run, faults, ax=None, k_ax=None, ls='-'):
+    def scrutinize_visual(self, strategy, run, faults, ax=None, k_ax=None, ls='-', plot_restarts=False):
         '''
         Take a closer look at a specific run with a plot
 
@@ -568,6 +605,7 @@ class FaultStats:
             faults (bool): Whether or not to include faults
             ax (Matplotlib.axes): Somewhere to plot the error
             k_ax (Matplotlib.axes): Somewhere to plot the iterations
+            plot_restarts (bool): Make vertical lines wherever restarts happened
 
         Returns:
             None
@@ -580,10 +618,10 @@ class FaultStats:
 
         force_params = dict()
 
-        rng = np.random.RandomState(run)
-        stats, controller, Tend = self.single_run(strategy, rng, faults, force_params, hook_class=log_local_error)
+        stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params,
+                                                  hook_class=log_local_error)
 
-        # plot the embedded error
+        # plot the local error
         e_loc = get_sorted(stats, type='e_loc', recomputed=False)
         ax.plot([me[0] for me in e_loc], [me[1] for me in e_loc], color=strategy.color, ls=ls)
 
@@ -596,6 +634,11 @@ class FaultStats:
         faults = get_sorted(stats, type='bitflip')
         for fault_time in [me[0] for me in faults]:
             ax.axvline(fault_time, color='grey', ls=':')
+
+        # plot restarts
+        if plot_restarts:
+            restarts = get_sorted(stats, type='restarts')
+            [ax.axvline(me[0], color='black', ls='-.') if me[1] else '' for me in restarts]
 
         # decorate
         ax.set_yscale('log')
@@ -619,23 +662,26 @@ class FaultStats:
         Returns:
             None
         '''
-        rng = np.random.RandomState(run)
-
         force_params = dict()
         force_params['controller_params'] = {'logger_level': 15}
 
-        stats, controller, Tend = self.single_run(strategy, rng, faults, force_params)
+        stats, controller, Tend = self.single_run(strategy=strategy, run=run, faults=faults, force_params=force_params)
 
         t, u = get_sorted(stats, type='u')[-1]
         k = [me[1] for me in get_sorted(stats, type='k')]
 
+        print(f'\nOverview for {strategy.name} strategy')
+
         # see if we can determine if the faults where recovered
         no_faults = self.load(strategy, False)
         e_star = np.mean(no_faults.get('error', [0]))
-        error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
+        if t < Tend:
+            error = np.inf
+            print(f'Final time was not reached! Code crashed at t={t:.2f} instead of reaching Tend={Tend:.2f}')
+        else:
+            error = abs(u - controller.MS[0].levels[0].prob.u_exact(t=t))
         recovery_thresh = e_star * self.recovery_thresh
 
-        print(f'\nOverview for {strategy.name} strategy')
         print(f'e={error:.2e}, e^*={e_star:.2e}, thresh: {recovery_thresh:.2e} -> recovered: \
 {error < recovery_thresh}')
         print(f'k: sum: {np.sum(k)}, min: {np.min(k)}, max: {np.max(k)}, mean: {np.mean(k):.2f},')
@@ -646,7 +692,7 @@ class FaultStats:
 
         # restarts
         restarts = [me[1] for me in get_sorted(stats, type='restarts')]
-        print(f'restarts: {sum(restarts)}')
+        print(f'restarts: {sum(restarts)}, without faults: {no_faults["restarts"][0]}')
 
         # print faults
         faults = get_sorted(stats, type='bitflip')
@@ -742,7 +788,7 @@ class FaultStats:
             pickle.dump(dat, f)
         return None
 
-    def load(self, strategy, faults):
+    def load(self, strategy=None, faults=True):
         '''
         Loads the stats belonging to a specific strategy and whether or not faults where inserted.
         When no data has been generated yet, a dictionary is returned which only contains the number of completed runs,
@@ -755,6 +801,9 @@ class FaultStats:
         Returns:
             dict: Data from previous run or if it is not avalable a placeholder dictionary
         '''
+        if strategy is None:
+            strategy = self.strategies[MPI.COMM_WORLD.rank % len(self.strategies)]
+
         try:
             with open(self.get_path(strategy, faults), 'rb') as f:
                 dat = pickle.load(f)
@@ -981,6 +1030,150 @@ class FaultStats:
 
         return None
 
+    def analyse_adaptivity(self, mask):
+        '''
+        Analyse a set of runs with adaptivity
+
+        Args:
+            mask (Numpy.ndarray of shape (n)): The mask you want to know about
+
+        Returns:
+            None
+        '''
+        index = self.get_index(mask)
+        dat = self.load()
+
+        # make a header
+        print('  run  | bit | node | iter |  e_em^*  |   e_em   | e_glob^* |  e_glob  ')
+        print('-------+-----+------+------+----------+----------+----------+----------')
+        for i in index:
+            e_em, e_glob = self.analyse_adaptivity_single(int(i))
+            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_em[1]:.2e}\
+ | {e_em[0]:.2e} | {e_glob[1]:.2e} | {e_glob[0]:.2e}')
+
+        e_tol = AdaptivityStrategy().get_custom_description(self.prob, self.num_procs)[
+            'convergence_controllers'][Adaptivity]['e_tol']
+        print(f'We only restart when e_em > e_tol = {e_tol:.2e}!')
+        return None
+
+    def analyse_adaptivity_single(self, run):
+        '''
+        Compute what the difference in embedded and global error are for a specific run with adaptivity
+
+        Args:
+            run (int): The run you want to know about
+
+        Returns:
+            list: Embedded error with fault and without for the last interation in the step with a fault
+            list: Global error with and without fault at the end of the run
+        '''
+        # perform one run with and one without faults
+        stats = []
+        controllers = []
+        for faults in [True, False]:
+            s, c, _ = self.single_run(strategy=AdaptivityStrategy(), run=run, faults=faults,
+                                      hook_class=log_all_iterates)
+            stats += [s]
+            controllers += [c]
+
+        # figure out when the fault happened
+        t_fault = get_sorted(stats[0], type='bitflip')[0][0]
+
+        # get embedded error
+        e_em = [[me[1] for me in get_sorted(stat, type='e_em', time=t_fault, sortby='iter')] for stat in stats]
+
+        # compute the global error
+        u_end = [get_sorted(stat, type='u')[-1] for stat in stats]
+        e_glob = [abs(u_end[i][1] - controllers[i].MS[0].levels[0].prob.u_exact(t=u_end[i][0])) for i in [0, 1]]
+
+        return [e_em[i][-1] for i in [0, 1]], e_glob
+
+    def analyse_HotRod(self, mask):
+        '''
+        Analyse a set of runs with Hot Rod
+
+        Args:
+            mask (Numpy.ndarray of shape (n)): The mask you want to know about
+
+        Returns:
+            None
+        '''
+        index = self.get_index(mask)
+        dat = self.load()
+
+        # make a header
+        print('  run  | bit | node | iter |  e_ex^*  |   e_ex   |  e_em^*  |   e_em   |   diff*  |   diff   | e_glob^* \
+|  e_glob  ')
+        print('-------+-----+------+------+----------+----------+----------+----------+----------+----------+----------\
++----------')
+        for i in index:
+            e_em, e_ex, e_glob = self.analyse_HotRod_single(int(i))
+            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | {e_ex[1]:.2e}\
+ | {e_ex[0]:.2e} | {e_em[1]:.2e} | {e_em[0]:.2e} | {abs(e_em[1]-e_ex[1]):.2e} | {abs(e_em[0]-e_ex[0]):.2e} | \
+{e_glob[1]:.2e} | {e_glob[0]:.2e}')
+
+        tol = HotRodStrategy().get_custom_description(self.prob, self.num_procs)[
+            'convergence_controllers'][HotRod]['HotRod_tol']
+        print(f'We only restart when diff > tol = {tol:.2e}!')
+        return None
+
+    def analyse_HotRod_single(self, run):
+        '''
+        Compute what the difference in embedded, extrapolated and global error are for a specific run with Hot Rod
+
+        Args:
+            run (int): The run you want to know about
+
+        Returns:
+            list: Embedded error with fault and without for the last interation in the step with a fault
+            list: Extrapolation error with fault and without for the last interation in the step with a fault
+            list: Global error with and without fault at the end of the run
+        '''
+        # perform one run with and one without faults
+        stats = []
+        controllers = []
+        for faults in [True, False]:
+            s, c, _ = self.single_run(strategy=HotRodStrategy(), run=run, faults=faults,
+                                      hook_class=log_all_iterates)
+            stats += [s]
+            controllers += [c]
+
+        # figure out when the fault happened
+        t_fault = get_sorted(stats[0], type='bitflip')[0][0]
+
+        # get embedded error
+        e_em = [[me[1] for me in get_sorted(stat, type='e_em', time=t_fault, sortby='iter')] for stat in stats]
+        # get extrapolated error
+        e_ex = [[me[1] for me in get_sorted(stat, type='e_ex', time=t_fault, sortby='iter')] for stat in stats]
+
+        # compute the global error
+        u_end = [get_sorted(stat, type='u')[-1] for stat in stats]
+        e_glob = [abs(u_end[i][1] - controllers[i].MS[0].levels[0].prob.u_exact(t=u_end[i][0])) for i in [0, 1]]
+
+        return [e_em[i][-1] for i in [0, 1]], [e_ex[i][-1] for i in [0, 1]], e_glob
+
+    def print_faults(self, mask):
+        '''
+        Print all faults that happened within a certain mask
+
+        Args:
+            mask (Numpy.ndarray of shape (n)): The mask you want to know the contents of
+
+        Returns:
+            None
+        '''
+        index = self.get_index(mask)
+        dat = self.load()
+
+        # make a header
+        print('  run  | bit | node | iter | space pos')
+        print('-------+-----+------+------+-----------')
+        for i in index:
+            print(f' {i:5d} | {dat["bit"][i]:3.0f} | {dat["node"][i]:4.0f} | {dat["iteration"][i]:4.0f} | \
+{dat["problem_pos"][i]}')
+
+        return None
+
     def get_mask(self, strategy=None, key=None, val=None, op='eq', old_mask=None, compare_faults=False):
         '''
         Make a mask to apply to stored data to filter out certain things
@@ -1138,6 +1331,27 @@ class FaultStats:
 
         return occurrences, bins
 
+    def get_max_combinations(self, dat=None):
+        '''
+        Count how many combinations of parameters for faults are possible
+
+        Args:
+            dat (dict): The recorded statistics
+            keys (list): The keys in dat that you want to know the combinations of
+
+        Returns:
+            int: Number of possible combinations
+        '''
+        stats, controller, Tend = self.single_run(strategy=self.strategies[0], run=0, faults=True)
+        ranges = [
+            (0, controller.hooks.rnd_params['level_number']),
+            (0, controller.hooks.rnd_params['node'] + 1),
+            (1, controller.hooks.rnd_params['iteration'] + 1),
+            (0, controller.hooks.rnd_params['bit']),
+        ]
+        ranges += [(0, i) for i in controller.hooks.rnd_params['problem_pos']]
+        return np.prod([me[1] - me[0] for me in ranges], dtype=int)
+
     def get_combination_counts(self, dat, keys, mask):
         '''
         Get counts of how often all combinations of values of keys appear. This is done recursively to support arbitrary
@@ -1243,8 +1457,8 @@ class FaultStats:
 
 def main():
     stats_analyser = FaultStats(prob=run_vdp, strategies=[BaseStrategy(), AdaptivityStrategy(), IterateStrategy(),
-                                HotRodStrategy()], faults=[False, True], reload=True, recovery_thresh=1 + 2e-2,
-                                num_procs=1)
+                                HotRodStrategy()], faults=[False, True], reload=True, recovery_thresh=1.1,
+                                num_procs=1, mode='combination')
 
     stats_analyser.run_stats_generation(runs=5000, step=50)
     mask = None

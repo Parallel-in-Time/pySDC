@@ -54,7 +54,7 @@ def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_da
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = 'IE'
     sweeper_params['QE'] = 'PIC'
 
     problem_params = {
@@ -106,8 +106,8 @@ def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_da
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_random_fault(rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
-                                          args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
+                                   args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

@@ -44,6 +44,8 @@ class Fault(FrozenClass):
             args (dict): Supply variables that will be exempt from randomization here
             rnd_params (dict): Supply attributes to the randomization such as maximum values here
             random_generator (numpy.random.RandomState): Give a random generator to ensure repeatability
+
+        Returns Fault: Randomly generated fault
         '''
 
         if random_generator is None:
@@ -58,6 +60,50 @@ class Fault(FrozenClass):
         }
 
         return cls({**random, **args})
+
+    @classmethod
+    def index_to_combination(cls, args, rnd_params, generator=None):
+        '''
+        Classmethod to initialize a fault based on an index to translate to a combination of fault parameters, in order
+        to loop through all combinations. Probably only makes sense for ODEs.
+
+        First, we get the number of possible combinations m, and then get a value for each fault paramter as
+        i = m % i_max (plus modifications to make sure we get a sensible value)
+
+        Args:
+            args (dict): Supply variables that will be exempt from randomization here.
+            rnd_params (dict): Supply attributes to the randomization such as maximum values here
+            generator (int): Index for specific combinatino
+
+        Returns Fault: Generated fro a specific combination of parameters
+        '''
+
+        ranges = [
+            (0, rnd_params['level_number']),
+            (0, rnd_params['node'] + 1),
+            (1, rnd_params['iteration'] + 1),
+            (0, rnd_params['bit']),
+        ]
+        ranges += [(0, i) for i in rnd_params['problem_pos']]
+
+        # get values for taking modulo later
+        mods = [me[1] - me[0] for me in ranges]
+
+        if len(np.unique(mods)) < len(mods):
+            raise NotImplementedError('I can\'t deal with combinations when parameters have the same admissable number\
+ of values yet!')
+
+        coeff = [(generator // np.prod(mods[:i], dtype=int)) % mods[i] for i in range(len(mods))]
+
+        combinations = {
+            'level_number': coeff[0],
+            'node': coeff[1],
+            'iteration': coeff[2] + 1,
+            'bit': coeff[3],
+            'problem_pos': [coeff[4 + i] for i in range(len(rnd_params['problem_pos']))],
+        }
+
+        return cls({**combinations, **args})
 
 
 class FaultInjector(hooks):
@@ -77,6 +123,30 @@ class FaultInjector(hooks):
         self.rnd_params = {}
         self.random_generator = np.random.RandomState(2187)  # number of the cell in which Princess Leia is held
 
+    def add_fault(self, args, rnd_args):
+        if type(self.random_generator) == int:
+            self.add_fault_from_combination(args, rnd_args)
+        elif type(self.random_generator) == np.random.RandomState:
+            self.add_random_fault(args, rnd_args)
+        else:
+            raise NotImplementedError(f'Don\'t know how to add fault with generator of type \
+{type(self.random_generator)}')
+
+    def add_stored_faults(self):
+        '''
+        Method to add faults that are recorded for later adding in the pre run hook
+
+        Returns:
+            None
+        '''
+        for f in self.fault_init:
+            if f['kind'] == 'random':
+                self.add_random_fault(args=f['args'], rnd_args=f['rnd_args'])
+            elif f['kind'] == 'combination':
+                self.add_fault_from_combination(args=f['args'], rnd_args=f['rnd_args'])
+            else:
+                raise NotImplementedError(f'I don\'t know how to add stored fault of kind {f["kind"]}')
+
     def add_random_fault(self, args=None, rnd_args=None):
         '''
         Method to generate a random fault and add it to the list of faults to be injected at some point
@@ -95,10 +165,35 @@ class FaultInjector(hooks):
 
         # check if we can add the fault directly, or if we have to store its parameters and add it in the pre_run hook
         if self.rnd_params == {}:
-            self.fault_init += [{'args': args, 'rnd_args': rnd_args}]
+            self.fault_init += [{'args': args, 'rnd_args': rnd_args, 'kind': 'random'}]
         else:
             self.faults += [Fault.random(args=args, rnd_params={**self.rnd_params, **rnd_args},
                             random_generator=self.random_generator)]
+
+        return None
+
+    def add_fault_from_combination(self, args=None, rnd_args=None):
+        '''
+        Method to generate a random fault and add it to the list of faults to be injected at some point
+
+        Args:
+            args (dict): parameters for fault initialization that override the combinations
+            rnd_args (dict): possible values that the parameters can take
+
+        Returns:
+            None
+        '''
+
+        # replace args and rnd_args with empty dict if we didn't specify anything
+        args = {} if args is None else args
+        rnd_args = {} if rnd_args is None else rnd_args
+
+        # check if we can add the fault directly, or if we have to store its parameters and add it in the pre_run hook
+        if self.rnd_params == {}:
+            self.fault_init += [{'args': args, 'rnd_args': rnd_args, 'kind': 'combination'}]
+        else:
+            self.faults += [Fault.index_to_combination(args=args, rnd_params={**self.rnd_params, **rnd_args},
+                            generator=self.random_generator)]
 
         return None
 
@@ -132,7 +227,7 @@ class FaultInjector(hooks):
             L.f[f.node] = L.prob.eval_f(L.u[f.node], L.time + L.dt * L.sweep.coll.nodes[max([0, f.node - 1])])
             L.sweep.compute_residual()
         else:
-            raise NotImplementedError(f'Target {f.target} for faults not impelemted!')
+            raise NotImplementedError(f'Target {f.target} for faults not impelented!')
 
         # log what happened to stats and screen
         self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
@@ -173,8 +268,7 @@ class FaultInjector(hooks):
         }
 
         # initialize the faults have been added before we knew the random parameters
-        for f in self.fault_init:
-            self.add_random_fault(args=f['args'], rnd_args=f['rnd_args'])
+        self.add_stored_faults()
 
         if self.rnd_params['level_number'] > 1:
             raise NotImplementedError('I don\'t know how to insert faults in this multi-level madness :(')
