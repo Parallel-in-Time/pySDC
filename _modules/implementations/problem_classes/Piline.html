@@ -124,12 +124,14 @@
         <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">)</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">me</span></div>
 
-<div class="viewcode-block" id="piline.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Piline.piline.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="piline.u_exact"><a class="viewcode-back" href="../../../pySDC/implementations.problem_classes.html#implementations.problem_classes.Piline.piline.u_exact">[docs]</a>    <span class="k">def</span> <span class="nf">u_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">t_init</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to approximate the exact solution at time t by scipy</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (float): current time</span>
+<span class="sd">            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution</span>
+<span class="sd">            t_init (float): the starting time</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dtype_u: exact solution (kind of)</span>
@@ -143,12 +145,20 @@
         <span class="n">me</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># p3</span>
 
         <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">u_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Please supply `t_init` when you want to get the exact solution from a point that </span><span class="se">\</span>
+<span class="s1">is not 0!&#39;</span><span class="p">)</span>
+                <span class="n">me</span> <span class="o">=</span> <span class="n">u_init</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">t_init</span> <span class="o">=</span> <span class="mf">0.</span>
+
             <span class="k">def</span> <span class="nf">rhs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
                 <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">impl</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">expl</span>  <span class="c1"># evaluate only explicitly rather than IMEX</span>
 
             <span class="n">tol</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
-            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">me</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">me</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="p">(</span><span class="n">t_init</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">me</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">me</span></div></div>
 </pre></div>

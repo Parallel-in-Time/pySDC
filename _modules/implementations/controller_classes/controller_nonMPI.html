@@ -218,6 +218,7 @@
                 <span class="c1"># initial condition to next block is initial condition of step that needs restarting</span>
                 <span class="n">uend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">restart_at</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting next block with initial conditions from step </span><span class="si">{</span><span class="n">restart_at</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># move on to next block</span>
                 <span class="c1"># initial condition for next block is last solution of current block</span>
