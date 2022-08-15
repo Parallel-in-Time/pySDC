@@ -6,6 +6,8 @@ matplotlib.use('Agg')
 import matplotlib.pylab as plt
 from matplotlib import rc
 
+from pySDC.core.Collocation import CollBase
+
 
 def compute_and_plot_specrad(Nnodes, lam):
     """
@@ -16,7 +18,7 @@ def compute_and_plot_specrad(Nnodes, lam):
         lam: test parameter representing the spatial problem
     """
 
-    coll = CollGaussRadau_Right(Nnodes, 0, 1)
+    coll = CollBase(Nnodes, 0, 1, quad_type='RADAU-RIGHT')
     Qmat = coll.Qmat[1:, 1:]
 
     # do LU decomposition of QT (St. Martin's trick)
