@@ -1,3 +1,4 @@
+import logging
 from pySDC.helpers.pysdc_helper import FrozenClass
 
 
@@ -23,6 +24,22 @@ class ConvergenceController(object):
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
         self.dependencies(controller, description)
+        self.logger = logging.getLogger(f'{type(self).__name__}')
+
+    def log(self, msg, S, level=15):
+        '''
+        Shortcut that has a default level for the logger. 15 is above debug but below info.
+
+        Args:
+            msg (str): Meassage you want to log
+            S (pySDC.step): The current step
+            level (int): the level passed to the logger
+
+        Returns:
+            None
+        '''
+        self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
+        return None
 
     def setup(self, controller, params, description):
         '''
