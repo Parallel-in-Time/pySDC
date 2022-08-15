@@ -21,7 +21,6 @@ class _Pars(FrozenClass):
         self.fname = 'run_pid' + str(os.getpid()) + '.log'
         self.use_iteration_estimator = False
         self.store_uold = False
-        self.use_extrapolation_estimate = False
 
         for k, v in params.items():
             setattr(self, k, v)
