@@ -9,7 +9,7 @@ from pylab import rcParams
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.acoustic_helpers.standard_integrators import dirk, rk_imex
 
 from pySDC.core.Step import step
@@ -44,7 +44,8 @@ def compute_and_plot_dispersion():
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE AND NUMBER OF QUADRATURE NODES ###
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['do_coll_update'] = True
     sweeper_params['num_nodes'] = 3
 

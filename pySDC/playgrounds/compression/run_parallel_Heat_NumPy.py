@@ -2,7 +2,7 @@ from mpi4py import MPI
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.sweeper_classes.generic_LU import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
@@ -25,7 +25,8 @@ def set_parameters_ml():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['QI'] = 'LU'
     sweeper_params['num_nodes'] = [3]
 

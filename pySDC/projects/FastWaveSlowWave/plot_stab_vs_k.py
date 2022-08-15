@@ -9,7 +9,7 @@ from matplotlib.ticker import ScalarFormatter
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 
 from pySDC.core.Step import step
 
@@ -48,7 +48,8 @@ def compute_stab_vs_k(slow_resolved):
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE AND NUMBER OF QUADRATURE NODES ###
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['do_coll_update'] = True
 
     # initialize level parameters

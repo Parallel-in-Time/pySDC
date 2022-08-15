@@ -3,8 +3,6 @@ import matplotlib.pylab as plt
 import numpy as np
 import scipy.optimize as opt
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-
 
 def main():
     def rho(x):

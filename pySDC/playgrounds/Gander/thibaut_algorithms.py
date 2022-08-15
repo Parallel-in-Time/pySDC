@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.collocation_classes.gauss_radau_left import CollGaussRadau_Left
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.collocation_classes.equidistant import Equidistant
 
 collDict = {
     'LOBATTO': CollGaussLobatto,

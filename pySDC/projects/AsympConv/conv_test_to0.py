@@ -6,8 +6,6 @@ matplotlib.use('Agg')
 import matplotlib.pylab as plt
 from matplotlib import rc
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-
 
 def compute_and_plot_specrad(Nnodes, lam):
     """

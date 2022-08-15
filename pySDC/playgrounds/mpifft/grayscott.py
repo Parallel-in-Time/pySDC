@@ -3,8 +3,8 @@ from mpi4py import MPI
 import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
@@ -39,8 +39,10 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    # sweeper_params['collocation_class'] = CollGaussRadau_Right
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    # sweeper_params['node_type'] = 'LEGENDRE'
+    # sweeper_params['quad_type'] = 'RADAU-RIGHT'
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['Q1'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part

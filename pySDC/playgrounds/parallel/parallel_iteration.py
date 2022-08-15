@@ -1,6 +1,6 @@
 import numpy as np
 import scipy as sp
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.helpers.transfer_helper import interpolation_matrix_1d
 
 

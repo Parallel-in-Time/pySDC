@@ -2,10 +2,8 @@ import unittest
 
 import numpy as np
 
-from pySDC.core.Collocation import CollBase
-from pySDC.tests.test_helpers import get_derived_from_in_package
-
-classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
+node_types = ['EQUID', 'LEGENDRE']
+quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 
 class TestImexSweeper(unittest.TestCase):
@@ -62,8 +60,9 @@ class TestImexSweeper(unittest.TestCase):
         from pySDC.core import Step as stepclass
         from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order as imex
 
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
             S = stepclass.step(description=self.description)
             assert isinstance(S.levels[0].sweep, imex), "sweeper in generated level is not an object of type imex"
@@ -75,8 +74,9 @@ class TestImexSweeper(unittest.TestCase):
 
         from pySDC.core import Step as stepclass
 
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
             step = stepclass.step(description=self.description)
             L = step.levels[0]
@@ -91,8 +91,9 @@ class TestImexSweeper(unittest.TestCase):
     # Check that the sweeper functions update_nodes and compute_end_point can be executed
     #
     def test_canrunsweep(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             self.description['sweeper_params'] = self.swparams
             # After running setupLevelStepProblem, the functions predict, update_nodes and compute_end_point should run
             step, level, problem, nnodes = self.setupLevelStepProblem()
@@ -109,8 +110,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure a sweep in matrix form is equal to a sweep in node-to-node form
     #
     def test_sweepequalmatrix(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             step.levels[0].sweep.predict()
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -131,8 +133,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure the implemented update formula matches the matrix update formula
     #
     def test_updateformula(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             level.sweep.predict()
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -158,8 +161,9 @@ class TestImexSweeper(unittest.TestCase):
     # Compute the exact collocation solution by matrix inversion and make sure it is a fixed point
     #
     def test_collocationinvariant(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             level.sweep.predict()
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -199,8 +203,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that K node-to-node sweeps give the same result as K sweeps in matrix form and the single matrix formulation for K sweeps
     #
     def test_manysweepsequalmatrix(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             step.levels[0].sweep.predict()
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -232,8 +237,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that update function for K sweeps computed from K-sweep matrix gives same result as K sweeps in node-to-node form plus compute_end_point
     #
     def test_manysweepupdate(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             step, level, problem, nnodes = self.setupLevelStepProblem()
             step.levels[0].sweep.predict()
             u0full = np.array([level.u[l].flatten() for l in range(1, nnodes + 1)])
@@ -269,8 +275,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure the update with do_coll_update=False reproduces last stage
     #
     def test_update_nocollupdate_laststage(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             self.swparams['do_coll_update'] = False
             step, level, problem, nnodes = self.setupLevelStepProblem()
             # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test
@@ -289,8 +296,9 @@ class TestImexSweeper(unittest.TestCase):
     # Make sure that update with do_coll_update=False is identical to update formula with q=(0,...,0,1)
     #
     def test_updateformula_no_coll_update(self):
-        for type in classes:
-            self.swparams['collocation_class'] = type
+        for node_type, quad_type in zip(node_types, quad_types):
+            self.swparams['node_type'] = node_type
+            self.swparams['quad_type'] = quad_type
             self.swparams['do_coll_update'] = False
             step, level, problem, nnodes = self.setupLevelStepProblem()
             # if type of nodes does not have right endpoint as quadrature nodes, cannot set do_coll_update to False and perform this test

@@ -1,4 +1,3 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.core.Sweeper import sweeper
 import numpy as np
 import matplotlib.pyplot as plt

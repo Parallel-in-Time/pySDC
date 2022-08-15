@@ -2,7 +2,7 @@ import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.GrayScott_1D_FEniCS_implicit import fenics_grayscott
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferFenicsMesh import mesh_to_mesh_fenics
@@ -38,7 +38,8 @@ def main(ft_strategies):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = 'LU'
 

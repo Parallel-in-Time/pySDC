@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 import scipy.linalg as sl
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
 
 

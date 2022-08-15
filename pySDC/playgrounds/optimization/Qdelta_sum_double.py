@@ -2,8 +2,6 @@ import indiesolver
 import numpy as np
 import scipy
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-
 
 def evaluate(solution):
     x = solution["parameters"]

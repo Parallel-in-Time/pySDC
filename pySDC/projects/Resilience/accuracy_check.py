@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pylab as plt
 import numpy as np
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
@@ -190,6 +191,7 @@ def main():
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
         plot_all_errors(ax, ks, serial)
+        Path("data").mkdir(parents=True, exist_ok=True)
         if serial:
             fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
         else:
