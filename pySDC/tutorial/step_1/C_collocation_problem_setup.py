@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 from pathlib import Path
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.core.Collocation import CollBase
 from pySDC.implementations.datatype_classes.mesh import mesh
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 
@@ -22,7 +22,7 @@ def main():
     prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
     # instantiate collocation class, relative to the time interval [0,1]
-    coll = CollGaussRadau_Right(num_nodes=3, tleft=0, tright=1)
+    coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
 
     # set time-step size (warning: the collocation matrices are relative to [0,1], see above)
     dt = 0.1

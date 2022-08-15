@@ -1,8 +1,6 @@
 import indiesolver
 import numpy as np
 
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-
 
 def evaluate(solution):
     x = solution["parameters"]

@@ -2,61 +2,23 @@ import pytest
 import numpy as np
 
 from pySDC.core.Collocation import CollBase
-from pySDC.tests.test_helpers import get_derived_from_in_package
 
-from pySDC.implementations.collocation_classes.equidistant import Equidistant
-from pySDC.implementations.collocation_classes.equidistant_inner import EquidistantInner
-from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
-from pySDC.implementations.collocation_classes.equidistant_spline_right import EquidistantSpline_Right
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.collocation_classes.gauss_radau_left import CollGaussRadau_Left
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-
-EQUIV = {
-    ('EQUID', 'LOBATTO', False): Equidistant,
-    ('EQUID', 'GAUSS', False): EquidistantInner,
-    ('EQUID', 'RADAU-RIGHT', False): EquidistantNoLeft,
-    ('EQUID', 'RADAU-RIGHT', True): EquidistantSpline_Right,
-    ('LEGENDRE', 'GAUSS', False): CollGaussLegendre,
-    ('LEGENDRE', 'LOBATTO', False): CollGaussLobatto,
-    ('LEGENDRE', 'RADAU-LEFT', False): CollGaussRadau_Left,
-    ('LEGENDRE', 'RADAU-RIGHT', False): CollGaussRadau_Right,
-}
-
-classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 t_start = np.random.rand(1) * 0.2
 t_end = 0.8 + np.random.rand(1) * 0.2
 
 tolQuad = 1e-13
 
-
-def testEquivalencies():
-
-    M = 5
-    tLeft, tRight = 0, 1
-    norm = lambda diff: np.linalg.norm(diff, ord=np.inf)
-    tol = 1e-14
-
-    lAttrVect = ['nodes', 'weights', 'Qmat', 'Smat', 'delta_m']
-    lAttrScalar = ['order', 'left_is_node', 'right_is_node']
-
-    # Compare each original class with their equivalent generic implementation
-    for params, CollClass in EQUIV.items():
-        cOrig = CollClass(M, tLeft, tRight)
-        cNew = CollBase(M, tLeft, tRight, *params)
-        for attr in lAttrVect:
-            assert norm(getattr(cOrig, attr) - getattr(cNew, attr)) < tol
-        for attr in lAttrScalar:
-            assert getattr(cOrig, attr) == getattr(cNew, attr)
+node_types = ['EQUID', 'LEGENDRE']
+quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 
-@pytest.mark.parametrize("collclass", classes)
-def test_canintegratepolynomials(collclass):
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_canintegratepolynomials(node_type, quad_type):
 
     for M in range(2, 13):
 
-        coll = collclass(M, t_start, t_end)
+        coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
 
         # some basic consistency tests
         assert np.size(coll.nodes) == np.size(coll.weights), (
@@ -88,10 +50,11 @@ def test_canintegratepolynomials(collclass):
         )
 
 
-@pytest.mark.parametrize("collclass", classes)
-def test_relateQandSmat(collclass):
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_relateQandSmat(node_type, quad_type):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
         Q = coll.Qmat[1:, 1:]
         S = coll.Smat[1:, 1:]
         assert np.shape(Q) == np.shape(S), (
@@ -108,10 +71,11 @@ def test_relateQandSmat(collclass):
             )
 
 
-@pytest.mark.parametrize("collclass", classes)
-def test_partialquadraturewithQ(collclass):
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_partialquadraturewithQ(node_type, quad_type):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
         Q = coll.Qmat[1:, 1:]
         # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
         degree = min(coll.order, M - 1)
@@ -129,10 +93,11 @@ def test_partialquadraturewithQ(collclass):
             )
 
 
-@pytest.mark.parametrize("collclass", classes)
-def test_partialquadraturewithS(collclass):
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_partialquadraturewithS(node_type, quad_type):
     for M in range(2, 13):
-        coll = collclass(M, t_start, t_end)
+        coll = CollBase(M, t_start, t_end, node_type=node_type, quad_type=quad_type)
         S = coll.Smat[1:, 1:]
         # as in TEST 1, create and integrate a polynomial with random coefficients, but now of degree M-1 (or less for splines)
         degree = min(coll.order, M - 1)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
 from pySDC.implementations.problem_classes.boussinesq_helpers.standard_integrators import SplitExplicit, dirk, rk_imex
@@ -36,7 +36,8 @@ def main(cwd=''):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLegendre
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'GAUSS'
     sweeper_params['num_nodes'] = 3
 
     # initialize controller parameters

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
@@ -43,8 +43,8 @@ class controller_matrix_nonMPI(controller_nonMPI):
         prob = self.MS[0].levels[0].prob
 
         assert isinstance(self.nspace, int), 'ERROR: can only handle 1D data, got %s' % self.nspace
-        assert [type(level.sweep.coll) for step in self.MS for level in step.levels].count(
-            CollGaussRadau_Right
+        assert [level.sweep.coll.right_is_node for step in self.MS for level in step.levels].count(
+            True
         ) == self.nlevels * self.nsteps, 'ERROR: all collocation nodes have to be of Gauss-Radau type'
         assert self.nlevels <= 2, 'ERROR: cannot use matrix-PFASST with more than 2 levels'  # TODO: fixme
         assert [level.dt for step in self.MS for level in step.levels].count(

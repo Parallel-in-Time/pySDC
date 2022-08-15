@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -21,7 +21,8 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters for the Penning trap

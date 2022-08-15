@@ -6,10 +6,8 @@ import scipy.optimize as opt
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
+from pySDC.core.Collocation import CollBase
 from pySDC.helpers.pysdc_helper import FrozenClass
-from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 # short helper class to add params as attributes
@@ -48,16 +46,19 @@ class sweeper(object):
         # set up logger
         self.logger = logging.getLogger('sweeper')
 
-        essential_keys = ['collocation_class', 'num_nodes']
+        essential_keys = ['num_nodes']
         for key in essential_keys:
             if key not in params:
                 msg = 'need %s to instantiate step, only got %s' % (key, str(params.keys()))
                 self.logger.error(msg)
                 raise ParameterError(msg)
 
+        if 'collocation_class' not in params:
+            params['collocation_class'] = CollBase
+
         self.params = _Pars(params)
 
-        coll = params['collocation_class'](params['num_nodes'], 0, 1)
+        coll = params['collocation_class'](**params)
 
         if not coll.right_is_node and not self.params.do_coll_update:
             self.logger.warning(
@@ -119,7 +120,7 @@ class sweeper(object):
             # These values have been obtained using Indie Solver, a commercial solver for black-box optimization which
             # aggregates several state-of-the-art optimization methods (free academic subscription plan)
             # objective function: sum over 17^2 values of lamdt, real and imaginary (WORKS SURPRISINGLY WELL!)
-            if type(coll) == CollGaussLobatto:
+            if coll.node_type == 'LEGENDRE' and coll.quad_type == 'LOBATTO':
                 if m == 9:
                     # rho = 0.154786693955
                     x = [
@@ -160,7 +161,7 @@ class sweeper(object):
                     NotImplementedError(
                         'This combination of preconditioner, node type and node number is not ' 'implemented'
                     )
-            elif type(coll) == CollGaussRadau_Right:
+            elif coll.node_type == 'LEGENDRE' and coll.quad_type == 'RADAU-RIGHT':
                 if m == 9:
                     # rho = 0.151784861385
                     x = [
@@ -207,7 +208,7 @@ class sweeper(object):
                     NotImplementedError(
                         'This combination of preconditioner, node type and node number is not ' 'implemented'
                     )
-            elif type(coll) == EquidistantNoLeft:
+            elif coll.node_type == 'EQUID' and coll.quad_type == 'RADAU-RIGHT':
                 if m == 9:
                     # rho = 0.251820022583 (iteration 32402)
                     x = [

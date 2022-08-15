@@ -6,7 +6,7 @@ import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.problem_classes.HenonHeiles import henon_heiles
@@ -31,7 +31,8 @@ def setup_harmonic():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'
 
@@ -79,7 +80,8 @@ def setup_henonheiles():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'
 

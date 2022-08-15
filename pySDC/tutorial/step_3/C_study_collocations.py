@@ -2,9 +2,6 @@ from pathlib import Path
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -34,9 +31,9 @@ def main():
 
     # set expected differences and check
     ediff_expect = dict()
-    ediff_expect['CollGaussRadau_Right'] = 15
-    ediff_expect['CollGaussLobatto'] = 1e-05
-    ediff_expect['CollGaussLegendre'] = 3e-05
+    ediff_expect['RADAU-RIGHT'] = 15
+    ediff_expect['LOBATTO'] = 1e-05
+    ediff_expect['GAUSS'] = 3e-05
     for k, v in ediff.items():
         assert v < ediff_expect[k], "ERROR: energy deviated too much, got %s" % ediff[k]
 
@@ -80,10 +77,10 @@ def run_simulation():
     description['step_params'] = step_params
 
     # assemble and loop over list of collocation classes
-    coll_list = [CollGaussRadau_Right, CollGaussLegendre, CollGaussLobatto]
+    quad_types = ['RADAU-RIGHT', 'GAUSS', 'LOBATTO']
     stats_dict = dict()
-    for cclass in coll_list:
-        sweeper_params['collocation_class'] = cclass
+    for qtype in quad_types:
+        sweeper_params['quad_type'] = qtype
         description['sweeper_params'] = sweeper_params
 
         # instantiate the controller (no controller parameters used here)
@@ -101,7 +98,7 @@ def run_simulation():
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # gather stats in dictionary, collocation classes being the keys
-        stats_dict[cclass.__name__] = stats
+        stats_dict[qtype] = stats
 
     return stats_dict
 

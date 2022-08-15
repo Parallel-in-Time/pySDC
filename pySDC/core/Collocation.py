@@ -70,9 +70,11 @@ class CollBase(object):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes, tleft=0, tright=1, node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False):
+    def __init__(
+        self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False, **kwargs
+    ):
         """
-        Initialization routine for an collocation object
+        Initialization routine for a collocation object
 
         Args:
             num_nodes (int): number of collocation nodes
@@ -92,24 +94,27 @@ class CollBase(object):
         self.tleft = tleft
         self.tright = tright
 
+        self.node_type = node_type
+        self.quad_type = quad_type
+
         # Instanciate attributes
-        self.nodeGenerator = NodesGenerator(node_type, quad_type)
+        self.nodeGenerator = NodesGenerator(self.node_type, self.quad_type)
         if useSpline:
             self._getWeights = self._getWeights_spline
             # We need: 1<=order<=5 and order < num_nodes
             self.order = min(num_nodes - 1, 3)
-        elif node_type == 'EQUID':
+        elif self.node_type == 'EQUID':
             self.order = num_nodes
         else:
-            if quad_type == 'GAUSS':
+            if self.quad_type == 'GAUSS':
                 self.order = 2 * num_nodes
-            elif quad_type.startswith('RADAU'):
+            elif self.quad_type.startswith('RADAU'):
                 self.order = 2 * num_nodes - 1
-            elif quad_type == 'LOBATTO':
+            elif self.quad_type == 'LOBATTO':
                 self.order = 2 * num_nodes - 2
 
-        self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
-        self.right_is_node = quad_type in ['LOBATTO', 'RADAU-RIGHT']
+        self.left_is_node = self.quad_type in ['LOBATTO', 'RADAU-LEFT']
+        self.right_is_node = self.quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)

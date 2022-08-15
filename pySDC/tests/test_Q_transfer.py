@@ -2,17 +2,19 @@ import pytest
 import numpy as np
 from numpy.polynomial.polynomial import polyval
 
-import pySDC.helpers.transfer_helper as th
 from pySDC.core.Collocation import CollBase
-from pySDC.tests.test_helpers import get_derived_from_in_package
+import pySDC.helpers.transfer_helper as th
 
-classes = get_derived_from_in_package(CollBase, 'pySDC/implementations/collocation_classes')
 t_start = np.random.rand(1) * 0.2
 t_end = 0.8 + np.random.rand(1) * 0.2
 
+node_types = ['EQUID', 'LEGENDRE']
+quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
-@pytest.mark.parametrize("collclass", classes)
-def test_Q_transfer(collclass):
+
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_Q_transfer(node_type, quad_type):
     """
     A simple test program to check the order of the Q interpolation/restriction
     """
@@ -22,8 +24,8 @@ def test_Q_transfer(collclass):
         Mfine = M
         Mcoarse = int((Mfine + 1) / 2.0)
 
-        coll_fine = collclass(Mfine, 0, 1)
-        coll_coarse = collclass(Mcoarse, 0, 1)
+        coll_fine = CollBase(Mfine, 0, 1, node_type=node_type, quad_type=quad_type)
+        coll_coarse = CollBase(Mcoarse, 0, 1, node_type=node_type, quad_type=quad_type)
 
         assert (
             coll_fine.left_is_node == coll_coarse.left_is_node
@@ -55,20 +57,21 @@ def test_Q_transfer(collclass):
                     assert err_inter > 2e-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
 
 
-@pytest.mark.parametrize("collclass", classes)
-def test_Q_transfer_minimal(collclass):
+@pytest.mark.parametrize("node_type", node_types)
+@pytest.mark.parametrize("quad_type", quad_types)
+def test_Q_transfer_minimal(node_type, quad_type):
     """
     A simple test program to check the order of the Q interpolation/restriction for only 2 coarse nodes
     """
 
     Mcoarse = 2
-    coll_coarse = collclass(Mcoarse, 0, 1)
+    coll_coarse = CollBase(Mcoarse, 0, 1, node_type=node_type, quad_type=quad_type)
 
     for M in range(3, 9):
 
         Mfine = M
 
-        coll_fine = collclass(Mfine, 0, 1)
+        coll_fine = CollBase(Mfine, 0, 1, node_type=node_type, quad_type=quad_type)
 
         assert (
             coll_fine.left_is_node == coll_coarse.left_is_node

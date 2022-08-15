@@ -1,7 +1,7 @@
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT import advectiondiffusion1d_implicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -22,7 +22,8 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'spread'

@@ -2,7 +2,7 @@ import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.Boussinesq_2D_FD_imex import boussinesq_2d_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh
@@ -40,7 +40,8 @@ def main(ft_strategies):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = 'LU'
 

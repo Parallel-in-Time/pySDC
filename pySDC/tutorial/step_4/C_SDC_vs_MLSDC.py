@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
@@ -20,11 +20,13 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params_sdc = dict()
-    sweeper_params_sdc['collocation_class'] = CollGaussRadau_Right
+    sweeper_params_sdc['node_type'] = 'LEGENDRE'
+    sweeper_params_sdc['quad_type'] = 'RADAU-RIGHT'
     sweeper_params_sdc['num_nodes'] = 5
 
     sweeper_params_mlsdc = dict()
-    sweeper_params_mlsdc['collocation_class'] = CollGaussRadau_Right
+    sweeper_params_mlsdc['node_type'] = 'LEGENDRE'
+    sweeper_params_mlsdc['quad_type'] = 'RADAU-RIGHT'
     sweeper_params_mlsdc['num_nodes'] = [5, 3, 2]
 
     # initialize problem parameters

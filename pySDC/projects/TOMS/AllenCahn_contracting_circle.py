@@ -6,7 +6,7 @@ import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import (
     allencahn_fullyimplicit,
@@ -43,7 +43,8 @@ def setup_parameters():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']

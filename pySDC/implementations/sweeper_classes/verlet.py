@@ -1,7 +1,6 @@
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
 class verlet(sweeper):
@@ -64,7 +63,7 @@ class verlet(sweeper):
 
         # if we have Gauss-Lobatto nodes, we can do a magic trick from the Book
         # this takes Gauss-Lobatto IIIB and create IIIA out of this
-        if isinstance(self.coll, CollGaussLobatto):
+        if self.coll.node_type == 'LEGENDRE' and self.coll.quad_type == 'LOBATTO':
 
             for m in range(self.coll.num_nodes):
                 for n in range(self.coll.num_nodes):

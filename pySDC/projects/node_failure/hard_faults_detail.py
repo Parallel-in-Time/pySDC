@@ -2,7 +2,7 @@ import numpy as np
 
 import pySDC.projects.node_failure.emulate_hard_faults as ft
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -35,7 +35,8 @@ def main(ft_setups, ft_strategies):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     # initialize controller parameters
