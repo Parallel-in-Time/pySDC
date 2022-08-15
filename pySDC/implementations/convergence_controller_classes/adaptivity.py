@@ -2,6 +2,7 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
@@ -28,7 +29,7 @@ class Adaptivity(ConvergenceController):
 
     def dependencies(self, controller, description):
         '''
-        Load dependencies on other convergence controllers here
+        Load dependencies on other convergence controllers here.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -37,6 +38,7 @@ class Adaptivity(ConvergenceController):
 
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
+            controller.add_convergence_controller(SpreadStepSizesBlockwise, description=description)
         else:
             raise NotImplementedError('Don\'t have an implementation to estimate the embedded error with MPI')
 
