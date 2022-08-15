@@ -2,14 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pySDC.helpers.stats_helper import get_sorted
+from pySDC.core.Hooks import hooks
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 from pySDC.implementations.convergence_controller_classes.hotrod import HotRod
-
-from pySDC.core.Hooks import hooks
 
 
 class log_data(hooks):
@@ -41,7 +40,8 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='sweeps', value=step.status.iter)
 
 
-def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
+def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_data, fault_stuff=None,
+               custom_controller_params=None, custom_problem_params=None):
     """
     A simple test program to do SDC runs for Piline problem
     """
@@ -54,7 +54,7 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
+    sweeper_params['QI'] = 'IE'
     sweeper_params['QE'] = 'PIC'
 
     problem_params = {
@@ -67,6 +67,9 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
         'Rl': 5.,
     }
 
+    if custom_problem_params is not None:
+        problem_params = {**problem_params, **custom_problem_params}
+
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 4
@@ -77,6 +80,9 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
     controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
 
+    if custom_controller_params is not None:
+        controller_params = {**controller_params, **custom_controller_params}
+
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = piline  # pass problem class
@@ -85,15 +91,23 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description.update(custom_description)
+
+    if custom_description is not None:
+        for k in custom_description.keys():
+            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
     t0 = 0.0
 
     # instantiate controller
-    controller_class = controller_nonMPI
-    controller = controller_class(num_procs=num_procs, controller_params=controller_params,
-                                  description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                   description=description)
+
+    # insert faults
+    if fault_stuff is not None:
+        controller.hooks.random_generator = fault_stuff['rng']
+        controller.hooks.add_fault(rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
+                                   args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -101,7 +115,7 @@ def run_piline(custom_description, num_procs, Tend=20., hook_class=log_data):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    return stats
+    return stats, controller, Tend
 
 
 def get_data(stats, recomputed=False):
@@ -254,7 +268,7 @@ def main():
 
         for num_procs in [1, 4]:
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
-            stats = run_piline(custom_description, num_procs=num_procs)
+            stats, _, _ = run_piline(custom_description, num_procs=num_procs)
             data = get_data(stats)
             check_solution(data, use_adaptivity, num_procs, generate_reference)
             fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))

@@ -177,6 +177,7 @@ class controller_nonMPI(controller):
                 # initial condition to next block is initial condition of step that needs restarting
                 uend = self.MS[restart_at].levels[0].u[0]
                 time[active_slots[0]] = time[restart_at]
+                self.logger.info(f'Starting next block with initial conditions from step {restart_at}')
 
             else:  # move on to next block
                 # initial condition for next block is last solution of current block
