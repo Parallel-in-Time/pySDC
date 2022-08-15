@@ -3,6 +3,8 @@ import matplotlib.pylab as plt
 import numpy as np
 import scipy.optimize as opt
 
+from pySDC.core.Collocation import CollBase
+
 
 def main():
     def rho(x):
@@ -10,7 +12,7 @@ def main():
 
     M = 2
 
-    coll = CollGaussRadau_Right(M, 0, 1)
+    coll = CollBase(M, 0, 1, quad_type='RADAU-RIGHT')
 
     x0 = np.ones(M)
     d = opt.minimize(rho, x0, method='Nelder-Mead')

@@ -6,6 +6,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+from pySDC.core.Collocation import CollBase
+
 
 def compute_and_plot_specrad():
     """
@@ -33,7 +35,7 @@ def compute_and_plot_specrad():
     Nnodes = 3
     Nsteps = 4
 
-    coll = CollGaussRadau_Right(Nnodes, 0, 1)
+    coll = CollBase(Nnodes, 0, 1, quad_type='RADAU-RIGHT')
     Qmat = coll.Qmat[1:, 1:]
 
     Nmat = np.zeros((Nnodes, Nnodes))
