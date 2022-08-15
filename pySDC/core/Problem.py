@@ -69,7 +69,7 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
         n = len(steps)
     elif type == 'center':
         n = order + derivative - (derivative + 1) % 2 // 1
-        steps = np.arange(n) - (n) // 2
+        steps = np.arange(n) - n // 2
     elif type == 'forward':
         n = order + derivative
         steps = np.arange(n)
@@ -92,7 +92,7 @@ else, you can also give specific steps.'
     for i in range(0, n):
         A[i, :] = steps ** idx[i] * inv_facs[i]
 
-    # make a right hand side vector that is zero everywhere except at the postition of the desired derivative
+    # make a right hand side vector that is zero everywhere except at the position of the desired derivative
     sol = np.zeros(n)
     sol[derivative] = 1.0
 

@@ -116,7 +116,8 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1):
             bary_pol = []
             for l in range(k):
                 bary_pol.append(BarycentricInterpolator(cont_arr, np.roll(circulating_one, l)))
-            M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+            with np.errstate(divide='ignore'):
+                M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
     else:
         M = np.zeros((coarse_grid.size, fine_grid.size + 2 * pad))
         for i, p in zip(range(n_g), coarse_grid):
@@ -127,7 +128,8 @@ def restriction_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1):
             bary_pol = []
             for l in range(k):
                 bary_pol.append(BarycentricInterpolator(padded_f_grid[nn], np.roll(circulating_one, l)))
-            M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+            with np.errstate(divide='ignore'):
+                M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
         if pad > 0:
             M = M[:, pad:-pad]
 
@@ -187,7 +189,8 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                     bary_pol = []
                     for l in range(k):
                         bary_pol.append(BarycentricInterpolator(cont_arr, np.roll(circulating_one, l)))
-                    M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+                    with np.errstate(divide='ignore'):
+                        M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         else:
 
@@ -202,7 +205,8 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                 bary_pol = []
                 for l in range(k):
                     bary_pol.append(BarycentricInterpolator(cont_arr, np.roll(circulating_one, l)))
-                M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+                with np.errstate(divide='ignore'):
+                    M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
     else:
 
@@ -231,7 +235,8 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                     bary_pol = []
                     for l in range(k):
                         bary_pol.append(BarycentricInterpolator(padded_c_grid[nn], np.roll(circulating_one, l)))
-                    M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+                    with np.errstate(divide='ignore'):
+                        M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         else:
 
@@ -242,7 +247,8 @@ def interpolation_matrix_1d(fine_grid, coarse_grid, k=2, periodic=False, pad=1, 
                 bary_pol = []
                 for l in range(k):
                     bary_pol.append(BarycentricInterpolator(padded_c_grid[nn], np.roll(circulating_one, l)))
-                M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
+                with np.errstate(divide='ignore'):
+                    M[i, nn] = np.asarray(list(map(lambda x: x(p), bary_pol)))
 
         if pad > 0:
             M = M[:, pad:-pad]
