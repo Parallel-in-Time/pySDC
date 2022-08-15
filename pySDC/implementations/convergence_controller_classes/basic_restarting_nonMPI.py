@@ -1,4 +1,5 @@
 from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
 
 
 class BasicRestartingNonMPI(ConvergenceController):
@@ -7,12 +8,19 @@ class BasicRestartingNonMPI(ConvergenceController):
      - Telling each step after one that requested a restart to get restarted as well
      - Allowing each step to be restarted a limited number of times in a row before just moving on anyways
 
-    Default control order is 100.
+    Default control order is 95.
     '''
 
     def setup(self, controller, params, description):
         '''
-        Define parameters here
+        Define parameters here.
+
+        Default parameters are:
+         - control_order (int): The order relative to other convergence controllers
+         - max_restarts (int): Maximum number of restarts we allow each step before we just move on with whatever we
+                               have
+         - step_size_spreader (pySDC.ConvergenceController): A convergence controller that takes care of distributing
+                                                             the steps sizes between blocks
 
         Args:
             controller (pySDC.Controller): The controller
@@ -25,9 +33,24 @@ class BasicRestartingNonMPI(ConvergenceController):
         defaults = {
             'control_order': 95,
             'max_restarts': 1 if len(controller.MS) == 1 else 2,
+            'step_size_spreader': SpreadStepSizesBlockwise,
         }
 
         return {**defaults, **params}
+
+    def dependencies(self, controller, description):
+        '''
+        Load a convergence controller that spreads the step sizes between steps.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        '''
+        controller.add_convergence_controller(self.params.step_size_spreader, description=description)
+        return None
 
     def determine_restart(self, controller, S):
         '''
