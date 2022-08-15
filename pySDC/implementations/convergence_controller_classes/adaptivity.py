@@ -2,20 +2,25 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
-from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
 class Adaptivity(ConvergenceController):
     """
     Class to compute time step size adaptively based on embedded error estimate.
-    Adaptivity requires you to know the order of the scheme, which you can also know for Jacobi, but it works
-    differently.
+
+    We have a version working in non-MPI pipelined SDC, but Adaptivity requires you to know the order of the scheme,
+    which you can also know for block-Jacobi, but it works differently and it is only implemented for block
+    Gauss-Seidel so far.
     """
 
     def setup(self, controller, params, description):
         '''
-        Define default parameters here
+        Define default parameters here.
+
+        Default parameters are:
+         - control_order (int): The order relative to other convergence controllers
+         - beta (float): The safety factor
 
         Args:
             controller (pySDC.Controller): The controller
@@ -29,16 +34,18 @@ class Adaptivity(ConvergenceController):
 
     def dependencies(self, controller, description):
         '''
-        Load dependencies on other convergence controllers here.
+        Load error estimator and step size limiters here, if they are desired.
 
         Args:
             controller (pySDC.Controller): The controller
             description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
         '''
 
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
-            controller.add_convergence_controller(SpreadStepSizesBlockwise, description=description)
         else:
             raise NotImplementedError('Don\'t have an implementation to estimate the embedded error with MPI')
 
@@ -48,9 +55,12 @@ class Adaptivity(ConvergenceController):
             step_limiter_params['dt_max'] = self.params.__dict__.get('dt_max', np.inf)
             controller.add_convergence_controller(StepSizeLimiter, params=step_limiter_params, description=description)
 
+        return None
+
     def check_parameters(self, controller, params, description):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+        For adaptivity, we need to know the order of the scheme.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -76,7 +86,7 @@ _params\'][\'e_tol\']!'
 
     def get_new_step_size(self, controller, S):
         '''
-        Determine a step size for the next step from an estimate of the local error of the current step
+        Determine a step size for the next step from an estimate of the local error of the current step.
 
         Args:
             controller (pySDC.Controller): The controller
