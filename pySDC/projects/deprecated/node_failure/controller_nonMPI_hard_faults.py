@@ -10,7 +10,7 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
     """
 
-    def pfasst(self, S, num_procs):
+    def pfasst(self, S):
         """
         Main function including the stages of SDC, MLSDC and PFASST (the "controller")
 
@@ -18,7 +18,6 @@ class controller_nonMPI_hard_faults(controller_nonMPI):
 
         Args:
             S: currently active step
-            num_procs: number of active processors
 
         Returns:
             updated step

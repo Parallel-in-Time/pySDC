@@ -1,1 +1,1 @@
-.. include:: /../../pySDC/projects/node_failure/README.rst
+.. include:: /../../pySDC/projects/deprecated/node_failure/README.rst

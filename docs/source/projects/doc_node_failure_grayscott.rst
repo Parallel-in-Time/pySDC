@@ -1,6 +1,6 @@
-Full code: `pySDC/projects/node_failure/grayscott_example.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/node_failure/grayscott_example.py>`_
+Full code: `pySDC/projects/deprecated/node_failure/grayscott_example.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/deprecated/node_failure/grayscott_example.py>`_
 
-.. literalinclude:: ../../../pySDC/projects/node_failure/grayscott_example.py
+.. literalinclude:: ../../../pySDC/projects/deprecated/node_failure/grayscott_example.py
 
 Results (visualized by ``postproc_grayscott``):
 
