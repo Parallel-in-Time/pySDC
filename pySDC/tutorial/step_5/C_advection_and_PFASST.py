@@ -135,7 +135,7 @@ def main():
             f.write('\n')
             print()
 
-            assert err < 5.13642e-04, "ERROR: error is too high, got %s" % err
+            assert err < 5.1365e-04, "ERROR: error is too high, got %s" % err
 
         out = 'Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' % (
             niters_min_all[QI],
