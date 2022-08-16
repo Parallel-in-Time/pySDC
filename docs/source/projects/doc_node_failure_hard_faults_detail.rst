@@ -1,6 +1,6 @@
-Full code: `pySDC/projects/node_failure/hard_faults_detail.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/node_failure/hard_faults_detail.py>`_
+Full code: `pySDC/projects/deprecated/node_failure/hard_faults_detail.py <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/deprecated/node_failure/hard_faults_detail.py>`_
 
-.. literalinclude:: ../../../pySDC/projects/node_failure/hard_faults_detail.py
+.. literalinclude:: ../../../pySDC/projects/deprecated/node_failure/hard_faults_detail.py
 
 Results (visualized by ``postproc_hard_faults_detail``):
 

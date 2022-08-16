@@ -1,5 +1,5 @@
-Fault-tolerance with PFASST: node failures
-==========================================
+[DEPRECATED] Fault-tolerance with PFASST: node failures
+=======================================================
 
 In this project, we explore PFASST's potential to deal with node failures.
 We derive different strategies which allow PFASST to continue after one time-step has failed.
