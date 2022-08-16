@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pySDC.core.Collocation import CollBase
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 
 def main():
@@ -17,9 +17,10 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # instantiate problem
-    prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+    prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
     # instantiate collocation class, relative to the time interval [0,1]
     coll = CollBase(num_nodes=3, tleft=0, tright=1, node_type='LEGENDRE', quad_type='RADAU-RIGHT')
@@ -57,7 +58,7 @@ def solve_collocation_problem(prob, coll, dt):
     Q = coll.Qmat[1:, 1:]
 
     # build system matrix M of collocation problem
-    M = sp.eye(prob.params.nvars * coll.num_nodes) - dt * sp.kron(Q, prob.A)
+    M = sp.eye(prob.params.nvars[0] * coll.num_nodes) - dt * sp.kron(Q, prob.A)
 
     # get initial value at t0 = 0
     u0 = prob.u_exact(t=0)
@@ -70,7 +71,7 @@ def solve_collocation_problem(prob, coll, dt):
     u_coll = sp.linalg.spsolve(M, u0_coll)
 
     # compute error
-    err = np.linalg.norm(u_coll[-prob.params.nvars :] - uend, np.inf)
+    err = np.linalg.norm(u_coll[-prob.params.nvars[0] :] - uend, np.inf)
 
     return err
 

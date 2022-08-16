@@ -10,7 +10,7 @@ from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 from pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit import generalized_fisher
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 
@@ -79,10 +79,11 @@ def main():
 
                     problem_params['nu'] = param
                     problem_params['freq'] = 2
+                    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
                     level_params['dt'] = 0.1
 
-                    description['problem_class'] = heat1d
+                    description['problem_class'] = heatNd_unforced
                     description['problem_params'] = problem_params
                     description['level_params'] = level_params  # pass level parameters
 

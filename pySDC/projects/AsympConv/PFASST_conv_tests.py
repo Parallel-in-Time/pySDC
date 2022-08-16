@@ -7,7 +7,7 @@ import numpy as np
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
 
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -57,6 +57,7 @@ def run_diffusion(nsweeps):
     problem_params = dict()
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -74,7 +75,7 @@ def run_diffusion(nsweeps):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters

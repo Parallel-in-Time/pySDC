@@ -9,7 +9,7 @@ import numpy as np
 import os.path
 
 from pySDC.implementations.datatype_classes.mesh import mesh
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
 # setup id for gathering the results (will sort by nvars)
 ID = namedtuple('ID', 'nvars')
@@ -24,6 +24,7 @@ def main():
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # create list of nvars to do the accuracy test with
     nvars_list = [2**p - 1 for p in range(4, 15)]
@@ -67,17 +68,19 @@ def run_accuracy_check(nvars_list, problem_params):
     for nvars in nvars_list:
         # setup problem
         problem_params['nvars'] = nvars
-        prob = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
-        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars)])
+        xvalues = np.array([(i + 1) * prob.dx for i in range(prob.params.nvars[0])])
 
         # create a mesh instance and fill it with a sine wave
         u = prob.u_exact(t=0)
 
         # create a mesh instance and fill it with the Laplacian of the sine wave
         u_lap = prob.dtype_u(init=prob.init)
-        u_lap[:] = -((np.pi * prob.params.freq) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq * xvalues)
+        u_lap[:] = (
+            -((np.pi * prob.params.freq[0]) ** 2) * prob.params.nu * np.sin(np.pi * prob.params.freq[0] * xvalues)
+        )
 
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)

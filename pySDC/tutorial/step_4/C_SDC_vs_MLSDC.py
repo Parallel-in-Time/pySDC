@@ -3,7 +3,7 @@ from pathlib import Path
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -34,11 +34,13 @@ def main():
     problem_params_sdc['nu'] = 0.1  # diffusion coefficient
     problem_params_sdc['freq'] = 4  # frequency for the test value
     problem_params_sdc['nvars'] = 1023  # number of degrees of freedom for each level
+    problem_params_sdc['bc'] = 'dirichlet-zero'  # boundary conditions
 
     problem_params_mlsdc = dict()
     problem_params_mlsdc['nu'] = 0.1  # diffusion coefficient
     problem_params_mlsdc['freq'] = 4  # frequency for the test value
     problem_params_mlsdc['nvars'] = [1023, 511, 255]  # number of degrees of freedom for each level
+    problem_params_mlsdc['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -55,7 +57,7 @@ def main():
 
     # fill description dictionary for SDC
     description_sdc = dict()
-    description_sdc['problem_class'] = heat1d  # pass problem class
+    description_sdc['problem_class'] = heatNd_unforced  # pass problem class
     description_sdc['problem_params'] = problem_params_sdc  # pass problem parameters
     description_sdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description_sdc['sweeper_params'] = sweeper_params_sdc  # pass sweeper parameters
@@ -64,7 +66,7 @@ def main():
 
     # fill description dictionary for MLSDC
     description_mlsdc = dict()
-    description_mlsdc['problem_class'] = heat1d  # pass problem class
+    description_mlsdc['problem_class'] = heatNd_unforced  # pass problem class
     description_mlsdc['problem_params'] = problem_params_mlsdc  # pass problem parameters
     description_mlsdc['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description_mlsdc['sweeper_params'] = sweeper_params_mlsdc  # pass sweeper parameters

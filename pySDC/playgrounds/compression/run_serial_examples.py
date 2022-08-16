@@ -3,7 +3,7 @@ import numpy as np
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_periodic
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_forced
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
 from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -33,6 +33,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     problem_params['ndim'] = ndim  # will be iterated over
     problem_params['order'] = 8  # order of accuracy for FD discretization in space
     problem_params['nu'] = 0.1  # diffusion coefficient
+    problem_params['bc'] = 'periodic'  # boundary conditions
     problem_params['freq'] = tuple(2 for _ in range(ndim))  # frequencies
     if ml:
         problem_params['nvars'] = [tuple(64 for _ in range(ndim)), tuple(32 for _ in range(ndim))]  # number of dofs
@@ -60,7 +61,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heatNd_periodic  # pass problem class
+    description['problem_class'] = heatNd_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters

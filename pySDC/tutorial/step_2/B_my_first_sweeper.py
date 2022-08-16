@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pySDC.core.Step import step
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
@@ -25,6 +25,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -32,7 +33,7 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = heat1d_forced
+    description['problem_class'] = heatNd_forced
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params

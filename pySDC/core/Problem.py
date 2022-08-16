@@ -1,6 +1,4 @@
 import logging
-import numpy as np
-from scipy.special import factorial
 
 from pySDC.helpers.pysdc_helper import FrozenClass
 
@@ -59,44 +57,3 @@ class ptype(object):
         Abstract interface to apply mass matrix (only needed for FEM)
         """
         raise NotImplementedError('ERROR: if you want a mass matrix, implement apply_mass_matrix(u)')
-
-
-def get_finite_difference_stencil(derivative, order, type=None, steps=None):
-    """
-    Derive general finite difference stencils from Taylor expansions
-    """
-    if steps is not None:
-        n = len(steps)
-    elif type == 'center':
-        n = order + derivative - (derivative + 1) % 2 // 1
-        steps = np.arange(n) - n // 2
-    elif type == 'forward':
-        n = order + derivative
-        steps = np.arange(n)
-    elif type == 'backward':
-        n = order + derivative
-        steps = -np.arange(n)
-    else:
-        raise ValueError(
-            f'Stencil must be of type "center", "forward" or "backward", not {type}. If you want something\
-else, you can also give specific steps.'
-        )
-
-    # the index of the position around which we Taylor expand
-    zero_pos = np.argmin(abs(steps)) + 1
-
-    # make a matrix that contains the Taylor coefficients
-    A = np.zeros((n, n))
-    idx = np.arange(n)
-    inv_facs = 1.0 / factorial(idx)
-    for i in range(0, n):
-        A[i, :] = steps ** idx[i] * inv_facs[i]
-
-    # make a right hand side vector that is zero everywhere except at the position of the desired derivative
-    sol = np.zeros(n)
-    sol[derivative] = 1.0
-
-    # solve the linear system for the finite difference coefficients
-    coeff = np.linalg.solve(A, sol)
-
-    return coeff, zero_pos, steps

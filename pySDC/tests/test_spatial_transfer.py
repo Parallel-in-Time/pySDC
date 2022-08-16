@@ -52,13 +52,14 @@ def test_mesh_to_mesh_1d_dirichlet():
     A simple test program to test dirichlet interpolation order in space
     """
     from pySDC.implementations.datatype_classes.mesh import mesh
-    from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
     from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 3  # frequency for the test value
+    problem_params['bc'] = 'dirichlet-zero'  # BCs
 
     # initialize transfer parameters
     space_transfer_params = {}
@@ -81,11 +82,11 @@ def test_mesh_to_mesh_1d_dirichlet():
 
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pfine = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = int((nvars_fine + 1) / 2.0 - 1)
-            Pcoarse = heat1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pcoarse = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
@@ -106,7 +107,7 @@ def test_mesh_to_mesh_1d_dirichlet():
 
     orders = get_accuracy_orders(results)
     for p in range(len(orders)):
-        # print(abs(orders[p][1]-orders[p][2])/orders[p][1])
+        # print(abs(orders[p][1] - orders[p][2]) / orders[p][1])
         assert (
             abs(orders[p][1] - orders[p][2]) / orders[p][1] < 0.151
         ), 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
@@ -188,14 +189,15 @@ def test_mesh_to_mesh_2d_periodic():
     """
 
     from pySDC.implementations.datatype_classes.mesh import mesh
-    from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
     from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}
-    problem_params['c'] = 0.1  # advection coefficient
-    problem_params['freq'] = 4  # frequency for the test value
+    problem_params['freq'] = (2, 2)
     problem_params['nu'] = 1.0
+    problem_params['bc'] = 'periodic'
+    problem_params['ndim'] = 2
 
     # initialize transfer parameters
     space_transfer_params = {}
@@ -218,11 +220,11 @@ def test_mesh_to_mesh_2d_periodic():
         for nvars_fine in nvars_fine_list:
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pfine = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = (int(nvars_fine[0] / 2), int(nvars_fine[1] / 2))
-            Pcoarse = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pcoarse = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)
