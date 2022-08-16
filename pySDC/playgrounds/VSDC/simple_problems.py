@@ -31,7 +31,6 @@ def setup_harmonic():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['initial_guess'] = 'zero'
@@ -80,7 +79,6 @@ def setup_henonheiles():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5]
     sweeper_params['initial_guess'] = 'zero'

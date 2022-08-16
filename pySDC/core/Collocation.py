@@ -71,7 +71,7 @@ class CollBase(object):
     """
 
     def __init__(
-        self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False, **kwargs
+        self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type=None, useSpline=False, **kwargs
     ):
         """
         Initialization routine for a collocation object

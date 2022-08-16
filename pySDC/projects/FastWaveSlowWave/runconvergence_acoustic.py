@@ -40,7 +40,6 @@ def compute_convergence_data(cwd=''):
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['do_coll_update'] = True
