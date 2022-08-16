@@ -4,7 +4,7 @@ from pathlib import Path
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_forced
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
 from pySDC.implementations.problem_classes.Auzinger_implicit import auzinger
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order

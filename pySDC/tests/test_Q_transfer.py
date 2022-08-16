@@ -52,7 +52,7 @@ def test_Q_transfer(node_type, quad_type):
 
                 if polyorder <= order:
                     assert err_inter < 5e-15, "ERROR: Q-interpolation order is not reached, got %s" % err_inter
-                    assert err_restr < 2e-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
+                    assert err_restr < 3e-15, "ERROR: Q-restriction order is not reached, got %s" % err_restr
                 else:
                     assert err_inter > 2e-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
 
