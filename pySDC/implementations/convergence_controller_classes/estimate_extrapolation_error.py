@@ -172,8 +172,8 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationError):
 
     def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
         '''
-        If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available otherwise, we
-        need to store all stuff we can.
+        If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we
+        need to store all the stuff that we can.
         '''
         if self.params.no_storage:
             self.t = np.array([None] * self.params.n)
