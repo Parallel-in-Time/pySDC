@@ -223,6 +223,7 @@ class fenics_vortex_2d(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         w = df.Expression(
             'r*(1-pow(tanh(r*((0.75-4) - x[1])),2)) + r*(1-pow(tanh(r*(x[1] - (0.25-4))),2)) - \

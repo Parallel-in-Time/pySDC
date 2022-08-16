@@ -200,6 +200,8 @@ class fenics_grayscott(ptype):
             def value_shape(self):
                 return (2,)
 
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
+
         uinit = InitialConditions()
 
         me = self.dtype_u(self.V)
