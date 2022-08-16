@@ -27,7 +27,6 @@ def diffusion_setup(par=0.0):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
@@ -81,7 +80,6 @@ def advection_setup(par=0.0):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
@@ -138,7 +136,6 @@ def scalar_equation_setup():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3, 2]
     sweeper_params['QI'] = 'LU'

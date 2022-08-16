@@ -26,7 +26,6 @@ def run_simulation():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'

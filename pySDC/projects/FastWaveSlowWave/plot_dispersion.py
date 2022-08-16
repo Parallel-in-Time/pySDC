@@ -44,7 +44,6 @@ def compute_and_plot_dispersion():
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE AND NUMBER OF QUADRATURE NODES ###
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['do_coll_update'] = True
     sweeper_params['num_nodes'] = 3

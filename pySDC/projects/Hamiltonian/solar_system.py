@@ -32,7 +32,6 @@ def setup_outer_solar_system():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'spread'
@@ -79,7 +78,6 @@ def setup_full_solar_system():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'spread'

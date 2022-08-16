@@ -28,7 +28,6 @@ def main(comm=None):
 
     # initialize sweeper parameters (part I)
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = comm.Get_size()
     sweeper_params['comm'] = comm

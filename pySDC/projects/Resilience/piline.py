@@ -108,7 +108,6 @@ def run_piline(custom_description, num_procs, Tend=20.0, hook_class=log_data):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part

@@ -33,7 +33,6 @@ def setup(t0=None, ml=None):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     if ml:
         # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)

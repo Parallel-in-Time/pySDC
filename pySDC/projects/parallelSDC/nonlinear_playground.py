@@ -35,7 +35,6 @@ def main():
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'

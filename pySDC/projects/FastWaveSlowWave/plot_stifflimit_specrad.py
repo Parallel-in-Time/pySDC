@@ -34,7 +34,6 @@ def compute_specrad():
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE OF QUADRATURE NODES ###
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
 
     # initialize level parameters
