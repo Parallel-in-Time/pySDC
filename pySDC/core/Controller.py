@@ -247,19 +247,17 @@ class controller(object):
 
     def convergence_controllers_post_step_processing(self, S):
         # perform the convergence control operations for each controller
-        for i in range(len(self.convergence_controllers)):
-            self.convergence_controllers[self.convergence_controller_order[i]].post_step_processing(self, S)
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_step_processing(self, S)
 
     def convergence_controllers_post_iteration_processing(self, S):
         # perform the convergence control operations for each controller
-        for i in range(len(self.convergence_controllers)):
-            self.convergence_controllers[self.convergence_controller_order[i]].post_iteration_processing(self, S)
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing(self, S)
 
     def convergence_control(self, S):
         # perform the convergence control operations for each controller
-        for i in range(len(self.convergence_controllers)):
-            C = self.convergence_controllers[self.convergence_controller_order[i]]
-
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.check_iteration_status(self, S)
             C.get_new_step_size(self, S)
             C.determine_restart(self, S)
