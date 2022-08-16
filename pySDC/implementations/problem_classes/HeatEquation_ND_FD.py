@@ -54,7 +54,7 @@ class heatNd_forced(ptype):
             type(problem_params['nvars']) is int and type(problem_params['freq']) is int
         ):
             print(problem_params['nvars'], problem_params['freq'])
-            raise ProblemError(f'Type of nvars and freq must be both either int or both tuple')
+            raise ProblemError('Type of nvars and freq must be both either int or both tuple')
 
         if 'ndim' not in problem_params:
             if type(problem_params['nvars']) is int:
