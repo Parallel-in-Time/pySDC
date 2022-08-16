@@ -119,13 +119,15 @@ def test_mesh_to_mesh_1d_periodic():
     """
 
     from pySDC.implementations.datatype_classes.mesh import mesh
-    from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+    from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
     from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
     # initialize problem parameters
     problem_params = {}
     problem_params['c'] = 0.1  # advection coefficient
     problem_params['freq'] = 4  # frequency for the test value
+    problem_params['type'] = 'center'
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
     # initialize transfer parameters
     space_transfer_params = {}
@@ -149,11 +151,11 @@ def test_mesh_to_mesh_1d_periodic():
 
             # instantiate fine problem
             problem_params['nvars'] = nvars_fine  # number of degrees of freedom
-            Pfine = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pfine = advectionNd(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate coarse problem
             problem_params['nvars'] = int(nvars_fine / 2)
-            Pcoarse = advection1d(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+            Pcoarse = advectionNd(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
             # instantiate spatial interpolation
             T = mesh_to_mesh(fine_prob=Pfine, coarse_prob=Pcoarse, params=space_transfer_params)

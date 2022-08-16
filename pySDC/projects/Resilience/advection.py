@@ -1,6 +1,6 @@
 # script to run a simple advection problem
 
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
@@ -96,7 +96,7 @@ def run_advection(custom_description, num_procs):
     sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['QE'] = 'PIC'
 
-    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'upwind', 'order': 5}
+    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'backward', 'order': 5, 'bc': 'periodic'}
 
     # initialize step parameters
     step_params = dict()
@@ -110,7 +110,7 @@ def run_advection(custom_description, num_procs):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advection1d  # pass problem class
+    description['problem_class'] = advectionNd  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters

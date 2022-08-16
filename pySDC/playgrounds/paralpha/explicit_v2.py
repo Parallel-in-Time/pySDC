@@ -3,7 +3,7 @@ import scipy.sparse as sp
 import scipy.linalg as sl
 
 
-from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 
 
 def get_config():
@@ -14,8 +14,9 @@ def get_config():
     problem_params['type'] = 'upwind'
     problem_params['ndim'] = 1
     problem_params['order'] = 1
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
-    problem = advectionNd_periodic(problem_params)
+    problem = advectionNd(problem_params)
 
     time_params = dict()
     time_params['dt'] = 5e-04
@@ -70,7 +71,7 @@ def run_paralpha(problem, time_params, err_euler):
 
     print(Lip)
 
-    u = [problem.dtype_u(problem.params.nvars, val=0.0) for _ in range(L)]
+    u = [problem.dtype_u(problem.init, val=0.0) for _ in range(L)]
 
     u0 = [problem.u_exact(t=0) for _ in range(L)]
 
@@ -94,7 +95,7 @@ def run_paralpha(problem, time_params, err_euler):
         rhs1[0] -= alpha * u[-1]
 
         for i in range(L):
-            tmp = problem.dtype_u(problem.params.nvars, val=0.0 + 0.0j)
+            tmp = problem.dtype_u(problem.init, val=0.0 + 0.0j)
             for j in range(L):
                 tmp += Sinv[i, j] * rhs1[j]
             u[i] = problem.dtype_u(tmp)
@@ -104,7 +105,7 @@ def run_paralpha(problem, time_params, err_euler):
 
         u1 = [problem.dtype_u(u[l], val=0.0) for l in range(L)]
         for i in range(L):
-            tmp = problem.dtype_u(problem.params.nvars, val=0.0 + 0.0j)
+            tmp = problem.dtype_u(problem.init, val=0.0 + 0.0j)
             for j in range(L):
                 tmp += S[i, j] * u1[j]
             u[i] = problem.dtype_u(tmp)
