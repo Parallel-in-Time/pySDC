@@ -49,7 +49,6 @@ class heatNd_forced(ptype):
                 raise ParameterError(msg)
 
         # make sure parameters have the correct form
-
         if not (type(problem_params['nvars']) is tuple and type(problem_params['freq']) is tuple) and not (
             type(problem_params['nvars']) is int and type(problem_params['freq']) is int
         ):

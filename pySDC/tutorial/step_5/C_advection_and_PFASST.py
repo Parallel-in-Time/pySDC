@@ -4,7 +4,7 @@ import numpy as np
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -30,7 +30,8 @@ def main():
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 4
-    problem_params['type'] = 'upwind'
+    problem_params['bc'] = 'periodic'
+    problem_params['type'] = 'backward'
 
     # initialize step parameters
     step_params = dict()
@@ -49,7 +50,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advection1d  # pass problem class
+    description['problem_class'] = advectionNd  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['level_params'] = level_params  # pass level parameters
@@ -134,7 +135,7 @@ def main():
             f.write('\n')
             print()
 
-            assert err < 5.0716135e-04, "ERROR: error is too high, got %s" % err
+            assert err < 5.13642e-04, "ERROR: error is too high, got %s" % err
 
         out = 'Mean number of iterations went up from %4.2f to %4.2f for QI = %s!' % (
             niters_min_all[QI],

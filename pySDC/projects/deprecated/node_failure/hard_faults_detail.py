@@ -1,14 +1,14 @@
 import numpy as np
 
-import pySDC.projects.node_failure.emulate_hard_faults as ft
+import pySDC.projects.deprecated.node_failure.emulate_hard_faults as ft
 from pySDC.helpers.stats_helper import get_sorted, filter_stats
 
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
-from pySDC.projects.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
+from pySDC.projects.deprecated.node_failure.controller_nonMPI_hard_faults import controller_nonMPI_hard_faults
 
 
 # noinspection PyShadowingNames,PyShadowingBuiltins
@@ -84,6 +84,7 @@ def main(ft_setups, ft_strategies):
             problem_params['nvars'] = [256, 128]
             problem_params['freq'] = 2
             problem_params['order'] = 2
+            problem_params['bc'] = 'periodic'  # boundary conditions
 
             level_params['dt'] = 0.125
 
@@ -91,7 +92,7 @@ def main(ft_setups, ft_strategies):
 
             # fill description dictionary for easy step instantiation
             description = dict()
-            description['problem_class'] = advection1d  # pass problem class
+            description['problem_class'] = advectionNd  # pass problem class
             description['problem_params'] = problem_params  # pass problem parameters
             description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
             description['sweeper_params'] = sweeper_params  # pass sweeper parameters

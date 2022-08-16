@@ -7,6 +7,7 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
     """
     Derive general finite difference stencils from Taylor expansions
     """
+
     if steps is not None:
         n = len(steps)
     elif type == 'center':
@@ -24,9 +25,6 @@ def get_finite_difference_stencil(derivative, order, type=None, steps=None):
 else, you can also give specific steps.'
         )
 
-    # the index of the position around which we Taylor expand
-    zero_pos = np.argmin(abs(steps)) + 1
-
     # make a matrix that contains the Taylor coefficients
     A = np.zeros((n, n))
     idx = np.arange(n)
@@ -41,7 +39,7 @@ else, you can also give specific steps.'
     # solve the linear system for the finite difference coefficients
     coeff = np.linalg.solve(A, sol)
 
-    return coeff, zero_pos, steps
+    return coeff, steps
 
 
 def get_finite_difference_matrix(derivative, order, type=None, steps=None, dx=None, size=None, dim=None, bc=None):
@@ -49,22 +47,22 @@ def get_finite_difference_matrix(derivative, order, type=None, steps=None, dx=No
     Build FD matrix from stencils, with boundary conditions
     """
 
+    if order > 2 and bc != 'periodic':
+        raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
+
     # get stencil
-    coeff, zero_pos, steps = get_finite_difference_stencil(derivative=derivative, order=order, type=type, steps=steps)
+    coeff, steps = get_finite_difference_stencil(derivative=derivative, order=order, type=type, steps=steps)
 
     if bc == 'dirichlet-zero':
         A_1d = sp.diags(coeff, steps, shape=(size, size), format='csc')
     elif bc == 'periodic':
-        dstencil = np.concatenate((coeff, np.delete(coeff, zero_pos - 1)))
-        offsets = np.concatenate(
-            (
-                [size - i - 1 for i in reversed(range(zero_pos - 1))],
-                [i - zero_pos + 1 for i in range(zero_pos - 1, len(coeff))],
-            )
-        )
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - size))
-
-        A_1d = sp.diags(dstencil, doffsets, shape=(size, size), format='csc')
+        A_1d = 0 * sp.eye(size, format='csc')
+        for i in steps:
+            A_1d += coeff[i] * sp.eye(size, k=steps[i])
+            if steps[i] > 0:
+                A_1d += coeff[i] * sp.eye(size, k=-size + steps[i])
+            if steps[i] < 0:
+                A_1d += coeff[i] * sp.eye(size, k=size + steps[i])
     else:
         raise NotImplementedError(f'Boundary conditons {bc} not implemented.')
 

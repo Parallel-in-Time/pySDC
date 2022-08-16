@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
+from pySDC.core.Collocation import CollBase
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 
 
 def run():
@@ -28,14 +28,15 @@ def run():
     problem_params['nvars'] = tuple(N for _ in range(ndim))  # number of dofs
     problem_params['direct_solver'] = False  # do GMRES instead of LU
     problem_params['liniter'] = 10  # number of GMRES iterations
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
-    prob = advectionNd_periodic(problem_params)
+    prob = advectionNd(problem_params)
 
     IL = np.eye(L)
     LM = np.eye(M)
     IN = np.eye(N)
 
-    coll = CollGaussRadau_Right(M, 0, 1)
+    coll = CollBase(M, 0, 1, quad_type='RADAU-RIGHT')
 
     Q = coll.Qmat[1:, 1:]
     A = prob.A.todense()
