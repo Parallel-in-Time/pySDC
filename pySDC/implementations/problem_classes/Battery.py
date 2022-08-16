@@ -92,6 +92,7 @@ class battery(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
 

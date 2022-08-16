@@ -178,6 +178,7 @@ class boussinesq_2d_imex(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         dtheta = 0.01
         H = 10.0

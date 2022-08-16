@@ -48,6 +48,7 @@ class vanderpol(ptype):
         """
 
         # thou shall not call this at time > 0
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
         me[:] = self.params.u0[:]
