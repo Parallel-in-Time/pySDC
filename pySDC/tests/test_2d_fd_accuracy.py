@@ -14,8 +14,9 @@ def test_spatial_accuracy():
 
     # initialize problem parameters
     problem_params = {}
-    problem_params['freq'] = 2
+    problem_params['freq'] = (2, 2)
     problem_params['nu'] = 1.0
+    problem_params['bc'] = 'periodic'
 
     # create list of nvars to do the accuracy test with
     nvars_list = [(2**p, 2**p) for p in range(4, 12)]
@@ -45,7 +46,7 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
         a dictionary containing the errors and a header (with nvars_list)
     """
     from pySDC.implementations.datatype_classes.mesh import mesh
-    from pySDC.implementations.problem_classes.HeatEquation_2D_FD_periodic import heat2d_periodic
+    from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 
     results = {}
     # loop over all nvars
@@ -54,7 +55,7 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
         # setup problem
         problem_params['nvars'] = nvars
         problem_params['order'] = order_stencil
-        prob = heat2d_periodic(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
+        prob = heatNd_unforced(problem_params=problem_params, dtype_u=mesh, dtype_f=mesh)
 
         # create x values, use only inner points
         xvalues = np.array([i * prob.dx for i in range(prob.params.nvars[0])])
@@ -66,11 +67,11 @@ def run_accuracy_check(nvars_list, problem_params, order_stencil):
         u_lap = prob.dtype_u(init=prob.init)
         u_lap[:] = (
             -2
-            * (np.pi * prob.params.freq) ** 2
+            * (np.pi**2 * prob.params.freq[0] * prob.params.freq[1])
             * prob.params.nu
-            * np.kron(np.sin(np.pi * prob.params.freq * xvalues), np.sin(np.pi * prob.params.freq * xvalues)).reshape(
-                nvars
-            )
+            * np.kron(
+                np.sin(np.pi * prob.params.freq[0] * xvalues), np.sin(np.pi * prob.params.freq[1] * xvalues)
+            ).reshape(nvars)
         )
         # compare analytic and computed solution using the eval_f routine of the problem class
         err = abs(prob.eval_f(u, 0) - u_lap)

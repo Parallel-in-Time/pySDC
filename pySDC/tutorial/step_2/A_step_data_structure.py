@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pySDC.core.Step import step
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.tutorial.step_1.A_spatial_problem_setup import run_accuracy_check
 
@@ -27,6 +27,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -34,7 +35,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_LU  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters

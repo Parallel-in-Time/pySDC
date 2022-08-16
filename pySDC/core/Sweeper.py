@@ -205,8 +205,8 @@ class sweeper(object):
                     # rho = 0.0208560702294 (iteration 6690)
                     x = [0.2584092406077449, 0.6449261740461826]
                 else:
-                    NotImplementedError(
-                        'This combination of preconditioner, node type and node number is not ' 'implemented'
+                    raise NotImplementedError(
+                        'This combination of preconditioner, node type and node number is not implemented'
                     )
             elif coll.node_type == 'EQUID' and coll.quad_type == 'RADAU-RIGHT':
                 if m == 9:
