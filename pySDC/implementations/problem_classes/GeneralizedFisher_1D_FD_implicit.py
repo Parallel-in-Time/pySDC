@@ -4,6 +4,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
+from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -48,26 +49,15 @@ class generalized_fisher(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
-        self.A = self.__get_A(self.params.nvars, self.dx)
-
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N (int): number of dofs
-            dx (float): distance between two spatial nodes
-
-        Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N + 2, N + 2), format='lil')
-        A *= 1.0 / (dx**2)
-
-        return A
+        self.A = problem_helper.get_finite_difference_matrix(
+            derivative=2,
+            order=2,
+            type='center',
+            dx=self.dx,
+            size=self.params.nvars + 2,
+            dim=1,
+            bc='dirichlet-zero',
+        )
 
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):

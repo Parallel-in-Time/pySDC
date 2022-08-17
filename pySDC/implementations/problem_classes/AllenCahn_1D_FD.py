@@ -4,6 +4,7 @@ from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
+from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
@@ -50,32 +51,21 @@ class allencahn_front_fullyimplicit(ptype):
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
         self.xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
 
-        self.A = self.__get_A(self.params.nvars, self.dx)
+        self.A = problem_helper.get_finite_difference_matrix(
+            derivative=2,
+            order=2,
+            type='center',
+            dx=self.dx,
+            size=self.params.nvars + 2,
+            dim=1,
+            bc='dirichlet-zero',
+        )
         self.uext = self.dtype_u((self.init[0] + 2, self.init[1], self.init[2]), val=0.0)
 
         self.newton_itercount = 0
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
-
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N (int): number of dofs
-            dx (float): distance between two spatial nodes
-
-        Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N + 2, N + 2), format='lil')
-        A *= 1.0 / (dx**2)
-
-        return A
 
     def solve_system(self, rhs, factor, u0, t):
         """
@@ -433,41 +423,20 @@ class allencahn_periodic_fullyimplicit(ptype):
         self.dx = (self.params.interval[1] - self.params.interval[0]) / self.params.nvars
         self.xvalues = np.array([self.params.interval[0] + i * self.dx for i in range(self.params.nvars)])
 
-        self.A = self.__get_A(self.params.nvars, self.dx)
+        self.A = problem_helper.get_finite_difference_matrix(
+            derivative=2,
+            order=2,
+            type='center',
+            dx=self.dx,
+            size=self.params.nvars,
+            dim=1,
+            bc='periodic',
+        )
 
         self.newton_itercount = 0
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
-
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N (int): number of dofs
-            dx (float): distance between two spatial nodes
-
-        Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        zero_pos = 2
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(
-            (
-                [N - i - 1 for i in reversed(range(zero_pos - 1))],
-                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
-            )
-        )
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N))
-
-        A = sp.diags(dstencil, doffsets, shape=(N, N), format='csc')
-        A *= 1.0 / (dx**2)
-
-        return A
 
     def solve_system(self, rhs, factor, u0, t):
         """
