@@ -1,5 +1,7 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_semiimplicit
 # from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
+# from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -8,7 +10,10 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import numpy as np
 import pickle
 import matplotlib.pylab as plt
-name = 'pickle/ac-jusuf-pySDC-cpu.pickle'
+name = 'pickle/ac-jusuf-pySDC-cpu_f.pickle'
+# name = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
+# name = 'pickle/ac-jusuf-pySDC-cpu_fft.pickle'
+# name = 'pickle/ac-jusuf-pySDC-gpu_fft.pickle'
 Ns = np.asarray([128, 256, 512, 1024, 2048])
 # Ns = np.asarray([128, 256, 512])
 times = np.zeros_like(Ns, dtype=float)
@@ -84,8 +89,8 @@ for i, N in enumerate(Ns):
     timing_step = [ts[1] for ts in timing_step]
     cg[i] = np.asarray(sum(timing_step))
     cg_Count[i] = P.lin_ncalls
-    f_im[i] = 0
-    f_ex[i] = 0
+    f_im[i] = P.f_im
+    f_ex[i] = P.f_ex
 # write down stats to .pickle file
 data = {
     'Ns': Ns,

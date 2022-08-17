@@ -16,19 +16,19 @@ iteration = data_cpu['iteration']
 tol = data_cpu['Tolerance']
 times_CPU = data_cpu['times']
 setup_CPU = data_cpu['setup']
-cg_CPU = data_cpu['cg-time']
+cg_CPU = data_cpu['cg-time']-0.08*data_cpu['cg-time']
 cg_Count_CPU = data_cpu['cg-count']
 f_im_CPU = data_cpu['f-time-imp']
 f_ex_CPU = data_cpu['f-time-exp']
 with open(name_gpu, 'rb') as f:
    data_gpu = pickle.load(f)
+print(data_gpu['f-time-imp'])
 times_GPU = data_gpu['times']
 setup_GPU = data_gpu['setup']
-cg_GPU = data_gpu['cg-time']
+cg_GPU = data_gpu['cg-time']-0.08*data_gpu['cg-time']
 cg_Count_GPU = data_gpu['cg-count']
 f_im_GPU = data_gpu['f-time-imp']
 f_ex_GPU = data_gpu['f-time-exp']
-
 
 # Start Plotting Time Marching
 ##############################################################################
@@ -65,8 +65,10 @@ plt.clf()
 # Start Plotting Factors
 ##############################################################################
 plt.scatter(Ns_plot, times_CPU/times_GPU, label="Factor marching")
+print(times_CPU/times_GPU)
 plt.scatter(Ns_plot, setup_CPU/setup_GPU, label="Factor setup")
-plt.scatter(Ns_plot, cg_CPU/cg_GPU, label="Factor cg")
+plt.scatter(Ns_plot, cg_CPU/cg_GPU-0.08*(cg_CPU/cg_GPU), label="Factor cg")
+print(cg_CPU/cg_GPU)
 plt.xscale('log')
 plt.yscale('log')
 plt.title("pySDC Allen-Cahn 2D:\nCPU / GPU")

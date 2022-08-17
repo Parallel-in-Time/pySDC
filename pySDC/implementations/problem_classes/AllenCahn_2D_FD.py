@@ -1,3 +1,4 @@
+import time
 
 import numpy as np
 import scipy.sparse as sp
@@ -205,6 +206,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
+        self.f_im = 0
+        self.f_ex = 0
 
     def eval_f(self, u, t):
         """
@@ -219,9 +222,14 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
         """
         f = self.dtype_f(self.init)
         v = u.flatten()
+        start = time.perf_counter()
         f.impl[:] = self.A.dot(v).reshape(self.params.nvars)
+        ende = time.perf_counter()
+        self.f_im += ende - start
+        start = time.perf_counter()
         f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
-
+        ende = time.perf_counter()
+        self.f_ex += ende - start
         return f
 
     def solve_system(self, rhs, factor, u0, t):
