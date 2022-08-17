@@ -169,6 +169,7 @@ def plot_voltages(cwd='./'):
     ax.set_ylabel('Energy')
 
     fig.savefig('data/piline_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 def setup_mpl(fontsize=8):
