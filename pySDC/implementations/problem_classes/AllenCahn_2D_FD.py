@@ -4,6 +4,7 @@ from scipy.sparse.linalg import cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
+from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
 
 
@@ -30,6 +31,9 @@ class allencahn_fullyimplicit(ptype):
             dtype_f: mesh data type (will be passed parent class)
         """
 
+        if 'order' not in problem_params:
+            problem_params['order'] = 2
+
         # these parameters will be used later, so assert their existence
         essential_keys = ['nvars', 'nu', 'eps', 'newton_maxiter', 'newton_tol', 'lin_tol', 'lin_maxiter', 'radius']
         for key in essential_keys:
@@ -52,43 +56,21 @@ class allencahn_fullyimplicit(ptype):
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
-        self.A = self.__get_A(self.params.nvars, self.dx)
+        self.A = problem_helper.get_finite_difference_matrix(
+            derivative=2,
+            order=self.params.order,
+            type='center',
+            dx=self.dx,
+            size=self.params.nvars[0],
+            dim=2,
+            bc='periodic',
+        )
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
         self.newton_itercount = 0
         self.lin_itercount = 0
         self.newton_ncalls = 0
         self.lin_ncalls = 0
-
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N (list): number of dofs
-            dx (float): distance between two spatial nodes
-
-        Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        zero_pos = 2
-        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
-        offsets = np.concatenate(
-            (
-                [N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
-                [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))],
-            )
-        )
-        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
-
-        A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
-        A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
-        A *= 1.0 / (dx**2)
-
-        return A
 
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
