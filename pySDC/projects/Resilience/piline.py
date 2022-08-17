@@ -328,6 +328,7 @@ def main():
                 sol_fig, sol_ax = plt.subplots(1, 1, figsize=(3.5, 3))
                 plot_solution(data, sol_ax)
                 sol_fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
+            plt.close(fig)
 
 
 if __name__ == "__main__":
