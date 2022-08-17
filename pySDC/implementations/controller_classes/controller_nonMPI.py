@@ -261,7 +261,7 @@ class controller_nonMPI(controller):
 
         Args:
             S: the current step
-            level: the leven number
+            level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
@@ -291,7 +291,7 @@ class controller_nonMPI(controller):
 
         Args:
             S: the current step
-            level: the leven number
+            level: the level number
             add_to_stats: a flag to end recording data in the hooks (defaults to False)
         """
 
