@@ -45,6 +45,8 @@ class advection1d(ptype):
             problem_params['order'] = 1
         if 'type' not in problem_params:
             problem_params['type'] = 'upwind'
+        if 'sigma' not in problem_params and problem_params['freq'] == -1:
+            problem_params['sigma'] = 1e-1
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(advection1d, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
@@ -180,10 +182,9 @@ class advection1d(ptype):
         if self.params.freq >= 0:
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
             me[:] = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
-        elif self.params.freq == -1:  # gaussian
+        elif self.params.freq == -1:  # Gaussian
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
-            sigma = 1e-1
-            me[:] = np.exp(-0.5 * (((xvalues - (self.params.c * t)) % 1. - 0.5) / sigma)**2)
+            me[:] = np.exp(-0.5 * (((xvalues - (self.params.c * t)) % 1. - 0.5) / self.params.sigma)**2)
         else:
             np.random.seed(1)
             me[:] = np.random.rand(self.params.nvars)
