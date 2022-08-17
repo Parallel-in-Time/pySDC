@@ -196,6 +196,7 @@ def main():
             fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
         else:
             fig.savefig('data/error_estimate_order_parallel.png', dpi=300, bbox_inches='tight')
+        plt.close(fig)
 
 
 if __name__ == "__main__":
