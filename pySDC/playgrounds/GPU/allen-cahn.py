@@ -1,5 +1,5 @@
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_semiimplicit
-# from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit
+# from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_semiimplicit
+from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 # from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -10,8 +10,8 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import numpy as np
 import pickle
 import matplotlib.pylab as plt
-name = 'pickle/ac-jusuf-pySDC-cpu_f.pickle'
-# name = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
+# name = 'pickle/ac-jusuf-pySDC-cpu_f.pickle'
+name = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
 # name = 'pickle/ac-jusuf-pySDC-cpu_fft.pickle'
 # name = 'pickle/ac-jusuf-pySDC-gpu_fft.pickle'
 Ns = np.asarray([128, 256, 512, 1024, 2048])
