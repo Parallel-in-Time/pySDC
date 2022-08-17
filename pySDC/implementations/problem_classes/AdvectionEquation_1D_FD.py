@@ -180,7 +180,12 @@ class advection1d(ptype):
         if self.params.freq >= 0:
             xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
             me[:] = np.sin(np.pi * self.params.freq * (xvalues - self.params.c * t))
+        elif self.params.freq == -1:  # gaussian
+            xvalues = np.array([i * self.dx for i in range(self.params.nvars)])
+            sigma = 1e-1
+            me[:] = np.exp(-0.5 * (((xvalues - (self.params.c * t)) % 1. - 0.5) / sigma)**2)
         else:
             np.random.seed(1)
             me[:] = np.random.rand(self.params.nvars)
+            assert t == 0, "Exact solution with random initial conditions only available at t=0"
         return me

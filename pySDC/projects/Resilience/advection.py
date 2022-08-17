@@ -97,6 +97,9 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
 
     if custom_description is not None:
         for k in custom_description.keys():
+            if k == 'sweeper_class':
+                description[k] = custom_description[k]
+                continue
             description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
