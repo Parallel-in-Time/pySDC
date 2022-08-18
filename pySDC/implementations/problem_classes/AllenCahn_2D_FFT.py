@@ -1,5 +1,5 @@
 import numpy as np
-
+import time
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
@@ -65,6 +65,8 @@ class allencahn2d_imex(ptype):
 
         xv, yv = np.meshgrid(kx, ky, indexing='ij')
         self.lap = -xv ** 2 - yv ** 2
+        self.f_im = 0
+        self.f_ex = 0
 
     def eval_f(self, u, t):
         """
@@ -80,10 +82,16 @@ class allencahn2d_imex(ptype):
 
         f = self.dtype_f(self.init)
         v = u.flatten()
+        start = time.perf_counter()
         tmp = self.lap * np.fft.rfft2(u)
         f.impl[:] = np.fft.irfft2(tmp)
+        ende = time.perf_counter()
+        self.f_im += ende - start
+        start = time.perf_counter()
         if self.params.eps > 0:
             f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
+        ende = time.perf_counter()
+        self.f_ex += ende - start
         return f
 
     def solve_system(self, rhs, factor, u0, t):
