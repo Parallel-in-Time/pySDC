@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # name = 'pickle/ac-jusuf-pySDC.pickle'
-name_cpu = f'pickle/ac-jusuf-pySDC-cpu.pickle'
-name_gpu = 'pickle/ac-jusuf-pySDC-gpu.pickle'
+name_cpu = f'pickle/ac-jusuf-pySDC-cpu_f.pickle'
+name_gpu = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
 with open(name_cpu, 'rb') as f:
    data_cpu = pickle.load(f)
 Ns = data_cpu['Ns']
@@ -144,10 +144,10 @@ plt.scatter(Ns_plot, setup_CPU, label="setup")
 plt.plot(Ns_plot, setup_CPU)
 plt.scatter(Ns_plot, cg_CPU, label="cg")
 plt.plot(Ns_plot, cg_CPU)
-# plt.scatter(Ns_plot, f_im_CPU, label="f implizit")
-# plt.plot(Ns_plot, f_im_CPU)
-# plt.scatter(Ns_plot, f_ex_CPU, label="f explizit")
-# plt.plot(Ns_plot, f_ex_CPU)
+plt.scatter(Ns_plot, f_im_CPU, label="f implizit")
+plt.plot(Ns_plot, f_im_CPU)
+plt.scatter(Ns_plot, f_ex_CPU, label="f explizit")
+plt.plot(Ns_plot, f_ex_CPU)
 plt.xscale('log')
 plt.yscale('log')
 plt.title("pySDC Allan-Cahn 2D:\nCPU All Times")
