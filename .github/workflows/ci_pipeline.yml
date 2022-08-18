@@ -3,6 +3,8 @@ name: CI pipeline for pySDC
 on:
   push:
   pull_request:
+  schedule:
+    - cron: '0 9 * * 5'
 
 jobs:
 
