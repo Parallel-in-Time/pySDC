@@ -9,7 +9,7 @@ from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 # from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
-from pySDC.implementations.datatype_classes.cupy_class import cupy_class, imex_cupy_class, comp2_cupy_class
+from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
 
@@ -24,7 +24,7 @@ class allencahn_fullyimplicit(ptype):
         dx: distance between two spatial nodes (same for both directions)
     """
 
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=cupy_mesh):
         """
         Initialization routine
 
@@ -188,7 +188,7 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=imex_cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
 
@@ -266,7 +266,7 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=imex_cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
 
@@ -360,7 +360,7 @@ class allencahn_multiimplicit(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, SDC standard splitting
     """
 
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=comp2_cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=comp2_cupy_mesh):
         """
         Initialization routine
 
@@ -487,7 +487,7 @@ class allencahn_multiimplicit_v2(allencahn_fullyimplicit):
     Example implementing the Allen-Cahn equation in 2D with finite differences, AC splitting
     """
 
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=comp2_cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=comp2_cupy_mesh):
         """
         Initialization routine
 
