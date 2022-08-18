@@ -21,7 +21,7 @@ class _Status(FrozenClass):
     '''
     def __init__(self, status_variabes):
 
-        [setattr(self, key) for key in status_variabes]
+        [setattr(self, key, None) for key in status_variabes]
 
         self._freeze()
 
@@ -241,12 +241,10 @@ class ConvergenceController(object):
     def convergence_control(self, controller, S):
         '''
         Call all the functions related to convergence control.
-        This is called in `it_check` in the controller after every iteration, in contrast to
-        `post_iteration_processing`, including iteration 0.
-
+        This is called in `it_check` in the controller after every iteration just after `post_iteration_processing`.
         Args:
             controller (pySDC.Controller): The controller
-            S (pySDC.step): The current step
+            S (pySDC.Step): The current step
 
         Returns:
             None
@@ -257,3 +255,13 @@ class ConvergenceController(object):
         self.check_iteration_status(controller, S)
 
         return None
+
+    def post_spread_processing(self, controller, S):
+        '''
+        This function is called at the end of the `SPREAD` stage in the controller
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+        '''
+        pass

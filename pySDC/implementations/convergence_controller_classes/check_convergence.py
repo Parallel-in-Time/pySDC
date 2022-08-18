@@ -22,7 +22,7 @@ class CheckConvergence(ConvergenceController):
         Returns:
             (dict): The updated params dictionary
         '''
-        return {'control_order': -100, **params}
+        return {'control_order': +200, **params}
 
     def check_iteration_status(self, controller, S):
         """
