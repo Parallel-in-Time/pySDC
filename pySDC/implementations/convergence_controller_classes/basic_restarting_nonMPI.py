@@ -1,4 +1,4 @@
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController, _Pars
 from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
 
 
@@ -10,6 +10,10 @@ class BasicRestartingNonMPI(ConvergenceController):
 
     Default control order is 95.
     '''
+
+    def __init__(self, controller, params, description):
+        super(BasicRestartingNonMPI, self).__init__(controller, params, description)
+        self.buffers = _Pars({'restart': False, 'max_restart_reached': False})
 
     def setup(self, controller, params, description):
         '''
@@ -66,17 +70,17 @@ class BasicRestartingNonMPI(ConvergenceController):
         '''
         # check if we performed too many restarts
         if S.status.first:
-            self.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
-            if self.max_restart_reached and S.status.restart:
+            self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
+            if self.buffers.max_restart_reached and S.status.restart:
                 self.log(f'Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
 on...', S)
 
-        self.restart = S.status.restart or self.restart
-        S.status.restart = (S.status.restart or self.restart) and not self.max_restart_reached
+        self.buffers.restart = S.status.restart or self.buffers.restart
+        S.status.restart = (S.status.restart or self.buffers.restart) and not self.buffers.max_restart_reached
 
         return None
 
-    def reset_global_variables_nonMPI(self, controller):
+    def reset_buffers_nonMPI(self, controller):
         '''
         Reset all variables with are used to simulate communication here
 
@@ -86,8 +90,8 @@ on...', S)
         Returns:
             None
         '''
-        self.restart = False
-        self.max_restart_reached = False
+        self.buffers.restart = False
+        self.buffers.max_restart_reached = False
 
         return None
 

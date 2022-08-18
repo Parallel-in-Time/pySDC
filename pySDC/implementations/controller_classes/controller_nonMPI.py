@@ -79,7 +79,7 @@ class controller_nonMPI(controller):
         self.add_convergence_controller(BasicRestartingNonMPI, description)
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_global_variables_nonMPI(self)
+            C.reset_buffers_nonMPI(self)
             C.setup_status_variables(self)
 
     def check_iteration_estimator(self, MS):
@@ -564,7 +564,7 @@ class controller_nonMPI(controller):
                 S.status.stage = 'DONE'
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.reset_global_variables_nonMPI(self)
+            C.reset_buffers_nonMPI(self)
 
     def it_fine(self, local_MS_running):
         """

@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.ConvergenceController import ConvergenceController
+from pySDC.core.ConvergenceController import ConvergenceController, _Pars
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
 
@@ -21,8 +21,23 @@ class EstimateEmbeddedError(ConvergenceController):
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
 
-    def reset_global_variables_nonMPI(self, controller):
-        self.e_em_last = 0.
+    def __init__(self, controller, params, description):
+        '''Add the buffers for communication'''
+        super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
+        self.buffers = _Pars({'e_em_last': 0.})
+
+    def reset_buffers_nonMPI(self, controller):
+        '''
+        Reset buffers for immitated communication.
+
+        Args:
+            controller (pySDC.controller): The controller
+
+        Returns:
+            None
+        '''
+        self.buffers.e_em_last = 0.
+        return None
 
     def post_iteration_processing(self, controller, S):
         """
@@ -37,6 +52,6 @@ level')
             for L in S.levels:
                 # order rises by one between sweeps, making this so ridiculously easy
                 temp = abs(L.uold[-1] - L.u[-1])
-                L.status.error_embedded_estimate = max([abs(temp - self.e_em_last), np.finfo(float).eps])
+                L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
-            self.e_em_last = temp * 1.
+            self.buffers.e_em_last = temp * 1.
