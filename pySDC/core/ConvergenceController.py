@@ -13,6 +13,19 @@ class _Pars(FrozenClass):
         self._freeze()
 
 
+# short helper class to store status variables
+class _Status(FrozenClass):
+    '''
+    Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
+    relevant information about the controller are known.
+    '''
+    def __init__(self, status_variabes):
+
+        [setattr(self, key) for key in status_variabes]
+
+        self._freeze()
+
+
 class ConvergenceController(object):
     """
     Base abstract class for convergence controller, which is plugged into the controller to determine the iteration
@@ -125,19 +138,36 @@ class ConvergenceController(object):
         '''
         pass
 
-    def reset_global_variables_nonMPI(self, controller):
+    def setup_status_variables(self, controller):
         '''
-        Global variables refer to variables used across multiple steps that are stored in the convergence controller
-        classes to immitate communication in non mpi versions. These have to be reset in order to replicate
-        avalability of variables in mpi versions.
+        Setup status variables.
+        This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
+        hence not all information are available. Instead, this function is called after the controller has been fully
+        instantiated.
 
-        For instance, if step 0 sets x = 1 from x = 0, when the same MPI rank uses the variable with step 1, it will
-        still carry the value of x = 1, equivalent to a send from the rank computing step 0 to the rank computing
-        step 1.
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Reutrns:
+            None
+        '''
+        return None
+
+    def reset_buffers_nonMPI(self, controller):
+        '''
+        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
+        immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
+        variables in mpi versions.
+
+        For instance, if step 0 sets self.buffers.x = 1 from self.buffers.x = 0, when the same MPI rank uses the
+        variable with step 1, it will still carry the value of self.buffers.x = 1, equivalent to a send from the rank
+        computing step 0 to the rank computing step 1.
 
         However, you can only receive what somebody sent and in order to make sure that is true for the non MPI
         versions, we reset after each iteration so you cannot use this function to communicate backwards from the last
         step to the first one for instance.
+
+        This function is called both at the end of instantiating the controller, as well as after each iteration.
 
         Args:
             controller (pySDC.Controller): The controller
@@ -207,3 +237,23 @@ class ConvergenceController(object):
             None
         '''
         pass
+
+    def convergence_control(self, controller, S):
+        '''
+        Call all the functions related to convergence control.
+        This is called in `it_check` in the controller after every iteration, in contrast to
+        `post_iteration_processing`, including iteration 0.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.step): The current step
+
+        Returns:
+            None
+        '''
+
+        self.get_new_step_size(controller, S)
+        self.determine_restart(controller, S)
+        self.check_iteration_status(controller, S)
+
+        return None

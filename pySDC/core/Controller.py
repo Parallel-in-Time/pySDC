@@ -226,18 +226,46 @@ class controller(object):
         return self.__hooks
 
     def setup_convergence_controllers(self, description):
+        '''
+        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing
+        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration
+        count or a residual based stopping criterion, as well as all convergence controllers added to the description.
+
+        Args:
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        '''
         self.convergence_controllers = []
         self.convergence_controller_order = []
         conv_classes = description.get('convergence_controllers', {})
         conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
+
+        # instantiate the convergence controllers
         for conv_class, params in conv_classes.items():
             self.add_convergence_controller(conv_class, description=description, params=params)
 
+        return None
+
     def add_convergence_controller(self, convergence_controller, description, params=None, allow_double=False):
+        '''
+        Add an individual convergence controller to the list of convergence controllers and instiate it.
+        Afterwards, the order of the convergence controllers is updated.
+
+        Args:
+            convergence_controller (pySDC.ConvergenceController): The convergence controller to be added
+            description (dict): The description object used to instantiate the controller
+            params (dict): Parametes for the convergence controller
+            allow_double (bool): Allow adding the same convergence controller multiple times
+
+        Returns:
+            None
+        '''
         # check if we passed any sort of special params
         params = {} if params is None else params
 
-        # check if we already have it or if we want to have it multiple times
+        # check if we already have the convergence controller or if we want to have it multiple times
         if convergence_controller not in [type(me) for me in self.convergence_controllers] or allow_double:
             self.convergence_controllers.append(convergence_controller(self, params, description))
 
@@ -245,26 +273,11 @@ class controller(object):
             orders = [C.params.control_order for C in self.convergence_controllers]
             self.convergence_controller_order = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
 
-    def convergence_controllers_post_step_processing(self, S):
-        # perform the convergence control operations for each controller
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_step_processing(self, S)
-
-    def convergence_controllers_post_iteration_processing(self, S):
-        # perform the convergence control operations for each controller
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.post_iteration_processing(self, S)
-
-    def convergence_control(self, S):
-        # perform the convergence control operations for each controller
-        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
-            C.check_iteration_status(self, S)
-            C.get_new_step_size(self, S)
-            C.determine_restart(self, S)
+        return None
 
     def print_convergence_controllers(self):
         '''
-        This function is for debugging purposes to keep track of the different convergence controllers and their order
+        This function is for debugging purposes to keep track of the different convergence controllers and their order.
         '''
         print('    | order | convergence controller')
         print('----+-------+-------------------------------------------------------------------')
