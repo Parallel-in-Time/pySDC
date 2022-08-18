@@ -80,6 +80,7 @@ class controller_nonMPI(controller):
 
         for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
             C.reset_global_variables_nonMPI(self)
+            C.setup_status_variables(self)
 
     def check_iteration_estimator(self, MS):
         """
@@ -185,7 +186,8 @@ class controller_nonMPI(controller):
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
             for S in MS_active[:restart_at]:
-                self.convergence_controllers_post_step_processing(S)
+                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                    C.post_step_processing(self, S)
 
             for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 [C.prepare_next_block(self, S, len(active_slots), time, Tend) for S in self.MS]
@@ -520,11 +522,13 @@ class controller_nonMPI(controller):
         for S in local_MS_running:
 
             if S.status.iter > 0:
-                self.convergence_controllers_post_iteration_processing(S)
                 self.hooks.post_iteration(step=S, level_number=0)
 
             # decide if the step is done, needs to be restarted and other things convergence related
-            self.convergence_control(S)
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                if S.status.iter > 0:
+                    C.post_iteration_processing(self, S)
+                C.convergence_control(self, S)
 
         for S in local_MS_running:
             if not S.status.first:
