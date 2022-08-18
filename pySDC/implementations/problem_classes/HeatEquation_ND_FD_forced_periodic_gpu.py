@@ -6,7 +6,7 @@ from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-from pySDC.implementations.datatype_classes.cupy_class import cupy_class, imex_cupy_class
+from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
 
 
 # noinspection PyUnusedLocal
@@ -19,7 +19,7 @@ class heatNd_periodic(ptype):
         A: second-order FD discretization of the ND laplace operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
-    def __init__(self, problem_params, dtype_u=cupy_class, dtype_f=imex_cupy_class):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
 

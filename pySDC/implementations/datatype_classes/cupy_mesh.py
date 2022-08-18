@@ -7,7 +7,7 @@ except ImportError:
     MPI = None
 
 
-class cupy_class:
+class cupy_mesh:
     """
     cupy-based datatype
     """
@@ -24,7 +24,7 @@ class cupy_class:
             values: cupy.ndarray
 
         """
-        if isinstance(init, cupy_class):
+        if isinstance(init, cupy_mesh):
             self.values = cp.ndarray(shape=init.values.shape, dtype=init.values.dtype, strides=strides, order=order)
             self.values[:] = init.values.copy()
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
@@ -56,29 +56,29 @@ class cupy_class:
         return self.values.flatten()
 
     def __add__(self, other):
-        if type(other) is cupy_class:
-            new = cupy_class(other)
+        if type(other) is cupy_mesh:
+            new = cupy_mesh(other)
             new.values = other.values + self.values
         if type(other) is int or type(other) is float:
-            new = cupy_class(self)
+            new = cupy_mesh(self)
             new.values = other + self.values
         return new
 
     def __rmul__(self, other):
         new = None
-        if type(other) is cupy_class:
+        if type(other) is cupy_mesh:
             raise NotImplementedError("not implemendet to multiplicate to cupy_class obj")
         if type(other) is int or type(other) is float:
-            new = cupy_class(self)
+            new = cupy_mesh(self)
             new.values = other * self.values
         return new
 
     def __sub__(self, other):
-        new = cupy_class(self)
-        if type(other) is cupy_class:
+        new = cupy_mesh(self)
+        if type(other) is cupy_mesh:
             new.values = self.values - other.values
         if type(other) is int or type(other) is float:
-            new = cupy_class(self)
+            new = cupy_mesh(self)
             new.values = self.values - other
         return new
 
@@ -87,7 +87,7 @@ class cupy_class:
 
 
 
-class imex_cupy_class(object):
+class imex_cupy_mesh(object):
     """
     RHS data type for meshes with implicit and explicit components
 
@@ -111,18 +111,18 @@ class imex_cupy_class(object):
         """
 
         if isinstance(init, type(self)):
-            self.impl = cupy_class(init.impl)
-            self.expl = cupy_class(init.expl)
+            self.impl = cupy_mesh(init.impl)
+            self.expl = cupy_mesh(init.expl)
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], cp.dtype):
-            self.impl = cupy_class(init, val=val)
-            self.expl = cupy_class(init, val=val)
+            self.impl = cupy_mesh(init, val=val)
+            self.expl = cupy_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
 
 
-class comp2_cupy_class(object):
+class comp2_cupy_mesh(object):
     """
     RHS data type for meshes with 2 components
 
@@ -143,12 +143,12 @@ class comp2_cupy_class(object):
         """
 
         if isinstance(init, type(self)):
-            self.comp1 = cupy_class(init.comp1)
-            self.comp2 = cupy_class(init.comp2)
+            self.comp1 = cupy_mesh(init.comp1)
+            self.comp2 = cupy_mesh(init.comp2)
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], cp.dtype):
-            self.comp1 = cupy_class(init, val=val)
-            self.comp2 = cupy_class(init, val=val)
+            self.comp1 = cupy_mesh(init, val=val)
+            self.comp2 = cupy_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
         else:
             raise DataError('something went wrong during %s initialization' % type(self))
