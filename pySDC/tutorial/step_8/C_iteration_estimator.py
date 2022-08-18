@@ -11,7 +11,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh as mesh_to_mesh_nc
 from pySDC.implementations.convergence_controller_classes.check_iteration_estimator import CheckIterationEstimatorNonMPI
-from pySDC.playgrounds.compression.HookClass_error_output import error_output
+from pySDC.tutorial.step_8.HookClass_error_output import error_output
 
 
 def setup_diffusion(dt=None, ndim=None, ml=False):
@@ -60,7 +60,6 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -126,7 +125,6 @@ def setup_advection(dt=None, ndim=None, ml=False):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -180,7 +178,6 @@ def setup_auzinger(dt=None, ml=False):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation

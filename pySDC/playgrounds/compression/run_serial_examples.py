@@ -10,6 +10,7 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh as mesh_to_mesh_nc
+from pySDC.implementations.convergence_controller_classes.check_iteration_estimator import CheckIterationEstimatorNonMPI
 from pySDC.playgrounds.compression.HookClass_error_output import error_output
 
 
@@ -44,7 +45,6 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -52,10 +52,13 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     space_transfer_params['iorder'] = 6
     space_transfer_params['periodic'] = True
 
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -69,6 +72,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     # description['space_transfer_class'] = mesh_to_mesh_fft  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['convergence_controllers'] = convergence_controllers
 
     return description, controller_params
 
@@ -105,7 +109,6 @@ def setup_advection(dt=None, ndim=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
 
     # initialize space transfer parameters
     space_transfer_params = dict()
@@ -113,10 +116,13 @@ def setup_advection(dt=None, ndim=None, ml=False):
     space_transfer_params['iorder'] = 6
     space_transfer_params['periodic'] = True
 
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -130,6 +136,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     # description['space_transfer_class'] = mesh_to_mesh_fft  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
+    description['convergence_controllers'] = convergence_controllers
 
     return description, controller_params
 
@@ -160,12 +167,14 @@ def setup_auzinger(dt=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    step_params['errtol'] = 1E-07
+
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
 
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -177,6 +186,7 @@ def setup_auzinger(dt=None, ml=False):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
     description['space_transfer_class'] = mesh_to_mesh_nc  # pass spatial transfer class
+    description['convergence_controllers'] = convergence_controllers
 
     return description, controller_params
 
