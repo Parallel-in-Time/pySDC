@@ -1,4 +1,4 @@
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gpu import heatNd_periodic
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -7,19 +7,19 @@ import numpy as np
 
 # initialize problem parameters
 problem_params = dict()
-problem_params['nu'] = 2
-problem_params['eps'] = 0.04
-problem_params['radius'] = 0.25
-problem_params['nvars'] = [(512, 512)]
-problem_params['newton_maxiter'] = 100
-problem_params['newton_tol'] = 1E-08
-problem_params['lin_tol'] = 1E-10
-problem_params['lin_maxiter'] = 99
+problem_params['nu'] = 1
+problem_params['freq'] = [4, 4, 4]
+problem_params['order'] = 2
+problem_params['ndim'] = 3
+problem_params['lintol'] = 1E-10
+problem_params['liniter'] = 99
+problem_params['direct_solver'] = True
+problem_params['nvars'] = [(64, 64, 64)]
 
 # initialize level parameters
 level_params = dict()
 level_params['restol'] = 1E-07
-level_params['dt'] = 1E-03
+level_params['dt'] = 1E-07
 level_params['nsweeps'] = 1
 
 # initialize sweeper parameters
@@ -37,7 +37,7 @@ step_params['maxiter'] = 50
 # setup parameters "in time"
 t0 = 0
 schritte = 8
-Tend = schritte*1E-03
+Tend = schritte*level_params['dt']
 
 # initialize controller parameters
 controller_params = dict()
@@ -45,7 +45,7 @@ controller_params['logger_level'] = 30
 
 # fill description dictionary for easy step instantiation
 description = dict()
-description['problem_class'] = allencahn_semiimplicit
+description['problem_class'] = heatNd_periodic
 description['problem_params'] = problem_params  # pass problem parameters
 description['sweeper_class'] = imex_1st_order  # pass sweeper
 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -61,3 +61,5 @@ uinit = P.u_exact(t0)
 
 # call main function to get things done...
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+print('Laufzeit:', timing[0][1])
