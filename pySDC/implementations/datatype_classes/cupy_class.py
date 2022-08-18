@@ -79,9 +79,7 @@ class cupy_class:
             new.values = self.values - other.values
         if type(other) is int or type(other) is float:
             new = cupy_class(self)
-            # TODO: check which one is korrekt
-            # new.values = self.values - other
-            # new.values = other - self.values
+            new.values = self.values - other
         return new
 
     def get(self):
