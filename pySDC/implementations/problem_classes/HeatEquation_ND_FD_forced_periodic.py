@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import gmres, spsolve
@@ -70,6 +72,8 @@ class heatNd_periodic(ptype):
         xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = np.meshgrid(*[xvalues for _ in range(self.params.ndim)])
         self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
+        self.f_im = 0
+        self.f_ex = 0
 
     @staticmethod
     def __get_A(N, nu, dx, ndim, order):
@@ -130,7 +134,11 @@ class heatNd_periodic(ptype):
         """
 
         f = self.dtype_f(self.init)
+        start = time.perf_counter()
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        ende = time.perf_counter()
+        self.f_im += ende - start
+        start = time.perf_counter()
         if self.params.ndim == 1:
             f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
                 (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
@@ -143,7 +151,8 @@ class heatNd_periodic(ptype):
                 np.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
                 np.sin(np.pi * self.params.freq[2] * self.xv[2]) * \
                 (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
-
+        ende = time.perf_counter()
+        self.f_ex += ende - start
         return f
 
     def solve_system(self, rhs, factor, u0, t):

@@ -2,6 +2,7 @@ import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as csp
 from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
+import time
 
 
 from pySDC.core.Errors import ParameterError, ProblemError
@@ -72,6 +73,8 @@ class heatNd_periodic(ptype):
         xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
         self.Id = csp.eye(cp.prod(self.params.nvars), format='csc')
+        self.f_im = 0
+        self.f_ex = 0
 
     @staticmethod
     def __get_A(N, nu, dx, ndim, order):
@@ -126,7 +129,11 @@ class heatNd_periodic(ptype):
         """
 
         f = self.dtype_f(self.init)
+        start = time.perf_counter()
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        ende = time.perf_counter()
+        self.f_im += ende - start
+        start = time.perf_counter()
         if self.params.ndim == 1:
             f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
                 (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
@@ -139,7 +146,8 @@ class heatNd_periodic(ptype):
                 cp.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
                 cp.sin(np.pi * self.params.freq[2] * self.xv[2]) * \
                 (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
-
+        ende = time.perf_counter()
+        self.f_ex += ende - start
         return f
 
     def solve_system(self, rhs, factor, u0, t):
