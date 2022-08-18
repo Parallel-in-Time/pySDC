@@ -94,6 +94,9 @@ def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_da
 
     if custom_description is not None:
         for k in custom_description.keys():
+            if k == 'sweeper_class':
+                description[k] = custom_description[k]
+                continue
             description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
