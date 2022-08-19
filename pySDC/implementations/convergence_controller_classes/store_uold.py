@@ -38,3 +38,17 @@ class StoreUOld(ConvergenceController):
                 L.uold[:] = L.u[:]
 
         return None
+
+    def post_spread_processing(self, controller, S):
+        '''
+        Store the initial conditions in u_old in the spread phase.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Return:
+            None
+        '''
+        self.post_iteration_processing(controller, S)
+        return None
