@@ -94,6 +94,9 @@ def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_da
 
     if custom_description is not None:
         for k in custom_description.keys():
+            if k == 'sweeper_class':
+                description[k] = custom_description[k]
+                continue
             description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
@@ -270,7 +273,6 @@ def main():
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
             stats, _, _ = run_piline(custom_description, num_procs=num_procs)
             data = get_data(stats)
-            check_solution(data, use_adaptivity, num_procs, generate_reference)
             fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
             plot_error(data, ax, use_adaptivity)
             if use_adaptivity:
@@ -281,6 +283,7 @@ def main():
                 sol_fig, sol_ax = plt.subplots(1, 1, figsize=(3.5, 3))
                 plot_solution(data, sol_ax)
                 sol_fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
+            check_solution(data, use_adaptivity, num_procs, generate_reference)
 
 
 if __name__ == "__main__":
