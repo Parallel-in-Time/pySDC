@@ -13,16 +13,45 @@ class EstimateEmbeddedError(ConvergenceController):
     '''
 
     def setup(self, controller, params, description):
+        '''
+        Add a default value for control order to the parameters
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: Updated parameters
+        '''
         return {'control_order': -80, **params}
 
     def dependencies(self, controller, description):
+        '''
+        Load the convergence controller that stores the solution of the last sweep
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        '''
         controller.add_convergence_controller(StoreUOld, description=description)
+        return None
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
 
     def __init__(self, controller, params, description):
-        '''Add the buffers for communication'''
+        '''
+        Initalization routine. Add the buffers for communication over the parent class.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        '''
         super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
         self.buffers = Pars({'e_em_last': 0.})
 
@@ -43,6 +72,13 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
         """
         Compute embedded error estimate on the last node of each level
         In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
         """
         if len(S.levels) > 1 and len(controller.MS) > 1:
             raise NotImplementedError('Embedded error estimate only works for serial multi-level or parallel single \
@@ -55,3 +91,5 @@ level')
                 L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
             self.buffers.e_em_last = temp * 1.
+
+        return None

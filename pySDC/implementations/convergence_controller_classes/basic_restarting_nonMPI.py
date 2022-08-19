@@ -12,6 +12,14 @@ class BasicRestartingNonMPI(ConvergenceController):
     '''
 
     def __init__(self, controller, params, description):
+        '''
+        Initialization routine
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+        '''
         super(BasicRestartingNonMPI, self).__init__(controller, params, description)
         self.buffers = Pars({'restart': False, 'max_restart_reached': False})
 

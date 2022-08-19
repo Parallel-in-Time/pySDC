@@ -11,7 +11,7 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
 
         Args:
             controller (pySDC.Controller): The controller
-            params (dict): Parametes for the convergence controller
+            params (dict): Parameters for the convergence controller
             description (dict): The description object used to instantiate the controller
         '''
         super(CheckIterationEstimatorNonMPI, self).__init__(controller, params, description)
@@ -38,6 +38,17 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
         return True, ''
 
     def setup(self, controller, params, description):
+        '''
+        Setup parameters. Here we only give a default value for the control order.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): Parameters for the convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: The updated parameters
+        '''
         return {'control_order': -50, **params}
 
     def dependencies(self, controller, description):
@@ -70,10 +81,17 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
 
     def setup_status_variables(self, controller):
         '''
-        Store the differences between sweeps for all steps
+        Setup storage variables for the differences between sweeps for all steps.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
         '''
         self.status.diff_old_loc = [0.] * len(controller.MS)
         self.status.diff_first_loc = [0.] * len(controller.MS)
+        return None
 
     def check_iteration_status(self, controller, S):
         """

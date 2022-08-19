@@ -125,8 +125,8 @@ class ConvergenceController(object):
         `controller.print_convergence_controllers()`.
 
         Args:
-            controller (pySDC.Controller.controller): The controller
-            S (pySDC.step): The current step
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
 
         Returns:
             None
@@ -138,7 +138,7 @@ class ConvergenceController(object):
         Determine for each step separately if it wants to be restarted for whatever reason.
 
         Args:
-            controller (pySDC.Controller.controller): The controller
+            controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
 
         Returns:

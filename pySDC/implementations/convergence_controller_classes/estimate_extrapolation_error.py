@@ -370,3 +370,5 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             S.levels[0].status.error_extrapolation_estimate = abs(u_ex - S.levels[0].u[-1]) * self.coeff.prefactor
         else:
             S.levels[0].status.error_extrapolation_estimate = None
+
+        return None
