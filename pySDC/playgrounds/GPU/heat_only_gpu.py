@@ -2,8 +2,8 @@ from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gp
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.transfer_classes.TransferCupyMesh import mesh_to_mesh
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-import numpy as np
 
 # initialize problem parameters
 problem_params = dict()
@@ -34,6 +34,12 @@ sweeper_params['initial_guess'] = 'spread'
 step_params = dict()
 step_params['maxiter'] = 50
 
+# initialize space transfer parameters
+space_transfer_params = dict()
+space_transfer_params['rorder'] = 0
+space_transfer_params['iorder'] = 2
+space_transfer_params['periodic'] = True
+
 # setup parameters "in time"
 t0 = 0
 schritte = 8
@@ -51,6 +57,8 @@ description['sweeper_class'] = imex_1st_order  # pass sweeper
 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
 description['level_params'] = level_params  # pass level parameters
 description['step_params'] = step_params  # pass step parameters
+description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
 # instantiate controller
 controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
