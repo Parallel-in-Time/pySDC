@@ -1,4 +1,4 @@
-from pySDC.core.ConvergenceController import ConvergenceController, _Pars
+from pySDC.core.ConvergenceController import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.spread_step_sizes import SpreadStepSizesBlockwise
 
 
@@ -13,7 +13,7 @@ class BasicRestartingNonMPI(ConvergenceController):
 
     def __init__(self, controller, params, description):
         super(BasicRestartingNonMPI, self).__init__(controller, params, description)
-        self.buffers = _Pars({'restart': False, 'max_restart_reached': False})
+        self.buffers = Pars({'restart': False, 'max_restart_reached': False})
 
     def setup(self, controller, params, description):
         '''

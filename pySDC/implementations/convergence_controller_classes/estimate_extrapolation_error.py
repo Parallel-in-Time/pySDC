@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import factorial
 
-from pySDC.core.ConvergenceController import ConvergenceController, _Status
+from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Errors import DataError
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
@@ -24,8 +24,8 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
             params (dict): The params passed for this specific convergence controller
             description (dict): The description object used to instantiate the controller
         '''
-        self.prev = _Status(['t', 'u', 'f', 'dt'])  # store solutions etc. of previous steps here
-        self.coeff = _Status(['u', 'f', 'prefactor'])  # store coefficients for extrapolation here
+        self.prev = Status(['t', 'u', 'f', 'dt'])  # store solutions etc. of previous steps here
+        self.coeff = Status(['u', 'f', 'prefactor'])  # store coefficients for extrapolation here
         super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
 
     def setup(self, controller, params, description):
@@ -65,10 +65,22 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         new_params['n'] = (new_params['Taylor_order'] + 1) // 2
         new_params['n_per_proc'] = new_params['n'] * 1
 
-        self.coeff.u = [None] * new_params['n']
-        self.coeff.f = [0.] * new_params['n']
-
         return new_params
+
+    def setup_status_variables(self, controller):
+        '''
+        Initialize coefficient variables.
+
+        Args:
+            controller (pySDC.controller): The controller
+
+        Returns:
+            None
+        '''
+        self.coeff.u = [None] * self.params.n
+        self.coeff.f = [0.] * self.params.n
+        return None
+
 
     def check_parameters(self, controller, params, description):
         '''
@@ -224,12 +236,26 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             'no_storage': False,
         }
 
-        self.prev.t = np.array([None] * default_params['n'])
-        self.prev.dt = np.array([None] * default_params['n'])
-        self.prev.u = [None] * default_params['n']
-        self.prev.f = [None] * default_params['n']
-
         return {**non_mpi_defaults, **default_params}
+
+    def setup_status_variables(self, controller):
+        '''
+        Initialize storage variables.
+
+        Args:
+            controller (pySDC.controller): The controller
+
+        Returns:
+            None
+        '''
+        super(EstimateExtrapolationErrorNonMPI, self).setup_status_variables(controller)
+
+        self.prev.t = np.array([None] * self.params.n)
+        self.prev.dt = np.array([None] * self.params.n)
+        self.prev.u = [None] * self.params.n
+        self.prev.f = [None] * self.params.n
+
+        return None
 
     def post_iteration_processing(self, controller, S):
         '''

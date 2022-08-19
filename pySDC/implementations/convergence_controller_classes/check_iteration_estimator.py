@@ -1,5 +1,5 @@
 import numpy as np
-from pySDC.core.ConvergenceController import ConvergenceController, _Status
+from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
 
@@ -15,8 +15,8 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             description (dict): The description object used to instantiate the controller
         '''
         super(CheckIterationEstimatorNonMPI, self).__init__(controller, params, description)
-        self.buffers = _Status(['Kest_loc', 'diff_new', 'Ltilde_loc'])
-        self.status = _Status(['diff_old_loc', 'diff_first_loc'])
+        self.buffers = Status(['Kest_loc', 'diff_new', 'Ltilde_loc'])
+        self.status = Status(['diff_old_loc', 'diff_first_loc'])
 
     def check_parameters(self, controller, params, description):
         '''

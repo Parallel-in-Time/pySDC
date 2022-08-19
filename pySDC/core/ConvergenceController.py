@@ -3,7 +3,7 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 
 
 # short helper class to add params as attributes
-class _Pars(FrozenClass):
+class Pars(FrozenClass):
     def __init__(self, params):
         self.control_order = 0  # integer that determines the order in which the convergence controllers are called
 
@@ -14,7 +14,7 @@ class _Pars(FrozenClass):
 
 
 # short helper class to store status variables
-class _Status(FrozenClass):
+class Status(FrozenClass):
     '''
     Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
     relevant information about the controller are known.
@@ -41,7 +41,7 @@ class ConvergenceController(object):
             params (dict): The params passed for this specific convergence controller
             description (dict): The description object used to instantiate the controller
         '''
-        self.params = _Pars(self.setup(controller, params, description))
+        self.params = Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
         self.dependencies(controller, description)
