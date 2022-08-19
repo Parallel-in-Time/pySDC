@@ -3,6 +3,7 @@ import logging
 import numpy as np
 import scipy.linalg
 import scipy.optimize as opt
+from scipy.special import factorial
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Level import level
@@ -200,8 +201,33 @@ class sweeper(object):
                                     'implemented')
             QDmat[1:, 1:] = np.diag(x)
             self.parallelizable = True
+        elif qd_type == 'TAYLOR':
+            '''
+            Do a Taylor expansion using u0 and f(u_m) backwards in time from tau_m and solve for u_m.
+            We take as many values as we have available, meaning the order of the Taylor expansion is m.
+            That means for the first node, we get backward Euler, but for later nodes we get higher order
+            solutions and in some cases we can get more than one order per sweep.
+            '''
+            j = np.arange(len(self.coll.nodes) + 1)  # index variable
+            inv_fac = 1. / factorial(j)  # compute inverse factorials once to use in Taylor expansions
+            for i in range(1, len(self.coll.nodes) + 1):
+                t_expand = self.coll.nodes[i - 1]
+                h = np.append([0], self.coll.nodes[:i]) - t_expand  # time difference to where we expand about
+
+                # build a matrix containing the Taylor coefficients
+                A = np.zeros((i + 1, i + 1))
+                A[:, 0] = h[0]**j[:i + 1] * inv_fac[:i + 1]
+                for k in range(1, i + 1):
+                    A[1:, k] = h[k]**j[:i] * inv_fac[:i]
+
+                # build a right hand side vector for solving the system
+                b = np.zeros(i + 1)
+                b[0] = 1.
+
+                # solve the linear system
+                QDmat[i, 1: i + 1] = np.linalg.solve(A, b)[1:]
         else:
-            raise NotImplementedError('qd_type implicit not implemented')
+            raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
         # check if we got not more than a lower triangular matrix
         np.testing.assert_array_equal(np.triu(QDmat, k=1), np.zeros(QDmat.shape),
                                       err_msg='Lower triangular matrix expected!')
