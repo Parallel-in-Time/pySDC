@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.core.ConvergenceController import ConvergenceController, _Pars
+from pySDC.core.ConvergenceController import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
 
@@ -24,7 +24,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
     def __init__(self, controller, params, description):
         '''Add the buffers for communication'''
         super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
-        self.buffers = _Pars({'e_em_last': 0.})
+        self.buffers = Pars({'e_em_last': 0.})
 
     def reset_buffers_nonMPI(self, controller):
         '''
