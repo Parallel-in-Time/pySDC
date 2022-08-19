@@ -3,7 +3,6 @@ from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic im
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.transfer_classes.TransferCupyMesh import mesh_to_mesh
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import numpy as np
 import pickle
@@ -22,7 +21,7 @@ f_ex = np.zeros_like(Ns, dtype=float)
 # initialize problem parameters
 problem_params = dict()
 problem_params['nu'] = 1
-problem_params['freq'] = [4, 4, 4]
+problem_params['freq'] = (4, 4, 4)
 problem_params['order'] = 2
 problem_params['ndim'] = D
 problem_params['lintol'] = 1E-10
@@ -62,7 +61,7 @@ Tend = schritte*level_params['dt']
 controller_params = dict()
 controller_params['logger_level'] = 30
 for i, N in enumerate(Ns):
-    problem_params['nvars'] = [(N, N, N)]
+    problem_params['nvars'] = (N, N, N)
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = heatNd_periodic
@@ -71,8 +70,6 @@ for i, N in enumerate(Ns):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
-    description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
