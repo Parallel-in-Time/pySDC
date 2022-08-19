@@ -1,7 +1,8 @@
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gpu import heatNd_periodic
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_periodic
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
+from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 # initialize problem parameters
@@ -13,7 +14,7 @@ problem_params['ndim'] = 3
 problem_params['lintol'] = 1E-10
 problem_params['liniter'] = 99
 problem_params['direct_solver'] = True
-problem_params['nvars'] = (64, 64, 64)
+problem_params['nvars'] = (32, 32, 32)
 
 # initialize level parameters
 level_params = dict()
@@ -56,6 +57,8 @@ description['sweeper_class'] = imex_1st_order  # pass sweeper
 description['sweeper_params'] = sweeper_params  # pass sweeper parameters
 description['level_params'] = level_params  # pass level parameters
 description['step_params'] = step_params  # pass step parameters
+# description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
+# description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
 # instantiate controller
 controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -66,5 +69,8 @@ uinit = P.u_exact(t0)
 
 # call main function to get things done...
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+print(uinit)
+print(uend)
 timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 print('Laufzeit:', timing[0][1])
+print(P.f_im, P.f_ex)
