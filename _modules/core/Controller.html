@@ -61,7 +61,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dump_setup</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;run_pid&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_iteration_estimator</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
@@ -267,45 +266,58 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__hooks</span>
 
 <div class="viewcode-block" id="controller.setup_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.setup_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">setup_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing</span>
+<span class="sd">        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration</span>
+<span class="sd">        count or a residual based stopping criterion, as well as all convergence controllers added to the description.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">conv_classes</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">conv_classes</span><span class="p">[</span><span class="n">CheckConvergence</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># don&#39;t need special params for this, hence the {}</span>
+
+        <span class="c1"># instantiate the convergence controllers</span>
         <span class="k">for</span> <span class="n">conv_class</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">conv_classes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">conv_class</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">conv_class</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="controller.add_convergence_controller"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.add_convergence_controller">[docs]</a>    <span class="k">def</span> <span class="nf">add_convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">convergence_controller</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_double</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add an individual convergence controller to the list of convergence controllers and instiate it.</span>
+<span class="sd">        Afterwards, the order of the convergence controllers is updated.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            convergence_controller (pySDC.ConvergenceController): The convergence controller to be added</span>
+<span class="sd">            description (dict): The description object used to instantiate the controller</span>
+<span class="sd">            params (dict): Parametes for the convergence controller</span>
+<span class="sd">            allow_double (bool): Allow adding the same convergence controller multiple times</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># check if we passed any sort of special params</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span>
 
-        <span class="c1"># check if we already have it or if we want to have it multiple times</span>
+        <span class="c1"># check if we already have the convergence controller or if we want to have it multiple times</span>
         <span class="k">if</span> <span class="n">convergence_controller</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">me</span><span class="p">)</span> <span class="k">for</span> <span class="n">me</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">]</span> <span class="ow">or</span> <span class="n">allow_double</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convergence_controller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">description</span><span class="p">))</span>
 
             <span class="c1"># update ordering</span>
             <span class="n">orders</span> <span class="o">=</span> <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">control_order</span> <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">))[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">orders</span><span class="p">)]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">))[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">orders</span><span class="p">)]</span>
 
-<div class="viewcode-block" id="controller.convergence_controllers_post_step_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.convergence_controllers_post_step_processing">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_controllers_post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-        <span class="c1"># perform the convergence control operations for each controller</span>
-        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="controller.convergence_controllers_post_iteration_processing"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.convergence_controllers_post_iteration_processing">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_controllers_post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-        <span class="c1"># perform the convergence control operations for each controller</span>
-        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="controller.convergence_control"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.convergence_control">[docs]</a>    <span class="k">def</span> <span class="nf">convergence_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-        <span class="c1"># perform the convergence control operations for each controller</span>
-        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">check_iteration_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">get_new_step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">determine_restart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="controller.print_convergence_controllers"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.print_convergence_controllers">[docs]</a>    <span class="k">def</span> <span class="nf">print_convergence_controllers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order</span>
+<span class="sd">        This function is for debugging purposes to keep track of the different convergence controllers and their order.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    | order | convergence controller&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;----+-------+-------------------------------------------------------------------&#39;</span><span class="p">)</span>

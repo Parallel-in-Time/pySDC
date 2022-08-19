@@ -51,7 +51,8 @@
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh_NoCoarse</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span> <span class="k">as</span> <span class="n">mesh_to_mesh_nc</span>
-<span class="kn">from</span> <span class="nn">pySDC.playgrounds.compression.HookClass_error_output</span> <span class="kn">import</span> <span class="n">error_output</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.convergence_controller_classes.check_iteration_estimator</span> <span class="kn">import</span> <span class="n">CheckIterationEstimatorNonMPI</span>
+<span class="kn">from</span> <span class="nn">pySDC.tutorial.step_8.HookClass_error_output</span> <span class="kn">import</span> <span class="n">error_output</span>
 
 
 <span class="k">def</span> <span class="nf">setup_diffusion</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -93,10 +94,13 @@
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
+    <span class="c1"># setup the iteration estimator</span>
+    <span class="n">convergence_controllers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">convergence_controllers</span><span class="p">[</span><span class="n">CheckIterationEstimatorNonMPI</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errtol&#39;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">}</span>
+
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;use_iteration_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_output</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
@@ -107,6 +111,7 @@
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convergence_controllers</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
@@ -154,10 +159,13 @@
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;iorder&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>
     <span class="n">space_transfer_params</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
+    <span class="c1"># setup the iteration estimator</span>
+    <span class="n">convergence_controllers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">convergence_controllers</span><span class="p">[</span><span class="n">CheckIterationEstimatorNonMPI</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errtol&#39;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">}</span>
+
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;use_iteration_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_output</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
@@ -168,6 +176,7 @@
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convergence_controllers</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh</span>  <span class="c1"># pass spatial transfer class</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">space_transfer_params</span>  <span class="c1"># pass paramters for spatial transfer</span>
@@ -203,10 +212,13 @@
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-07</span>
 
+    <span class="c1"># setup the iteration estimator</span>
+    <span class="n">convergence_controllers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">convergence_controllers</span><span class="p">[</span><span class="n">CheckIterationEstimatorNonMPI</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errtol&#39;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">}</span>
+
     <span class="c1"># initialize controller parameters</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;logger_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;use_iteration_estimator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_output</span>
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
@@ -217,6 +229,7 @@
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>  <span class="c1"># pass step parameters</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;convergence_controllers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convergence_controllers</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_to_mesh_nc</span>  <span class="c1"># pass spatial transfer class</span>
 
@@ -243,17 +256,20 @@
                 <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nsteps</span>
                 <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup_diffusion</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">ml</span><span class="p">)</span>
+                <span class="n">mean_number_of_iterations</span> <span class="o">=</span> <span class="mf">3.00</span> <span class="k">if</span> <span class="n">ml</span> <span class="k">else</span> <span class="mf">5.75</span>
             <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;advection&#39;</span><span class="p">:</span>
                 <span class="c1"># set time parameters</span>
                 <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nsteps</span>
                 <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup_advection</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">ml</span><span class="p">)</span>
+                <span class="n">mean_number_of_iterations</span> <span class="o">=</span> <span class="mf">2.00</span> <span class="k">if</span> <span class="n">ml</span> <span class="k">else</span> <span class="mf">4.00</span>
             <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;auzinger&#39;</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
                 <span class="c1"># set time parameters</span>
                 <span class="n">t0</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">Tend</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">/</span> <span class="n">nsteps</span>
                 <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span> <span class="o">=</span> <span class="n">setup_auzinger</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">ml</span><span class="p">)</span>
+                <span class="n">mean_number_of_iterations</span> <span class="o">=</span> <span class="mf">3.62</span> <span class="k">if</span> <span class="n">ml</span> <span class="k">else</span> <span class="mf">5.62</span>
 
             <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Running </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="n">ndim</span><span class="si">}</span><span class="s1"> dimensions with time-step size </span><span class="si">{</span><span class="n">dt</span><span class="si">}</span><span class="s1">...</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -306,6 +322,8 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mean_number_of_iterations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="se">\</span>
+<span class="si">{</span><span class="n">mean_number_of_iterations</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> mean iterations, but got </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
@@ -327,86 +345,86 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 5.75
-   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 8.6491e-09
-   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 2.9864e-08
-   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 3.5302e-09
-   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 4.9221e-09
-   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 6.2372e-09
-   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 7.4551e-09
-   Errors after step   0.8750 with 6 iterations: 3.6531e-08 / 8.5567e-09
-   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 9.5247e-09
+   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 3.6737e-13
+   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 6.0840e-13
+   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 6.0385e-13
+   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 3.6682e-13
+   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 5.6413e-13
+   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 4.7964e-13
+   Errors after step   0.8750 with 6 iterations: 3.6531e-08 / 3.5039e-13
+   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 3.4467e-13
 
-...done, took 1.4298165270001846 seconds!
+...done, took 0.34667788799970367 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 3.00
-   Errors after step   0.1250 with 3 iterations: 9.8194e-09 / 6.6472e-10
-   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 2.2937e-09
-   Errors after step   0.3750 with 3 iterations: 2.2850e-08 / 3.8871e-09
-   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 5.4197e-09
-   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 6.8678e-09
-   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 8.2087e-09
-   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 9.4215e-09
-   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 1.0487e-08
+   Errors after step   0.1250 with 3 iterations: 9.8194e-09 / 5.5111e-13
+   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 5.8820e-13
+   Errors after step   0.3750 with 3 iterations: 2.2850e-08 / 6.2939e-13
+   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 5.4690e-13
+   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 5.6910e-13
+   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 6.2106e-13
+   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 3.7814e-13
+   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 3.3412e-13
 
-...done, took 3.4148661500003072 seconds!
+...done, took 0.7679369289999158 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 4.00
-   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 3.1514e-09
-   Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 3.1527e-09
-   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 3.1529e-09
-   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 3.1519e-09
-   Errors after step   0.6250 with 4 iterations: 1.8225e-08 / 3.1496e-09
-   Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 3.1514e-09
-   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 3.1527e-09
-   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 3.1529e-09
+   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 3.3307e-16
+   Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 4.4409e-16
+   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 3.3307e-16
+   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 5.5511e-16
+   Errors after step   0.6250 with 4 iterations: 1.8225e-08 / 4.4409e-16
+   Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 3.3307e-16
+   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 5.5511e-16
+   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 4.4409e-16
 
-...done, took 0.2788217040001655 seconds!
+...done, took 0.21008732700011024 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 2.00
-   Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.2776e-09
-   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.2768e-09
-   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.2704e-09
-   Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.2797e-09
-   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.2688e-09
-   Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.2776e-09
-   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.2768e-09
-   Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.2704e-09
+   Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.1852e-13
+   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.1886e-13
+   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.1863e-13
+   Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.1886e-13
+   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.1852e-13
+   Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.1841e-13
+   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1886e-13
+   Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 0.7601956889998291 seconds!
+...done, took 0.6036888190001264 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 5.62
-   Errors after step   0.1250 with 5 iterations: 4.6598e-09 / 4.0224e-09
-   Errors after step   0.2500 with 5 iterations: 8.0010e-09 / 7.0014e-09
-   Errors after step   0.3750 with 5 iterations: 1.4700e-08 / 1.0859e-08
-   Errors after step   0.5000 with 6 iterations: 1.5583e-08 / 8.8100e-10
-   Errors after step   0.6250 with 6 iterations: 2.1829e-08 / 1.4698e-09
-   Errors after step   0.7500 with 6 iterations: 2.6153e-08 / 2.5605e-09
-   Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 3.9548e-09
-   Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 5.5334e-09
+   Errors after step   0.1250 with 5 iterations: 4.6598e-09 / 0.0000e+00
+   Errors after step   0.2500 with 5 iterations: 8.0010e-09 / 0.0000e+00
+   Errors after step   0.3750 with 5 iterations: 1.4700e-08 / 0.0000e+00
+   Errors after step   0.5000 with 6 iterations: 1.5583e-08 / 0.0000e+00
+   Errors after step   0.6250 with 6 iterations: 2.1829e-08 / 0.0000e+00
+   Errors after step   0.7500 with 6 iterations: 2.6153e-08 / 0.0000e+00
+   Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
+   Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.5165948040003059 seconds!
+...done, took 0.1534117480000532 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 3.62
-   Errors after step   0.1250 with 3 iterations: 4.2389e-09 / 1.7594e-09
-   Errors after step   0.2500 with 3 iterations: 8.4469e-09 / 2.8400e-09
-   Errors after step   0.3750 with 3 iterations: 1.1763e-08 / 4.2048e-09
-   Errors after step   0.5000 with 4 iterations: 1.7832e-08 / 5.1321e-11
-   Errors after step   0.6250 with 4 iterations: 2.3399e-08 / 8.4754e-11
-   Errors after step   0.7500 with 4 iterations: 2.8017e-08 / 1.5106e-10
-   Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 2.3830e-10
-   Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 3.3903e-10
+   Errors after step   0.1250 with 3 iterations: 4.2389e-09 / 0.0000e+00
+   Errors after step   0.2500 with 3 iterations: 8.4469e-09 / 0.0000e+00
+   Errors after step   0.3750 with 3 iterations: 1.1763e-08 / 0.0000e+00
+   Errors after step   0.5000 with 4 iterations: 1.7832e-08 / 0.0000e+00
+   Errors after step   0.6250 with 4 iterations: 2.3399e-08 / 0.0000e+00
+   Errors after step   0.7500 with 4 iterations: 2.8017e-08 / 0.0000e+00
+   Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
+   Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.9562323750001269 seconds!
+...done, took 0.18784501000027376 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>

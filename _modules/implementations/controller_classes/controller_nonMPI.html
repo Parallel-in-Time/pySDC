@@ -115,51 +115,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;you have specified a predictor type but only a single level.. &#39;</span>
                                 <span class="s1">&#39;predictor will be ignored&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">add_convergence_controller</span><span class="p">(</span><span class="n">BasicRestartingNonMPI</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">reset_global_variables_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-<div class="viewcode-block" id="controller_nonMPI.check_iteration_estimator"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.check_iteration_estimator">[docs]</a>    <span class="k">def</span> <span class="nf">check_iteration_estimator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MS</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method to check the iteration estimator</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            MS (list): list of currently active steps</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">diff_new</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="n">Kest_loc</span> <span class="o">=</span> <span class="mi">99</span>
-
-        <span class="c1"># go through active steps and compute difference, Ltilde, Kest up to this step</span>
-        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">L</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">coll</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="n">diff_new</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">diff_new</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">uold</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
-
-            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">diff_old_loc</span> <span class="o">=</span> <span class="n">diff_new</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">diff_first_loc</span> <span class="o">=</span> <span class="n">diff_new</span>
-            <span class="k">elif</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">Ltilde_loc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">diff_new</span> <span class="o">/</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">diff_old_loc</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">)</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">diff_old_loc</span> <span class="o">=</span> <span class="n">diff_new</span>
-                <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">Ltilde_loc</span><span class="p">)</span> <span class="o">*</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">diff_first_loc</span>
-                <span class="n">Kest_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">errtol</span> <span class="o">/</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Ltilde_loc</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.05</span>  <span class="c1"># Safety factor!</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;LOCAL: </span><span class="si">{</span><span class="n">L</span><span class="o">.</span><span class="n">time</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">Kest_loc</span><span class="p">))</span><span class="si">}</span><span class="s1">, &#39;</span>
-                                  <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Ltilde_loc</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">Kest_loc</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">Ltilde_loc</span> <span class="o">**</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">*</span> <span class="n">alpha</span><span class="si">:</span><span class="s1">8.6e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="c1"># You should not stop prematurely on earlier steps, since later steps may need more accuracy to reach</span>
-                <span class="c1"># the tolerance themselves. The final Kest_loc is the one that counts.</span>
-                <span class="c1"># if np.ceil(Kest_loc) &lt;= S.status.iter:</span>
-                <span class="c1">#     S.status.force_done = True</span>
-
-        <span class="c1"># set global Kest as last local one, force stop if done</span>
-        <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">Kest_glob</span> <span class="o">=</span> <span class="n">Kest_loc</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">Kest_glob</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span><span class="p">:</span>
-                    <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">force_done</span> <span class="o">=</span> <span class="kc">True</span></div>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">C</span><span class="o">.</span><span class="n">setup_status_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="controller_nonMPI.run"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -226,7 +186,8 @@
                 <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="n">active_slots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">dt</span>
 
             <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">MS_active</span><span class="p">[:</span><span class="n">restart_at</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers_post_step_processing</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                    <span class="n">C</span><span class="o">.</span><span class="n">post_step_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
                 <span class="p">[</span><span class="n">C</span><span class="o">.</span><span class="n">prepare_next_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_slots</span><span class="p">),</span> <span class="n">time</span><span class="p">,</span> <span class="n">Tend</span><span class="p">)</span> <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MS</span><span class="p">]</span>
@@ -378,15 +339,14 @@
             <span class="c1"># call predictor from sweeper</span>
             <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span><span class="p">:</span>
-                <span class="c1"># store previous iterate to compute difference later on</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span>
-
             <span class="c1"># update stage</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># MLSDC or PFASST with predict</span>
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;PREDICT&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_CHECK&#39;</span></div>
+                <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_CHECK&#39;</span>
+
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">post_spread_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="controller_nonMPI.predict"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -555,17 +515,15 @@
 
             <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep</span><span class="o">.</span><span class="n">compute_residual</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">use_iteration_estimator</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_iteration_estimator</span><span class="p">(</span><span class="n">local_MS_running</span><span class="p">)</span>
-
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers_post_iteration_processing</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">post_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
             <span class="c1"># decide if the step is done, needs to be restarted and other things convergence related</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_control</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">post_iteration_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+                <span class="n">C</span><span class="o">.</span><span class="n">convergence_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">S</span> <span class="ow">in</span> <span class="n">local_MS_running</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
@@ -584,10 +542,6 @@
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">iter</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hooks</span><span class="o">.</span><span class="n">pre_iteration</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">S</span><span class="p">,</span> <span class="n">level_number</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_uold</span><span class="p">:</span>
-                    <span class="c1"># store previous iterate to compute difference later on</span>
-                    <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">uold</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">u</span><span class="p">[:]</span>
-
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">levels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># MLSDC or PFASST</span>
                     <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;IT_DOWN&#39;</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># SDC or MSSDC</span>
@@ -601,7 +555,7 @@
                 <span class="n">S</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;DONE&#39;</span>
 
         <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_controllers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_controller_order</span><span class="p">]:</span>
-            <span class="n">C</span><span class="o">.</span><span class="n">reset_global_variables_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+            <span class="n">C</span><span class="o">.</span><span class="n">reset_buffers_nonMPI</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="controller_nonMPI.it_fine"><a class="viewcode-back" href="../../../pySDC/implementations.controller_classes.html#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine">[docs]</a>    <span class="k">def</span> <span class="nf">it_fine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_MS_running</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
