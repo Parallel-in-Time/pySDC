@@ -81,7 +81,6 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.coeff.f = [0.] * self.params.n
         return None
 
-
     def check_parameters(self, controller, params, description):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
