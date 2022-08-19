@@ -33,6 +33,14 @@ class ConvergenceController(object):
     """
 
     def __init__(self, controller, params, description):
+        '''
+        Initialization routine
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+        '''
         self.params = _Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
@@ -228,7 +236,7 @@ class ConvergenceController(object):
 
         Args:
             controller (pySDC.Controller): The controller
-            S (pySDC.Step): The current step
+            MS (list): All steps of the controller
             active_slots (list): Index list of active steps
             time (float): The current time
             Tend (float): The final time
