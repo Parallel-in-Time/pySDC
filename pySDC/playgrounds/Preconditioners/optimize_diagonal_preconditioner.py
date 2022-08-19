@@ -9,7 +9,7 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon, DiagPreconIMEX
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity  # , AdaptivityResidual
 
 
 class log_cost(hooks):
@@ -52,7 +52,10 @@ def objective_function_diagonal(x, *args):
 
     # setup adaptivity and problem parameters
     custom_description = {
-        'convergence_controllers': {Adaptivity: {'e_tol': args[2]}}
+        'convergence_controllers': {
+            Adaptivity: {'e_tol': args[2]},
+            # AdaptivityResidual: {'e_tol': args[4], 'max_restarts': 99}
+        }
     }
     problem_params = args[3]
 
@@ -80,9 +83,11 @@ def objective_function_diagonal(x, *args):
     e_em = max([me[1] for me in get_sorted(stats, type='e_em', recomputed=False)])
 
     # return the score
-    print(x, k, f'e={e:.2e}', f'e_em={e_em:.2e}')
+    score = k * e / args[6]
+    print(f's={score:7.0f} | k: {k - args[5]:5} | e: {e / args[6]:.2e} | e_em: {e_em / args[7]:.2e}', x)
+    # print(x, k, f'e={e:.2e}', f'e_em={e_em:.2e}')
 
-    return k
+    return score
 
 
 def plot_errors(stats, u_end, exact):
@@ -99,20 +104,21 @@ def plot_errors(stats, u_end, exact):
 
 
 if __name__ == '__main__':
-    args_vdp = (run_vdp, DiagPrecon, 2e-5, None)
-    args_piline = (run_piline, DiagPreconIMEX, 1e-7, None)
-    args_advection = (run_advection, DiagPrecon, 1e-9, {'freq': -1, 'sigma': 6e-2})
+    # parameters are: problem, sweeper, adaptivity tolerance, problem_params, adaptivity residual tolerance, k, e, e_em
+    args_vdp = (run_vdp, DiagPrecon, 2e-5, None, 1., 1, 1, 1)
+    args_piline = (run_piline, DiagPreconIMEX, 1e-7, None, np.inf, 2416, 4.14e-8, 7.27e-8)
+    args_advection = (run_advection, DiagPrecon, 1e-9, {'freq': -1, 'sigma': 6e-2}, 2e-11, 475, 5.98e-8, 5.91e-10)
 
-    args = args_advection
+    args = args_piline
     num_nodes = 3
-    initial_guess = np.random.rand(num_nodes)
-    # initial_guess = np.ones(num_nodes) * 1./2.
+    # initial_guess = np.random.rand(num_nodes)
+    initial_guess = np.ones(num_nodes) * 0.5
     # initial_guess = [0.73583259, 0.14629964, 0.44240191] #  320 iterations for vdp (local minimum)
     # initial_guess = [0.53941499, 0.47673377, 0.47673299] #  20 iterations for advection (local minimum)
     bounds = [(0, 1) for i in initial_guess]
     tol = 1e-16
     print(minimize(objective_function_diagonal, initial_guess, args=args, tol=tol, bounds=bounds, method='nelder-mead'))
     objective_function_diagonal([None], *args)
-    plt.show()
-    objective_function_diagonal([0.19915688, 0.27594549, 0.27594545], *args)
-    plt.show()
+    # plt.show()
+    # objective_function_diagonal([0.19915688, 0.27594549, 0.27594545], *args)
+    # plt.show()

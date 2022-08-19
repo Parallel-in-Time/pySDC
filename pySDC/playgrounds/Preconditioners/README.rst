@@ -33,3 +33,4 @@ TODO
 ----
  - Try adaptivity with extrapolation estimate instead of embedded estimate
  - Penalize a bad solve of the problem by checking the residual during run time
+ - Do heatmap with dahlquist problems instead of advection
