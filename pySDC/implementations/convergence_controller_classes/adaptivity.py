@@ -2,6 +2,7 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
+from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 
@@ -209,3 +210,126 @@ _params\'][\'e_tol\']!'
             float: Embedded error estimate
         '''
         return S.levels[0].status.error_embedded_estimate
+
+
+class AdaptivityResidual(AdaptivityBase):
+    '''
+    Do adaptivity based on residual.
+
+    Since we don't know a correlation between the residual and the error (for nonlinear problems), we employ a simpler
+    rule to update the step size. Instead of giving a local tolerance that we try to hit as closely as possible, we set
+    two thresholds for the residual. When we exceed the upper one, we reduce the step size by a factor of 2 and if the
+    residual falls below the lower threshold, we double the step size.
+    '''
+
+    def setup(self, controller, params, description):
+        '''
+        Define default parameters here.
+
+        Default parameters are:
+         - control_order (int): The order relative to other convergence controllers
+         - e_tol_low (float): Lower absolute threshold for the residual
+         - e_tol (float): Upper absolute threshold for the residual
+         - max_restarts: Override maximum number of restarts
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            (dict): The updated params dictionary
+        '''
+        defaults = {
+            'control_order': -45,
+            'e_tol_low': 0,
+            'e_tol': np.inf,
+            'max_restarts': 2 if 'e_tol_low' in params else None
+        }
+        return {**defaults, **params}
+
+    def setup_status_variables(self, controller):
+        '''
+        Change maximum number of allowed restarts here.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Reutrns:
+            None
+        '''
+        if self.params.max_restarts is not None:
+            conv_controllers = controller.convergence_controllers
+            restart_cont = [me for me in conv_controllers if type(me) == BasicRestartingNonMPI]
+
+            if len(restart_cont) == 0:
+                raise NotImplementedError("Please implement override of maximum number of restarts!")
+
+            restart_cont[0].params.max_restarts = self.params.max_restarts
+        return None
+
+    def check_parameters(self, controller, params, description):
+        '''
+        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+        For adaptivity, we want a fixed order of the scheme.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        '''
+        if description['step_params'].get('restol', -1.) >= 0:
+            return False, 'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!'
+
+        if controller.params.mssdc_jac:
+            return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
+
+        return True, ''
+
+    def get_new_step_size(self, controller, S):
+        '''
+        Determine a step size for the next step.
+        If we exceed the absolute tolerance of the residual in either direction, we either double or halve the step
+        size.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        '''
+        # check if we performed the desired amount of sweeps
+        if S.status.iter == S.params.maxiter:
+            L = S.levels[0]
+
+            res = self.get_local_error_estimate(controller, S)
+
+            dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
+
+            if res > self.params.e_tol:
+                L.status.dt_new = min([dt_planned, L.params.dt / 2.])
+                self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
+            elif res < self.params.e_tol_low:
+                L.status.dt_new = max([dt_planned, L.params.dt * 2.])
+                self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
+
+        return None
+
+    def get_local_error_estimate(self, controller, S, **kwargs):
+        '''
+        Get the residual of the finest level of the step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            float: Embedded error estimate
+        '''
+        return S.levels[0].status.residual
