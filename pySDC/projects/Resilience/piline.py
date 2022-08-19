@@ -273,7 +273,6 @@ def main():
             custom_description['convergence_controllers'][HotRod] = {'HotRod_tol': 1, 'no_storage': num_procs > 1}
             stats, _, _ = run_piline(custom_description, num_procs=num_procs)
             data = get_data(stats)
-            check_solution(data, use_adaptivity, num_procs, generate_reference)
             fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
             plot_error(data, ax, use_adaptivity)
             if use_adaptivity:
@@ -284,6 +283,7 @@ def main():
                 sol_fig, sol_ax = plt.subplots(1, 1, figsize=(3.5, 3))
                 plot_solution(data, sol_ax)
                 sol_fig.savefig('data/piline_solution_adaptive.png', bbox_inches='tight', dpi=300)
+            check_solution(data, use_adaptivity, num_procs, generate_reference)
 
 
 if __name__ == "__main__":
