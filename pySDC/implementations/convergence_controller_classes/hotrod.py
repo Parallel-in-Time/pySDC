@@ -12,7 +12,7 @@ class HotRod(ConvergenceController):
     Class that incorporates the Hot Rod detector [1] for soft faults. Based on comparing two estimates of the local
     error.
 
-    Default control order is -45.
+    Default control order is -40.
 
     See for the reference:
     [1]: Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
@@ -33,7 +33,7 @@ class HotRod(ConvergenceController):
         '''
         default_params = {
             'HotRod_tol': np.inf,
-            'control_order': -45,
+            'control_order': -40,
             'no_storage': False
         }
         return {**default_params, **params}
