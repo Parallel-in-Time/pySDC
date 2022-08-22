@@ -69,7 +69,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi"
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
 
       - name: Store results
         if: matrix.py == '3.10'
@@ -309,3 +309,43 @@ jobs:
 #        with:
 #          branch: gh-pages # The branch the action should deploy to.
 #          folder: docs/build/html # The folder the action should deploy.
+
+
+  benchmark:
+    runs-on: ubuntu-latest
+
+    needs:
+      - test_base
+      - test_fenics
+      - test_petsc
+      - test_mpi
+
+    env:
+      YML: 'etc/environment-base.yml'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    strategy:
+      matrix:
+        py: [ "3.7", "3.8", "3.9", "3.10" ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+#      - name: Add packages
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: ${{ env.YML }}
+          extra-specs: python = ${{ matrix.py }}
+
+      - name: Run pytest
+        run: |
+          pytest --benchmark-json --continue-on-collection-errors -v pySDC/tests -m "benchmark"
