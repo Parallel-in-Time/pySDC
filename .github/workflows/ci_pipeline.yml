@@ -327,10 +327,6 @@ jobs:
       run:
         shell: bash -l {0}
 
-    strategy:
-      matrix:
-        py: [ "3.7", "3.8", "3.9", "3.10" ]
-
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -344,8 +340,27 @@ jobs:
         uses: mamba-org/provision-with-micromamba@main
         with:
           environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
+          extra-specs: python = 3.10
 
       - name: Run pytest
         run: |
-          pytest --benchmark-json --continue-on-collection-errors -v pySDC/tests -m "benchmark"
+          pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json 
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: pySDC Benchmark with pytest-benchmark
+          tool: 'pytest'
+          output-file-path: output.json
+          auto-push: false
+
+#      - name: Pushes to another repository
+#        uses: cpina/github-action-push-to-another-repository@main
+#        env:
+#          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+#        with:
+#          source-directory: 'output'
+#          destination-github-username: 'pancetta'
+#          destination-repository-name: 'pySDC-benchmarks'
+#          user-email: sig.pancetta+github@gmail.com
+#          target-branch: main
