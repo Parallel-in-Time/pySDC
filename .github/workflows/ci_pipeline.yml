@@ -352,10 +352,13 @@ jobs:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
           output-file-path: output.json
+          benchmark-data-dir-path: dev/bench
           auto-push: false
 
       - name: ls
-        run: ls -artl .
+        run: |
+          ls -artl .
+          ls -artl dev/bench
 #      - name: Pushes to another repository
 #        uses: cpina/github-action-push-to-another-repository@main
 #        env:
