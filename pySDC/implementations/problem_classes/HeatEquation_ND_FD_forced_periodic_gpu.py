@@ -72,7 +72,7 @@ class heatNd_periodic(ptype):
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.ndim, self.params.order)
         xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = csp.eye(cp.prod(self.params.nvars), format='csc')
+        self.Id = csp.eye(self.params.nvars[0]**self.params.ndim, format='csc')
         self.f_im = 0
         self.f_ex = 0
 
