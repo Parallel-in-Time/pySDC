@@ -354,6 +354,8 @@ jobs:
           output-file-path: output.json
           auto-push: false
 
+      - name: ls
+        run: ls -artl .
 #      - name: Pushes to another repository
 #        uses: cpina/github-action-push-to-another-repository@main
 #        env:
