@@ -7,15 +7,15 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import numpy as np
 import pickle
 import matplotlib.pylab as plt
-name = 'pickle/heat-jusuf-pySDC-cpu_f.pickle'
-# name = 'pickle/heat-jusuf-pySDC-gpu_f.pickle'
+name = 'pickle/heat-jusuf-pySDC-cpu.pickle'
+# name = 'pickle/heat-jusuf-pySDC-gpu.pickle'
 Ns = np.asarray([16, 32, 64, 128, 256])
 D = 3
 # Ns = np.asarray([128, 256, 512])
 times = np.zeros_like(Ns, dtype=float)
 setup = np.zeros_like(Ns, dtype=float)
 cg = np.zeros_like(Ns, dtype=float)
-cg_Count = np.zeros_like(Ns)
+# cg_Count = np.zeros_like(Ns)
 f_im = np.zeros_like(Ns, dtype=float)
 f_ex = np.zeros_like(Ns, dtype=float)
 # initialize problem parameters
@@ -26,7 +26,7 @@ problem_params['order'] = 2
 problem_params['ndim'] = D
 problem_params['lintol'] = 1E-10
 problem_params['liniter'] = 99
-problem_params['direct_solver'] = True
+problem_params['direct_solver'] = False
 
 # initialize level parameters
 level_params = dict()
@@ -89,7 +89,7 @@ for i, N in enumerate(Ns):
     timing_step = sort_stats(filter_stats(stats, type='timing_step'), sortby='time')
     timing_step = [ts[1] for ts in timing_step]
     cg[i] = np.asarray(sum(timing_step))
-    cg_Count[i] = P.lin_ncalls
+    # cg_Count[i] = P.lin_ncalls
     f_im[i] = P.f_im
     f_ex[i] = P.f_ex
 # write down stats to .pickle file
@@ -99,11 +99,11 @@ data = {
     'dt': level_params['dt'],
     'schritte': schritte,
     'iteration': step_params['maxiter'],
-    'Tolerance': problem_params['lin_tol'],
+    'Tolerance': problem_params['lintol'],
     'times': times,
     'setup': setup,
     'cg-time': cg,
-    'cg-count': cg_Count,
+    # 'cg-count': cg_Count,
     'f-time-imp': f_im,
     'f-time-exp': f_ex
 
