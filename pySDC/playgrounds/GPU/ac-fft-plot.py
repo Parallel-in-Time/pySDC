@@ -1,8 +1,10 @@
 import pickle
+import numpy as np
 import matplotlib.pyplot as plt
 
-name_cpu = f'pickle/heat-jusuf-pySDC-cpu.pickle'
-name_gpu = 'pickle/heat-jusuf-pySDC-gpu.pickle'
+# name = 'pickle/ac-jusuf-pySDC.pickle'
+name_cpu = f'pickle/ac-jusuf-pySDC-cpu_f.pickle'
+name_gpu = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
 with open(name_cpu, 'rb') as f:
    data_cpu = pickle.load(f)
 Ns = data_cpu['Ns']
@@ -12,24 +14,22 @@ schritte = data_cpu['schritte']
 dt = data_cpu['dt']
 iteration = data_cpu['iteration']
 tol = data_cpu['Tolerance']
-# times_CPU = data_cpu['times']
+times_CPU = data_cpu['times']
 setup_CPU = data_cpu['setup']
 cg_CPU = data_cpu['cg-time']-0.08*data_cpu['cg-time']
-# cg_Count_CPU = data_cpu['cg-count']
+cg_Count_CPU = data_cpu['cg-count']
 f_im_CPU = data_cpu['f-time-imp']
 f_ex_CPU = data_cpu['f-time-exp']
 with open(name_gpu, 'rb') as f:
    data_gpu = pickle.load(f)
 print(data_gpu['f-time-imp'])
-# times_GPU = data_gpu['times']
+times_GPU = data_gpu['times']
 setup_GPU = data_gpu['setup']
 cg_GPU = data_gpu['cg-time']-0.08*data_gpu['cg-time']
-# cg_Count_GPU = data_gpu['cg-count']
+cg_Count_GPU = data_gpu['cg-count']
 f_im_GPU = data_gpu['f-time-imp']
 f_ex_GPU = data_gpu['f-time-exp']
 
-times_CPU = cg_CPU+f_im_CPU+f_ex_CPU
-times_GPU = cg_GPU+f_im_GPU+f_ex_GPU
 # Start Plotting Time Marching
 ##############################################################################
 Ns_plot = Ns**D
@@ -40,7 +40,7 @@ plt.plot(Ns_plot, times_CPU)
 plt.xscale('log')
 plt.yscale('log')
 # plt.title("Simple SDC (GMRES) Allen-Cahn 2D:\nGPU vs CPU only time_marching")
-plt.title("pySDC WLG 3D:\nGPU vs CPU only time_marching")
+plt.title("pySDC Allen-Cahn 2D:\nGPU vs CPU only time_marching")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Time in s')
 plt.legend()
@@ -55,7 +55,7 @@ plt.scatter(Ns_plot, setup_CPU, label="CPU")
 plt.plot(Ns_plot, setup_CPU)
 plt.xscale('log')
 plt.yscale('log')
-plt.title("pySDC WLG 3D:\nGPU vs CPU only Setup")
+plt.title("pySDC Allen-Cahn 2D:\nGPU vs CPU only Setup")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Time in s')
 plt.legend()
@@ -71,7 +71,7 @@ plt.scatter(Ns_plot, cg_CPU/cg_GPU-0.08*(cg_CPU/cg_GPU), label="Factor cg")
 print(cg_CPU/cg_GPU)
 plt.xscale('log')
 plt.yscale('log')
-plt.title("pySDC WLG 3D:\nCPU / GPU")
+plt.title("pySDC Allen-Cahn 2D:\nCPU / GPU")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Factor')
 plt.legend()
@@ -82,14 +82,13 @@ plt.scatter(Ns_plot, f_im_CPU/f_im_GPU, label="Factor f implizit")
 plt.scatter(Ns_plot, f_ex_CPU/f_ex_GPU, label="Factor f explizit")
 plt.xscale('log')
 plt.yscale('log')
-plt.title("pySDC WLG 3D:\nCPU / GPU")
+plt.title("pySDC Allen-Cahn 2D:\nCPU / GPU")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Factor')
 plt.legend()
 # plt.savefig('pdfs/allen-cahn_jusuf_factors_f_log2.pdf')
 plt.show()
 plt.clf()
-"""
 # Start Plotting Bar-GMRES-Count
 ##############################################################################
 width = 30
@@ -105,7 +104,6 @@ plt.legend()
 # plt.savefig('pdfs/allen-cahn_jusuf_count2.pdf')
 plt.show()
 plt.clf()
-"""
 # Start Plotting Error
 ##############################################################################
 """
@@ -135,7 +133,7 @@ plt.scatter(Ns_plot, f_ex_GPU, label="f explizit")
 plt.plot(Ns_plot, f_ex_GPU)
 plt.xscale('log')
 plt.yscale('log')
-plt.title("pySDC WLG 3D:\nGPU All Times")
+plt.title("pySDC Allan-Cahn 2D:\nGPU All Times")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Time in s')
 plt.legend()
@@ -152,7 +150,7 @@ plt.scatter(Ns_plot, f_ex_CPU, label="f explizit")
 plt.plot(Ns_plot, f_ex_CPU)
 plt.xscale('log')
 plt.yscale('log')
-plt.title("pySDC WLG 3D:\nCPU All Times")
+plt.title("pySDC Allan-Cahn 2D:\nCPU All Times")
 plt.xlabel('degrees of freedom')
 plt.ylabel('Time in s')
 plt.legend()
