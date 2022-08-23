@@ -352,8 +352,7 @@ jobs:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
           output-file-path: output.json
-          benchmark-data-dir-path: dev/bench
-          auto-push: false
+          auto-push: true
           gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
           gh-pages-branch: main
           github-token: ${{ secrets.BENCHMARK_BOT }}
@@ -361,7 +360,7 @@ jobs:
       - name: ls
         run: |
           ls -artl .
-          ls -artl dev/bench
+          ls -artl benchmark-data-repository
 #      - name: Pushes to another repository
 #        uses: cpina/github-action-push-to-another-repository@main
 #        env:
