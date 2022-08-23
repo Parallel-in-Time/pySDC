@@ -169,12 +169,13 @@ class heatNd_periodic(ptype):
                           tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
         Routine to compute the exact solution at time t
 
         Args:
             t (float): current time
+            u_init, t_init: Dummy variables to provide unified interface
 
         Returns:
             dtype_u: exact solution
