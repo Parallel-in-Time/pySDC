@@ -14,10 +14,7 @@ quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 @pytest.mark.benchmark
 def test_benchmark_collocation(benchmark):
-
-    for node_type in node_types:
-        for quad_type in quad_types:
-            benchmark(test_canintegratepolynomials, node_type, quad_type)
+    benchmark(test_canintegratepolynomials)
 
 
 @pytest.mark.parametrize("node_type", node_types)
