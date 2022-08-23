@@ -30,7 +30,7 @@ class log_data(hooks):
                           sweep=L.status.sweep, type='voltage C', value=L.uend[1])
 
 
-def main():
+def main(use_switch_estimator=True):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
     """
@@ -58,19 +58,21 @@ def main():
     problem_params['L'] = 1
     problem_params['alpha'] = 10
     problem_params['V_ref'] = 1
+    problem_params['set_switch'] = False
+    problem_params['t_switch'] = False
 
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 20
 
-    # convergence controllers
-    switch_estimator_params = {}
-    convergence_controllers = {SwitchEstimator: switch_estimator_params}
-
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data
+
+    # convergence controllers
+    switch_estimator_params = {}
+    convergence_controllers = {SwitchEstimator: switch_estimator_params}
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -80,7 +82,9 @@ def main():
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description['convergence_controllers'] = convergence_controllers
+
+    if use_switch_estimator:
+        description['convergence_controllers'] = convergence_controllers
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
@@ -133,6 +137,8 @@ def main():
 
     plot_voltages()
 
+    return np.mean(niters)
+
 
 def plot_voltages(cwd='./'):
     """
@@ -159,6 +165,17 @@ def plot_voltages(cwd='./'):
     ax.set_ylabel('Energy')
 
     fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+
+
+def estimation_check():
+    use_switch_estimator = [True, False]
+    niters_mean = []
+    for item in use_switch_estimator:
+        niters_mean.append(main(use_switch_estimator=item))
+
+    for item, element in zip(use_switch_estimator, niters_mean):
+        out = 'Switch estimation: {} -- Average number of iterations: {}'.format(item, element)
+        print(out)
 
 
 if __name__ == "__main__":
