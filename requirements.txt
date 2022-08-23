@@ -7,6 +7,7 @@ matplotlib>=3.0
 numba>=0.35
 sympy>=1.0
 # These packages are required for some of the more involved examples (and data types etc.), can be omitted
+mpich
 petsc4py>=3.10.0
 mpi4py>=3.0.0
 fenics>=2019.1.0

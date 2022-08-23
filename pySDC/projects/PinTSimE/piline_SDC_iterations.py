@@ -88,7 +88,7 @@ def plot_SDC_iterations():
         Routine to plot the residuals for each SDC run
     """
 
-    num_nodes = [3, 5, 7]
+    num_nodes = [3, 5]
     dt_list = [1e-2, 1e-3, 1e-4, 1e-5]
     num_procs = 1
     iter_nodes_asarray = np.zeros((len(dt_list), len(num_nodes)))
@@ -160,4 +160,4 @@ def plot_PFASST_iterations():
 
 
 if __name__ == "__main__":
-    plot_PFASST_iterations()
+    plot_SDC_iterations()

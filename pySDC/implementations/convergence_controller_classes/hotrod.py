@@ -9,20 +9,46 @@ from pySDC.implementations.convergence_controller_classes.estimate_extrapolation
 
 class HotRod(ConvergenceController):
     """
+    Class that incorporates the Hot Rod detector [1] for soft faults. Based on comparing two estimates of the local
+    error.
+
+    Default control order is -40.
+
     See for the reference:
-    Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
-    Guhur et al. 2016, Springer. DOI: 10.1007/978-3-319-43659-3_47
+    [1]: Lightweight and Accurate Silent Data Corruption Detection in Ordinary Differential Equation Solvers,
+    Guhur et al. 2016, Springer. DOI: https://doi.org/10.1007/978-3-319-43659-3_47
     """
 
     def setup(self, controller, params, description):
+        '''
+        Setup default values for crucial parameters.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            dict: The updated params
+        '''
         default_params = {
             'HotRod_tol': np.inf,
-            'control_order': -45,
+            'control_order': -40,
             'no_storage': False
         }
         return {**default_params, **params}
 
     def dependencies(self, controller, description):
+        '''
+        Load the dependencies of Hot Rod, which are the two error estimators
+
+        Args:
+            controller (pySDC.Controller): The controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        '''
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
             controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI, description=description,
@@ -34,8 +60,14 @@ class HotRod(ConvergenceController):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
         Returns:
-            Whether the parameters are compatible
+            bool: Whether the parameters are compatible
+            str: Error message
         '''
         if self.params.HotRod_tol == np.inf:
             controller.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a \
@@ -52,20 +84,41 @@ smaller than 0!'
 
     def determine_restart(self, controller, S):
         '''
-        Determine for each step separately if it wants to be restarted for whatever reason. All steps after this one
-        will be recomputed also.
+        Check if the difference between the error estimates exceeds the allowed tolerance
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
         '''
+        # we determine whether to restart only on the last sweep
+        if S.status.iter < S.params.maxiter:
+            return None
+
         for L in S.levels:
             if None not in [L.status.error_extrapolation_estimate, L.status.error_embedded_estimate]:
-                diff = L.status.error_extrapolation_estimate - L.status.error_embedded_estimate
+                diff = abs(L.status.error_extrapolation_estimate - L.status.error_embedded_estimate)
                 if diff > self.params.HotRod_tol:
                     S.status.restart = True
-        super(HotRod, self).determine_restart(controller, S)
+                    self.log(f'Triggering restart: delta={diff:.2e}, tol={self.params.HotRod_tol:.2e}', S)
+
+        return None
 
     def post_iteration_processing(self, controller, S):
         '''
         Throw away the final sweep to match the error estimates.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
         '''
         if S.status.iter == S.params.maxiter:
             for L in S.levels:
                 L.u[:] = L.uold[:]
+
+        return None

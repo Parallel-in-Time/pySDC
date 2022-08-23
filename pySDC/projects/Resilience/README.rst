@@ -8,6 +8,8 @@ The fist strategy we try is `Adaptivity <https://github.com/Parallel-in-Time/pyS
 
 The second strategy is `Hot Rod <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/HotRod.ipynb>`_, which is designed purely as a detector for soft faults.
 
+We have also simulated faults and tried recovering them with the strategies `here <https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/Resilience/ResilienceStatistics.ipynb>`_.
+
 Tests
 -----
 Please refer to the above mentioned notebooks for thorough descriptions of what you are seeing here.
