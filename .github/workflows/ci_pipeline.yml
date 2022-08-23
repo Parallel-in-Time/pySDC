@@ -356,6 +356,7 @@ jobs:
           auto-push: false
           gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
           gh-pages-branch: master
+          github-token: ${{ secrets.BENCHMARK_BOT }}
 
       - name: ls
         run: |
