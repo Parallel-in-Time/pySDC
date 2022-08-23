@@ -9,7 +9,6 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
 from pySDC.projects.PinTSimE.battery_model import log_data
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
@@ -53,7 +52,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     controller_params = dict()
     controller_params['logger_level'] = 20
     controller_params['hook_class'] = log_data
-    
+
     # convergence controllers
     switch_estimator_params = {}
     convergence_controllers = {SwitchEstimator: switch_estimator_params}
@@ -66,13 +65,13 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    
+
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-    assert level_params['dt']<= 4E-1, 'Time step dt is too coarse, please set dt less than 4E-1'
+    assert level_params['dt'] <= 4E-1, 'Time step dt is too coarse, please set dt less than 4E-1'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
@@ -80,7 +79,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
     # set time parameters
     t0 = 0.0
-    Tend = 4#2.5
+    Tend = 2.5
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -102,9 +101,6 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
-    min_iter = 20
-    max_iter = 0
-
     f = open('battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
 
@@ -113,64 +109,61 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     f.close()
 
     return stats
-    
+
+
 def check(cwd='./'):
     """
         Routine to check the differences between using a switch estimator or not
     """
+
     V_ref = 1
-    #dt_list = [2E-1, 2E-2, 2E-3, 2E-4]
+    # dt_list = [2E-1, 2E-2, 2E-3, 2E-4]
     dt_list = [1e-3]
     use_switch_estimator = [True, False]
-    estimate_true = []
-    estimate_false = []
     for dt_item in dt_list:
         for item in use_switch_estimator:
-           stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
-           
-           fname = 'data_project/battery_dt{}_USE{}.dat'.format(dt_item, item)
-           f = open(fname, 'wb')
-           dill.dump(stats, f)
-           f.close()
-    
-    val_switch_all = [] 
+            stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
+
+            fname = 'data/battery_dt{}_USE{}.dat'.format(dt_item, item)
+            f = open(fname, 'wb')
+            dill.dump(stats, f)
+            f.close()
+
+    val_switch_all = []
     diff_true_all = []
-    diff_false_all_before = [] 
-    diff_false_all_after = []          
+    diff_false_all_before = []
+    diff_false_all_after = []
     for dt_item in dt_list:
-        f1 = open(cwd + 'data_project/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'data_project/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
         stats_false = dill.load(f2)
         f2.close()
-        
+
         val_switch = get_sorted(stats_true, type='switch', sortby='time')
         t_switch = [v[0] for v in val_switch]
         vC_switch = [v[1] for v in val_switch]
-        t_switch = t_switch[0] # battery has only one single switch
+        t_switch = t_switch[0]  # battery has only one single switch
         vC_switch = vC_switch[0]
         val_switch_all.append([t_switch, vC_switch])
 
-        vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time') 
+        vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
         vC_false = get_sorted(stats_false, type='voltage C', sortby='time')
 
-        diff_true = [v[1]-V_ref for v in vC_true]
-        diff_false = [v[1]-V_ref for v in vC_false]
+        diff_true = [v[1] - V_ref for v in vC_true]
+        diff_false = [v[1] - V_ref for v in vC_false]
 
         times_true = [v[0] for v in vC_true]
         times_false = [v[0] for v in vC_false]
-        print(dt_item, t_switch)
         for m in range(len(times_true)):
             if np.round(times_true[m], 15) == np.round(t_switch, 15):
                 diff_true_all.append(diff_true[m])
-                
-        print(diff_true_all)
-                
+
         for m in range(1, len(times_false)):
-            if times_false[m-1] < t_switch < times_false[m]:
-                diff_false_all_before.append(diff_false[m-1])
+            if times_false[m - 1] < t_switch < times_false[m]:
+                diff_false_all_before.append(diff_false[m - 1])
                 diff_false_all_after.append(diff_false[m])
 
         setup_mpl()
@@ -180,19 +173,19 @@ def check(cwd='./'):
         ax.plot(times_false, diff_false, label='SE=False', color='#1f77b4')
         ax.axvline(x=t_switch, linestyle='--', color='k', label='Switch')
         ax.legend(frameon=False, fontsize=10, loc='lower left')
-        #ax.set_yticks(np.arange(-3e-2, 3e-2))
-        #ax.set_xlim(t_switch-5e-1, 2.5)
+        # ax.set_yticks(np.arange(-3e-2, 3e-2))
+        # ax.set_xlim(t_switch-5e-1, 2.5)
         ax.set_yscale('symlog', linthresh=1e-5)
         ax.set_xlabel('Time')
-        
-        fig.savefig('difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
-        
+
+        fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
         ax2.plot(times_true, [v[1] for v in vC_true])
         ax2.set_ylim(0.97, 1.1)
-        fig2.savefig('vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
-    
+        fig2.savefig('data/vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
     ax.set_title("Difference $v_{C}-V_{ref}$")
@@ -206,9 +199,9 @@ def check(cwd='./'):
     ax.set_yscale('symlog', linthresh=1e-8)
     ax.set_ylim(-1, 1)
     ax.set_xlabel("$\Delta t$")
-    
-    fig.savefig('diffs_estimation.png', dpi=300, bbox_inches='tight')
-    
-    
+
+    fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
+
+
 if __name__ == "__main__":
     check()
