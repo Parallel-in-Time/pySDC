@@ -353,7 +353,7 @@ jobs:
           tool: 'pytest'
           output-file-path: output.json
           auto-push: true
-          benchmark-data-dir-path: /
+          benchmark-data-dir-path: .
           gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
           gh-pages-branch: main
           github-token: ${{ secrets.BENCHMARK_BOT }}
