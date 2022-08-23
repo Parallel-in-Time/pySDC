@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import solve_ivp
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -31,25 +32,46 @@ class vanderpol(ptype):
 
         if 'stop_at_nan' not in problem_params:
             problem_params['stop_at_nan'] = True
+        if 'crash_at_maxiter' not in problem_params:
+            problem_params['crash_at_maxiter'] = True
 
         # invoke super init, passing dtype_u and dtype_f, plus setting number of elements to 2
         super(vanderpol, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
                                         dtype_u, dtype_f, problem_params)
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
-        Dummy routine for the exact solution, currently only passes the initial values
+        Routine to approximate the exact solution at time t by scipy or give initial conditions when called at t=0
 
         Args:
             t (float): current time
+            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
+            t_init (float): the starting time
+
         Returns:
-            dtype_u: mesh type containing the initial values
+            dtype_u: approximate exact solution
         """
 
-        # thou shall not call this at time > 0
-
         me = self.dtype_u(self.init)
-        me[:] = self.params.u0[:]
+
+        if t > 0.:
+
+            def rhs(t, u):
+                return self.eval_f(u, t)
+
+            tol = 100 * np.finfo(float).eps
+
+            if u_init is not None:
+                if t_init is None:
+                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!')
+                me = u_init.copy()
+            else:
+                u_init = self.params.u0.copy()
+                t_init = 0.
+            me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
+        else:
+            me[:] = self.params.u0[:]
         return me
 
     def eval_f(self, u, t):
@@ -122,7 +144,7 @@ class vanderpol(ptype):
         elif np.isnan(res):
             self.logger.warning('Newton got nan after %i iterations...' % n)
 
-        if n == self.params.newton_maxiter:
+        if n == self.params.newton_maxiter and self.params.crash_at_maxiter:
             raise ProblemError('Newton did not converge after %i iterations, error is %s' % (n, res))
 
         return u

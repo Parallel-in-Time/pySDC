@@ -83,12 +83,14 @@ class piline(ptype):
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
         Routine to approximate the exact solution at time t by scipy
 
         Args:
             t (float): current time
+            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
+            t_init (float): the starting time
 
         Returns:
             dtype_u: exact solution (kind of)
@@ -102,11 +104,19 @@ class piline(ptype):
         me[2] = 0.0  # p3
 
         if t > 0.:
+            if u_init is not None:
+                if t_init is None:
+                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!')
+                me = u_init
+            else:
+                t_init = 0.
+
             def rhs(t, u):
                 f = self.eval_f(u, t)
                 return f.impl + f.expl  # evaluate only explicitly rather than IMEX
 
             tol = 100 * np.finfo(float).eps
-            me[:] = solve_ivp(rhs, (0., t), me, rtol=tol, atol=tol).y[:, -1]
+            me[:] = solve_ivp(rhs, (t_init, t), me, rtol=tol, atol=tol).y[:, -1]
 
         return me

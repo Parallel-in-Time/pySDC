@@ -74,51 +74,11 @@ class controller_nonMPI(controller):
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
 
-        self.store_uold = self.params.use_iteration_estimator
-
         self.add_convergence_controller(BasicRestartingNonMPI, description)
 
-        for C in self.convergence_controllers:
-            C.reset_global_variables_nonMPI(self)
-
-    def check_iteration_estimator(self, MS):
-        """
-        Method to check the iteration estimator
-
-        Args:
-            MS (list): list of currently active steps
-        """
-        diff_new = 0.0
-        Kest_loc = 99
-
-        # go through active steps and compute difference, Ltilde, Kest up to this step
-        for S in MS:
-            L = S.levels[0]
-
-            for m in range(1, L.sweep.coll.num_nodes + 1):
-                diff_new = max(diff_new, abs(L.uold[m] - L.u[m]))
-
-            if S.status.iter == 1:
-                S.status.diff_old_loc = diff_new
-                S.status.diff_first_loc = diff_new
-            elif S.status.iter > 1:
-                Ltilde_loc = min(diff_new / S.status.diff_old_loc, 0.9)
-                S.status.diff_old_loc = diff_new
-                alpha = 1 / (1 - Ltilde_loc) * S.status.diff_first_loc
-                Kest_loc = np.log(S.params.errtol / alpha) / np.log(Ltilde_loc) * 1.05  # Safety factor!
-                self.logger.debug(f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(Kest_loc))}, '
-                                  f'{Ltilde_loc:8.6e}, {Kest_loc:8.6e}, {Ltilde_loc ** S.status.iter * alpha:8.6e}')
-                # You should not stop prematurely on earlier steps, since later steps may need more accuracy to reach
-                # the tolerance themselves. The final Kest_loc is the one that counts.
-                # if np.ceil(Kest_loc) <= S.status.iter:
-                #     S.status.force_done = True
-
-        # set global Kest as last local one, force stop if done
-        for S in MS:
-            if S.status.iter > 1:
-                Kest_glob = Kest_loc
-                if np.ceil(Kest_glob) <= S.status.iter:
-                    S.status.force_done = True
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers_nonMPI(self)
+            C.setup_status_variables(self)
 
     def run(self, u0, t0, Tend):
         """
@@ -177,6 +137,7 @@ class controller_nonMPI(controller):
                 # initial condition to next block is initial condition of step that needs restarting
                 uend = self.MS[restart_at].levels[0].u[0]
                 time[active_slots[0]] = time[restart_at]
+                self.logger.info(f'Starting next block with initial conditions from step {restart_at}')
 
             else:  # move on to next block
                 # initial condition for next block is last solution of current block
@@ -184,9 +145,10 @@ class controller_nonMPI(controller):
                 time[active_slots[0]] = time[active_slots[-1]] + self.MS[active_slots[-1]].dt
 
             for S in MS_active[:restart_at]:
-                self.convergence_controllers_post_step_processing(S)
+                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                    C.post_step_processing(self, S)
 
-            for C in self.convergence_controllers:
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
                 [C.prepare_next_block(self, S, len(active_slots), time, Tend) for S in self.MS]
                 C.prepare_next_block_nonMPI(self, self.MS, active_slots, time, Tend)
 
@@ -336,15 +298,14 @@ class controller_nonMPI(controller):
             # call predictor from sweeper
             S.levels[0].sweep.predict()
 
-            if self.store_uold:
-                # store previous iterate to compute difference later on
-                S.levels[0].uold[:] = S.levels[0].u[:]
-
             # update stage
             if len(S.levels) > 1:  # MLSDC or PFASST with predict
                 S.status.stage = 'PREDICT'
             else:
                 S.status.stage = 'IT_CHECK'
+
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.post_spread_processing(self, S)
 
     def predict(self, local_MS_running):
         """
@@ -513,17 +474,15 @@ class controller_nonMPI(controller):
 
             S.levels[0].sweep.compute_residual()
 
-        if self.params.use_iteration_estimator:
-            self.check_iteration_estimator(local_MS_running)
-
         for S in local_MS_running:
 
             if S.status.iter > 0:
-                self.convergence_controllers_post_iteration_processing(S)
                 self.hooks.post_iteration(step=S, level_number=0)
 
             # decide if the step is done, needs to be restarted and other things convergence related
-            self.convergence_control(S)
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.post_iteration_processing(self, S)
+                C.convergence_control(self, S)
 
         for S in local_MS_running:
             if not S.status.first:
@@ -542,10 +501,6 @@ class controller_nonMPI(controller):
                 S.status.iter += 1
                 self.hooks.pre_iteration(step=S, level_number=0)
 
-                if self.store_uold:
-                    # store previous iterate to compute difference later on
-                    S.levels[0].uold[:] = S.levels[0].u[:]
-
                 if len(S.levels) > 1:  # MLSDC or PFASST
                     S.status.stage = 'IT_DOWN'
                 else:  # SDC or MSSDC
@@ -558,8 +513,8 @@ class controller_nonMPI(controller):
                 self.hooks.post_step(step=S, level_number=0)
                 S.status.stage = 'DONE'
 
-        for C in self.convergence_controllers:
-            C.reset_global_variables_nonMPI(self)
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers_nonMPI(self)
 
     def it_fine(self, local_MS_running):
         """
