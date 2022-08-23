@@ -357,8 +357,3 @@ jobs:
           gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
           gh-pages-branch: main
           github-token: ${{ secrets.BENCHMARK_BOT }}
-
-      - name: ls
-        run: |
-          ls -artl .
-          ls -artl benchmark-data-repository
