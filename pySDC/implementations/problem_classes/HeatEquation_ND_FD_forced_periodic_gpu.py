@@ -72,7 +72,7 @@ class heatNd_periodic(ptype):
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.ndim, self.params.order)
         xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = csp.eye(self.params.nvars[0]**self.params.ndim, format='csc')
+        self.Id = csp.eye(self.params.nvars[0]**self.params.ndim, format='csr')
         self.f_im = 0
         self.f_ex = 0
 
@@ -111,7 +111,13 @@ class heatNd_periodic(ptype):
             A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
             A += stencil[i] * csp.eye(N[0], k=N[0] - i, format='csr')
             A += stencil[i] * csp.eye(N[0], k=-N[0] + i, format='csr')
-        A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
+
+        if ndim == 2:
+            A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
+        elif ndim == 3:
+            A = csp.kron(A, csp.eye(N[1] * N[0])) + csp.kron(csp.eye(N[2] * N[1]), A) + \
+                csp.kron(csp.kron(csp.eye(N[2]), A), csp.eye(N[0]))
+        # A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         A *= nu / (dx ** 2)
 
         return A
@@ -169,7 +175,7 @@ class heatNd_periodic(ptype):
         if self.params.direct_solver:
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         else:
-            me[:] = gmres(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
+            me[:] = cg(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
                           tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
         return me
 
