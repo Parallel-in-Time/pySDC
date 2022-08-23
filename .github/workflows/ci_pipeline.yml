@@ -314,11 +314,11 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
 
-    needs:
-      - test_base
-      - test_fenics
-      - test_petsc
-      - test_mpi
+#    needs:
+#      - test_base
+#      - test_fenics
+#      - test_petsc
+#      - test_mpi
 
     env:
       YML: 'etc/environment-base.yml'
@@ -354,6 +354,8 @@ jobs:
           output-file-path: output.json
           benchmark-data-dir-path: dev/bench
           auto-push: false
+          gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
+          gh-pages-branch: master
 
       - name: ls
         run: |
