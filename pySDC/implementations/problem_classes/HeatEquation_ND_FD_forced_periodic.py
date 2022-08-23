@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import gmres, spsolve
+from scipy.sparse.linalg import gmres, spsolve, cg
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -174,7 +174,7 @@ class heatNd_periodic(ptype):
         if self.params.direct_solver:
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         else:
-            me[:] = gmres(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
+            me[:] = cg(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
                           tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
         return me
 

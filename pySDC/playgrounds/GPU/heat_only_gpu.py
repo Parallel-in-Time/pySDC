@@ -12,7 +12,7 @@ problem_params['order'] = 2
 problem_params['ndim'] = 3
 problem_params['lintol'] = 1E-10
 problem_params['liniter'] = 99
-problem_params['direct_solver'] = True
+problem_params['direct_solver'] = False
 problem_params['nvars'] = (64, 64, 64)
 
 # initialize level parameters
@@ -68,3 +68,4 @@ uinit = P.u_exact(t0)
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 print('Laufzeit:', timing[0][1])
+print(P.f_im, P.f_ex)
