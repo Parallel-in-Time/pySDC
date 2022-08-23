@@ -361,13 +361,3 @@ jobs:
         run: |
           ls -artl .
           ls -artl benchmark-data-repository
-#      - name: Pushes to another repository
-#        uses: cpina/github-action-push-to-another-repository@main
-#        env:
-#          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-#        with:
-#          source-directory: 'output'
-#          destination-github-username: 'pancetta'
-#          destination-repository-name: 'pySDC-benchmarks'
-#          user-email: sig.pancetta+github@gmail.com
-#          target-branch: main
