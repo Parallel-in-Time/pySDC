@@ -18,6 +18,7 @@ benchmark-base:
 
 
 upload_results:
+  image: ubuntu:latest
   stage: upload
 
   before_script:
