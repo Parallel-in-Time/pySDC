@@ -2,10 +2,10 @@ import numpy as np
 from scipy.special import factorial
 
 
-def get_linear_multistep_method(steps, u_signature, f_signature):
+def get_linear_multistep_method(steps, u_signature, f_signature, checks=False):
     '''
     Derive a general linear multistep method from step sizes and a signature. This function will provide a consistent
-    linear multistep method by cancelling terms in Taylor expansions, but note that this must not be convergent!
+    linear multistep method by cancelling terms in Taylor expansions, but note that this must not be stable!
 
     The resulting coefficients must be multiplied with the corresponding value of u or f and then all must be summed to
     get a numerical solution to the initial value problem.
@@ -14,12 +14,15 @@ def get_linear_multistep_method(steps, u_signature, f_signature):
     the order of consistency of our method.
 
     We check if our method is consistent and zero stable, which together means it is convergent.
+    However, some of the methods that we generate are not A stable. As it turns out, according to Dahlquist's second
+    barrier theorem, there are no A-stable LMMs of order greater than 2.
 
     Args:
         steps (list): The step sizes between the multiple steps that are used
         u_signature (list): A list containing which solutions at which steps should be used. Set to 1, for all times at
                             which you want to use the solution and to 0 at all other times
         f_signature (list): Analogue to u_signature for the right hand side evaluations
+        checks (bool): Perform some checks on stability and convergence
 
     Returns:
         list: Coefficients for u
@@ -55,18 +58,23 @@ def get_linear_multistep_method(steps, u_signature, f_signature):
     f_coeff = np.zeros_like(f_signature)
     f_coeff[f_signature > 0] = coeff[n_u:]
 
-    # check that the method is consistent
-    check_linear_difference_operator(u_coeff, f_coeff, steps)
+    if checks:
+        # check that the method is consistent
+        check_linear_difference_operator(u_coeff, f_coeff, steps)
 
-    # check if our method is zero stable
-    verify_root_condition(first_characteristic_polynomial(u_coeff))
+        # check if our method is zero stable
+        verify_root_condition(first_characteristic_polynomial(u_coeff))
+
+        # Check if the method is stable for h*lambda=-1
+        p = stability_polynomial(u_coeff, f_coeff, -1.)
+        strict_root_condition(p)
 
     return u_coeff, f_coeff
 
 
 def first_characteristic_polynomial(u_coeff, r=1):
     '''
-    The first characteristic polynomial of a linear multistep method is equal to the coefficients multiplied with
+    The first characteristic polynomial of a linear multistep method is equal to the coefficients of umultiplied with
     powers of r.
 
     Args:
@@ -81,6 +89,24 @@ def first_characteristic_polynomial(u_coeff, r=1):
     rho = -u_coeff * r**j
     rho[-1] = r**len(u_coeff)
     return rho[::-1]  # reverse the order to go along with usual definitions
+
+
+def second_characteristic_polynomial(f_coeff, r=1):
+    '''
+    The second characteristic polynomial of a linear multistep method is equal to the coefficients multiplied with
+    powers of r.
+
+    Args:
+        f_coeff: The alpha coefficients for f of the LMM in order of descending time difference to the solution we want
+        r: The variable of the polynomial
+
+    Returns:
+        numpy.ndarray: List containing the polynomial in r. Set r=1 to get the coefficients.
+    '''
+    j = np.arange(len(f_coeff))
+    sigma = np.zeros_like(f_coeff)
+    sigma = f_coeff * r**j
+    return sigma[::-1]  # reverse the order to go along with usual definitions
 
 
 def verify_root_condition(rho):
@@ -160,3 +186,35 @@ def taylor_expansion(step, order):
     '''
     j = np.arange(order)
     return step**j / factorial(j)
+
+
+def stability_polynomial(u_coeff, f_coeff, h_hat):
+    '''
+    Construct the stability polynomial for a value of h_hat = h * lambda.
+
+    Args:
+        u_coeff (numpy.ndarray): Coefficients for u in the LMM
+        f_coeff (numpy.ndarray): Coefficients for f in the LMM
+        h_hat (float) Parameter where you want to check stability
+
+    Returns:
+        numpy.ndarray: List containing the coefficients of the stability polynomial
+    '''
+    rho = first_characteristic_polynomial(u_coeff)
+    sigma = second_characteristic_polynomial(f_coeff)
+    return rho - h_hat * sigma
+
+
+def strict_root_condition(p):
+    '''
+    Check whether the roots of the polynomial ae strictly smaller than one.
+
+    Args:
+        p (numpy.ndarray): Coefficients for the polynomial
+
+    Returns:
+        None
+    '''
+    roots = np.roots(p)
+    assert all(abs(roots) < 1), "Polynomial does not satisfy strict root condition!"
+    return None
