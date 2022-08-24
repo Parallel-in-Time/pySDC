@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore")
 # from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
@@ -6,8 +8,6 @@ from pySDC.implementations.controller_classes.controller_nonMPI import controlle
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 import numpy as np
 import pickle
-import warnings
-warnings.filterwarnings("ignore")
 
 # name = 'pickle/ac-jusuf-pySDC-cpu_fft2.pickle'
 name = 'pickle/ac-jusuf-pySDC-gpu_fft2.pickle'
