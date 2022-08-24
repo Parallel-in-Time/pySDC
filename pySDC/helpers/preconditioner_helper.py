@@ -13,6 +13,8 @@ def get_linear_multistep_method(steps, u_signature, f_signature):
     Since we can cancel as many terms in the Taylor expansion as we have entries in the signature, that will also be
     the order of consistency of our method.
 
+    We check if our method is consistent and zero stable, which together means it is convergent.
+
     Args:
         steps (list): The step sizes between the multiple steps that are used
         u_signature (list): A list containing which solutions at which steps should be used. Set to 1, for all times at
@@ -53,7 +55,10 @@ def get_linear_multistep_method(steps, u_signature, f_signature):
     f_coeff = np.zeros_like(f_signature)
     f_coeff[f_signature > 0] = coeff[n_u:]
 
-    # check if our method is convergent
+    # check that the method is consistent
+    check_linear_difference_operator(u_coeff, f_coeff, steps)
+
+    # check if our method is zero stable
     verify_root_condition(first_characteristic_polynomial(u_coeff))
 
     return u_coeff, f_coeff
@@ -75,13 +80,16 @@ def first_characteristic_polynomial(u_coeff, r=1):
     rho = np.zeros_like(u_coeff)
     rho = -u_coeff * r**j
     rho[-1] = r**len(u_coeff)
-    return rho[::-1]
+    return rho[::-1]  # reverse the order to go along with usual definitions
 
 
 def verify_root_condition(rho):
     '''
     For a linear multistep method to be convergent, we require that all roots of the first characteristic polynomial
     are distinct and have modulus smaller or equal to one.
+    This root condition implies that the method is zero stable and Dahlquist's theorem states that a zero stable and
+    consistent method is convergent. If we can also show that the method is consistent, we have thus shown it is
+    convergent.
 
     Args:
         rho (numpy.ndarray): Coefficients of the first characteristic polynomial
@@ -94,6 +102,7 @@ def verify_root_condition(rho):
 
     # check the conditions
     roots_distinct = len(np.unique(roots)) == len(roots)
+    # give some leeway because we introduce some numerical error when computing the roots
     modulus_condition = all(abs(roots) <= 1. + 10. * np.finfo(float).eps)
 
     # raise errors if we violate one of the conditions
@@ -101,3 +110,53 @@ def verify_root_condition(rho):
     assert modulus_condition, "Some of the roots of the first characteristic polynomial of the LMM have modulus larger \
 one!"
     return roots_distinct and modulus_condition
+
+
+def check_linear_difference_operator(u_coeff, f_coeff, steps):
+    '''
+    Check if the linear multistep method is consistent by doing a Taylor expansion and testing if all terms cancel
+    except for the first, which should be one.
+
+    Args:
+        u_coeff (numpy.ndarray): Coefficients for u in the LMM
+        f_coeff (numpy.ndarray): Coefficients for f in the LMM
+        steps (numpy.ndarray): Steps from point of expansion
+
+    Returns:
+        None
+    '''
+    order = len(steps)
+    taylor_coeffs = np.zeros((len(u_coeff) + len(f_coeff), order))
+
+    # fill in the coefficients
+    for i in range(order):
+        # get expansions of u
+        if u_coeff[i] != 0:
+            taylor_coeffs[i, :] = u_coeff[i] * taylor_expansion(steps[i], order)
+
+        # get expansions of f
+        if f_coeff[i] != 0:
+            taylor_coeffs[order + i, 1:] = f_coeff[i] * taylor_expansion(steps[i], order - 1)
+
+    # check that all is well
+    L = np.sum(taylor_coeffs, axis=0)
+    want = np.zeros_like(L)
+    want[0] = 1.
+    assert all(np.isclose(L, want)), "Some derivatives do not cancel in the Taylor expansion!"
+
+    return None
+
+
+def taylor_expansion(step, order):
+    '''
+    Get coefficients of a Taylor expansion.
+
+    Args:
+        step (float): Time difference from point around which we expand
+        order (int): The order up to which we want to expand
+
+    Returns:
+        numpy.ndarray: List containing the coefficients of the derivatives of u in the Taylor expansion
+    '''
+    j = np.arange(order)
+    return step**j / factorial(j)
