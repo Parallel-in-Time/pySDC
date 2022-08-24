@@ -3,8 +3,6 @@
 
 benchmark-base:
   image: mambaorg/micromamba
-  tags:
-    - public-docker
   before_script:
     - micromamba install --yes -f etc/environment-base.yml
   script:
