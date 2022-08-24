@@ -1,17 +1,16 @@
 # from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_semiimplicit
 from pySDC.implementations.problem_classes.AllenCahn_2D_FD_gpu import allencahn_semiimplicit
-from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
-# from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-# from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh
 import numpy as np
 import pickle
-import matplotlib.pylab as plt
-# name = 'pickle/ac-jusuf-pySDC-cpu_f.pickle'
-name = 'pickle/ac-jusuf-pySDC-gpu_f.pickle'
+import warnings
+warnings.filterwarnings("ignore")
+
+# name = 'pickle/ac-jusuf-pySDC-cpu_f2.pickle'
+name = 'pickle/ac-jusuf-pySDC-gpu_f2.pickle'
 # name = 'pickle/ac-jusuf-pySDC-cpu_fft.pickle'
 # name = 'pickle/ac-jusuf-pySDC-gpu_fft.pickle'
 Ns = np.asarray([128, 256, 512, 1024, 2048])  # TODO: ersten Knoten rauslassen wegen massiver Setupzeit
