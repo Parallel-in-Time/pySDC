@@ -1,0 +1,13 @@
+
+
+
+benchmark-base:
+  image: mambaorg/micromamba
+  tags:
+    - public-docker
+  before_script:
+    - micromamba install --yes -f etc/environment-base.yml
+  script:
+    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
+  after_script:
+    - cat output.json
