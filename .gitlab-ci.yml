@@ -1,13 +1,26 @@
-
-
+stages:
+  - benchmark
+  - upload
 
 benchmark-base:
   image: mambaorg/micromamba
+  stage: benchmark
+  artifacts:
+    paths:
+      - output.json
+
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
-  after_script:
+
+
+upload_results:
+  stage: upload
+  script:
     - cat output.json
+
+
+
