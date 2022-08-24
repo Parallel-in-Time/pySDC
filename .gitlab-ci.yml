@@ -19,8 +19,16 @@ benchmark-base:
 
 upload_results:
   stage: upload
+
+  before_script:
+    - apt-get update -y && apt-get install openssh-client -y
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+#    - chmod 644 ~/.ssh/known_hosts
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PUSH_KEY_GITHUB" | tr -d '\r' | DISPLAY=":0.0" setsid ssh-add - > /dev/null
   script:
-    - cat output.json
+    - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
 
 
 
