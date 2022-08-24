@@ -123,5 +123,6 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
     return stats, controller, Tend
 
+
 if __name__ == '__main__':
     run_advection()

@@ -15,6 +15,7 @@ from pySDC.projects.Resilience.piline import run_piline
 class do_nothing(hooks):
     pass
 
+
 class log_errors(hooks):
 
     def post_step(self, step, level_number):
@@ -72,7 +73,8 @@ def get_results_from_stats(stats, var, val, hook_class=log_errors):
     return results
 
 
-def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None, hook_class=log_errors):
+def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                  hook_class=log_errors):
     """
     A simple test program to compute the order of accuracy in time
     """
@@ -101,7 +103,7 @@ def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, pr
             desc = {**desc, **custom_description}
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
         stats, controller, _ = prob(custom_description=desc, num_procs=num_procs, Tend=Tend,
-                                 hook_class=hook_class)
+                                    hook_class=hook_class)
 
         level = controller.MS[-1].levels[-1]
         e_glob = abs(level.prob.u_exact(t=level.time + level.dt) - level.u[-1])
@@ -128,13 +130,11 @@ def plot_order(res, ax, k):
     order = get_accuracy_order(res, key=key, thresh=1e-11)
     label = f'k={k}, p={np.mean(order):.2f}'
     ax.loglog(res['dt'], res[key], color=color, ls='-', label=label)
-    #ax.loglog(res['dt'], res['e'], color=color, ls='-')
-    #ax.loglog(res['dt'], res['e_loc'], ls=':', color='black')
     ax.set_xlabel(r'$\Delta t$')
     ax.set_ylabel(r'$\epsilon$')
     ax.legend(frameon=False, loc='lower right')
 
-     
+
 def plot(res, ax, k):
     keys = ['e_embedded', 'e_extrapolated', 'e']
     ls = ['-', ':', '-.']
@@ -194,6 +194,7 @@ def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=r
         res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
                             prob=prob, dt_list=dt_list, hook_class=do_nothing)
         plot_order(res, ax, k)
+
 
 def plot_all_errors(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline):
     for i in range(len(ks)):
