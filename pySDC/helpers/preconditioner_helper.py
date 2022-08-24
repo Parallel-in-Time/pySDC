@@ -53,4 +53,51 @@ def get_linear_multistep_method(steps, u_signature, f_signature):
     f_coeff = np.zeros_like(f_signature)
     f_coeff[f_signature > 0] = coeff[n_u:]
 
+    # check if our method is convergent
+    verify_root_condition(first_characteristic_polynomial(u_coeff))
+
     return u_coeff, f_coeff
+
+
+def first_characteristic_polynomial(u_coeff, r=1):
+    '''
+    The first characteristic polynomial of a linear multistep method is equal to the coefficients multiplied with
+    powers of r.
+
+    Args:
+        u_coeff: The alpha coefficients for u of the LMM in order of descending time difference to the solution we want
+        r: The variable of the polynomial
+
+    Returns:
+        numpy.ndarray: List containing the polynomial in r. Set r=1 to get the coefficients.
+    '''
+    j = np.arange(len(u_coeff))
+    rho = np.zeros_like(u_coeff)
+    rho = -u_coeff * r**j
+    rho[-1] = r**len(u_coeff)
+    return rho[::-1]
+
+
+def verify_root_condition(rho):
+    '''
+    For a linear multistep method to be convergent, we require that all roots of the first characteristic polynomial
+    are distinct and have modulus smaller or equal to one.
+
+    Args:
+        rho (numpy.ndarray): Coefficients of the first characteristic polynomial
+
+    Returns:
+        bool: Whether the root condition is satisfied.
+    '''
+    # compute the roots of the polynomial
+    roots = np.roots(rho)
+
+    # check the conditions
+    roots_distinct = len(np.unique(roots)) == len(roots)
+    modulus_condition = all(abs(roots) <= 1. + 10. * np.finfo(float).eps)
+
+    # raise errors if we violate one of the conditions
+    assert roots_distinct, "Not all roots of the first characteristic polynomial of the LMM are distinct!"
+    assert modulus_condition, "Some of the roots of the first characteristic polynomial of the LMM have modulus larger \
+one!"
+    return roots_distinct and modulus_condition
