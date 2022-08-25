@@ -241,6 +241,24 @@ class sweeper(object):
                 u_coeff, f_coeff = get_linear_multistep_method(h, u_signature, f_signature)
 
                 QDmat[i, 0: i + 1] = f_coeff
+        elif qd_type == 'LMMpar':
+            '''
+            Trapezoidal rule between initial conditions and the node you want to compute the solution at.
+            '''
+            for i in range(1, len(self.coll.nodes) + 1):
+                t_expand = self.coll.nodes[i - 1]
+                h = np.append([0], self.coll.nodes[:i]) - t_expand  # time difference to where we expand about
+
+                u_signature = np.zeros_like(h)
+                u_signature[0] = 1
+
+                f_signature = np.zeros_like(h)
+                f_signature[-1] = 1
+                f_signature[0] = 1
+
+                u_coeff, f_coeff = get_linear_multistep_method(h, u_signature, f_signature)
+
+                QDmat[i, 0: i + 1] = f_coeff
         else:
             raise NotImplementedError(f'qd_type implicit "{qd_type}" not implemented')
         # check if we got not more than a lower triangular matrix

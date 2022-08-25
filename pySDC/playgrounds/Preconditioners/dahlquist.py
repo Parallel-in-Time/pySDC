@@ -42,7 +42,7 @@ def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'LMM'
+    sweeper_params['QI'] = 'LMMpar'
 
     # build lambdas
     re = np.linspace(-30, 30, 400)
@@ -136,3 +136,4 @@ if __name__ == '__main__':
     custom_description = None
     stats, controller, Tend = run_dahlquist(custom_description=custom_description)
     plot_stability(stats, iter=[1, 2, 3])
+    plt.show()
