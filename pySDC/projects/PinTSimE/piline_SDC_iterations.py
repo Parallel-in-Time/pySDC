@@ -4,8 +4,8 @@ import dill
 
 mpl.use('Agg')
 
+from pySDC.core import CollBase as Collocation
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -89,7 +89,8 @@ def plot_SDC_iterations():
     """
 
     num_nodes = [3, 5]
-    dt_list = [1e-2, 1e-3, 1e-4, 1e-5]
+    # dt_list = [1e-2, 1e-3, 1e-4, 1e-5]
+    dt_list = [1e-2, 1e-3, 1e-4]
     num_procs = 1
     iter_nodes_asarray = np.zeros((len(dt_list), len(num_nodes)))
 
@@ -129,7 +130,7 @@ def plot_PFASST_iterations():
         Routine to plot the residuals for each PFASST run
     """
 
-    dt_list = [1e-2, 1e-3]
+    dt_list = [1e-2, 1e-3, 1e-4]
     num_procs = 8
     iter_nodes_asarray = np.zeros((len(dt_list)))
 
@@ -160,4 +161,4 @@ def plot_PFASST_iterations():
 
 
 if __name__ == "__main__":
-    plot_SDC_iterations()
+    plot_PFASST_iterations()
