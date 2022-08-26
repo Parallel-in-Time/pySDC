@@ -147,3 +147,6 @@ Temporary Items
 
 ### Spyder ###
 .spyproject
+
+# jupyter
+.ipynb_checkpoints
