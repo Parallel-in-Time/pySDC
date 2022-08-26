@@ -31,7 +31,7 @@ test-base:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
+    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
 
 test-libs:
   image: mambaorg/micromamba
@@ -84,9 +84,12 @@ upload_results:
   script:
     - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
     - cd pySDC-benchmarks
-    - mkdir -p latest
-    - cd latest
+    - mkdir -p latest-benchmark
+    - cd latest-benchmark
     - cp ../../*.json .
+    - mkdir -p latest-coverage
+    - cd latest-coverage
+    - cp ../../coverage_*.dat .
     - git add -A
-    - git commit -m "adding new benchmark results"
+    - git commit -m "adding new benchmark and coverage results"
     - git push
