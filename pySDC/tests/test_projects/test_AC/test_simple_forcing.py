@@ -2,7 +2,7 @@ import pytest
 import subprocess
 
 
-@pytest.mark.mpi
+@pytest.mark.mpi4py
 def test_main_serial():
     from pySDC.projects.AllenCahn_Bayreuth.run_simple_forcing_verification import main, visualize_radii
 
@@ -11,7 +11,7 @@ def test_main_serial():
 
 
 @pytest.mark.slow
-@pytest.mark.mpi
+@pytest.mark.mpi4py
 def test_main_parallel():
 
     # try to import MPI here, will fail if things go wrong (and not later on in the subprocess part)

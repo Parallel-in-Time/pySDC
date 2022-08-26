@@ -219,7 +219,7 @@ jobs:
 
       - name: Run pytest
         run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi
+          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi4py
 
       - name: Store results
         if: matrix.py == '3.10'
