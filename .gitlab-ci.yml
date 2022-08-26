@@ -39,7 +39,7 @@ test-libs:
   parallel:
     matrix:
       - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
-      - NAME: ['fenics', 'petsc', 'mpi4py']
+        NAME: ['fenics', 'petsc', 'mpi4py']
   artifacts:
     paths:
       - coverage_$NAME_$PYTHON.dat
