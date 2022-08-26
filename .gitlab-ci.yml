@@ -18,19 +18,22 @@ lint:
 test-base:
   image: mambaorg/micromamba
   stage: test
+  variables:
+    NAME: 'base'
+  parallel:
+    matrix:
+      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
   artifacts:
     paths:
-      - coverage_$CI_JOB_NAME.dat
+      - coverage_$NAME_$PYTHON.dat
   before_script:
     - sed -i "s/python=3.10/python=${PYTHON}/" etc/environment-base.yml
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-    - coverage run --data-file=coverage_$CI_JOB_NAME.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
-  parallel:
-    matrix:
-      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
+
 
 benchmark-base:
   image: mambaorg/micromamba
