@@ -33,6 +33,22 @@ test-base:
   script:
     - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
 
+test-libs:
+  image: mambaorg/micromamba
+  stage: test
+  parallel:
+    matrix:
+      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+      - NAME: ['fenics', 'petsc', 'mpi4py']
+  artifacts:
+    paths:
+      - coverage_$NAME_$PYTHON.dat
+  before_script:
+    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+  script:
+    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m $NAME
 
 benchmark-base:
   image: mambaorg/micromamba
