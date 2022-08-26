@@ -9,7 +9,9 @@ from pySDC.projects.Resilience.vdp import run_vdp
 from pySDC.projects.Resilience.piline import run_piline
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon, DiagPreconIMEX
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity  # , AdaptivityResidual
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity, AdaptivityResidual
+
+print_status = False
 
 
 class log_cost(hooks):
@@ -36,28 +38,26 @@ class log_cost(hooks):
                              sweep=L.status.sweep, type='restarts', value=int(step.status.restart))
 
 
-def objective_function_diagonal(x, *args):
+def single_run(x, params, convergence_controllers, *args):
     '''
-    This function takes as input the diagonal preconditioner entries and runs a problem and then returns the number of
-    iterations.
-
+    This function takes as input the diagonal preconditioner entries and runs a problem.
     The args should contain the problem to run in position 0
 
     Args:
         x (numpy.ndarray): The entries of the preconditioner
+        params (dict): Parameters for setting up the run
+        convergence_controllers (dict): Convergence controllers to use
 
     Returns:
-        int: Number of iterations
+        dict: Stats of the run
+        pySDC.controller: The controller used in the run
     '''
 
     # setup adaptivity and problem parameters
     custom_description = {
-        'convergence_controllers': {
-            Adaptivity: {'e_tol': args[2]},
-            # AdaptivityResidual: {'e_tol': args[4], 'max_restarts': 99}
-        }
+        'convergence_controllers': convergence_controllers,
     }
-    problem_params = args[3]
+    problem_params = params['problem_params']
 
     # setup the sweeper
     if None not in x:
@@ -67,11 +67,68 @@ def objective_function_diagonal(x, *args):
         }
 
         custom_description['sweeper_params'] = sweeper_params
-        custom_description['sweeper_class'] = args[1]
+        custom_description['sweeper_class'] = params['sweeper']
 
-    prob = args[0]
-    stats, controller, _ = prob(custom_description=custom_description, hook_class=log_cost,
-                                custom_problem_params=problem_params)
+    stats, controller, _ = params['prob'](custom_description=custom_description, hook_class=log_cost,
+                                          custom_problem_params=problem_params)
+    return stats, controller
+
+
+def objective_function_diagonal_adaptivity_embedded(x, *args):
+    '''
+    This function takes as input the diagonal preconditioner entries and runs a problem and then returns the number of
+    iterations.
+
+    The args should contain the params for a problem in position 0
+
+    Args:
+        x (numpy.ndarray): The entries of the preconditioner
+
+    Returns:
+        int: Number of iterations
+    '''
+    params = args[0]
+
+    # setup adaptivity and problem parameters
+    convergence_controllers = {
+        Adaptivity: {'e_tol': params['e_tol']},
+    }
+
+    stats, controller = single_run(x, params, convergence_controllers)
+
+    # check how many iterations we needed
+    k = sum([me[1] for me in get_sorted(stats, type='k')])
+
+    # return the score
+    score = k
+    if print_status:
+        print(f's={score:7.0f} | k: {k - params["k"]:5}', x)
+
+    return score
+
+
+def objective_function_diagonal_residual_embedded(x, *args):
+    '''
+    This function takes as input the diagonal preconditioner entries and runs a problem and then returns the number of
+    iterations.
+
+    The args should contain the problem parameters in position 0
+
+    Args:
+        x (numpy.ndarray): The entries of the preconditioner
+
+    Returns:
+        int: Number of iterations
+    '''
+    params = args[0]
+
+    # setup adaptivity and problem parameters
+    convergence_controllers = {
+        Adaptivity: {'e_tol': params['e_tol']},
+        AdaptivityResidual: {'e_tol': params['r_tol'], 'max_restarts': 99}
+    }
+
+    stats, controller = single_run(x, params, convergence_controllers)
 
     # check how many iterations we needed
     k = sum([me[1] for me in get_sorted(stats, type='k')])
@@ -81,6 +138,7 @@ def objective_function_diagonal(x, *args):
     exact = controller.MS[0].levels[0].prob.u_exact(t=u_end[0])
     e = abs(exact - u_end[1])
     e_em = max([me[1] for me in get_sorted(stats, type='e_em', recomputed=False)])
+    raise NotImplementedError('Please fix the next couple of lines')
 
     # return the score
     score = k * e / args[6]
@@ -103,22 +161,52 @@ def plot_errors(stats, u_end, exact):
     plt.cla()
 
 
+vdp_params = {
+    'prob': run_vdp,
+    'sweeper': DiagPrecon,
+    'e_tol': 2e-5,
+    'problem_params': None,
+    'r_tol': 1.,
+    'k': 1,
+    'e': 1,
+    'e_em': 1.,
+}
+
+
+args_piline = {
+    'prob': run_piline,
+    'sweeper': DiagPreconIMEX,
+    'e_tol': 1e-7,
+    'problem_params': None,
+    'r_tol': np.inf,
+    'k': 2461,
+    'e': 4.14e-8,
+    'e_em': 7.27e-8,
+}
+
+
+args_advection = {
+    'prob': run_advection,
+    'sweeper': DiagPrecon,
+    'e_tol': 1e-9,
+    'problem_params': {'freq': -1, 'sigma': 6e-2},
+    'r_tol': 2e-11,
+    'k': 475,
+    'e': 5.98e-8,
+    'e_em': 5.91e-10,
+}
+
+
 if __name__ == '__main__':
-    # parameters are: problem, sweeper, adaptivity tolerance, problem_params, adaptivity residual tolerance, k, e, e_em
-    args_vdp = (run_vdp, DiagPrecon, 2e-5, None, 1., 1, 1, 1)
-    args_piline = (run_piline, DiagPreconIMEX, 1e-7, None, np.inf, 2416, 4.14e-8, 7.27e-8)
-    args_advection = (run_advection, DiagPrecon, 1e-9, {'freq': -1, 'sigma': 6e-2}, 2e-11, 475, 5.98e-8, 5.91e-10)
+    print_status = True
 
     args = args_piline
     num_nodes = 3
-    # initial_guess = np.random.rand(num_nodes)
-    initial_guess = np.ones(num_nodes) * 0.5
-    # initial_guess = [0.73583259, 0.14629964, 0.44240191] #  320 iterations for vdp (local minimum)
-    # initial_guess = [0.53941499, 0.47673377, 0.47673299] #  20 iterations for advection (local minimum)
-    bounds = [(0, 1) for i in initial_guess]
+    initial_guess = np.linspace(0, 1, num_nodes + 1)
     tol = 1e-16
-    print(minimize(objective_function_diagonal, initial_guess, args=args, tol=tol, bounds=bounds, method='nelder-mead'))
-    objective_function_diagonal([None], *args)
+    minimize(objective_function_diagonal_adaptivity_embedded, initial_guess, args=args_advection, tol=tol,
+             method='nelder-mead')
+    # objective_function_diagonal([None], *args)
     # plt.show()
     # objective_function_diagonal([0.19915688, 0.27594549, 0.27594545], *args)
     # plt.show()

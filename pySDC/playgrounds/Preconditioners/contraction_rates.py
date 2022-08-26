@@ -18,7 +18,7 @@ class log_residual(hooks):
                           sweep=L.status.sweep, type='res', value=L.status.residual)
 
 
-def contraction_rate(ax, precon):
+def contraction_rate(ax, precon, desc=None, label=None):
     custom_problem_params = {'freq': -1}  # Gaussian
 
     step_params = {'maxiter': 50}
@@ -26,6 +26,8 @@ def contraction_rate(ax, precon):
     level_params = {}  # {'dt': 1e-3}
 
     custom_description = {'step_params': step_params, 'sweeper_params': sweeper_params, 'level_params': level_params}
+    if desc is not None:
+        custom_description = {**custom_description, **desc}
     stats, _, _ = run_advection(hook_class=log_residual, custom_problem_params=custom_problem_params,
                                 custom_description=custom_description, Tend=1e-2)
 
@@ -36,7 +38,7 @@ def contraction_rate(ax, precon):
     r = [res[i][1] for i in range(len(res)) if res[i][0] == t0]
 
     k = np.arange(len(r)) + 1
-    ax.plot(k, r, label=precon)
+    ax.plot(k, r, label=precon if label is None else label)
     ax.set_yscale('log')
     ax.legend(frameon=False)
 
