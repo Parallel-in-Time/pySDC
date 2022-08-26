@@ -1,6 +1,36 @@
 stages:
+  - lint
+  - test
   - benchmark
   - upload
+
+lint:
+  image: mambaorg/micromamba
+  stage: lint
+  before_script:
+    - micromamba create --yes -f etc/environment-lint.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+  script:
+    - black pySDC  --check --diff --color
+    - flakeheaven lint --benchmark pySDC
+
+test-base:
+  image: mambaorg/micromamba
+  stage: test
+  artifacts:
+    paths:
+      - coverage_$CI_JOB_NAME.dat
+  before_script:
+    - sed -i "s/python=3.10/python=${PYTHON}/" etc/environment-base.yml
+    - micromamba create --yes -f etc/environment-base.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+  script:
+    - coverage run --data-file=coverage_$CI_JOB_NAME.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi and not benchmark"
+  parallel:
+    matrix:
+      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
 
 benchmark-base:
   image: mambaorg/micromamba
