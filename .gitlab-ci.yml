@@ -27,8 +27,7 @@ test-base:
     paths:
       - coverage_$NAME_$PYTHON.dat
   before_script:
-    - sed -i "s/python=3.10/python=${PYTHON}/" etc/environment-base.yml
-    - micromamba create --yes -f etc/environment-base.yml
+    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
