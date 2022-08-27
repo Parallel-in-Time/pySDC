@@ -47,7 +47,7 @@ test-libs:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - sudo apt-get install ssh
+    - micromamba install -c conda-forge openssh
   script:
     - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -svv --durations=0 pySDC/tests -m $NAME
 
