@@ -70,8 +70,10 @@ merge_coverage:
   image: mambaorg/micromamba
   stage: benchmark
   artifacts:
-    paths:
-      - coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
