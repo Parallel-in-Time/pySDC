@@ -78,6 +78,7 @@ merge_coverage:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
+    - micromamba install -c conda-forge git
     - git config --global --add safe.directory '*'
   script:
     - python -m coverage combine coverage_*.dat
