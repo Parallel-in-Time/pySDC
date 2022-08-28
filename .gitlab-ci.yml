@@ -69,6 +69,8 @@ benchmark-base:
 merge_coverage:
   image: mambaorg/micromamba
   stage: benchmark
+  variables:
+    COV_TOKEN: ${COV_TOKEN}
   artifacts:
     paths:
       - coverage.xml
@@ -76,18 +78,17 @@ merge_coverage:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install -c conda-forge git
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
-    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
+    - COVERALLS_REPO_TOKEN=${COV_TOKEN} coveralls
 
 upload_results:
   image: ubuntu:latest
   stage: upload
   variables:
     KEY: ${SSH_PUSH_KEY_GITHUB}
-    COV_TOKEN: ${COV_TOKEN}
+
   before_script:
     - apt-get update -y && apt-get install openssh-client git -y
     - eval $(ssh-agent -s)
@@ -104,10 +105,10 @@ upload_results:
     - mkdir -p latest-benchmark
     - cd latest-benchmark
     - cp ../../*.json .
-    - cd ..
-    - mkdir -p latest-coverage
-    - cd latest-coverage
-    - cp ../../coverage.xml .
+#    - cd ..
+#    - mkdir -p latest-coverage
+#    - cd latest-coverage
+#    - cp ../../coverage.xml .
     - cd ..
     - git add -A
     - git commit -m "adding new benchmark results"
