@@ -97,15 +97,18 @@ upload_results:
     - git config --global user.email "sig.pancetta+github@gmail.com"
     - git config --global user.name "pancetta"
   script:
+    - ls -artl .
     - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
     - cd pySDC-benchmarks
     - mkdir -p latest-benchmark
     - cd latest-benchmark
     - cp ../../*.json .
+    - ls -artl .
     - cd ..
     - mkdir -p latest-coverage
     - cd latest-coverage
     - cp ../../coverage.xml .
+    - ls -artl .
     - git add -A
     - git commit -m "adding new benchmark and coverage results"
     - git push
