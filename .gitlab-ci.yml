@@ -77,8 +77,8 @@ merge_coverage:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-      python -m coverage combine coverage_*.dat
-      python -m coverage xml
+    - python -m coverage combine coverage_*.dat
+    - python -m coverage xml
 
 upload_results:
   image: ubuntu:latest
