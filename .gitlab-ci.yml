@@ -69,11 +69,11 @@ benchmark-base:
 merge_coverage:
   image: mambaorg/micromamba
   stage: benchmark
+  variables:
+    COV_TOKEN: ${COV_TOKEN}
   artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
+    paths:
+      - coverage.xml
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -81,6 +81,7 @@ merge_coverage:
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
+    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
 
 upload_results:
   image: ubuntu:latest
@@ -99,18 +100,15 @@ upload_results:
     - git config --global user.email "sig.pancetta+github@gmail.com"
     - git config --global user.name "pancetta"
   script:
-    - ls -artl .
     - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
     - cd pySDC-benchmarks
     - mkdir -p latest-benchmark
     - cd latest-benchmark
     - cp ../../*.json .
-    - ls -artl .
     - cd ..
     - mkdir -p latest-coverage
     - cd latest-coverage
     - cp ../../coverage.xml .
-    - ls -artl .
     - cd ..
     - git add -A
     - git commit -m "adding new benchmark and coverage results"
