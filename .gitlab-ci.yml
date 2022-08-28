@@ -96,6 +96,7 @@ upload_results:
     - chmod 644 ~/.ssh/known_hosts
     - git config --global user.email "sig.pancetta+github@gmail.com"
     - git config --global user.name "pancetta"
+    - pip install coveralls
   script:
     - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
     - cd pySDC-benchmarks
