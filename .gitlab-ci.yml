@@ -109,6 +109,7 @@ upload_results:
     - cd latest-coverage
     - cp ../../coverage.xml .
     - ls -artl .
+    - cd ..
     - git add -A
     - git commit -m "adding new benchmark and coverage results"
     - git push
