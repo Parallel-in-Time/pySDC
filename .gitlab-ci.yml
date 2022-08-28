@@ -69,8 +69,6 @@ benchmark-base:
 merge_coverage:
   image: mambaorg/micromamba
   stage: benchmark
-  variables:
-    COV_TOKEN: ${COV_TOKEN}
   artifacts:
     paths:
       - coverage.xml
@@ -81,14 +79,13 @@ merge_coverage:
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
-    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
 
 upload_results:
   image: ubuntu:latest
   stage: upload
   variables:
     KEY: ${SSH_PUSH_KEY_GITHUB}
-
+    COV_TOKEN: ${COV_TOKEN}
   before_script:
     - apt-get update -y && apt-get install openssh-client git -y
     - eval $(ssh-agent -s)
@@ -109,7 +106,8 @@ upload_results:
     - mkdir -p latest-coverage
     - cd latest-coverage
     - cp ../../coverage.xml .
+    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
     - cd ..
     - git add -A
-    - git commit -m "adding new benchmark and coverage results"
+    - git commit -m "adding new benchmark results"
     - git push
