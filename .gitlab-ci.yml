@@ -76,9 +76,11 @@ merge_coverage:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
+    - micromamba install -c conda-forge git
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
+    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
 
 upload_results:
   image: ubuntu:latest
@@ -96,7 +98,6 @@ upload_results:
     - chmod 644 ~/.ssh/known_hosts
     - git config --global user.email "sig.pancetta+github@gmail.com"
     - git config --global user.name "pancetta"
-    - pip install coveralls
   script:
     - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
     - cd pySDC-benchmarks
@@ -107,7 +108,6 @@ upload_results:
     - mkdir -p latest-coverage
     - cd latest-coverage
     - cp ../../coverage.xml .
-    - COVERALLS_REPO_TOKEN=$COV_TOKEN coveralls
     - cd ..
     - git add -A
     - git commit -m "adding new benchmark results"
