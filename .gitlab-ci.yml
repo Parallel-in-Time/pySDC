@@ -66,6 +66,20 @@ benchmark-base:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
 
 
+merge_coverage:
+  image: mambaorg/micromamba
+  stage: benchmark
+  artifacts:
+    paths:
+      - coverage.xml
+  before_script:
+    - micromamba create --yes -f etc/environment-base.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+  script:
+      python -m coverage combine coverage_*.dat
+      python -m coverage xml
+
 upload_results:
   image: ubuntu:latest
   stage: upload
@@ -91,7 +105,7 @@ upload_results:
     - cd ..
     - mkdir -p latest-coverage
     - cd latest-coverage
-    - cp ../../coverage_*.dat .
+    - cp ../../coverage.xml .
     - git add -A
     - git commit -m "adding new benchmark and coverage results"
     - git push
