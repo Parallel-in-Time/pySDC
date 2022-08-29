@@ -268,26 +268,26 @@ jobs:
         with:
           path: data
 
-      - name: Prepare data
-        run: |
-          rm -rf data/README
-          find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
-          python -m coverage combine data/coverage_*.dat
-          python -m coverage xml
-
-      - name: Code Coverage Summary Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: coverage.xml
-          badge: true
-          format: 'markdown'
-          output: 'both'
-
-      - name: Adding markdown to build summary
-        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload to coveralls.io
-        run: coveralls --service=github
+#      - name: Prepare data
+#        run: |
+#          rm -rf data/README
+#          find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
+#          python -m coverage combine data/coverage_*.dat
+#          python -m coverage xml
+#
+#      - name: Code Coverage Summary Report
+#        uses: irongut/CodeCoverageSummary@v1.3.0
+#        with:
+#          filename: coverage.xml
+#          badge: true
+#          format: 'markdown'
+#          output: 'both'
+#
+#      - name: Adding markdown to build summary
+#        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+#
+#      - name: Upload to coveralls.io
+#        run: coveralls --service=github
 
       - name: Build documentation
         run: |

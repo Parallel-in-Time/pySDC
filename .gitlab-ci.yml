@@ -81,6 +81,10 @@ merge_coverage:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
     - export COVERALLS_REPO_TOKEN=$COV_TOKEN
+    - export COVERALLS_SERVICE_NAME="gitlab-ci"
+    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
+    - export CI_BUILD_URL=$CI_JOB_URL
+    - export CI_BRANCH=$CI_COMMIT_REF_NAME
     - coveralls
 
 upload_results:
@@ -105,10 +109,6 @@ upload_results:
     - mkdir -p latest-benchmark
     - cd latest-benchmark
     - cp ../../*.json .
-#    - cd ..
-#    - mkdir -p latest-coverage
-#    - cd latest-coverage
-#    - cp ../../coverage.xml .
     - cd ..
     - git add -A
     - git commit -m "adding new benchmark results"
