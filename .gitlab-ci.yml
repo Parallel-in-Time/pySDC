@@ -85,7 +85,7 @@ merge_coverage:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
     - micromamba install -c conda-forge git
-#    - git config --global --add safe.directory '*'
+    - git config --global --add safe.directory '*'
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
