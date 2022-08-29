@@ -2,7 +2,6 @@ from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic im
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
 
 # initialize problem parameters
@@ -14,7 +13,7 @@ problem_params['ndim'] = 3
 problem_params['lintol'] = 1E-10
 problem_params['liniter'] = 99
 problem_params['direct_solver'] = False
-problem_params['nvars'] = (64, 64, 64)
+problem_params['nvars'] = (32, 32, 32)
 
 # initialize level parameters
 level_params = dict()
@@ -71,4 +70,3 @@ uinit = P.u_exact(t0)
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 print('Laufzeit:', timing[0][1])
-print(P.f_im, P.f_ex)
