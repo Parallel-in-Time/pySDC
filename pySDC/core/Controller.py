@@ -1,10 +1,12 @@
 import logging
 import os
 import sys
+import numpy as np
 
 from pySDC.core import Hooks as hookclass
 from pySDC.core.BaseTransfer import base_transfer
 from pySDC.helpers.pysdc_helper import FrozenClass
+from pySDC.implementations.convergence_controller_classes.check_convergence import CheckConvergence
 
 
 # short helper class to add params as attributes
@@ -30,7 +32,7 @@ class controller(object):
     Base abstract controller class
     """
 
-    def __init__(self, controller_params):
+    def __init__(self, controller_params, description):
         """
         Initialization routine for the base controller
 
@@ -51,6 +53,8 @@ class controller(object):
 
         if self.params.use_iteration_estimator and self.params.all_to_done:
             self.logger.warning('all_to_done and use_iteration_estimator set, will ignore all_to_done')
+
+        self.setup_convergence_controllers(description)
 
     @staticmethod
     def __setup_custom_logger(level=None, log_to_file=None, fname=None):
@@ -219,3 +223,63 @@ class controller(object):
             pySDC.Hooks.hooks: hooks
         """
         return self.__hooks
+
+    def setup_convergence_controllers(self, description):
+        '''
+        Setup variables needed for convergence controllers, notably a list containing all of them and a list containing
+        their order. Also, we add the `CheckConvergence` convergence controller, which takes care of maximum iteration
+        count or a residual based stopping criterion, as well as all convergence controllers added to the description.
+
+        Args:
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            None
+        '''
+        self.convergence_controllers = []
+        self.convergence_controller_order = []
+        conv_classes = description.get('convergence_controllers', {})
+        conv_classes[CheckConvergence] = {}  # don't need special params for this, hence the {}
+
+        # instantiate the convergence controllers
+        for conv_class, params in conv_classes.items():
+            self.add_convergence_controller(conv_class, description=description, params=params)
+
+        return None
+
+    def add_convergence_controller(self, convergence_controller, description, params=None, allow_double=False):
+        '''
+        Add an individual convergence controller to the list of convergence controllers and instiate it.
+        Afterwards, the order of the convergence controllers is updated.
+
+        Args:
+            convergence_controller (pySDC.ConvergenceController): The convergence controller to be added
+            description (dict): The description object used to instantiate the controller
+            params (dict): Parametes for the convergence controller
+            allow_double (bool): Allow adding the same convergence controller multiple times
+
+        Returns:
+            None
+        '''
+        # check if we passed any sort of special params
+        params = {} if params is None else params
+
+        # check if we already have the convergence controller or if we want to have it multiple times
+        if convergence_controller not in [type(me) for me in self.convergence_controllers] or allow_double:
+            self.convergence_controllers.append(convergence_controller(self, params, description))
+
+            # update ordering
+            orders = [C.params.control_order for C in self.convergence_controllers]
+            self.convergence_controller_order = np.arange(len(self.convergence_controllers))[np.argsort(orders)]
+
+        return None
+
+    def print_convergence_controllers(self):
+        '''
+        This function is for debugging purposes to keep track of the different convergence controllers and their order.
+        '''
+        print('    | order | convergence controller')
+        print('----+-------+-------------------------------------------------------------------')
+        for i in range(len(self.convergence_controllers)):
+            C = self.convergence_controllers[self.convergence_controller_order[i]]
+            print(f'{i:3} | {C.params.control_order:5} | {type(C).__name__}')

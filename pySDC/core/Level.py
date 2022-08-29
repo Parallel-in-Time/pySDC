@@ -5,13 +5,16 @@ from pySDC.helpers.pysdc_helper import FrozenClass
 class _Pars(FrozenClass):
     def __init__(self, params):
         self.dt = None
-        self.restol = 0.0
+        self.dt_initial = None
+        self.restol = -1.0
         self.nsweeps = 1
         self.residual_type = 'full_abs'
         for k, v in params.items():
             setattr(self, k, v)
         # freeze class, no further attributes allowed from this point
         self._freeze()
+
+        self.dt_initial = self.dt * 1.
 
 
 # short helper class to bundle all status variables
@@ -21,7 +24,10 @@ class _Status(FrozenClass):
         self.unlocked = False
         self.updated = False
         self.time = None
+        self.dt_new = None
         self.sweep = None
+        self.error_embedded_estimate = None
+        self.error_extrapolation_estimate = None
         # freeze class, no further attributes allowed from this point
         self._freeze()
 

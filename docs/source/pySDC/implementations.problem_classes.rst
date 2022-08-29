@@ -101,10 +101,26 @@ implementations.problem\_classes.Auzinger\_implicit module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.Battery module
+-----------------------------------------------
+
+.. automodule:: implementations.problem_classes.Battery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.Boussinesq\_2D\_FD\_imex module
 ----------------------------------------------------------------
 
 .. automodule:: implementations.problem_classes.Boussinesq_2D_FD_imex
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementations.problem\_classes.BuckConverter module
+-----------------------------------------------------
+
+.. automodule:: implementations.problem_classes.BuckConverter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -253,6 +269,14 @@ implementations.problem\_classes.HenonHeiles module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.LogisticEquation module
+--------------------------------------------------------
+
+.. automodule:: implementations.problem_classes.LogisticEquation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.NonlinearSchroedinger\_MPIFFT module
 ---------------------------------------------------------------------
 
@@ -277,6 +301,14 @@ implementations.problem\_classes.PenningTrap\_3D module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.Piline module
+----------------------------------------------
+
+.. automodule:: implementations.problem_classes.Piline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.TestEquation\_0D module
 --------------------------------------------------------
 
@@ -297,6 +329,14 @@ implementations.problem\_classes.VorticityVelocity\_2D\_FEniCS\_periodic module
 -------------------------------------------------------------------------------
 
 .. automodule:: implementations.problem_classes.VorticityVelocity_2D_FEniCS_periodic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementations.problem\_classes.nonlinear\_ODE\_1 module
+---------------------------------------------------------
+
+.. automodule:: implementations.problem_classes.nonlinear_ODE_1
    :members:
    :undoc-members:
    :show-inheritance:

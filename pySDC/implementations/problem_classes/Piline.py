@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import solve_ivp
 
 from pySDC.core.Errors import ParameterError
 from pySDC.core.Problem import ptype
@@ -82,27 +83,40 @@ class piline(ptype):
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
         return me
 
-    def u_exact(self, t):
+    def u_exact(self, t, u_init=None, t_init=None):
         """
-        Routine to compute the exact solution at time t
+        Routine to approximate the exact solution at time t by scipy
 
         Args:
             t (float): current time
+            u_init (pySDC.problem.Piline.dtype_u): initial conditions for getting the exact solution
+            t_init (float): the starting time
 
         Returns:
-            dtype_u: exact solution
+            dtype_u: exact solution (kind of)
         """
 
         me = self.dtype_u(self.init)
 
+        # fill initial conditions
         me[0] = 0.0  # v1
         me[1] = 0.0  # v2
         me[2] = 0.0  # p3
-        # me[3] = 0.0  # i_Vs
-        # me[4] = self.params.Vs / self.params.Rs  # i_C1
-        # me[5] = 0.0  # i_Rpi
-        # me[6] = 0.0  # i_Lpi
-        # me[7] = 0.0  # i_C2
-        # me[8] = 0.0  # i_Rl
+
+        if t > 0.:
+            if u_init is not None:
+                if t_init is None:
+                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!')
+                me = u_init
+            else:
+                t_init = 0.
+
+            def rhs(t, u):
+                f = self.eval_f(u, t)
+                return f.impl + f.expl  # evaluate only explicitly rather than IMEX
+
+            tol = 100 * np.finfo(float).eps
+            me[:] = solve_ivp(rhs, (t_init, t), me, rtol=tol, atol=tol).y[:, -1]
 
         return me

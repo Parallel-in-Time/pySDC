@@ -1,8 +1,8 @@
 import numpy as np
 import dill
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -22,7 +22,9 @@ def main():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['collocation_class'] = Collocation
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 3
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
@@ -69,21 +71,21 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    fname = 'data/piline.dat'
+    fname = 'piline.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
 
 
 def plot_voltages(cwd='./'):
-    f = open(cwd + 'data/piline.dat', 'rb')
+    f = open(cwd + 'piline.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
     # convert filtered statistics to list of iterations count, sorted by process
-    v1 = sort_stats(filter_stats(stats, type='v1'), sortby='time')
-    v2 = sort_stats(filter_stats(stats, type='v2'), sortby='time')
-    p3 = sort_stats(filter_stats(stats, type='p3'), sortby='time')
+    v1 = get_sorted(stats, type='v1', sortby='time')
+    v2 = get_sorted(stats, type='v2', sortby='time')
+    p3 = get_sorted(stats, type='p3', sortby='time')
 
     times = [v[0] for v in v1]
 

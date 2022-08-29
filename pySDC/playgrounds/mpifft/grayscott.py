@@ -68,7 +68,6 @@ def run_simulation(spectral=None, splitting_type=None, ml=None, num_procs=None):
     controller_params = dict()
     controller_params['logger_level'] = 20 if rank == 0 else 99
     # controller_params['predict_type'] = 'fine_only'
-    controller_params['use_iteration_estimator'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
