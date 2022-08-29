@@ -72,23 +72,27 @@ merge_coverage:
   variables:
     COV_TOKEN: ${COV_TOKEN}
   artifacts:
-    paths:
-      - coverage.xml
+#    paths:
+#      - coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
     - micromamba install -c conda-forge git
-    - git config --global --add safe.directory '*'
+#    - git config --global --add safe.directory '*'
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
-    - export COVERALLS_REPO_TOKEN=IIVno4qGDiM8hITDjEIukDloO9HnPQfPmB9Id
-    - export CI_NAME=gitlab
-    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
-    - export CI_BUILD_URL=$CI_JOB_URL
-    - export CI_BRANCH=$CI_COMMIT_REF_NAME
-    - coveralls
+#    - export COVERALLS_REPO_TOKEN=IIVno4qGDiM8hITDjEIukDloO9HnPQfPmB9Id
+#    - export CI_NAME=gitlab
+#    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
+#    - export CI_BUILD_URL=$CI_JOB_URL
+#    - export CI_BRANCH=$CI_COMMIT_REF_NAME
+#    - coveralls
 
 upload_results:
   image: ubuntu:latest
