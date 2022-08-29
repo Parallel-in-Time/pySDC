@@ -78,6 +78,7 @@ merge_coverage:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -87,7 +88,10 @@ merge_coverage:
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
-#    - export COVERALLS_REPO_TOKEN=IIVno4qGDiM8hITDjEIukDloO9HnPQfPmB9Id
+    - echo $CI_COMMIT_SHORT_SHA
+    - echo $CI_JOB_URL
+    - echo $CI_COMMIT_REF_NAME
+#    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
 #    - export CI_NAME=gitlab
 #    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
 #    - export CI_BUILD_URL=$CI_JOB_URL
