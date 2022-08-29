@@ -68,4 +68,4 @@ uinit = P.u_exact(t0)
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
 print('Laufzeit:', timing[0][1])
-print(P.f_im, P.f_ex)
+

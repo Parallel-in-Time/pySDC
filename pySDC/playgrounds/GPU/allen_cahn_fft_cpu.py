@@ -1,5 +1,4 @@
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex
-from pySDC.implementations.collocations import Collocation
 from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -62,3 +61,5 @@ uinit = P.u_exact(t0)
 
 # call main function to get things done...
 uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+print('Laufzeit:', timing[0][1])
