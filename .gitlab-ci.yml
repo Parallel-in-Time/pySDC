@@ -71,6 +71,7 @@ merge_coverage:
   stage: benchmark
   variables:
     COV_TOKEN: ${COV_TOKEN}
+
   artifacts:
 #    paths:
 #      - coverage.xml
@@ -88,15 +89,13 @@ merge_coverage:
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml
-    - echo $CI_COMMIT_SHORT_SHA
-    - echo $CI_JOB_URL
-    - echo $CI_COMMIT_REF_NAME
-#    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
-#    - export CI_NAME=gitlab
-#    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
-#    - export CI_BUILD_URL=$CI_JOB_URL
-#    - export CI_BRANCH=$CI_COMMIT_REF_NAME
-#    - coveralls
+    - export COVERALLS_REPO_TOKEN="$COV_TOKEN"
+    - export COVERALLS_SERVICE_NAME="gitlab-ci"
+    - export CI_NAME="gitlab-ci"
+    - export CI_BUILD_NUMBER="$CI_COMMIT_SHORT_SHA"
+    - export CI_BUILD_URL="$CI_JOB_URL"
+    - export CI_BRANCH="$CI_COMMIT_REF_NAME"
+    - coveralls
 
 upload_results:
   image: ubuntu:latest
