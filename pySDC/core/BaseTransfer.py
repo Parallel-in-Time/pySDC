@@ -1,10 +1,10 @@
 import logging
 
-import numpy as np
 import scipy.sparse as sp
 
 from pySDC.core.Errors import UnlockError
 from pySDC.helpers.pysdc_helper import FrozenClass
+from pySDC.core import LagrangeApproximation
 
 
 # short helper class to add params as attributes
@@ -66,33 +66,17 @@ class base_transfer(object):
     @staticmethod
     def get_transfer_matrix_Q(f_nodes, c_nodes):
         """
-        Helper routine to quickly define transfer matrices between sets of nodes (fully Lagrangian)
+        Helper routine to quickly define transfer matrices from a coarse set
+        to a fine set of nodes (fully Lagrangian)
         Args:
-            f_nodes: fine nodes
-            c_nodes: coarse nodes
+            f_nodes: fine nodes (size nF)
+            c_nodes: coarse nodes (size nC)
 
         Returns:
-            matrix containing the interpolation weights
+            matrix containing the interpolation weights (shape (nF, nC))
         """
-        nnodes_f = len(f_nodes)
-        nnodes_c = len(c_nodes)
-
-        tmat = np.zeros((nnodes_f, nnodes_c))
-
-        for i in range(nnodes_f):
-            xi = f_nodes[i]
-            for j in range(nnodes_c):
-                den = 1.0
-                num = 1.0
-                for k in range(nnodes_c):
-                    if k == j:
-                        continue
-                    else:
-                        den *= c_nodes[j] - c_nodes[k]
-                        num *= xi - c_nodes[k]
-                tmat[i, j] = num / den
-
-        return tmat
+        approx = LagrangeApproximation(c_nodes)
+        return approx.getInterpolationMatrix(f_nodes)
 
     def restrict(self):
         """

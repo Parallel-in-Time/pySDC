@@ -24,7 +24,7 @@ class controller_MPI(controller):
        """
 
         # call parent's initialization routine
-        super(controller_MPI, self).__init__(controller_params)
+        super(controller_MPI, self).__init__(controller_params, description)
 
         # create single step per processor
         self.S = step(description)
@@ -370,422 +370,6 @@ class controller_MPI(controller):
             num_procs (int): number of parallel processes
         """
 
-        def spread():
-            """
-            Spreading phase
-            """
-
-            # first stage: spread values
-            self.hooks.pre_step(step=self.S, level_number=0)
-
-            # call predictor from sweeper
-            self.S.levels[0].sweep.predict()
-
-            if self.params.use_iteration_estimator:
-                # store pervious iterate to compute difference later on
-                self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
-
-            # update stage
-            if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
-                self.S.status.stage = 'PREDICT'
-            else:
-                self.S.status.stage = 'IT_CHECK'
-
-        def predict():
-            """
-            Predictor phase
-            """
-
-            self.hooks.pre_predict(step=self.S, level_number=0)
-
-            if self.params.predict_type is None:
-                pass
-
-            elif self.params.predict_type == 'fine_only':
-
-                # do a fine sweep only
-                self.S.levels[0].sweep.update_nodes()
-
-            # elif self.params.predict_type == 'libpfasst_style':
-            #
-            #     # restrict to coarsest level
-            #     for l in range(1, len(self.S.levels)):
-            #         self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
-            #
-            #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-            #     if not self.S.status.first:
-            #         self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
-            #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-            #                            self.S.status.iter))
-            #         self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-            #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-            #
-            #     # do the sweep with new values
-            #     self.S.levels[-1].sweep.update_nodes()
-            #     self.S.levels[-1].sweep.compute_end_point()
-            #
-            #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-            #     if not self.S.status.last:
-            #         self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
-            #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-            #                            self.S.status.iter))
-            #         self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
-            #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
-            #
-            #     # go back to fine level, sweeping
-            #     for l in range(len(self.S.levels) - 1, 0, -1):
-            #         # prolong values
-            #         self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-            #         # on middle levels: do sweep as usual
-            #         if l - 1 > 0:
-            #             self.S.levels[l - 1].sweep.update_nodes()
-            #
-            #     # end with a fine sweep
-            #     self.S.levels[0].sweep.update_nodes()
-
-            elif self.params.predict_type == 'pfasst_burnin':
-
-                # restrict to coarsest level
-                for l in range(1, len(self.S.levels)):
-                    self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
-
-                for p in range(self.S.status.slot + 1):
-
-                    self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-                    if not p == 0 and not self.S.status.first:
-                        self.logger.debug(
-                            'recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
-                            (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                             self.S.status.iter, p))
-                        self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-                    self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-
-                    # do the sweep with new values
-                    self.S.levels[-1].sweep.update_nodes()
-                    self.S.levels[-1].sweep.compute_end_point()
-
-                    self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-                    if not self.S.status.last:
-                        self.logger.debug(
-                            'send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
-                            (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                             self.S.status.iter, p))
-                        self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
-                    self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1,
-                                         add_to_stats=(p == self.S.status.slot))
-
-                # interpolate back to finest level
-                for l in range(len(self.S.levels) - 1, 0, -1):
-                    self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-
-                self.hooks.pre_comm(step=self.S, level_number=0)
-
-                self.wait_with_interrupt(request=self.req_send[0])
-                if self.S.status.force_done:
-                    return None
-
-                self.S.levels[0].sweep.compute_end_point()
-
-                if not self.S.status.last:
-                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                       self.S.status.iter, self.S.status.iter))
-                    self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
-
-                if not self.S.status.first and not self.S.status.prev_done:
-                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                       self.S.status.iter, self.S.status.iter))
-                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-                    if self.S.status.force_done:
-                        return None
-
-                self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=False)
-
-                # end this with a fine sweep
-                self.S.levels[0].sweep.update_nodes()
-
-            elif self.params.predict_type == 'fmg':
-                # TODO: implement FMG predictor
-                raise NotImplementedError('FMG predictor is not yet implemented')
-
-            else:
-                raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
-
-            self.hooks.post_predict(step=self.S, level_number=0)
-
-            # update stage
-            self.S.status.stage = 'IT_CHECK'
-
-        def it_check():
-            """
-            Key routine to check for convergence/termination
-            """
-            if not self.params.use_iteration_estimator:
-                self.check_residual(comm=comm)
-            else:
-                self.check_iteration_estimate(comm=comm)
-            if self.S.status.force_done:
-                return None
-
-            if self.S.status.iter > 0:
-                self.hooks.post_iteration(step=self.S, level_number=0)
-
-            # if not readys, keep doing stuff
-            if not self.S.status.done:
-
-                # increment iteration count here (and only here)
-                self.S.status.iter += 1
-
-                self.hooks.pre_iteration(step=self.S, level_number=0)
-
-                if self.params.use_iteration_estimator:
-                    # store pervious iterate to compute difference later on
-                    self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
-
-                if len(self.S.levels) > 1:  # MLSDC or PFASST
-                    self.S.status.stage = 'IT_DOWN'
-                else:
-                    if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
-                        self.S.status.stage = 'IT_FINE'
-                    else:
-                        self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
-
-            else:
-
-                if not self.params.use_iteration_estimator:
-                    # Need to finish all pending isend requests. These will occur for the first active process, since
-                    # in the last iteration the wait statement will not be called ("send and forget")
-                    for req in self.req_send:
-                        if req is not None:
-                            req.Wait()
-                    if self.req_status is not None:
-                        self.req_status.Wait()
-                    if self.req_diff is not None:
-                        self.req_diff.Wait()
-                else:
-                    for req in self.req_send:
-                        if req is not None:
-                            req.Cancel()
-                    if self.req_status is not None:
-                        self.req_status.Cancel()
-                    if self.req_diff is not None:
-                        self.req_diff.Cancel()
-
-                self.hooks.post_step(step=self.S, level_number=0)
-                self.S.status.stage = 'DONE'
-
-        def it_fine():
-            """
-            Fine sweeps
-            """
-
-            nsweeps = self.S.levels[0].params.nsweeps
-
-            self.S.levels[0].status.sweep = 0
-
-            # do fine sweep
-            for k in range(nsweeps):
-
-                self.S.levels[0].status.sweep += 1
-
-                self.hooks.pre_comm(step=self.S, level_number=0)
-
-                self.wait_with_interrupt(request=self.req_send[0])
-                if self.S.status.force_done:
-                    return None
-
-                self.S.levels[0].sweep.compute_end_point()
-
-                if not self.S.status.last:
-                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                       self.S.status.iter, self.S.status.iter))
-                    self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
-
-                if not self.S.status.first and not self.S.status.prev_done:
-                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                       self.S.status.iter, self.S.status.iter))
-                    self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
-                    if self.S.status.force_done:
-                        return None
-
-                self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=(k == nsweeps - 1))
-
-                self.hooks.pre_sweep(step=self.S, level_number=0)
-                self.S.levels[0].sweep.update_nodes()
-                self.S.levels[0].sweep.compute_residual()
-                self.hooks.post_sweep(step=self.S, level_number=0)
-
-            # update stage
-            self.S.status.stage = 'IT_CHECK'
-
-        def it_down():
-            """
-            Go down the hierarchy from finest to coarsest level
-            """
-
-            self.S.transfer(source=self.S.levels[0], target=self.S.levels[1])
-
-            # sweep and send on middle levels (not on finest, not on coarsest, though)
-            for l in range(1, len(self.S.levels) - 1):
-
-                nsweeps = self.S.levels[l].params.nsweeps
-
-                for _ in range(nsweeps):
-
-                    self.hooks.pre_comm(step=self.S, level_number=l)
-
-                    self.wait_with_interrupt(request=self.req_send[l])
-                    if self.S.status.force_done:
-                        return None
-
-                    self.S.levels[l].sweep.compute_end_point()
-
-                    if not self.S.status.last:
-                        self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                           l * 100 + self.S.status.iter, self.S.status.iter))
-                        self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next,
-                                                                       tag=l * 100 + self.S.status.iter,
-                                                                       comm=comm)
-
-                    if not self.S.status.first and not self.S.status.prev_done:
-                        self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                           l * 100 + self.S.status.iter, self.S.status.iter))
-                        self.recv(target=self.S.levels[l], source=self.S.prev,
-                                  tag=l * 100 + self.S.status.iter,
-                                  comm=comm)
-                        if self.S.status.force_done:
-                            return None
-
-                    self.hooks.post_comm(step=self.S, level_number=l)
-
-                    self.hooks.pre_sweep(step=self.S, level_number=l)
-                    self.S.levels[l].sweep.update_nodes()
-                    self.S.levels[l].sweep.compute_residual()
-                    self.hooks.post_sweep(step=self.S, level_number=l)
-
-                # transfer further down the hierarchy
-                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
-
-            # update stage
-            self.S.status.stage = 'IT_COARSE'
-
-        def it_coarse():
-            """
-            Coarse sweep
-            """
-
-            # receive from previous step (if not first)
-            self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-            if not self.S.status.first and not self.S.status.prev_done:
-                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                   (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
-                self.recv(target=self.S.levels[-1], source=self.S.prev,
-                          tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
-                          comm=comm)
-                if self.S.status.force_done:
-                    return None
-
-            self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
-
-            # do the sweep
-            self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-            assert self.S.levels[-1].params.nsweeps == 1, \
-                'ERROR: this controller can only work with one sweep on the coarse level, got %s' % \
-                self.S.levels[-1].params.nsweeps
-            self.S.levels[-1].sweep.update_nodes()
-            self.S.levels[-1].sweep.compute_residual()
-            self.hooks.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
-            self.S.levels[-1].sweep.compute_end_point()
-
-            # send to next step
-            self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
-            if not self.S.status.last:
-                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                   (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
-                self.req_send[-1] = \
-                    self.S.levels[-1].uend.isend(dest=self.S.next,
-                                                 tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
-                                                 comm=comm)
-                self.wait_with_interrupt(request=self.req_send[-1])
-                if self.S.status.force_done:
-                    return None
-
-            self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
-
-            # update stage
-            if len(self.S.levels) > 1:  # MLSDC or PFASST
-                self.S.status.stage = 'IT_UP'
-            else:
-                self.S.status.stage = 'IT_CHECK'  # MSSDC
-
-        def it_up():
-            """
-            Prolong corrections up to finest level (parallel)
-            """
-
-            # receive and sweep on middle levels (except for coarsest level)
-            for l in range(len(self.S.levels) - 1, 0, -1):
-
-                # prolong values
-                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
-
-                # on middle levels: do sweep as usual
-                if l - 1 > 0:
-
-                    nsweeps = self.S.levels[l - 1].params.nsweeps
-
-                    for k in range(nsweeps):
-
-                        self.hooks.pre_comm(step=self.S, level_number=l - 1)
-
-                        self.wait_with_interrupt(request=self.req_send[l - 1])
-                        if self.S.status.force_done:
-                            return None
-
-                        self.S.levels[l - 1].sweep.compute_end_point()
-
-                        if not self.S.status.last:
-                            self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
-                                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
-                                               (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
-                            self.req_send[l - 1] = \
-                                self.S.levels[l - 1].uend.isend(dest=self.S.next,
-                                                                tag=(l - 1) * 100 + self.S.status.iter,
-                                                                comm=comm)
-
-                        if not self.S.status.first and not self.S.status.prev_done:
-                            self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
-                                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
-                                               (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
-                            self.recv(target=self.S.levels[l - 1], source=self.S.prev,
-                                      tag=(l - 1) * 100 + self.S.status.iter,
-                                      comm=comm)
-                            if self.S.status.force_done:
-                                return None
-
-                        self.hooks.post_comm(step=self.S, level_number=l - 1, add_to_stats=(k == nsweeps - 1))
-
-                        self.hooks.pre_sweep(step=self.S, level_number=l - 1)
-                        self.S.levels[l - 1].sweep.update_nodes()
-                        self.S.levels[l - 1].sweep.compute_residual()
-                        self.hooks.post_sweep(step=self.S, level_number=l - 1)
-
-            # update stage
-            self.S.status.stage = 'IT_FINE'
-
-        def default():
-            """
-            Default routine to catch wrong status
-            """
-            raise ControllerError('Weird stage, got %s' % self.S.status.stage)
-
         stage = self.S.status.stage
 
         self.logger.debug(stage + ' - process ' + str(self.S.status.slot))
@@ -820,13 +404,429 @@ class controller_MPI(controller):
         else:
             # Start cycling, if not interrupted
             switcher = {
-                'SPREAD': spread,
-                'PREDICT': predict,
-                'IT_CHECK': it_check,
-                'IT_FINE': it_fine,
-                'IT_DOWN': it_down,
-                'IT_COARSE': it_coarse,
-                'IT_UP': it_up
+                'SPREAD': self.spread,
+                'PREDICT': self.predict,
+                'IT_CHECK': self.it_check,
+                'IT_FINE': self.it_fine,
+                'IT_DOWN': self.it_down,
+                'IT_COARSE': self.it_coarse,
+                'IT_UP': self.it_up
             }
 
-            switcher.get(stage, default)()
+            switcher.get(stage, self.default)(comm, num_procs)
+
+    def spread(self, comm, num_procs):
+        """
+        Spreading phase
+        """
+
+        # first stage: spread values
+        self.hooks.pre_step(step=self.S, level_number=0)
+
+        # call predictor from sweeper
+        self.S.levels[0].sweep.predict()
+
+        if self.params.use_iteration_estimator:
+            # store pervious iterate to compute difference later on
+            self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
+
+        # update stage
+        if len(self.S.levels) > 1:  # MLSDC or PFASST with predict
+            self.S.status.stage = 'PREDICT'
+        else:
+            self.S.status.stage = 'IT_CHECK'
+
+    def predict(self, comm, num_procs):
+        """
+        Predictor phase
+        """
+
+        self.hooks.pre_predict(step=self.S, level_number=0)
+
+        if self.params.predict_type is None:
+            pass
+
+        elif self.params.predict_type == 'fine_only':
+
+            # do a fine sweep only
+            self.S.levels[0].sweep.update_nodes()
+
+        # elif self.params.predict_type == 'libpfasst_style':
+        #
+        #     # restrict to coarsest level
+        #     for l in range(1, len(self.S.levels)):
+        #         self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+        #
+        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+        #     if not self.S.status.first:
+        #         self.logger.debug('recv data predict: process %s, stage %s, time, %s, source %s, tag %s' %
+        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+        #                            self.S.status.iter))
+        #         self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
+        #
+        #     # do the sweep with new values
+        #     self.S.levels[-1].sweep.update_nodes()
+        #     self.S.levels[-1].sweep.compute_end_point()
+        #
+        #     self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+        #     if not self.S.status.last:
+        #         self.logger.debug('send data predict: process %s, stage %s, time, %s, target %s, tag %s' %
+        #                           (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+        #                            self.S.status.iter))
+        #         self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
+        #     self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
+        #
+        #     # go back to fine level, sweeping
+        #     for l in range(len(self.S.levels) - 1, 0, -1):
+        #         # prolong values
+        #         self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+        #         # on middle levels: do sweep as usual
+        #         if l - 1 > 0:
+        #             self.S.levels[l - 1].sweep.update_nodes()
+        #
+        #     # end with a fine sweep
+        #     self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'pfasst_burnin':
+
+            # restrict to coarsest level
+            for l in range(1, len(self.S.levels)):
+                self.S.transfer(source=self.S.levels[l - 1], target=self.S.levels[l])
+
+            for p in range(self.S.status.slot + 1):
+
+                self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+                if not p == 0 and not self.S.status.first:
+                    self.logger.debug(
+                        'recv data predict: process %s, stage %s, time, %s, source %s, tag %s, phase %s' %
+                        (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                         self.S.status.iter, p))
+                    self.recv(target=self.S.levels[-1], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
+
+                # do the sweep with new values
+                self.S.levels[-1].sweep.update_nodes()
+                self.S.levels[-1].sweep.compute_end_point()
+
+                self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+                if not self.S.status.last:
+                    self.logger.debug(
+                        'send data predict: process %s, stage %s, time, %s, target %s, tag %s, phase %s' %
+                        (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                         self.S.status.iter, p))
+                    self.S.levels[-1].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm).Wait()
+                self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1,
+                                     add_to_stats=(p == self.S.status.slot))
+
+            # interpolate back to finest level
+            for l in range(len(self.S.levels) - 1, 0, -1):
+                self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+            self.hooks.pre_comm(step=self.S, level_number=0)
+
+            self.wait_with_interrupt(request=self.req_send[0])
+            if self.S.status.force_done:
+                return None
+
+            self.S.levels[0].sweep.compute_end_point()
+
+            if not self.S.status.last:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   self.S.status.iter, self.S.status.iter))
+                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   self.S.status.iter, self.S.status.iter))
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                if self.S.status.force_done:
+                    return None
+
+            self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=False)
+
+            # end this with a fine sweep
+            self.S.levels[0].sweep.update_nodes()
+
+        elif self.params.predict_type == 'fmg':
+            # TODO: implement FMG predictor
+            raise NotImplementedError('FMG predictor is not yet implemented')
+
+        else:
+            raise ControllerError('Wrong predictor type, got %s' % self.params.predict_type)
+
+        self.hooks.post_predict(step=self.S, level_number=0)
+
+        # update stage
+        self.S.status.stage = 'IT_CHECK'
+
+    def it_check(self, comm, num_procs):
+        """
+        Key routine to check for convergence/termination
+        """
+        if not self.params.use_iteration_estimator:
+            self.check_residual(comm=comm)
+        else:
+            self.check_iteration_estimate(comm=comm)
+        if self.S.status.force_done:
+            return None
+
+        if self.S.status.iter > 0:
+            self.hooks.post_iteration(step=self.S, level_number=0)
+
+        # if not readys, keep doing stuff
+        if not self.S.status.done:
+
+            # increment iteration count here (and only here)
+            self.S.status.iter += 1
+
+            self.hooks.pre_iteration(step=self.S, level_number=0)
+
+            if self.params.use_iteration_estimator:
+                # store pervious iterate to compute difference later on
+                self.S.levels[0].uold[1:] = self.S.levels[0].u[1:]
+
+            if len(self.S.levels) > 1:  # MLSDC or PFASST
+                self.S.status.stage = 'IT_DOWN'
+            else:
+                if num_procs == 1 or self.params.mssdc_jac:  # SDC or parallel MSSDC (Jacobi-like)
+                    self.S.status.stage = 'IT_FINE'
+                else:
+                    self.S.status.stage = 'IT_COARSE'  # serial MSSDC (Gauss-like)
+
+        else:
+
+            if not self.params.use_iteration_estimator:
+                # Need to finish all pending isend requests. These will occur for the first active process, since
+                # in the last iteration the wait statement will not be called ("send and forget")
+                for req in self.req_send:
+                    if req is not None:
+                        req.Wait()
+                if self.req_status is not None:
+                    self.req_status.Wait()
+                if self.req_diff is not None:
+                    self.req_diff.Wait()
+            else:
+                for req in self.req_send:
+                    if req is not None:
+                        req.Cancel()
+                if self.req_status is not None:
+                    self.req_status.Cancel()
+                if self.req_diff is not None:
+                    self.req_diff.Cancel()
+
+            self.hooks.post_step(step=self.S, level_number=0)
+            self.S.status.stage = 'DONE'
+
+    def it_fine(self, comm, num_procs):
+        """
+        Fine sweeps
+        """
+
+        nsweeps = self.S.levels[0].params.nsweeps
+
+        self.S.levels[0].status.sweep = 0
+
+        # do fine sweep
+        for k in range(nsweeps):
+
+            self.S.levels[0].status.sweep += 1
+
+            self.hooks.pre_comm(step=self.S, level_number=0)
+
+            self.wait_with_interrupt(request=self.req_send[0])
+            if self.S.status.force_done:
+                return None
+
+            self.S.levels[0].sweep.compute_end_point()
+
+            if not self.S.status.last:
+                self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                   self.S.status.iter, self.S.status.iter))
+                self.req_send[0] = self.S.levels[0].uend.isend(dest=self.S.next, tag=self.S.status.iter, comm=comm)
+
+            if not self.S.status.first and not self.S.status.prev_done:
+                self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                  (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                   self.S.status.iter, self.S.status.iter))
+                self.recv(target=self.S.levels[0], source=self.S.prev, tag=self.S.status.iter, comm=comm)
+                if self.S.status.force_done:
+                    return None
+
+            self.hooks.post_comm(step=self.S, level_number=0, add_to_stats=(k == nsweeps - 1))
+
+            self.hooks.pre_sweep(step=self.S, level_number=0)
+            self.S.levels[0].sweep.update_nodes()
+            self.S.levels[0].sweep.compute_residual()
+            self.hooks.post_sweep(step=self.S, level_number=0)
+
+        # update stage
+        self.S.status.stage = 'IT_CHECK'
+
+    def it_down(self, comm, num_procs):
+        """
+        Go down the hierarchy from finest to coarsest level
+        """
+
+        self.S.transfer(source=self.S.levels[0], target=self.S.levels[1])
+
+        # sweep and send on middle levels (not on finest, not on coarsest, though)
+        for l in range(1, len(self.S.levels) - 1):
+
+            nsweeps = self.S.levels[l].params.nsweeps
+
+            for _ in range(nsweeps):
+
+                self.hooks.pre_comm(step=self.S, level_number=l)
+
+                self.wait_with_interrupt(request=self.req_send[l])
+                if self.S.status.force_done:
+                    return None
+
+                self.S.levels[l].sweep.compute_end_point()
+
+                if not self.S.status.last:
+                    self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                       l * 100 + self.S.status.iter, self.S.status.iter))
+                    self.req_send[l] = self.S.levels[l].uend.isend(dest=self.S.next,
+                                                                   tag=l * 100 + self.S.status.iter,
+                                                                   comm=comm)
+
+                if not self.S.status.first and not self.S.status.prev_done:
+                    self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                      (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                       l * 100 + self.S.status.iter, self.S.status.iter))
+                    self.recv(target=self.S.levels[l], source=self.S.prev,
+                              tag=l * 100 + self.S.status.iter,
+                              comm=comm)
+                    if self.S.status.force_done:
+                        return None
+
+                self.hooks.post_comm(step=self.S, level_number=l)
+
+                self.hooks.pre_sweep(step=self.S, level_number=l)
+                self.S.levels[l].sweep.update_nodes()
+                self.S.levels[l].sweep.compute_residual()
+                self.hooks.post_sweep(step=self.S, level_number=l)
+
+            # transfer further down the hierarchy
+            self.S.transfer(source=self.S.levels[l], target=self.S.levels[l + 1])
+
+        # update stage
+        self.S.status.stage = 'IT_COARSE'
+
+    def it_coarse(self, comm, num_procs):
+        """
+        Coarse sweep
+        """
+
+        # receive from previous step (if not first)
+        self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+        if not self.S.status.first and not self.S.status.prev_done:
+            self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                               (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
+            self.recv(target=self.S.levels[-1], source=self.S.prev,
+                      tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
+                      comm=comm)
+            if self.S.status.force_done:
+                return None
+
+        self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1)
+
+        # do the sweep
+        self.hooks.pre_sweep(step=self.S, level_number=len(self.S.levels) - 1)
+        assert self.S.levels[-1].params.nsweeps == 1, \
+            'ERROR: this controller can only work with one sweep on the coarse level, got %s' % \
+            self.S.levels[-1].params.nsweeps
+        self.S.levels[-1].sweep.update_nodes()
+        self.S.levels[-1].sweep.compute_residual()
+        self.hooks.post_sweep(step=self.S, level_number=len(self.S.levels) - 1)
+        self.S.levels[-1].sweep.compute_end_point()
+
+        # send to next step
+        self.hooks.pre_comm(step=self.S, level_number=len(self.S.levels) - 1)
+        if not self.S.status.last:
+            self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                              (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                               (len(self.S.levels) - 1) * 100 + self.S.status.iter, self.S.status.iter))
+            self.req_send[-1] = \
+                self.S.levels[-1].uend.isend(dest=self.S.next,
+                                             tag=(len(self.S.levels) - 1) * 100 + self.S.status.iter,
+                                             comm=comm)
+            self.wait_with_interrupt(request=self.req_send[-1])
+            if self.S.status.force_done:
+                return None
+
+        self.hooks.post_comm(step=self.S, level_number=len(self.S.levels) - 1, add_to_stats=True)
+
+        # update stage
+        if len(self.S.levels) > 1:  # MLSDC or PFASST
+            self.S.status.stage = 'IT_UP'
+        else:
+            self.S.status.stage = 'IT_CHECK'  # MSSDC
+
+    def it_up(self, comm, num_procs):
+        """
+        Prolong corrections up to finest level (parallel)
+        """
+
+        # receive and sweep on middle levels (except for coarsest level)
+        for l in range(len(self.S.levels) - 1, 0, -1):
+
+            # prolong values
+            self.S.transfer(source=self.S.levels[l], target=self.S.levels[l - 1])
+
+            # on middle levels: do sweep as usual
+            if l - 1 > 0:
+
+                nsweeps = self.S.levels[l - 1].params.nsweeps
+
+                for k in range(nsweeps):
+
+                    self.hooks.pre_comm(step=self.S, level_number=l - 1)
+
+                    self.wait_with_interrupt(request=self.req_send[l - 1])
+                    if self.S.status.force_done:
+                        return None
+
+                    self.S.levels[l - 1].sweep.compute_end_point()
+
+                    if not self.S.status.last:
+                        self.logger.debug('isend data: process %s, stage %s, time %s, target %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.next,
+                                           (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
+                        self.req_send[l - 1] = \
+                            self.S.levels[l - 1].uend.isend(dest=self.S.next,
+                                                            tag=(l - 1) * 100 + self.S.status.iter,
+                                                            comm=comm)
+
+                    if not self.S.status.first and not self.S.status.prev_done:
+                        self.logger.debug('recv data: process %s, stage %s, time %s, source %s, tag %s, iter %s' %
+                                          (self.S.status.slot, self.S.status.stage, self.S.time, self.S.prev,
+                                           (l - 1) * 100 + self.S.status.iter, self.S.status.iter))
+                        self.recv(target=self.S.levels[l - 1], source=self.S.prev,
+                                  tag=(l - 1) * 100 + self.S.status.iter,
+                                  comm=comm)
+                        if self.S.status.force_done:
+                            return None
+
+                    self.hooks.post_comm(step=self.S, level_number=l - 1, add_to_stats=(k == nsweeps - 1))
+
+                    self.hooks.pre_sweep(step=self.S, level_number=l - 1)
+                    self.S.levels[l - 1].sweep.update_nodes()
+                    self.S.levels[l - 1].sweep.compute_residual()
+                    self.hooks.post_sweep(step=self.S, level_number=l - 1)
+
+        # update stage
+        self.S.status.stage = 'IT_FINE'
+
+    def default(self, num_procs):
+        """
+        Default routine to catch wrong status
+        """
+        raise ControllerError('Weird stage, got %s' % self.S.status.stage)

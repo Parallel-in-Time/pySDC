@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pySDC'
-copyright = '2021, Robert Speck'
+copyright = '2022, Robert Speck'
 author = 'Robert Speck'
 
 # The version info for the project you're documenting, acts as replacement for

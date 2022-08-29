@@ -52,6 +52,14 @@ core.Level module
    :undoc-members:
    :show-inheritance:
 
+core.Nodes module
+-----------------
+
+.. automodule:: core.Nodes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 core.Problem module
 -------------------
 

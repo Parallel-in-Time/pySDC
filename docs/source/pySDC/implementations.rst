@@ -14,6 +14,17 @@ Subpackages
    implementations.sweeper_classes
    implementations.transfer_classes
 
+Submodules
+----------
+
+implementations.collocations module
+-----------------------------------
+
+.. automodule:: implementations.collocations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
