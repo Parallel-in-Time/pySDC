@@ -14,7 +14,7 @@ class cupy_mesh:
 
     def __init__(self, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
         """
-        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a cupy_mesh.
 
         Args:
             init: either another mesh or a tuple containing the dimensions and the dtype
@@ -47,15 +47,31 @@ class cupy_mesh:
         return float(global_absval)
 
     def __setitem__(self, key, value):
+        """
+        Overloading the setitem operator
+        """
         self.values[key] = value
 
     def __getitem__(self, item):
+        """
+        Overloading the getitem operator
+        """
         return self.values[item]
 
     def flatten(self):
+        """
+        Overloading the flatten operator
+        Returns:
+             cupy.ndarray
+        """
         return self.values.flatten()
 
     def __add__(self, other):
+        """
+        Overloading the add operator
+        Returns:
+            new: cupy_mesh
+        """
         if type(other) is cupy_mesh:
             new = cupy_mesh(other)
             new.values = other.values + self.values
@@ -65,6 +81,11 @@ class cupy_mesh:
         return new
 
     def __rmul__(self, other):
+        """
+        Overloading the rmul operator
+        Returns:
+            new: cupy_mesh
+        """
         new = None
         if type(other) is cupy_mesh:
             raise NotImplementedError("not implemendet to multiplicate to cupy_class obj")
@@ -74,6 +95,11 @@ class cupy_mesh:
         return new
 
     def __sub__(self, other):
+        """
+        Overloading the sub operator
+        Returns:
+            new: cupy_mesh
+        """
         new = cupy_mesh(self)
         if type(other) is cupy_mesh:
             new.values = self.values - other.values
@@ -83,19 +109,23 @@ class cupy_mesh:
         return new
 
     def get(self):
+        """
+        Overloading the get operator from cupy.ndarray
+        Returns:
+            numpy.ndarray
+        """
         return self.values.get()
-
 
 
 class imex_cupy_mesh(object):
     """
-    RHS data type for meshes with implicit and explicit components
+    RHS data type for cupy_meshes with implicit and explicit components
 
     This data type can be used to have RHS with 2 components (here implicit and explicit)
 
     Attributes:
-        impl (mesh.mesh): implicit part
-        expl (mesh.mesh): explicit part
+        impl (cupy_mesh.cupy_mesh): implicit part
+        expl (cupy_mesh.cupy_mesh): explicit part
     """
 
     def __init__(self, init, val=0.0):
@@ -124,11 +154,11 @@ class imex_cupy_mesh(object):
 
 class comp2_cupy_mesh(object):
     """
-    RHS data type for meshes with 2 components
+    RHS data type for cupy_meshes with 2 components
 
     Attributes:
-        comp1 (mesh.mesh): first part
-        comp2 (mesh.mesh): second part
+        comp1 (cupy_mesh.cupy_mesh): first part
+        comp2 (cupy_mesh.cupy_mesh): second part
     """
 
     def __init__(self, init, val=0.0):
