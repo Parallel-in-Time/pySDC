@@ -91,7 +91,6 @@ class allencahn_fullyimplicit(ptype):
         A = sp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
         A = sp.kron(A, sp.eye(N[0])) + sp.kron(sp.eye(N[1]), A)
         A *= 1.0 / (dx ** 2)
-        
         return A
 
     # noinspection PyTypeChecker

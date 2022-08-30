@@ -3,7 +3,7 @@ import time
 import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as csp
-from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
+from cupyx.scipy.sparse.linalg import cg  # , spsolve, gmres, minres
 
 
 from pySDC.core.Errors import ParameterError, ProblemError

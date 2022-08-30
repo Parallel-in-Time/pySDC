@@ -1,9 +1,8 @@
 import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as csp
-from cupyx.scipy.sparse.linalg import spsolve, gmres, cg, minres
+from cupyx.scipy.sparse.linalg import spsolve, cg  # , gmres, minres
 import time
-
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -20,6 +19,7 @@ class heatNd_periodic(ptype):
         A: second-order FD discretization of the ND laplace operator
         dx: distance between two spatial nodes (here: being the same in all dimensions)
     """
+
     def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=imex_cupy_mesh):
         """
         Initialization routine
@@ -72,7 +72,7 @@ class heatNd_periodic(ptype):
         self.A = self.__get_A(self.params.nvars, self.params.nu, self.dx, self.params.ndim, self.params.order)
         xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = csp.eye(self.params.nvars[0]**self.params.ndim, format='csr')
+        self.Id = csp.eye(self.params.nvars[0] ** self.params.ndim, format='csr')
         self.f_im = 0
         self.f_ex = 0
 
@@ -93,16 +93,16 @@ class heatNd_periodic(ptype):
 
         if order == 2:
             stencil = [1, -2, 1]
-            zero_pos = 2
+            # zero_pos = 2
         elif order == 4:
             stencil = [-1 / 12, 4 / 3, -5 / 2, 4 / 3, -1 / 12]
-            zero_pos = 3
+            # zero_pos = 3
         elif order == 6:
             stencil = [1 / 90, -3 / 20, 3 / 2, -49 / 18, 3 / 2, -3 / 20, 1 / 90]
-            zero_pos = 4
+            # zero_pos = 4
         elif order == 8:
             stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315, -1 / 560]
-            zero_pos = 5
+            # zero_pos = 5
         else:
             raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')
         A = stencil[0] * csp.eye(N[0], format='csr')  # TODO: is this the right format? Was: csc
@@ -141,17 +141,26 @@ class heatNd_periodic(ptype):
         self.f_im += ende - start
         start = time.perf_counter()
         if self.params.ndim == 1:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
+            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (self.params.nu * np.pi ** 2 *
+                                                                            sum([freq ** 2 for freq in
+                                                                                 self.params.freq]) *
+                                                                            cp.cos(t) - cp.sin(t))
         elif self.params.ndim == 2:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                cp.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
+            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.sin(np.pi * self.params.freq[1] *
+                                                                                  self.xv[1]) * (self.params.nu *
+                                                                                                 np.pi ** 2 *
+                                                                                                 sum([freq ** 2 for freq
+                                                                                                      in
+                                                                                                      self.params.freq]
+                                                                                                     ) * cp.cos(t) -
+                                                                                                 cp.sin(t)
+                                                                                                 )
         elif self.params.ndim == 3:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                cp.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                cp.sin(np.pi * self.params.freq[2] * self.xv[2]) * \
-                (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
+            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.sin(np.pi * self.params.freq[1] *
+                                                                                  self.xv[1]) * cp.sin(
+                np.pi * self.params.freq[2] * self.xv[2]) * (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in
+                                                                                                self.params.freq]) *
+                                                             cp.cos(t) - cp.sin(t))
         ende = time.perf_counter()
         self.f_ex += ende - start
         return f
@@ -176,7 +185,7 @@ class heatNd_periodic(ptype):
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         else:
             me[:] = cg(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
-                          tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
+                       tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
         return me
 
     def u_exact(self, t):
