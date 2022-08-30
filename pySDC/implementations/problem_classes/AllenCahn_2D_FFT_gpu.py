@@ -82,8 +82,8 @@ class allencahn2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        v = u.flatten()
         start = time.perf_counter()
+        v = u.flatten()
         tmp = self.lap * cp.fft.rfft2(u.values)
         f.impl[:] = cp.fft.irfft2(tmp)
         ende = time.perf_counter()

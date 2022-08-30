@@ -215,8 +215,8 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        v = u.flatten()
         start = time.perf_counter()
+        v = u.flatten()
         f.impl[:] = self.A.dot(v).reshape(self.params.nvars)
         ende = time.perf_counter()
         self.f_im += ende - start
