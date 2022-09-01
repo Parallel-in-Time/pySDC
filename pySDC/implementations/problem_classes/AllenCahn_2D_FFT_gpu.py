@@ -1,6 +1,6 @@
 import cupy as cp
 import numpy as np
-import time
+
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh
@@ -13,7 +13,7 @@ class allencahn2d_imex(ptype):
 
     Attributes:
         xvalues: grid points in space
-        dx: mesh width
+        dx: cupy_mesh width
         lap: spectral operator for Laplacian
         rfft_object: planned real FFT for forward transformation
         irfft_object: planned IFFT for backward transformation
@@ -25,8 +25,8 @@ class allencahn2d_imex(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed to parent class)
-            dtype_f: mesh data type wuth implicit and explicit parts (will be passed to parent class)
+            dtype_u: cupy_mesh data type (will be passed to parent class)
+            dtype_f: cupy_mesh data type wuth implicit and explicit parts (will be passed to parent class)
         """
 
         if 'L' not in problem_params:
@@ -66,8 +66,6 @@ class allencahn2d_imex(ptype):
 
         xv, yv = cp.meshgrid(kx, ky, indexing='ij')
         self.lap = -xv ** 2 - yv ** 2
-        self.f_im = 0
-        self.f_ex = 0
 
     def eval_f(self, u, t):
         """
@@ -82,17 +80,11 @@ class allencahn2d_imex(ptype):
         """
 
         f = self.dtype_f(self.init)
-        start = time.perf_counter()
         v = u.flatten()
         tmp = self.lap * cp.fft.rfft2(u.values)
         f.impl[:] = cp.fft.irfft2(tmp)
-        ende = time.perf_counter()
-        self.f_im += ende - start
-        start = time.perf_counter()
         if self.params.eps > 0:
             f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_ex += ende - start
         return f
 
     def solve_system(self, rhs, factor, u0, t):
