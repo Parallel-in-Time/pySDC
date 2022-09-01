@@ -1,14 +1,11 @@
-import time
 
 import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as csp
 from cupyx.scipy.sparse.linalg import cg  # , spsolve, gmres, minres
 
-
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
-# from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -30,8 +27,8 @@ class allencahn_fullyimplicit(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: cupy_mesh data type (will be passed parent class)
+            dtype_f: cupy_mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -50,8 +47,6 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        # super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-        #                                               dtype_u, dtype_f, problem_params)
         super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, cp.dtype('float64')),
                                                       dtype_u, dtype_f, problem_params)
 
@@ -75,11 +70,11 @@ class allencahn_fullyimplicit(ptype):
             dx (float): distance between two spatial nodes
 
         Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
+             cupyx.scipy.sparse.csr_matrix: cupy-matrix A in CSR format
         """
 
         stencil = cp.asarray([-2, 1])
-        A = stencil[0] * csp.eye(N[0], format='csr')  # TODO: is this the right format? Was: csc
+        A = stencil[0] * csp.eye(N[0], format='csr')
         for i in range(1, len(stencil)):
             A += stencil[i] * csp.eye(N[0], k=-i, format='csr')
             A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
@@ -194,14 +189,12 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type with implicit and explicit parts (will be passed parent class)
+            dtype_u: cupy_mesh data type (will be passed parent class)
+            dtype_f: cupy_mesh data type with implicit and explicit parts (will be passed parent class)
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
-        self.f_im = 0
-        self.f_ex = 0
 
     def eval_f(self, u, t):
         """
@@ -215,15 +208,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        start = time.perf_counter()
         v = u.flatten()
         f.impl[:] = self.A.dot(v).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_im += ende - start
-        start = time.perf_counter()
         f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_ex += ende - start
+
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -272,8 +260,8 @@ class allencahn_semiimplicit_v2(allencahn_fullyimplicit):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type with implicit and explicit parts (will be passed parent class)
+            dtype_u: cupy_mesh data type (will be passed parent class)
+            dtype_f: cupy_mesh data type with implicit and explicit parts (will be passed parent class)
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
