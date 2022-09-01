@@ -2,7 +2,6 @@ import numpy as np
 import cupy as cp
 import cupyx.scipy.sparse as csp
 from cupyx.scipy.sparse.linalg import spsolve, cg  # , gmres, minres
-import time
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -26,8 +25,8 @@ class heatNd_periodic(ptype):
 
         Args:
             problem_params (dict): custom parameters for the example
-            dtype_u: mesh data type (will be passed parent class)
-            dtype_f: mesh data type (will be passed parent class)
+            dtype_u: cupy_mesh data type (will be passed parent class)
+            dtype_f: cupy_mesh data type (will be passed parent class)
         """
 
         # these parameters will be used later, so assert their existence
@@ -73,8 +72,6 @@ class heatNd_periodic(ptype):
         xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
         self.Id = csp.eye(self.params.nvars[0] ** self.params.ndim, format='csr')
-        self.f_im = 0
-        self.f_ex = 0
 
     @staticmethod
     def __get_A(N, nu, dx, ndim, order):
@@ -88,7 +85,7 @@ class heatNd_periodic(ptype):
             ndim (int): number of dimensions
 
         Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
+            cupyx.scipy.sparse.csr_matrix: matrix A in CSR format
         """
 
         if order == 2:
@@ -105,7 +102,7 @@ class heatNd_periodic(ptype):
             # zero_pos = 5
         else:
             raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')
-        A = stencil[0] * csp.eye(N[0], format='csr')  # TODO: is this the right format? Was: csc
+        A = stencil[0] * csp.eye(N[0], format='csr')
         for i in range(1, len(stencil)):
             A += stencil[i] * csp.eye(N[0], k=-i, format='csr')
             A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
@@ -117,7 +114,6 @@ class heatNd_periodic(ptype):
         elif ndim == 3:
             A = csp.kron(A, csp.eye(N[1] * N[0])) + csp.kron(csp.eye(N[2] * N[1]), A) + \
                 csp.kron(csp.kron(csp.eye(N[2]), A), csp.eye(N[0]))
-        # A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         A *= nu / (dx ** 2)
 
         return A
@@ -135,11 +131,7 @@ class heatNd_periodic(ptype):
         """
 
         f = self.dtype_f(self.init)
-        start = time.perf_counter()
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_im += ende - start
-        start = time.perf_counter()
         if self.params.ndim == 1:
             f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (self.params.nu * np.pi ** 2 *
                                                                             sum([freq ** 2 for freq in
@@ -161,8 +153,7 @@ class heatNd_periodic(ptype):
                 np.pi * self.params.freq[2] * self.xv[2]) * (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in
                                                                                                 self.params.freq]) *
                                                              cp.cos(t) - cp.sin(t))
-        ende = time.perf_counter()
-        self.f_ex += ende - start
+
         return f
 
     def solve_system(self, rhs, factor, u0, t):
