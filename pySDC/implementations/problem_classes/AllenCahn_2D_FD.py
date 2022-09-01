@@ -1,14 +1,11 @@
-import time
 
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import cg
 
-
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh, comp2_mesh
-# from pySDC.implementations.datatype_classes.cupy_mesh import cupy_mesh, imex_cupy_mesh, comp2_cupy_mesh
 
 
 # http://www.personal.psu.edu/qud2/Res/Pre/dz09sisc.pdf
@@ -50,16 +47,12 @@ class allencahn_fullyimplicit(ptype):
             raise ProblemError('the setup requires nvars = 2^p per dimension')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        # super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-        #                                               dtype_u, dtype_f, problem_params)
         super(allencahn_fullyimplicit, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
                                                       dtype_u, dtype_f, problem_params)
 
         # compute dx and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
         self.A = self.__get_A(self.params.nvars, self.dx)
-        # print(self.A)
-        # self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
         self.xvalues = np.array([i * self.dx - 0.5 for i in range(self.params.nvars[0])])
 
         self.newton_itercount = 0
@@ -184,6 +177,7 @@ class allencahn_fullyimplicit(ptype):
             for j in range(self.params.nvars[1]):
                 r2 = self.xvalues[i] ** 2 + self.xvalues[j] ** 2
                 me[i, j] = np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps))
+
         return me
 
 
@@ -205,8 +199,6 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(allencahn_semiimplicit, self).__init__(problem_params, dtype_u, dtype_f)
-        self.f_im = 0
-        self.f_ex = 0
 
     def eval_f(self, u, t):
         """
@@ -220,15 +212,10 @@ class allencahn_semiimplicit(allencahn_fullyimplicit):
             dtype_f: the RHS
         """
         f = self.dtype_f(self.init)
-        start = time.perf_counter()
         v = u.flatten()
         f.impl[:] = self.A.dot(v).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_im += ende - start
-        start = time.perf_counter()
         f.expl[:] = (1.0 / self.params.eps ** 2 * v * (1.0 - v ** self.params.nu)).reshape(self.params.nvars)
-        ende = time.perf_counter()
-        self.f_ex += ende - start
+
         return f
 
     def solve_system(self, rhs, factor, u0, t):
