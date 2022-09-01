@@ -25,17 +25,16 @@ Now you are ready to run `pySDC` on the GPU.
 
 Run pySDC on the GPU
 ------------
-You have to configure a Script to run it. You can see the file for 
-[GPU](heat_only_gpu.py) is the same as for the 
-[CPU](heat_only_gpu.py). Only the import for the problem_classes have changed!
+You have to configure a Script to run it. You can see at the file [heat.py](heat.py) that the parameters are the 
+same for GPU and CPU. Only the import for the problem_class changed.  
+
 
 
 More examples
 ----------
 Further examples can found with Allen-Cahn:
-* [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py) and [AllenCahn_2D_FD_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FD_gpu.py)
-  * [allen_cahn_gpu.py](allen_cahn_gpu.py)
-* [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py) and [AllenCahn_2D_FFT_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FFT_gpu.py)
-  * [allen_cahn_fft_cpu.py](allen_cahn_fft_cpu.py) and [allen_cahn_fft_gpu.py](allen_cahn_fft_gpu.py)
+* problem: [AllenCahn_2D_FD.py](../../implementations/problem_classes/AllenCahn_2D_FD.py) and [AllenCahn_2D_FD_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FD_gpu.py)
+* problem: [AllenCahn_2D_FFT.py](../../implementations/problem_classes/AllenCahn_2D_FFT.py) and [AllenCahn_2D_FFT_gpu.py](../../implementations/problem_classes/AllenCahn_2D_FFT_gpu.py)
+  * Script to run pySDC: [ac-fft.py](ac-fft.py)
 
 
