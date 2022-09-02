@@ -117,8 +117,8 @@ def check(cwd='./'):
     """
 
     V_ref = 1
-    # dt_list = [4E-1, 4E-2, 4E-3, 4E-4]
-    dt_list = [2e-2]
+    dt_list = [4E-1, 4E-2, 4E-3, 4E-4]
+    # dt_list = [2e-2]
     use_switch_estimator = [True, False]
     for dt_item in dt_list:
         for item in use_switch_estimator:
@@ -183,12 +183,6 @@ def check(cwd='./'):
         ax.set_xlabel('Time')
 
         fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
-
-        setup_mpl()
-        fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
-        ax2.plot(times_true, [v[1] for v in vC_true])
-        ax2.set_ylim(0.99, 1.01)
-        fig2.savefig('data/vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
