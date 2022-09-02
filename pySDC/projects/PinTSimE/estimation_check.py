@@ -182,13 +182,13 @@ def check(cwd='./'):
         ax.set_yscale('symlog', linthresh=1e-5)
         ax.set_xlabel('Time')
 
-        fig.savefig('difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
         ax2.plot(times_true, [v[1] for v in vC_true])
         ax2.set_ylim(0.99, 1.01)
-        fig2.savefig('vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig2.savefig('data/vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -204,7 +204,7 @@ def check(cwd='./'):
     ax.set_ylim(-1, 1)
     ax.set_xlabel("$\Delta t$")
 
-    fig.savefig('diffs_estimation.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
