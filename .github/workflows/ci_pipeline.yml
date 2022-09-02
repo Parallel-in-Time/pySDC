@@ -14,14 +14,14 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Mirror + trigger CI
-      uses: pancetta/gitlab-mirror-and-ci-action@master
+      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
       with:
         args: "https://gitlab.hzdr.de/r.speck/pysdc"
       env:
         FORCE_PUSH: "false"
         GITLAB_HOSTNAME: "gitlab.hzdr.de"
         GITLAB_USERNAME: "r.speck"
-        GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET }}
+        GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_H }}
         GITLAB_PROJECT_ID: "3525"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: finalize
