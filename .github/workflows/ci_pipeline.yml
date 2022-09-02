@@ -24,6 +24,13 @@ jobs:
         GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_H }}
         GITLAB_PROJECT_ID: "3525"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get artifacts
+      run: |
+        sudo apt-get install jq
+        job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://${GITLAB_HOSTNAME}/api/v4/projects/${GITLAB_PROJECT_ID}/jobs" |  jq '.[] | select( .name == "benchmark-base" ) | .id')
+        echo job_id
+        curl --output artifacts.zip --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" "https://${GITLAB_HOSTNAME}/api/v4/projects/${GITLAB_PROJECT_ID}/jobs/$JOB_ID/artifacts"
+        ls -artl
     - name: finalize
       run: echo "done!"
 
