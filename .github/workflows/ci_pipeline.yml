@@ -8,322 +8,341 @@ on:
 
 jobs:
 
-  lint:
+  build:
     runs-on: ubuntu-latest
 
-    env:
-      YML: 'etc/environment-lint.yml'
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-
-      - name: Code reformatting with black
-        run: |
-          black pySDC  --check --diff --color 
-
-      - name: Linting with flakeheaven
-        run: |
-          flakeheaven lint --benchmark pySDC          
-
-
-  test_base:
-    runs-on: ubuntu-latest
-
-    needs: lint
-
-    env:
-      YML: 'etc/environment-base.yml'
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    strategy:
-      matrix:
-        py: [ "3.7", "3.8", "3.9", "3.10" ]
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-        
-      - name: Add packages
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
-
-      - name: Run pytest
-        run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
-
-      - name: Store results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v3
-        with:
-          name: data_${{ github.job }}
-          path: data
-
-      - name: Store coverage results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.dat
-
-
-  test_fenics:
-    runs-on: ubuntu-latest
-
-    needs: lint
-
-    env:
-      YML: 'etc/environment-fenics.yml'
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    strategy:
-      matrix:
-        py: [ "3.7", "3.8", "3.9", "3.10" ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Add packages
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
-
-      - name: Run pytest
-        run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m fenics
-
-      - name: Store results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v3
-        with:
-          name: data_${{ github.job }}
-          path: data
-
-      - name: Store coverage results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.dat
-
-
-  test_petsc:
-    runs-on: ubuntu-latest
-
-    needs: lint
-
-    env:
-      YML: 'etc/environment-petsc.yml'
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    strategy:
-      matrix:
-        py: [ "3.7", "3.8", "3.9", "3.10" ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Add packages
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
-
-      - name: Run pytest
-        run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m petsc
-
-      - name: Store results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v3
-        with:
-          name: data_${{ github.job }}
-          path: data
-
-      - name: Store coverage results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.dat
-
-
-  test_mpi:
-    runs-on: ubuntu-latest
-
-    needs: lint
-
-    env:
-      YML: 'etc/environment-mpi4py.yml'
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    strategy:
-      matrix:
-        py: [ "3.7", "3.8", "3.9", "3.10" ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Add packages
-        run: |
-          sudo apt-get update
-          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
-
-      - name: Run pytest
-        run: |
-          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi4py
-
-      - name: Store results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v3
-        with:
-          name: data_${{ github.job }}
-          path: data
-
-      - name: Store coverage results
-        if: matrix.py == '3.10'
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage_${{ github.job }}
-          path: ./coverage_${{ github.job }}.dat
-
-
-  coverage_and_docs:
-    runs-on: ubuntu-latest
-
-    needs:
-      - test_base
-      - test_fenics
-      - test_petsc
-      - test_mpi
-
-    env:
-      YML: 'etc/environment-base.yml'
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-          extra-specs: python = ${{ matrix.py }}
-
-      - name: Get artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: data
-
-#      - name: Prepare data
+    - uses: actions/checkout@v1
+    - name: Mirror + trigger CI
+      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
+      with:
+        args: "https://gitlab.hzdr.de/r.speck/pysdc"
+      env:
+        FORCE_PUSH: "false"
+        GITLAB_HOSTNAME: "gitlab.hzdr.de"
+        GITLAB_USERNAME: "r.speck"
+        GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET }}
+        GITLAB_PROJECT_ID: "3525"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: finalize
+      run: echo "done!"
+      
+#  lint:
+#    runs-on: ubuntu-latest
+#
+#    env:
+#      YML: 'etc/environment-lint.yml'
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#
+#      - name: Code reformatting with black
 #        run: |
-#          rm -rf data/README
-#          find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
-#          python -m coverage combine data/coverage_*.dat
-#          python -m coverage xml
+#          black pySDC  --check --diff --color
 #
-#      - name: Code Coverage Summary Report
-#        uses: irongut/CodeCoverageSummary@v1.3.0
+#      - name: Linting with flakeheaven
+#        run: |
+#          flakeheaven lint --benchmark pySDC
+#
+#
+#  test_base:
+#    runs-on: ubuntu-latest
+#
+#    needs: lint
+#
+#    env:
+#      YML: 'etc/environment-base.yml'
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    strategy:
+#      matrix:
+#        py: [ "3.7", "3.8", "3.9", "3.10" ]
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Add packages
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
 #        with:
-#          filename: coverage.xml
-#          badge: true
-#          format: 'markdown'
-#          output: 'both'
+#          environment-file: ${{ env.YML }}
+#          extra-specs: python = ${{ matrix.py }}
 #
-#      - name: Adding markdown to build summary
-#        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+#      - name: Run pytest
+#        run: |
+#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
 #
-#      - name: Upload to coveralls.io
-#        run: coveralls --service=github
-
-      - name: Build documentation
-        run: |
-          pwd
-          ls -artl
-          chmod u+x ./docs/update_apidocs.sh
-          ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
-
-      - name: Store docs
-        uses: actions/upload-artifact@v2
-        with:
-          name: docs
-          path: docs/build/html
-
-#      - name: Deploy 🚀
-#        uses: JamesIves/github-pages-deploy-action@4.1.4
-#        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
+#      - name: Store results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v3
 #        with:
-#          branch: gh-pages # The branch the action should deploy to.
-#          folder: docs/build/html # The folder the action should deploy.
-
-  mirror:
-    if: github.repository_owner == 'Parallel-in-Time'
-    runs-on: ubuntu-latest
-
+#          name: data_${{ github.job }}
+#          path: data
+#
+#      - name: Store coverage results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: coverage_${{ github.job }}
+#          path: ./coverage_${{ github.job }}.dat
+#
+#
+#  test_fenics:
+#    runs-on: ubuntu-latest
+#
+#    needs: lint
+#
+#    env:
+#      YML: 'etc/environment-fenics.yml'
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    strategy:
+#      matrix:
+#        py: [ "3.7", "3.8", "3.9", "3.10" ]
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Add packages
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#          extra-specs: python = ${{ matrix.py }}
+#
+#      - name: Run pytest
+#        run: |
+#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m fenics
+#
+#      - name: Store results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: data_${{ github.job }}
+#          path: data
+#
+#      - name: Store coverage results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: coverage_${{ github.job }}
+#          path: ./coverage_${{ github.job }}.dat
+#
+#
+#  test_petsc:
+#    runs-on: ubuntu-latest
+#
+#    needs: lint
+#
+#    env:
+#      YML: 'etc/environment-petsc.yml'
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    strategy:
+#      matrix:
+#        py: [ "3.7", "3.8", "3.9", "3.10" ]
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Add packages
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#          extra-specs: python = ${{ matrix.py }}
+#
+#      - name: Run pytest
+#        run: |
+#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m petsc
+#
+#      - name: Store results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: data_${{ github.job }}
+#          path: data
+#
+#      - name: Store coverage results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: coverage_${{ github.job }}
+#          path: ./coverage_${{ github.job }}.dat
+#
+#
+#  test_mpi:
+#    runs-on: ubuntu-latest
+#
+#    needs: lint
+#
+#    env:
+#      YML: 'etc/environment-mpi4py.yml'
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    strategy:
+#      matrix:
+#        py: [ "3.7", "3.8", "3.9", "3.10" ]
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Add packages
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#          extra-specs: python = ${{ matrix.py }}
+#
+#      - name: Run pytest
+#        run: |
+#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi4py
+#
+#      - name: Store results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: data_${{ github.job }}
+#          path: data
+#
+#      - name: Store coverage results
+#        if: matrix.py == '3.10'
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: coverage_${{ github.job }}
+#          path: ./coverage_${{ github.job }}.dat
+#
+#
+#  coverage_and_docs:
+#    runs-on: ubuntu-latest
+#
 #    needs:
 #      - test_base
 #      - test_fenics
 #      - test_petsc
 #      - test_mpi
+#
+#    env:
+#      YML: 'etc/environment-base.yml'
+#      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#
+#    defaults:
+#      run:
+#        shell: bash -l {0}
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v1
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#          extra-specs: python = ${{ matrix.py }}
+#
+#      - name: Get artifacts
+#        uses: actions/download-artifact@v3
+#        with:
+#          path: data
+#
+##      - name: Prepare data
+##        run: |
+##          rm -rf data/README
+##          find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
+##          python -m coverage combine data/coverage_*.dat
+##          python -m coverage xml
+##
+##      - name: Code Coverage Summary Report
+##        uses: irongut/CodeCoverageSummary@v1.3.0
+##        with:
+##          filename: coverage.xml
+##          badge: true
+##          format: 'markdown'
+##          output: 'both'
+##
+##      - name: Adding markdown to build summary
+##        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+##
+##      - name: Upload to coveralls.io
+##        run: coveralls --service=github
+#
+#      - name: Build documentation
+#        run: |
+#          pwd
+#          ls -artl
+#          chmod u+x ./docs/update_apidocs.sh
+#          ./docs/update_apidocs.sh
+#          sphinx-build -b html docs/source docs/build/html
+#
+#      - name: Store docs
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: docs
+#          path: docs/build/html
+#
+##      - name: Deploy 🚀
+##        uses: JamesIves/github-pages-deploy-action@4.1.4
+##        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
+##        with:
+##          branch: gh-pages # The branch the action should deploy to.
+##          folder: docs/build/html # The folder the action should deploy.
+#
+#  mirror:
+#    if: github.repository_owner == 'Parallel-in-Time'
+#    runs-on: ubuntu-latest
+#
+##    needs:
+##      - test_base
+##      - test_fenics
+##      - test_petsc
+##      - test_mpi
 
-    steps:
-        - uses: actions/checkout@v1
-        - uses: spyoungtech/mirror-action@master
-          with:
-            REMOTE: 'https://gitlab.hzdr.de/r.speck/pysdc.git'
-            GIT_USERNAME: r.speck
-            GIT_PASSWORD: ${{ secrets.GITLAB_SECRET }}
+#    steps:
+#        - uses: actions/checkout@v1
+#        - uses: spyoungtech/mirror-action@master
+#          with:
+#            REMOTE: 'https://gitlab.hzdr.de/r.speck/pysdc.git'
+#            GIT_USERNAME: r.speck
+#            GIT_PASSWORD: ${{ secrets.GITLAB_SECRET }}
