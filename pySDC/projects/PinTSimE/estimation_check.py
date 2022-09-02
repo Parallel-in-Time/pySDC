@@ -39,7 +39,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     problem_params['C'] = 1
     problem_params['R'] = 1
     problem_params['L'] = 1
-    problem_params['alpha'] = 10
+    problem_params['alpha'] = 5
     problem_params['V_ref'] = V_ref
     problem_params['set_switch'] = False
     problem_params['t_switch'] = False
@@ -117,28 +117,32 @@ def check(cwd='./'):
     """
 
     V_ref = 1
-    # dt_list = [2E-1, 2E-2, 2E-3, 2E-4]
-    dt_list = [1e-3]
+    # dt_list = [4E-1, 4E-2, 4E-3, 4E-4]
+    dt_list = [2e-2]
     use_switch_estimator = [True, False]
     for dt_item in dt_list:
         for item in use_switch_estimator:
             stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
 
-            fname = 'data/battery_dt{}_USE{}.dat'.format(dt_item, item)
+            fname = 'battery_dt{}_USE{}.dat'.format(dt_item, item)
             f = open(fname, 'wb')
             dill.dump(stats, f)
             f.close()
+
+            if item:
+                restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                print(np.sum(restarts))
 
     val_switch_all = []
     diff_true_all = []
     diff_false_all_before = []
     diff_false_all_after = []
     for dt_item in dt_list:
-        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -178,13 +182,13 @@ def check(cwd='./'):
         ax.set_yscale('symlog', linthresh=1e-5)
         ax.set_xlabel('Time')
 
-        fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig.savefig('difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
         ax2.plot(times_true, [v[1] for v in vC_true])
-        ax2.set_ylim(0.97, 1.1)
-        fig2.savefig('data/vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        ax2.set_ylim(0.99, 1.01)
+        fig2.savefig('vC_true_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -200,7 +204,7 @@ def check(cwd='./'):
     ax.set_ylim(-1, 1)
     ax.set_xlabel("$\Delta t$")
 
-    fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
+    fig.savefig('diffs_estimation.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":
