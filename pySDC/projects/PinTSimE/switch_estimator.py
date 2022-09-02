@@ -1,7 +1,5 @@
 import numpy as np
 import scipy as sp
-import matplotlib
-matplotlib.use('TkAgg')
 
 from pySDC.core.ConvergenceController import ConvergenceController
 
