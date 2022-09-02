@@ -69,10 +69,26 @@ implementations.problem\_classes.AllenCahn\_2D\_FD module
    :undoc-members:
    :show-inheritance:
 
+implementations.problem\_classes.AllenCahn\_2D\_FD\_gpu module
+--------------------------------------------------------------
+
+.. automodule:: implementations.problem_classes.AllenCahn_2D_FD_gpu
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 implementations.problem\_classes.AllenCahn\_2D\_FFT module
 ----------------------------------------------------------
 
 .. automodule:: implementations.problem_classes.AllenCahn_2D_FFT
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementations.problem\_classes.AllenCahn\_2D\_FFT\_gpu module
+---------------------------------------------------------------
+
+.. automodule:: implementations.problem_classes.AllenCahn_2D_FFT_gpu
    :members:
    :undoc-members:
    :show-inheritance:
@@ -257,6 +273,14 @@ implementations.problem\_classes.HeatEquation\_ND\_FD\_forced\_periodic module
 ------------------------------------------------------------------------------
 
 .. automodule:: implementations.problem_classes.HeatEquation_ND_FD_forced_periodic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementations.problem\_classes.HeatEquation\_ND\_FD\_forced\_periodic\_gpu module
+-----------------------------------------------------------------------------------
+
+.. automodule:: implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gpu
    :members:
    :undoc-members:
    :show-inheritance:
