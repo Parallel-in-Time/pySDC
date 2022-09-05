@@ -13,7 +13,7 @@ test:
   artifacts:
     name: "$NAME_$PYTHON"
     paths:
-      - coverage_$NAME_3.10.dat
+      - coverage_$NAME_$PYTHON.dat
       - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
@@ -52,7 +52,8 @@ bundle:
 #    - micromamba install -c conda-forge git
 #    - git config --global --add safe.directory '*'
   script:
-    - python -m coverage combine coverage_*.dat
+    - ls -artl .
+    - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml -o data/coverage.xml
     - mv output*.json data/
     - ls -artl .
