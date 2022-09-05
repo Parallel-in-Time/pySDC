@@ -1,5 +1,5 @@
 from collections import namedtuple
-
+import pytest
 import numpy as np
 
 
@@ -7,6 +7,7 @@ import numpy as np
 ID = namedtuple('ID', 'nvars')
 
 
+@pytest.mark.base
 def test_spatial_accuracy():
     """
     A simple test program to check order of accuracy in space for a simple 2d test problem
@@ -34,6 +35,7 @@ def test_spatial_accuracy():
         ), f"ERROR: expected spatial order to be {order_stencil} but got {np.mean(order):.2f}"
 
 
+@pytest.mark.base
 def run_accuracy_check(nvars_list, problem_params, order_stencil):
     """
     Routine to check the error of the Laplacian vs. its FD discretization

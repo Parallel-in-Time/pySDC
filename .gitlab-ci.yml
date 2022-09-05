@@ -1,51 +1,50 @@
 stages:
-  - lint
   - test
   - benchmark
   - upload
 
-lint:
-  image: mambaorg/micromamba
-  stage: lint
-  before_script:
-    - micromamba create --yes -f etc/environment-lint.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-  script:
-    - black pySDC  --check --diff --color
-    - flakeheaven lint --benchmark pySDC
+#lint:
+#  image: mambaorg/micromamba
+#  stage: lint
+#  before_script:
+#    - micromamba create --yes -f etc/environment-lint.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#  script:
+#    - black pySDC  --check --diff --color
+#    - flakeheaven lint --benchmark pySDC
 
-test-base:
+#test-base:
+#  image: mambaorg/micromamba
+#  stage: test
+#  variables:
+#    NAME: 'base'
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+#  artifacts:
+#    name: "$NAME_$PYTHON"
+#    paths:
+#      - coverage.dat
+#      - data
+#  before_script:
+#    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#  script:
+#    - coverage run --data-file=coverage.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
+
+test:
   image: mambaorg/micromamba
   stage: test
-  variables:
-    NAME: 'base'
   parallel:
     matrix:
       - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+        NAME: ['base', 'fenics', 'petsc', 'mpi4py']
   artifacts:
     name: "$NAME_$PYTHON"
     paths:
-      - coverage.dat
-      - data
-  before_script:
-    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-  script:
-    - coverage run --data-file=coverage.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
-
-test-libs:
-  image: mambaorg/micromamba
-  stage: test
-  parallel:
-    matrix:
-      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
-        NAME: ['fenics', 'petsc', 'mpi4py']
-  artifacts:
-    name: "$NAME_$PYTHON"
-    paths:
-      - coverage.dat
+      - coverage_$NAME_$PYTHON.dat
       - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
@@ -55,11 +54,10 @@ test-libs:
   script:
     - coverage run --data-file=coverage.dat -m pytest --continue-on-collection-errors -svv --durations=0 pySDC/tests -m $NAME
 
-benchmark-base:
+benchmark:
   image: mambaorg/micromamba
   stage: benchmark
   artifacts:
-    name: "$NAME_$PYTHON"
     paths:
       - output.json
   before_script:
@@ -70,14 +68,14 @@ benchmark-base:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
 
 
-merge_and_bundle:
+bundle:
   image: mambaorg/micromamba
   stage: upload
 #  variables:
 #    COV_TOKEN: ${COV_TOKEN}
   artifacts:
     paths:
-      - coverage.xml
+      - data
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -85,8 +83,9 @@ merge_and_bundle:
 #    - micromamba install -c conda-forge git
 #    - git config --global --add safe.directory '*'
   script:
-#    - python -m coverage combine coverage_*.dat
-#    - python -m coverage xml
+    - python -m coverage combine coverage_*.dat
+    - python -m coverage xml -o data/coverage.xml
+    - mv output*.jsob data/
     - ls -artl .
     - ls -artl data/
 #    - export COVERALLS_REPO_TOKEN=$COV_TOKEN

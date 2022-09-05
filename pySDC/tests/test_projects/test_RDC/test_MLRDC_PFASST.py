@@ -1,3 +1,7 @@
+import pytest
+
+
+@pytest.mark.base
 def test_RDC_flavors():
     from pySDC.projects.RDC.vanderpol_MLSDC_PFASST_test import run_RDC
 

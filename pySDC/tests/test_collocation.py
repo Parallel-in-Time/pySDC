@@ -12,6 +12,7 @@ node_types = ['EQUID', 'LEGENDRE']
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_canintegratepolynomials(node_type, quad_type):
@@ -50,6 +51,7 @@ def test_canintegratepolynomials(node_type, quad_type):
         )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_relateQandSmat(node_type, quad_type):
@@ -71,6 +73,7 @@ def test_relateQandSmat(node_type, quad_type):
             )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_partialquadraturewithQ(node_type, quad_type):
@@ -93,6 +96,7 @@ def test_partialquadraturewithQ(node_type, quad_type):
             )
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_partialquadraturewithS(node_type, quad_type):

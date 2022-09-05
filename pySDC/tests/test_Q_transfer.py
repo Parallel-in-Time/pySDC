@@ -12,6 +12,7 @@ node_types = ['EQUID', 'LEGENDRE']
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_Q_transfer(node_type, quad_type):
@@ -57,6 +58,7 @@ def test_Q_transfer(node_type, quad_type):
                     assert err_inter > 2e-15, "ERROR: Q-interpolation order is higher than expected, got %s" % polyorder
 
 
+@pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)
 @pytest.mark.parametrize("quad_type", quad_types)
 def test_Q_transfer_minimal(node_type, quad_type):

@@ -1,5 +1,5 @@
 from collections import namedtuple
-
+import pytest
 import numpy as np
 
 
@@ -7,6 +7,7 @@ import numpy as np
 ID = namedtuple('ID', ('nvars_fine', 'iorder'))
 
 
+@pytest.mark.base
 def get_accuracy_orders(results):
     """
     Routine to compute the order of accuracy in space
@@ -47,6 +48,7 @@ def get_accuracy_orders(results):
     return order
 
 
+@pytest.mark.base
 def test_mesh_to_mesh_1d_dirichlet():
     """
     A simple test program to test dirichlet interpolation order in space
@@ -113,6 +115,7 @@ def test_mesh_to_mesh_1d_dirichlet():
         ), 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
 
 
+@pytest.mark.base
 def test_mesh_to_mesh_1d_periodic():
     """
     A simple test program to test periodic interpolation order in space
@@ -185,6 +188,7 @@ def test_mesh_to_mesh_1d_periodic():
         ), 'ERROR: did not get expected orders for interpolation, got %s' % str(orders[p])
 
 
+@pytest.mark.base
 def test_mesh_to_mesh_2d_periodic():
     """
     A simple test program to test periodic interpolation order in 2d

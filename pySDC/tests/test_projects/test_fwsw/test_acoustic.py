@@ -1,6 +1,8 @@
 import os
+import pytest
 
 
+@pytest.mark.base
 def test_plot_convergence():
     from pySDC.projects.FastWaveSlowWave.runconvergence_acoustic import plot_convergence
 
@@ -9,6 +11,7 @@ def test_plot_convergence():
     assert os.path.isfile('data/convergence.png'), 'ERROR: convergence plot has not been created'
 
 
+@pytest.mark.base
 def test_compute_and_plot_itererror():
     from pySDC.projects.FastWaveSlowWave.runitererror_acoustic import compute_and_plot_itererror
 
@@ -16,6 +19,7 @@ def test_compute_and_plot_itererror():
     assert os.path.isfile('data/iteration.png'), 'ERROR: iteration plot has not been created'
 
 
+@pytest.mark.base
 def test_compute_and_plot_solutions():
     from pySDC.projects.FastWaveSlowWave.runmultiscale_acoustic import compute_and_plot_solutions
 

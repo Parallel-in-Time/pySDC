@@ -1,8 +1,9 @@
 import os
-
+import pytest
 import numpy as np
 
 
+@pytest.mark.base
 def test_stifflimit_specrad():
     from pySDC.projects.FastWaveSlowWave.plot_stifflimit_specrad import compute_specrad, plot_specrad
 
@@ -15,6 +16,7 @@ def test_stifflimit_specrad():
     assert os.path.isfile('data/stifflimit-norm.png'), 'ERROR: norm plot has not been created'
 
 
+@pytest.mark.base
 def test_stability():
     from pySDC.projects.FastWaveSlowWave.plot_stability import compute_stability, plot_stability
 
@@ -26,6 +28,7 @@ def test_stability():
     assert os.path.isfile('data/stability-K3-M3.png'), 'ERROR: stability plot has not been created'
 
 
+@pytest.mark.base
 def test_stab_vs_k():
     from pySDC.projects.FastWaveSlowWave.plot_stab_vs_k import compute_stab_vs_k, plot_stab_vs_k
 
@@ -42,6 +45,7 @@ def test_stab_vs_k():
     assert os.path.isfile('data/stab_vs_k_unresolved.png'), 'ERROR: stability plot has not been created'
 
 
+@pytest.mark.base
 def test_dispersion():
     from pySDC.projects.FastWaveSlowWave.plot_dispersion import compute_and_plot_dispersion
 
