@@ -77,11 +77,12 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
+          mv data/coverage.xml ..
 
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: data/coverage.xml
+          filename: coverage.xml
           badge: true
           format: 'markdown'
           output: 'both'
@@ -109,83 +110,3 @@ jobs:
 #        with:
 #          branch: gh-pages # The branch the action should deploy to.
 #          folder: docs/build/html # The folder the action should deploy.
-
-
-
-
-
-#
-#
-#  coverage_and_docs:
-#    runs-on: ubuntu-latest
-#
-#    needs:
-#      - test_base
-#      - test_fenics
-#      - test_petsc
-#      - test_mpi
-#
-#    env:
-#      YML: 'etc/environment-base.yml'
-#      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#          extra-specs: python = ${{ matrix.py }}
-#
-#      - name: Get artifacts
-#        uses: actions/download-artifact@v3
-#        with:
-#          path: data
-#
-##      - name: Prepare data
-##        run: |
-##          rm -rf data/README
-##          find data -type f -print0 | xargs -0 -I file mv --backup=numbered file data
-##          python -m coverage combine data/coverage_*.dat
-##          python -m coverage xml
-##
-##      - name: Code Coverage Summary Report
-##        uses: irongut/CodeCoverageSummary@v1.3.0
-##        with:
-##          filename: coverage.xml
-##          badge: true
-##          format: 'markdown'
-##          output: 'both'
-##
-##      - name: Adding markdown to build summary
-##        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-##
-##      - name: Upload to coveralls.io
-##        run: coveralls --service=github
-#
-#      - name: Build documentation
-#        run: |
-#          pwd
-#          ls -artl
-#          chmod u+x ./docs/update_apidocs.sh
-#          ./docs/update_apidocs.sh
-#          sphinx-build -b html docs/source docs/build/html
-#
-#      - name: Store docs
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: docs
-#          path: docs/build/html
-#
-##      - name: Deploy 🚀
-##        uses: JamesIves/github-pages-deploy-action@4.1.4
-##        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
-##        with:
-##          branch: gh-pages # The branch the action should deploy to.
-##          folder: docs/build/html # The folder the action should deploy.
