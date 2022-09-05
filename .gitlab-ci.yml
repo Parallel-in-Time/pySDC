@@ -47,6 +47,8 @@ bundle:
   artifacts:
     paths:
       - data
+      - coverage.xml
+      - output.json
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -56,8 +58,7 @@ bundle:
   script:
     - mv data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
-    - python -m coverage xml -o data/coverage.xml
-    - mv output*.json data/
+    - python -m coverage xml
 #    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
 #    - export COVERALLS_SERVICE_NAME="gitlab-ci"
 #    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA

@@ -77,7 +77,6 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
-          mv data/coverage.xml ..
 
       - name: Code Coverage Summary Report
         uses: irongut/CodeCoverageSummary@v1.3.0
