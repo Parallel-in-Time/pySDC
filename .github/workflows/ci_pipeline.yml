@@ -93,8 +93,6 @@ jobs:
 
       - name: Build documentation
         run: |
-#          pwd
-#          ls -artl
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
