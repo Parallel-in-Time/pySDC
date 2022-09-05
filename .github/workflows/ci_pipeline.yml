@@ -8,257 +8,67 @@ on:
 
 jobs:
 
-  build:
+  lint:
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v1
-    - name: Mirror + trigger CI
-      uses: SvanBoxel/gitlab-mirror-and-ci-action@master
-      with:
-        args: "https://gitlab.hzdr.de/r.speck/pysdc"
-      env:
-        FORCE_PUSH: "false"
-        GITLAB_HOSTNAME: "gitlab.hzdr.de"
-        GITLAB_USERNAME: "r.speck"
-        GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_H }}
-        GITLAB_PROJECT_ID: "3525"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Get artifacts
-      run: |
-        job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/jobs" |  jq '.[] | select( .name == "benchmark-base" ) | .id')
-        echo $job_id
-        curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
-        ls -artl
-    - name: finalize
-      run: echo "done!"
+    env:
+      YML: 'etc/environment-lint.yml'
 
-#  lint:
-#    runs-on: ubuntu-latest
-#
-#    env:
-#      YML: 'etc/environment-lint.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#
-#      - name: Code reformatting with black
-#        run: |
-#          black pySDC  --check --diff --color
-#
-#      - name: Linting with flakeheaven
-#        run: |
-#          flakeheaven lint --benchmark pySDC
-#
-#
-#  test_base:
-#    runs-on: ubuntu-latest
-#
-#    needs: lint
-#
-#    env:
-#      YML: 'etc/environment-base.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    strategy:
-#      matrix:
-#        py: [ "3.7", "3.8", "3.9", "3.10" ]
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Add packages
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#          extra-specs: python = ${{ matrix.py }}
-#
-#      - name: Run pytest
-#        run: |
-#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
-#
-#      - name: Store results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: data_${{ github.job }}
-#          path: data
-#
-#      - name: Store coverage results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: coverage_${{ github.job }}
-#          path: ./coverage_${{ github.job }}.dat
-#
-#
-#  test_fenics:
-#    runs-on: ubuntu-latest
-#
-#    needs: lint
-#
-#    env:
-#      YML: 'etc/environment-fenics.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    strategy:
-#      matrix:
-#        py: [ "3.7", "3.8", "3.9", "3.10" ]
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Add packages
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#          extra-specs: python = ${{ matrix.py }}
-#
-#      - name: Run pytest
-#        run: |
-#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m fenics
-#
-#      - name: Store results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: data_${{ github.job }}
-#          path: data
-#
-#      - name: Store coverage results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: coverage_${{ github.job }}
-#          path: ./coverage_${{ github.job }}.dat
-#
-#
-#  test_petsc:
-#    runs-on: ubuntu-latest
-#
-#    needs: lint
-#
-#    env:
-#      YML: 'etc/environment-petsc.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    strategy:
-#      matrix:
-#        py: [ "3.7", "3.8", "3.9", "3.10" ]
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Add packages
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#          extra-specs: python = ${{ matrix.py }}
-#
-#      - name: Run pytest
-#        run: |
-#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m petsc
-#
-#      - name: Store results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: data_${{ github.job }}
-#          path: data
-#
-#      - name: Store coverage results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: coverage_${{ github.job }}
-#          path: ./coverage_${{ github.job }}.dat
-#
-#
-#  test_mpi:
-#    runs-on: ubuntu-latest
-#
-#    needs: lint
-#
-#    env:
-#      YML: 'etc/environment-mpi4py.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    strategy:
-#      matrix:
-#        py: [ "3.7", "3.8", "3.9", "3.10" ]
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Add packages
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get --yes install texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra cm-super dvipng nodejs
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
-#        with:
-#          environment-file: ${{ env.YML }}
-#          extra-specs: python = ${{ matrix.py }}
-#
-#      - name: Run pytest
-#        run: |
-#          coverage run --data-file=coverage_${{ github.job }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m mpi4py
-#
-#      - name: Store results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: data_${{ github.job }}
-#          path: data
-#
-#      - name: Store coverage results
-#        if: matrix.py == '3.10'
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: coverage_${{ github.job }}
-#          path: ./coverage_${{ github.job }}.dat
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: ${{ env.YML }}
+
+      - name: Code reformatting with black
+        run: |
+          black pySDC  --check --diff --color
+
+      - name: Linting with flakeheaven
+        run: |
+          flakeheaven lint --benchmark pySDC
+
+
+  spawn_gitlab:
+    runs-on: ubuntu-latest
+
+    needs:
+      - lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Mirror + trigger CI
+        uses: SvanBoxel/gitlab-mirror-and-ci-action@master
+        with:
+          args: "https://gitlab.hzdr.de/r.speck/pysdc"
+        env:
+          FORCE_PUSH: "false"
+          GITLAB_HOSTNAME: "gitlab.hzdr.de"
+          GITLAB_USERNAME: "r.speck"
+          GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_H }}
+          GITLAB_PROJECT_ID: "3525"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get artifacts
+        run: |
+          job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/jobs" |  jq '.[] | select( .name == "benchmark-base" ) | .id')
+          echo $job_id
+          curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
+          ls -artl
+
+
+
+
+
 #
 #
 #  coverage_and_docs:

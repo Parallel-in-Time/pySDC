@@ -24,14 +24,16 @@ test-base:
     matrix:
       - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
   artifacts:
+    name: "$NAME_$PYTHON"
     paths:
-      - coverage_$NAME_$PYTHON.dat
+      - coverage.dat
+      - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
+    - coverage run --data-file=coverage.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m "not fenics and not petsc and not mpi4py and not benchmark"
 
 test-libs:
   image: mambaorg/micromamba
@@ -41,23 +43,25 @@ test-libs:
       - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
         NAME: ['fenics', 'petsc', 'mpi4py']
   artifacts:
+    name: "$NAME_$PYTHON"
     paths:
-      - coverage_$NAME_$PYTHON.dat
+      - coverage.dat
+      - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
     - micromamba install --yes -c conda-forge openssh
   script:
-    - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -svv --durations=0 pySDC/tests -m $NAME
+    - coverage run --data-file=coverage.dat -m pytest --continue-on-collection-errors -svv --durations=0 pySDC/tests -m $NAME
 
 benchmark-base:
   image: mambaorg/micromamba
   stage: benchmark
   artifacts:
+    name: "$NAME_$PYTHON"
     paths:
       - output.json
-
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -66,50 +70,55 @@ benchmark-base:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
 
 
-merge_coverage:
+merge_and_bundle:
   image: mambaorg/micromamba
-  stage: benchmark
-  variables:
-    COV_TOKEN: ${COV_TOKEN}
+  stage: upload
+#  variables:
+#    COV_TOKEN: ${COV_TOKEN}
+  artifacts:
+    paths:
+      - coverage.xml
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install -c conda-forge git
-    - git config --global --add safe.directory '*'
+#    - micromamba install -c conda-forge git
+#    - git config --global --add safe.directory '*'
   script:
-    - python -m coverage combine coverage_*.dat
-    - python -m coverage xml
-    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
-    - export COVERALLS_SERVICE_NAME="gitlab-ci"
-    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
-    - export CI_BUILD_URL=$CI_JOB_URL
-    - export CI_BRANCH=$CI_COMMIT_REF_NAME
-    - coveralls
+#    - python -m coverage combine coverage_*.dat
+#    - python -m coverage xml
+    - ls -artl .
+    - ls -artl data/
+#    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
+#    - export COVERALLS_SERVICE_NAME="gitlab-ci"
+#    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
+#    - export CI_BUILD_URL=$CI_JOB_URL
+#    - export CI_BRANCH=$CI_COMMIT_REF_NAME
+#    - coveralls
 
-upload_results:
-  image: ubuntu:latest
-  stage: upload
-  variables:
-    KEY: ${SSH_PUSH_KEY_GITHUB}
-
-  before_script:
-    - apt-get update -y && apt-get install openssh-client git -y
-    - eval $(ssh-agent -s)
-    - echo "$KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global user.email "sig.pancetta+github@gmail.com"
-    - git config --global user.name "pancetta"
-  script:
-    - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
-    - cd pySDC-benchmarks
-    - mkdir -p latest-benchmark
-    - cd latest-benchmark
-    - cp ../../*.json .
-    - cd ..
-    - git add -A
-    - git commit -m "adding new benchmark results"
-    - git push
+#upload_results:
+#  image: ubuntu:latest
+#  stage: upload
+#  variables:
+#    KEY: ${SSH_PUSH_KEY_GITHUB}
+#
+#  before_script:
+#    - apt-get update -y && apt-get install openssh-client git -y
+#    - eval $(ssh-agent -s)
+#    - echo "$KEY" | tr -d '\r' | ssh-add -
+#    - mkdir -p ~/.ssh
+#    - chmod 700 ~/.ssh
+#    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+#    - chmod 644 ~/.ssh/known_hosts
+#    - git config --global user.email "sig.pancetta+github@gmail.com"
+#    - git config --global user.name "pancetta"
+#  script:
+#    - git clone git@github.com:Parallel-in-Time/pySDC-benchmarks.git
+#    - cd pySDC-benchmarks
+#    - mkdir -p latest-benchmark
+#    - cd latest-benchmark
+#    - cp ../../*.json .
+#    - cd ..
+#    - git add -A
+#    - git commit -m "adding new benchmark results"
+#    - git push
