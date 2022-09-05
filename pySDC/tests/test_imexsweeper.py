@@ -1,11 +1,12 @@
 import unittest
-
+import pytest
 import numpy as np
 
 node_types = ['EQUID', 'LEGENDRE']
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
 
+@pytest.mark.base
 class TestImexSweeper(unittest.TestCase):
 
     #

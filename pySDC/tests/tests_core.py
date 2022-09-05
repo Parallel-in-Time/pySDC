@@ -1,12 +1,15 @@
 import numpy as np
+import pytest
 
 
+@pytest.mark.base
 def test_errors():
     classes = ['DataError']
     for subclass in classes:
         yield check_error, subclass
 
 
+@pytest.mark.base
 def check_error(subclass):
     import pySDC.core.Errors
 
@@ -18,6 +21,7 @@ def check_error(subclass):
         assert True
 
 
+@pytest.mark.base
 def test_datatypes_mesh():
 
     init = [10, (10, 10), (10, 10, 10)]
@@ -25,6 +29,7 @@ def test_datatypes_mesh():
         yield check_datatypes_mesh, i
 
 
+@pytest.mark.base
 def check_datatypes_mesh(init):
     import pySDC.implementations.datatype_classes.mesh as m
 
@@ -68,6 +73,7 @@ def check_datatypes_mesh(init):
     assert m7 >= 0
 
 
+@pytest.mark.base
 def test_datatypes_particles():
 
     init = [1, 10]
@@ -75,6 +81,7 @@ def test_datatypes_particles():
         yield check_datatypes_particles, i
 
 
+@pytest.mark.base
 def check_datatypes_particles(init):
     from pySDC.implementations.datatype_classes.particles import particles
     from pySDC.implementations.datatype_classes.particles import acceleration

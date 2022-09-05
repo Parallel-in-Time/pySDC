@@ -46,6 +46,7 @@ dev = [
 
 [tool.pytest.ini_options]
 markers = [
+    'base: all basic tests',
     'fenics: tests relying on FEniCS',
     'slow: tests taking much longer than bearable',
     'mpi4py: tests using MPI parallelism (but no other external library such as petsc)',

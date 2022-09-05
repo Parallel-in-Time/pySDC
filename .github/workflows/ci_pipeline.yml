@@ -60,10 +60,12 @@ jobs:
 
       - name: Get artifacts
         run: |
-          job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/jobs" |  jq '.[] | select( .name == "benchmark-base" ) | .id')
+          job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/jobs" |  jq '.[] | select( .name == "bundle" ) | .id')
           echo $job_id
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
+          unzip artifacts.zip
           ls -artl
+          ls -artl data
 
 
 

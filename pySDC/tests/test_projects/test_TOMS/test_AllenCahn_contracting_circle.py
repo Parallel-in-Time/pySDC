@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.base
 @pytest.mark.slow
 def test_AllenCahn_contracting_circle():
     from pySDC.projects.TOMS.AllenCahn_contracting_circle import main

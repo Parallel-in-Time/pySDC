@@ -1,6 +1,8 @@
 import os
+import pytest
 
 
+@pytest.mark.base
 def test_plot():
     from pySDC.projects.FastWaveSlowWave.plotgmrescounter_boussinesq import plot_buoyancy
 
