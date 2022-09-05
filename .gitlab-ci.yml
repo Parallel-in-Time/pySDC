@@ -13,7 +13,7 @@ test:
   artifacts:
     name: "$NAME_$PYTHON"
     paths:
-      - coverage_${NAME}_${PYTHON}.dat
+      - coverage_${NAME}_3.10.dat
       - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
@@ -38,7 +38,6 @@ benchmark:
   script:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
 
-
 bundle:
   image: mambaorg/micromamba
   stage: upload
@@ -54,12 +53,9 @@ bundle:
 #    - micromamba install -c conda-forge git
 #    - git config --global --add safe.directory '*'
   script:
-    - ls -artl .
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml -o data/coverage.xml
     - mv output*.json data/
-    - ls -artl .
-    - ls -artl data/
 #    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
 #    - export COVERALLS_SERVICE_NAME="gitlab-ci"
 #    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
