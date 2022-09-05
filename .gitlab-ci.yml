@@ -54,7 +54,7 @@ bundle:
 #    - micromamba install -c conda-forge git
 #    - git config --global --add safe.directory '*'
   script:
-    - mv data_3.10 data
+    - mv data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml -o data/coverage.xml
     - mv output*.json data/
