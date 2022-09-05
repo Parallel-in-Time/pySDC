@@ -13,7 +13,7 @@ test:
   artifacts:
     name: "$NAME_$PYTHON"
     paths:
-      - coverage_$NAME_$PYTHON.dat
+      - coverage_$NAME_3.10.dat
       - data
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
