@@ -54,7 +54,7 @@ bundle:
   script:
     - python -m coverage combine coverage_*.dat
     - python -m coverage xml -o data/coverage.xml
-    - mv output*.jsob data/
+    - mv output*.json data/
     - ls -artl .
     - ls -artl data/
 #    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
