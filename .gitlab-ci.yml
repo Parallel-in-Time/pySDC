@@ -21,7 +21,9 @@ test:
     - micromamba activate pySDC
     - micromamba install --yes -c conda-forge openssh
   script:
+    - echo $NAME_$PYTHON
     - coverage run --data-file=coverage_$NAME_$PYTHON.dat -m pytest --continue-on-collection-errors -svv --durations=0 pySDC/tests -m $NAME
+    - ls -artl .
 
 benchmark:
   image: mambaorg/micromamba
