@@ -99,6 +99,7 @@ jobs:
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finalize benchmark report
         run: |
