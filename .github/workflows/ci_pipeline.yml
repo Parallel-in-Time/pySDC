@@ -89,22 +89,26 @@ jobs:
           mv htmlcov docs/build/html/.
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
 
-      - name: Generate benchmark report
+      - name: Store benchmark result
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
           output-file-path: output.json
-          auto-push: false
-          external-data-json-path: docs/benchmark/data.json
-#          skip-fetch-gh-pages: true
-#          benchmark-data-dir-path: docs/benchmark
-#          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          benchmark-data-dir-path: .
+          gh-repository: github.com/Parallel-in-Time/pySDC-benchmarks
+          gh-pages-branch: main
+          github-token: ${{ secrets.BENCHMARK_BOT }}
 
-      - name: Finalize benchmark report
-        run: |
-          mv docs/benchmark docs/build/html/
+#      - name: Finalize benchmark report
+#        run: |
+#          git config --local user.email "sig.pancetta+github@gmail.com"
+#          git config --local user.name "Pancetta"
+#          git add docs/benchmark/data.json
+#          git commit -m "Updating benchmarks"
+#          git push
+#          mv docs/benchmark docs/build/html/
 
       - name: Store docs
         uses: actions/upload-artifact@v2
