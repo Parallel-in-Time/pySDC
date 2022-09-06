@@ -90,7 +90,7 @@ jobs:
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
 
       - name: Generate benchmark report
-        uses: pancetta/github-action-benchmark@v1
+        uses: pancetta/github-action-benchmark@master
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
@@ -103,6 +103,7 @@ jobs:
 
       - name: Finalize benchmark report
         run: |
+          git status
           git config --local user.email "sig.pancetta+github@gmail.com"
           git config --local user.name "Pancetta"
           git add docs/benchmark/data.json
