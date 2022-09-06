@@ -99,6 +99,11 @@ jobs:
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
 
+      - name: Finalize benchmark report
+        run: |
+          ls -artl .
+          ls -artl docs/benchmark
+          
       - name: Store docs
         uses: actions/upload-artifact@v2
         with:
