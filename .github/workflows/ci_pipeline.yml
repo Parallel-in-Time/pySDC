@@ -96,7 +96,7 @@ jobs:
           tool: 'pytest'
           output-file-path: output.json
           auto-push: false
-          external-data-json-path: docs/benchmark/data.js
+          skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
 
       - name: Store docs
