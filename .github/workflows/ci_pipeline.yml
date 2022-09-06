@@ -77,30 +77,29 @@ jobs:
           rm -rf data
           unzip artifacts.zip
 
-#      - name: Code Coverage Summary Report
-#        uses: irongut/CodeCoverageSummary@v1.3.0
-#        with:
-#          filename: coverage.xml
-#          badge: true
-#          format: 'markdown'
-#          output: 'both'
-#
-#      - name: Upload coverage report
-#        run: |
-#          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-#          coveralls --service=github
-
-      - name: Generate Coverage badge
-        run: |
-          pip install genbadge[all]
-          genbadge coverage -i coverage.xml -o docs/build/html/coverage-badge.svg
-          mv htmlcov docs/build/html/.
-
       - name: Build documentation
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
+
+      - name: Generate Coverage badge
+        run: |
+          pip install genbadge[all]
+          mv htmlcov docs/build/html/.
+          genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
+          echo ${GITHUB_REF#refs/heads/})
+    
+      - name: Generate benchmark report
+        uses: benchmark-action/github-action-benchmark@v1
+        if: github.event_name != 'pull_request'
+        with:
+          name: pySDC Benchmark with pytest-benchmark
+          tool: 'pytest'
+          output-file-path: output.json
+          auto-push: false
+          benchmark-data-dir-path: docs/benchmark
+          gh-pages-branch: ${GITHUB_REF#refs/heads/})
 
       - name: Store docs
         uses: actions/upload-artifact@v2
