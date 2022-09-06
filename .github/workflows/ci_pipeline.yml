@@ -36,7 +36,7 @@ jobs:
           flakeheaven lint --benchmark pySDC
 
 
-  spawn_gitlab:
+  spawn_gitlab_and_postprocess:
     runs-on: ubuntu-latest
 
     needs:
@@ -98,12 +98,13 @@ jobs:
           auto-push: false
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
+          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
 
       - name: Finalize benchmark report
         run: |
           ls -artl .
           ls -artl docs/benchmark
-          
+
       - name: Store docs
         uses: actions/upload-artifact@v2
         with:
