@@ -97,15 +97,14 @@ jobs:
           output-file-path: output.json
           auto-push: false
           external-data-json-path: docs/benchmark/data.json
-          skip-fetch-gh-pages: true
-          benchmark-data-dir-path: docs/benchmark
-          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          skip-fetch-gh-pages: true
+#          benchmark-data-dir-path: docs/benchmark
+#          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finalize benchmark report
         run: |
-          ls -artl .
-          ls -artl docs/benchmark
+          mv docs/benchmark docs/build/html/
 
       - name: Store docs
         uses: actions/upload-artifact@v2
