@@ -1,4 +1,4 @@
-{
+window.BENCHMARK_DATA = {
   "lastUpdate": 1661355555501,
   "repoUrl": "https://github.com/Parallel-in-Time/pySDC",
   "entries": {
