@@ -13,4 +13,3 @@ dependencies:
   - pytest-benchmark
   - coverage[toml]
   - sphinx
-  - coveralls
