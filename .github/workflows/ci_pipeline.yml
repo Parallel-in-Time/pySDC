@@ -53,6 +53,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
+      - name: get branch name
+        run: echo ${{ github.head_ref || github.ref_name }}
+
+
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
@@ -88,18 +92,16 @@ jobs:
           pip install genbadge[all]
           mv htmlcov docs/build/html/.
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
-          echo ${GITHUB_REF#refs/heads/})
-    
+
       - name: Generate benchmark report
         uses: benchmark-action/github-action-benchmark@v1
-        if: github.event_name != 'pull_request'
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
           output-file-path: output.json
           auto-push: false
           benchmark-data-dir-path: docs/benchmark
-          gh-pages-branch: ${GITHUB_REF#refs/heads/})
+          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
 
       - name: Store docs
         uses: actions/upload-artifact@v2
