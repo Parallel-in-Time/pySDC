@@ -49,6 +49,7 @@ bundle:
       - data
       - coverage.xml
       - output.json
+      - htmlcov
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -59,6 +60,7 @@ bundle:
     - mv data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml
+    - python -m coverage html
 #    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
 #    - export COVERALLS_SERVICE_NAME="gitlab-ci"
 #    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
