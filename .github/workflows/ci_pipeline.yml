@@ -96,6 +96,7 @@ jobs:
           tool: 'pytest'
           output-file-path: output.json
           auto-push: false
+          external-data-json-path: docs/benchmark/data.json
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
