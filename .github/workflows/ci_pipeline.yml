@@ -90,7 +90,7 @@ jobs:
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
 
       - name: Generate benchmark report
-        uses: pancetta/github-action-benchmark@alpha1
+        uses: pancetta/github-action-benchmark@master
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
