@@ -73,23 +73,28 @@ jobs:
       - name: Get artifacts
         run: |
           job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/jobs" |  jq '[.[] | select( .name == "bundle" ) | select( .status == "success" )] | sort_by( .finished_at )[-1] | .id')
-          echo $job_id
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
 
-      - name: Code Coverage Summary Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: coverage.xml
-          badge: true
-          format: 'markdown'
-          output: 'both'
+#      - name: Code Coverage Summary Report
+#        uses: irongut/CodeCoverageSummary@v1.3.0
+#        with:
+#          filename: coverage.xml
+#          badge: true
+#          format: 'markdown'
+#          output: 'both'
+#
+#      - name: Upload coverage report
+#        run: |
+#          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+#          coveralls --service=github
 
-      - name: Upload coverage report
-        run: | 
-          cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-          coveralls --service=github
+      - name: Generate Coverage badge
+        run: |
+          pip install genbadge[all]
+          genbadge coverage -i coverage.xml -o docs/build/html/coverage-badge.svg
+          mv htmlcov docs/build/html/.
 
       - name: Build documentation
         run: |
