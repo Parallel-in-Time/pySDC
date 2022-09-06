@@ -90,7 +90,7 @@ jobs:
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
 
       - name: Generate benchmark report
-        uses: pancetta/github-action-benchmark@master
+        uses: benchmark-action/github-action-benchmark@v1
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
@@ -99,7 +99,7 @@ jobs:
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: docs/benchmark
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finalize benchmark report
         run: |
