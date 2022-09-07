@@ -36,7 +36,8 @@ benchmark:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install -c conda-forge git
+#    - micromamba install -c conda-forge git
+    - git config --global --add safe.directory '*'
   script:
     - git describe --dirty --always --long --abbrev=40
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
