@@ -31,7 +31,7 @@ benchmark:
   stage: benchmark
   artifacts:
     paths:
-      - output.json
+      - benchmarks
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
@@ -39,39 +39,27 @@ benchmark:
     - micromamba install -c conda-forge git
     - git config --global --add safe.directory '*'
   script:
-    - git describe --dirty --always --long --abbrev=40
-    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
+    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-storage="file://./benchmarks" --benchmark-autosave  --benchmark-save-data
     - cat output.json
-    - exit(1)
 
 bundle:
   image: mambaorg/micromamba
   stage: upload
-#  variables:
-#    COV_TOKEN: ${COV_TOKEN}
   artifacts:
     paths:
       - data
       - coverage.xml
-      - output.json
+      - benchmarks
       - htmlcov
   before_script:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-#    - micromamba install -c conda-forge git
-#    - git config --global --add safe.directory '*'
   script:
     - mv data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml
     - python -m coverage html
-#    - export COVERALLS_REPO_TOKEN=$COV_TOKEN
-#    - export COVERALLS_SERVICE_NAME="gitlab-ci"
-#    - export CI_BUILD_NUMBER=$CI_COMMIT_SHORT_SHA
-#    - export CI_BUILD_URL=$CI_JOB_URL
-#    - export CI_BRANCH=$CI_COMMIT_REF_NAME
-#    - coveralls
 
 #upload_results:
 #  image: ubuntu:latest
