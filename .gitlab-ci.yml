@@ -39,8 +39,8 @@ benchmark:
     - micromamba install -c conda-forge git
     - git config --global --add safe.directory '*'
   script:
-    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-storage="file://./benchmarks" --benchmark-autosave  --benchmark-save-data
-    - cat output.json
+    - export STORAGE-PATH=./benchmarks
+    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-autosave  --benchmark-save-data
 
 bundle:
   image: mambaorg/micromamba

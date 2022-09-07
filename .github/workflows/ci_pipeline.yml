@@ -90,6 +90,16 @@ jobs:
           mv htmlcov docs/build/html/.
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
 
+      - name: Push benchmark data
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+        with:
+          source_file: 'benchmarks'
+          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
+          user_email: 'sig.pancetta+github@email.com'
+          user_name: 'pancetta'
+
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
 #        with:
