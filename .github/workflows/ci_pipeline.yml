@@ -104,8 +104,12 @@ jobs:
 
       - name: Finalize benchmark report
         run: |
-          ls -artl .
-          ls -artl docs/benchmark
+          git status
+          git config --local user.email "sig.pancetta+github@gmail.com"
+          git config --local user.name "Pancetta"
+          git add docs/benchmark/*
+          git commit -m "Updating benchmarks"
+          git push
           mv docs/benchmark docs/build/html/
 
       - name: Store docs

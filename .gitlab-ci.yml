@@ -1,30 +1,30 @@
 stages:
-  - test
+#  - test
   - benchmark
   - upload
 
-test:
-  image: mambaorg/micromamba
-  stage: test
-  parallel:
-    matrix:
-      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
-        NAME: ['base', 'fenics', 'petsc', 'mpi4py']
-  artifacts:
-    name: "$NAME_$PYTHON"
-    paths:
-      - coverage_${NAME}_3.10.dat
-      - data_3.10
-  before_script:
-    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install --yes -c conda-forge openssh
-  script:
-    - echo $NAME
-    - echo $PYTHON
-    - coverage run --data-file=coverage_${NAME}_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${NAME}
-    - mv data data_${PYTHON}
+#test:
+#  image: mambaorg/micromamba
+#  stage: test
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+#        NAME: ['base', 'fenics', 'petsc', 'mpi4py']
+#  artifacts:
+#    name: "$NAME_$PYTHON"
+#    paths:
+#      - coverage_${NAME}_3.10.dat
+#      - data_3.10
+#  before_script:
+#    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install --yes -c conda-forge openssh
+#  script:
+#    - echo $NAME
+#    - echo $PYTHON
+#    - coverage run --data-file=coverage_${NAME}_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${NAME}
+#    - mv data data_${PYTHON}
 
 benchmark:
   image: mambaorg/micromamba
@@ -38,6 +38,8 @@ benchmark:
     - micromamba activate pySDC
   script:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
+    - cat output.json
+    - exit(1)
 
 bundle:
   image: mambaorg/micromamba
