@@ -36,7 +36,9 @@ benchmark:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
+    - mamba install -c conda-forge git
   script:
+    - git describe --dirty --always --long --abbrev=40
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json output.json
     - cat output.json
     - exit(1)
