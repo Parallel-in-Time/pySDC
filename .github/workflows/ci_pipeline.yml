@@ -70,13 +70,14 @@ jobs:
           GITLAB_PROJECT_ID: "3525"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get artifacts
+      - name: Get and prepare artifacts
         run: |
           pipeline_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/repository/commits/${{ github.head_ref || github.ref_name }}" | jq '.last_pipeline.id')
           job_id=$(curl --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_SECRET_H }}" --silent "https://gitlab.hzdr.de/api/v4/projects/3525/pipelines/$pipeline_id/jobs" |  jq '.[] | select( .name == "bundle" ) | select( .status == "success" ) | .id')
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
+          for i in benchmarks/*/*.json; do cp $i tmp.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' tmp.json > $i; rm -f tmp.json; done;
 
       - name: Build documentation
         run: |
