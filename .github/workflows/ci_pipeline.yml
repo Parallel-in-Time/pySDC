@@ -100,28 +100,6 @@ jobs:
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
 
-#      - name: Generate benchmark report
-#        uses: pancetta/github-action-benchmark@v1
-#        with:
-#          name: pySDC Benchmark with pytest-benchmark
-#          tool: 'pytest'
-#          output-file-path: output.json
-#          auto-push: false
-#          skip-fetch-gh-pages: true
-#          benchmark-data-dir-path: docs/benchmark
-#          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-#      - name: Finalize benchmark report
-#        run: |
-##          git status
-##          git config --local user.email "sig.pancetta+github@gmail.com"
-##          git config --local user.name "Pancetta"
-##          git add docs/benchmark/*
-##          git commit -m "Updating benchmarks"
-##          git push
-#          mv docs/benchmark docs/build/html/
-
       - name: Store docs
         uses: actions/upload-artifact@v2
         with:
