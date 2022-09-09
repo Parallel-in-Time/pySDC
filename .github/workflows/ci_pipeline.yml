@@ -55,9 +55,6 @@ jobs:
         with:
           path: main
 
-      - name: cd
-        run: cd main
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
