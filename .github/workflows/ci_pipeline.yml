@@ -52,8 +52,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
