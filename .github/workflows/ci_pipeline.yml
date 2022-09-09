@@ -52,6 +52,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+        with:
+          path: main
+
+      - name: cd
+        run: cd main
 
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
@@ -85,22 +90,25 @@ jobs:
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
+      - name: cd
+        run: cd ..
+
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
         with:
           repository: Parallel-in-Time/pySDC-benchmarks
           token: ${{ secrets.BENCHMARK_BOT }}
-          path: '..'
-      
+          path: bench
+
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
-          output-file-path: docs/benchmarks/output.json
+          output-file-path: main/docs/benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
-          benchmark-data-dir-path: pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
+          benchmark-data-dir-path: bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -109,11 +117,14 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
         with:
-          source_file: '../pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
+          source_file: 'bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
           destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
           destination_folder: '${{ github.head_ref || github.ref_name }}'
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
+
+      - name: cd
+        run: cd main
 
       - name: Build documentation
         run: |
@@ -122,8 +133,6 @@ jobs:
           sphinx-build -b html docs/source docs/build/html
           mv htmlcov docs/build/html/.
           mv docs/benchmarks docs/build/html/.
-
-
 
       - name: Store docs
         uses: actions/upload-artifact@v2
