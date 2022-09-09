@@ -87,8 +87,8 @@ jobs:
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
-      - name: cd
-        run: cd ..
+#      - name: cd
+#        run: cd ..
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
@@ -116,12 +116,8 @@ jobs:
         with:
           source_file: 'bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
           destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
-          destination_folder: '${{ github.head_ref || github.ref_name }}'
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
-
-#      - name: cd
-#        run: cd main
 
       - name: Build documentation
         run: |
