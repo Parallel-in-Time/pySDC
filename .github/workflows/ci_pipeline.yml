@@ -87,9 +87,6 @@ jobs:
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
-#      - name: cd
-#        run: cd ..
-
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
         with:
