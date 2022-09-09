@@ -77,20 +77,12 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
-          mv htmlcov docs/build/html/.
           for i in benchmarks/*.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/benchmark/$i; done;
-
-
-      - name: Build documentation
-        run: |
-          chmod u+x ./docs/update_apidocs.sh
-          ./docs/update_apidocs.sh
-          sphinx-build -b html docs/source docs/build/html
 
       - name: Generate Coverage badge
         run: |
           pip install genbadge[all]
-          genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
+          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
       
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
@@ -108,6 +100,15 @@ jobs:
         run: |
           ls -artl docs
           ls -artl docs/benchmark
+          
+
+      - name: Build documentation
+        run: |
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          mv htmlcov docs/build/html/.
+          mv docs/benchmark docs/build/html/.
+          sphinx-build -b html docs/source docs/build/html    
 
 #      - name: Push benchmark data
 #        uses: dmnemec/copy_file_to_another_repo_action@main

@@ -39,6 +39,7 @@ benchmark:
     - micromamba install -c conda-forge git
     - git config --global --add safe.directory '*'
   script:
+    - mkdir -p benchmarks
 #    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-storage="file://./benchmarks" --benchmark-autosave  --benchmark-save-data
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
