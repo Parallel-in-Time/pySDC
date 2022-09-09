@@ -77,7 +77,8 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
-          for i in benchmarks/*.json; do jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/benchmark/$i; done;
+          mkdir -p docs/benchmarks
+          for i in benchmarks/*.json; do jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/$i; done;
 
       - name: Generate Coverage badge
         run: |
@@ -89,17 +90,17 @@ jobs:
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
-          output-file-path: docs/benchmark/output.json
+          output-file-path: docs/benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
-          benchmark-data-dir-path: docs/benchmark
+          benchmark-data-dir-path: docs/benchmarks
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: |
           ls -artl docs
-          ls -artl docs/benchmark
+          ls -artl docs/benchmarks
           
 
       - name: Build documentation
@@ -107,7 +108,7 @@ jobs:
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           mv htmlcov docs/build/html/.
-          mv docs/benchmark docs/build/html/.
+          mv docs/benchmarks docs/build/html/.
           sphinx-build -b html docs/source docs/build/html    
 
 #      - name: Push benchmark data
