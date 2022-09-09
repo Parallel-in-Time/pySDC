@@ -102,7 +102,7 @@ jobs:
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
-          output-file-path: main/docs/benchmarks/output.json
+          output-file-path: docs/benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
@@ -120,8 +120,8 @@ jobs:
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
 
-      - name: cd
-        run: cd main
+#      - name: cd
+#        run: cd main
 
       - name: Build documentation
         run: |
