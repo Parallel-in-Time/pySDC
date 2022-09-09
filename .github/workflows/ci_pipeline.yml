@@ -88,9 +88,9 @@ jobs:
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
         with:
-          repository: 'Parallel-in-Time/pySDC-benchmarks'
-          token: '${{ secrets.BENCHMARK_BOT }}'
-          path: '.'
+          repository: Parallel-in-Time/pySDC-benchmarks
+          token: ${{ secrets.BENCHMARK_BOT }}
+          path: '..'
       
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
@@ -109,7 +109,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
         with:
-          source_file: 'pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
+          source_file: '../pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
           destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
           destination_folder: '${{ github.head_ref || github.ref_name }}'
           user_email: 'sig.pancetta+github@email.com'
