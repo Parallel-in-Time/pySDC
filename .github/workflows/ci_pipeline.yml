@@ -78,7 +78,6 @@ jobs:
           rm -rf data
           unzip artifacts.zip
           mv htmlcov docs/build/html/.
-#          for i in benchmarks/*.json; do cp $i tmp.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' tmp.json > $i; rm -f tmp.json; done;
           for i in benchmarks/*.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/benchmark/$i; done;
 
 
