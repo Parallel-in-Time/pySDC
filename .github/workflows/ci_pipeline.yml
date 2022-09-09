@@ -51,7 +51,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
@@ -84,6 +86,13 @@ jobs:
         run: |
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+
+      - name: Checkout benchmark repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'Parallel-in-Time/pySDC-benchmarks'
+          token: '${{ secrets.BENCHMARK_BOT }}'
+          path: '.'
       
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
@@ -93,15 +102,20 @@ jobs:
           output-file-path: docs/benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
-          benchmark-data-dir-path: docs/benchmarks
+          benchmark-data-dir-path: pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
           gh-pages-branch: ${{ github.head_ref || github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test
-        run: |
-          ls -artl docs
-          ls -artl docs/benchmarks
-          
+      - name: Push benchmark data
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+        with:
+          source_file: 'pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
+          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
+          destination_folder: '${{ github.head_ref || github.ref_name }}'
+          user_email: 'sig.pancetta+github@email.com'
+          user_name: 'pancetta'
 
       - name: Build documentation
         run: |
@@ -111,15 +125,7 @@ jobs:
           mv htmlcov docs/build/html/.
           mv docs/benchmarks docs/build/html/.
 
-#      - name: Push benchmark data
-#        uses: dmnemec/copy_file_to_another_repo_action@main
-#        env:
-#          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
-#        with:
-#          source_file: 'benchmarks'
-#          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
-#          user_email: 'sig.pancetta+github@email.com'
-#          user_name: 'pancetta'
+
 
       - name: Store docs
         uses: actions/upload-artifact@v2
