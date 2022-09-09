@@ -77,7 +77,10 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
-          for i in benchmarks/*/*.json; do cp $i tmp.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' tmp.json > $i; rm -f tmp.json; done;
+          mv htmlcov docs/build/html/.
+#          for i in benchmarks/*.json; do cp $i tmp.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' tmp.json > $i; rm -f tmp.json; done;
+          for i in benchmarks/*.json; jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/benchmark/$i; done;
+
 
       - name: Build documentation
         run: |
@@ -88,18 +91,34 @@ jobs:
       - name: Generate Coverage badge
         run: |
           pip install genbadge[all]
-          mv htmlcov docs/build/html/.
           genbadge coverage -i coverage.xml -o docs/build/html/htmlcov/coverage-badge.svg
-
-      - name: Push benchmark data
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+      
+      - name: Generate benchmark report
+        uses: pancetta/github-action-benchmark@v1
         with:
-          source_file: 'benchmarks'
-          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
-          user_email: 'sig.pancetta+github@email.com'
-          user_name: 'pancetta'
+          name: pySDC Benchmark with pytest-benchmark
+          tool: 'pytest'
+          output-file-path: docs/benchmark/output.json
+          auto-push: false
+          skip-fetch-gh-pages: true
+          benchmark-data-dir-path: docs/benchmark
+          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test
+        run: |
+          ls -artl docs
+          ls -artl docs/benchmark
+
+#      - name: Push benchmark data
+#        uses: dmnemec/copy_file_to_another_repo_action@main
+#        env:
+#          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+#        with:
+#          source_file: 'benchmarks'
+#          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
+#          user_email: 'sig.pancetta+github@email.com'
+#          user_name: 'pancetta'
 
       - name: Store docs
         uses: actions/upload-artifact@v2
