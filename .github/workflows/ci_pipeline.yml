@@ -52,8 +52,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: main
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
@@ -66,13 +64,12 @@ jobs:
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
-          environment-file: main/etc/environment-base.yml
+          environment-file: etc/environment-base.yml
 
       - name: Mirror + trigger CI
         uses: SvanBoxel/gitlab-mirror-and-ci-action@master
         with:
           args: "https://gitlab.hzdr.de/r.speck/pysdc"
-          working-directory: ./main
         env:
           FORCE_PUSH: "true"
           GITLAB_HOSTNAME: "gitlab.hzdr.de"
