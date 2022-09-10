@@ -58,6 +58,8 @@ jobs:
       - run: |
           pwd
           ls -artl .
+          cd ..
+          pwd
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
