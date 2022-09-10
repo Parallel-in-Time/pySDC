@@ -99,8 +99,7 @@ jobs:
           pwd
           ls -artl .
           ls -artl bench
-          ls -artl bench/pySDC-benchmarks/
-          ls -artl bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
+          ls -artl bench/${{ github.head_ref || github.ref_name }}
           ls -artl docs/benchmarks/
 
       - name: Generate benchmark report
@@ -111,7 +110,7 @@ jobs:
           output-file-path: docs/benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
-          benchmark-data-dir-path: bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
+          benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push benchmark data
@@ -119,7 +118,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
         with:
-          source_file: 'bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}'
+          source_file: 'bench/${{ github.head_ref || github.ref_name }}'
           destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
