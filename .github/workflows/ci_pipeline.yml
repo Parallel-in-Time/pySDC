@@ -72,6 +72,7 @@ jobs:
         uses: SvanBoxel/gitlab-mirror-and-ci-action@master
         with:
           args: "https://gitlab.hzdr.de/r.speck/pysdc"
+          working-directory: ./main
         env:
           FORCE_PUSH: "true"
           GITLAB_HOSTNAME: "gitlab.hzdr.de"
