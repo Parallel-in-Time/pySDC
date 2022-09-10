@@ -94,6 +94,15 @@ jobs:
           token: ${{ secrets.BENCHMARK_BOT }}
           path: bench
 
+      - name: test
+        run: |
+          pwd
+          ls -artl .
+          ls -artl bench
+          ls -artl bench/pySDC-benchmarks/
+          ls -artl bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
+          ls -artl docs/benchmarks/
+
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
         with:
@@ -103,7 +112,6 @@ jobs:
           auto-push: false
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: bench/pySDC-benchmarks/${{ github.head_ref || github.ref_name }}
-          gh-pages-branch: ${{ github.head_ref || github.ref_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push benchmark data
