@@ -63,17 +63,10 @@ jobs:
           path: bench
           ref: main
 
-      - run: |
-          echo $GITHUB_WORKSPACE
-          pwd
-          ls -artl .
-          cd main
-          ls -artl .
-
       - name: Install Conda environment with Micromamba
         uses: mamba-org/provision-with-micromamba@main
         with:
-          environment-file: etc/environment-base.yml
+          environment-file: main/etc/environment-base.yml
 
       - name: Mirror + trigger CI
         uses: SvanBoxel/gitlab-mirror-and-ci-action@master
