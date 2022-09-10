@@ -122,7 +122,9 @@ jobs:
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
           mv htmlcov docs/build/html/.
-          mv docs/benchmarks docs/build/html/.
+#          mv docs/benchmarks docs/build/html/.
+          mkdir -p docs/build/html/benchmarks
+          cp bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
 
       - name: Store docs
         uses: actions/upload-artifact@v2
