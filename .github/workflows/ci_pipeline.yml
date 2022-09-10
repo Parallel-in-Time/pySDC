@@ -60,14 +60,14 @@ jobs:
           ls -artl .
           cd ..
           pwd
-          echo $GITHUB_WORKSPACE
+          export GITHUB_WORKSPACE=$GITHUB_WORKSPACE/..
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
         with:
           repository: Parallel-in-Time/pySDC-benchmarks
           token: ${{ secrets.BENCHMARK_BOT }}
-          path: ../bench
+          path: bench
           ref: main
 
       - run: |
