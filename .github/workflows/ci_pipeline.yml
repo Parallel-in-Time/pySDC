@@ -93,6 +93,7 @@ jobs:
           repository: Parallel-in-Time/pySDC-benchmarks
           token: ${{ secrets.BENCHMARK_BOT }}
           path: bench
+          ref: main
 
       - name: test
         run: |
@@ -101,6 +102,7 @@ jobs:
           ls -artl bench
           ls -artl bench/${{ github.head_ref || github.ref_name }}
           ls -artl docs/benchmarks/
+          git status
 
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
