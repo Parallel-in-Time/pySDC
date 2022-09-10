@@ -90,10 +90,10 @@ jobs:
           mkdir -p docs/benchmarks
           for i in benchmarks/*.json; do jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/$i; done;
 
-      - name: Generate Coverage badge
-        run: |
-          pip install genbadge[all]
-          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+#      - name: Generate Coverage badge
+#        run: |
+#          pip install genbadge[all]
+#          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
       - name: test
         run: |
