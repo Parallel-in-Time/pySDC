@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
         with:
           path: main
 
@@ -60,7 +60,6 @@ jobs:
           ls -artl .
           cd ..
           pwd
-          export GITHUB_WORKSPACE=$GITHUB_WORKSPACE/..
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
