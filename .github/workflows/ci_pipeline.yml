@@ -39,8 +39,8 @@ jobs:
   spawn_gitlab_and_postprocess:
     runs-on: ubuntu-latest
 
-#    needs:
-#      - lint
+    needs:
+      - lint
 
     defaults:
       run:
@@ -90,19 +90,10 @@ jobs:
           mkdir -p docs/benchmarks
           for i in benchmarks/*.json; do jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/$i; done;
 
-#      - name: Generate Coverage badge
-#        run: |
-#          pip install genbadge[all]
-#          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
-
-      - name: test
+      - name: Generate Coverage badge
         run: |
-          pwd
-          ls -artl .
-          ls -artl bench
-          ls -artl bench/${{ github.head_ref || github.ref_name }}
-          ls -artl docs/benchmarks/
-          git status
+          pip install genbadge[all]
+          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
