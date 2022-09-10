@@ -1,30 +1,30 @@
 stages:
-  - test
+#  - test
   - benchmark
   - upload
 
-test:
-  image: mambaorg/micromamba
-  stage: test
-  parallel:
-    matrix:
-      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
-        NAME: ['base', 'fenics', 'petsc', 'mpi4py']
-  artifacts:
-    name: "$NAME_$PYTHON"
-    paths:
-      - coverage_${NAME}_3.10.dat
-      - data_3.10
-  before_script:
-    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install --yes -c conda-forge openssh
-  script:
-    - echo $NAME
-    - echo $PYTHON
-    - coverage run --data-file=coverage_${NAME}_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${NAME}
-    - mv data data_${PYTHON}
+#test:
+#  image: mambaorg/micromamba
+#  stage: test
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.7', '3.8', '3.9', '3.10' ]
+#        NAME: ['base', 'fenics', 'petsc', 'mpi4py']
+#  artifacts:
+#    name: "$NAME_$PYTHON"
+#    paths:
+#      - coverage_${NAME}_3.10.dat
+#      - data_3.10
+#  before_script:
+#    - micromamba create --yes python=$PYTHON -f etc/environment-$NAME.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install --yes -c conda-forge openssh
+#  script:
+#    - echo $NAME
+#    - echo $PYTHON
+#    - coverage run --data-file=coverage_${NAME}_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${NAME}
+#    - mv data data_${PYTHON}
 
 benchmark:
   image: mambaorg/micromamba
@@ -57,7 +57,7 @@ bundle:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-    - mv data_3.10/* data/.
-    - python -m coverage combine coverage_*_3.10.dat
-    - python -m coverage xml
-    - python -m coverage html
+    - [ ! -d data_3.10 ] || mv data_3.10/* data/.
+    - [ ! -f coverage_*_3.10.dat ] || python -m coverage combine coverage_*_3.10.dat
+    - [ ! -f coverage_*_3.10.dat ] || python -m coverage xml
+    - [ ! -f coverage_*_3.10.dat ] || python -m coverage html
