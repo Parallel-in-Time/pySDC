@@ -29,6 +29,8 @@ test:
 benchmark:
   image: mambaorg/micromamba
   stage: benchmark
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ \[CI-no-benchmark\]
   artifacts:
     paths:
       - benchmarks
