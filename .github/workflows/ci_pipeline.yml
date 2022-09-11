@@ -87,8 +87,6 @@ jobs:
           curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
           rm -rf data
           unzip artifacts.zip
-          mkdir -p docs/benchmarks
-          for i in benchmarks/*.json; do jq '.commit_info.branch="${{ github.head_ref || github.ref_name }}"' $i > docs/$i; done;
 
       - name: Generate Coverage badge
         run: |
@@ -97,10 +95,11 @@ jobs:
 
       - name: Generate benchmark report
         uses: pancetta/github-action-benchmark@v1
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
         with:
           name: pySDC Benchmark with pytest-benchmark
           tool: 'pytest'
-          output-file-path: docs/benchmarks/output.json
+          output-file-path: benchmarks/output.json
           auto-push: false
           skip-fetch-gh-pages: true
           benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
@@ -108,6 +107,7 @@ jobs:
 
       - name: Push benchmark data
         uses: dmnemec/copy_file_to_another_repo_action@main
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
         env:
           API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
         with:
@@ -116,12 +116,16 @@ jobs:
           user_email: 'sig.pancetta+github@email.com'
           user_name: 'pancetta'
 
-      - name: Build documentation
+      - name: Build html I
         run: |
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
           mv htmlcov docs/build/html/.
+
+      - name: Build html II
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
+        run: |              
           mkdir -p docs/build/html/benchmarks
           cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
 
