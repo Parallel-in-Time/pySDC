@@ -25,52 +25,28 @@ test:
     - mv data data_${PYTHON}
 
 
-test_cupy:
-  image: mambaorg/micromamba
-  stage: test
-  tags:
-    - cuda
-    - intel
-  parallel:
-    matrix:
-      - PYTHON: [ '3.9', '3.10' ]
-  artifacts:
-    name: "gpu_$PYTHON"
-    paths:
-      - coverage_cupy_3.10.dat
-      - data_3.10
-  before_script:
-    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install --yes -c conda-forge openssh
-  script:
-    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
-    - mv data data_${PYTHON}
-
-test_cupy_2:
-  image: nvidia/cuda:11.7.0-runtime-rockylinux8
-  stage: test
-  tags:
-    - cuda
-    - intel
-  parallel:
-    matrix:
-      - PYTHON: [ '3.9', '3.10' ]
-  artifacts:
-    name: "gpu_$PYTHON"
-    paths:
-      - coverage_cupy_3.10.dat
-      - data_3.10
-  before_script:
-    - curl micro.mamba.pm/install.sh | bash
-    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install --yes -c conda-forge openssh
-  script:
-    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
-    - mv data data_${PYTHON}
+#test_cupy:
+#  image: mambaorg/micromamba
+#  stage: test
+#  tags:
+#    - cuda
+#    - intel
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.9', '3.10' ]
+#  artifacts:
+#    name: "gpu_$PYTHON"
+#    paths:
+#      - coverage_cupy_3.10.dat
+#      - data_3.10
+#  before_script:
+#    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install --yes -c conda-forge openssh
+#  script:
+#    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
+#    - mv data data_${PYTHON}
 
 benchmark:
   image: mambaorg/micromamba
