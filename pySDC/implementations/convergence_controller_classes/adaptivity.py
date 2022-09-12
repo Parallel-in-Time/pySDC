@@ -84,7 +84,7 @@ class AdaptivityBase(ConvergenceController):
         Returns:
             float: The optimal step size
         """
-        return beta * dt * (e_tol / e_est) ** (1. / order)
+        return beta * dt * (e_tol / e_est) ** (1.0 / order)
 
     def get_local_error_estimate(self, controller, S, **kwargs):
         """
@@ -199,8 +199,9 @@ _params\'][\'e_tol\']!',
             order = S.status.iter  # embedded error estimate is same order as time marching
 
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimatal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                               order)
+            L.status.dt_new = self.compute_optimatal_step_size(
+                self.params.beta, L.params.dt, self.params.e_tol, e_est, order
+            )
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
@@ -251,7 +252,7 @@ class AdaptivityResidual(AdaptivityBase):
             'control_order': -45,
             'e_tol_low': 0,
             'e_tol': np.inf,
-            'max_restarts': 2 if 'e_tol_low' in params else None
+            'max_restarts': 2 if 'e_tol_low' in params else None,
         }
         return {**defaults, **params}
 
@@ -289,9 +290,12 @@ class AdaptivityResidual(AdaptivityBase):
             bool: Whether the parameters are compatible
             str: The error message
         """
-        if description['step_params'].get('restol', -1.) >= 0:
-            return False, 'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!'
+        if description['step_params'].get('restol', -1.0) >= 0:
+            return (
+                False,
+                'Adaptivity needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!',
+            )
 
         if controller.params.mssdc_jac:
             return False, 'Adaptivity needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
@@ -320,10 +324,10 @@ smaller than 0!'
             dt_planned = L.status.dt_new if L.status.dt_new is not None else L.params.dt
 
             if res > self.params.e_tol:
-                L.status.dt_new = min([dt_planned, L.params.dt / 2.])
+                L.status.dt_new = min([dt_planned, L.params.dt / 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
             elif res < self.params.e_tol_low:
-                L.status.dt_new = max([dt_planned, L.params.dt * 2.])
+                L.status.dt_new = max([dt_planned, L.params.dt * 2.0])
                 self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None

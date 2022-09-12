@@ -55,7 +55,7 @@ class vanderpol(ptype):
 
         me = self.dtype_u(self.init)
 
-        if t > 0.:
+        if t > 0.0:
 
             def rhs(t, u):
                 return self.eval_f(u, t)
@@ -64,12 +64,14 @@ class vanderpol(ptype):
 
             if u_init is not None:
                 if t_init is None:
-                    raise ValueError('Please supply `t_init` when you want to get the exact solution from a point that \
-is not 0!')
+                    raise ValueError(
+                        'Please supply `t_init` when you want to get the exact solution from a point that \
+is not 0!'
+                    )
                 me = u_init.copy()
             else:
                 u_init = self.params.u0.copy()
-                t_init = 0.
+                t_init = 0.0
             me[:] = solve_ivp(rhs, (t_init, t), u_init, rtol=tol, atol=tol).y[:, -1]
         else:
             me[:] = self.params.u0[:]

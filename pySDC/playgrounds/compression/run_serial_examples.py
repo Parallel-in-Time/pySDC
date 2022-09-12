@@ -169,7 +169,7 @@ def setup_auzinger(dt=None, ml=False):
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 50
-    
+
     # setup the iteration estimator
     convergence_controllers = dict()
     convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}

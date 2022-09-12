@@ -19,6 +19,7 @@ class Status(FrozenClass):
     Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
     relevant information about the controller are known.
     """
+
     def __init__(self, status_variabes):
 
         [setattr(self, key, None) for key in status_variabes]

@@ -17,18 +17,17 @@ class SwitchEstimator(ConvergenceController):
         return {'control_order': 100, **params}
 
     def get_new_step_size(self, controller, S):
-
         def regulaFalsiMethod(a0, b0, f, tol, maxIter=50):
             """
-                Regula falsi method to find the root for the switch
-                Args:
-                    a0, b0 (np.float):              points to start the method
-                    f (callable function):          function values
-                    tol (np.float):                 when tol is reached, the secant method breaks
-                    maxIter (np.int):               maximum number of iterations to find root
+            Regula falsi method to find the root for the switch
+            Args:
+                a0, b0 (np.float):              points to start the method
+                f (callable function):          function values
+                tol (np.float):                 when tol is reached, the secant method breaks
+                maxIter (np.int):               maximum number of iterations to find root
 
-                Return:
-                    The root of f
+            Return:
+                The root of f
             """
             count = 0
             while count <= maxIter:
@@ -72,7 +71,7 @@ class SwitchEstimator(ConvergenceController):
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
                     p = sp.interpolate.interp1d(t_interp, vC_switch, 'cubic', bounds_error=False)
-                    
+
                     self.t_switch = regulaFalsiMethod(t_interp[0], t_interp[-1], p, 1e-12)
 
                     # if the switch is not find, we need to do ... ?
@@ -95,9 +94,15 @@ class SwitchEstimator(ConvergenceController):
                             L.status.dt_new = self.t_switch - L.time
                             L.prob.params.set_switch = self.switch_detected
                             L.prob.params.t_switch = self.t_switch
-                            controller.hooks.add_to_stats(process=S.status.slot, time=self.t_switch,
-                                                          level=L.level_index, iter=0, sweep=L.status.sweep,
-                                                          type='switch', value=p(self.t_switch))
+                            controller.hooks.add_to_stats(
+                                process=S.status.slot,
+                                time=self.t_switch,
+                                level=L.level_index,
+                                iter=0,
+                                sweep=L.status.sweep,
+                                type='switch',
+                                value=p(self.t_switch),
+                            )
 
                     else:
                         self.switch_detected = False

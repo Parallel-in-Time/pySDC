@@ -5,6 +5,7 @@ from pySDC.core.ConvergenceController import ConvergenceController, Status
 from pySDC.core.Errors import DataError
 from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
+
 class EstimateExtrapolationErrorBase(ConvergenceController):
     '''
     Abstract base class for extrapolated error estimates
@@ -77,7 +78,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
             None
         '''
         self.coeff.u = [None] * self.params.n
-        self.coeff.f = [0.] * self.params.n
+        self.coeff.f = [0.0] * self.params.n
         return None
 
     def check_parameters(self, controller, params, description):
@@ -133,8 +134,10 @@ el multistep mode!',
         elif type(f) == mesh:
             self.prev.f[oldest_val] = f
         else:
-            raise DataError(f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
- works with types imex_mesh and mesh')
+            raise DataError(
+                f'Unable to store f from datatype {type(f)}, extrapolation based error estimate only\
+ works with types imex_mesh and mesh'
+            )
 
         # store the rest of the values
         self.prev.u[oldest_val] = S.levels[0].u[-1]
@@ -204,15 +207,15 @@ el multistep mode!',
 
         # solve linear system for the coefficients
         coeff = np.linalg.solve(A, b)
-        self.coeff.u = coeff[:self.params.n]
-        self.coeff.f[self.params.n * 2 - self.params.Taylor_order:] = coeff[self.params.n:self.params.Taylor_order]
+        self.coeff.u = coeff[: self.params.n]
+        self.coeff.f[self.params.n * 2 - self.params.Taylor_order :] = coeff[self.params.n : self.params.Taylor_order]
 
         # determine prefactor
-        step_size_ratios = abs(dt[len(dt) - len(self.coeff.u):] / dt[-1])**(self.params.Taylor_order - 1)
-        inv_prefactor = -sum(step_size_ratios[1:]) - 1.
+        step_size_ratios = abs(dt[len(dt) - len(self.coeff.u) :] / dt[-1]) ** (self.params.Taylor_order - 1)
+        inv_prefactor = -sum(step_size_ratios[1:]) - 1.0
         for i in range(len(self.coeff.u)):
-            inv_prefactor += sum(step_size_ratios[1: i + 1]) * self.coeff.u[i]
-        self.coeff.prefactor = 1. / abs(inv_prefactor)
+            inv_prefactor += sum(step_size_ratios[1 : i + 1]) * self.coeff.u[i]
+        self.coeff.prefactor = 1.0 / abs(inv_prefactor)
 
         return None
 
@@ -280,8 +283,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             t_eval = S.time + S.dt
 
             # compute the extrapolation coefficients if needed
-            if (None in self.coeff.u or self.params.use_adaptivity) and\
-                    None not in self.prev.t and t_eval > max(self.prev.t):
+            if (
+                (None in self.coeff.u or self.params.use_adaptivity)
+                and None not in self.prev.t
+                and t_eval > max(self.prev.t)
+            ):
                 self.get_extrapolation_coefficients(self.prev.t, self.prev.dt, t_eval)
 
             # compute the error if we can
@@ -342,11 +348,11 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
             raise NotImplementedError('Extrapolated estimate only works on the finest level for now')
 
         # prepare variables
-        u_ex = S.levels[0].u[-1] * 0.
+        u_ex = S.levels[0].u[-1] * 0.0
         idx = np.argsort(self.prev.t)
 
         # see if we have a solution for the current step already stored
-        if (abs(S.time + S.dt - self.prev.t) < 10. * np.finfo(float).eps).any():
+        if (abs(S.time + S.dt - self.prev.t) < 10.0 * np.finfo(float).eps).any():
             idx_step = idx[np.argmin(abs(self.prev.t - S.time - S.dt))]
         else:
             idx_step = max(idx) + 1

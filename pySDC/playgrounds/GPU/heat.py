@@ -13,15 +13,15 @@ def set_parameter():
     problem_params['freq'] = (4, 4, 4)
     problem_params['order'] = 2
     problem_params['ndim'] = 3
-    problem_params['lintol'] = 1E-10
+    problem_params['lintol'] = 1e-10
     problem_params['liniter'] = 99
     problem_params['direct_solver'] = False
     problem_params['nvars'] = (32, 32, 32)
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
-    level_params['dt'] = 1E-07
+    level_params['restol'] = 1e-07
+    level_params['dt'] = 1e-07
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
@@ -39,7 +39,7 @@ def set_parameter():
     # setup parameters "in time"
     t0 = 0
     schritte = 8
-    Tend = schritte*level_params['dt']
+    Tend = schritte * level_params['dt']
 
     # initialize controller parameters
     controller_params = dict()
@@ -89,4 +89,4 @@ def main():
     timing_gpu = sort_stats(filter_stats(stats_gpu, type='timing_run'), sortby='time')
     print('Runtime GPU:', timing_gpu[0][1])
 
-    assert abs(uend_gpu-uend_cpu) < 10E-15
+    assert abs(uend_gpu - uend_cpu) < 10e-15

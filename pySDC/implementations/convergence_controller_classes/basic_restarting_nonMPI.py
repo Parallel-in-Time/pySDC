@@ -80,8 +80,11 @@ class BasicRestartingNonMPI(ConvergenceController):
         if S.status.first:
             self.buffers.max_restart_reached = S.status.restarts_in_a_row >= self.params.max_restarts
             if self.buffers.max_restart_reached and S.status.restart:
-                self.log(f'Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
-on...', S)
+                self.log(
+                    f'Step(s) restarted {S.status.restarts_in_a_row} time(s) already, maximum reached, moving \
+on...',
+                    S,
+                )
 
         self.buffers.restart = S.status.restart or self.buffers.restart
         S.status.restart = (S.status.restart or self.buffers.restart) and not self.buffers.max_restart_reached

@@ -79,8 +79,9 @@ class SpreadStepSizesBlockwise(ConvergenceController):
         for i in range(len(MS[restart_at].levels)):
             l = MS[restart_at].levels[i]
             # overrule the step size control to reach Tend if needed
-            new_steps[i] = min([l.status.dt_new if l.status.dt_new is not None else l.params.dt,
-                                max([dt_max, l.params.dt_initial])])
+            new_steps[i] = min(
+                [l.status.dt_new if l.status.dt_new is not None else l.params.dt, max([dt_max, l.params.dt_initial])]
+            )
 
         for p in active_slots:
             # spread the step sizes to all levels

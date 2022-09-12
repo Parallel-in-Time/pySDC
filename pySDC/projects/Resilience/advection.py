@@ -83,8 +83,15 @@ class log_data(hooks):
         )
 
 
-def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=log_data, fault_stuff=None,
-                  custom_controller_params=None, custom_problem_params=None):
+def run_advection(
+    custom_description=None,
+    num_procs=1,
+    Tend=2e-1,
+    hook_class=log_data,
+    fault_stuff=None,
+    custom_controller_params=None,
+    custom_problem_params=None,
+):
 
     # initialize level parameters
     level_params = dict()
@@ -134,14 +141,15 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
-                                   args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(
+            rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
+            args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})},
+        )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

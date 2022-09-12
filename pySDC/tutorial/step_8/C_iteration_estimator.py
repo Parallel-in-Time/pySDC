@@ -288,7 +288,9 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
         print(out)
 
     f.close()
-    assert np.isclose(mean_number_of_iterations, np.mean(niters), atol=1e-2), f'Expected \
+    assert np.isclose(
+        mean_number_of_iterations, np.mean(niters), atol=1e-2
+    ), f'Expected \
 {mean_number_of_iterations:.2f} mean iterations, but got {np.mean(niters):.2f}'
 
 

@@ -112,15 +112,11 @@ def compute_covnergence_data(cwd=""):
             for mm, nn in enumerate(values):
                 data = sortedlist_stats[0][1][nn].values()
                 u_val[nn] = np.array(list(data))
-                u_val[nn] = u_val[nn].reshape(
-                    np.shape(u_val[nn])[0], np.shape(u_val[nn])[1]
-                )
+                u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
 
                 data = sortedlist_stats[0][1][nn + "_exact"].values()
                 uex_val[nn] = np.array(list(data))
-                uex_val[nn] = uex_val[nn].reshape(
-                    np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1]
-                )
+                uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
 
                 error_val[nn][:, ii] = error_calculator(uex_val[nn], u_val[nn])
 

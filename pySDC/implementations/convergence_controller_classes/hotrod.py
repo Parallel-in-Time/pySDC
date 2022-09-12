@@ -32,11 +32,7 @@ class HotRod(ConvergenceController):
         Returns:
             dict: The updated params
         """
-        default_params = {
-            'HotRod_tol': np.inf,
-            'control_order': -40,
-            'no_storage': False
-        }
+        default_params = {'HotRod_tol': np.inf, 'control_order': -40, 'no_storage': False}
         return {**default_params, **params}
 
     def dependencies(self, controller, description):
