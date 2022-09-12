@@ -49,7 +49,7 @@ test_cupy:
     - mv data data_${PYTHON}
 
 test_cupy_2:
-  image: nvidia/cuda
+  image: nvidia/cuda:11.7.0-runtime-rockylinux8
   stage: test
   tags:
     - cuda
