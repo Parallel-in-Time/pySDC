@@ -24,13 +24,34 @@ class log_errors(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, sweep=L.status.sweep,
-                          type='e_loc', value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) -
-                                                  L.u[-1]))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_extrapolated',
+            value=L.status.error_extrapolation_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_loc',
+            value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) - L.u[-1]),
+        )
+
 
 def setup_mpl(font_size=8):
     plt_helper.setup_mpl(reset=True)
@@ -66,9 +87,9 @@ def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
 
     # assemble list of dt
     if Tend_fixed:
-        dt_list = 0.1 * 10.**-(np.arange(5) / 2)
+        dt_list = 0.1 * 10.0 ** -(np.arange(5) / 2)
     else:
-        dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
+        dt_list = 0.01 * 10.0 ** -(np.arange(20) / 10.0)
 
     num_procs = 1 if serial else 5
 
@@ -83,8 +104,7 @@ def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
             },
         }
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
-        stats, _, _ = run_piline(custom_description=desc, num_procs=num_procs, Tend=Tend,
-                                 hook_class=log_errors)
+        stats, _, _ = run_piline(custom_description=desc, num_procs=num_procs, Tend=Tend, hook_class=log_errors)
 
         res_ = get_results_from_stats(stats, 'dt', dt_list[i])
 
@@ -170,7 +190,7 @@ def main():
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
 
-        plot_all_errors(ax, ks, serial, Tend_fixed=1.)
+        plot_all_errors(ax, ks, serial, Tend_fixed=1.0)
 
         if serial:
             fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')

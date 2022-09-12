@@ -14,14 +14,14 @@ def set_parameter():
     problem_params['radius'] = 0.25
     problem_params['nvars'] = (512, 512)
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-08
-    problem_params['lin_tol'] = 1E-10
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-10
     problem_params['lin_maxiter'] = 99
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
-    level_params['dt'] = 1E-07
+    level_params['restol'] = 1e-07
+    level_params['dt'] = 1e-07
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
@@ -39,7 +39,7 @@ def set_parameter():
     # setup parameters "in time"
     t0 = 0
     schritte = 8
-    Tend = schritte*level_params['dt']
+    Tend = schritte * level_params['dt']
 
     # initialize controller parameters
     controller_params = dict()
@@ -89,7 +89,7 @@ def main():
     timing_gpu = sort_stats(filter_stats(stats_gpu, type='timing_run'), sortby='time')
     print('Runtime GPU:', timing_gpu[0][1])
 
-    assert abs(uend_gpu-uend_cpu) < 10E-15
+    assert abs(uend_gpu - uend_cpu) < 10e-15
 
 
 if __name__ == '__main__':

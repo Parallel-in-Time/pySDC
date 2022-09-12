@@ -4,7 +4,6 @@ from pySDC.implementations.convergence_controller_classes.store_uold import Stor
 
 
 class CheckIterationEstimatorNonMPI(ConvergenceController):
-
     def __init__(self, controller, params, description):
         '''
         Initalization routine
@@ -76,8 +75,8 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             None
         '''
         self.buffers.Kest_loc = [99] * len(controller.MS)
-        self.buffers.diff_new = 0.
-        self.buffers.Ltilde_loc = 0.
+        self.buffers.diff_new = 0.0
+        self.buffers.Ltilde_loc = 0.0
 
     def setup_status_variables(self, controller):
         '''
@@ -89,8 +88,8 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
         Returns:
             None
         '''
-        self.status.diff_old_loc = [0.] * len(controller.MS)
-        self.status.diff_first_loc = [0.] * len(controller.MS)
+        self.status.diff_old_loc = [0.0] * len(controller.MS)
+        self.status.diff_first_loc = [0.0] * len(controller.MS)
         return None
 
     def check_iteration_status(self, controller, S):
@@ -121,9 +120,11 @@ class CheckIterationEstimatorNonMPI(ConvergenceController):
             # estimate how many more iterations we need for this step to converge to the desired tolerance
             alpha = 1 / (1 - self.buffers.Ltilde_loc) * self.status.diff_first_loc[slot]
             self.buffers.Kest_loc = np.log(self.params.errtol / alpha) / np.log(self.buffers.Ltilde_loc) * 1.05
-            self.logger.debug(f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, '
-                              f'{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
-{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}')
+            self.logger.debug(
+                f'LOCAL: {L.time:8.4f}, {S.status.iter}: {int(np.ceil(self.buffers.Kest_loc))}, '
+                f'{self.buffers.Ltilde_loc:8.6e}, {self.buffers.Kest_loc:8.6e}, \
+{self.buffers.Ltilde_loc ** S.status.iter * alpha:8.6e}'
+            )
 
             # set global Kest as last local one, force stop if done
             if S.status.last:

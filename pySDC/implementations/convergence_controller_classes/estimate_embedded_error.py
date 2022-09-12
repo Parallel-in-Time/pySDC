@@ -42,7 +42,6 @@ class EstimateEmbeddedError(ConvergenceController):
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
-
     def __init__(self, controller, params, description):
         """
         Initalization routine. Add the buffers for communication over the parent class.
@@ -53,7 +52,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
             description (dict): The description object used to instantiate the controller
         """
         super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
-        self.buffers = Pars({'e_em_last': 0.})
+        self.buffers = Pars({'e_em_last': 0.0})
 
     def reset_buffers_nonMPI(self, controller):
         """
@@ -65,7 +64,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
         Returns:
             None
         """
-        self.buffers.e_em_last = 0.
+        self.buffers.e_em_last = 0.0
         return None
 
     def post_iteration_processing(self, controller, S):
@@ -92,6 +91,6 @@ level'
                 temp = abs(L.uold[-1] - L.u[-1])
                 L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
-            self.buffers.e_em_last = temp * 1.
+            self.buffers.e_em_last = temp * 1.0
 
         return None

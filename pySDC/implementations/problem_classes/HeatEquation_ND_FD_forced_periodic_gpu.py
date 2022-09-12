@@ -34,7 +34,7 @@ class heatNd_periodic(ptype):
         if 'order' not in problem_params:
             problem_params['order'] = 2
         if 'lintol' not in problem_params:
-            problem_params['lintol'] = 1E-12
+            problem_params['lintol'] = 1e-12
         if 'liniter' not in problem_params:
             problem_params['liniter'] = 10000
         if 'direct_solver' not in problem_params:
@@ -63,8 +63,12 @@ class heatNd_periodic(ptype):
             raise ProblemError('need a square domain, got %s' % problem_params['nvars'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(heatNd_periodic, self).__init__(init=(problem_params['nvars'], None, cp.dtype('float64')),
-                                              dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(heatNd_periodic, self).__init__(
+            init=(problem_params['nvars'], None, cp.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         # compute dx (equal in both dimensions) and get discretization matrix A
         self.dx = 1.0 / self.params.nvars[0]
@@ -112,9 +116,12 @@ class heatNd_periodic(ptype):
         if ndim == 2:
             A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         elif ndim == 3:
-            A = csp.kron(A, csp.eye(N[1] * N[0])) + csp.kron(csp.eye(N[2] * N[1]), A) + \
-                csp.kron(csp.kron(csp.eye(N[2]), A), csp.eye(N[0]))
-        A *= nu / (dx ** 2)
+            A = (
+                csp.kron(A, csp.eye(N[1] * N[0]))
+                + csp.kron(csp.eye(N[2] * N[1]), A)
+                + csp.kron(csp.kron(csp.eye(N[2]), A), csp.eye(N[0]))
+            )
+        A *= nu / (dx**2)
 
         return A
 
@@ -133,26 +140,22 @@ class heatNd_periodic(ptype):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         if self.params.ndim == 1:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (self.params.nu * np.pi ** 2 *
-                                                                            sum([freq ** 2 for freq in
-                                                                                 self.params.freq]) *
-                                                                            cp.cos(t) - cp.sin(t))
+            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
+                self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t)
+            )
         elif self.params.ndim == 2:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.sin(np.pi * self.params.freq[1] *
-                                                                                  self.xv[1]) * (self.params.nu *
-                                                                                                 np.pi ** 2 *
-                                                                                                 sum([freq ** 2 for freq
-                                                                                                      in
-                                                                                                      self.params.freq]
-                                                                                                     ) * cp.cos(t) -
-                                                                                                 cp.sin(t)
-                                                                                                 )
+            f.expl[:] = (
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
+            )
         elif self.params.ndim == 3:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.sin(np.pi * self.params.freq[1] *
-                                                                                  self.xv[1]) * cp.sin(
-                np.pi * self.params.freq[2] * self.xv[2]) * (self.params.nu * np.pi ** 2 * sum([freq ** 2 for freq in
-                                                                                                self.params.freq]) *
-                                                             cp.cos(t) - cp.sin(t))
+            f.expl[:] = (
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
+            )
 
         return f
 
@@ -175,8 +178,13 @@ class heatNd_periodic(ptype):
         if self.params.direct_solver:
             me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
         else:
-            me[:] = cg(self.Id - factor * self.A, rhs.flatten(), x0=u0.flatten(),
-                       tol=self.params.lintol, maxiter=self.params.liniter)[0].reshape(self.params.nvars)
+            me[:] = cg(
+                self.Id - factor * self.A,
+                rhs.flatten(),
+                x0=u0.flatten(),
+                tol=self.params.lintol,
+                maxiter=self.params.liniter,
+            )[0].reshape(self.params.nvars)
         return me
 
     def u_exact(self, t):
@@ -194,10 +202,16 @@ class heatNd_periodic(ptype):
         if self.params.ndim == 1:
             me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.cos(t)
         elif self.params.ndim == 2:
-            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                cp.sin(np.pi * self.params.freq[1] * self.xv[1]) * cp.cos(t)
+            me[:] = (
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.cos(t)
+            )
         elif self.params.ndim == 3:
-            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * \
-                cp.sin(np.pi * self.params.freq[1] * self.xv[1]) * \
-                cp.sin(np.pi * self.params.freq[2] * self.xv[2]) * cp.cos(t)
+            me[:] = (
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * cp.cos(t)
+            )
         return me

@@ -94,8 +94,15 @@ class log_data(hooks):
         )
 
 
-def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_data, fault_stuff=None,
-               custom_controller_params=None, custom_problem_params=None):
+def run_piline(
+    custom_description=None,
+    num_procs=1,
+    Tend=20.0,
+    hook_class=log_data,
+    fault_stuff=None,
+    custom_controller_params=None,
+    custom_problem_params=None,
+):
     """
     A simple test program to do SDC runs for Piline problem
     """
@@ -157,14 +164,15 @@ def run_piline(custom_description=None, num_procs=1, Tend=20., hook_class=log_da
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
-                                   args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(
+            rnd_args={'iteration': 4, **fault_stuff.get('rnd_params', {})},
+            args={'time': 2.5, 'target': 0, **fault_stuff.get('args', {})},
+        )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
