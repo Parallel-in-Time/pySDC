@@ -42,11 +42,14 @@ else, you can also give specific steps.'
     return coeff, steps
 
 
-def get_finite_difference_matrix(derivative, order, type=None, steps=None, dx=None, size=None, dim=None, bc=None):
+def get_finite_difference_matrix(
+    derivative, order, type=None, steps=None, dx=None, size=None, dim=None, bc=None, cupy=False
+):
     """
     Build FD matrix from stencils, with boundary conditions
     """
-
+    if cupy:
+        import cupyx.scipy.sparse as sp
     if order > 2 and bc != 'periodic':
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 

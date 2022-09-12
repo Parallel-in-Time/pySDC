@@ -346,4 +346,4 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
-autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft']
+autodoc_mock_imports = ['dolfin', 'mpi4py', 'petsc4py', 'mpi4py_fft', 'cupy']

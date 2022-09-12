@@ -1,6 +1,6 @@
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic import heatNd_periodic as heat_cpu
-from pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gpu import heatNd_periodic as heat_gpu
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex as ac_fft_cpu
+from pySDC.implementations.problem_classes.AllenCahn_2D_FFT_gpu import allencahn2d_imex as ac_fft_gpu
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
@@ -9,14 +9,14 @@ from pySDC.helpers.stats_helper import filter_stats, sort_stats
 def set_parameter():
     # initialize problem parameters
     problem_params = dict()
-    problem_params['nu'] = 1
-    problem_params['freq'] = (4, 4, 4)
-    problem_params['order'] = 2
-    problem_params['ndim'] = 3
-    problem_params['lintol'] = 1e-10
-    problem_params['liniter'] = 99
-    problem_params['direct_solver'] = False
-    problem_params['nvars'] = (32, 32, 32)
+    problem_params['nu'] = 2
+    problem_params['eps'] = 0.04
+    problem_params['radius'] = 0.25
+    problem_params['nvars'] = (512, 512)
+    problem_params['newton_maxiter'] = 100
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-10
+    problem_params['lin_maxiter'] = 99
 
     # initialize level parameters
     level_params = dict()
@@ -26,7 +26,9 @@ def set_parameter():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['collocation_class'] = Collocation
+    sweeper_params['node_type'] = 'LEGENDRE'
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['PIC']
     sweeper_params['num_nodes'] = 3
@@ -45,7 +47,7 @@ def set_parameter():
     controller_params = dict()
     controller_params['logger_level'] = 30
 
-    # fill description dictionary for easy step instantiation cpu
+    # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
@@ -60,7 +62,7 @@ def main():
     controller_params, description, t0, Tend = set_parameter()
 
     # fill description dictionary with CPU problem
-    description['problem_class'] = heat_cpu
+    description['problem_class'] = ac_fft_cpu
 
     # instantiate controller cpu
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -74,8 +76,8 @@ def main():
     timing_cpu = sort_stats(filter_stats(stats_cpu, type='timing_run'), sortby='time')
     print('Runtime CPU:', timing_cpu[0][1])
 
-    # change description dictionary for GPU problem
-    description['problem_class'] = heat_gpu
+    # change description dictionary with GPU problem
+    description['problem_class'] = ac_fft_gpu
 
     # instantiate controller cpu
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -90,3 +92,7 @@ def main():
     print('Runtime GPU:', timing_gpu[0][1])
 
     assert abs(uend_gpu - uend_cpu) < 10e-15
+
+
+if __name__ == '__main__':
+    main()

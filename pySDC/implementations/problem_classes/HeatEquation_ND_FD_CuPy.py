@@ -1,6 +1,7 @@
 import numpy as np
-import scipy.sparse as sp
-from scipy.sparse.linalg import cg, spsolve
+import cupy as cp
+import cupyx.scipy.sparse as csp
+from cupyx.scipy.sparse.linalg import spsolve, cg  # , gmres, minres
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
@@ -88,7 +89,7 @@ class heatNd_forced(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(heatNd_forced, self).__init__(
-            init=(problem_params['nvars'], None, np.dtype('float64')),
+            init=(problem_params['nvars'], None, cp.dtype('float64')),
             dtype_u=dtype_u,
             dtype_f=dtype_f,
             params=problem_params,
@@ -103,10 +104,10 @@ class heatNd_forced(ptype):
         # compute dx (equal in both dimensions) and get discretization matrix A
         if self.params.bc == 'periodic':
             self.dx = 1.0 / self.params.nvars[0]
-            xvalues = np.array([i * self.dx for i in range(self.params.nvars[0])])
+            xvalues = cp.array([i * self.dx for i in range(self.params.nvars[0])])
         elif self.params.bc == 'dirichlet-zero':
             self.dx = 1.0 / (self.params.nvars[0] + 1)
-            xvalues = np.array([(i + 1) * self.dx for i in range(self.params.nvars[0])])
+            xvalues = cp.array([(i + 1) * self.dx for i in range(self.params.nvars[0])])
         else:
             raise ProblemError(f'Boundary conditions {self.params.bc} not implemented.')
 
@@ -118,11 +119,12 @@ class heatNd_forced(ptype):
             size=self.params.nvars[0],
             dim=self.params.ndim,
             bc=self.params.bc,
+            cupy=True,
         )
         self.A *= self.params.nu
 
-        self.xv = np.meshgrid(*[xvalues for _ in range(self.params.ndim)])
-        self.Id = sp.eye(np.prod(self.params.nvars), format='csc')
+        self.xv = cp.meshgrid(*[xvalues for _ in range(self.params.ndim)])
+        self.Id = csp.eye(np.prod(self.params.nvars), format='csc')
 
     def eval_f(self, u, t):
         """
@@ -139,21 +141,21 @@ class heatNd_forced(ptype):
         f = self.dtype_f(self.init)
         f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
         if self.params.ndim == 1:
-            f.expl[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
-                self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t)
+            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
+                self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t)
             )
         elif self.params.ndim == 2:
             f.expl[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
             )
         elif self.params.ndim == 3:
             f.expl[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * np.sin(np.pi * self.params.freq[2] * self.xv[2])
-                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * np.cos(t) - np.sin(t))
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
             )
 
         return f
@@ -201,19 +203,19 @@ class heatNd_forced(ptype):
         me = self.dtype_u(self.init)
 
         if self.params.ndim == 1:
-            me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * np.cos(t)
+            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.cos(t)
         elif self.params.ndim == 2:
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * np.cos(t)
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.cos(t)
             )
         elif self.params.ndim == 3:
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * np.sin(np.pi * self.params.freq[2] * self.xv[2])
-                * np.cos(t)
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * cp.cos(t)
             )
         return me
 
@@ -253,29 +255,29 @@ class heatNd_unforced(heatNd_forced):
         me = self.dtype_u(self.init)
 
         if self.params.ndim == 1:
-            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
-            me[:] = np.sin(np.pi * self.params.freq[0] * self.xv[0]) * np.exp(-t * self.params.nu * rho)
+            rho = (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
+            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.exp(-t * self.params.nu * rho)
         elif self.params.ndim == 2:
-            rho = (2.0 - 2.0 * np.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2 + (
-                2.0 - 2.0 * np.cos(np.pi * self.params.freq[1] * self.dx)
+            rho = (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2 + (
+                2.0 - 2.0 * cp.cos(np.pi * self.params.freq[1] * self.dx)
             ) / self.dx**2
 
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * np.exp(-t * self.params.nu * rho)
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.exp(-t * self.params.nu * rho)
             )
         elif self.params.ndim == 3:
             rho = (
-                (2.0 - 2.0 * np.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
-                + (2.0 - 2.0 * np.cos(np.pi * self.params.freq[1] * self.dx))
-                + (2.0 - 2.0 * np.cos(np.pi * self.params.freq[2] * self.dx)) / self.dx**2
+                (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
+                + (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[1] * self.dx))
+                + (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[2] * self.dx)) / self.dx**2
             )
             me[:] = (
-                np.sin(np.pi * self.params.freq[0] * self.xv[0])
-                * np.sin(np.pi * self.params.freq[1] * self.xv[1])
-                * np.sin(np.pi * self.params.freq[2] * self.xv[2])
-                * np.exp(-t * self.params.nu * rho)
+                cp.sin(np.pi * self.params.freq[0] * self.xv[0])
+                * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
+                * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
+                * cp.exp(-t * self.params.nu * rho)
             )
 
         return me

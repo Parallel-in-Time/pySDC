@@ -1,5 +1,6 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core.Collocation import CollBase as Collocation
@@ -130,8 +131,8 @@ def main(use_switch_estimator=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -143,7 +144,7 @@ def main(use_switch_estimator=True):
     min_iter = 20
     max_iter = 0
 
-    f = open('battery_out.txt', 'w')
+    f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -168,7 +169,7 @@ def plot_voltages(cwd='./'):
     Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'battery.dat', 'rb')
+    f = open(cwd + 'data/battery.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
