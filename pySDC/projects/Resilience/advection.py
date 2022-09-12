@@ -83,7 +83,8 @@ class log_data(hooks):
         )
 
 
-def run_advection(custom_description, num_procs):
+def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=log_data, fault_stuff=None,
+                  custom_controller_params=None, custom_problem_params=None):
 
     # initialize level parameters
     level_params = dict()
@@ -93,10 +94,12 @@ def run_advection(custom_description, num_procs):
     sweeper_params = dict()
     sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'IE'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
-    sweeper_params['QE'] = 'PIC'
+    sweeper_params['QI'] = 'IE'
 
     problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'backward', 'order': 5, 'bc': 'periodic'}
+
+    if custom_problem_params is not None:
+        problem_params = {**problem_params, **custom_problem_params}
 
     # initialize step parameters
     step_params = dict()
@@ -105,8 +108,11 @@ def run_advection(custom_description, num_procs):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
+    controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
+
+    if custom_controller_params is not None:
+        controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -116,15 +122,26 @@ def run_advection(custom_description, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description.update(custom_description)
+
+    if custom_description is not None:
+        for k in custom_description.keys():
+            if k == 'sweeper_class':
+                description[k] = custom_description[k]
+                continue
+            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
     t0 = 0.0
-    Tend = 2e-1
 
     # instantiate controller
-    controller_class = controller_nonMPI
-    controller = controller_class(num_procs=num_procs, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
+                                   description=description)
+
+    # insert faults
+    if fault_stuff is not None:
+        controller.hooks.random_generator = fault_stuff['rng']
+        controller.hooks.add_fault(rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
+                                   args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -132,4 +149,4 @@ def run_advection(custom_description, num_procs):
 
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
-    return stats
+    return stats, controller, Tend

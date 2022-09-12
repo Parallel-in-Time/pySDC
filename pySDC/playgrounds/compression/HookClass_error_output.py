@@ -47,10 +47,10 @@ class error_output(hooks):
         description = step.params.description
         description['level_params']['restol'] = 1e-14
         description['problem_params']['direct_solver'] = True
+        description['convergence_controllers'] = {}
 
         controller_params = step.params.controller_params
         del controller_params['hook_class']
-        controller_params['use_iteration_estimator'] = False
         controller_params['logger_level'] = 90
 
         controller = controller_nonMPI(num_procs=1, description=description, controller_params=controller_params)

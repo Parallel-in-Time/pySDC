@@ -24,7 +24,7 @@ class battery(ptype):
         problem_params['nvars'] = 2
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref']
+        essential_keys = ['Vs', 'Rs', 'C', 'R', 'L', 'alpha', 'V_ref', 'set_switch', 't_switch']
         for key in essential_keys:
             if key not in problem_params:
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
@@ -53,8 +53,17 @@ class battery(ptype):
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
 
-        if u[1] <= self.params.V_ref:
-            f.expl[0] = self.params.Vs / self.params.L
+        if u[1] <= self.params.V_ref or self.params.set_switch:
+            # switching need to happen on exact time point
+            if self.params.set_switch:
+                if t >= self.params.t_switch:
+                    f.expl[0] = self.params.Vs / self.params.L
+
+                else:
+                    f.expl[0] = 0
+
+            else:
+                f.expl[0] = self.params.Vs / self.params.L
 
         else:
             f.expl[0] = 0
@@ -74,8 +83,17 @@ class battery(ptype):
         """
         self.A = np.zeros((2, 2))
 
-        if rhs[1] <= self.params.V_ref:
-            self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+        if rhs[1] <= self.params.V_ref or self.params.set_switch:
+            # switching need to happen on exact time point
+            if self.params.set_switch:
+                if t >= self.params.t_switch:
+                    self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
+
+                else:
+                    self.A[1, 1] = -1 / (self.params.C * self.params.R)
+
+            else:
+                self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
         else:
             self.A[1, 1] = -1 / (self.params.C * self.params.R)
