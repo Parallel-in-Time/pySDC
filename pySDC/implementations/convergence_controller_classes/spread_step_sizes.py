@@ -1,20 +1,19 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 
 class SpreadStepSizesBlockwise(ConvergenceController):
-    '''
+    """
     Take the step size from the last step in the block and spread it to all steps in the next block such that every step
     in a block always has the same step size.
     By block we refer to a composite collocation problem, which is solved in pipelined SDC parallel-in-time.
 
     Also, we overrule the step size control here, if we get close to the final time and we would take too large of a
     step otherwise.
-    '''
+    """
 
     def setup(self, controller, params, description):
-        '''
+        """
         Define parameters here
 
         Args:
@@ -24,7 +23,7 @@ class SpreadStepSizesBlockwise(ConvergenceController):
 
         Returns:
             (dict): The updated params dictionary
-        '''
+        """
         defaults = {
             'control_order': +100,
         }
@@ -32,7 +31,7 @@ class SpreadStepSizesBlockwise(ConvergenceController):
         return {**defaults, **params}
 
     def check_parameters(self, controller, params, description):
-        '''
+        """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
         Args:
@@ -43,9 +42,16 @@ class SpreadStepSizesBlockwise(ConvergenceController):
         Returns:
             bool: Whether the parameters are compatible
             str: The error message
-        '''
-        if type(controller) == controller_MPI:
-            return False, 'No implementation for spreading step sizes in MPI yet :('
+        """
+
+        try:
+            from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
+
+            if type(controller) == controller_MPI:
+                return False, 'No implementation for spreading step sizes in MPI yet :('
+
+        except ModuleNotFoundError:
+            pass
 
         return True, ''
 
