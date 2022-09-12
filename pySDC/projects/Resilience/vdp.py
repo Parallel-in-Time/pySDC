@@ -6,6 +6,7 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
+from pySDC.core.Errors import ProblemError
 
 
 def plot_step_sizes(stats, ax):
