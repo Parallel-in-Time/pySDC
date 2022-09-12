@@ -44,6 +44,8 @@ class SpreadStepSizesBlockwise(ConvergenceController):
             str: The error message
         """
 
+        # Have to do this weird try/except block here, because if MPI is not installed, importing the controller will
+        # raise an ModuleNotFoundError error. This is not elegant, but the easiest solution so far.
         try:
             from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 

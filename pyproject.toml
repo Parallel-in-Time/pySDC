@@ -51,7 +51,8 @@ markers = [
     'slow: tests taking much longer than bearable',
     'mpi4py: tests using MPI parallelism (but no other external library such as petsc)',
     'petsc: tests relying on PETSc/petsc4py',
-    'benchmark: tests for benchmarking'
+    'benchmark: tests for benchmarking',
+    'cupy: tests for cupy on GPUs',
     ]
 
 [tool.flakeheaven]
