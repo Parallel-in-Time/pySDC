@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.special import factorial
-import scipy.sparse as sp
 
 
 def get_finite_difference_stencil(derivative, order, type=None, steps=None):
@@ -49,7 +48,10 @@ def get_finite_difference_matrix(
     Build FD matrix from stencils, with boundary conditions
     """
     if cupy:
-        import cupyx.scipy.sparse as sp  # noqa: F811
+        import cupyx.scipy.sparse as sp
+    else:
+        import scipy.sparse as sp
+
     if order > 2 and bc != 'periodic':
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 
