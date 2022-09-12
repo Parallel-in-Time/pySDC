@@ -7,6 +7,8 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+import matplotlib as mpl
 
 
 class log_data(hooks):
@@ -140,10 +142,12 @@ def plot_stability(stats, ax=None, iter=None):
     ax.legend(frameon=False)
 
 
-def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False):
+def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, cbar=True, **kwargs):
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
     u_exact = np.exp(lambdas)
+
+    kwargs['cmap'] = kwargs.get('cmap', 'jet')
 
     # get error for each iteration
     iter = [1] if iter is None else iter
@@ -162,25 +166,44 @@ def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False):
     # get a grid for plotting
     X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
     if plot_increase:
-        cs = ax.contourf(X, Y, rho_log, cmap='jet')
+        cs = ax.contourf(X, Y, rho_log, **kwargs)
         ax.contour(X, Y, rho_log, levels=[0.])
     else:
-        cs = ax.contourf(X, Y, np.where(rho_log < 0, rho_log, None), cmap='jet')
+        cs = ax.contourf(X, Y, np.where(rho_log < 0, rho_log, None), levels=500, **kwargs)
 
     # decorate
     ax.axhline(0, color='black')
     ax.axvline(0, color='black')
-    fig.colorbar(cs)
+    if cbar:
+        cb = fig.colorbar(mpl.cm.ScalarMappable(**kwargs))
+        cb.set_label(r'$\rho$')
+
+
+def compare_contraction():
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5.5), gridspec_kw={'width_ratios': [0.8, 1]})
+    precons = ['TRAP', 'TAYLOR']
+    norm = Normalize(vmin=-7, vmax=0)
+    cbar=True
+    for i in range(len(precons)):
+        custom_description = {'sweeper_params': {'QI': precons[i]}}
+        stats, controller, Tend = run_dahlquist(custom_description=custom_description, res=(400, 400))
+        plot_contraction(stats, fig=fig, ax=axs[i], cbar=cbar, norm=norm, cmap='jet')
+        cbar=False
+        axs[i].set_title(precons[i])
+    fig.tight_layout()
 
 
 if __name__ == '__main__':
-    custom_description = {'sweeper_params': {'QI': 'LU'}}
-    stats, controller, Tend = run_dahlquist(custom_description=custom_description, res=(500, 500))
-
-    fig, axs = plt.subplots(1, 2, figsize=(12, 5.5))
-    plot_contraction(stats, fig=fig, ax=axs[1])
-    plot_stability(stats, iter=[1, 2, 3], ax=axs[0])
-    axs[0].set_title('Stability')
-    axs[1].set_title('Contraction')
-    fig.tight_layout()
+    compare_contraction()
     plt.show()
+
+    #custom_description = {'sweeper_params': {'QI': 'LU'}}
+    #stats, controller, Tend = run_dahlquist(custom_description=custom_description, res=(500, 500))
+
+    #fig, axs = plt.subplots(1, 2, figsize=(12, 5.5))
+    #plot_contraction(stats, fig=fig, ax=axs[1])
+    #plot_stability(stats, iter=[1, 2, 3], ax=axs[0])
+    #axs[0].set_title('Stability')
+    #axs[1].set_title('Contraction')
+    #fig.tight_layout()
+    #plt.show()
