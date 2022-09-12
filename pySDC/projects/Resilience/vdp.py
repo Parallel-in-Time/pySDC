@@ -2,7 +2,6 @@
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -107,7 +106,8 @@ class log_data(hooks):
         )
 
 
-def run_vdp(custom_description, num_procs):
+def run_vdp(custom_description=None, num_procs=1, Tend=10., hook_class=log_data, fault_stuff=None,
+            custom_controller_params=None, custom_problem_params=None):
 
     # initialize level parameters
     level_params = dict()
@@ -126,6 +126,9 @@ def run_vdp(custom_description, num_procs):
         'u0': np.array([2.0, 0.0]),
     }
 
+    if custom_problem_params is not None:
+        problem_params = {**problem_params, **custom_problem_params}
+
     # initialize step parameters
     step_params = dict()
     step_params['maxiter'] = 4
@@ -133,8 +136,11 @@ def run_vdp(custom_description, num_procs):
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['hook_class'] = log_data
+    controller_params['hook_class'] = hook_class
     controller_params['mssdc_jac'] = False
+
+    if custom_controller_params is not None:
+        controller_params = {**controller_params, **custom_controller_params}
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -144,20 +150,34 @@ def run_vdp(custom_description, num_procs):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
-    description.update(custom_description)
+
+    if custom_description is not None:
+        for k in custom_description.keys():
+            if k == 'sweeper_class':
+                description[k] = custom_description[k]
+                continue
+            description[k] = {**description.get(k, {}), **custom_description.get(k, {})}
 
     # set time parameters
     t0 = 0.0
-    Tend = 1e1
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
+
+    # insert faults
+    if fault_stuff is not None:
+        controller.hooks.random_generator = fault_stuff['rng']
+        controller.hooks.add_fault(rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
+                                   args={'time': 1., 'target': 0, **fault_stuff.get('args', {})})
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    try:
+        uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
+    except ProblemError:
+        stats = controller.hooks.return_stats()
 
-    return stats
+    return stats, controller, Tend

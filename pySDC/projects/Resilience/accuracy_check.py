@@ -24,34 +24,13 @@ class log_errors(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_embedded',
-            value=L.status.error_embedded_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time + L.dt,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_extrapolated',
-            value=L.status.error_extrapolation_estimate,
-        )
-        self.add_to_stats(
-            process=step.status.slot,
-            time=L.time,
-            level=L.level_index,
-            iter=0,
-            sweep=L.status.sweep,
-            type='e_glob',
-            value=abs(L.prob.u_exact(t=L.time + L.dt) - L.u[-1]),
-        )
-
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
+                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0, sweep=L.status.sweep,
+                          type='e_loc', value=abs(L.prob.u_exact(t=L.time + L.dt, u_init=L.u[0], t_init=L.time) -
+                                                  L.u[-1]))
 
 def setup_mpl(font_size=8):
     plt_helper.setup_mpl(reset=True)
@@ -68,43 +47,33 @@ def setup_mpl(font_size=8):
 def get_results_from_stats(stats, var, val):
     e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
 
-    e_glob = np.array(get_sorted(stats, type='e_glob'))[:, 1]
+    e_loc = np.array(get_sorted(stats, type='e_loc'))[:, 1]
 
     results = {
         'e_embedded': get_sorted(stats, type='e_embedded')[-1][1],
         'e_extrapolated': e_extrapolated[e_extrapolated != [None]][-1],
-        'e': max([abs(e_glob[-1] - e_glob[-2]), np.finfo(float).eps]),
+        'e': max([e_loc[-1], np.finfo(float).eps]),
         var: val,
     }
 
     return results
 
 
-def multiple_runs(ax, k=5, serial=True):
+def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
     """
     A simple test program to compute the order of accuracy in time
     """
 
     # assemble list of dt
-    dt_list = 0.01 * 10.0 ** -(np.arange(20) / 10.0)
+    if Tend_fixed:
+        dt_list = 0.1 * 10.**-(np.arange(5) / 2)
+    else:
+        dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
 
-    num_procs = 1 if serial else 30
-
-    # perform first test
-    desc = {
-        'level_params': {'dt': dt_list[0]},
-        'step_params': {'maxiter': k},
-        'convergence_controllers': {
-            EstimateEmbeddedErrorNonMPI: {},
-            EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
-        },
-    }
-    res = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[0], log_errors), 'dt', dt_list[0])
-    for key in res.keys():
-        res[key] = [res[key]]
+    num_procs = 1 if serial else 5
 
     # perform rest of the tests
-    for i in range(1, len(dt_list)):
+    for i in range(0, len(dt_list)):
         desc = {
             'level_params': {'dt': dt_list[i]},
             'step_params': {'maxiter': k},
@@ -113,9 +82,19 @@ def multiple_runs(ax, k=5, serial=True):
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
             },
         }
-        res_ = get_results_from_stats(run_piline(desc, num_procs, 30 * dt_list[i], log_errors), 'dt', dt_list[i])
-        for key in res_.keys():
-            res[key].append(res_[key])
+        Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
+        stats, _, _ = run_piline(custom_description=desc, num_procs=num_procs, Tend=Tend,
+                                 hook_class=log_errors)
+
+        res_ = get_results_from_stats(stats, 'dt', dt_list[i])
+
+        if i == 0:
+            res = res_.copy()
+            for key in res.keys():
+                res[key] = [res[key]]
+        else:
+            for key in res_.keys():
+                res[key].append(res_[key])
 
     # visualize results
     plot(res, ax, k)
@@ -175,10 +154,10 @@ def get_accuracy_order(results, key='e_embedded', order=5):
     return order
 
 
-def plot_all_errors(ax, ks, serial):
+def plot_all_errors(ax, ks, serial, Tend_fixed=None):
     for i in range(len(ks)):
         k = ks[i]
-        multiple_runs(k=k, ax=ax, serial=serial)
+        multiple_runs(k=k, ax=ax, serial=serial, Tend_fixed=Tend_fixed)
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
     ax.plot([None, None], color='black', label=r'$e$', ls='-.')
@@ -190,8 +169,9 @@ def main():
     ks = [4, 3, 2]
     for serial in [True, False]:
         fig, ax = plt.subplots(1, 1, figsize=(3.5, 3))
-        plot_all_errors(ax, ks, serial)
-        Path("data").mkdir(parents=True, exist_ok=True)
+
+        plot_all_errors(ax, ks, serial, Tend_fixed=1.)
+
         if serial:
             fig.savefig('data/error_estimate_order.png', dpi=300, bbox_inches='tight')
         else:

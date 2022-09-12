@@ -11,7 +11,8 @@ from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.transfer_classes.TransferMesh_NoCoarse import mesh_to_mesh as mesh_to_mesh_nc
-from pySDC.playgrounds.compression.HookClass_error_output import error_output
+from pySDC.implementations.convergence_controller_classes.check_iteration_estimator import CheckIterationEstimatorNonMPI
+from pySDC.tutorial.step_8.HookClass_error_output import error_output
 
 
 def setup_diffusion(dt=None, ndim=None, ml=False):
@@ -54,10 +55,13 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     space_transfer_params['iorder'] = 6
     space_transfer_params['periodic'] = True
 
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -68,6 +72,7 @@ def setup_diffusion(dt=None, ndim=None, ml=False):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+    description['convergence_controllers'] = convergence_controllers
     if ml:
         description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
         description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
@@ -116,10 +121,13 @@ def setup_advection(dt=None, ndim=None, ml=False):
     space_transfer_params['iorder'] = 6
     space_transfer_params['periodic'] = True
 
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -130,6 +138,7 @@ def setup_advection(dt=None, ndim=None, ml=False):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+    description['convergence_controllers'] = convergence_controllers
     if ml:
         description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
         description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
@@ -165,10 +174,13 @@ def setup_auzinger(dt=None, ml=False):
     step_params['maxiter'] = 50
     step_params['errtol'] = 1e-07
 
+    # setup the iteration estimator
+    convergence_controllers = dict()
+    convergence_controllers[CheckIterationEstimatorNonMPI] = {'errtol': 1e-7}
+
     # initialize controller parameters
     controller_params = dict()
     controller_params['logger_level'] = 30
-    controller_params['use_iteration_estimator'] = True
     controller_params['hook_class'] = error_output
 
     # fill description dictionary for easy step instantiation
@@ -179,6 +191,7 @@ def setup_auzinger(dt=None, ml=False):
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+    description['convergence_controllers'] = convergence_controllers
     if ml:
         description['space_transfer_class'] = mesh_to_mesh_nc  # pass spatial transfer class
 
@@ -206,17 +219,20 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
                 t0 = 0.0
                 dt = (Tend - t0) / nsteps
                 description, controller_params = setup_diffusion(dt, ndim, ml)
+                mean_number_of_iterations = 3.00 if ml else 5.75
             elif type == 'advection':
                 # set time parameters
                 t0 = 0.0
                 dt = (Tend - t0) / nsteps
                 description, controller_params = setup_advection(dt, ndim, ml)
+                mean_number_of_iterations = 2.00 if ml else 4.00
             elif type == 'auzinger':
                 assert ndim == 1
                 # set time parameters
                 t0 = 0.0
                 dt = (Tend - t0) / nsteps
                 description, controller_params = setup_auzinger(dt, ml)
+                mean_number_of_iterations = 3.62 if ml else 5.62
 
             out = f'Running {type} in {ndim} dimensions with time-step size {dt}...\n'
             f.write(out + '\n')
@@ -272,6 +288,8 @@ def run_simulations(type=None, ndim_list=None, Tend=None, nsteps_list=None, ml=F
         print(out)
 
     f.close()
+    assert np.isclose(mean_number_of_iterations, np.mean(niters), atol=1e-2), f'Expected \
+{mean_number_of_iterations:.2f} mean iterations, but got {np.mean(niters):.2f}'
 
 
 def main():

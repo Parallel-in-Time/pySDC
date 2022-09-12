@@ -30,8 +30,8 @@ class error_output(hooks):
 
         controller_params = step.params.controller_params
         del controller_params['hook_class']  # get rid of the hook, otherwise this will be an endless recursion..
-        controller_params['use_iteration_estimator'] = False
         controller_params['logger_level'] = 90
+        controller_params['convergence_controllers'] = {}
 
         controller = controller_nonMPI(num_procs=1, description=description, controller_params=controller_params)
         self.uex, _ = controller.run(u0=L.u[0], t0=L.time, Tend=L.time + L.dt)

@@ -111,7 +111,6 @@ def set_parameters_ml():
     controller_params = dict()
     controller_params['logger_level'] = 30
     controller_params['all_to_done'] = True  # can ask the controller to keep iterating all steps until the end
-    controller_params['use_iteration_estimator'] = False  # activate iteration estimator
     controller_params['predict_type'] = 'pfasst_burnin'  # activate iteration estimator
 
     # fill description dictionary for easy step instantiation
