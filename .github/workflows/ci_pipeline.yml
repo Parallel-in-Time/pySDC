@@ -22,18 +22,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: ${{ env.YML }}
-
-      - name: Code reformatting with black
-        run: |
-          black pySDC  --check --diff --color
-
-      - name: Linting with flakeheaven
-        run: |
-          flakeheaven lint --benchmark pySDC
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: ${{ env.YML }}
+#
+#      - name: Code reformatting with black
+#        run: |
+#          black pySDC  --check --diff --color
+#
+#      - name: Linting with flakeheaven
+#        run: |
+#          flakeheaven lint --benchmark pySDC
 
 
   spawn_gitlab_and_postprocess:
@@ -55,18 +55,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout benchmark repository
-        uses: actions/checkout@v3
-        with:
-          repository: Parallel-in-Time/pySDC-benchmarks
-          token: ${{ secrets.BENCHMARK_BOT }}
-          path: bench
-          ref: main
-
-      - name: Install Conda environment with Micromamba
-        uses: mamba-org/provision-with-micromamba@main
-        with:
-          environment-file: etc/environment-base.yml
+#      - name: Checkout benchmark repository
+#        uses: actions/checkout@v3
+#        with:
+#          repository: Parallel-in-Time/pySDC-benchmarks
+#          token: ${{ secrets.BENCHMARK_BOT }}
+#          path: bench
+#          ref: main
+#
+#      - name: Install Conda environment with Micromamba
+#        uses: mamba-org/provision-with-micromamba@main
+#        with:
+#          environment-file: etc/environment-base.yml
 
       - name: Mirror + trigger CI
         uses: SvanBoxel/gitlab-mirror-and-ci-action@master
