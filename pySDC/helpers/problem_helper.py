@@ -49,7 +49,7 @@ def get_finite_difference_matrix(
     Build FD matrix from stencils, with boundary conditions
     """
     if cupy:
-        import cupyx.scipy.sparse as sp
+        import cupyx.scipy.sparse as sp  # noqa: F811
     if order > 2 and bc != 'periodic':
         raise NotImplementedError('Higher order allowed only for periodic boundary conditions')
 
