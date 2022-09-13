@@ -1,3 +1,4 @@
+# TODO: Fix the nodes!
 import numpy as np
 import logging
 
@@ -37,15 +38,15 @@ class ButcherTableau(object):
             raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
 
         # Set number of nodes, left and right interval boundaries
-        self.num_nodes = matrix.shape[0]
+        self.num_nodes = matrix.shape[0] + 1
         self.tleft = 0.
         self.tright = 1.
 
-        self.nodes = np.append(nodes, [1])
+        self.nodes = np.append(np.append([0], nodes), [1])
         self.weights = weights
         self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
-        self.Qmat[:-1, :-1] = matrix
-        self.Qmat[-1, :-1] = weights  # this is for computing the solution to the step from the previous stages
+        self.Qmat[1:-1, 1:-1] = matrix
+        self.Qmat[-1, 1:-1] = weights  # this is for computing the solution to the step from the previous stages
 
         self.left_is_node = True
         self.right_is_node = self.nodes[-1] == self.tright
@@ -58,7 +59,7 @@ class ButcherTableau(object):
         self.delta_m[0] = self.nodes[0] - self.tleft
 
         # check if the RK scheme is implicit
-        self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes)])
+        self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes - 1)])
 
 
 class RungeKutta(generic_implicit):
@@ -110,6 +111,7 @@ class RungeKutta(generic_implicit):
         self.__level = None
 
         self.parallelizable = False
+        self.QI = self.coll.Qmat
 
     def update_nodes(self):
         """
@@ -127,26 +129,22 @@ class RungeKutta(generic_implicit):
         assert L.status.unlocked
         assert L.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
 
-        # evaluate at the first node
-        L.f[0] = P.eval_f(L.u[0], L.time)
+        # get number of collocation nodes for easier access
+        M = self.coll.num_nodes
 
-        # compute the stages
-        for m in range(0, self.coll.num_nodes):
-            # initialize variable to store the solution at which to evaluate to compute the new stage
-            u_temp = L.u[0]
+        for m in range(0, M):
+            # build rhs, consisting of the known values from above and new values from previous nodes (at k+1)
+            rhs = L.u[0]
+            for j in range(1, m + 1):
+                rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
-            # add the stages to compute the solution at which to evaluate for the next stage
-            for j in range(0, m + 1):
-                u_temp += L.dt * self.coll.Qmat[m + 1, j] * L.f[j]
-
-            # compute the new intermediate solution
+            # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                L.u[m + 1] = P.solve_system(u_temp, L.dt * self.coll.Qmat[m + 1, m + 1], L.u[m + 1],
+                L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
                                             L.time + L.dt * self.coll.nodes[m])
             else:
-                L.u[m + 1] = u_temp
-
-            # evaluate the new stage
+                L.u[m + 1] = rhs
+            # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
@@ -168,18 +166,35 @@ class RK1(RungeKutta):
         super(RK1, self).__init__(params)
 
 
+class CrankNicholson(RungeKutta):
+    '''
+    Implicit Runge-Kutta method of second order
+    '''
+    def __init__(self, params):
+        nodes = np.array([0, 1])
+        weights = np.array([0.5, 0.5])
+        matrix = np.zeros((2, 2))
+        matrix[1, 0] = 0.5
+        matrix[1, 1] = 0.5
+        params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
+        super(CrankNicholson, self).__init__(params)
+
+
 class MidpointMethod(RungeKutta):
     '''
     Runge-Kutta method of second order
     '''
     def __init__(self, params):
         implicit = params.get('implicit', False)
-        nodes = np.array([0, 0.5])
-        weights = np.array([0, 1])
-        matrix = np.zeros((2, 2))
         if implicit:
-            matrix[1, 1] = 0.5
+            nodes = np.array([0.5])
+            weights = np.array([1])
+            matrix = np.zeros((1, 1))
+            matrix[0, 0] = 1. / 2.
         else:
+            nodes = np.array([0, 0.5])
+            weights = np.array([0, 1])
+            matrix = np.zeros((2, 2))
             matrix[1, 0] = 0.5
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
         super(MidpointMethod, self).__init__(params)
