@@ -10,6 +10,10 @@ except ImportError:
 class cupy_mesh:
     """
     cupy-based datatype
+
+    Attributes:
+        values: cupy.ndarray
+        _comm: MPI communicator or None
     """
 
     def __init__(self, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
@@ -19,18 +23,16 @@ class cupy_mesh:
         Args:
             init: either another mesh or a tuple containing the dimensions and the dtype
             val: value to initialize
-
-        Attributes:
-            values: cupy.ndarray
-
         """
         if isinstance(init, cupy_mesh):
             self.values = cp.ndarray(shape=init.values.shape, dtype=init.values.dtype, strides=strides, order=order)
             self.values[:] = init.values.copy()
+            self._comm = init._comm
         elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
                 and isinstance(init[2], cp.dtype):
             self.values = cp.ndarray(shape=init[0], dtype=init[2], strides=strides, order=order)
             self.values[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
+            self._comm = init[1]
         else:
             raise NotImplementedError(type(init))
 
@@ -115,6 +117,49 @@ class cupy_mesh:
             numpy.ndarray
         """
         return self.values.get()
+
+    @property
+    def comm(self):
+        """
+        Getter for the communicator
+        """
+        return self._comm
+
+    def isend(self, dest=None, tag=None, comm=None):
+        """
+        Routine for sending data forward in time (non-blocking)
+        Args:
+            dest (int): target rank
+            tag (int): communication tag
+            comm: communicator
+        Returns:
+            request handle
+        """
+        return comm.Issend(self[:], dest=dest, tag=tag)
+
+    def irecv(self, source=None, tag=None, comm=None):
+        """
+        Routine for receiving in time
+        Args:
+            source (int): source rank
+            tag (int): communication tag
+            comm: communicator
+        Returns:
+            None
+        """
+        return comm.Irecv(self[:], source=source, tag=tag)
+
+    def bcast(self, root=None, comm=None):
+        """
+        Routine for broadcasting values
+        Args:
+            root (int): process with value to broadcast
+            comm: communicator
+        Returns:
+            broadcasted values
+        """
+        comm.Bcast(self[:], root=root)
+        return self
 
 
 class imex_cupy_mesh(object):
