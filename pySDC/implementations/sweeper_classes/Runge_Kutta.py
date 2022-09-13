@@ -113,7 +113,7 @@ class RungeKutta(generic_implicit):
 
     def update_nodes(self):
         """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
+        Update the u- and f-values at the collocation nodes
 
         Returns:
             None
@@ -125,6 +125,7 @@ class RungeKutta(generic_implicit):
 
         # only if the level has been touched before
         assert L.status.unlocked
+        assert L.status.sweep <= 1, "RK schemes are direct solvers. Please perform only 1 iteration!"
 
         # evaluate at the first node
         L.f[0] = P.eval_f(L.u[0], L.time)
@@ -138,12 +139,14 @@ class RungeKutta(generic_implicit):
             for j in range(0, m + 1):
                 u_temp += L.dt * self.coll.Qmat[m + 1, j] * L.f[j]
 
-            # compute the new stage
+            # compute the new intermediate solution
             if self.coll.implicit:
                 L.u[m + 1] = P.solve_system(u_temp, L.dt * self.coll.Qmat[m + 1, m + 1], L.u[m + 1],
                                             L.time + L.dt * self.coll.nodes[m])
             else:
                 L.u[m + 1] = u_temp
+
+            # evaluate the new stage
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
         # indicate presence of new values at this level
