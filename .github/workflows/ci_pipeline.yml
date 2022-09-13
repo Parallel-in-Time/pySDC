@@ -121,7 +121,8 @@ jobs:
           chmod u+x ./docs/update_apidocs.sh
           ./docs/update_apidocs.sh
           sphinx-build -b html docs/source docs/build/html
-          mv htmlcov docs/build/html/.
+          mkdir -p docs/build/html/coverage
+          mv htmlcov/* docs/build/html/coverage/.
 
       - name: Build html II
         if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
