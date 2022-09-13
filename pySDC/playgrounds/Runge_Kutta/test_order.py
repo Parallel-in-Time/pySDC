@@ -6,7 +6,7 @@ from pySDC.projects.Resilience.accuracy_check import plot_orders
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
 
-from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod
+from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson
 
 
 def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=None):
@@ -25,6 +25,7 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
         RK1: 'blue',
         MidpointMethod: 'red',
         RK4: 'orange',
+        CrankNicholson: 'purple',
     }
     ax.get_lines()[-1].set_color(colors.get(sweeper, 'black'))
 
@@ -35,7 +36,10 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
 
 def plot_all_orders(prob, dt_list, Tend):
     fig, ax = plt.subplots(1, 1)
-    sweepers = [RK1, MidpointMethod, RK4]
+    sweepers = [RK1]
+    sweepers = [RK4]
+    sweepers = [MidpointMethod]
+    sweepers = [RK1, MidpointMethod, CrankNicholson, RK4]
     for i in range(len(sweepers)):
         plot_order(sweepers[i], prob, dt_list, Tend_fixed=Tend, ax=ax)
 
