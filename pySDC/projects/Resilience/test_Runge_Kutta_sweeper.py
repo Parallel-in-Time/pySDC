@@ -8,7 +8,7 @@ from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson, Cash_Karp
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
 from pySDC.helpers.stats_helper import get_sorted
 
 
@@ -121,9 +121,10 @@ def test_embedded_method():
     # change only the things in the description that we need for adaptivity
     adaptivity_params = dict()
     adaptivity_params['e_tol'] = 1e-7
+    adaptivity_params['update_order'] = 5
 
     convergence_controllers = dict()
-    convergence_controllers[Adaptivity] = adaptivity_params
+    convergence_controllers[AdaptivityRK] = adaptivity_params
 
     description = dict()
     description['convergence_controllers'] = convergence_controllers
@@ -136,8 +137,10 @@ def test_embedded_method():
 
     fig.tight_layout()
 
-    dt_last = get_sorted(stats, type='dt')[-1][1]
-    assert np.isclose(dt_last, 0.11091455589374277), "Cash-Karp has computed a different last step size than before!"
+    dt_last = get_sorted(stats, type='dt')[-2][1]
+    restarts = sum([me[1] for me in get_sorted(stats, type='restart')])
+    assert np.isclose(dt_last, 0.14175080252629996), "Cash-Karp has computed a different last step size than before!"
+    assert restarts == 17, "Cash-Karp has restarted a different number of times than before"
 
 
 if __name__ == '__main__':
