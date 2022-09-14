@@ -9,7 +9,7 @@ from pySDC.implementations.sweeper_classes.generic_implicit import generic_impli
 class ButcherTableau(object):
     def __init__(self, weights, nodes, matrix):
         """
-        Initialization routine for an collocation object
+        Initialization routine to get a quadrature matrix out of a Butcher tableau
 
         Args:
             weights (numpy.ndarray): Butcher tableau weights
@@ -59,6 +59,64 @@ class ButcherTableau(object):
 
         # check if the RK scheme is implicit
         self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes - 1)])
+
+
+class ButcherTableauEmbedded(object):
+    def __init__(self, weights, nodes, matrix):
+        """
+        Initialization routine to get a quadrature matrix out of a Butcher tableau for embedded RK methods.
+
+        Be aware that the method that generates the final solution should be in the first row of the weights matrix.
+
+        Args:
+            weights (numpy.ndarray): Butcher tableau weights
+            nodes (numpy.ndarray): Butcher tableau nodes
+            matrix (numpy.ndarray): Butcher tableau entries
+        """
+        # check if the arguments have the correct form
+        if type(matrix) != np.ndarray:
+            raise ParameterError('Runge-Kutta matrix needs to be supplied as  a numpy array!')
+        elif len(np.unique(matrix.shape)) != 1 or len(matrix.shape) != 2:
+            raise ParameterError('Runge-Kutta matrix needs to be a square 2D numpy array!')
+
+        if type(weights) != np.ndarray:
+            raise ParameterError('Weights need to be supplied as a numpy array!')
+        elif len(weights.shape) != 2:
+            raise ParameterError(f'Incompatible dimension of weights! Need 2, got {len(weights.shape)}')
+        elif len(weights[0]) != matrix.shape[0]:
+            raise ParameterError(f'Incompatible number of weights! Need {matrix.shape[0]}, got {len(weights[0])}')
+
+        if type(nodes) != np.ndarray:
+            raise ParameterError('Nodes need to be supplied as a numpy array!')
+        elif len(nodes.shape) != 1:
+            raise ParameterError(f'Incompatible dimension of nodes! Need 1, got {len(nodes.shape)}')
+        elif len(nodes) != matrix.shape[0]:
+            raise ParameterError(f'Incompatible number of nodes! Need {matrix.shape[0]}, got {len(nodes)}')
+
+        # Set number of nodes, left and right interval boundaries
+        self.num_nodes = matrix.shape[0] + 2
+        self.tleft = 0.
+        self.tright = 1.
+
+        self.nodes = np.append(np.append([0], nodes), [1, 1])
+        self.weights = weights
+        self.Qmat = np.zeros([self.num_nodes + 1, self.num_nodes + 1])
+        self.Qmat[1:-2, 1:-2] = matrix
+        self.Qmat[-1, 1:-2] = weights[0]  # this is for computing the higher order solution
+        self.Qmat[-2, 1:-2] = weights[1]  # this is for computing the lower order solution
+
+        self.left_is_node = True
+        self.right_is_node = self.nodes[-1] == self.tright
+
+        # compute distances between the nodes
+        if self.num_nodes > 1:
+            self.delta_m = self.nodes[1:] - self.nodes[:-1]
+        else:
+            self.delta_m = np.zeros(1)
+        self.delta_m[0] = self.nodes[0] - self.tleft
+
+        # check if the RK scheme is implicit
+        self.implicit = any([matrix[i, i] != 0 for i in range(self.num_nodes - 2)])
 
 
 class RungeKutta(generic_implicit):
@@ -215,3 +273,34 @@ class RK4(RungeKutta):
         matrix[3, 2] = 1.
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
         super(RK4, self).__init__(params)
+
+
+class Heun_Euler(RungeKutta):
+    '''
+    Second order explicit embedded Runge-Kutta
+    '''
+    def __init__(self, params):
+        nodes = np.array([0, 1])
+        weights = np.array([[0.5, 0.5], [1, 0]])
+        matrix = np.zeros((2, 2))
+        matrix[1, 0] = 1
+        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
+        super(Heun_Euler, self).__init__(params)
+
+
+class Cash_Karp(RungeKutta):
+    '''
+    Fifth order explicit embedded Runge-Kutta
+    '''
+    def __init__(self, params):
+        nodes = np.array([0, 0.2, 0.3, 0.6, 1., 7. / 8.])
+        weights = np.array([[37. / 378., 0., 250. / 621., 125. / 594., 0., 512. / 1771.],
+                            [2825. / 27648., 0., 18575. / 48384., 13525. / 55296., 277. / 14336., 1. / 4.]])
+        matrix = np.zeros((6, 6))
+        matrix[1, 0] = 1. / 5.
+        matrix[2, :2] = [3. / 40., 9. / 40.]
+        matrix[3, :3] = [0.3, -0.9, 1.2]
+        matrix[4, :4] = [-11. / 54., 5. / 2., -70. / 27., 35. / 27.]
+        matrix[5, :5] = [1631. / 55296., 175. / 512., 575. / 13824., 44275. / 110592., 253. / 4096.]
+        params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
+        super(Cash_Karp, self).__init__(params)
