@@ -30,7 +30,7 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def dependencies(self, controller, description):
         '''
-        Load the convergence controller that stores the solution of the last sweep
+        Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta
 
         Args:
             controller (pySDC.Controller): The controller
@@ -39,7 +39,8 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             None
         '''
-        controller.add_convergence_controller(StoreUOld, description=description)
+        if RungeKutta not in description['sweeper_class'].__bases__:
+            controller.add_convergence_controller(StoreUOld, description=description)
         return None
 
     def estimate_embedded_error_serial(self, L):
