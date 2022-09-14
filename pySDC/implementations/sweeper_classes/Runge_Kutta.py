@@ -1,4 +1,3 @@
-# TODO: Fix the nodes!
 import numpy as np
 import logging
 
@@ -65,12 +64,12 @@ class ButcherTableau(object):
 class RungeKutta(generic_implicit):
     """
     Runge-Kutta scheme that fits the interface of a sweeper.
-    However, this is not a sweeper at all, since Runge-Kutta schemes are direct methods. We perform exactly one
-    "iteration" of generic SDC and by choosing Q = Q_Delta = <Butcher tableau>, we can implement a Runge-Kutta to
-    compare to the various flavours of SDC that we can think of.
+    Actually, the sweeper idea fits the Runge-Kutta idea when using only lower triangular rules, where solutions
+    at the nodes are succesively computed from earlier nodes. However, we only perform a single iteration of this.
 
-    I want to emphasize that this sweeper does not fit the intendet purpose of the class it inherits from, but allows
-    to make time measurements to compare SDC to popular schemes that are actually in use.
+    We have two choices to realise a Runge-Kutta sweeper: We can choose Q = Q_Delta = <Butcher tableau>, but in this
+    implementation, that would lead to a lot of wasted FLOPS from integrating with Q and then with Q_Delta and
+    subtracting the two. For that reason, we built this new sweeper, which does not have a preconditioner.
 
     This class only supports lower triangular Butcher tableaus such that the system can be solved with forward
     subsitution. In this way, we don't get the maximum order that we could for the number of stages, but computing the
