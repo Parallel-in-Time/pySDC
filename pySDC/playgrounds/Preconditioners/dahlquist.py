@@ -107,9 +107,14 @@ def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_
     return stats, controller, Tend
 
 
-def plot_stability(stats, ax=None, iter=None, colors=None):
+def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=False):
     lambdas = get_sorted(stats, type='lambdas')[0][1]
     u = get_sorted(stats, type='u', sortby='iter')
+
+    # decorate
+    if crosshair:
+        ax.axhline(0, color='black', alpha=1.)
+        ax.axvline(0, color='black', alpha=1.)
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)
@@ -123,12 +128,11 @@ def plot_stability(stats, ax=None, iter=None, colors=None):
 
         # get a grid for plotting
         X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
+        if fill:
+            ax.contourf(X, Y, U, levels=[-np.inf, 1 - np.finfo(float).eps], colors=colors[i - 1], alpha=0.5)
         ax.contour(X, Y, U, levels=[1], colors=colors[i - 1])
         ax.plot([None], [None], color=colors[i - 1], label=f'k={i}')
 
-    # decorate
-    ax.axhline(0, color='black')
-    ax.axvline(0, color='black')
     ax.legend(frameon=False)
 
 

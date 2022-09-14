@@ -90,7 +90,7 @@ class RungeKutta(generic_implicit):
         # set up logger
         self.logger = logging.getLogger('sweeper')
 
-        essential_keys = ['butcher_tableau', 'num_nodes']
+        essential_keys = ['butcher_tableau']
         for key in essential_keys:
             if key not in params:
                 msg = 'need %s to instantiate step, only got %s' % (key, str(params.keys()))
@@ -99,6 +99,9 @@ class RungeKutta(generic_implicit):
 
         self.params = _Pars(params)
 
+        if 'collocation_class' in params or 'num_nodes' in params:
+            self.logger.warning('You supplied parameters to setup a collocation problem to the Runge-Kutta sweeper. \
+Please be aware that they are ignored since the quadrature matrix is entirely determined by the Butcher tableau.')
         self.coll = params['butcher_tableau']
 
         if not self.coll.right_is_node and not self.params.do_coll_update:

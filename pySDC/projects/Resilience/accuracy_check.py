@@ -74,7 +74,7 @@ def get_results_from_stats(stats, var, val, hook_class=log_errors):
 
 
 def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
-                  hook_class=log_errors):
+                  hook_class=log_errors, custom_controller_params=None):
     """
     A simple test program to compute the order of accuracy in time
     """
@@ -103,7 +103,7 @@ def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, pr
             desc = {**desc, **custom_description}
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
         stats, controller, _ = prob(custom_description=desc, num_procs=num_procs, Tend=Tend,
-                                    hook_class=hook_class)
+                                    hook_class=hook_class, custom_controller_params=custom_controller_params)
 
         level = controller.MS[-1].levels[-1]
         e_glob = abs(level.prob.u_exact(t=level.time + level.dt) - level.u[-1])
@@ -188,11 +188,13 @@ def get_accuracy_order(results, key='e_embedded', thresh=1e-14):
     return order
 
 
-def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None):
+def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                custom_controller_params=None):
     for i in range(len(ks)):
         k = ks[i]
         res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
-                            prob=prob, dt_list=dt_list, hook_class=do_nothing)
+                            prob=prob, dt_list=dt_list, hook_class=do_nothing,
+                            custom_controller_params=custom_controller_params)
         plot_order(res, ax, k)
 
 
