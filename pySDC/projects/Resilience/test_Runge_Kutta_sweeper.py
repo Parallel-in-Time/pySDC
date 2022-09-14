@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pySDC.projects.Resilience.accuracy_check import plot_orders
-from pySDC.playgrounds.Preconditioners.dahlquist import run_dahlquist, plot_stability
+from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
 
 from pySDC.projects.Resilience.advection import run_advection
 from pySDC.projects.Resilience.vdp import run_vdp
