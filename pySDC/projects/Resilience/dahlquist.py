@@ -129,8 +129,8 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
         # get a grid for plotting
         X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
         if fill:
-            ax.contourf(X, Y, U, levels=[-np.inf, 1 - np.finfo(float).eps], colors=colors[i - 1], alpha=0.5)
-        ax.contour(X, Y, U, levels=[1], colors=colors[i - 1])
+            ax.contourf(X, Y, abs(U), levels=[-np.inf, 1 - np.finfo(float).eps], colors=colors[i - 1], alpha=0.5)
+        ax.contour(X, Y, abs(U), levels=[1], colors=colors[i - 1])
         ax.plot([None], [None], color=colors[i - 1], label=f'k={i}')
 
     ax.legend(frameon=False)

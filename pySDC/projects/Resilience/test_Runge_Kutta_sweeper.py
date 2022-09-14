@@ -82,13 +82,13 @@ def plot_all_stability():
     impl = [True, False]
     sweepers = [[RK1, MidpointMethod, CrankNicholson], [RK1, MidpointMethod, RK4]]
     titles = ['implicit', 'explicit']
-    res = [np.linspace(-3, 3, 400), np.linspace(-30, 30, 400)]
-    ims = [np.linspace(-3, 3, 400), np.linspace(-30, 30, 400)]
+    re = np.linspace(-3, 3, 400)
+    im = np.linspace(-3, 3, 400)
     crosshair = [True, False, False]
 
     for j in range(len(impl)):
         for i in range(len(sweepers[j])):
-            plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=res[j], im=ims[j],
+            plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im,
                                   crosshair=crosshair[i])
         axs[j].set_title(titles[j])
 
