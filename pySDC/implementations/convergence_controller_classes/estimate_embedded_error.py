@@ -3,6 +3,8 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController, Pars
 from pySDC.implementations.convergence_controller_classes.store_uold import StoreUOld
 
+from pySDC.implementations.sweeper_classes.Runge_Kutta import RungeKutta
+
 
 class EstimateEmbeddedError(ConvergenceController):
     '''
@@ -39,6 +41,24 @@ class EstimateEmbeddedError(ConvergenceController):
         '''
         controller.add_convergence_controller(StoreUOld, description=description)
         return None
+
+    def estimate_embedded_error_serial(self, L):
+        '''
+        Estimate the serial embedded error, which may need to be modified for a parallel estimate.
+
+        Depending on the type of sweeper, the lower order solution is stored in a different place.
+
+        Args:
+            L (pySDC.level): The level
+
+        Returns:
+            dtype_u: The embedded error estimate
+        '''
+        sweeper = L.sweep
+        if RungeKutta in type(sweeper).__bases__:
+            return abs(L.u[-2] - L.u[-1])
+        else:
+            return abs(L.uold[-1] - L.u[-1])
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
@@ -87,7 +107,7 @@ level')
         if S.status.iter > 1:
             for L in S.levels:
                 # order rises by one between sweeps, making this so ridiculously easy
-                temp = abs(L.uold[-1] - L.u[-1])
+                temp = self.estimate_embedded_error_serial(L)
                 L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
             self.buffers.e_em_last = temp * 1.
