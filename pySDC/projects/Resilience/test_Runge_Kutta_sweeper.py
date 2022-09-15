@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.projects.Resilience.accuracy_check import plot_orders
+from pySDC.projects.Resilience.accuracy_check import plot_orders, plot_all_errors
 from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
 
 from pySDC.projects.Resilience.advection import run_advection
@@ -9,6 +9,7 @@ from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
 
 from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson, Cash_Karp
 from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.helpers.stats_helper import get_sorted
 
 
@@ -28,6 +29,7 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     description = dict() if description is None else description
     description['sweeper_class'] = sweeper
     description['sweeper_params'] = {'implicit': True}
+    description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
 
@@ -63,6 +65,7 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
     description = dict() if description is None else description
     description['sweeper_class'] = sweeper
     description['sweeper_params'] = {'implicit': implicit}
+    description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
 
@@ -114,6 +117,28 @@ def test_advection():
     plot_all_orders(run_advection, 1.e-3 * 2.**(-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson])
 
 
+def test_embedded_estimate_order():
+    sweeper = Cash_Karp
+    fig, ax = plt.subplots(1, 1)
+
+    # change only the things in the description that we need for adaptivity
+    convergence_controllers = dict()
+    convergence_controllers[EstimateEmbeddedErrorNonMPI] = {}
+
+    description = dict()
+    description['convergence_controllers'] = convergence_controllers
+    description['sweeper_class'] = sweeper
+    description['step_params'] = {'maxiter': 1}
+
+    custom_controller_params = {'logger_level': 40}
+
+    Tend = 7e-2
+    dt_list = Tend * 2.**(-np.arange(8))
+    prob = run_vdp
+    plot_all_errors(ax, [5], True, Tend_fixed=Tend, custom_description=description, dt_list=dt_list, prob=prob,
+                    custom_controller_params=custom_controller_params)
+
+
 def test_embedded_method():
     sweeper = Cash_Karp
     fig, ax = plt.subplots(1, 1)
@@ -129,6 +154,7 @@ def test_embedded_method():
     description = dict()
     description['convergence_controllers'] = convergence_controllers
     description['sweeper_class'] = sweeper
+    description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
 
@@ -145,6 +171,7 @@ def test_embedded_method():
 
 if __name__ == '__main__':
     test_embedded_method()
+    test_embedded_estimate_order()
     test_vdp()
     test_advection()
     plot_all_stability()

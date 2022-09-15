@@ -67,7 +67,7 @@ class AdaptivityBase(ConvergenceController):
         '''
         raise NotImplementedError('Please implement a rule for updating the step size!')
 
-    def compute_optimatal_step_size(self, beta, dt, e_tol, e_est, order):
+    def compute_optimal_step_size(self, beta, dt, e_tol, e_est, order):
         '''
         Compute the optimal step size for the current step based on the order of the scheme.
         This function can be called from `get_new_step_size` for various implementations of adaptivity, but notably not
@@ -192,8 +192,8 @@ _params\'][\'e_tol\']!'
             # compute next step size
             order = S.status.iter  # embedded error estimate is same order as time marching
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimatal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                               order)
+            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
+                                                             order)
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
@@ -254,8 +254,8 @@ description[\'convergence_control_params\'][\'update_order\']!'
             # compute next step size
             order = self.params.update_order
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimatal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                               order)
+            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
+                                                             order)
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
