@@ -67,7 +67,7 @@ class AdaptivityBase(ConvergenceController):
         '''
         raise NotImplementedError('Please implement a rule for updating the step size!')
 
-    def compute_optimatal_step_size(self, beta, dt, e_tol, e_est, order):
+    def compute_optimal_step_size(self, beta, dt, e_tol, e_est, order):
         '''
         Compute the optimal step size for the current step based on the order of the scheme.
         This function can be called from `get_new_step_size` for various implementations of adaptivity, but notably not
@@ -192,8 +192,8 @@ _params\'][\'e_tol\']!'
             # compute next step size
             order = S.status.iter  # embedded error estimate is same order as time marching
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimatal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                               order)
+            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
+                                                             order)
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
@@ -210,6 +210,55 @@ _params\'][\'e_tol\']!'
             float: Embedded error estimate
         '''
         return S.levels[0].status.error_embedded_estimate
+
+
+class AdaptivityRK(Adaptivity):
+    '''
+    Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update
+    '''
+    def check_parameters(self, controller, params, description):
+        '''
+        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
+        For adaptivity, we need to know the order of the scheme.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            params (dict): The params passed for this specific convergence controller
+            description (dict): The description object used to instantiate the controller
+
+        Returns:
+            bool: Whether the parameters are compatible
+            str: The error message
+        '''
+        if 'update_order' not in params.keys():
+            return False, 'Adaptivity needs an order for the update rule! Please set some up in \
+description[\'convergence_control_params\'][\'update_order\']!'
+
+        return super(AdaptivityRK, self).check_parameters(controller, params, description)
+
+    def get_new_step_size(self, controller, S):
+        '''
+        Determine a step size for the next step from an embedded estimate of the local error of the current step.
+
+        Args:
+            controller (pySDC.Controller): The controller
+            S (pySDC.Step): The current step
+
+        Returns:
+            None
+        '''
+        # check if we performed the desired amount of sweeps
+        if S.status.iter == S.params.maxiter:
+            L = S.levels[0]
+
+            # compute next step size
+            order = self.params.update_order
+            e_est = self.get_local_error_estimate(controller, S)
+            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
+                                                             order)
+            self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
+
+        return None
 
 
 class AdaptivityResidual(AdaptivityBase):

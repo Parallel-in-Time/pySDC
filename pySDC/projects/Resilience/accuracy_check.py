@@ -141,16 +141,20 @@ def plot(res, ax, k):
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
+        if all([me == 0. for me in res[keys[i]]]):
+            continue
         order = get_accuracy_order(res, key=keys[i])
         if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            assert np.isclose(np.mean(order), k, atol=3e-1), f'Expected embedded error estimate to have order {k} \
+            assert np.isclose(np.mean(order), k, atol=4e-1), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
         elif keys[i] == 'e_extrapolated':
             label = None
             assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
 {k+1} but got {np.mean(order):.2f}'
+        else:
+            label = None
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')
@@ -198,11 +202,12 @@ def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=r
         plot_order(res, ax, k)
 
 
-def plot_all_errors(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline):
+def plot_all_errors(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                    custom_controller_params=None):
     for i in range(len(ks)):
         k = ks[i]
         res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
-                            prob=prob)
+                            prob=prob, dt_list=dt_list, custom_controller_params=custom_controller_params)
 
         # visualize results
         plot(res, ax, k)
