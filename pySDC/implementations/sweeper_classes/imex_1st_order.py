@@ -99,6 +99,7 @@ class imex_1st_order(sweeper):
             # implicit solve with prefactor stemming from QI
             L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
                                         L.time + L.dt * self.coll.nodes[m])
+
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
