@@ -1,13 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.projects.Resilience.accuracy_check import plot_orders
+from pySDC.projects.Resilience.accuracy_check import plot_orders, plot_all_errors
 from pySDC.projects.Resilience.dahlquist import run_dahlquist, plot_stability
 
 from pySDC.projects.Resilience.advection import run_advection
-from pySDC.projects.Resilience.vdp import run_vdp
+from pySDC.projects.Resilience.vdp import run_vdp, plot_step_sizes
 
-from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson
+from pySDC.implementations.sweeper_classes.Runge_Kutta import RK1, RK4, MidpointMethod, CrankNicholson, Cash_Karp
+from pySDC.implementations.convergence_controller_classes.adaptivity import AdaptivityRK
+from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
+from pySDC.helpers.stats_helper import get_sorted
 
 
 colors = {
@@ -15,6 +18,7 @@ colors = {
     MidpointMethod: 'red',
     RK4: 'orange',
     CrankNicholson: 'purple',
+    Cash_Karp: 'teal',
 }
 
 
@@ -25,6 +29,7 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     description = dict() if description is None else description
     description['sweeper_class'] = sweeper
     description['sweeper_params'] = {'implicit': True}
+    description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
 
@@ -38,10 +43,11 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
         MidpointMethod: 3,
         RK4: 5,
         CrankNicholson: 3,
+        Cash_Karp: 6,
     }
     numerical_order = float(ax.get_lines()[-1].get_label()[7:])
     expected_order = orders.get(sweeper, numerical_order)
-    assert np.isclose(numerical_order, expected_order, atol=2.5e-1),\
+    assert np.isclose(numerical_order, expected_order, atol=2.6e-1),\
         f"Expected order {expected_order}, got {numerical_order}!"
 
     # decorate
@@ -59,6 +65,7 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
     description = dict() if description is None else description
     description['sweeper_class'] = sweeper
     description['sweeper_params'] = {'implicit': implicit}
+    description['step_params'] = {'maxiter': 1}
 
     custom_controller_params = {'logger_level': 40}
 
@@ -80,11 +87,11 @@ def plot_all_stability():
     fig, axs = plt.subplots(1, 2, figsize=(11, 5))
 
     impl = [True, False]
-    sweepers = [[RK1, MidpointMethod, CrankNicholson], [RK1, MidpointMethod, RK4]]
+    sweepers = [[RK1, MidpointMethod, CrankNicholson], [RK1, MidpointMethod, RK4, Cash_Karp]]
     titles = ['implicit', 'explicit']
-    re = np.linspace(-3, 3, 400)
-    im = np.linspace(-3, 3, 400)
-    crosshair = [True, False, False]
+    re = np.linspace(-4, 4, 400)
+    im = np.linspace(-4, 4, 400)
+    crosshair = [True, False, False, False]
 
     for j in range(len(impl)):
         for i in range(len(sweepers[j])):
@@ -102,15 +109,69 @@ def plot_all_orders(prob, dt_list, Tend, sweepers):
 
 
 def test_vdp():
-    Tend = 5e-2
-    plot_all_orders(run_vdp, Tend * 2.**(-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4])
+    Tend = 7e-2
+    plot_all_orders(run_vdp, Tend * 2.**(-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
 
 
 def test_advection():
     plot_all_orders(run_advection, 1.e-3 * 2.**(-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson])
 
 
+def test_embedded_estimate_order():
+    sweeper = Cash_Karp
+    fig, ax = plt.subplots(1, 1)
+
+    # change only the things in the description that we need for adaptivity
+    convergence_controllers = dict()
+    convergence_controllers[EstimateEmbeddedErrorNonMPI] = {}
+
+    description = dict()
+    description['convergence_controllers'] = convergence_controllers
+    description['sweeper_class'] = sweeper
+    description['step_params'] = {'maxiter': 1}
+
+    custom_controller_params = {'logger_level': 40}
+
+    Tend = 7e-2
+    dt_list = Tend * 2.**(-np.arange(8))
+    prob = run_vdp
+    plot_all_errors(ax, [5], True, Tend_fixed=Tend, custom_description=description, dt_list=dt_list, prob=prob,
+                    custom_controller_params=custom_controller_params)
+
+
+def test_embedded_method():
+    sweeper = Cash_Karp
+    fig, ax = plt.subplots(1, 1)
+
+    # change only the things in the description that we need for adaptivity
+    adaptivity_params = dict()
+    adaptivity_params['e_tol'] = 1e-7
+    adaptivity_params['update_order'] = 5
+
+    convergence_controllers = dict()
+    convergence_controllers[AdaptivityRK] = adaptivity_params
+
+    description = dict()
+    description['convergence_controllers'] = convergence_controllers
+    description['sweeper_class'] = sweeper
+    description['step_params'] = {'maxiter': 1}
+
+    custom_controller_params = {'logger_level': 40}
+
+    stats, _, _ = run_vdp(description, 1, custom_controller_params=custom_controller_params)
+    plot_step_sizes(stats, ax)
+
+    fig.tight_layout()
+
+    dt_last = get_sorted(stats, type='dt')[-2][1]
+    restarts = sum([me[1] for me in get_sorted(stats, type='restart')])
+    assert np.isclose(dt_last, 0.14175080252629996), "Cash-Karp has computed a different last step size than before!"
+    assert restarts == 17, "Cash-Karp has restarted a different number of times than before"
+
+
 if __name__ == '__main__':
+    test_embedded_method()
+    test_embedded_estimate_order()
     test_vdp()
     test_advection()
     plot_all_stability()
