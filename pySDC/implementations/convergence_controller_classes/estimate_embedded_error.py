@@ -16,7 +16,7 @@ class EstimateEmbeddedError(ConvergenceController):
 
     def setup(self, controller, params, description):
         '''
-        Add a default value for control order to the parameters
+        Add a default value for control order to the parameters and check if we are using a Runge-Kutta sweeper
 
         Args:
             controller (pySDC.Controller): The controller
@@ -26,7 +26,8 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dict: Updated parameters
         '''
-        return {'control_order': -80, **params}
+        sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
+        return {'control_order': -80, 'sweeper_type': sweeper_type, **params}
 
     def dependencies(self, controller, description):
         '''
@@ -55,11 +56,15 @@ class EstimateEmbeddedError(ConvergenceController):
         Returns:
             dtype_u: The embedded error estimate
         '''
-        sweeper = L.sweep
-        if RungeKutta in type(sweeper).__bases__:
+        if self.params.sweeper_type == 'RK':
+            # lower order solution is stored in the second to last entry of L.u
             return abs(L.u[-2] - L.u[-1])
-        else:
+        elif self.params.sweeper_type == 'SDC':
+            # order rises by one between sweeps, making this so ridiculously easy
             return abs(L.uold[-1] - L.u[-1])
+        else:
+            raise NotImplementedError(f'Don\'t know how to estimate embedded error for sweeper type \
+{self.params.sweeper_type}')
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
@@ -105,9 +110,8 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
             raise NotImplementedError('Embedded error estimate only works for serial multi-level or parallel single \
 level')
 
-        if S.status.iter > 1:
+        if S.status.iter > 1 or self.params.sweeper_type == 'RK':
             for L in S.levels:
-                # order rises by one between sweeps, making this so ridiculously easy
                 temp = self.estimate_embedded_error_serial(L)
                 L.status.error_embedded_estimate = max([abs(temp - self.buffers.e_em_last), np.finfo(float).eps])
 
