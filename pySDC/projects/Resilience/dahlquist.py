@@ -7,6 +7,8 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+import matplotlib as mpl
 
 
 class log_data(hooks):
@@ -42,7 +44,7 @@ def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_
     sweeper_params = dict()
     sweeper_params['collocation_class'] = CollGaussRadau_Right
     sweeper_params['num_nodes'] = 3
-    sweeper_params['QI'] = 'LMMpar'
+    sweeper_params['QI'] = 'IE'
 
     # build lambdas
     re = np.linspace(-30, 30, 400)
@@ -136,8 +138,60 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
     ax.legend(frameon=False)
 
 
+def plot_contraction(stats, fig=None, ax=None, iter=None, plot_increase=False, cbar=True, **kwargs):
+    lambdas = get_sorted(stats, type='lambdas')[0][1]
+    u = get_sorted(stats, type='u', sortby='iter')
+    u_exact = np.exp(lambdas)
+
+    kwargs['cmap'] = kwargs.get('cmap', 'jet')
+
+    # get error for each iteration
+    iter = [1] if iter is None else iter
+    us = np.reshape(np.append(np.ones_like(lambdas), [me[1] for me in u if me[0] in iter]),
+                    (len(iter) + 1, len(lambdas)))
+    e = abs(us - u_exact)
+
+    # get contraction rates for each iteration
+    rho = e[1:, :] / e[:-1, :]
+    rho_avg = np.mean(rho, axis=0)
+    rho_log = np.log(np.reshape(rho_avg, (len(np.unique(lambdas.real)), len(np.unique(lambdas.imag)))))
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1)
+
+    # get a grid for plotting
+    X, Y = np.meshgrid(np.unique(lambdas.real), np.unique(lambdas.imag))
+    if plot_increase:
+        ax.contourf(X, Y, rho_log, **kwargs)
+        ax.contour(X, Y, rho_log, levels=[0.])
+    else:
+        ax.contourf(X, Y, np.where(rho_log < 0, rho_log, None), levels=500, **kwargs)
+
+    # decorate
+    ax.axhline(0, color='black')
+    ax.axvline(0, color='black')
+    if cbar:
+        cb = fig.colorbar(mpl.cm.ScalarMappable(**kwargs))
+        cb.set_label(r'$\rho$')
+
+
+def compare_contraction():
+    fig, axs = plt.subplots(1, 2, figsize=(12, 5.5), gridspec_kw={'width_ratios': [0.8, 1]})
+    precons = ['TRAP', 'IE']
+    norm = Normalize(vmin=-7, vmax=0)
+    cbar = True
+    for i in range(len(precons)):
+        custom_description = {'sweeper_params': {'QI': precons[i]}}
+        stats, controller, Tend = run_dahlquist(custom_description=custom_description, res=(400, 400))
+        plot_contraction(stats, fig=fig, ax=axs[i], cbar=cbar, norm=norm, cmap='jet')
+        cbar = False
+        axs[i].set_title(precons[i])
+    fig.tight_layout()
+
+
 if __name__ == '__main__':
     custom_description = None
     stats, controller, Tend = run_dahlquist(custom_description=custom_description)
     plot_stability(stats, iter=[1, 2, 3])
+    plot_contraction(stats)
     plt.show()

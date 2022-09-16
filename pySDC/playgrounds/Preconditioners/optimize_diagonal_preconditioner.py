@@ -74,6 +74,13 @@ def single_run(x, params, convergence_controllers, *args):
     return stats, controller
 
 
+def objective_function_diagonal_adaptivity_embedded2(x, *args):
+    '''
+    The same as objective_function_diagonal_residual_embedded, but with sum(x) = 1
+    '''
+    return objective_function_diagonal_adaptivity_embedded(np.append(x, - sum(x) + 1), *args)
+
+
 def objective_function_diagonal_adaptivity_embedded(x, *args):
     '''
     This function takes as input the diagonal preconditioner entries and runs a problem and then returns the number of
@@ -99,10 +106,13 @@ def objective_function_diagonal_adaptivity_embedded(x, *args):
     # check how many iterations we needed
     k = sum([me[1] for me in get_sorted(stats, type='k')])
 
+    # get error
+    e = get_error(stats, controller)
+
     # return the score
     score = k
     if print_status:
-        print(f's={score:7.0f} | k: {k - params["k"]:5}', x)
+        print(f's={score:7.0f} | e={e:.2e} | k: {k - params["k"]:5} | sum(x)={sum(x):.2f}', x)
 
     return score
 
@@ -161,6 +171,12 @@ def plot_errors(stats, u_end, exact):
     plt.cla()
 
 
+def get_error(stats, controller):
+    u_end = get_sorted(stats, type='u')[-1]
+    exact = controller.MS[0].levels[0].prob.u_exact(t=u_end[0])
+    return abs(u_end[1] - exact)
+
+
 vdp_params = {
     'prob': run_vdp,
     'sweeper': DiagPrecon,
@@ -197,16 +213,33 @@ args_advection = {
 }
 
 
-if __name__ == '__main__':
-    print_status = True
+def optimize_with_sum(args, num_nodes):
+    initial_guess = (np.arange(num_nodes - 1) + 1) / (num_nodes + 2)
+    tol = 1e-16
+    minimize(objective_function_diagonal_adaptivity_embedded2, initial_guess, args=args_advection, tol=tol,
+             method='nelder-mead')
 
-    args = args_piline
-    num_nodes = 3
-    initial_guess = np.linspace(0, 1, num_nodes + 1)
+
+def optimize_without_sum(args, num_nodes):
+    initial_guess = (np.arange(num_nodes) + 1) / (num_nodes + 1)
     tol = 1e-16
     minimize(objective_function_diagonal_adaptivity_embedded, initial_guess, args=args_advection, tol=tol,
              method='nelder-mead')
+
+
+if __name__ == '__main__':
+    print_status = True
+
+    args = args_advection
+    num_nodes = 3
+    initial_guess = np.arange(num_nodes) + 1 / num_nodes
+    tol = 1e-16
+    # minimize(objective_function_diagonal_adaptivity_embedded, initial_guess, args=args_advection, tol=tol,
+    #          method='nelder-mead')
     # objective_function_diagonal([None], *args)
     # plt.show()
     # objective_function_diagonal([0.19915688, 0.27594549, 0.27594545], *args)
     # plt.show()
+
+    # optimize_with_sum(args, num_nodes)
+    optimize_without_sum(args, num_nodes)

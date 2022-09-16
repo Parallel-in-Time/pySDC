@@ -5,6 +5,7 @@ from pySDC.core.Hooks import hooks
 from pySDC.helpers.stats_helper import get_sorted
 
 from pySDC.projects.Resilience.advection import run_advection
+from pySDC.playgrounds.Preconditioners.diagonal_precon_sweeper import DiagPrecon
 
 
 class log_residual(hooks):
@@ -43,8 +44,17 @@ def contraction_rate(ax, precon, desc=None, label=None):
     ax.legend(frameon=False)
 
 
+def contraction_rate_diag_precon(ax, x, label=None):
+    description = {
+        'sweeper_class': DiagPrecon,
+        'sweeper_params': {'diagonal_elements': np.array(x)},
+    }
+    contraction_rate(ax, 'IE', description, label=label)
+
+
 if __name__ == '__main__':
     fig, ax = plt.subplots(1, 1)
     precons = ['IE', 'LU', 'MIN', 'MIN3']
     [contraction_rate(ax=ax, precon=precon) for precon in precons]
+    contraction_rate_diag_precon(ax, [0.16855984, 0.50539923, 0.32604094], 'Diag')
     plt.show()
