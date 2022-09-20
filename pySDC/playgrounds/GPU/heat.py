@@ -16,7 +16,7 @@ def set_parameter():
     problem_params['lintol'] = 1E-10
     problem_params['liniter'] = 99
     problem_params['direct_solver'] = False
-    problem_params['nvars'] = (32, 32, 32)
+    problem_params['nvars'] = (128, 128, 128)
 
     # initialize level parameters
     level_params = dict()
@@ -89,4 +89,8 @@ def main():
     timing_gpu = sort_stats(filter_stats(stats_gpu, type='timing_run'), sortby='time')
     print('Runtime GPU:', timing_gpu[0][1])
 
-    assert abs(uend_gpu-uend_cpu) < 10E-15
+    assert abs(uend_gpu.get()-uend_cpu) < 1E-15
+
+
+if __name__ == '__main__':
+    main()
