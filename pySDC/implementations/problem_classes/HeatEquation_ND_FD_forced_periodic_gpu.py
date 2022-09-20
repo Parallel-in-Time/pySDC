@@ -85,30 +85,31 @@ class heatNd_periodic(ptype):
             ndim (int): number of dimensions
 
         Returns:
-            cupyx.scipy.sparse.csr_matrix: matrix A in CSR format
+            cupyx.scipy.sparse.csc_matrix: matrix A in CSC format
         """
 
         if order == 2:
             stencil = [1, -2, 1]
-            # zero_pos = 2
+            zero_pos = 2
         elif order == 4:
             stencil = [-1 / 12, 4 / 3, -5 / 2, 4 / 3, -1 / 12]
-            # zero_pos = 3
+            zero_pos = 3
         elif order == 6:
             stencil = [1 / 90, -3 / 20, 3 / 2, -49 / 18, 3 / 2, -3 / 20, 1 / 90]
-            # zero_pos = 4
+            zero_pos = 4
         elif order == 8:
             stencil = [-1 / 560, 8 / 315, -1 / 5, 8 / 5, -205 / 72, 8 / 5, -1 / 5, 8 / 315, -1 / 560]
-            # zero_pos = 5
+            zero_pos = 5
         else:
             raise ProblemError(f'wrong order given, has to be 2, 4, 6, or 8, got {order}')
-        A = stencil[0] * csp.eye(N[0], format='csr')
-        for i in range(1, len(stencil)):
-            A += stencil[i] * csp.eye(N[0], k=-i, format='csr')
-            A += stencil[i] * csp.eye(N[0], k=+i, format='csr')
-            A += stencil[i] * csp.eye(N[0], k=N[0] - i, format='csr')
-            A += stencil[i] * csp.eye(N[0], k=-N[0] + i, format='csr')
+        dstencil = np.concatenate((stencil, np.delete(stencil, zero_pos - 1)))
+        offsets = np.concatenate(([N[0] - i - 1 for i in reversed(range(zero_pos - 1))],
+                                  [i - zero_pos + 1 for i in range(zero_pos - 1, len(stencil))]))
+        doffsets = np.concatenate((offsets, np.delete(offsets, zero_pos - 1) - N[0]))
 
+        A = csp.diags(dstencil, doffsets, shape=(N[0], N[0]), format='csc')
+        # stencil = [1, -2, 1]
+        # A = sp.diags(stencil, [-1, 0, 1], shape=(N[0], N[0]), format='csc')
         if ndim == 2:
             A = csp.kron(A, csp.eye(N[0])) + csp.kron(csp.eye(N[1]), A)
         elif ndim == 3:
