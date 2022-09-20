@@ -44,6 +44,9 @@ dev = [
     'sphinx'
     ]
 
+[tool.setuptools.packages]
+find = {}
+
 [tool.pytest.ini_options]
 markers = [
     'base: all basic tests',
