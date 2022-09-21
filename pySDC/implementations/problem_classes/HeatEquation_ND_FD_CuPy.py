@@ -221,7 +221,7 @@ class heatNd_forced(ptype):
 
 
 class heatNd_unforced(heatNd_forced):
-    def __init__(self, problem_params, dtype_u=mesh, dtype_f=mesh):
+    def __init__(self, problem_params, dtype_u=cupy_mesh, dtype_f=cupy_mesh):
         super(heatNd_unforced, self).__init__(problem_params, dtype_u=dtype_u, dtype_f=dtype_f)
 
     def eval_f(self, u, t):
