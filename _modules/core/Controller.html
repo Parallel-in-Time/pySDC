@@ -140,6 +140,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">pass</span>
 
+<div class="viewcode-block" id="controller.welcome_message"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.welcome_message">[docs]</a>    <span class="k">def</span> <span class="nf">welcome_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Welcome to the one and only, really very astonishing and 87.3% bug free&#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                                 _____ _____   _____ &#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                                / ____|  __ \ / ____|&#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                    _ __  _   _| (___ | |  | | |     &#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                   | </span><span class="se">\&#39;</span><span class="s1">_ \| | | |\___ \| |  | | |     &#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                   | |_) | |_| |____) | |__| | |____ &#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                   | .__/ \__, |_____/|_____/ \_____|&#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                   | |     __/ |                     &#39;</span> <span class="o">+</span> \
+              <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">                   |_|    |___/                      &#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="controller.dump_setup"><a class="viewcode-back" href="../../pySDC/core.html#core.Controller.controller.dump_setup">[docs]</a>    <span class="k">def</span> <span class="nf">dump_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to dump the setup used for this controller</span>
@@ -150,6 +162,7 @@
 <span class="sd">            description (dict): description of the problem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">welcome_message</span><span class="p">()</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Setup overview (--&gt; user-defined) -- BEGIN&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;----------------------------------------------------------------------------------------------------</span><span class="se">\n\n</span><span class="s1">&#39;</span>
