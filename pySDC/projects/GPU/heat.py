@@ -92,4 +92,8 @@ def main():
     timing_gpu = sort_stats(filter_stats(stats_gpu, type='timing_run'), sortby='time')
     print('Runtime GPU:', timing_gpu[0][1])
 
-    assert abs(uend_gpu - uend_cpu) < 1e-14, abs(uend_gpu - uend_cpu)
+    assert abs(uend_gpu.get() - uend_cpu) < 1e-14, abs(uend_gpu.get() - uend_cpu)
+
+
+if __name__ == '__main__':
+    main()
