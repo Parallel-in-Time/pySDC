@@ -161,6 +161,22 @@ class ConvergenceController(object):
         '''
         return None
 
+    def reset_buffers(self, controller):
+        '''
+        Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
+        do communication. These can be reset in order to make sure the value was freshly communicated rather than
+        reused.
+
+        This function is called both at the end of instantiating the controller, as well as after each iteration.
+
+        Args:
+            controller (pySDC.Controller): The controller
+
+        Returns:
+            None
+        '''
+        pass
+
     def reset_buffers_nonMPI(self, controller):
         '''
         Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to

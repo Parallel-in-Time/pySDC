@@ -6,7 +6,7 @@ import dill
 from pySDC.core.Controller import controller
 from pySDC.core import Step as stepclass
 from pySDC.core.Errors import ControllerError, CommunicationError
-from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 
 
 class controller_nonMPI(controller):

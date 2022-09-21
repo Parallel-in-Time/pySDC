@@ -2,7 +2,7 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
 from pySDC.implementations.convergence_controller_classes.step_size_limiter import StepSizeLimiter
-from pySDC.implementations.convergence_controller_classes.basic_restarting_nonMPI import BasicRestartingNonMPI
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingNonMPI
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
 

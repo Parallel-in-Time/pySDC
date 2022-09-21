@@ -1,9 +1,8 @@
 import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
-from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 
 
-class SpreadStepSizesBlockwise(ConvergenceController):
+class SpreadStepSizesBlockwiseBase(ConvergenceController):
     '''
     Take the step size from the last step in the block and spread it to all steps in the next block such that every step
     in a block always has the same step size.
@@ -31,23 +30,10 @@ class SpreadStepSizesBlockwise(ConvergenceController):
 
         return {**defaults, **params}
 
-    def check_parameters(self, controller, params, description):
-        '''
-        Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
-
-        Args:
-            controller (pySDC.Controller): The controller
-            params (dict): The params passed for this specific convergence controller
-            description (dict): The description object used to instantiate the controller
-
-        Returns:
-            bool: Whether the parameters are compatible
-            str: The error message
-        '''
-        if type(controller) == controller_MPI:
-            return False, 'No implementation for spreading step sizes in MPI yet :('
-
-        return True, ''
+class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
+    """
+    Non-MPI version
+    """
 
     def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
         """
@@ -88,3 +74,6 @@ class SpreadStepSizesBlockwise(ConvergenceController):
                 MS[p].levels[i].params.dt = new_steps[i]
 
         return None
+
+class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwiseBase):
+    pass

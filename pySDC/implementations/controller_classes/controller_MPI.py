@@ -4,6 +4,7 @@ from mpi4py import MPI
 from pySDC.core.Controller import controller
 from pySDC.core.Errors import ControllerError
 from pySDC.core.Step import step
+from pySDC.implementations.convergence_controller_classes.basic_restarting import BasicRestartingMPI
 
 
 class controller_MPI(controller):
@@ -58,6 +59,12 @@ class controller_MPI(controller):
         if num_levels == 1 and self.params.predict_type is not None:
             self.logger.warning('you have specified a predictor type but only a single level.. '
                                 'predictor will be ignored')
+
+        self.add_convergence_controller(BasicRestartingMPI, description)
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers(self)
+            C.setup_status_variables(self)
 
     def run(self, u0, t0, Tend):
         """
@@ -115,6 +122,7 @@ class controller_MPI(controller):
             while not self.S.status.done:
                 self.pfasst(comm_active, num_procs)
 
+            # TODO: implement restarting of particular steps
             time += self.S.dt
 
             # broadcast uend, set new times and fine active processes
@@ -130,6 +138,14 @@ class controller_MPI(controller):
                 rank = comm_active.Get_rank()
                 num_procs = comm_active.Get_size()
                 self.S.status.slot = rank
+
+            # do convergence controller stuff
+            if not self.S.status.restart:
+                for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                    C.post_step_processing(self, self.S)
+
+            for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+                C.prepare_next_block(self, self.S, self.S.status.time_size, time, Tend)
 
             # initialize block of steps with u0
             self.restart_block(num_procs, time, uend)
@@ -321,7 +337,6 @@ class controller_MPI(controller):
 
         # Compute residual and check for convergence
         self.S.levels[0].sweep.compute_residual()
-        self.S.status.done = self.check_convergence(self.S)
 
         # Either gather information about all status or send forward own
         if self.params.all_to_done:
@@ -435,6 +450,9 @@ class controller_MPI(controller):
             self.S.status.stage = 'PREDICT'
         else:
             self.S.status.stage = 'IT_CHECK'
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_spread_processing(self, self.S)
 
     def predict(self, comm, num_procs):
         """
@@ -576,7 +594,12 @@ class controller_MPI(controller):
         if self.S.status.iter > 0:
             self.hooks.post_iteration(step=self.S, level_number=0)
 
-        # if not readys, keep doing stuff
+        # decide if the step is done, needs to be restarted and other things convergence related
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.post_iteration_processing(self, self.S)
+            C.convergence_control(self, self.S)
+
+        # if not ready, keep doing stuff
         if not self.S.status.done:
 
             # increment iteration count here (and only here)
@@ -619,6 +642,9 @@ class controller_MPI(controller):
 
             self.hooks.post_step(step=self.S, level_number=0)
             self.S.status.stage = 'DONE'
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers(self)
 
     def it_fine(self, comm, num_procs):
         """
