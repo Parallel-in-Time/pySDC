@@ -139,19 +139,19 @@ class heatNd_forced(ptype):
         """
 
         f = self.dtype_f(self.init)
-        f.impl[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f.impl.values[:] = self.A.dot(u.values.flatten()).reshape(self.params.nvars)
         if self.params.ndim == 1:
-            f.expl[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
+            f.expl.values[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * (
                 self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t)
             )
         elif self.params.ndim == 2:
-            f.expl[:] = (
+            f.expl.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * (self.params.nu * np.pi**2 * sum([freq**2 for freq in self.params.freq]) * cp.cos(t) - cp.sin(t))
             )
         elif self.params.ndim == 3:
-            f.expl[:] = (
+            f.expl.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
@@ -177,12 +177,12 @@ class heatNd_forced(ptype):
         me = self.dtype_u(self.init)
 
         if self.params.direct_solver:
-            me[:] = spsolve(self.Id - factor * self.A, rhs.flatten()).reshape(self.params.nvars)
+            me.values[:] = spsolve(self.Id - factor * self.A, rhs.values.flatten()).reshape(self.params.nvars)
         else:
-            me[:] = cg(
+            me.values[:] = cg(
                 self.Id - factor * self.A,
-                rhs.flatten(),
-                x0=u0.flatten(),
+                rhs.values.flatten(),
+                x0=u0.values.flatten(),
                 tol=self.params.lintol,
                 maxiter=self.params.liniter,
                 atol=0,
@@ -203,15 +203,15 @@ class heatNd_forced(ptype):
         me = self.dtype_u(self.init)
 
         if self.params.ndim == 1:
-            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.cos(t)
+            me.values[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.cos(t)
         elif self.params.ndim == 2:
-            me[:] = (
+            me.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * cp.cos(t)
             )
         elif self.params.ndim == 3:
-            me[:] = (
+            me.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
@@ -237,7 +237,7 @@ class heatNd_unforced(heatNd_forced):
         """
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
+        f.values[:] = self.A.dot(u.flatten()).reshape(self.params.nvars)
 
         return f
 
@@ -256,13 +256,13 @@ class heatNd_unforced(heatNd_forced):
 
         if self.params.ndim == 1:
             rho = (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2
-            me[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.exp(-t * self.params.nu * rho)
+            me.values[:] = cp.sin(np.pi * self.params.freq[0] * self.xv[0]) * cp.exp(-t * self.params.nu * rho)
         elif self.params.ndim == 2:
             rho = (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[0] * self.dx)) / self.dx**2 + (
                 2.0 - 2.0 * cp.cos(np.pi * self.params.freq[1] * self.dx)
             ) / self.dx**2
 
-            me[:] = (
+            me.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * cp.exp(-t * self.params.nu * rho)
@@ -273,7 +273,7 @@ class heatNd_unforced(heatNd_forced):
                 + (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[1] * self.dx))
                 + (2.0 - 2.0 * cp.cos(np.pi * self.params.freq[2] * self.dx)) / self.dx**2
             )
-            me[:] = (
+            me.values[:] = (
                 cp.sin(np.pi * self.params.freq[0] * self.xv[0])
                 * cp.sin(np.pi * self.params.freq[1] * self.xv[1])
                 * cp.sin(np.pi * self.params.freq[2] * self.xv[2])
