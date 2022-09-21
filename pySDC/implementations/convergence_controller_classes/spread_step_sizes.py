@@ -12,7 +12,7 @@ class SpreadStepSizesBlockwiseBase(ConvergenceController):
     step otherwise.
     '''
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Define parameters here
 
@@ -30,12 +30,13 @@ class SpreadStepSizesBlockwiseBase(ConvergenceController):
 
         return {**defaults, **params}
 
+
 class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
     """
     Non-MPI version
     """
 
-    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
+    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
         """
         Spread the step size of the last step with no restarted predecessors to all steps and limit the step size based
         on Tend
@@ -74,6 +75,7 @@ class SpreadStepSizesBlockwiseNonMPI(SpreadStepSizesBlockwiseBase):
                 MS[p].levels[i].params.dt = new_steps[i]
 
         return None
+
 
 class SpreadStepSizesBlockwiseMPI(SpreadStepSizesBlockwiseBase):
     pass

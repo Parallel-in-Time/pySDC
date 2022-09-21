@@ -15,7 +15,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
     MPI and non-MPI versions.
     '''
 
-    def __init__(self, controller, params, description):
+    def __init__(self, controller, params, description, **kwargs):
         '''
         Initialization routine
 
@@ -28,7 +28,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.coeff = Status(['u', 'f', 'prefactor'])  # store coefficients for extrapolation here
         super(EstimateExtrapolationErrorBase, self).__init__(controller, params, description)
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         """
         The extrapolation based method requires storage of previous values of u, f, t and dt and also requires solving
         a linear system of equations to compute the Taylor expansion finite difference style. Here, all variables are
@@ -67,7 +67,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
 
         return new_params
 
-    def setup_status_variables(self, controller):
+    def setup_status_variables(self, controller, **kwargs):
         '''
         Initialize coefficient variables.
 
@@ -81,7 +81,7 @@ class EstimateExtrapolationErrorBase(ConvergenceController):
         self.coeff.f = [0.] * self.params.n
         return None
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
@@ -104,7 +104,7 @@ el multistep mode!'
 
         return True, ''
 
-    def store_values(self, S):
+    def store_values(self, S, **kwargs):
         """
         Store the required attributes of the step to do the extrapolation. We only care about the last collocation
         node on the finest level at the moment.
@@ -216,7 +216,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
     Implementation of the extrapolation error estimate for the non-MPI controller.
     '''
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Add a no parameter 'no_storage' which decides whether the standart or the no-memory-overhead version is run,
         where only values are used for extrapolation which are in memory of other processes
@@ -237,7 +237,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return {**non_mpi_defaults, **default_params}
 
-    def setup_status_variables(self, controller):
+    def setup_status_variables(self, controller, **kwargs):
         '''
         Initialize storage variables.
 
@@ -256,7 +256,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def post_iteration_processing(self, controller, S):
+    def post_iteration_processing(self, controller, S, **kwargs):
         '''
         We perform three key operations here in the last iteration:
          - Compute the error estimate
@@ -288,7 +288,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
+    def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend, **kwargs):
         '''
         If the no-memory-overhead version is used, we need to delete stuff that shouldn't be available. Otherwise, we
         need to store all the stuff that we can.
@@ -322,7 +322,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return None
 
-    def get_extrapolated_solution(self, S):
+    def get_extrapolated_solution(self, S, **kwargs):
         '''
         Combine values from previous steps to extrapolate.
 
@@ -354,7 +354,7 @@ class EstimateExtrapolationErrorNonMPI(EstimateExtrapolationErrorBase):
 
         return u_ex
 
-    def get_extrapolated_error(self, S):
+    def get_extrapolated_error(self, S, **kwargs):
         """
         The extrapolation estimate combines values of u and f from multiple steps to extrapolate and compare to the
         solution obtained by the time marching scheme.

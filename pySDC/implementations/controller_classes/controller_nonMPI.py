@@ -472,8 +472,6 @@ class controller_nonMPI(controller):
                 self.recv(S.levels[0], S.prev.levels[0], tag=(0, S.status.iter, S.prev.status.slot))
             self.hooks.post_comm(step=S, level_number=0)
 
-            S.levels[0].sweep.compute_residual()
-
         for S in local_MS_running:
 
             if S.status.iter > 0:

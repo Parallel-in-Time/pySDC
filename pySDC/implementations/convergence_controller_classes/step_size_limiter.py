@@ -9,7 +9,7 @@ class StepSizeLimiter(ConvergenceController):
     Please supply dt_min or dt_max in the params to limit in either direction
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Define parameters here
 
@@ -23,7 +23,7 @@ class StepSizeLimiter(ConvergenceController):
         '''
         return {'control_order': +92, 'dt_min': 0, 'dt_max': np.inf, **params}
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         '''
         Enforce an upper and lower limit to the step size here
 

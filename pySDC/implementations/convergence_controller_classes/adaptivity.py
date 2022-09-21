@@ -12,7 +12,7 @@ class AdaptivityBase(ConvergenceController):
     and update rules.
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Define default parameters here.
 
@@ -34,7 +34,7 @@ class AdaptivityBase(ConvergenceController):
         }
         return {**defaults, **params}
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         '''
         Load step size limiters here, if they are desired.
 
@@ -54,7 +54,7 @@ class AdaptivityBase(ConvergenceController):
 
         return None
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         '''
         Determine a step size for the next step from an estimate of the local error of the current step.
 
@@ -100,7 +100,7 @@ class AdaptivityBase(ConvergenceController):
         '''
         raise NotImplementedError('Please implement a way to get the local error')
 
-    def determine_restart(self, controller, S):
+    def determine_restart(self, controller, S, **kwargs):
         '''
         Check if the step wants to be restarted by comparing the estimate of the local error to a preset tolerance
 
@@ -129,7 +129,7 @@ class Adaptivity(AdaptivityBase):
     Gauss-Seidel so far.
     """
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         '''
         Load the embedded error estimator.
 
@@ -147,7 +147,7 @@ class Adaptivity(AdaptivityBase):
             raise NotImplementedError('I only have an implementation of the embedded error for non MPI versions')
         return None
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we need to know the order of the scheme.
@@ -174,7 +174,7 @@ _params\'][\'e_tol\']!'
 
         return True, ''
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         '''
         Determine a step size for the next step from an embedded estimate of the local error of the current step.
 
@@ -216,7 +216,7 @@ class AdaptivityRK(Adaptivity):
     '''
     Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update
     '''
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we need to know the order of the scheme.
@@ -236,7 +236,7 @@ description[\'convergence_control_params\'][\'update_order\']!'
 
         return super(AdaptivityRK, self).check_parameters(controller, params, description)
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         '''
         Determine a step size for the next step from an embedded estimate of the local error of the current step.
 
@@ -271,7 +271,7 @@ class AdaptivityResidual(AdaptivityBase):
     residual falls below the lower threshold, we double the step size.
     '''
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Define default parameters here.
 
@@ -297,7 +297,7 @@ class AdaptivityResidual(AdaptivityBase):
         }
         return {**defaults, **params}
 
-    def setup_status_variables(self, controller):
+    def setup_status_variables(self, controller, **kwargs):
         '''
         Change maximum number of allowed restarts here.
 
@@ -317,7 +317,7 @@ class AdaptivityResidual(AdaptivityBase):
             restart_cont[0].params.max_restarts = self.params.max_restarts
         return None
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
         For adaptivity, we want a fixed order of the scheme.
@@ -340,7 +340,7 @@ smaller than 0!'
 
         return True, ''
 
-    def get_new_step_size(self, controller, S):
+    def get_new_step_size(self, controller, S, **kwargs):
         '''
         Determine a step size for the next step.
         If we exceed the absolute tolerance of the residual in either direction, we either double or halve the step

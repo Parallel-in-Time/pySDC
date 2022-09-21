@@ -14,7 +14,7 @@ class EstimateEmbeddedError(ConvergenceController):
     you make sure your preconditioner is compatible, which you have to just try out...
     '''
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Add a default value for control order to the parameters and check if we are using a Runge-Kutta sweeper
 
@@ -29,7 +29,7 @@ class EstimateEmbeddedError(ConvergenceController):
         sweeper_type = 'RK' if RungeKutta in description['sweeper_class'].__bases__ else 'SDC'
         return {'control_order': -80, 'sweeper_type': sweeper_type, **params}
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         '''
         Load the convergence controller that stores the solution of the last sweep unless we are doing Runge-Kutta
 
@@ -69,7 +69,7 @@ class EstimateEmbeddedError(ConvergenceController):
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
 
-    def __init__(self, controller, params, description):
+    def __init__(self, controller, params, description, **kwargs):
         '''
         Initalization routine. Add the buffers for communication over the parent class.
 
@@ -81,7 +81,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
         super(EstimateEmbeddedErrorNonMPI, self).__init__(controller, params, description)
         self.buffers = Pars({'e_em_last': 0.})
 
-    def reset_buffers_nonMPI(self, controller):
+    def reset_buffers_nonMPI(self, controller, **kwargs):
         '''
         Reset buffers for immitated communication.
 
@@ -94,7 +94,7 @@ class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
         self.buffers.e_em_last = 0.
         return None
 
-    def post_iteration_processing(self, controller, S):
+    def post_iteration_processing(self, controller, S, **kwargs):
         """
         Compute embedded error estimate on the last node of each level
         In serial this is the local error, but in block Gauss-Seidel MSSDC this is a semi-global error in each block

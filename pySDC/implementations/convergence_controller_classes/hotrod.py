@@ -19,7 +19,7 @@ class HotRod(ConvergenceController):
     Guhur et al. 2016, Springer. DOI: https://doi.org/10.1007/978-3-319-43659-3_47
     """
 
-    def setup(self, controller, params, description):
+    def setup(self, controller, params, description, **kwargs):
         '''
         Setup default values for crucial parameters.
 
@@ -38,7 +38,7 @@ class HotRod(ConvergenceController):
         }
         return {**default_params, **params}
 
-    def dependencies(self, controller, description):
+    def dependencies(self, controller, description, **kwargs):
         '''
         Load the dependencies of Hot Rod, which are the two error estimators
 
@@ -56,7 +56,7 @@ class HotRod(ConvergenceController):
         else:
             raise NotImplementedError("Don\'t know how to estimate errors with MPI")
 
-    def check_parameters(self, controller, params, description):
+    def check_parameters(self, controller, params, description, **kwargs):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
@@ -82,7 +82,7 @@ smaller than 0!'
 
         return True, ''
 
-    def determine_restart(self, controller, S):
+    def determine_restart(self, controller, S, **kwargs):
         '''
         Check if the difference between the error estimates exceeds the allowed tolerance
 
@@ -106,7 +106,7 @@ smaller than 0!'
 
         return None
 
-    def post_iteration_processing(self, controller, S):
+    def post_iteration_processing(self, controller, S, **kwargs):
         '''
         Throw away the final sweep to match the error estimates.
 
