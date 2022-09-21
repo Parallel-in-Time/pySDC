@@ -108,7 +108,8 @@ class controller(object):
               '\n                   | |_) | |_| |____) | |__| | |____ ' + \
               '\n                   | .__/ \__, |_____/|_____/ \_____|' + \
               '\n                   | |     __/ |                     ' + \
-              '\n                   |_|    |___/                      '
+              '\n                   |_|    |___/                      ' + \
+              '\n                                                     '
         self.logger.info(out)
 
     def dump_setup(self, step, controller_params, description):
