@@ -144,7 +144,7 @@ jobs:
 #          folder: docs/build/html # The folder the action should deploy.
 #
 
-  user_cpu_tests:
+  user_cpu_tests_nonMPI:
     runs-on: ubuntu-latest
 
     env:
@@ -165,4 +165,27 @@ jobs:
 
       - name: Run pytest for CPU stuff
         run: |
-          pytest -v --durations=0 pySDC/tests
+          pytest -v --durations=0 pySDC/tests -m base
+
+  user_cpu_tests_MPI:
+    runs-on: ubuntu-latest
+
+    env:
+      YML: 'etc/environment-mpi4py.yml'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: ${{ env.YML }}
+
+      - name: Run pytest for CPU stuff
+        run: |
+          pytest -v --durations=0 pySDC/tests -m mpi4py
