@@ -39,8 +39,8 @@ jobs:
   spawn_gitlab_and_postprocess:
     runs-on: ubuntu-latest
 
-    needs:
-      - lint
+#    needs:
+#      - lint
 
     defaults:
       run:
