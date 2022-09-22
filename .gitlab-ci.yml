@@ -53,7 +53,7 @@ benchmark:
   variables:
     USE_NAME: "pySDC-benchmark"
     SLURM_PARTITION: "dev_cpuonly"
-    SLURM_TIME: "00:10:00"
+    SLURM_TIME: "00:11:00"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:
