@@ -5,7 +5,6 @@ class DataError(Exception):
 
     pass
 
-
 class ParameterError(Exception):
     """
     Error Class handling/indicating problems with parameters (mostly within dictionaries)
