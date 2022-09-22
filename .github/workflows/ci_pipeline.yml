@@ -149,7 +149,7 @@ jobs:
   user_cpu_tests_nonMPI:
     runs-on: ubuntu-latest
 
-    if: !${{ github.repository_owner == 'Parallel-in-Time'}}
+    if: ${{ github.repository_owner != 'Parallel-in-Time'}}
 
     env:
       YML: 'etc/environment-base.yml'
@@ -174,7 +174,7 @@ jobs:
   user_cpu_tests_MPI:
     runs-on: ubuntu-latest
 
-    if: !${{ github.repository_owner == 'Parallel-in-Time'}}
+    if: ${{ github.repository_owner != 'Parallel-in-Time'}}
 
     env:
       YML: 'etc/environment-mpi4py.yml'
