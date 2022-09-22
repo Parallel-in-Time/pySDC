@@ -48,7 +48,7 @@ stages:
 #    - mv data data_${PYTHON}
 
 benchmark:
-  image: rcaspart/micromamba
+  image: mambaorg/micromamba
   stage: benchmark
   variables:
     USE_NAME: "pySDC-benchmark"
@@ -70,7 +70,7 @@ benchmark:
     - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
 benchmark_kit:
-  image: mambaorg/micromamba
+  image: rcaspart/micromamba
   stage: benchmark
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
