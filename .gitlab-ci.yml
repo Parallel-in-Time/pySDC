@@ -112,7 +112,7 @@ benchmark_kit:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install -c conda-forge git
+    - micromamba install -c conda-forge git openssh
     - git config --global --add safe.directory '*'
   script:
     - mkdir -p benchmarks
