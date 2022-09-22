@@ -108,7 +108,7 @@ jobs:
 
       - name: Push benchmark data
         uses: dmnemec/copy_file_to_another_repo_action@main
-        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')" && ${{ github.event_name == 'push' }}
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')" 
         env:
           API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
         with:
