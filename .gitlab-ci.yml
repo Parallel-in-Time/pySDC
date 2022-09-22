@@ -54,6 +54,7 @@ test_kit:
     USE_NAME: "pySDC-test"
     SLURM_PARTITION: "dev_accelerated"
     SLURM_TIME: "00:11:00"
+    SLURM_GRES: "gpu:1"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   tags:
