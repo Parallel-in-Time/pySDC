@@ -47,13 +47,37 @@ stages:
 #    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
 #    - mv data data_${PYTHON}
 
+test_kit:
+  image: rcaspart/micromamba
+  stage: benchmark
+  variables:
+    USE_NAME: "pySDC-test"
+    SLURM_PARTITION: "dev_accelerated"
+    SLURM_TIME: "00:11:00"
+  rules:
+    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+  tags:
+    - kit
+  parallel:
+    matrix:
+      - PYTHON: [ '3.9', '3.10' ]
+  artifacts:
+    name: "gpu_$PYTHON"
+    paths:
+      - coverage_cupy_3.10.dat
+      - data_3.10
+  before_script:
+    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
+    - eval "$(micromamba shell hook --shell=bash)"
+    - micromamba activate pySDC
+    - micromamba install --yes -c conda-forge openssh
+  script:
+    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
+    - mv data data_${PYTHON}
+
 benchmark:
   image: mambaorg/micromamba
   stage: benchmark
-  variables:
-    USE_NAME: "pySDC-benchmark"
-    SLURM_PARTITION: "dev_cpuonly"
-    SLURM_TIME: "00:11:00"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:
@@ -72,6 +96,10 @@ benchmark:
 benchmark_kit:
   image: rcaspart/micromamba
   stage: benchmark
+  variables:
+    USE_NAME: "pySDC-benchmark"
+    SLURM_PARTITION: "dev_cpuonly"
+    SLURM_TIME: "00:11:00"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   tags:
@@ -83,7 +111,6 @@ benchmark_kit:
     - micromamba create --yes -f etc/environment-base.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install -c conda-forge git
     - git config --global --add safe.directory '*'
   script:
     - mkdir -p benchmarks
