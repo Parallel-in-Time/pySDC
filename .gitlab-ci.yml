@@ -48,13 +48,12 @@ stages:
 #    - mv data data_${PYTHON}
 
 benchmark:
-  image: mambaorg/micromamba
+  image: rcaspart/micromamba
   stage: benchmark
   variables:
     USE_NAME: "pySDC-benchmark"
     SLURM_PARTITION: "dev_cpuonly"
     SLURM_TIME: "00:11:00"
-    CI_JOB_IMAGE: mambaorg/micromamba
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   artifacts:
