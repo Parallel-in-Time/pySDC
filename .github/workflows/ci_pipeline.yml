@@ -163,7 +163,6 @@ jobs:
         with:
           environment-file: ${{ env.YML }}
 
-      - name: Run CPU tests
-      - name: Run pytest
+      - name: Run pytest for CPU stuff
         run: |
           pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
