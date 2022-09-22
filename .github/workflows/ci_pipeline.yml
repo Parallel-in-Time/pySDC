@@ -165,4 +165,4 @@ jobs:
 
       - name: Run pytest for CPU stuff
         run: |
-          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests
+          pytest -v --durations=0 pySDC/tests
