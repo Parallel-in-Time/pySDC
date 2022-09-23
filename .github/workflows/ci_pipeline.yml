@@ -58,7 +58,7 @@ jobs:
         with:
           fetch-depth: 0
           #ref: ${{ github.head_ref || github.ref_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
 
       - name: Checkout benchmark repository
