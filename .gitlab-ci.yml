@@ -72,51 +72,52 @@ test_kit:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
     - micromamba install --yes -c conda-forge openssh
+    - pip install cupy-cuda116
   script:
     - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
     - mv data data_${PYTHON}
 
-benchmark:
-  image: mambaorg/micromamba
-  stage: benchmark
-  rules:
-    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
-  artifacts:
-    paths:
-      - benchmarks
-  before_script:
-    - micromamba create --yes -f etc/environment-base.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install -c conda-forge git
-    - git config --global --add safe.directory '*'
-  script:
-    - mkdir -p benchmarks
-    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
-
-benchmark_kit:
-  image: rcaspart/micromamba
-  stage: benchmark
-  variables:
-    USE_NAME: "pySDC-benchmark"
-    SLURM_PARTITION: "dev_cpuonly"
-    SLURM_TIME: "00:11:00"
-  rules:
-    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
-  tags:
-    - kit
-  artifacts:
-    paths:
-      - benchmarks
-  before_script:
-    - micromamba create --yes -f etc/environment-base.yml
-    - eval "$(micromamba shell hook --shell=bash)"
-    - micromamba activate pySDC
-    - micromamba install -c conda-forge git
-    - git config --global --add safe.directory '*'
-  script:
-    - mkdir -p benchmarks
-    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+#benchmark:
+#  image: mambaorg/micromamba
+#  stage: benchmark
+#  rules:
+#    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+#  artifacts:
+#    paths:
+#      - benchmarks
+#  before_script:
+#    - micromamba create --yes -f etc/environment-base.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install -c conda-forge git
+#    - git config --global --add safe.directory '*'
+#  script:
+#    - mkdir -p benchmarks
+#    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
+#
+#benchmark_kit:
+#  image: rcaspart/micromamba
+#  stage: benchmark
+#  variables:
+#    USE_NAME: "pySDC-benchmark"
+#    SLURM_PARTITION: "dev_cpuonly"
+#    SLURM_TIME: "00:11:00"
+#  rules:
+#    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+#  tags:
+#    - kit
+#  artifacts:
+#    paths:
+#      - benchmarks
+#  before_script:
+#    - micromamba create --yes -f etc/environment-base.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install -c conda-forge git openssh
+#    - git config --global --add safe.directory '*'
+#  script:
+#    - mkdir -p benchmarks
+#    - pytest --continue-on-collection-errors -v pySDC/tests -m "benchmark" --benchmark-json=benchmarks/output.json
 
 
 bundle:
