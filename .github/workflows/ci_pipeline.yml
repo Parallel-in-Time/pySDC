@@ -41,8 +41,8 @@ jobs:
 
     if: github.repository_owner == 'Parallel-in-Time'
 
-    needs:
-      - lint
+#    needs:
+#      - lint
 
     defaults:
       run:
