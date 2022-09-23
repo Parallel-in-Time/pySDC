@@ -68,6 +68,7 @@ test_kit:
       - coverage_cupy_3.10.dat
       - data_3.10
   before_script:
+    - echo ${CUSTOM_ENV_CI_JOB_IMAGE}
     - cat /etc/environment
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
     - eval "$(micromamba shell hook --shell=bash)"
