@@ -10,4 +10,4 @@ dependencies:
   - cupy
   - pytest
   - pytest-cov
-  - cudatoolkit<=11.3
+  - cudatoolkit==11.6
