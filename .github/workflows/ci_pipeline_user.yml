@@ -34,4 +34,4 @@ jobs:
 
       - name: Run pytest for CPU stuff
         run: |
-          pytest -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          pytest -v --cov=pySDC --cov-config=.coveragerc --cov-report=html --cov-report=term --durations=0 pySDC/tests -m ${{ matrix.env }}
