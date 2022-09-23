@@ -48,7 +48,7 @@ stages:
 #    - mv data data_${PYTHON}
 
 test_kit:
-  image: rcaspart/micromamba:cuda
+  image: rcaspart/micromamba-cuda
   stage: benchmark
   variables:
     USE_NAME: "pySDC-test"
