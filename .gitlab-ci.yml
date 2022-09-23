@@ -66,7 +66,7 @@ test_kit:
     name: "gpu_$PYTHON"
     paths:
       - coverage_cupy_3.10.dat
-      - data_3.10
+      - data_3.10 
   before_script:
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
     - eval "$(micromamba shell hook --shell=bash)"
