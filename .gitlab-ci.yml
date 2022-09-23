@@ -1,18 +1,6 @@
 stages:
-  - build
   - benchmark
   - upload
-
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  image: rcaspart/micromamba:latest
-  variables:
-    USE_NAME: "simple_hpc_ci_job"
-    SLURM_PARTITION: "dev_cpuonly"
-    SLURM_TIME: "00:30:00"
-  script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
 
 #test:
 #  image: mambaorg/micromamba
@@ -80,7 +68,7 @@ test_kit:
       - coverage_cupy_3.10.dat
       - data_3.10
   before_script:
-    - nvcc --version
+    - nvidia-smi
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
