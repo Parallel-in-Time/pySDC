@@ -7,7 +7,5 @@ dependencies:
   - scipy>=0.17.1
   - matplotlib>=3.0
   - dill>=0.2.6
-  - cupy
   - pytest
   - pytest-cov
-  - cudatoolkit==11.6
