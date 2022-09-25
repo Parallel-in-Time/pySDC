@@ -47,14 +47,39 @@ stages:
 #    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
 #    - mv data data_${PYTHON}
 
-test_kit:
-  image: rcaspart/micromamba-cuda
+#test_kit:
+#  image: rcaspart/micromamba-cuda
+#  stage: benchmark
+#  variables:
+#    USE_NAME: "pySDC-test"
+#    SLURM_PARTITION: "dev_accelerated"
+#    SLURM_TIME: "00:11:00"
+#    SLURM_GRES: "gpu:1"
+#  rules:
+#    - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
+#  tags:
+#    - kit
+#  parallel:
+#    matrix:
+#      - PYTHON: [ '3.9', '3.10' ]
+#  artifacts:
+#    name: "gpu_$PYTHON"
+#    paths:
+#      - coverage_cupy_3.10.dat
+#      - data_3.10
+#  before_script:
+#    - cat /etc/environment
+#    - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
+#    - eval "$(micromamba shell hook --shell=bash)"
+#    - micromamba activate pySDC
+#    - micromamba install --yes -c conda-forge openssh
+#  script:
+#    - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
+#    - mv data data_${PYTHON}
+
+
+test_kit_bare:
   stage: benchmark
-  variables:
-    USE_NAME: "pySDC-test"
-    SLURM_PARTITION: "dev_accelerated"
-    SLURM_TIME: "00:11:00"
-    SLURM_GRES: "gpu:1"
   rules:
     - if: $CI_COMMIT_MESSAGE !~ /.*\[CI-no-benchmarks\]/
   tags:
@@ -68,11 +93,11 @@ test_kit:
       - coverage_cupy_3.10.dat
       - data_3.10
   before_script:
-    - cat /etc/environment
+    - module load devel/cuda
+    - curl micro.mamba.pm/install.sh | bash
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
-    - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
-    - micromamba install --yes -c conda-forge openssh
+#    - micromamba install --yes -c conda-forge openssh
   script:
     - coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
     - mv data data_${PYTHON}
