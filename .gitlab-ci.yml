@@ -93,6 +93,7 @@ test_kit_bare:
       - coverage_cupy_3.10.dat
       - data_3.10
   before_script:
+    - salloc -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1
     - module load devel/cuda
     - curl micro.mamba.pm/install.sh | bash
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
