@@ -64,7 +64,7 @@ test_kit_bare:
     - kit
   parallel:
     matrix:
-      - PYTHON: [ '3.8', '3.9', '3.10' ]
+      - PYTHON: [ '3.9', '3.10' ]
   artifacts:
     name: "gpu_$PYTHON"
     paths:
