@@ -23,6 +23,7 @@ test:
   script:
     - coverage run --data-file=coverage_${NAME}_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${NAME}
     - mv data data_${PYTHON}
+    - cat coverage_${NAME}_${PYTHON}.dat
 
 #test_kit:
 #  image: rcaspart/micromamba-cuda
@@ -78,6 +79,7 @@ test_kit_bare:
     - srun -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1 coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
     - mv data data_${PYTHON}
     - chmod +rwx data_${PYTHON}
+    - cat coverage_cupy_${PYTHON}.dat
 
 #benchmark:
 #  image: mambaorg/micromamba
