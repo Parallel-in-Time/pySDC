@@ -60,8 +60,11 @@ jobs:
           echo "${{ github.event.pull_request.head.sha }}"
           echo "${GITHUB_REF:11}"
           echo "$(git symbolic-ref --short HEAD)"
+          echo "$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")"
+          pull_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          git fetch origin pull/$pull_number/head:pr_tmp
+          git checkout pr_tmp
           
-
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
         if: ${{ github.event_name == 'push' }}
