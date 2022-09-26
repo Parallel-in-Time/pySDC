@@ -54,6 +54,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+      
+      - name: testing github env
+        run: |
+          echo "${{ github.event.pull_request.head.sha }}"
+          echo "${GITHUB_REF:11}"
+          echo "$(git symbolic-ref --short HEAD)"
+          
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
