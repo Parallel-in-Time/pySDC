@@ -87,6 +87,7 @@ skip-string-normalization = true
 
 [tool.coverage.run]
 omit = ['*/pySDC/tests/*', '*/data/*', '*/pySDC/playgrounds/*', '*/pySDC/projects/deprecated/*']
+relative_paths = true
 
 [tool.coverage.report]
 skip_empty = true
