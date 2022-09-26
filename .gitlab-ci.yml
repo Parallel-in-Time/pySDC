@@ -97,7 +97,6 @@ test_kit_bare:
     - curl micro.mamba.pm/install.sh | bash
     - micromamba create --yes python=$PYTHON -f etc/environment-cupy.yml
     - micromamba activate pySDC
-#    - micromamba install --yes -c conda-forge openssh
   script:
     - srun -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1 coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
     - mv data data_${PYTHON}
@@ -159,6 +158,8 @@ bundle:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
+    - ls -artl
+    - 
     - mv data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml
