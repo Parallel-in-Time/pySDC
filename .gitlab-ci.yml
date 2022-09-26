@@ -100,6 +100,7 @@ test_kit_bare:
   script:
     - srun -p dev_accelerated -t 00:20:00 -N1 --gres gpu:1 coverage run --data-file=coverage_cupy_${PYTHON}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m cupy
     - mv data data_${PYTHON}
+    - chmod +rwx data_${PYTHON}
 
 #benchmark:
 #  image: mambaorg/micromamba
