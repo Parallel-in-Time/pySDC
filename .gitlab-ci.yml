@@ -159,8 +159,7 @@ bundle:
     - eval "$(micromamba shell hook --shell=bash)"
     - micromamba activate pySDC
   script:
-    - chown -R root:root data_3.10
-    - mv data_3.10/* data/.
+    - cp data_3.10/* data/.
     - python -m coverage combine coverage_*_3.10.dat
     - python -m coverage xml
     - python -m coverage html
