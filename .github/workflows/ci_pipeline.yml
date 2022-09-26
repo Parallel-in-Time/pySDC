@@ -54,6 +54,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout benchmark repository
         uses: actions/checkout@v3
@@ -76,8 +77,8 @@ jobs:
         env:
           FORCE_PUSH: "true"
           GITLAB_HOSTNAME: "gitlab.hzdr.de"
-          GITLAB_USERNAME: "r.speck"
-          GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_H }}
+          GITLAB_USERNAME: ${{ secrets.GITLAB_SECRET_USER }}
+          GITLAB_PASSWORD: ${{ secrets.GITLAB_SECRET_PASS }}
           GITLAB_PROJECT_ID: "3525"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
