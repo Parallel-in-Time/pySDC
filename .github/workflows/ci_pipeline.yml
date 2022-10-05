@@ -19,7 +19,7 @@ jobs:
         run: |
           cd ..
           ls -artl
-          tar -zcvf pySDC
+          tar -zcvf pySDC.tar.gz pySDC
           ls -artl
 
       - uses: actions/upload-artifact@v3
