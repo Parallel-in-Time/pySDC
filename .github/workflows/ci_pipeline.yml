@@ -8,6 +8,32 @@ on:
 
 jobs:
 
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Zip
+        run: |
+          ls -artl
+          zip pySDC
+          ls -artl
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pySDC
+          path: pySDC.zip
+
+      - name: trigger Gitlab CI
+        run: |
+          curl --request POST \
+          --form token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
+          --form ref=main \
+          --form "variables[TEST]=true" \
+          "https://gitlab.hzdr.de/api/v4/projects/6200/trigger/pipeline"
+
   lint:
     runs-on: ubuntu-latest
 
