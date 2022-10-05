@@ -17,14 +17,15 @@ jobs:
 
       - name: Zip
         run: |
+          cd ..
           ls -artl
-          zip pySDC
+          tar -zcvf pySDC
           ls -artl
 
       - uses: actions/upload-artifact@v3
         with:
           name: pySDC
-          path: pySDC.zip
+          path: pySDC.tar.gz
 
       - name: trigger Gitlab CI
         run: |
