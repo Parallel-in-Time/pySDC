@@ -12,6 +12,10 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.projects.Resilience.piline import run_piline
 
 
+class do_nothing(hooks):
+    pass
+
+
 class log_errors(hooks):
 
     def post_step(self, step, level_number):
@@ -44,28 +48,41 @@ def setup_mpl(font_size=8):
     mpl.rcParams.update(style_options)
 
 
-def get_results_from_stats(stats, var, val):
-    e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
-
-    e_loc = np.array(get_sorted(stats, type='e_loc'))[:, 1]
-
+def get_results_from_stats(stats, var, val, hook_class=log_errors):
     results = {
-        'e_embedded': get_sorted(stats, type='e_embedded')[-1][1],
-        'e_extrapolated': e_extrapolated[e_extrapolated != [None]][-1],
-        'e': max([e_loc[-1], np.finfo(float).eps]),
+        'e_embedded': 0.,
+        'e_extrapolated': 0.,
+        'e': 0.,
         var: val,
     }
+
+    if hook_class == log_errors:
+        e_extrapolated = np.array(get_sorted(stats, type='e_extrapolated'))[:, 1]
+        e_embedded = np.array(get_sorted(stats, type='e_embedded'))[:, 1]
+        e_loc = np.array(get_sorted(stats, type='e_loc'))[:, 1]
+
+        if len(e_extrapolated[e_extrapolated != [None]]) > 0:
+            results['e_extrapolated'] = e_extrapolated[e_extrapolated != [None]][-1]
+
+        if len(e_loc[e_loc != [None]]) > 0:
+            results['e'] = max([e_loc[e_loc != [None]][-1], np.finfo(float).eps])
+
+        if len(e_embedded[e_embedded != [None]]) > 0:
+            results['e_embedded'] = e_embedded[e_embedded != [None]][-1]
 
     return results
 
 
-def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
+def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                  hook_class=log_errors, custom_controller_params=None):
     """
     A simple test program to compute the order of accuracy in time
     """
 
     # assemble list of dt
-    if Tend_fixed:
+    if dt_list is not None:
+        pass
+    elif Tend_fixed:
         dt_list = 0.1 * 10.**-(np.arange(5) / 2)
     else:
         dt_list = 0.01 * 10.**-(np.arange(20) / 10.)
@@ -82,11 +99,19 @@ def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
                 EstimateExtrapolationErrorNonMPI: {'no_storage': not serial},
             }
         }
+        if custom_description is not None:
+            desc = {**desc, **custom_description}
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
-        stats, _, _ = run_piline(custom_description=desc, num_procs=num_procs, Tend=Tend,
-                                 hook_class=log_errors)
+        stats, controller, _ = prob(custom_description=desc, num_procs=num_procs, Tend=Tend,
+                                    hook_class=hook_class, custom_controller_params=custom_controller_params)
 
-        res_ = get_results_from_stats(stats, 'dt', dt_list[i])
+        level = controller.MS[-1].levels[-1]
+        e_glob = abs(level.prob.u_exact(t=level.time + level.dt) - level.u[-1])
+        e_loc = abs(level.prob.u_exact(t=level.time + level.dt, u_init=level.u[0], t_init=level.time) - level.u[-1])
+
+        res_ = get_results_from_stats(stats, 'dt', dt_list[i], hook_class)
+        res_['e_glob'] = e_glob
+        res_['e_loc'] = e_loc
 
         if i == 0:
             res = res_.copy()
@@ -95,9 +120,19 @@ def multiple_runs(ax, k=5, serial=True, Tend_fixed=None):
         else:
             for key in res_.keys():
                 res[key].append(res_[key])
+    return res
 
-    # visualize results
-    plot(res, ax, k)
+
+def plot_order(res, ax, k):
+    color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
+
+    key = 'e_loc'
+    order = get_accuracy_order(res, key=key, thresh=1e-11)
+    label = f'k={k}, p={np.mean(order):.2f}'
+    ax.loglog(res['dt'], res[key], color=color, ls='-', label=label)
+    ax.set_xlabel(r'$\Delta t$')
+    ax.set_ylabel(r'$\epsilon$')
+    ax.legend(frameon=False, loc='lower right')
 
 
 def plot(res, ax, k):
@@ -106,16 +141,20 @@ def plot(res, ax, k):
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
-        order = get_accuracy_order(res, key=keys[i], order=k)
+        if all([me == 0. for me in res[keys[i]]]):
+            continue
+        order = get_accuracy_order(res, key=keys[i])
         if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            assert np.isclose(np.mean(order), k, atol=3e-1), f'Expected embedded error estimate to have order {k} \
+            assert np.isclose(np.mean(order), k, atol=4e-1), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
         elif keys[i] == 'e_extrapolated':
             label = None
             assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
 {k+1} but got {np.mean(order):.2f}'
+        else:
+            label = None
         ax.loglog(res['dt'], res[keys[i]], color=color, ls=ls[i], label=label)
 
     ax.set_xlabel(r'$\Delta t$')
@@ -123,12 +162,13 @@ but got {np.mean(order):.2f}'
     ax.legend(frameon=False, loc='lower right')
 
 
-def get_accuracy_order(results, key='e_embedded', order=5):
+def get_accuracy_order(results, key='e_embedded', thresh=1e-14):
     """
     Routine to compute the order of accuracy in time
 
     Args:
-        results: the dictionary containing the errors
+        results (dict): the dictionary containing the errors
+        key (str): The key in the dictionary correspdoning to a specific error
 
     Returns:
         the list of orders
@@ -144,7 +184,7 @@ def get_accuracy_order(results, key='e_embedded', order=5):
         # compute order as log(prev_error/this_error)/log(this_dt/old_dt) <-- depends on the sorting of the list!
         try:
             tmp = np.log(results[key][i] / results[key][i - 1]) / np.log(dt_list[i] / dt_list[i - 1])
-            if results[key][i] > 1e-14 and results[key][i - 1] > 1e-14:
+            if results[key][i] > thresh and results[key][i - 1] > thresh:
                 order.append(tmp)
         except TypeError:
             print('Type Warning', results[key])
@@ -152,10 +192,26 @@ def get_accuracy_order(results, key='e_embedded', order=5):
     return order
 
 
-def plot_all_errors(ax, ks, serial, Tend_fixed=None):
+def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                custom_controller_params=None):
     for i in range(len(ks)):
         k = ks[i]
-        multiple_runs(k=k, ax=ax, serial=serial, Tend_fixed=Tend_fixed)
+        res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
+                            prob=prob, dt_list=dt_list, hook_class=do_nothing,
+                            custom_controller_params=custom_controller_params)
+        plot_order(res, ax, k)
+
+
+def plot_all_errors(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
+                    custom_controller_params=None):
+    for i in range(len(ks)):
+        k = ks[i]
+        res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
+                            prob=prob, dt_list=dt_list, custom_controller_params=custom_controller_params)
+
+        # visualize results
+        plot(res, ax, k)
+
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{embedded}$', ls='-')
     ax.plot([None, None], color='black', label=r'$\epsilon_\mathrm{extrapolated}$', ls=':')
     ax.plot([None, None], color='black', label=r'$e$', ls='-.')
