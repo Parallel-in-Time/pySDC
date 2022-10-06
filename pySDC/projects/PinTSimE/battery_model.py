@@ -96,7 +96,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
 
-    proof_assertions_description(problem_params, description)
+    proof_assertions_description(description, problem_params)
 
     # set time parameters
     t0 = 0.0
@@ -176,7 +176,7 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
 
     fig.savefig('battery_model_solution.png', dpi=300, bbox_inches='tight')
 
-def proof_assertions_description(problem_params, description):
+def proof_assertions_description(description, problem_params):
     """
         Function to proof the assertions (function to get cleaner code)
     """
