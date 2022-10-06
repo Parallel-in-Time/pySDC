@@ -11,7 +11,7 @@ from pySDC.projects.PinTSimE.piline_model import setup_mpl
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
-from pySDC.projects.PinTSimE.switch_estimator_extended import SwitchEstimator
+from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
@@ -35,7 +35,8 @@ class log_data(hooks):
         self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='restart', value=1, initialize=0)
 
-def main(use_switch_estimator=True, use_adaptivity=False):
+
+def main(use_switch_estimator=False, use_adaptivity=False):
     """
     A simple test program to do SDC/PFASST runs for the extended battery drain model
     """
@@ -65,7 +66,7 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     problem_params['alpha'] = 5
     problem_params['V_ref'] = np.array([1, 1])  # [V_ref1, V_ref2]
     problem_params['set_switch'] = np.array([False, False], dtype=bool)
-    problem_params['t_switch'] = -200 * np.zeros(np.shape(problem_params['V_ref'])[0])
+    problem_params['t_switch'] = np.zeros(np.shape(problem_params['V_ref'])[0])
 
     # initialize step parameters
     step_params = dict()
@@ -102,14 +103,7 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
 
-    assert problem_params['alpha'] > problem_params['V_ref'][0], 'Please set "alpha" greater than "V_ref1"'
-    assert problem_params['alpha'] > problem_params['V_ref'][1], 'Please set "alpha" greater than "V_ref2"'
-    assert problem_params['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
-    assert problem_params['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
-    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+    proof_assertions_description(description, problem_params)
 
     # set time parameters
     t0 = 0.0
@@ -156,7 +150,8 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     plot_voltages(description, use_switch_estimator, use_adaptivity)
 
     return np.mean(niters)
-    
+
+
 def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     """
         Routine to plot the numerical solution of the model
@@ -182,9 +177,9 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     if use_switch_estimator:
         t_switch_plot = np.zeros(np.shape(description['problem_params']['t_switch'])[0])
         for i in range(np.shape(description['problem_params']['t_switch'])[0]):
-            t_switch_plot[i] = description['problem_params']['t_switch'][i] 
+            t_switch_plot[i] = description['problem_params']['t_switch'][i]
 
-            ax.axvline(x=t_switch_plot[i], linestyle='--', color='k', label='Switch {}'.format(i+1))
+            ax.axvline(x=t_switch_plot[i], linestyle='--', color='k', label='Switch {}'.format(i + 1))
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
@@ -192,6 +187,33 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     ax.set_ylabel('Energy')
 
     fig.savefig('battery_extended_model_solution.png', dpi=300, bbox_inches='tight')
+
+
+def proof_assertions_description(description, problem_params):
+    """
+        Function to proof the assertions (function to get cleaner code)
+    """
+
+    assert problem_params['alpha'] > problem_params['V_ref'][0], 'Please set "alpha" greater than "V_ref1"'
+    assert problem_params['alpha'] > problem_params['V_ref'][1], 'Please set "alpha" greater than "V_ref2"'
+
+    assert problem_params['V_ref'][0] > 0, 'Please set "V_ref1" greater than 0'
+    assert problem_params['V_ref'][1] > 0, 'Please set "V_ref2" greater than 0'
+
+    assert type(problem_params['V_ref']) == np.ndarray, '"V_ref" needs to be an array (of type float)'
+    assert not problem_params['set_switch'][0], 'First entry of "set_switch" needs to be False'
+    assert not problem_params['set_switch'][1], 'Second entry of "set_switch" needs to be False'
+
+    assert not type(problem_params['t_switch']) == float, '"t_switch" has to be an array with entry zero'
+
+    # assert all([problem_params['t_switch'][i] == 0 for i in range(np.shape(problem_params['t_switch'])[0])]),
+    # 'All entries of "t_switch" needs to be zero'
+    assert problem_params['t_switch'][0] == 0, 'First entry of "t_switch" needs to be zero'
+    assert problem_params['t_switch'][1] == 0, 'Second entry of "t_switch" needs to be zero'
+
+    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
+    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
+    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
 
 
 if __name__ == "__main__":
