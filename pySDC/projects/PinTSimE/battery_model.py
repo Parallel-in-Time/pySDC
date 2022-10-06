@@ -11,6 +11,7 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
 class log_data(hooks):
@@ -32,7 +33,7 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='restart', value=1, initialize=0)
 
 
-def main(use_switch_estimator=True):
+def main(use_switch_estimator=True, use_adaptivity=True):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model
     """
@@ -58,10 +59,10 @@ def main(use_switch_estimator=True):
     problem_params['C'] = 1
     problem_params['R'] = 1
     problem_params['L'] = 1
-    problem_params['alpha'] = 10
-    problem_params['V_ref'] = 1
-    problem_params['set_switch'] = False
-    problem_params['t_switch'] = False
+    problem_params['alpha'] = 5
+    problem_params['V_ref'] = 1.0
+    problem_params['set_switch'] = np.array([False], dtype=bool)
+    problem_params['t_switch'] = np.zeros(1)
 
     # initialize step parameters
     step_params = dict()
@@ -73,8 +74,15 @@ def main(use_switch_estimator=True):
     controller_params['hook_class'] = log_data
 
     # convergence controllers
-    switch_estimator_params = {}
-    convergence_controllers = {SwitchEstimator: switch_estimator_params}
+    convergence_controllers = dict()
+    if use_switch_estimator:
+        switch_estimator_params = {}
+        convergence_controllers[SwitchEstimator] = switch_estimator_params
+
+    if use_adaptivity:
+        adaptivity_params = {'e_tol': 1e-7}
+        convergence_controllers[Adaptivity] = adaptivity_params
+        controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -85,15 +93,10 @@ def main(use_switch_estimator=True):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
-    if use_switch_estimator:
+    if use_switch_estimator or use_adaptivity:
         description['convergence_controllers'] = convergence_controllers
 
-    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
-    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
-    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+    proof_assertions_description(problem_params, description)
 
     # set time parameters
     t0 = 0.0
@@ -137,12 +140,11 @@ def main(use_switch_estimator=True):
     assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages()
+    plot_voltages(description, use_switch_estimator, use_adaptivity)
 
     return np.mean(niters)
 
-
-def plot_voltages(cwd='./'):
+def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     """
         Routine to plot the numerical solution of the model
     """
@@ -161,23 +163,33 @@ def plot_voltages(cwd='./'):
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
     ax.plot(times, [v[1] for v in cL], label='$i_L$')
     ax.plot(times, [v[1] for v in vC], label='$v_C$')
+
+    if use_switch_estimator:
+        val_switch = get_sorted(stats, type='switch1', sortby='time')
+        t_switch = [v[0] for v in val_switch]
+        ax.axvline(x=t_switch, linestyle='--', color='k', label='Switch')
+
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('battery_model_solution.png', dpi=300, bbox_inches='tight')
 
+def proof_assertions_description(problem_params, description):
+    """
+        Function to proof the assertions (function to get cleaner code)
+    """
 
-def estimation_check():
-    use_switch_estimator = [True, False]
-    niters_mean = []
-    for item in use_switch_estimator:
-        niters_mean.append(main(use_switch_estimator=item))
+    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
+    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
+    assert type(problem_params['V_ref']) == float or type(problem_params['V_ref']) == int, '"V_ref" needs to be of type int or float'
+    assert type(problem_params['set_switch'][0]) == np.bool_, '"set_switch" has to be an bool array'
+    assert not type(problem_params['t_switch']) == int and not type(problem_params['t_switch']) == float and problem_params['t_switch'][0] == 0, '"t_switch" has to be an array with entry zero'
 
-    for item, element in zip(use_switch_estimator, niters_mean):
-        out = 'Switch estimation: {} -- Average number of iterations: {}'.format(item, element)
-        print(out)
+    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
+    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
+    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
 
 
 if __name__ == "__main__":

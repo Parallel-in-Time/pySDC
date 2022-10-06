@@ -51,8 +51,8 @@ class battery(ptype):
 
         if u[1] <= self.params.V_ref or self.params.set_switch:
             # switching need to happen on exact time point
-            if self.params.set_switch:
-                if t >= self.params.t_switch:
+            if self.params.set_switch[0]:
+                if t >= self.params.t_switch[0]:
                     f.expl[0] = self.params.Vs / self.params.L
 
                 else:
@@ -77,12 +77,13 @@ class battery(ptype):
         Returns:
             dtype_u: solution as mesh
         """
+
         self.A = np.zeros((2, 2))
 
         if rhs[1] <= self.params.V_ref or self.params.set_switch:
             # switching need to happen on exact time point
-            if self.params.set_switch:
-                if t >= self.params.t_switch:
+            if self.params.set_switch[0]:
+                if t >= self.params.t_switch[0]:
                     self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
                 else:
