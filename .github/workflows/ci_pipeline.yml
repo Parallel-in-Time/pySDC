@@ -56,7 +56,7 @@ jobs:
         with:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           extra-specs: |
-              python=${{ matrix.env }}
+              python=${{ matrix.python }}
 
       - name: Run pytest for CPU stuff
         run: |
