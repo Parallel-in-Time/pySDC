@@ -67,7 +67,7 @@ class SwitchEstimator(ConvergenceController):
 
         if S.status.iter > 0 and self.count_switches < np.shape(V_ref)[0]:
             for m in range(len(L.u)):
-                if L.u[m][self.count_switches+1] - V_ref[self.count_switches] <= 0:
+                if L.u[m][self.count_switches + 1] - V_ref[self.count_switches] <= 0:
                     self.switch_detected = True
                     m_guess = m - 1
                     break
@@ -77,7 +77,7 @@ class SwitchEstimator(ConvergenceController):
 
                 vC_switch = []
                 for m in range(1, len(L.u)):
-                    vC_switch.append(L.u[m][self.count_switches+1] - V_ref[self.count_switches])
+                    vC_switch.append(L.u[m][self.count_switches + 1] - V_ref[self.count_switches])
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
@@ -106,8 +106,9 @@ class SwitchEstimator(ConvergenceController):
                             L.prob.params.t_switch[self.count_switches] = self.t_switch
                             controller.hooks.add_to_stats(process=S.status.slot, time=self.t_switch,
                                                           level=L.level_index, iter=0, sweep=L.status.sweep,
-                                                          type='switch{}'.format(self.count_switches+1), value=p(self.t_switch))
-                            #self.switch_detected_step = self.switch_detected
+                                                          type='switch{}'.format(self.count_switches + 1),
+                                                          value=p(self.t_switch))
+                            # self.switch_detected_step = self.switch_detected
                             self.switch_detected_step = True
 
                     else:

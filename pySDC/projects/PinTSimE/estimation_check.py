@@ -143,14 +143,15 @@ def check(cwd='./'):
         val_switch = get_sorted(stats_true, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
         vC_switch = [v[1] for v in val_switch]
-        
+
         if len(t_switch) > 1:
             t_switch = t_switch[-1]  # battery has only one single switch
             vC_switch = vC_switch[-1]
-            
+
         else:
             t_switch = t_switch[0]  # battery has only one single switch
             vC_switch = vC_switch[0]
+
         val_switch_all.append([t_switch, vC_switch])
 
         vC_true = get_sorted(stats_true, type='voltage C', recomputed=False, sortby='time')
@@ -178,7 +179,7 @@ def check(cwd='./'):
         ax1.set_xlabel('Time')
         ax1.set_ylabel('Energy')
         fig1.savefig('simulation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
-        
+
         setup_mpl()
         fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
         ax.set_title('Time evolution of $v_{C}-V_{ref}$')
@@ -210,7 +211,7 @@ def check(cwd='./'):
     restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
     restart_ax.set_ylabel("Restarts")
 
-    lines = pos1+pos2+pos3+restarts
+    lines = pos1 + pos2 + pos3 + restarts
     labels = [l.get_label() for l in lines]
     ax.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 

@@ -144,6 +144,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
     return np.mean(niters)
 
+
 def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     """
         Routine to plot the numerical solution of the model
@@ -176,6 +177,7 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
 
     fig.savefig('battery_model_solution.png', dpi=300, bbox_inches='tight')
 
+
 def proof_assertions_description(description, problem_params):
     """
         Function to proof the assertions (function to get cleaner code)
@@ -183,9 +185,12 @@ def proof_assertions_description(description, problem_params):
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-    assert type(problem_params['V_ref']) == float or type(problem_params['V_ref']) == int, '"V_ref" needs to be of type int or float'
+    assert type(problem_params['V_ref']) == float, '"V_ref" needs to be of type float'
+    assert type(problem_params['V_ref']) == int, '"V_ref" needs to be of type int'
+
     assert type(problem_params['set_switch'][0]) == np.bool_, '"set_switch" has to be an bool array'
-    assert not type(problem_params['t_switch']) == int and not type(problem_params['t_switch']) == float and problem_params['t_switch'][0] == 0, '"t_switch" has to be an array with entry zero'
+    assert type(problem_params['t_switch']) == np.ndarray, '"t_switch" has to be an array'
+    assert problem_params['t_switch'][0] == 0, '"t_switch" is only allowed to have entry zero'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'

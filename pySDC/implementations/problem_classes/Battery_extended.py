@@ -52,20 +52,19 @@ class battery_extended(ptype):
         f = self.dtype_f(self.init, val=0.0)
         f.impl[:] = self.A.dot(u)
 
-        # switch to C2   
-        if (u[1] <= self.params.V_ref[0] and u[2] > self.params.V_ref[1]) or (self.params.set_switch[0] and not self.params.set_switch[1]):
+        # switch to C2
+        if (u[1] <= self.params.V_ref[0] and u[2] > self.params.V_ref[1] or
+                self.params.set_switch[0] and not self.params.set_switch[1]):
             if self.params.set_switch[0]:
                 if t >= self.params.t_switch[0]:
                     f.expl[0] = 0
-                    self.switched_over = True
 
                 else:
                     f.expl[0] = 0
 
             else:
                 f.expl[0] = 0
-                self.switched_over = True
-        
+
         # switch to Vs
         elif u[2] <= self.params.V_ref[1] or (self.params.set_switch[0] and self.params.set_switch[1]):
             # switch to Vs
@@ -78,8 +77,9 @@ class battery_extended(ptype):
 
             else:
                 f.expl[0] = self.params.Vs / self.params.L
-        
-        elif (u[1] > self.params.V_ref[0] and u[2] > self.params.V_ref[1]) or (not self.params.set_switch[0] and not self.params.set_switch[1]):
+
+        elif (u[1] > self.params.V_ref[0] and u[2] > self.params.V_ref[1] or
+                not self.params.set_switch[0] and not self.params.set_switch[1]):
             # C1 supplies energy
             f.expl[0] = 0
 
@@ -97,45 +97,40 @@ class battery_extended(ptype):
             dtype_u: solution as mesh
         """
         self.A = np.zeros((3, 3))
-        
+
         # switch to C2
-        if (rhs[1] <= self.params.V_ref[0] and rhs[2] > self.params.V_ref[1]) or (self.params.set_switch[0] and not self.params.set_switch[1]):
+        if (rhs[1] <= self.params.V_ref[0] and rhs[2] > self.params.V_ref[1] or
+                self.params.set_switch[0] and not self.params.set_switch[1]):
             if self.params.set_switch[0]:
                 if t >= self.params.t_switch[0]:
-                    print(t, '- After switch1 (if-if-if)', self.params.t_switch[0])
                     self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
                 else:
-                    print(t, '- Before switch1 (if-if-else)', self.params.t_switch[0])
                     self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
 
             else:
-                print(t, '- After switch1 (if-else)', self.params.t_switch[0])
                 self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
-        
+
         # switch to Vs
         elif rhs[2] <= self.params.V_ref[1] or (self.params.set_switch[0] and self.params.set_switch[1]):
             if self.params.set_switch[1]:
                 if t >= self.params.t_switch[1]:
-                    print(t, '- After switch2 (elif-if-if)', self.params.t_switch[1])
                     self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
                 else:
-                    print(t, '- Before switch2 (elif-if-else)', self.params.t_switch[1])
                     self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
             else:
-                print(t, '- After switch2 (elif-else)', self.params.t_switch[1])
                 self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
-        
-        elif (rhs[1] > self.params.V_ref[0] and rhs[2] > self.params.V_ref[1]) or (not self.params.set_switch[0] and not self.params.set_switch[1]):
+
+        elif (rhs[1] > self.params.V_ref[0] and rhs[2] > self.params.V_ref[1] or
+                not self.params.set_switch[0] and not self.params.set_switch[1]):
             # C1 supplies energy
-            print(t, '- Before switch1 (elif2)', self.params.t_switch[1])
             self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
 
         me = self.dtype_u(self.init)
         me[:] = np.linalg.solve(np.eye(self.params.nvars) - factor * self.A, rhs)
-        return me   
+        return me
 
     def u_exact(self, t):
         """
@@ -151,5 +146,4 @@ class battery_extended(ptype):
         me[0] = 0.0  # cL
         me[1] = self.params.alpha * self.params.V_ref[0]  # vC1
         me[2] = self.params.alpha * self.params.V_ref[1]  # vC2
-
-        return me 
+        return me
