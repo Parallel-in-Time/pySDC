@@ -15,23 +15,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Zip
-        run: |
-          cd ..
-          tar -zcf pySDC.tar.gz pySDC
-          mv pySDC.tar.gz pySDC/.
+#      - name: Zip
+#        run: |
+#          cd ..
+#          tar -zcf pySDC.tar.gz pySDC
+#          mv pySDC.tar.gz pySDC/.
 
-      - uses: actions/upload-artifact@v3
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: pySDC
+#          path: pySDC
+      - uses: jwalton/gh-find-current-pr@v1
+        id: findPr
         with:
-          name: pySDC
-          path: pySDC.tar.gz
+          # Can be "open", "closed", or "all".  Defaults to "open".
+          state: open
 
       - name: trigger Gitlab CI
         run: |
           curl --request POST \
           --form token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
           --form ref=main \
-          --form "variables[TEST]=true" \
+          --form "variables[PR_NUMBER]=${{ steps.findPr.outputs.pr }}" \
           "https://gitlab.hzdr.de/api/v4/projects/6200/trigger/pipeline"
 
 #  lint:
