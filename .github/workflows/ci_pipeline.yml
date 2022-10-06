@@ -63,8 +63,9 @@ jobs:
           coverage run --data-file=coverage_${{ matrix.env }}_${{ matrix.python }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
           mv data data_${{ matrix.python }}
 
-      - uses: actions/upload-artifact@v3
-        if: ${{ matrix.env }} == '3.10'
+      - name: Uploading artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ matrix.python }} == '3.10'
         with:
           name: cpu-test-artifacts
           path: |
@@ -89,14 +90,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v3
+      - name: Downloading artifacts
+        uses: actions/download-artifact@v3
         with:
           path: .
 
-      - name: prepare artifacts
+      - name: Prepare artifacts
         run: |
-          ls -arlt
-          unzip *.zip
+          ls -artl cpu-test-artifacts
+          cp cpu-test-artifacts/data_3.10/* data/.
+          python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
+          python -m coverage xml
+          python -m coverage html
 
       - name: Generate Coverage badge
         run: |
