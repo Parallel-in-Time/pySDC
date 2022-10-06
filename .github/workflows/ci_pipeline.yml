@@ -8,66 +8,151 @@ on:
 
 jobs:
 
-  trigger:
+  lint:
     runs-on: ubuntu-latest
+
+    env:
+      YML: 'etc/environment-lint.yml'
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: ${{ env.YML }}
+
+      - name: Code reformatting with black
+        run: |
+          black pySDC  --check --diff --color
+
+      - name: Linting with flakeheaven
+        run: |
+          flakeheaven lint --benchmark pySDC
+
+  user_cpu_tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.7', '3.8', '3.9', '3.10']
+        env: ['base', 'fenics', 'mpi4py', 'petsc']
+
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-#      - name: Zip
-#        run: |
-#          cd ..
-#          tar -zcf pySDC.tar.gz pySDC
-#          mv pySDC.tar.gz pySDC/.
-
-#      - uses: actions/upload-artifact@v3
-#        with:
-#          name: pySDC
-#          path: pySDC
-
-      - uses: jwalton/gh-find-current-pr@v1
-        id: findPr
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
         with:
-          # Can be "open", "closed", or "all".  Defaults to "open".
-          state: open
+          environment-file: "etc/environment-${{ matrix.env }}.yml"
+          extra-specs: |
+              python=${{ matrix.env }}
 
-      - name: trigger Gitlab CI
+      - name: Run pytest for CPU stuff
         run: |
-          curl --request POST \
-          --form token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
-          --form ref=main \
-          --form "variables[PR_NUMBER]=${{ steps.findPr.outputs.pr }}" \
-          "https://gitlab.hzdr.de/api/v4/projects/6200/trigger/pipeline"
+          coverage run --data-file=coverage_${{ matrix.env }}_${{ matrix.python }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+          mv data data_${{ matrix.python }}
 
-#  lint:
-#    runs-on: ubuntu-latest
-#
-#    env:
-#      YML: 'etc/environment-lint.yml'
-#
-#    defaults:
-#      run:
-#        shell: bash -l {0}
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v1
-#
-#      - name: Install Conda environment with Micromamba
-#        uses: mamba-org/provision-with-micromamba@main
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.env }} == '3.10'
+        with:
+          name: cpu-test-artifacts
+          path: |
+            data_3.10
+            coverage_${{ matrix.env }}_3.10.dat
+
+
+  post-processing:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.repository_owner == 'Parallel-in-Time'}}
+
+    needs:
+      - lint
+      - user_cpu_tests
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: .
+
+      - name: prepare artifacts
+        run: |
+          ls -arlt
+          unzip *.zip
+
+      - name: Generate Coverage badge
+        run: |
+          pip install genbadge[all]
+          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+
+      - name: Generate benchmark report
+        uses: pancetta/github-action-benchmark@v1
+        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
+        with:
+          name: pySDC Benchmark with pytest-benchmark
+          tool: 'pytest'
+          output-file-path: benchmarks/output.json
+          auto-push: false
+          skip-fetch-gh-pages: true
+          benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push benchmark data
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+        with:
+          source_file: 'bench/${{ github.head_ref || github.ref_name }}'
+          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
+          user_email: 'sig.pancetta+github@email.com'
+          user_name: 'pancetta'
+
+      - name: Build html I
+        run: |
+          chmod u+x ./docs/update_apidocs.sh
+          ./docs/update_apidocs.sh
+          sphinx-build -b html docs/source docs/build/html
+          mkdir -p docs/build/html/coverage
+          mv htmlcov/* docs/build/html/coverage/.
+
+      - name: Build html II
+        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
+        run: |
+          mkdir -p docs/build/html/benchmarks
+          cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
+
+      - name: Store docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs
+          path: docs/build/html
+
+#      - name: Deploy 🚀
+#        uses: JamesIves/github-pages-deploy-action@4.1.4
+#        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
 #        with:
-#          environment-file: ${{ env.YML }}
-#
-#      - name: Code reformatting with black
-#        run: |
-#          black pySDC  --check --diff --color
-#
-#      - name: Linting with flakeheaven
-#        run: |
-#          flakeheaven lint --benchmark pySDC
-#
-#
+#          branch: gh-pages # The branch the action should deploy to.
+#          folder: docs/build/html # The folder the action should deploy.
+
 #  spawn_gitlab_and_postprocess:
 #    runs-on: ubuntu-latest
 #
@@ -122,57 +207,4 @@ jobs:
 #          rm -rf data
 #          unzip artifacts.zip
 #
-#      - name: Generate Coverage badge
-#        run: |
-#          pip install genbadge[all]
-#          genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
-#
-#      - name: Generate benchmark report
-#        uses: pancetta/github-action-benchmark@v1
-#        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
-#        with:
-#          name: pySDC Benchmark with pytest-benchmark
-#          tool: 'pytest'
-#          output-file-path: benchmarks/output.json
-#          auto-push: false
-#          skip-fetch-gh-pages: true
-#          benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Push benchmark data
-#        uses: dmnemec/copy_file_to_another_repo_action@main
-#        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
-#        env:
-#          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
-#        with:
-#          source_file: 'bench/${{ github.head_ref || github.ref_name }}'
-#          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
-#          user_email: 'sig.pancetta+github@email.com'
-#          user_name: 'pancetta'
-#
-#      - name: Build html I
-#        run: |
-#          chmod u+x ./docs/update_apidocs.sh
-#          ./docs/update_apidocs.sh
-#          sphinx-build -b html docs/source docs/build/html
-#          mkdir -p docs/build/html/coverage
-#          mv htmlcov/* docs/build/html/coverage/.
-#
-#      - name: Build html II
-#        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
-#        run: |
-#          mkdir -p docs/build/html/benchmarks
-#          cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
-#
-#      - name: Store docs
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: docs
-#          path: docs/build/html
-#
-##      - name: Deploy 🚀
-##        uses: JamesIves/github-pages-deploy-action@4.1.4
-##        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
-##        with:
-##          branch: gh-pages # The branch the action should deploy to.
-##          folder: docs/build/html # The folder the action should deploy.
+
