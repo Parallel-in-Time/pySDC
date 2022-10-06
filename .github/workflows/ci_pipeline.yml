@@ -113,28 +113,28 @@ jobs:
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
 
-      - name: Generate benchmark report
-        uses: pancetta/github-action-benchmark@v1
-        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
-        with:
-          name: pySDC Benchmark with pytest-benchmark
-          tool: 'pytest'
-          output-file-path: benchmarks/output.json
-          auto-push: false
-          skip-fetch-gh-pages: true
-          benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push benchmark data
-        uses: dmnemec/copy_file_to_another_repo_action@main
-        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
-        with:
-          source_file: 'bench/${{ github.head_ref || github.ref_name }}'
-          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
-          user_email: 'sig.pancetta+github@email.com'
-          user_name: 'pancetta'
+#      - name: Generate benchmark report
+#        uses: pancetta/github-action-benchmark@v1
+#        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
+#        with:
+#          name: pySDC Benchmark with pytest-benchmark
+#          tool: 'pytest'
+#          output-file-path: benchmarks/output.json
+#          auto-push: false
+#          skip-fetch-gh-pages: true
+#          benchmark-data-dir-path: bench/${{ github.head_ref || github.ref_name }}
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Push benchmark data
+#        uses: dmnemec/copy_file_to_another_repo_action@main
+#        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
+#        env:
+#          API_TOKEN_GITHUB: ${{ secrets.BENCHMARK_BOT }}
+#        with:
+#          source_file: 'bench/${{ github.head_ref || github.ref_name }}'
+#          destination_repo: 'Parallel-in-Time/pySDC-benchmarks'
+#          user_email: 'sig.pancetta+github@email.com'
+#          user_name: 'pancetta'
 
       - name: Build html I
         run: |
@@ -144,14 +144,14 @@ jobs:
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
 
-      - name: Build html II
-        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
-        run: |
-          mkdir -p docs/build/html/benchmarks
-          cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
+#      - name: Build html II
+#        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
+#        run: |
+#          mkdir -p docs/build/html/benchmarks
+#          cp -r bench/${{ github.head_ref || github.ref_name }}/* docs/build/html/benchmarks/.
 
       - name: Store docs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docs
           path: docs/build/html
