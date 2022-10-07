@@ -35,7 +35,7 @@ class battery_2condensators(ptype):
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(battery_2condensators, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                               dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+                                                    dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
 
         self.A = np.zeros((3, 3))
 
