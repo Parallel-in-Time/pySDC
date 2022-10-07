@@ -99,9 +99,12 @@ This project also received funding from the `German Federal Ministry of Educatio
 
 .. image:: docs/source/logo/Time-X.png
    :width: 20%
+   :alt: Time-X
 
 .. image:: docs/source/logo/EU.png
    :width: 15%
+   :alt: EU
 
 .. image:: docs/source/logo/BMBF.jpg
    :width: 20%
+   :alt: BMBF
