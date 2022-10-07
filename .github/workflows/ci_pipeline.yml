@@ -65,7 +65,7 @@ jobs:
 
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
-        if: matrix.python == '3.10' &&  matrix.os == 'ubuntu-latest'
+        if: matrix.python == '3.10'
         with:
           name: cpu-test-artifacts
           path: |
