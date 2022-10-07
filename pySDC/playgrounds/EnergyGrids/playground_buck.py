@@ -3,7 +3,7 @@ import dill
 from scipy.integrate import solve_ivp
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.implementations.collocations import Collocation
+from pySDC.core import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -14,7 +14,7 @@ import pySDC.helpers.plot_helper as plt_helper
 
 def main():
     """
-    A simple test program to do PFASST runs for the heat equation
+    A playground to do PFASST runs for the buck converter model
     """
 
     # initialize level parameters
