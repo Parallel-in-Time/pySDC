@@ -19,8 +19,7 @@ Changelog
     Thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_ and `@lisawim <https://github.com/lisawim>`_!
   - **Toward GPU computing**: We included a new data type based on `CuPy <https://cupy.dev/>`_ making GPU computing possible.
     Thanks to `@timo2705 <https://github.com/timo2705>`_!
-  - **Better testing**: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking, separate environments and so on.
-    Tests and benchmarks are now done on the `HIFIS Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_, so that custom gitlab runners are now possible.
+  - **Better testing**: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking (at least, in principal), separate environments and so on.
   - **Better code formatting**: `pySDC` now uses `black <https://black.readthedocs.io>`_ and `flakeheaven <https://flakeheaven.readthedocs.io>`_ for cleaner source code.
     After complaints here and there about linting "errors" the recommended way now is to run ``black`` before submission.
 
