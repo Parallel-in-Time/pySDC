@@ -34,8 +34,16 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     custom_controller_params = {'logger_level': 40}
 
     # determine the order
-    plot_orders(ax, [1], True, Tend_fixed=Tend_fixed, custom_description=description, dt_list=dt_list, prob=prob,
-                custom_controller_params=custom_controller_params)
+    plot_orders(
+        ax,
+        [1],
+        True,
+        Tend_fixed=Tend_fixed,
+        custom_description=description,
+        dt_list=dt_list,
+        prob=prob,
+        custom_controller_params=custom_controller_params,
+    )
 
     # check if we got the expected order for the local error
     orders = {
@@ -47,8 +55,9 @@ def plot_order(sweeper, prob, dt_list, description=None, ax=None, Tend_fixed=Non
     }
     numerical_order = float(ax.get_lines()[-1].get_label()[7:])
     expected_order = orders.get(sweeper, numerical_order)
-    assert np.isclose(numerical_order, expected_order, atol=2.6e-1),\
-        f"Expected order {expected_order}, got {numerical_order}!"
+    assert np.isclose(
+        numerical_order, expected_order, atol=2.6e-1
+    ), f"Expected order {expected_order}, got {numerical_order}!"
 
     # decorate
     ax.get_lines()[-1].set_color(colors.get(sweeper, 'black'))
@@ -71,12 +80,16 @@ def plot_stability_single(sweeper, ax=None, description=None, implicit=True, re=
 
     re = np.linspace(-30, 30, 400) if re is None else re
     im = np.linspace(-50, 50, 400) if im is None else im
-    lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).\
-        reshape((len(re) * len(im)))
+    lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+        (len(re) * len(im))
+    )
     custom_problem_params = {'lambdas': lambdas}
 
-    stats, _, _ = run_dahlquist(custom_description=description, custom_problem_params=custom_problem_params,
-                                custom_controller_params=custom_controller_params)
+    stats, _, _ = run_dahlquist(
+        custom_description=description,
+        custom_problem_params=custom_problem_params,
+        custom_controller_params=custom_controller_params,
+    )
     plot_stability(stats, ax=ax, iter=[1], colors=[colors.get(sweeper, 'black')], crosshair=crosshair, fill=True)
 
     ax.get_lines()[-1].set_label(sweeper.__name__)
@@ -95,8 +108,7 @@ def plot_all_stability():
 
     for j in range(len(impl)):
         for i in range(len(sweepers[j])):
-            plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im,
-                                  crosshair=crosshair[i])
+            plot_stability_single(sweepers[j][i], implicit=impl[j], ax=axs[j], re=re, im=im, crosshair=crosshair[i])
         axs[j].set_title(titles[j])
 
     fig.tight_layout()
@@ -110,11 +122,11 @@ def plot_all_orders(prob, dt_list, Tend, sweepers):
 
 def test_vdp():
     Tend = 7e-2
-    plot_all_orders(run_vdp, Tend * 2.**(-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
+    plot_all_orders(run_vdp, Tend * 2.0 ** (-np.arange(8)), Tend, [RK1, MidpointMethod, CrankNicholson, RK4, Cash_Karp])
 
 
 def test_advection():
-    plot_all_orders(run_advection, 1.e-3 * 2.**(-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson])
+    plot_all_orders(run_advection, 1.0e-3 * 2.0 ** (-np.arange(8)), None, [RK1, MidpointMethod, CrankNicholson])
 
 
 def test_embedded_estimate_order():
@@ -133,10 +145,18 @@ def test_embedded_estimate_order():
     custom_controller_params = {'logger_level': 40}
 
     Tend = 7e-2
-    dt_list = Tend * 2.**(-np.arange(8))
+    dt_list = Tend * 2.0 ** (-np.arange(8))
     prob = run_vdp
-    plot_all_errors(ax, [5], True, Tend_fixed=Tend, custom_description=description, dt_list=dt_list, prob=prob,
-                    custom_controller_params=custom_controller_params)
+    plot_all_errors(
+        ax,
+        [5],
+        True,
+        Tend_fixed=Tend,
+        custom_description=description,
+        dt_list=dt_list,
+        prob=prob,
+        custom_controller_params=custom_controller_params,
+    )
 
 
 def test_embedded_method():

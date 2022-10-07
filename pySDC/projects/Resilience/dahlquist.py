@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 
 class log_data(hooks):
-
     def post_iteration(self, step, level_number):
 
         super(log_data, self).post_iteration(step, level_number)
@@ -20,10 +19,24 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
 
     def pre_run(self, step, level_number):
         super(log_data, self).pre_run(step, level_number)
@@ -31,12 +44,19 @@ class log_data(hooks):
         self.add_to_stats(process=0, time=0, level=0, iter=0, sweep=0, type='lambdas', value=L.prob.params.lambdas)
 
 
-def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_data, fault_stuff=None,
-                  custom_controller_params=None, custom_problem_params=None):
+def run_dahlquist(
+    custom_description=None,
+    num_procs=1,
+    Tend=1.0,
+    hook_class=log_data,
+    fault_stuff=None,
+    custom_controller_params=None,
+    custom_problem_params=None,
+):
 
     # initialize level parameters
     level_params = dict()
-    level_params['dt'] = 1.
+    level_params['dt'] = 1.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -47,12 +67,13 @@ def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_
     # build lambdas
     re = np.linspace(-30, 30, 400)
     im = np.linspace(-50, 50, 400)
-    lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).\
-        reshape((len(re) * len(im)))
+    lambdas = np.array([[complex(re[i], im[j]) for i in range(len(re))] for j in range(len(im))]).reshape(
+        (len(re) * len(im))
+    )
 
     problem_params = {
         'lambdas': lambdas,
-        'u0': 1.,
+        'u0': 1.0,
     }
 
     if custom_problem_params is not None:
@@ -91,8 +112,7 @@ def run_dahlquist(custom_description=None, num_procs=1, Tend=1., hook_class=log_
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
@@ -113,8 +133,8 @@ def plot_stability(stats, ax=None, iter=None, colors=None, crosshair=True, fill=
 
     # decorate
     if crosshair:
-        ax.axhline(0, color='black', alpha=1.)
-        ax.axvline(0, color='black', alpha=1.)
+        ax.axhline(0, color='black', alpha=1.0)
+        ax.axvline(0, color='black', alpha=1.0)
 
     if ax is None:
         fig, ax = plt.subplots(1, 1)

@@ -199,8 +199,9 @@ _params\'][\'e_tol\']!',
             order = S.status.iter  # embedded error estimate is same order as time marching
 
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                             order)
+            L.status.dt_new = self.compute_optimal_step_size(
+                self.params.beta, L.params.dt, self.params.e_tol, e_est, order
+            )
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
@@ -223,6 +224,7 @@ class AdaptivityRK(Adaptivity):
     '''
     Adaptivity for Runge-Kutta methods. Basically, we need to change the order in the step size update
     '''
+
     def check_parameters(self, controller, params, description):
         '''
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
@@ -238,8 +240,11 @@ class AdaptivityRK(Adaptivity):
             str: The error message
         '''
         if 'update_order' not in params.keys():
-            return False, 'Adaptivity needs an order for the update rule! Please set some up in \
-description[\'convergence_control_params\'][\'update_order\']!'
+            return (
+                False,
+                'Adaptivity needs an order for the update rule! Please set some up in \
+description[\'convergence_control_params\'][\'update_order\']!',
+            )
 
         return super(AdaptivityRK, self).check_parameters(controller, params, description)
 
@@ -261,8 +266,9 @@ description[\'convergence_control_params\'][\'update_order\']!'
             # compute next step size
             order = self.params.update_order
             e_est = self.get_local_error_estimate(controller, S)
-            L.status.dt_new = self.compute_optimal_step_size(self.params.beta, L.params.dt, self.params.e_tol, e_est,
-                                                             order)
+            L.status.dt_new = self.compute_optimal_step_size(
+                self.params.beta, L.params.dt, self.params.e_tol, e_est, order
+            )
             self.log(f'Adjusting step size from {L.params.dt:.2e} to {L.status.dt_new:.2e}', S)
 
         return None
