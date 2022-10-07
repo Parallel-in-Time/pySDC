@@ -58,7 +58,7 @@ New ideas like e.g. sweepers or predictors can be tested and first toy problems 
 <li><p>Many different examples, collocation types, data types already implemented</p></li>
 <li><p>Works with <a class="reference external" href="https://fenicsproject.org/">FEniCS</a>, <a class="reference external" href="https://mpi4py-fft.readthedocs.io/en/latest/">mpi4py-fft</a> and <a class="reference external" href="http://www.mcs.anl.gov/petsc/">PETSc</a> (through <a class="reference external" href="https://bitbucket.org/petsc/petsc4py">petsc4py</a>)</p></li>
 <li><p>Continuous integration via <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions">GitHub Actions</a> and <a class="reference external" href="https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines">Gitlab CI</a></p></li>
-<li><p>Fully compatible with Python 3.7 - 3.10</p></li>
+<li><p>Fully compatible with Python 3.7 - 3.10, runs at least on Ubuntu and MacOS</p></li>
 </ul>
 </section>
 <section id="getting-started">
@@ -106,7 +106,7 @@ The project also received help from the <a class="reference external" href="http
 <section id="changelog">
 <h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h2>
 <ul>
-<li><p>September 23, 2022: Version 5 comes with many changes, both visible and invisible ones. Some of those break the existing API, but
+<li><p>October 7, 2022: Version 5 comes with many changes, both visible and invisible ones. Some of those break the existing API, but
 if you are using tests, you should be fine. Major changes include:</p>
 <ul class="simple">
 <li><p><strong>New convergence controllers</strong>: Checking whether a step has converged can be tricky, so we made separate modules out of these
@@ -124,7 +124,8 @@ This could potentially <strong>break your code</strong>, too, if you rely on any
 Thanks to <a class="reference external" href="https://github.com/brownbaerchen">&#64;brownbaerchen</a> and <a class="reference external" href="https://github.com/lisawim">&#64;lisawim</a>!</p></li>
 <li><p><strong>Toward GPU computing</strong>: We included a new data type based on <a class="reference external" href="https://cupy.dev/">CuPy</a> making GPU computing possible.
 Thanks to <a class="reference external" href="https://github.com/timo2705">&#64;timo2705</a>!</p></li>
-<li><p><strong>Better testing</strong>: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking (at least, in principal), separate environments and so on.</p></li>
+<li><p><strong>Better testing</strong>: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking (at least, in principal), separate environments and so on.
+The code is tested under Ubuntu and MacOS.</p></li>
 <li><p><strong>Better code formatting</strong>: <cite>pySDC</cite> now uses <a class="reference external" href="https://black.readthedocs.io">black</a> and <a class="reference external" href="https://flakeheaven.readthedocs.io">flakeheaven</a> for cleaner source code.
 After complaints here and there about linting “errors” the recommended way now is to run <code class="docutils literal notranslate"><span class="pre">black</span></code> before submission.</p></li>
 </ul>
@@ -282,8 +283,7 @@ Parts of the Python scripts are supported by tests and checked for PEP8 conformi
 </section>
 <section id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">¶</a></h2>
-<p>Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.
-The codes also provides some <a class="reference external" href="./benchmarks/index.html">benchmarks</a>.</p>
+<p>Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.</p>
 <p>Github Action reports: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml"><img alt="badge-ga" src="https://github.com/Parallel-in-Time/pySDC/actions/workflows/ci_pipeline.yml/badge.svg" /></a></p>
 <p>Code coverage: <a class="reference external" href="./coverage/index.html"><img alt="badge-cc" src="coverage/coverage-badge.svg" /></a></p>
 </section>
