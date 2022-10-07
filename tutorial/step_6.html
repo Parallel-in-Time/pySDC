@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Step-6: Advanced PFASST controllers &#8212; pySDC 4.2.3 documentation</title>
+    <title>Step-6: Advanced PFASST controllers &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="step_5.html" title="Step-5: PFASST"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-6: Advanced PFASST controllers</a></li> 
       </ul>
     </div>  
@@ -60,10 +61,12 @@ By monitoring the convergence, this controller can already give a detailed idea 
 <li><p>If you care for parallelization, use the MPI controller, see Part C.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_6/A_run_non_MPI_controller.py">pySDC/tutorial/step_6/A_run_non_MPI_controller.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_LU</span> <span class="kn">import</span> <span class="n">generic_LU</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.transfer_classes.TransferMesh</span> <span class="kn">import</span> <span class="n">mesh_to_mesh</span>
 
@@ -81,11 +84,13 @@ By monitoring the convergence, this controller can already give a detailed idea 
     <span class="k">if</span> <span class="n">multi_level</span><span class="p">:</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span> <span class="o">=</span> <span class="n">set_parameters_ml</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">num_proc</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">num_proc</span> <span class="ow">in</span> <span class="n">num_proc_list</span><span class="p">),</span> \
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">num_proc</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">num_proc</span> <span class="ow">in</span> <span class="n">num_proc_list</span><span class="p">),</span> <span class="p">(</span>
             <span class="s1">&#39;ERROR: single-level run can only use 1 processor, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">num_proc_list</span>
+        <span class="p">)</span>
         <span class="n">description</span><span class="p">,</span> <span class="n">controller_params</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span> <span class="o">=</span> <span class="n">set_parameters_sl</span><span class="p">()</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="c1"># loop over different numbers of processes</span>
     <span class="k">for</span> <span class="n">num_proc</span> <span class="ow">in</span> <span class="n">num_proc_list</span><span class="p">:</span>
 
@@ -112,10 +117,7 @@ By monitoring the convergence, this controller can already give a detailed idea 
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
         <span class="c1"># filter statistics by type (number of iterations)</span>
-        <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-        <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-        <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+        <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
         <span class="c1"># compute and print statistics</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">:</span>
@@ -143,12 +145,12 @@ By monitoring the convergence, this controller can already give a detailed idea 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.125</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 
     <span class="c1"># initialize problem parameters</span>
@@ -156,11 +158,12 @@ By monitoring the convergence, this controller can already give a detailed idea 
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># frequency for the test value</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-05</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-05</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -175,7 +178,7 @@ By monitoring the convergence, this controller can already give a detailed idea 
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
@@ -203,12 +206,12 @@ By monitoring the convergence, this controller can already give a detailed idea 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.125</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize problem parameters</span>
@@ -216,6 +219,7 @@ By monitoring the convergence, this controller can already give a detailed idea 
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># frequency for the test value</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">63</span>  <span class="c1"># number of degrees of freedom for each level</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -227,7 +231,7 @@ By monitoring the convergence, this controller can already give a detailed idea 
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>  <span class="c1"># pass problem class</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_LU</span>  <span class="c1"># pass sweeper</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
@@ -421,42 +425,50 @@ We can use the results of Parts A and B to compare with and we expect the same n
 
     <span class="c1"># set up new/empty file for output</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;step_6_C1_out.txt&#39;</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">&#39;/../../../&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">&#39;/../../../data/&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># run code with different number of MPI processes</span>
     <span class="k">for</span> <span class="n">num_procs</span> <span class="ow">in</span> <span class="n">num_procs_list</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running code with </span><span class="si">%2i</span><span class="s1"> processes...&#39;</span> <span class="o">%</span> <span class="n">num_procs</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mpirun -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; python playground_parallelization.py ../../../&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;mpirun -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; python playground_parallelization.py ../../../../data/&#39;</span> <span class="o">+</span> <span class="n">fname</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
         <span class="c1"># while True:</span>
         <span class="c1">#     line = p.stdout.readline()</span>
         <span class="c1">#     print(line)</span>
         <span class="c1">#     if not line: break</span>
         <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes&#39;</span> <span class="o">%</span> \
-                                  <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+            <span class="n">num_procs</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="c1"># set list of number of parallel steps (odd)</span>
     <span class="n">num_procs_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
 
     <span class="c1"># set up new/empty file for output</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;step_6_C2_out.txt&#39;</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">&#39;/../../../&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">+</span> <span class="s1">&#39;/../../../data/&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="c1"># run code with different number of MPI processes</span>
     <span class="k">for</span> <span class="n">num_procs</span> <span class="ow">in</span> <span class="n">num_procs_list</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running code with </span><span class="si">%2i</span><span class="s1"> processes...&#39;</span> <span class="o">%</span> <span class="n">num_procs</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mpirun -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; python playground_parallelization.py ../../../&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;mpirun -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_procs</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; python playground_parallelization.py ../../../../data/&#39;</span> <span class="o">+</span> <span class="n">fname</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">my_env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">)</span>
         <span class="c1"># while True:</span>
         <span class="c1">#     line = p.stdout.readline()</span>
         <span class="c1">#     print(line)</span>
         <span class="c1">#     if not line: break</span>
         <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes&#39;</span> <span class="o">%</span> \
-                                  <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">num_procs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: did not get return code 0, got </span><span class="si">%s</span><span class="s1"> with </span><span class="si">%2i</span><span class="s1"> processes&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+            <span class="n">num_procs</span><span class="p">,</span>
+        <span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -464,10 +476,11 @@ We can use the results of Parts A and B to compare with and we expect the same n
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_MPI</span> <span class="kn">import</span> <span class="n">controller_MPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.tutorial.step_6.A_run_non_MPI_controller</span> <span class="kn">import</span> <span class="n">set_parameters_ml</span>
 
@@ -492,10 +505,7 @@ We can use the results of Parts A and B to compare with and we expect the same n
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># combine statistics into list of statistics</span>
     <span class="n">iter_counts_list</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">iter_counts</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -511,7 +521,8 @@ We can use the results of Parts A and B to compare with and we expect the same n
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;step_6_B_out.txt&#39;</span>
 
-        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Working with </span><span class="si">%2i</span><span class="s1"> processes...&#39;</span> <span class="o">%</span> <span class="n">size</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -701,13 +712,13 @@ We can use the results of Parts A and B to compare with and we expect the same n
         <li class="right" >
           <a href="step_5.html" title="Step-5: PFASST"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-6: Advanced PFASST controllers</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

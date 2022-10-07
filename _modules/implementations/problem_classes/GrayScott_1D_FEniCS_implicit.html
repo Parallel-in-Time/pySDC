@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.GrayScott_1D_FEniCS_implicit &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.problem_classes.GrayScott_1D_FEniCS_implicit &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_1D_FEniCS_implicit</a></li> 
       </ul>
@@ -113,10 +114,16 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">F1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span> <span class="o">-</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q1</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">F2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">q2</span><span class="p">))</span> <span class="o">+</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">*</span> <span class="n">q2</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Du</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span>
+            <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q1</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">)</span> <span class="o">*</span> <span class="n">q1</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F2</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Dv</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">nabla_grad</span><span class="p">(</span><span class="n">q2</span><span class="p">))</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">q2</span>
+            <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">B</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">*</span> <span class="n">q2</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">F1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">F2</span>
 
         <span class="c1"># mass matrix</span>
@@ -179,8 +186,8 @@
         <span class="n">solver</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">NonlinearVariationalSolver</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
 
         <span class="n">prm</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">parameters</span>
-        <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;absolute_tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
-        <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;relative_tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+        <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;absolute_tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
+        <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;relative_tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
         <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;maximum_iterations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="n">prm</span><span class="p">[</span><span class="s1">&#39;newton_solver&#39;</span><span class="p">][</span><span class="s1">&#39;relaxation_parameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
 
@@ -233,7 +240,9 @@
                 <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
 
             <span class="k">def</span> <span class="nf">value_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                <span class="k">return</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="p">,)</span>
+
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
 
         <span class="n">uinit</span> <span class="o">=</span> <span class="n">InitialConditions</span><span class="p">()</span>
 
@@ -272,14 +281,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.GrayScott_1D_FEniCS_implicit</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

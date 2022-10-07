@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>What is the fastest SDC variant? &#8212; pySDC 4.2.3 documentation</title>
+    <title>What is the fastest SDC variant? &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="Hamiltonian.html" title="Second-order Problems"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">What is the fastest SDC variant?</a></li> 
       </ul>
     </div>  
@@ -63,11 +64,14 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc</span> <span class="kn">import</span> <span class="n">petsc_fisher_multiimplicit</span><span class="p">,</span> \
-    <span class="n">petsc_fisher_fullyimplicit</span><span class="p">,</span> <span class="n">petsc_fisher_semiimplicit</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_PETSc</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">petsc_fisher_multiimplicit</span><span class="p">,</span>
+    <span class="n">petsc_fisher_fullyimplicit</span><span class="p">,</span>
+    <span class="n">petsc_fisher_semiimplicit</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span> <span class="kn">import</span> <span class="n">multi_implicit</span>
@@ -86,13 +90,13 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-06</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-06</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;Q2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>
@@ -105,9 +109,9 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2049</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
 
     <span class="c1"># initialize step parameters</span>
@@ -191,10 +195,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by variant (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
@@ -202,23 +203,24 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Iteration count (nonlinear/linear): </span><span class="si">%i</span><span class="s1"> / </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                                                            <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="p">)</span>
 
-    <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">timing</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time to solution: </span><span class="si">%6.4f</span><span class="s1"> sec.&#39;</span> <span class="o">%</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error vs. PDE solution: </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">9.2E-05</span><span class="p">,</span> <span class="s1">&#39;ERROR: variant </span><span class="si">%s</span><span class="s1"> did not match error tolerance, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">9.2e-05</span><span class="p">,</span> <span class="s1">&#39;ERROR: variant </span><span class="si">%s</span><span class="s1"> did not match error tolerance, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;ERROR: number of iterations is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
@@ -292,7 +294,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/timings_SDC_variants_Fisher.png"><img alt="../_images/timings_SDC_variants_Fisher.png" src="../_images/timings_SDC_variants_Fisher.png" style="width: 287.0px; height: 243.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/timings_SDC_variants_Fisher.png"><img alt="../_images/timings_SDC_variants_Fisher.png" src="../_images/timings_SDC_variants_Fisher.png" style="width: 287.0px; height: 248.0px;" /></a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/SDC_showdown/SDC_timing_GrayScott.py">pySDC/projects/SDC_showdown/SDC_timing_GrayScott.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
@@ -301,11 +303,14 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 <span class="kn">from</span> <span class="nn">petsc4py</span> <span class="kn">import</span> <span class="n">PETSc</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</span> <span class="kn">import</span> <span class="n">petsc_grayscott_multiimplicit</span><span class="p">,</span> \
-    <span class="n">petsc_grayscott_fullyimplicit</span><span class="p">,</span> <span class="n">petsc_grayscott_semiimplicit</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GrayScott_2D_PETSc_periodic</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">petsc_grayscott_multiimplicit</span><span class="p">,</span>
+    <span class="n">petsc_grayscott_fullyimplicit</span><span class="p">,</span>
+    <span class="n">petsc_grayscott_semiimplicit</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.multi_implicit</span> <span class="kn">import</span> <span class="n">multi_implicit</span>
@@ -324,13 +329,13 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;Q2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>
@@ -344,9 +349,9 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.09</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.086</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)]</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nlsol_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lsol_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
 
     <span class="c1"># initialize step parameters</span>
@@ -435,10 +440,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by variant (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
@@ -446,23 +448,24 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Iteration count (nonlinear/linear): </span><span class="si">%i</span><span class="s1"> / </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                                                            <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="p">)</span>
 
-    <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">timing</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time to solution: </span><span class="si">%6.4f</span><span class="s1"> sec.&#39;</span> <span class="o">%</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error vs. reference solution: </span><span class="si">%6.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">3E-06</span><span class="p">,</span> <span class="s1">&#39;ERROR: variant </span><span class="si">%s</span><span class="s1"> did not match error tolerance, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">3e-06</span><span class="p">,</span> <span class="s1">&#39;ERROR: variant </span><span class="si">%s</span><span class="s1"> did not match error tolerance, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">variant</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;ERROR: number of iterations is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
@@ -532,10 +535,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by variant (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
@@ -543,17 +543,18 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Iteration count (nonlinear/linear): </span><span class="si">%i</span><span class="s1"> / </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span><span class="p">,</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                                                            <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s1">&#39;Mean Iteration count per call: </span><span class="si">%4.2f</span><span class="s1"> / </span><span class="si">%4.2f</span><span class="s1">&#39;</span>
+        <span class="o">%</span> <span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">snes_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">P</span><span class="o">.</span><span class="n">ksp_itercount</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">ksp_ncalls</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="p">)</span>
 
-    <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">timing</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time to solution: </span><span class="si">%6.4f</span><span class="s1"> sec.&#39;</span> <span class="o">%</span> <span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
 
@@ -598,7 +599,7 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/timings_SDC_variants_GrayScott.png"><img alt="../_images/timings_SDC_variants_GrayScott.png" src="../_images/timings_SDC_variants_GrayScott.png" style="width: 293.0px; height: 243.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/timings_SDC_variants_GrayScott.png"><img alt="../_images/timings_SDC_variants_GrayScott.png" src="../_images/timings_SDC_variants_GrayScott.png" style="width: 295.0px; height: 248.0px;" /></a>
 </section>
 </section>
 
@@ -665,13 +666,13 @@ Note that on standard machines the inexact semi-implicit variant wins each time 
         <li class="right" >
           <a href="Hamiltonian.html" title="Second-order Problems"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">What is the fastest SDC variant?</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.problem_classes.boussinesq_helpers package &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.problem_classes.boussinesq_helpers package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.acoustic_helpers.html" title="implementations.problem_classes.acoustic_helpers package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" accesskey="U">implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.boussinesq_helpers package</a></li> 
@@ -325,12 +326,84 @@
     <ul>
 <li><a class="reference internal" href="#">implementations.problem_classes.boussinesq_helpers package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.build2DFDMatrix">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.helper_classes">implementations.problem_classes.boussinesq_helpers.helper_classes module</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.standard_integrators">implementations.problem_classes.boussinesq_helpers.standard_integrators module</a></li>
-<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.unflatten">implementations.problem_classes.boussinesq_helpers.unflatten module</a></li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.build2DFDMatrix">implementations.problem_classes.boussinesq_helpers.build2DFDMatrix module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMatrix"><code class="docutils literal notranslate"><span class="pre">get2DMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DMesh"><code class="docutils literal notranslate"><span class="pre">get2DMesh()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.get2DUpwindMatrix"><code class="docutils literal notranslate"><span class="pre">get2DUpwindMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCHorizontal"><code class="docutils literal notranslate"><span class="pre">getBCHorizontal()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.build2DFDMatrix.getBCVertical"><code class="docutils literal notranslate"><span class="pre">getBCVertical()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DMatrix"><code class="docutils literal notranslate"><span class="pre">getBoussinesq2DMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix"><code class="docutils literal notranslate"><span class="pre">getBoussinesq2DUpwindMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCHorizontal"><code class="docutils literal notranslate"><span class="pre">getBoussinesqBCHorizontal()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesqBCVertical"><code class="docutils literal notranslate"><span class="pre">getBoussinesqBCVertical()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.buildFDMatrix">implementations.problem_classes.boussinesq_helpers.buildFDMatrix module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCLeft"><code class="docutils literal notranslate"><span class="pre">getBCLeft()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getBCRight"><code class="docutils literal notranslate"><span class="pre">getBCRight()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getMatrix"><code class="docutils literal notranslate"><span class="pre">getMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.buildFDMatrix.getUpwindMatrix"><code class="docutils literal notranslate"><span class="pre">getUpwindMatrix()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.helper_classes">implementations.problem_classes.boussinesq_helpers.helper_classes module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback"><code class="docutils literal notranslate"><span class="pre">Callback</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getcounter"><code class="docutils literal notranslate"><span class="pre">Callback.getcounter()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.Callback.getresidual"><code class="docutils literal notranslate"><span class="pre">Callback.getresidual()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging"><code class="docutils literal notranslate"><span class="pre">logging</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.helper_classes.logging.add"><code class="docutils literal notranslate"><span class="pre">logging.add()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.standard_integrators">implementations.problem_classes.boussinesq_helpers.standard_integrators module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit"><code class="docutils literal notranslate"><span class="pre">SplitExplicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.NumSmallTimeSteps"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.NumSmallTimeSteps()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.RK3Lin"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.RK3Lin()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.VerletLin"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.VerletLin()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fast"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.f_fast()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastMom"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.f_fastMom()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_fastTher"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.f_fastTher()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.f_slow"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.f_slow()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.SplitExplicit.timestep"><code class="docutils literal notranslate"><span class="pre">SplitExplicit.timestep()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2"><code class="docutils literal notranslate"><span class="pre">bdf2</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f"><code class="docutils literal notranslate"><span class="pre">bdf2.f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.f_solve"><code class="docutils literal notranslate"><span class="pre">bdf2.f_solve()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.firsttimestep"><code class="docutils literal notranslate"><span class="pre">bdf2.firsttimestep()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.bdf2.timestep"><code class="docutils literal notranslate"><span class="pre">bdf2.timestep()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk"><code class="docutils literal notranslate"><span class="pre">dirk</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f"><code class="docutils literal notranslate"><span class="pre">dirk.f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.f_solve"><code class="docutils literal notranslate"><span class="pre">dirk.f_solve()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.dirk.timestep"><code class="docutils literal notranslate"><span class="pre">dirk.timestep()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex"><code class="docutils literal notranslate"><span class="pre">rk_imex</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_fast()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_fast_solve"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_fast_solve()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.f_slow"><code class="docutils literal notranslate"><span class="pre">rk_imex.f_slow()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.rk_imex.timestep"><code class="docutils literal notranslate"><span class="pre">rk_imex.timestep()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal"><code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f"><code class="docutils literal notranslate"><span class="pre">trapezoidal.f()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.f_solve"><code class="docutils literal notranslate"><span class="pre">trapezoidal.f_solve()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.standard_integrators.trapezoidal.timestep"><code class="docutils literal notranslate"><span class="pre">trapezoidal.timestep()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers.unflatten">implementations.problem_classes.boussinesq_helpers.unflatten module</a><ul>
+<li><a class="reference internal" href="#implementations.problem_classes.boussinesq_helpers.unflatten.unflatten"><code class="docutils literal notranslate"><span class="pre">unflatten()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-implementations.problem_classes.boussinesq_helpers">Module contents</a></li>
 </ul>
 </li>
@@ -383,7 +456,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.acoustic_helpers.html" title="implementations.problem_classes.acoustic_helpers package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="implementations.problem_classes.html" >implementations.problem_classes package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.boussinesq_helpers package</a></li> 
@@ -391,7 +464,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

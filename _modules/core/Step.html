@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>core.Step &#8212; pySDC 4.2.3 documentation</title>
+    <title>core.Step &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Step</a></li> 
       </ul>
@@ -132,11 +133,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="s1">&#39;dtype_u&#39;</span> <span class="ow">in</span> <span class="n">descr</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Deprecated parameter dtype_u, please remove from description dictionary and specify &#39;</span>
-                                 <span class="s1">&#39;directly in the problem class&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
+                <span class="s1">&#39;Deprecated parameter dtype_u, please remove from description dictionary and specify &#39;</span>
+                <span class="s1">&#39;directly in the problem class&#39;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;dtype_f&#39;</span> <span class="ow">in</span> <span class="n">descr</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="s1">&#39;Deprecated parameter dtype_f, please remove from description dictionary and specify &#39;</span>
-                                 <span class="s1">&#39;directly in the problem class&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span>
+                <span class="s1">&#39;Deprecated parameter dtype_f, please remove from description dictionary and specify &#39;</span>
+                <span class="s1">&#39;directly in the problem class&#39;</span>
+            <span class="p">)</span>
 
         <span class="c1"># assert the existence of all the keys we need to set up at least on level</span>
         <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">,</span> <span class="s1">&#39;sweeper_class&#39;</span><span class="p">,</span> <span class="s1">&#39;sweeper_params&#39;</span><span class="p">,</span> <span class="s1">&#39;level_params&#39;</span><span class="p">]</span>
@@ -175,29 +180,34 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descr_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> \
-                <span class="p">(</span><span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;base_transfer_class&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">base_transfer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">descr_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;base_transfer_class&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">base_transfer</span>
+        <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;you have specified transfer classes, but only a single level&#39;</span><span class="p">)</span>
 
         <span class="c1"># generate levels, register and connect if needed</span>
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">descr_list</span><span class="p">)):</span>
 
-            <span class="n">L</span> <span class="o">=</span> <span class="n">levclass</span><span class="o">.</span><span class="n">level</span><span class="p">(</span><span class="n">problem_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;problem_class&#39;</span><span class="p">],</span>
-                               <span class="n">problem_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;problem_params&#39;</span><span class="p">],</span>
-                               <span class="n">sweeper_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">],</span>
-                               <span class="n">sweeper_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">],</span>
-                               <span class="n">level_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;level_params&#39;</span><span class="p">],</span>
-                               <span class="n">level_index</span><span class="o">=</span><span class="n">l</span><span class="p">)</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">levclass</span><span class="o">.</span><span class="n">level</span><span class="p">(</span>
+                <span class="n">problem_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;problem_class&#39;</span><span class="p">],</span>
+                <span class="n">problem_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;problem_params&#39;</span><span class="p">],</span>
+                <span class="n">sweeper_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">],</span>
+                <span class="n">sweeper_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">],</span>
+                <span class="n">level_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;level_params&#39;</span><span class="p">],</span>
+                <span class="n">level_index</span><span class="o">=</span><span class="n">l</span><span class="p">,</span>
+            <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">l</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connect_levels</span><span class="p">(</span><span class="n">base_transfer_class</span><span class="o">=</span><span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;base_transfer_class&#39;</span><span class="p">],</span>
-                                    <span class="n">base_transfer_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;base_transfer_params&#39;</span><span class="p">],</span>
-                                    <span class="n">space_transfer_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">],</span>
-                                    <span class="n">space_transfer_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">],</span>
-                                    <span class="n">fine_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
-                                    <span class="n">coarse_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connect_levels</span><span class="p">(</span>
+                    <span class="n">base_transfer_class</span><span class="o">=</span><span class="n">descr_new</span><span class="p">[</span><span class="s1">&#39;base_transfer_class&#39;</span><span class="p">],</span>
+                    <span class="n">base_transfer_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;base_transfer_params&#39;</span><span class="p">],</span>
+                    <span class="n">space_transfer_class</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;space_transfer_class&#39;</span><span class="p">],</span>
+                    <span class="n">space_transfer_params</span><span class="o">=</span><span class="n">descr_list</span><span class="p">[</span><span class="n">l</span><span class="p">][</span><span class="s1">&#39;space_transfer_params&#39;</span><span class="p">],</span>
+                    <span class="n">fine_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">coarse_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="n">l</span><span class="p">],</span>
+                <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__dict_to_list</span><span class="p">(</span><span class="n">in_dict</span><span class="p">):</span>
@@ -226,8 +236,15 @@
                     <span class="n">ld</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">ld</span>
 
-<div class="viewcode-block" id="step.connect_levels"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.connect_levels">[docs]</a>    <span class="k">def</span> <span class="nf">connect_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_transfer_class</span><span class="p">,</span> <span class="n">base_transfer_params</span><span class="p">,</span> <span class="n">space_transfer_class</span><span class="p">,</span> <span class="n">space_transfer_params</span><span class="p">,</span>
-                       <span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">):</span>
+<div class="viewcode-block" id="step.connect_levels"><a class="viewcode-back" href="../../pySDC/core.html#core.Step.step.connect_levels">[docs]</a>    <span class="k">def</span> <span class="nf">connect_levels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_transfer_class</span><span class="p">,</span>
+        <span class="n">base_transfer_params</span><span class="p">,</span>
+        <span class="n">space_transfer_class</span><span class="p">,</span>
+        <span class="n">space_transfer_params</span><span class="p">,</span>
+        <span class="n">fine_level</span><span class="p">,</span>
+        <span class="n">coarse_level</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Routine to couple levels with base_transfer operators</span>
 
@@ -241,8 +258,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create new instance of the specific base_transfer class</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">base_transfer</span> <span class="o">=</span> <span class="n">base_transfer_class</span><span class="p">(</span><span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="n">base_transfer_params</span><span class="p">,</span>
-                                                 <span class="n">space_transfer_class</span><span class="p">,</span> <span class="n">space_transfer_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_transfer</span> <span class="o">=</span> <span class="n">base_transfer_class</span><span class="p">(</span>
+            <span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">,</span> <span class="n">base_transfer_params</span><span class="p">,</span> <span class="n">space_transfer_class</span><span class="p">,</span> <span class="n">space_transfer_params</span>
+        <span class="p">)</span>
         <span class="c1"># use base_transfer dictionary twice to set restrict and prolong operator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__transfer_dict</span><span class="p">[(</span><span class="n">fine_level</span><span class="p">,</span> <span class="n">coarse_level</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_transfer</span><span class="o">.</span><span class="n">restrict</span>
 
@@ -380,14 +398,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.Step</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

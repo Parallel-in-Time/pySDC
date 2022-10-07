@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.Boussinesq_2D_FD_imex &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.problem_classes.Boussinesq_2D_FD_imex &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex</a></li> 
       </ul>
@@ -69,29 +70,51 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># these parameters will be used later, so assert their existence</span>
-        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">,</span> <span class="s1">&#39;c_s&#39;</span><span class="p">,</span> <span class="s1">&#39;u_adv&#39;</span><span class="p">,</span> <span class="s1">&#39;Nfreq&#39;</span><span class="p">,</span> <span class="s1">&#39;x_bounds&#39;</span><span class="p">,</span> <span class="s1">&#39;z_bounds&#39;</span><span class="p">,</span> <span class="s1">&#39;order_upw&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;gmres_maxiter&#39;</span><span class="p">,</span> <span class="s1">&#39;gmres_restart&#39;</span><span class="p">,</span> <span class="s1">&#39;gmres_tol_limit&#39;</span><span class="p">]</span>
+        <span class="n">essential_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;nvars&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;c_s&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;u_adv&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Nfreq&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;x_bounds&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;z_bounds&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;order_upw&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;order&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;gmres_maxiter&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;gmres_restart&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;gmres_tol_limit&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">essential_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">problem_params</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;need </span><span class="si">%s</span><span class="s1"> to instantiate problem, only got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">problem_params</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
                 <span class="k">raise</span> <span class="n">ParameterError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># invoke super init, passing number of dofs, dtype_u and dtype_f</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">boussinesq_2d_imex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">((</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span>
-                                                 <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">boussinesq_2d_imex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)),</span> <span class="n">dtype_u</span><span class="p">,</span> <span class="n">dtype_f</span><span class="p">,</span> <span class="n">problem_params</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nvars</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
-                       <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">]]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dirichlet&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;dirichlet&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span>
-                       <span class="p">[</span><span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;periodic&#39;</span><span class="p">],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;dirichlet&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;dirichlet&#39;</span><span class="p">,</span> <span class="s1">&#39;dirichlet&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s1">&#39;neumann&#39;</span><span class="p">,</span> <span class="s1">&#39;neumann&#39;</span><span class="p">],</span>
+        <span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">get2DMesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">x_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">z_bounds</span><span class="p">,</span>
-                                             <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">get2DMesh</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">x_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">z_bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">getBoussinesq2DMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">c_s</span><span class="p">,</span>
-                                                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Nfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">getBoussinesq2DMatrix</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_hor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_ver</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">c_s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">Nfreq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">D_upwind</span> <span class="o">=</span> <span class="n">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">u_adv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">order_upw</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">gmres_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">()</span>
@@ -113,8 +136,16 @@
         <span class="n">b</span> <span class="o">=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="n">Callback</span><span class="p">()</span>
 
-        <span class="n">sol</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">gmres</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">u0</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_tol_limit</span><span class="p">,</span>
-                          <span class="n">restart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_restart</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_maxiter</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">)</span>
+        <span class="n">sol</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">gmres</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Id</span> <span class="o">-</span> <span class="n">factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span>
+            <span class="n">b</span><span class="p">,</span>
+            <span class="n">x0</span><span class="o">=</span><span class="n">u0</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+            <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_tol_limit</span><span class="p">,</span>
+            <span class="n">restart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_restart</span><span class="p">,</span>
+            <span class="n">maxiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">gmres_maxiter</span><span class="p">,</span>
+            <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">callback</span><span class="o">=</span><span class="n">cb</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="c1"># If this is a dummy call with factor==0.0, do not log because it should not be counted as a solver call</span>
         <span class="k">if</span> <span class="n">factor</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gmres_logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cb</span><span class="o">.</span><span class="n">getcounter</span><span class="p">())</span>
@@ -189,6 +220,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dtype_u: exact solution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ERROR: u_exact only valid for t=0&#39;</span>
 
         <span class="n">dtheta</span> <span class="o">=</span> <span class="mf">0.01</span>
         <span class="n">H</span> <span class="o">=</span> <span class="mf">10.0</span>
@@ -235,14 +267,14 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.Boussinesq_2D_FD_imex</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

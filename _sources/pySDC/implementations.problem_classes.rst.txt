@@ -29,26 +29,10 @@ implementations.problem\_classes.AdvectionDiffusionEquation\_1D\_FFT module
    :undoc-members:
    :show-inheritance:
 
-implementations.problem\_classes.AdvectionEquation\_1D\_FD module
+implementations.problem\_classes.AdvectionEquation\_ND\_FD module
 -----------------------------------------------------------------
 
-.. automodule:: implementations.problem_classes.AdvectionEquation_1D_FD
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-implementations.problem\_classes.AdvectionEquation\_1D\_FD\_dirichlet module
-----------------------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.AdvectionEquation_1D_FD_dirichlet
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-implementations.problem\_classes.AdvectionEquation\_ND\_FD\_periodic module
----------------------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.AdvectionEquation_ND_FD_periodic
+.. automodule:: implementations.problem_classes.AdvectionEquation_ND_FD
    :members:
    :undoc-members:
    :show-inheritance:
@@ -213,30 +197,6 @@ implementations.problem\_classes.HarmonicOscillator module
    :undoc-members:
    :show-inheritance:
 
-implementations.problem\_classes.HeatEquation\_1D\_FD module
-------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.HeatEquation_1D_FD
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-implementations.problem\_classes.HeatEquation\_1D\_FD\_forced module
---------------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.HeatEquation_1D_FD_forced
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-implementations.problem\_classes.HeatEquation\_1D\_FD\_periodic module
-----------------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.HeatEquation_1D_FD_periodic
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 implementations.problem\_classes.HeatEquation\_1D\_FEniCS\_matrix\_forced module
 --------------------------------------------------------------------------------
 
@@ -253,14 +213,6 @@ implementations.problem\_classes.HeatEquation\_1D\_FEniCS\_weak\_forced module
    :undoc-members:
    :show-inheritance:
 
-implementations.problem\_classes.HeatEquation\_2D\_FD\_periodic module
-----------------------------------------------------------------------
-
-.. automodule:: implementations.problem_classes.HeatEquation_2D_FD_periodic
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 implementations.problem\_classes.HeatEquation\_2D\_PETSc\_forced module
 -----------------------------------------------------------------------
 
@@ -269,18 +221,18 @@ implementations.problem\_classes.HeatEquation\_2D\_PETSc\_forced module
    :undoc-members:
    :show-inheritance:
 
-implementations.problem\_classes.HeatEquation\_ND\_FD\_forced\_periodic module
-------------------------------------------------------------------------------
+implementations.problem\_classes.HeatEquation\_ND\_FD module
+------------------------------------------------------------
 
-.. automodule:: implementations.problem_classes.HeatEquation_ND_FD_forced_periodic
+.. automodule:: implementations.problem_classes.HeatEquation_ND_FD
    :members:
    :undoc-members:
    :show-inheritance:
 
-implementations.problem\_classes.HeatEquation\_ND\_FD\_forced\_periodic\_gpu module
------------------------------------------------------------------------------------
+implementations.problem\_classes.HeatEquation\_ND\_FD\_CuPy module
+------------------------------------------------------------------
 
-.. automodule:: implementations.problem_classes.HeatEquation_ND_FD_forced_periodic_gpu
+.. automodule:: implementations.problem_classes.HeatEquation_ND_FD_CuPy
    :members:
    :undoc-members:
    :show-inheritance:

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Step-3: Statistics and a new sweeper &#8212; pySDC 4.2.3 documentation</title>
+    <title>Step-3: Statistics and a new sweeper &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-3: Statistics and a new sweeper</a></li> 
       </ul>
     </div>  
@@ -60,15 +61,13 @@ as its keys are tuples which contain the process, time, level, iteration
 and type of entry for the values. This way, each value has some sort of
 time stamp attached to it, so that it is clear when this value was
 added. To help dealing with the statistics, we make use of the
-<code class="docutils literal notranslate"><span class="pre">filter_stats</span></code> and <code class="docutils literal notranslate"><span class="pre">sort_stats</span></code> routines. The first one filters the
+<code class="docutils literal notranslate"><span class="pre">get_sorted</span></code> routine. This filters the
 dictionary, following the keys we provide. Here, we would like to have
 all residuals logged during time 0.1 (i.e. for all iterations in the
-first time step). Analogously, we could ask for all residuals at the
-final iteration of each step by calling
-<code class="docutils literal notranslate"><span class="pre">filter_stats(stats,</span> <span class="pre">iter=-1,</span> <span class="pre">type='residual')</span></code>. The second helper
-routine converts the filtered or non-filtered dictionary to a list of
+first time step). Then, it is converted to a list of
 tuples, where the first part is the item defined by the parameter
-<code class="docutils literal notranslate"><span class="pre">sortby</span></code> and the second part is the value. Here, we would like to have
+<code class="docutils literal notranslate"><span class="pre">sortby</span></code> and the second part is the value.
+Here, we would like to have
 a list of iterations and residuals to see how SDC converged over the
 iterations.</p>
 <p>Important things to note:</p>
@@ -84,10 +83,12 @@ values are registered in the statistics. This can be helpful, if
 users register their own types, see below.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/A_getting_statistics.py">pySDC/tutorial/step_3/A_getting_statistics.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span><span class="p">,</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_list_of_types</span><span class="p">,</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced</span> <span class="kn">import</span> <span class="n">heat1d_forced</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
 
 
@@ -99,26 +100,21 @@ users register their own types, see below.</p></li>
     <span class="c1"># run simulation</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">run_simulation</span><span class="p">()</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_3_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;List of registered statistic types: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_list_of_types</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by first time intervall and type (residual)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">)</span>
-
-    <span class="c1"># sort and convert stats to list, sorted by iteration numbers</span>
-    <span class="n">residuals</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;residual_post_iteration&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">residuals</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Residual in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%8.4e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">item</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
-    <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by time</span>
+    <span class="c1"># get and convert filtered statistics to list of iterations count, sorted by time</span>
     <span class="c1"># the get_sorted function is just a shortcut for sort_stats(filter_stats()) with all the same arguments</span>
     <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
@@ -129,8 +125,9 @@ users register their own types, see below.</p></li>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">]),</span> \
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">]),</span> <span class="p">(</span>
         <span class="s1">&#39;ERROR: number of iterations are not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iter_counts</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">run_simulation</span><span class="p">():</span>
@@ -139,12 +136,12 @@ users register their own types, see below.</p></li>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize problem parameters</span>
@@ -152,6 +149,7 @@ users register their own types, see below.</p></li>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># frequency for the test value</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1023</span>  <span class="c1"># number of degrees of freedom</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -163,7 +161,7 @@ users register their own types, see below.</p></li>
 
     <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d_forced</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
@@ -242,9 +240,10 @@ using the level.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/B_adding_statistics.py">pySDC/tutorial/step_3/B_adding_statistics.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
@@ -255,27 +254,30 @@ using the level.</p></li>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple tets program to retrieve user-defined statistics from a run</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="n">err</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">()</span>
 
     <span class="c1"># filter statistics type (etot)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
-
-    <span class="c1"># sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)</span>
-    <span class="n">energy</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
 
     <span class="c1"># get base energy and show difference</span>
     <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_3_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
-                                                  <span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
 
 
 <span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
@@ -284,12 +286,12 @@ using the level.</p></li>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize problem parameters for the Penning trap</span>
@@ -308,7 +310,7 @@ using the level.</p></li>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_hook</span>  <span class="c1"># specialized hook class for more statistics and output</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;log_to_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;step_3_B_out.txt&#39;</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data/step_3_B_out.txt&#39;</span>
 
     <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -345,18 +347,9 @@ using the level.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-09-21 10:44:55,717 - controller - Controller - welcome_message - 113 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
-                                 _____ _____   _____ 
-                                / ____|  __ \ / ____|
-                    _ __  _   _| (___ | |  | | |     
-                   | &#39;_ \| | | |\___ \| |  | | |     
-                   | |_) | |_| |____) | |__| | |____ 
-                   | .__/ \__, |_____/|_____/ \_____|
-                   | |     __/ |                     
-                   |_|    |___/                      
-                                                     
-2022-09-21 10:44:55,717 - controller - Controller - dump_setup - 127 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 190 - INFO: ----------------------------------------------------------------------------------------------------
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-10-07 12:49:26,849 - controller - Controller - welcome_message - 116 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free\n                                 _____ _____   _____ \n                                / ____|  __ \ / ____|\n                    _ __  _   _| (___ | |  | | |     \n                   | \&#39;_ \| | | |\___ \| |  | | |     \n                   | |_) | |_| |____) | |__| | |____ \n                   | .__/ \__, |_____/|_____/ \_____|\n                   | |     __/ |                     \n                   |_|    |___/                      \n                                                     
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 130 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 193 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -365,7 +358,7 @@ Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_n
     logger_level = 20
 --&gt; log_to_file = True
     dump_setup = True
---&gt; fname = step_3_B_out.txt
+--&gt; fname = data/step_3_B_out.txt
     use_iteration_estimator = False
 --&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
 
@@ -389,23 +382,24 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
 --&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
                     do_coll_update = False
                     initial_guess = spread
+--&gt;                 quad_type = RADAU-RIGHT
 --&gt;                 num_nodes = 3
---&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
+--&gt;                 Collocation: &lt;class &#39;pySDC.core.Collocation.CollBase&#39;&gt;
 
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 192 - INFO: ----------------------------------------------------------------------------------------------------
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 194 - INFO: Setup overview (--&gt; user-defined) -- END
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 195 - INFO: ----------------------------------------------------------------------------------------------------
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 197 - INFO: Setup overview (--&gt; user-defined) -- END
 
-2022-09-21 10:44:56,747 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2022-09-21 10:44:56,754 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2022-09-21 10:44:56,761 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2022-09-21 10:44:56,767 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2022-09-21 10:44:56,774 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2022-09-21 10:44:56,780 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2022-09-21 10:44:56,787 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2022-09-21 10:44:56,794 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2022-09-21 10:44:56,800 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2022-09-21 10:44:56,807 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
-2022-09-21 10:44:56,813 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2022-10-07 12:49:28,259 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2022-10-07 12:49:28,267 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2022-10-07 12:49:28,276 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2022-10-07 12:49:28,284 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2022-10-07 12:49:28,293 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2022-10-07 12:49:28,301 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2022-10-07 12:49:28,310 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2022-10-07 12:49:28,318 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2022-10-07 12:49:28,326 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2022-10-07 12:49:28,334 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
+2022-10-07 12:49:28,343 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
@@ -435,12 +429,10 @@ Alternatively, each <code class="docutils literal notranslate"><span class="pre"
 the relevant information can be stored.</p></li>
 </ul>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/C_study_collocations.py">pySDC/tutorial/step_3/C_study_collocations.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_legendre</span> <span class="kn">import</span> <span class="n">CollGaussLegendre</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_lobatto</span> <span class="kn">import</span> <span class="n">CollGaussLobatto</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
@@ -454,11 +446,11 @@ the relevant information can be stored.</p></li>
     <span class="n">stats_dict</span> <span class="o">=</span> <span class="n">run_simulation</span><span class="p">()</span>
 
     <span class="n">ediff</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_3_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">cclass</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">stats_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># filter and convert/sort statistics by etot and iterations</span>
-        <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
-        <span class="n">energy</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
         <span class="c1"># compare base and final energy</span>
         <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">final_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -470,9 +462,9 @@ the relevant information can be stored.</p></li>
 
     <span class="c1"># set expected differences and check</span>
     <span class="n">ediff_expect</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussRadau_Right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
-    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussLobatto&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-05</span>
-    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;CollGaussLegendre&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3E-05</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;LOBATTO&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-05</span>
+    <span class="n">ediff_expect</span><span class="p">[</span><span class="s1">&#39;GAUSS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3e-05</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ediff</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">assert</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">ediff_expect</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="s2">&quot;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ediff</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
@@ -483,7 +475,7 @@ the relevant information can be stored.</p></li>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-06</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-06</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
 
     <span class="c1"># initialize sweeper parameters</span>
@@ -516,10 +508,10 @@ the relevant information can be stored.</p></li>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
 
     <span class="c1"># assemble and loop over list of collocation classes</span>
-    <span class="n">coll_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">CollGaussRadau_Right</span><span class="p">,</span> <span class="n">CollGaussLegendre</span><span class="p">,</span> <span class="n">CollGaussLobatto</span><span class="p">]</span>
+    <span class="n">quad_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RADAU-RIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;GAUSS&#39;</span><span class="p">,</span> <span class="s1">&#39;LOBATTO&#39;</span><span class="p">]</span>
     <span class="n">stats_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">cclass</span> <span class="ow">in</span> <span class="n">coll_list</span><span class="p">:</span>
-        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cclass</span>
+    <span class="k">for</span> <span class="n">qtype</span> <span class="ow">in</span> <span class="n">quad_types</span><span class="p">:</span>
+        <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qtype</span>
         <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>
 
         <span class="c1"># instantiate the controller (no controller parameters used here)</span>
@@ -537,7 +529,7 @@ the relevant information can be stored.</p></li>
         <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
         <span class="c1"># gather stats in dictionary, collocation classes being the keys</span>
-        <span class="n">stats_dict</span><span class="p">[</span><span class="n">cclass</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
+        <span class="n">stats_dict</span><span class="p">[</span><span class="n">qtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span>
 
     <span class="k">return</span> <span class="n">stats_dict</span>
 
@@ -547,9 +539,9 @@ the relevant information can be stored.</p></li>
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussRadau_Right</span><span class="p">:</span> <span class="mf">1.44960920e+01</span>
-<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLegendre</span><span class="p">:</span> <span class="mf">2.33862975e-05</span>
-<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">CollGaussLobatto</span><span class="p">:</span> <span class="mf">9.32710100e-06</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">RADAU</span><span class="o">-</span><span class="n">RIGHT</span><span class="p">:</span> <span class="mf">1.44960920e+01</span>
+<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">GAUSS</span><span class="p">:</span> <span class="mf">2.33862975e-05</span>
+<span class="n">Energy</span> <span class="n">deviation</span> <span class="k">for</span> <span class="n">LOBATTO</span><span class="p">:</span> <span class="mf">9.32710282e-06</span>
 </pre></div>
 </div>
 </section>
@@ -620,13 +612,13 @@ the relevant information can be stored.</p></li>
         <li class="right" >
           <a href="step_2.html" title="Step-2: Data structures and my first sweeper"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Step-3: Statistics and a new sweeper</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

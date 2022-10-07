@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>core.BaseTransfer &#8212; pySDC 4.2.3 documentation</title>
+    <title>core.BaseTransfer &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.BaseTransfer</a></li> 
       </ul>
@@ -45,7 +46,7 @@
 
 <span class="kn">from</span> <span class="nn">pySDC.core.Errors</span> <span class="kn">import</span> <span class="n">UnlockError</span>
 <span class="kn">from</span> <span class="nn">pySDC.helpers.pysdc_helper</span> <span class="kn">import</span> <span class="n">FrozenClass</span>
-<span class="kn">from</span> <span class="nn">pySDC.core</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
+<span class="kn">from</span> <span class="nn">pySDC.core.Lagrange</span> <span class="kn">import</span> <span class="n">LagrangeApproximation</span>
 
 
 <span class="c1"># short helper class to add params as attributes</span>
@@ -101,8 +102,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Rcoll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">coarse_grid</span><span class="p">,</span> <span class="n">fine_grid</span><span class="p">)</span>
 
         <span class="c1"># set up spatial transfer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span> <span class="o">=</span> <span class="n">space_transfer_class</span><span class="p">(</span><span class="n">fine_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span>
-                                                   <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">space_transfer</span> <span class="o">=</span> <span class="n">space_transfer_class</span><span class="p">(</span>
+            <span class="n">fine_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fine</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">coarse_prob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coarse</span><span class="o">.</span><span class="n">prob</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">space_transfer_params</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="base_transfer.get_transfer_matrix_Q"><a class="viewcode-back" href="../../pySDC/core.html#core.BaseTransfer.base_transfer.get_transfer_matrix_Q">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_transfer_matrix_Q</span><span class="p">(</span><span class="n">f_nodes</span><span class="p">,</span> <span class="n">c_nodes</span><span class="p">):</span>
@@ -309,14 +311,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core.BaseTransfer</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

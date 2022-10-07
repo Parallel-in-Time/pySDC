@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.controller_classes package &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.controller_classes package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,11 +15,12 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="implementations.datatype_classes package" href="implementations.datatype_classes.html" />
-    <link rel="prev" title="implementations.collocation_classes package" href="implementations.collocation_classes.html" /> 
+    <link rel="next" title="implementations.convergence_controller_classes package" href="implementations.convergence_controller_classes.html" />
+    <link rel="prev" title="implementations package" href="implementations.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -31,12 +32,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.datatype_classes.html" title="implementations.datatype_classes package"
+          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="implementations.collocation_classes.html" title="implementations.collocation_classes package"
+          <a href="implementations.html" title="implementations package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.controller_classes package</a></li> 
       </ul>
@@ -155,6 +156,21 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.recv_full">
+<span class="sig-name descname"><span class="pre">recv_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.recv_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.recv_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform the recv, including bookkeeping and logging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> – the communicator</p></li>
+<li><p><strong>level</strong> – the level number</p></li>
+<li><p><strong>add_to_stats</strong> – a flag to end recording data in the hooks (defaults to False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.restart_block">
 <span class="sig-name descname"><span class="pre">restart_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.restart_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.restart_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper routine to reset/restart block of (active) steps</p>
@@ -187,6 +203,22 @@
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>end values on the finest level
 stats object containing statistics for each step, each level and each iteration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_MPI.controller_MPI.send_full">
+<span class="sig-name descname"><span class="pre">send_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_MPI.html#controller_MPI.send_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_MPI.controller_MPI.send_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform the send, including bookkeeping and logging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> – the communicator</p></li>
+<li><p><strong>blocking</strong> – flag to indicate that we need blocking communication</p></li>
+<li><p><strong>level</strong> – the level number</p></li>
+<li><p><strong>add_to_stats</strong> – a flag to end recording data in the hooks (defaults to False)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -309,15 +341,15 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receive function</p>
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full">
+<span class="sig-name descname"><span class="pre">recv_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.recv_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform the recv, including bookkeeping and logging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target</strong> – level which will receive the values</p></li>
-<li><p><strong>source</strong> – level which initiated the send</p></li>
-<li><p><strong>tag</strong> – identifier to check if this message is really for me</p></li>
+<li><p><strong>S</strong> – the current step</p></li>
+<li><p><strong>level</strong> – the level number</p></li>
+<li><p><strong>add_to_stats</strong> – a flag to end recording data in the hooks (defaults to False)</p></li>
 </ul>
 </dd>
 </dl>
@@ -358,14 +390,15 @@ stats object containing statistics for each step, each level and each iteration<
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.send">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.send"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send function</p>
+<dt class="sig sig-object py" id="implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full">
+<span class="sig-name descname"><span class="pre">send_full</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_to_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/controller_classes/controller_nonMPI.html#controller_nonMPI.send_full"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to perform the send, including bookkeeping and logging</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>source</strong> – level which has the new values</p></li>
-<li><p><strong>tag</strong> – identifier for this message</p></li>
+<li><p><strong>S</strong> – the current step</p></li>
+<li><p><strong>level</strong> – the level number</p></li>
+<li><p><strong>add_to_stats</strong> – a flag to end recording data in the hooks (defaults to False)</p></li>
 </ul>
 </dd>
 </dl>
@@ -402,8 +435,48 @@ stats object containing statistics for each step, each level and each iteration<
     <ul>
 <li><a class="reference internal" href="#">implementations.controller_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI module</a></li>
-<li><a class="reference internal" href="#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI module</a></li>
+<li><a class="reference internal" href="#module-implementations.controller_classes.controller_MPI">implementations.controller_classes.controller_MPI module</a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI"><code class="docutils literal notranslate"><span class="pre">controller_MPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.check_iteration_estimate"><code class="docutils literal notranslate"><span class="pre">controller_MPI.check_iteration_estimate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.check_residual"><code class="docutils literal notranslate"><span class="pre">controller_MPI.check_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.default"><code class="docutils literal notranslate"><span class="pre">controller_MPI.default()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_check"><code class="docutils literal notranslate"><span class="pre">controller_MPI.it_check()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_coarse"><code class="docutils literal notranslate"><span class="pre">controller_MPI.it_coarse()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_down"><code class="docutils literal notranslate"><span class="pre">controller_MPI.it_down()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_fine"><code class="docutils literal notranslate"><span class="pre">controller_MPI.it_fine()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.it_up"><code class="docutils literal notranslate"><span class="pre">controller_MPI.it_up()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.pfasst"><code class="docutils literal notranslate"><span class="pre">controller_MPI.pfasst()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.predict"><code class="docutils literal notranslate"><span class="pre">controller_MPI.predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.recv"><code class="docutils literal notranslate"><span class="pre">controller_MPI.recv()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.recv_full"><code class="docutils literal notranslate"><span class="pre">controller_MPI.recv_full()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.restart_block"><code class="docutils literal notranslate"><span class="pre">controller_MPI.restart_block()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.run"><code class="docutils literal notranslate"><span class="pre">controller_MPI.run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.send_full"><code class="docutils literal notranslate"><span class="pre">controller_MPI.send_full()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.spread"><code class="docutils literal notranslate"><span class="pre">controller_MPI.spread()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_MPI.controller_MPI.wait_with_interrupt"><code class="docutils literal notranslate"><span class="pre">controller_MPI.wait_with_interrupt()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.controller_classes.controller_nonMPI">implementations.controller_classes.controller_nonMPI module</a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.default"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.default()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_check"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.it_check()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_coarse"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.it_coarse()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_down"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.it_down()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_fine"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.it_fine()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.it_up"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.it_up()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.pfasst"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.pfasst()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.predict"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.predict()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.recv_full"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.recv_full()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.restart_block"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.restart_block()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.run"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.run()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.send_full"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.send_full()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.controller_classes.controller_nonMPI.controller_nonMPI.spread"><code class="docutils literal notranslate"><span class="pre">controller_nonMPI.spread()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-implementations.controller_classes">Module contents</a></li>
 </ul>
 </li>
@@ -412,13 +485,13 @@ stats object containing statistics for each step, each level and each iteration<
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="implementations.collocation_classes.html"
-                          title="previous chapter">implementations.collocation_classes package</a></p>
+    <p class="topless"><a href="implementations.html"
+                          title="previous chapter">implementations package</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="implementations.datatype_classes.html"
-                          title="next chapter">implementations.datatype_classes package</a></p>
+    <p class="topless"><a href="implementations.convergence_controller_classes.html"
+                          title="next chapter">implementations.convergence_controller_classes package</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -451,19 +524,19 @@ stats object containing statistics for each step, each level and each iteration<
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="implementations.datatype_classes.html" title="implementations.datatype_classes package"
+          <a href="implementations.convergence_controller_classes.html" title="implementations.convergence_controller_classes package"
              >next</a> |</li>
         <li class="right" >
-          <a href="implementations.collocation_classes.html" title="implementations.collocation_classes package"
+          <a href="implementations.html" title="implementations package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.controller_classes package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

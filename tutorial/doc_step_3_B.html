@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 4.2.3 documentation</title>
+    <title>&lt;no title&gt; &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -28,7 +29,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>  
@@ -40,9 +41,10 @@
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_3/B_adding_statistics.py">pySDC/tutorial/step_3/B_adding_statistics.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.PenningTrap_3D</span> <span class="kn">import</span> <span class="n">penningtrap</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.boris_2nd_order</span> <span class="kn">import</span> <span class="n">boris_2nd_order</span>
@@ -53,27 +55,30 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple tets program to retrieve user-defined statistics from a run</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="n">err</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">run_penning_trap_simulation</span><span class="p">()</span>
 
     <span class="c1"># filter statistics type (etot)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">)</span>
-
-    <span class="c1"># sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)</span>
-    <span class="n">energy</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;etot&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)</span>
 
     <span class="c1"># get base energy and show difference</span>
     <span class="n">base_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_3_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_3_B_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">energy</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Total energy and deviation in iteration </span><span class="si">%2i</span><span class="s1">: </span><span class="si">%12.10f</span><span class="s1"> -- </span><span class="si">%12.8e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> \
-                                                  <span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5E-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
+    <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;ERROR: energy deviated too much, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">base_energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">5e-04</span><span class="p">,</span> <span class="s2">&quot;ERROR: solution is not as exact as expected, got </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span>
 
 
 <span class="k">def</span> <span class="nf">run_penning_trap_simulation</span><span class="p">():</span>
@@ -82,12 +87,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">16</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize problem parameters for the Penning trap</span>
@@ -106,7 +111,7 @@
     <span class="n">controller_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;hook_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">particle_hook</span>  <span class="c1"># specialized hook class for more statistics and output</span>
     <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;log_to_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;step_3_B_out.txt&#39;</span>
+    <span class="n">controller_params</span><span class="p">[</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;data/step_3_B_out.txt&#39;</span>
 
     <span class="c1"># Fill description dictionary for easy hierarchy creation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -143,18 +148,9 @@
 </pre></div>
 </div>
 <p>Results:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-09-21 10:44:55,717 - controller - Controller - welcome_message - 113 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free
-                                 _____ _____   _____ 
-                                / ____|  __ \ / ____|
-                    _ __  _   _| (___ | |  | | |     
-                   | &#39;_ \| | | |\___ \| |  | | |     
-                   | |_) | |_| |____) | |__| | |____ 
-                   | .__/ \__, |_____/|_____/ \_____|
-                   | |     __/ |                     
-                   |_|    |___/                      
-                                                     
-2022-09-21 10:44:55,717 - controller - Controller - dump_setup - 127 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 190 - INFO: ----------------------------------------------------------------------------------------------------
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>2022-10-07 12:49:26,849 - controller - Controller - welcome_message - 116 - INFO: Welcome to the one and only, really very astonishing and 87.3% bug free\n                                 _____ _____   _____ \n                                / ____|  __ \ / ____|\n                    _ __  _   _| (___ | |  | | |     \n                   | \&#39;_ \| | | |\___ \| |  | | |     \n                   | |_) | |_| |____) | |__| | |____ \n                   | .__/ \__, |_____/|_____/ \_____|\n                   | |     __/ |                     \n                   |_|    |___/                      \n                                                     
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 130 - INFO: Setup overview (--&gt; user-defined) -- BEGIN
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 193 - INFO: ----------------------------------------------------------------------------------------------------
 
 Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_nonMPI.controller_nonMPI&#39;&gt;
     mssdc_jac = True
@@ -163,7 +159,7 @@ Controller: &lt;class &#39;pySDC.implementations.controller_classes.controller_n
     logger_level = 20
 --&gt; log_to_file = True
     dump_setup = True
---&gt; fname = step_3_B_out.txt
+--&gt; fname = data/step_3_B_out.txt
     use_iteration_estimator = False
 --&gt; hook_class = &lt;class &#39;pySDC.tutorial.step_3.HookClass_Particles.particle_hook&#39;&gt;
 
@@ -187,23 +183,24 @@ Step: &lt;class &#39;pySDC.core.Step.step&#39;&gt;
 --&gt;             Sweeper: &lt;class &#39;pySDC.implementations.sweeper_classes.boris_2nd_order.boris_2nd_order&#39;&gt;
                     do_coll_update = False
                     initial_guess = spread
+--&gt;                 quad_type = RADAU-RIGHT
 --&gt;                 num_nodes = 3
---&gt;                 Collocation: &lt;class &#39;pySDC.implementations.collocation_classes.gauss_radau_right.CollGaussRadau_Right&#39;&gt;
+--&gt;                 Collocation: &lt;class &#39;pySDC.core.Collocation.CollBase&#39;&gt;
 
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 192 - INFO: ----------------------------------------------------------------------------------------------------
-2022-09-21 10:44:55,718 - controller - Controller - dump_setup - 194 - INFO: Setup overview (--&gt; user-defined) -- END
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 195 - INFO: ----------------------------------------------------------------------------------------------------
+2022-10-07 12:49:26,850 - controller - Controller - dump_setup - 197 - INFO: Setup overview (--&gt; user-defined) -- END
 
-2022-09-21 10:44:56,747 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
-2022-09-21 10:44:56,754 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
-2022-09-21 10:44:56,761 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
-2022-09-21 10:44:56,767 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
-2022-09-21 10:44:56,774 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
-2022-09-21 10:44:56,780 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
-2022-09-21 10:44:56,787 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
-2022-09-21 10:44:56,794 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
-2022-09-21 10:44:56,800 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
-2022-09-21 10:44:56,807 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
-2022-09-21 10:44:56,813 - hooks - Hooks - post_sweep - 220 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
+2022-10-07 12:49:28,259 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  1 -- Sweep:  1 -- residual: 3.53203678e+00
+2022-10-07 12:49:28,267 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  2 -- Sweep:  1 -- residual: 2.09852117e-01
+2022-10-07 12:49:28,276 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  3 -- Sweep:  1 -- residual: 3.50301513e-02
+2022-10-07 12:49:28,284 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  4 -- Sweep:  1 -- residual: 4.67724741e-03
+2022-10-07 12:49:28,293 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  5 -- Sweep:  1 -- residual: 7.95583202e-04
+2022-10-07 12:49:28,301 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  6 -- Sweep:  1 -- residual: 1.11405073e-04
+2022-10-07 12:49:28,310 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  7 -- Sweep:  1 -- residual: 1.26902403e-05
+2022-10-07 12:49:28,318 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  8 -- Sweep:  1 -- residual: 1.16534547e-06
+2022-10-07 12:49:28,326 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration:  9 -- Sweep:  1 -- residual: 1.66968007e-07
+2022-10-07 12:49:28,334 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 10 -- Sweep:  1 -- residual: 2.09407887e-08
+2022-10-07 12:49:28,343 - hooks - Hooks - post_sweep - 227 - INFO: Process  0 on time 0.000000 at stage         IT_FINE: Level: 0 -- Iteration: 11 -- Sweep:  1 -- residual: 2.17123386e-09
 Total energy and deviation in iteration  0: 8799.5000000000 -- 0.00000000e+00
 Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
 </pre></div>
@@ -246,13 +243,13 @@ Total energy and deviation in iteration 11: 8785.0038936088 -- 1.44961064e+01
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

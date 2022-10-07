@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Overview: module code &#8212; pySDC 4.2.3 documentation</title>
+    <title>Overview: module code &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Overview: module code</a></li> 
       </ul>
     </div>  
@@ -52,32 +53,35 @@
 <li><a href="core/Step.html">core.Step</a></li>
 <li><a href="core/Sweeper.html">core.Sweeper</a></li>
 <li><a href="helpers/plot_helper.html">helpers.plot_helper</a></li>
+<li><a href="helpers/problem_helper.html">helpers.problem_helper</a></li>
 <li><a href="helpers/pysdc_helper.html">helpers.pysdc_helper</a></li>
 <li><a href="helpers/stats_helper.html">helpers.stats_helper</a></li>
 <li><a href="helpers/transfer_helper.html">helpers.transfer_helper</a></li>
 <li><a href="helpers/visualization_tools.html">helpers.visualization_tools</a></li>
-<li><a href="implementations/collocation_classes/equidistant.html">implementations.collocation_classes.equidistant</a></li>
-<li><a href="implementations/collocation_classes/equidistant_inner.html">implementations.collocation_classes.equidistant_inner</a></li>
-<li><a href="implementations/collocation_classes/equidistant_right.html">implementations.collocation_classes.equidistant_right</a></li>
-<li><a href="implementations/collocation_classes/equidistant_spline_right.html">implementations.collocation_classes.equidistant_spline_right</a></li>
-<li><a href="implementations/collocation_classes/gauss_legendre.html">implementations.collocation_classes.gauss_legendre</a></li>
-<li><a href="implementations/collocation_classes/gauss_lobatto.html">implementations.collocation_classes.gauss_lobatto</a></li>
-<li><a href="implementations/collocation_classes/gauss_radau_left.html">implementations.collocation_classes.gauss_radau_left</a></li>
-<li><a href="implementations/collocation_classes/gauss_radau_right.html">implementations.collocation_classes.gauss_radau_right</a></li>
 <li><a href="implementations/controller_classes/controller_MPI.html">implementations.controller_classes.controller_MPI</a></li>
 <li><a href="implementations/controller_classes/controller_nonMPI.html">implementations.controller_classes.controller_nonMPI</a></li>
+<li><a href="implementations/convergence_controller_classes/adaptivity.html">implementations.convergence_controller_classes.adaptivity</a></li>
+<li><a href="implementations/convergence_controller_classes/basic_restarting_nonMPI.html">implementations.convergence_controller_classes.basic_restarting_nonMPI</a></li>
+<li><a href="implementations/convergence_controller_classes/check_convergence.html">implementations.convergence_controller_classes.check_convergence</a></li>
+<li><a href="implementations/convergence_controller_classes/check_iteration_estimator.html">implementations.convergence_controller_classes.check_iteration_estimator</a></li>
+<li><a href="implementations/convergence_controller_classes/estimate_embedded_error.html">implementations.convergence_controller_classes.estimate_embedded_error</a></li>
+<li><a href="implementations/convergence_controller_classes/estimate_extrapolation_error.html">implementations.convergence_controller_classes.estimate_extrapolation_error</a></li>
+<li><a href="implementations/convergence_controller_classes/hotrod.html">implementations.convergence_controller_classes.hotrod</a></li>
+<li><a href="implementations/convergence_controller_classes/spread_step_sizes.html">implementations.convergence_controller_classes.spread_step_sizes</a></li>
+<li><a href="implementations/convergence_controller_classes/step_size_limiter.html">implementations.convergence_controller_classes.step_size_limiter</a></li>
+<li><a href="implementations/convergence_controller_classes/store_uold.html">implementations.convergence_controller_classes.store_uold</a></li>
+<li><a href="implementations/datatype_classes/cupy_mesh.html">implementations.datatype_classes.cupy_mesh</a></li>
 <li><a href="implementations/datatype_classes/fenics_mesh.html">implementations.datatype_classes.fenics_mesh</a></li>
 <li><a href="implementations/datatype_classes/mesh.html">implementations.datatype_classes.mesh</a></li>
 <li><a href="implementations/datatype_classes/particles.html">implementations.datatype_classes.particles</a></li>
 <li><a href="implementations/datatype_classes/petsc_vec.html">implementations.datatype_classes.petsc_vec</a></li>
 <li><a href="implementations/problem_classes/AcousticAdvection_1D_FD_imex.html">implementations.problem_classes.AcousticAdvection_1D_FD_imex</a></li>
 <li><a href="implementations/problem_classes/AdvectionDiffusionEquation_1D_FFT.html">implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT</a></li>
-<li><a href="implementations/problem_classes/AdvectionEquation_1D_FD.html">implementations.problem_classes.AdvectionEquation_1D_FD</a></li>
-<li><a href="implementations/problem_classes/AdvectionEquation_1D_FD_dirichlet.html">implementations.problem_classes.AdvectionEquation_1D_FD_dirichlet</a></li>
-<li><a href="implementations/problem_classes/AdvectionEquation_ND_FD_periodic.html">implementations.problem_classes.AdvectionEquation_ND_FD_periodic</a></li>
+<li><a href="implementations/problem_classes/AdvectionEquation_ND_FD.html">implementations.problem_classes.AdvectionEquation_ND_FD</a></li>
 <li><a href="implementations/problem_classes/AllenCahn_1D_FD.html">implementations.problem_classes.AllenCahn_1D_FD</a></li>
 <li><a href="implementations/problem_classes/AllenCahn_2D_FD.html">implementations.problem_classes.AllenCahn_2D_FD</a></li>
 <li><a href="implementations/problem_classes/AllenCahn_2D_FFT.html">implementations.problem_classes.AllenCahn_2D_FFT</a></li>
+<li><a href="implementations/problem_classes/AllenCahn_2D_FFT_gpu.html">implementations.problem_classes.AllenCahn_2D_FFT_gpu</a></li>
 <li><a href="implementations/problem_classes/AllenCahn_MPIFFT.html">implementations.problem_classes.AllenCahn_MPIFFT</a></li>
 <li><a href="implementations/problem_classes/AllenCahn_Temp_MPIFFT.html">implementations.problem_classes.AllenCahn_Temp_MPIFFT</a></li>
 <li><a href="implementations/problem_classes/Auzinger_implicit.html">implementations.problem_classes.Auzinger_implicit</a></li>
@@ -93,14 +97,10 @@
 <li><a href="implementations/problem_classes/GrayScott_2D_PETSc_periodic.html">implementations.problem_classes.GrayScott_2D_PETSc_periodic</a></li>
 <li><a href="implementations/problem_classes/GrayScott_MPIFFT.html">implementations.problem_classes.GrayScott_MPIFFT</a></li>
 <li><a href="implementations/problem_classes/HarmonicOscillator.html">implementations.problem_classes.HarmonicOscillator</a></li>
-<li><a href="implementations/problem_classes/HeatEquation_1D_FD.html">implementations.problem_classes.HeatEquation_1D_FD</a></li>
-<li><a href="implementations/problem_classes/HeatEquation_1D_FD_forced.html">implementations.problem_classes.HeatEquation_1D_FD_forced</a></li>
-<li><a href="implementations/problem_classes/HeatEquation_1D_FD_periodic.html">implementations.problem_classes.HeatEquation_1D_FD_periodic</a></li>
 <li><a href="implementations/problem_classes/HeatEquation_1D_FEniCS_matrix_forced.html">implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced</a></li>
 <li><a href="implementations/problem_classes/HeatEquation_1D_FEniCS_weak_forced.html">implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced</a></li>
-<li><a href="implementations/problem_classes/HeatEquation_2D_FD_periodic.html">implementations.problem_classes.HeatEquation_2D_FD_periodic</a></li>
 <li><a href="implementations/problem_classes/HeatEquation_2D_PETSc_forced.html">implementations.problem_classes.HeatEquation_2D_PETSc_forced</a></li>
-<li><a href="implementations/problem_classes/HeatEquation_ND_FD_forced_periodic.html">implementations.problem_classes.HeatEquation_ND_FD_forced_periodic</a></li>
+<li><a href="implementations/problem_classes/HeatEquation_ND_FD.html">implementations.problem_classes.HeatEquation_ND_FD</a></li>
 <li><a href="implementations/problem_classes/HenonHeiles.html">implementations.problem_classes.HenonHeiles</a></li>
 <li><a href="implementations/problem_classes/LogisticEquation.html">implementations.problem_classes.LogisticEquation</a></li>
 <li><a href="implementations/problem_classes/NonlinearSchroedinger_MPIFFT.html">implementations.problem_classes.NonlinearSchroedinger_MPIFFT</a></li>
@@ -138,9 +138,6 @@
 <li><a href="implementations/transfer_classes/TransferMesh_NoCoarse.html">implementations.transfer_classes.TransferMesh_NoCoarse</a></li>
 <li><a href="implementations/transfer_classes/TransferPETScDMDA.html">implementations.transfer_classes.TransferPETScDMDA</a></li>
 <li><a href="implementations/transfer_classes/TransferParticles_NoCoarse.html">implementations.transfer_classes.TransferParticles_NoCoarse</a></li>
-<li><a href="pySDC/core/Collocation.html">pySDC.core.Collocation</a></li>
-<li><a href="pySDC/core/Lagrange.html">pySDC.core.Lagrange</a></li>
-<li><a href="pySDC/core/Nodes.html">pySDC.core.Nodes</a></li>
 </ul>
 
             <div class="clearer"></div>
@@ -172,13 +169,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Overview: module code</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

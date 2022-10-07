@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Second-order Problems &#8212; pySDC 4.2.3 documentation</title>
+    <title>Second-order Problems &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="matrixPFASST.html" title="Matrix-based versions of PFASST"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Second-order Problems</a></li> 
       </ul>
     </div>  
@@ -63,8 +64,8 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_lobatto</span> <span class="kn">import</span> <span class="n">CollGaussLobatto</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span><span class="p">,</span> <span class="n">filter_stats</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HarmonicOscillator</span> <span class="kn">import</span> <span class="n">harmonic_oscillator</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HenonHeiles</span> <span class="kn">import</span> <span class="n">henon_heiles</span>
@@ -84,12 +85,12 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussLobatto</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LOBATTO&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zero&#39;</span>
 
@@ -132,12 +133,12 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.25</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussLobatto</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LOBATTO&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zero&#39;</span>
 
@@ -194,8 +195,7 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Problem type not implemented, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">prob</span><span class="p">)</span>
 
     <span class="c1"># instantiate the controller</span>
-    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                   <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
     <span class="c1"># get initial values on finest level</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -205,10 +205,7 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="c1"># for item in iter_counts:</span>
@@ -220,8 +217,7 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -270,7 +266,7 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
         <span class="n">err_ham</span> <span class="o">=</span> <span class="n">ham</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">ham</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Iter &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
 
-    <span class="k">assert</span> <span class="n">err_ham</span> <span class="o">&lt;</span> <span class="mf">3.7E-08</span><span class="p">,</span> <span class="s1">&#39;Error in the Hamiltonian is too large for </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">err_ham</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err_ham</span> <span class="o">&lt;</span> <span class="mf">3.7e-08</span><span class="p">,</span> <span class="s1">&#39;Error in the Hamiltonian is too large for </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">err_ham</span><span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Error in Hamiltonian&#39;</span><span class="p">)</span>
@@ -298,8 +294,8 @@ PFASST is run with 100 processors (virtually parallel) and the deviation from th
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/harmonic_hamiltonian.png"><img alt="../_images/harmonic_hamiltonian.png" src="../_images/harmonic_hamiltonian.png" style="width: 185.0px; height: 92.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/henonheiles_hamiltonian.png"><img alt="../_images/henonheiles_hamiltonian.png" src="../_images/henonheiles_hamiltonian.png" style="width: 185.0px; height: 92.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/harmonic_hamiltonian.png"><img alt="../_images/harmonic_hamiltonian.png" src="../_images/harmonic_hamiltonian.png" style="width: 187.5px; height: 93.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/henonheiles_hamiltonian.png"><img alt="../_images/henonheiles_hamiltonian.png" src="../_images/henonheiles_hamiltonian.png" style="width: 187.5px; height: 93.0px;" /></a>
 </section>
 <section id="solar-system-problem">
 <h2>Solar system problem<a class="headerlink" href="#solar-system-problem" title="Permalink to this heading">¶</a></h2>
@@ -322,8 +318,8 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_lobatto</span> <span class="kn">import</span> <span class="n">CollGaussLobatto</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span><span class="p">,</span> <span class="n">filter_stats</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.FullSolarSystem</span> <span class="kn">import</span> <span class="n">full_solar_system</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.OuterSolarSystem</span> <span class="kn">import</span> <span class="n">outer_solar_system</span>
@@ -343,12 +339,12 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussLobatto</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LOBATTO&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
 
@@ -389,12 +385,12 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussLobatto</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LOBATTO&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;spread&#39;</span>
 
@@ -450,14 +446,13 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Problem type not implemented, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">prob</span><span class="p">)</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">prob</span> <span class="o">+</span> <span class="s1">&#39;_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/&#39;</span> <span class="o">+</span> <span class="n">prob</span> <span class="o">+</span> <span class="s1">&#39;_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Running &#39;</span> <span class="o">+</span> <span class="n">prob</span> <span class="o">+</span> <span class="s1">&#39; problem with </span><span class="si">%s</span><span class="s1"> processors...&#39;</span> <span class="o">%</span> <span class="n">num_procs</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># instantiate the controller</span>
-    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                   <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
     <span class="c1"># get initial values on finest level</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -467,10 +462,7 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="c1"># for item in iter_counts:</span>
@@ -485,8 +477,7 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
@@ -538,7 +529,7 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
         <span class="n">ham</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
         <span class="n">err_ham</span> <span class="o">=</span> <span class="n">ham</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">ham</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Iter &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-    <span class="k">assert</span> <span class="n">err_ham</span> <span class="o">&lt;</span> <span class="mf">2.4E-14</span><span class="p">,</span> <span class="s1">&#39;Error in the Hamiltonian is too large for </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">err_ham</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">err_ham</span> <span class="o">&lt;</span> <span class="mf">2.4e-14</span><span class="p">,</span> <span class="s1">&#39;Error in the Hamiltonian is too large for </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">err_ham</span><span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Error in Hamiltonian&#39;</span><span class="p">)</span>
@@ -552,8 +543,7 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">),</span> <span class="s1">&#39;ERROR: plotting did not create PNG file&#39;</span>
 
     <span class="c1"># extract positions and prepare for plotting</span>
-    <span class="n">extract_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">extract_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
@@ -606,8 +596,8 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.75</span> <span class="o">--</span> <span class="mf">0.56</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/outer_solar_system_hamiltonian.png"><img alt="../_images/outer_solar_system_hamiltonian.png" src="../_images/outer_solar_system_hamiltonian.png" style="width: 370.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/outer_solar_system_positions.png"><img alt="../_images/outer_solar_system_positions.png" src="../_images/outer_solar_system_positions.png" style="width: 493.0px; height: 483.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/outer_solar_system_hamiltonian.png"><img alt="../_images/outer_solar_system_hamiltonian.png" src="../_images/outer_solar_system_hamiltonian.png" style="width: 375.0px; height: 186.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/outer_solar_system_positions.png"><img alt="../_images/outer_solar_system_positions.png" src="../_images/outer_solar_system_positions.png" style="width: 494.0px; height: 483.0px;" /></a>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Running</span> <span class="n">full_solar_system</span> <span class="n">problem</span> <span class="k">with</span> <span class="mi">100</span> <span class="n">processors</span><span class="o">...</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">18.02</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mi">24</span> 
@@ -615,8 +605,8 @@ Here, over 15 iterations are required in the mean, while SDC and MLSDC require o
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.37</span> <span class="o">--</span> <span class="mf">40.54</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/full_solar_system_hamiltonian.png"><img alt="../_images/full_solar_system_hamiltonian.png" src="../_images/full_solar_system_hamiltonian.png" style="width: 376.0px; height: 526.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/full_solar_system_positions.png"><img alt="../_images/full_solar_system_positions.png" src="../_images/full_solar_system_positions.png" style="width: 490.0px; height: 483.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/full_solar_system_hamiltonian.png"><img alt="../_images/full_solar_system_hamiltonian.png" src="../_images/full_solar_system_hamiltonian.png" style="width: 383.0px; height: 584.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/full_solar_system_positions.png"><img alt="../_images/full_solar_system_positions.png" src="../_images/full_solar_system_positions.png" style="width: 491.0px; height: 483.0px;" /></a>
 </section>
 <section id="fermi-pasta-ulam-tsingou-problem">
 <h2>Fermi-Pasta-Ulam-Tsingou problem<a class="headerlink" href="#fermi-pasta-ulam-tsingou-problem" title="Permalink to this heading">¶</a></h2>
@@ -633,8 +623,8 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_lobatto</span> <span class="kn">import</span> <span class="n">CollGaussLobatto</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span><span class="p">,</span> <span class="n">filter_stats</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.FermiPastaUlamTsingou</span> <span class="kn">import</span> <span class="n">fermi_pasta_ulam_tsingou</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.verlet</span> <span class="kn">import</span> <span class="n">verlet</span>
@@ -653,12 +643,12 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussLobatto</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LOBATTO&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;initial_guess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;zero&#39;</span>
 
@@ -705,14 +695,13 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
     <span class="n">Tend</span> <span class="o">=</span> <span class="mf">1000.0</span>
     <span class="n">num_procs</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;fput_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/fput_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Running fput problem with </span><span class="si">%s</span><span class="s1"> processors...&#39;</span> <span class="o">%</span> <span class="n">num_procs</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># instantiate the controller</span>
-    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                   <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">num_procs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
 
     <span class="c1"># get initial values on finest level</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -722,10 +711,7 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
     <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="c1"># compute and print statistics</span>
     <span class="c1"># for item in iter_counts:</span>
@@ -740,8 +726,7 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
@@ -749,7 +734,7 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># get runtime</span>
-    <span class="n">timing_run</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">timing_run</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;... took </span><span class="si">%6.4f</span><span class="s1"> seconds to run this.&#39;</span> <span class="o">%</span> <span class="n">timing_run</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -815,8 +800,7 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
 
     <span class="c1"># ENERGY PLOTTING #</span>
     <span class="c1"># extract error in hamiltonian and prepare for plotting</span>
-    <span class="n">extract_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;energy_step&#39;</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">extract_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;energy_step&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
@@ -839,8 +823,7 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
 
     <span class="c1"># POSITION PLOTTING #</span>
     <span class="c1"># extract positions and prepare for plotting</span>
-    <span class="n">extract_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">extract_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
@@ -880,12 +863,12 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">7</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mi">475</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">2.10</span> <span class="o">--</span> <span class="mf">4.42</span>
-<span class="o">...</span> <span class="n">took</span> <span class="mf">55.1327</span> <span class="n">seconds</span> <span class="n">to</span> <span class="n">run</span> <span class="n">this</span><span class="o">.</span>
+<span class="o">...</span> <span class="n">took</span> <span class="mf">66.5951</span> <span class="n">seconds</span> <span class="n">to</span> <span class="n">run</span> <span class="n">this</span><span class="o">.</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/fput_hamiltonian.png"><img alt="../_images/fput_hamiltonian.png" src="../_images/fput_hamiltonian.png" style="width: 376.0px; height: 201.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/fput_positions.png"><img alt="../_images/fput_positions.png" src="../_images/fput_positions.png" style="width: 271.0px; height: 167.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/fput_energy.png"><img alt="../_images/fput_energy.png" src="../_images/fput_energy.png" style="width: 381.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/fput_hamiltonian.png"><img alt="../_images/fput_hamiltonian.png" src="../_images/fput_hamiltonian.png" style="width: 383.0px; height: 212.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/fput_positions.png"><img alt="../_images/fput_positions.png" src="../_images/fput_positions.png" style="width: 276.0px; height: 168.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/fput_energy.png"><img alt="../_images/fput_energy.png" src="../_images/fput_energy.png" style="width: 393.0px; height: 184.0px;" /></a>
 <a class="reference internal image-reference" href="../_images/fput_energy_full.png"><img alt="../_images/fput_energy_full.png" src="../_images/fput_energy_full.png" style="width: 347.0px; height: 181.0px;" /></a>
 </section>
 </section>
@@ -955,13 +938,13 @@ Note that we run MLSDC here, since PFASST does not seem to converge easily.</p>
         <li class="right" >
           <a href="matrixPFASST.html" title="Matrix-based versions of PFASST"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Second-order Problems</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

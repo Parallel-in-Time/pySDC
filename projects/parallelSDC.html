@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Attempts to parallelize SDC &#8212; pySDC 4.2.3 documentation</title>
+    <title>Attempts to parallelize SDC &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,10 +15,11 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Fault-tolerance with PFASST: node failures" href="node_failure.html" />
+    <link rel="next" title="Fast-Wave-Slow-Wave SDC" href="fwsw.html" />
     <link rel="prev" title="Step-8: Advanced topics" href="../tutorial/step_8.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -31,12 +32,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+          <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../tutorial/step_8.html" title="Step-8: Advanced topics"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Attempts to parallelize SDC</a></li> 
       </ul>
     </div>  
@@ -71,12 +72,12 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 
@@ -86,11 +87,11 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
 
     <span class="c1"># initialize sweeper parameters (part I)</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
 
     <span class="c1"># initialize step parameters</span>
@@ -103,10 +104,12 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 
     <span class="c1"># set up list of Q-delta types and setups</span>
     <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">,</span> <span class="s1">&#39;IE&#39;</span><span class="p">,</span> <span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">]</span>
-    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+    <span class="p">]</span>
     <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
 
     <span class="c1"># pre-fill results with lists of  setups</span>
@@ -143,10 +146,11 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
@@ -155,16 +159,18 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>  <span class="c1"># boundary conditions</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
 
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -180,7 +186,7 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
@@ -194,8 +200,9 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                     <span class="n">exit</span><span class="p">()</span>
 
                 <span class="c1"># instantiate controller</span>
-                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+                    <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+                <span class="p">)</span>
 
                 <span class="c1"># get initial values on finest level</span>
                 <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -205,10 +212,7 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
                 <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
 
                 <span class="c1"># filter statistics by type (number of iterations)</span>
-                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
                 <span class="c1"># just one time-step, grep number of iteration and store</span>
                 <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -274,8 +278,16 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
                 <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">niter</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span>
+                <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+                <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
             <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
@@ -310,10 +322,10 @@ Here, we study different ideas to work with a diagonal matrix and compare them t
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_heat.png"><img alt="../_images/parallelSDC_preconditioner_heat.png" src="../_images/parallelSDC_preconditioner_heat.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_advection.png"><img alt="../_images/parallelSDC_preconditioner_advection.png" src="../_images/parallelSDC_preconditioner_advection.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_vanderpol.png" src="../_images/parallelSDC_preconditioner_vanderpol.png" style="width: 272.0px; height: 184.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_fisher.png"><img alt="../_images/parallelSDC_preconditioner_fisher.png" src="../_images/parallelSDC_preconditioner_fisher.png" style="width: 272.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_heat.png"><img alt="../_images/parallelSDC_preconditioner_heat.png" src="../_images/parallelSDC_preconditioner_heat.png" style="width: 277.0px; height: 188.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_advection.png"><img alt="../_images/parallelSDC_preconditioner_advection.png" src="../_images/parallelSDC_preconditioner_advection.png" style="width: 277.0px; height: 188.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_vanderpol.png" src="../_images/parallelSDC_preconditioner_vanderpol.png" style="width: 277.0px; height: 190.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_fisher.png"><img alt="../_images/parallelSDC_preconditioner_fisher.png" src="../_images/parallelSDC_preconditioner_fisher.png" style="width: 277.0px; height: 192.0px;" /></a>
 </section>
 <section id="node-parallel-sdc-with-mpi">
 <h2>Node-parallel SDC with MPI<a class="headerlink" href="#node-parallel-sdc-with-mpi" title="Permalink to this heading">¶</a></h2>
@@ -330,12 +342,12 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
 <span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
 
@@ -348,11 +360,11 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
 
     <span class="c1"># initialize sweeper parameters (part I)</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
 
@@ -366,10 +378,12 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># set up list of Q-delta types and setups</span>
     <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
-    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+    <span class="p">]</span>
     <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
 
     <span class="c1"># pre-fill results with lists of  setups</span>
@@ -407,10 +421,11 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
@@ -419,16 +434,18 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>  <span class="c1"># boundary conditions</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
 
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -444,7 +461,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
@@ -458,8 +475,9 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">exit</span><span class="p">()</span>
 
                 <span class="c1"># instantiate controller</span>
-                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+                    <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+                <span class="p">)</span>
 
                 <span class="c1"># get initial values on finest level</span>
                 <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -469,10 +487,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                 <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
 
                 <span class="c1"># filter statistics by type (number of iterations)</span>
-                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
                 <span class="c1"># just one time-step, grep number of iteration and store</span>
                 <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -532,8 +547,16 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                         <span class="n">niter</span><span class="p">[</span><span class="n">xvalue</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
             <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">niter</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span>
+                <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+                <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
             <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
@@ -570,10 +593,10 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 266.0px; height: 180.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" /></a>
 </section>
 <section id="simplified-newton-for-nonlinear-problems">
 <h2>Simplified Newton for nonlinear problems<a class="headerlink" href="#simplified-newton-for-nonlinear-problems" title="Permalink to this heading">¶</a></h2>
@@ -591,8 +614,8 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac</span> <span class="kn">import</span> <span class="n">generalized_fisher_jac</span>
@@ -604,7 +627,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
 
     <span class="c1"># This comes as read-in for the step class (this is optional!)</span>
@@ -617,12 +640,12 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
     <span class="c1"># This comes as read-in for the sweeper class</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;fixed_time_in_jacobian&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -639,10 +662,14 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_params</span>
 
-    <span class="n">sweeper_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic_implicit</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel_prec</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel</span><span class="p">,</span>
-                    <span class="n">linearized_implicit_parallel</span><span class="p">]</span>
+    <span class="n">sweeper_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">generic_implicit</span><span class="p">,</span>
+        <span class="n">linearized_implicit_fixed_parallel_prec</span><span class="p">,</span>
+        <span class="n">linearized_implicit_fixed_parallel</span><span class="p">,</span>
+        <span class="n">linearized_implicit_parallel</span><span class="p">,</span>
+    <span class="p">]</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;parallelSDC_nonlinear_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/parallelSDC_nonlinear_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
     <span class="n">uinit</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uex</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">uend</span> <span class="o">=</span> <span class="kc">None</span>
@@ -673,10 +700,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error at time </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Tend</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
 
         <span class="c1"># filter statistics by type (number of iterations)</span>
-        <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-        <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-        <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+        <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
         <span class="c1"># compute and print statistics</span>
         <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
@@ -686,12 +710,13 @@ This part also contains the code <code class="docutils literal notranslate"><spa
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span>
+        <span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -700,8 +725,9 @@ This part also contains the code <code class="docutils literal notranslate"><spa
         <span class="nb">print</span><span class="p">()</span>
 
         <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;</span> <span class="mf">3.686e-05</span><span class="p">,</span> <span class="s1">&#39;ERROR: error is too high for sweeper </span><span class="si">%s</span><span class="s1">, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">7.5</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">4.0</span><span class="p">,</span> \
-            <span class="s1">&#39;ERROR: mean number of iterations not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">7.5</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">==</span> <span class="mf">4.0</span>
+        <span class="p">),</span> <span class="s1">&#39;ERROR: mean number of iterations not as expected, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
@@ -793,14 +819,14 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 403.0px; height: 265.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher.png"><img alt="../_images/parallelSDC_fisher.png" src="../_images/parallelSDC_fisher.png" style="width: 404.0px; height: 265.0px;" /></a>
 <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/projects/parallelSDC/newton_vs_sdc.py">pySDC/projects/parallelSDC/newton_vs_sdc.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
 <span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.ErrReductionHook</span> <span class="kn">import</span> <span class="n">err_reduction_hook</span>
@@ -812,7 +838,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
 
     <span class="c1"># This comes as read-in for the step class (this is optional!)</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -824,12 +850,12 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2047</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
     <span class="c1"># This comes as read-in for the sweeper class</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LU&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;fixed_time_in_jacobian&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -851,7 +877,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">Tend</span> <span class="o">=</span> <span class="mf">0.1</span>
 
     <span class="n">sweeper_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic_implicit</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel</span><span class="p">,</span> <span class="n">linearized_implicit_fixed_parallel_prec</span><span class="p">]</span>
-    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tend</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Tend</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
 
     <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">results</span><span class="p">[</span><span class="s1">&#39;sweeper_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweeper</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">sweeper</span> <span class="ow">in</span> <span class="n">sweeper_list</span><span class="p">]</span>
@@ -878,11 +904,9 @@ This part also contains the code <code class="docutils literal notranslate"><spa
             <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
             <span class="c1"># filter statistics</span>
-            <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_pre_iteration&#39;</span><span class="p">)</span>
-            <span class="n">error_pre</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">error_pre</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_pre_iteration&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-            <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_post_iteration&#39;</span><span class="p">)</span>
-            <span class="n">error_post</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">error_post</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;error_post_iteration&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;iter&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="n">error_reduction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_post</span> <span class="o">/</span> <span class="n">error_pre</span><span class="p">)</span>
 
@@ -929,12 +953,14 @@ This part also contains the code <code class="docutils literal notranslate"><spa
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">newfig</span><span class="p">(</span><span class="n">textwidth</span><span class="o">=</span><span class="mf">238.96</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.89</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">sweeper</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">setups</span><span class="p">:</span>
-        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="n">sweeper</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
-                              <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span>
+            <span class="n">dt_list</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="n">sweeper</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span>
+        <span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="p">[</span><span class="n">dt</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
-    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="p">[</span><span class="n">dt</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
-                          <span class="n">label</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span><span class="p">)</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span>
+        <span class="n">dt_list</span><span class="p">,</span> <span class="p">[</span><span class="n">dt</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">],</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span>
+    <span class="p">)</span>
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;dt&#39;</span><span class="p">)</span>
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;error reduction&#39;</span><span class="p">)</span>
@@ -947,7 +973,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
     <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="n">dt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">dt_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.1</span><span class="p">])</span>
-    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">4E-03</span><span class="p">,</span> <span class="mf">1E0</span><span class="p">])</span>
+    <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">4e-03</span><span class="p">,</span> <span class="mf">1e0</span><span class="p">])</span>
 
     <span class="c1"># save plot, beautify</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;data/parallelSDC_fisher_newton&#39;</span>
@@ -964,7 +990,7 @@ This part also contains the code <code class="docutils literal notranslate"><spa
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 286.0px; height: 184.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_fisher_newton.png"><img alt="../_images/parallelSDC_fisher_newton.png" src="../_images/parallelSDC_fisher_newton.png" style="width: 293.0px; height: 186.0px;" /></a>
 </section>
 <section id="id1">
 <h2>Node-parallel SDC with MPI<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
@@ -981,12 +1007,12 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
 
 <span class="kn">import</span> <span class="nn">pySDC.helpers.plot_helper</span> <span class="k">as</span> <span class="nn">plt_helper</span>
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_1D_FD</span> <span class="kn">import</span> <span class="n">advection1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.GeneralizedFisher_1D_FD_implicit</span> <span class="kn">import</span> <span class="n">generalized_fisher</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FD</span> <span class="kn">import</span> <span class="n">heat1d</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_unforced</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Van_der_Pol_implicit</span> <span class="kn">import</span> <span class="n">vanderpol</span>
 <span class="kn">from</span> <span class="nn">pySDC.projects.parallelSDC.generic_implicit_MPI</span> <span class="kn">import</span> <span class="n">generic_implicit_MPI</span>
 
@@ -999,11 +1025,11 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># initialize level parameters (part I)</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-08</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span>
 
     <span class="c1"># initialize sweeper parameters (part I)</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">Get_size</span><span class="p">()</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
 
@@ -1017,10 +1043,12 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
     <span class="c1"># set up list of Q-delta types and setups</span>
     <span class="n">qd_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;IEpar&#39;</span><span class="p">,</span> <span class="s1">&#39;Qpar&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN&#39;</span><span class="p">,</span> <span class="s1">&#39;MIN3&#39;</span><span class="p">]</span>
-    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
-                  <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span> <span class="o">**</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])]</span>
+    <span class="n">setup_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;advection&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="p">[</span><span class="mf">10.0</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;vanderpol&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.1</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]),</span>
+        <span class="p">(</span><span class="s1">&#39;fisher&#39;</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]),</span>
+    <span class="p">]</span>
     <span class="c1"># setup_list = [(&#39;fisher&#39;, 63, [2 * i for i in range(1, 6)])]</span>
 
     <span class="c1"># pre-fill results with lists of  setups</span>
@@ -1058,10 +1086,11 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dirichlet-zero&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_unforced</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
@@ -1070,16 +1099,18 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>  <span class="c1"># boundary conditions</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
 
-                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advection1d</span>
+                    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>
                     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;level_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_params</span>  <span class="c1"># pass level parameters</span>
 
                 <span class="k">elif</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;vanderpol&#39;</span><span class="p">:</span>
 
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-09</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-09</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;u0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -1095,7 +1126,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;lambda0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
-                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+                    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
                     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
                     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
@@ -1109,8 +1140,9 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                     <span class="n">exit</span><span class="p">()</span>
 
                 <span class="c1"># instantiate controller</span>
-                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                               <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+                <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+                    <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+                <span class="p">)</span>
 
                 <span class="c1"># get initial values on finest level</span>
                 <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -1120,10 +1152,7 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                 <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
 
                 <span class="c1"># filter statistics by type (number of iterations)</span>
-                <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-                <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+                <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
                 <span class="c1"># just one time-step, grep number of iteration and store</span>
                 <span class="n">niter</span> <span class="o">=</span> <span class="n">iter_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -1183,8 +1212,16 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
                         <span class="n">niter</span><span class="p">[</span><span class="n">xvalue</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
             <span class="n">lw</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">niter</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                                    <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">plt_helper</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">setup</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">niter</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">qd_type</span><span class="p">,</span>
+                <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="n">ls</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
+                <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">setup</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
             <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$\nu$&#39;</span>
@@ -1221,10 +1258,10 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
 </pre></div>
 </div>
 <p>Results:</p>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 266.0px; height: 180.0px;" /></a>
-<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 266.0px; height: 180.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_heat.png"><img alt="../_images/parallelSDC_preconditioner_MPI_heat.png" src="../_images/parallelSDC_preconditioner_MPI_heat.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_advection.png"><img alt="../_images/parallelSDC_preconditioner_MPI_advection.png" src="../_images/parallelSDC_preconditioner_MPI_advection.png" style="width: 269.0px; height: 185.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_vanderpol.png"><img alt="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" src="../_images/parallelSDC_preconditioner_MPI_vanderpol.png" style="width: 269.0px; height: 187.0px;" /></a>
+<a class="reference internal image-reference" href="../_images/parallelSDC_preconditioner_MPI_fisher.png"><img alt="../_images/parallelSDC_preconditioner_MPI_fisher.png" src="../_images/parallelSDC_preconditioner_MPI_fisher.png" style="width: 269.0px; height: 188.0px;" /></a>
 </section>
 </section>
 
@@ -1255,8 +1292,8 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="node_failure.html"
-                          title="next chapter">Fault-tolerance with PFASST: node failures</a></p>
+    <p class="topless"><a href="fwsw.html"
+                          title="next chapter">Fast-Wave-Slow-Wave SDC</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -1289,18 +1326,18 @@ The objective function in this case is the sum over 17^2 values of lamdt, real a
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="node_failure.html" title="Fault-tolerance with PFASST: node failures"
+          <a href="fwsw.html" title="Fast-Wave-Slow-Wave SDC"
              >next</a> |</li>
         <li class="right" >
           <a href="../tutorial/step_8.html" title="Step-8: Advanced topics"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Attempts to parallelize SDC</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

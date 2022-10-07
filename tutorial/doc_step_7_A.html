@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 4.2.3 documentation</title>
+    <title>&lt;no title&gt; &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -28,7 +29,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>  
@@ -39,10 +40,11 @@
           <div class="body" role="main">
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py">pySDC/tutorial/step_7/A_pySDC_with_FEniCS.py</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced</span> <span class="kn">import</span> <span class="n">fenics_heat_mass</span><span class="p">,</span> <span class="n">fenics_heat</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced</span> <span class="kn">import</span> <span class="n">fenics_heat_weak_imex</span>
@@ -64,7 +66,7 @@
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
 
     <span class="c1"># initialize step parameters</span>
@@ -73,7 +75,7 @@
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="c1"># Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
@@ -158,17 +160,15 @@
     <span class="n">uex</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">u_exact</span><span class="p">(</span><span class="n">Tend</span><span class="p">)</span>
     <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span> <span class="o">-</span> <span class="n">uend</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">uex</span><span class="p">)</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_7_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_7_A_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Variant </span><span class="si">{</span><span class="n">variant</span><span class="si">}</span><span class="s1"> with ml=</span><span class="si">{</span><span class="n">ml</span><span class="si">}</span><span class="s1"> and num_procs=</span><span class="si">{</span><span class="n">num_procs</span><span class="si">}</span><span class="s1"> -- error at time </span><span class="si">{</span><span class="n">Tend</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="c1"># filter statistics by type (number of iterations)</span>
-    <span class="n">filtered_stats</span> <span class="o">=</span> <span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">)</span>
-
-    <span class="c1"># convert filtered statistics to list of iterations count, sorted by process</span>
-    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filtered_stats</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
     <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Mean number of iterations: </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
@@ -177,25 +177,24 @@
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Range of values for number of iterations: </span><span class="si">%2i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> \
-          <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Position of max/min number of iterations: </span><span class="si">%2i</span><span class="s1"> -- </span><span class="si">%2i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;   Std and var for number of iterations: </span><span class="si">%4.2f</span><span class="s1"> -- </span><span class="si">%4.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">niters</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">niters</span><span class="p">)))</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
-    <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">timing</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Time to solution: </span><span class="si">{</span><span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">6.4f</span><span class="si">}</span><span class="s1"> sec.&#39;</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">num_procs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">6.0</span><span class="p">,</span> <span class="s1">&#39;Mean number of iterations is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4.1E-08</span><span class="p">,</span> <span class="s1">&#39;Error is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+        <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4.1e-08</span><span class="p">,</span> <span class="s1">&#39;Error is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">11.6</span><span class="p">,</span> <span class="s1">&#39;Mean number of iterations is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4.0E-08</span><span class="p">,</span> <span class="s1">&#39;Error is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
+        <span class="k">assert</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="mf">4.0e-08</span><span class="p">,</span> <span class="s1">&#39;Error is too high, got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">err</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
@@ -227,49 +226,49 @@
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.9940</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.5364</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">mass</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">4.046761177025691e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.00</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.5254</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">1.8568</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">weak</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">False</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">4.038068772113821e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.00</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">6.0718</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">7.0676</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">mass_inv</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">4.0467880206951514e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.00</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.7608</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">3.3027</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">mass</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">4.0466577002423495e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.00</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.3072</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">2.8081</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">weak</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">1</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">4.0380688838876016e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">6.00</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">0</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">0.00</span> <span class="o">--</span> <span class="mf">0.00</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">4.3801</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">5.2686</span> <span class="n">sec</span><span class="o">.</span>
 
 <span class="n">Variant</span> <span class="n">mass_inv</span> <span class="k">with</span> <span class="n">ml</span><span class="o">=</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">num_procs</span><span class="o">=</span><span class="mi">5</span> <span class="o">--</span> <span class="n">error</span> <span class="n">at</span> <span class="n">time</span> <span class="mf">1.0</span><span class="p">:</span> <span class="mf">3.9624688218753e-08</span>
    <span class="n">Mean</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">11.60</span>
    <span class="n">Range</span> <span class="n">of</span> <span class="n">values</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">9</span> 
    <span class="n">Position</span> <span class="n">of</span> <span class="nb">max</span><span class="o">/</span><span class="nb">min</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span>  <span class="mi">4</span> <span class="o">--</span>  <span class="mi">0</span>
    <span class="n">Std</span> <span class="ow">and</span> <span class="n">var</span> <span class="k">for</span> <span class="n">number</span> <span class="n">of</span> <span class="n">iterations</span><span class="p">:</span> <span class="mf">3.26</span> <span class="o">--</span> <span class="mf">10.64</span>
-<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">4.5279</span> <span class="n">sec</span><span class="o">.</span>
+<span class="n">Time</span> <span class="n">to</span> <span class="n">solution</span><span class="p">:</span> <span class="mf">5.5582</span> <span class="n">sec</span><span class="o">.</span>
 
 </pre></div>
 </div>
@@ -311,13 +310,13 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

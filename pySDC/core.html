@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>core package &#8212; pySDC 4.2.3 documentation</title>
+    <title>core package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
@@ -37,7 +38,7 @@
         <li class="right" >
           <a href="../projects/Resilience.html" title="Resilience in SDC"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core package</a></li> 
       </ul>
     </div>  
@@ -145,7 +146,7 @@ fine level are restricted as well.</p>
 <span id="core-collocation-module"></span><h2>core.Collocation module<a class="headerlink" href="#module-core.Collocation" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Collocation.CollBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useSpline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Collocation.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useSpline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Collocation.CollBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Generic collocation class, that contains everything to do integration over
 intervals and between nodes.
@@ -1303,7 +1304,7 @@ function <span class="math notranslate nohighlight">\(f\)</span> can be approxim
 <div class="math notranslate nohighlight">
 \[w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}\]</div>
 <p>are the barycentric weights.
-The theory and implementation is inspired from <a href="#id16"><span class="problematic" id="id1">[1]_</span></a>.</p>
+The theory and implementation is inspired from <a class="reference external" href="http://dx.doi.org/10.1137/S0036144502417715">this paper</a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.points">
 <span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.points" title="Permalink to this definition">¶</a></dt>
@@ -1326,44 +1327,9 @@ The theory and implementation is inspired from <a href="#id16"><span class="prob
 </dl>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.n">
-<span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.n" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of points</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int (property)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weightComputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AUTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaleRef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MAX'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instanciate the LagrangeApproximation object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">getInterpolationMatrix(self,</span> <span class="pre">times):</span></span></dt>
-<dd><p>Compute the interpolation matrix for a given set of discrete “time” points.</p>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.getIntegrationMatrix">
-<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the integration matrix for a given set of intervals.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">..</span> <span class="pre">[1]</span> <span class="pre">Berrut,</span> <span class="pre">J.</span> <span class="pre">P.,</span> <span class="pre">&amp;</span> <span class="pre">Trefethen,</span> <span class="pre">L.</span> <span class="pre">N.</span> <span class="pre">(2004).</span></span></dt>
-<dd><p>“Barycentric lagrange interpolation.” SIAM review, 46(3), 501-517.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the integration matrix for a given set of intervals.</p>
 <p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
 <span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and
@@ -1382,7 +1348,7 @@ method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>intervals</strong> (<em>list of pairs</em>) – A list of all integration intervals.</p></li>
+<li><p><strong>intervals</strong> (<em>list</em><em> of </em><em>pairs</em>) – A list of all integration intervals.</p></li>
 <li><p><strong>numQuad</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Quadrature rule used to integrate the interpolant barycentric
 polynomial. Can be :</p>
 <ul>
@@ -1433,8 +1399,8 @@ parameter) and <span class="math notranslate nohighlight">\(n\)</span> columns.<
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id2">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="core.Lagrange.LagrangeApproximation.n">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.Lagrange.LagrangeApproximation.n" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1653,7 +1619,7 @@ know about other levels.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class that can be used to generate generic distribution of nodes derived
 from Gauss quadrature rule.
-Its implementation is fully inspired from a book of W. Gautschi <a href="#id17"><span class="problematic" id="id3">[1]_</span></a>.</p>
+Its implementation is fully inspired from a <a class="reference external" href="https://doi.org/10.1093/oso/9780198506720.001.0001">book of W. Gautschi</a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="core.Nodes.NodesGenerator.node_type">
 <span class="sig-name descname"><span class="pre">node_type</span></span><a class="headerlink" href="#core.Nodes.NodesGenerator.node_type" title="Permalink to this definition">¶</a></dt>
@@ -1677,46 +1643,8 @@ Its implementation is fully inspired from a book of W. Gautschi <a href="#id17">
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instanciate the NodesGenerator object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getNodes">
-<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getNodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes a given number of quadrature nodes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getOrthogPolyCoefficients">
-<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getOrthogPolyCoefficients" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="core.Nodes.NodesGenerator.evalOrthogPoly">
-<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.evalOrthogPoly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates the two higher order orthogonal polynomials corresponding
-to the given (alpha,beta) coefficients.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getTridiagCoefficients">
-<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getTridiagCoefficients" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
-taking into account the quadrature type.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">..</span> <span class="pre">[1]</span> <span class="pre">W.</span> <span class="pre">Gautschi,</span> <span class="pre">&quot;Orthogonal</span> <span class="pre">polynomials:</span> <span class="pre">computation</span> <span class="pre">and</span> <span class="pre">approximation.&quot;</span></span></dt>
-<dd><p>OUP Oxford, 2004.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.evalOrthogPoly" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the two higher order orthogonal polynomials corresponding
 to the given (alpha,beta) coefficients.</p>
 <dl class="field-list simple">
@@ -1738,8 +1666,8 @@ to the given (alpha,beta) coefficients.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getNodes">
+<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getNodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes a given number of quadrature nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1755,8 +1683,8 @@ to the given (alpha,beta) coefficients.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getOrthogPolyCoefficients">
+<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getOrthogPolyCoefficients" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1773,8 +1701,8 @@ to the given (alpha,beta) coefficients.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="core.Nodes.NodesGenerator.getTridiagCoefficients">
+<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Nodes.NodesGenerator.getTridiagCoefficients" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
 taking into account the quadrature type.</p>
 <dl class="field-list simple">
@@ -1796,12 +1724,6 @@ taking into account the quadrature type.</p>
 </section>
 <section id="module-core.Problem">
 <span id="core-problem-module"></span><h2>core.Problem module<a class="headerlink" href="#module-core.Problem" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="core.Problem.get_finite_difference_stencil">
-<span class="sig-prename descclassname"><span class="pre">core.Problem.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
-<dd><p>Derive general finite difference stencils from Taylor expansions</p>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="core.Problem.ptype">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.Problem.</span></span><span class="sig-name descname"><span class="pre">ptype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/core/Problem.html#ptype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.Problem.ptype" title="Permalink to this definition">¶</a></dt>
@@ -2178,514 +2100,6 @@ and evaluates the RHS of the ODE there</p>
 </section>
 <section id="module-core">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="core.CollBase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.</span></span><span class="sig-name descname"><span class="pre">CollBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tleft</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useSpline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Collocation.html#CollBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.CollBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Generic collocation class, that contains everything to do integration over
-intervals and between nodes.
-It can be used to produce many kind of quadrature nodes from various
-distribution (awesome!).</p>
-<p>It is based on the two main parameters that define the nodes :</p>
-<ul class="simple">
-<li><p>node_type : the node distribution used for the collocation method</p></li>
-<li><p>quad_type : the type of quadrature used (inclusion of not of boundary)</p></li>
-</ul>
-<p>Current implementation provides the following available parameter values
-for node_type :</p>
-<ul class="simple">
-<li><p>EQUID : equidistant node distribution</p></li>
-<li><p>LEGENDRE : distribution from Legendre polynomials</p></li>
-<li><p>CHEBY-{1,2,3,4} : distribution from Chebyshev polynomials of a given kind</p></li>
-</ul>
-<p>The type of quadrature cann be GAUSS (only inner nodes), RADAU-LEFT
-(inclusion of the left boundary), RADAU-RIGHT (inclusion of the right
-boundary) and LOBATTO (inclusion of left and right boundary).</p>
-<p>Furthermore, the <code class="docutils literal notranslate"><span class="pre">useSpline</span></code> option can be activated to eventually use
-spline interpolation when computing the weights.</p>
-<p>Here is the equivalency table with the original classes implemented in
-pySDC :</p>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Original Class</p></th>
-<th class="head"><p>node_type</p></th>
-<th class="head"><p>quad_type</p></th>
-<th class="head"><p>useSpline</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Equidistant</p></td>
-<td><p>EQUID</p></td>
-<td><p>LOBATTO</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td><p>EquidistantInner</p></td>
-<td><p>EQUID</p></td>
-<td><p>GAUSS</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-even"><td><p>EquidistantNoLeft</p></td>
-<td><p>EQUID</p></td>
-<td><p>RADAU-RIGHT</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td><p>EquidistantSpline_Right</p></td>
-<td><p>EQUID</p></td>
-<td><p>RADAU-RIGHT</p></td>
-<td><p>True</p></td>
-</tr>
-<tr class="row-even"><td><p>CollGaussLegendre</p></td>
-<td><p>LEGENDRE</p></td>
-<td><p>GAUSS</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td><p>CollGaussLobatto</p></td>
-<td><p>LEGENDRE</p></td>
-<td><p>LOBATTO</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-even"><td><p>CollGaussRadau_Left</p></td>
-<td><p>LEGENDRE</p></td>
-<td><p>RADAU-LEFT</p></td>
-<td><p>False</p></td>
-</tr>
-<tr class="row-odd"><td><p>CollGaussRadau_Right</p></td>
-<td><p>LEGENDRE</p></td>
-<td><p>RADAU-RIGHT</p></td>
-<td><p>False</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.num_nodes">
-<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#core.CollBase.num_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>number of collocation nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.tleft">
-<span class="sig-name descname"><span class="pre">tleft</span></span><a class="headerlink" href="#core.CollBase.tleft" title="Permalink to this definition">¶</a></dt>
-<dd><p>left interval point</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.tright">
-<span class="sig-name descname"><span class="pre">tright</span></span><a class="headerlink" href="#core.CollBase.tright" title="Permalink to this definition">¶</a></dt>
-<dd><p>right interval point</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.nodes">
-<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#core.CollBase.nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>array of quadrature nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.CollBase.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p>array of quadrature weights for the full interval</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.Qmat">
-<span class="sig-name descname"><span class="pre">Qmat</span></span><a class="headerlink" href="#core.CollBase.Qmat" title="Permalink to this definition">¶</a></dt>
-<dd><p>matrix containing the weights for tleft to node</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.Smat">
-<span class="sig-name descname"><span class="pre">Smat</span></span><a class="headerlink" href="#core.CollBase.Smat" title="Permalink to this definition">¶</a></dt>
-<dd><p>matrix containing the weights for node to node</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.delta_m">
-<span class="sig-name descname"><span class="pre">delta_m</span></span><a class="headerlink" href="#core.CollBase.delta_m" title="Permalink to this definition">¶</a></dt>
-<dd><p>array of distances between nodes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.right_is_node">
-<span class="sig-name descname"><span class="pre">right_is_node</span></span><a class="headerlink" href="#core.CollBase.right_is_node" title="Permalink to this definition">¶</a></dt>
-<dd><p>flag to indicate whether right point is collocation node</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.CollBase.left_is_node">
-<span class="sig-name descname"><span class="pre">left_is_node</span></span><a class="headerlink" href="#core.CollBase.left_is_node" title="Permalink to this definition">¶</a></dt>
-<dd><p>flag to indicate whether left point is collocation node</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.CollBase.evaluate">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Collocation.html#CollBase.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.CollBase.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates the quadrature over the full interval</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>weights</strong> (<em>numpy.ndarray</em>) – array of quadrature weights for the full interval</p></li>
-<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – f(x) to be integrated</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>integral over f(x) between tleft and tright</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="core.LagrangeApproximation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.</span></span><span class="sig-name descname"><span class="pre">LagrangeApproximation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weightComputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AUTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaleRef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MAX'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Lagrange.html#LagrangeApproximation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.LagrangeApproximation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class approximating any function on a given set of points using barycentric
-Lagrange interpolation.</p>
-<p>Let note <span class="math notranslate nohighlight">\((t_j)_{0\leq j&lt;n}\)</span> the set of points, then any scalar
-function <span class="math notranslate nohighlight">\(f\)</span> can be approximated by the barycentric formula :</p>
-<div class="math notranslate nohighlight">
-\[p(x) =
-\frac{\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}f_j}
-{\displaystyle \sum_{j=0}^{n-1}\frac{w_j}{x-x_j}},\]</div>
-<p>where <span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> and</p>
-<div class="math notranslate nohighlight">
-\[w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}\]</div>
-<p>are the barycentric weights.
-The theory and implementation is inspired from <a href="#id18"><span class="problematic" id="id8">[1]_</span></a>.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.points">
-<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#core.LagrangeApproximation.points" title="Permalink to this definition">¶</a></dt>
-<dd><p>The interpolating points</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.1darray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.weights">
-<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#core.LagrangeApproximation.weights" title="Permalink to this definition">¶</a></dt>
-<dd><p>The associated barycentric weights</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.1darray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.n">
-<span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#core.LagrangeApproximation.n" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of points</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int (property)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weightComputation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AUTO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaleRef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MAX'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Lagrange.html#LagrangeApproximation.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.LagrangeApproximation.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instanciate the LagrangeApproximation object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">getInterpolationMatrix(self,</span> <span class="pre">times):</span></span></dt>
-<dd><p>Compute the interpolation matrix for a given set of discrete “time” points.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.getIntegrationMatrix">
-<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.LagrangeApproximation.getIntegrationMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the integration matrix for a given set of intervals.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">..</span> <span class="pre">[1]</span> <span class="pre">Berrut,</span> <span class="pre">J.</span> <span class="pre">P.,</span> <span class="pre">&amp;</span> <span class="pre">Trefethen,</span> <span class="pre">L.</span> <span class="pre">N.</span> <span class="pre">(2004).</span></span></dt>
-<dd><p>“Barycentric lagrange interpolation.” SIAM review, 46(3), 501-517.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">getIntegrationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intervals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numQuad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE_NUMPY'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Lagrange.html#LagrangeApproximation.getIntegrationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the integration matrix for a given set of intervals.</p>
-<p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
-<span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and
-<span class="math notranslate nohighlight">\((\tau_{m,left}, \tau_{m,right})_{0\leq m&lt;M}\)</span> the different
-interval where the function should be integrated using the barycentric
-interpolant polynomial.
-Then <span class="math notranslate nohighlight">\(\Delta[\vec{f}]\)</span>, the vector containing the approximations
-of</p>
-<div class="math notranslate nohighlight">
-\[\int_{\tau_{m,left}}^{\tau_{m,right}} f(t)dt,\]</div>
-<p>can be obtained using :</p>
-<div class="math notranslate nohighlight">
-\[\Delta[\vec{f}] = P_{Integ} \vec{f},\]</div>
-<p>where <span class="math notranslate nohighlight">\(P_{Integ}\)</span> is the interpolation matrix returned by this
-method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>intervals</strong> (<em>list of pairs</em>) – A list of all integration intervals.</p></li>
-<li><p><strong>numQuad</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Quadrature rule used to integrate the interpolant barycentric
-polynomial. Can be :</p>
-<ul>
-<li><p>’LEGENDRE_NUMPY’ : Gauss-Legendre rule from Numpy</p></li>
-<li><p>’LEGENDRE_SCIPY’ : Gauss-Legendre rule from Scipy</p></li>
-<li><p>’FEJER’ : internaly implemented Fejer-I rule</p></li>
-</ul>
-<p>The default is ‘LEGENDRE_NUMPY’.</p>
-</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>PInter</strong> – The integration matrix, with <span class="math notranslate nohighlight">\(M\)</span> rows (number of intervals)
-and <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.2darray(M, n)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.LagrangeApproximation.getInterpolationMatrix">
-<span class="sig-name descname"><span class="pre">getInterpolationMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Lagrange.html#LagrangeApproximation.getInterpolationMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.LagrangeApproximation.getInterpolationMatrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the interpolation matrix for a given set of discrete “time”
-points.</p>
-<p>For instance, if we note <span class="math notranslate nohighlight">\(\vec{f}\)</span> the vector containing the
-<span class="math notranslate nohighlight">\(f_j=f(t_j)\)</span> values, and <span class="math notranslate nohighlight">\((\tau_m)_{0\leq m&lt;M}\)</span>
-the “time” points where to interpolate.
-Then <span class="math notranslate nohighlight">\(I[\vec{f}]\)</span>, the vector containing the interpolated
-<span class="math notranslate nohighlight">\(f(\tau_m)\)</span> values, can be obtained using :</p>
-<div class="math notranslate nohighlight">
-\[I[\vec{f}] = P_{Inter} \vec{f},\]</div>
-<p>where <span class="math notranslate nohighlight">\(P_{Inter}\)</span> is the interpolation matrix returned by this
-method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>times</strong> (<em>list-like</em><em> or </em><em>np.1darray</em>) – The discrete “time” points where to interpolate the function.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>PInter</strong> – The interpolation matrix, with <span class="math notranslate nohighlight">\(M\)</span> rows (size of the <strong>times</strong>
-parameter) and <span class="math notranslate nohighlight">\(n\)</span> columns.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.2darray(M, n)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="id10">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="core.NodesGenerator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.</span></span><span class="sig-name descname"><span class="pre">NodesGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class that can be used to generate generic distribution of nodes derived
-from Gauss quadrature rule.
-Its implementation is fully inspired from a book of W. Gautschi <a href="#id19"><span class="problematic" id="id11">[1]_</span></a>.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.NodesGenerator.node_type">
-<span class="sig-name descname"><span class="pre">node_type</span></span><a class="headerlink" href="#core.NodesGenerator.node_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of node distribution</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="core.NodesGenerator.quad_type">
-<span class="sig-name descname"><span class="pre">quad_type</span></span><a class="headerlink" href="#core.NodesGenerator.quad_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The quadrature type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.NodesGenerator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LEGENDRE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quad_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LOBATTO'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instanciate the NodesGenerator object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.NodesGenerator.getNodes">
-<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator.getNodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes a given number of quadrature nodes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.NodesGenerator.getOrthogPolyCoefficients">
-<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator.getOrthogPolyCoefficients" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.NodesGenerator.evalOrthogPoly">
-<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator.evalOrthogPoly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates the two higher order orthogonal polynomials corresponding
-to the given (alpha,beta) coefficients.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="core.NodesGenerator.getTridiagCoefficients">
-<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#core.NodesGenerator.getTridiagCoefficients" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
-taking into account the quadrature type.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">..</span> <span class="pre">[1]</span> <span class="pre">W.</span> <span class="pre">Gautschi,</span> <span class="pre">&quot;Orthogonal</span> <span class="pre">polynomials:</span> <span class="pre">computation</span> <span class="pre">and</span> <span class="pre">approximation.&quot;</span></span></dt>
-<dd><p>OUP Oxford, 2004.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">evalOrthogPoly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.evalOrthogPoly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates the two higher order orthogonal polynomials corresponding
-to the given (alpha,beta) coefficients.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>float</em><em> or </em><em>np.1darray</em>) – The point where to evaluate the orthogonal polynomials.</p></li>
-<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
-<li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>pi[0]</strong> (<em>float or np.1darray</em>) – The second higher order orthogonal polynomial evaluation.</p></li>
-<li><p><strong>pi[1]</strong> (<em>float or np.1darray</em>) – The higher oder orthogonal polynomial evaluation.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">getNodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getNodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes a given number of quadrature nodes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes to compute.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>nodes</strong> – Nodes located in [-1, 1], in increasing order.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.1darray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">getOrthogPolyCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getOrthogPolyCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produces a given number of analytic three-term recurrence coefficients.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_coeff</strong> (<em>int</em>) – Number of coefficients to compute.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The alpha coefficients of the three-term recurrence.</p></li>
-<li><p><strong>beta</strong> (<em>np.1darray</em>) – The beta coefficients of the three-term recurrence.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">getTridiagCoefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pySDC/core/Nodes.html#NodesGenerator.getTridiagCoefficients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes recurrence coefficients for the tridiagonal Jacobian matrix,
-taking into account the quadrature type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_nodes</strong> (<em>int</em>) – Number of nodes that should be computed from those coefficients.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>alpha</strong> (<em>np.1darray</em>) – The modified alpha coefficients of the three-term recurrence.</p></li>
-<li><p><strong>beta</strong> (<em>np.1darray</em>) – The modified beta coefficients of the three-term recurrence.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 </section>
 
@@ -2701,19 +2115,232 @@ taking into account the quadrature type.</p>
     <ul>
 <li><a class="reference internal" href="#">core package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-core.BaseTransfer">core.BaseTransfer module</a></li>
-<li><a class="reference internal" href="#module-core.Collocation">core.Collocation module</a></li>
-<li><a class="reference internal" href="#module-core.Controller">core.Controller module</a></li>
-<li><a class="reference internal" href="#module-core.ConvergenceController">core.ConvergenceController module</a></li>
-<li><a class="reference internal" href="#module-core.Errors">core.Errors module</a></li>
-<li><a class="reference internal" href="#module-core.Hooks">core.Hooks module</a></li>
-<li><a class="reference internal" href="#module-core.Lagrange">core.Lagrange module</a></li>
-<li><a class="reference internal" href="#module-core.Level">core.Level module</a></li>
-<li><a class="reference internal" href="#module-core.Nodes">core.Nodes module</a></li>
-<li><a class="reference internal" href="#module-core.Problem">core.Problem module</a></li>
-<li><a class="reference internal" href="#module-core.SpaceTransfer">core.SpaceTransfer module</a></li>
-<li><a class="reference internal" href="#module-core.Step">core.Step module</a></li>
-<li><a class="reference internal" href="#module-core.Sweeper">core.Sweeper module</a></li>
+<li><a class="reference internal" href="#module-core.BaseTransfer">core.BaseTransfer module</a><ul>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer"><code class="docutils literal notranslate"><span class="pre">base_transfer</span></code></a><ul>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.logger"><code class="docutils literal notranslate"><span class="pre">base_transfer.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.params"><code class="docutils literal notranslate"><span class="pre">base_transfer.params</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.fine"><code class="docutils literal notranslate"><span class="pre">base_transfer.fine</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.coarse"><code class="docutils literal notranslate"><span class="pre">base_transfer.coarse</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.get_transfer_matrix_Q"><code class="docutils literal notranslate"><span class="pre">base_transfer.get_transfer_matrix_Q()</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.prolong"><code class="docutils literal notranslate"><span class="pre">base_transfer.prolong()</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.prolong_f"><code class="docutils literal notranslate"><span class="pre">base_transfer.prolong_f()</span></code></a></li>
+<li><a class="reference internal" href="#core.BaseTransfer.base_transfer.restrict"><code class="docutils literal notranslate"><span class="pre">base_transfer.restrict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Collocation">core.Collocation module</a><ul>
+<li><a class="reference internal" href="#core.Collocation.CollBase"><code class="docutils literal notranslate"><span class="pre">CollBase</span></code></a><ul>
+<li><a class="reference internal" href="#core.Collocation.CollBase.num_nodes"><code class="docutils literal notranslate"><span class="pre">CollBase.num_nodes</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.tleft"><code class="docutils literal notranslate"><span class="pre">CollBase.tleft</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.tright"><code class="docutils literal notranslate"><span class="pre">CollBase.tright</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.nodes"><code class="docutils literal notranslate"><span class="pre">CollBase.nodes</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.weights"><code class="docutils literal notranslate"><span class="pre">CollBase.weights</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.Qmat"><code class="docutils literal notranslate"><span class="pre">CollBase.Qmat</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.Smat"><code class="docutils literal notranslate"><span class="pre">CollBase.Smat</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.delta_m"><code class="docutils literal notranslate"><span class="pre">CollBase.delta_m</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.right_is_node"><code class="docutils literal notranslate"><span class="pre">CollBase.right_is_node</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.left_is_node"><code class="docutils literal notranslate"><span class="pre">CollBase.left_is_node</span></code></a></li>
+<li><a class="reference internal" href="#core.Collocation.CollBase.evaluate"><code class="docutils literal notranslate"><span class="pre">CollBase.evaluate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Controller">core.Controller module</a><ul>
+<li><a class="reference internal" href="#core.Controller.controller"><code class="docutils literal notranslate"><span class="pre">controller</span></code></a><ul>
+<li><a class="reference internal" href="#core.Controller.controller.add_convergence_controller"><code class="docutils literal notranslate"><span class="pre">controller.add_convergence_controller()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.check_convergence"><code class="docutils literal notranslate"><span class="pre">controller.check_convergence()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.dump_setup"><code class="docutils literal notranslate"><span class="pre">controller.dump_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.hooks"><code class="docutils literal notranslate"><span class="pre">controller.hooks</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.print_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">controller.print_convergence_controllers()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.run"><code class="docutils literal notranslate"><span class="pre">controller.run()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.setup_convergence_controllers"><code class="docutils literal notranslate"><span class="pre">controller.setup_convergence_controllers()</span></code></a></li>
+<li><a class="reference internal" href="#core.Controller.controller.welcome_message"><code class="docutils literal notranslate"><span class="pre">controller.welcome_message()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.ConvergenceController">core.ConvergenceController module</a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController"><code class="docutils literal notranslate"><span class="pre">ConvergenceController</span></code></a><ul>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_iteration_status"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.check_iteration_status()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.check_parameters"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.check_parameters()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.convergence_control"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.convergence_control()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.dependencies"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.dependencies()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.determine_restart"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.determine_restart()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.get_new_step_size"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.get_new_step_size()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.log"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.log()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_iteration_processing"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.post_iteration_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_spread_processing"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.post_spread_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.post_step_processing"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.post_step_processing()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.prepare_next_block_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.prepare_next_block_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.reset_buffers_nonMPI"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.reset_buffers_nonMPI()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.ConvergenceController.setup_status_variables"><code class="docutils literal notranslate"><span class="pre">ConvergenceController.setup_status_variables()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.ConvergenceController.Pars"><code class="docutils literal notranslate"><span class="pre">Pars</span></code></a></li>
+<li><a class="reference internal" href="#core.ConvergenceController.Status"><code class="docutils literal notranslate"><span class="pre">Status</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Errors">core.Errors module</a><ul>
+<li><a class="reference internal" href="#core.Errors.CollocationError"><code class="docutils literal notranslate"><span class="pre">CollocationError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.CommunicationError"><code class="docutils literal notranslate"><span class="pre">CommunicationError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.ControllerError"><code class="docutils literal notranslate"><span class="pre">ControllerError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.DataError"><code class="docutils literal notranslate"><span class="pre">DataError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.ParameterError"><code class="docutils literal notranslate"><span class="pre">ParameterError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.ProblemError"><code class="docutils literal notranslate"><span class="pre">ProblemError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li><a class="reference internal" href="#core.Errors.UnlockError"><code class="docutils literal notranslate"><span class="pre">UnlockError</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Hooks">core.Hooks module</a><ul>
+<li><a class="reference internal" href="#core.Hooks.hooks"><code class="docutils literal notranslate"><span class="pre">hooks</span></code></a><ul>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_setup"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_setup</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_run"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_run</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_predict"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_predict</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_step"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_step</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_iteration"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_iteration</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_sweep"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t0_comm"><code class="docutils literal notranslate"><span class="pre">hooks.__t0_comm</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_run"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_run</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_predict"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_predict</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_step"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_step</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_iteration"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_iteration</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_sweep"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_setup"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_setup</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__t1_comm"><code class="docutils literal notranslate"><span class="pre">hooks.__t1_comm</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.logger"><code class="docutils literal notranslate"><span class="pre">hooks.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__stats"><code class="docutils literal notranslate"><span class="pre">hooks.__stats</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.__entry"><code class="docutils literal notranslate"><span class="pre">hooks.__entry</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.add_to_stats"><code class="docutils literal notranslate"><span class="pre">hooks.add_to_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.increment_stats"><code class="docutils literal notranslate"><span class="pre">hooks.increment_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_comm"><code class="docutils literal notranslate"><span class="pre">hooks.post_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_iteration"><code class="docutils literal notranslate"><span class="pre">hooks.post_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_predict"><code class="docutils literal notranslate"><span class="pre">hooks.post_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_run"><code class="docutils literal notranslate"><span class="pre">hooks.post_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_setup"><code class="docutils literal notranslate"><span class="pre">hooks.post_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_step"><code class="docutils literal notranslate"><span class="pre">hooks.post_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.post_sweep"><code class="docutils literal notranslate"><span class="pre">hooks.post_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_comm"><code class="docutils literal notranslate"><span class="pre">hooks.pre_comm()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_iteration"><code class="docutils literal notranslate"><span class="pre">hooks.pre_iteration()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_predict"><code class="docutils literal notranslate"><span class="pre">hooks.pre_predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_run"><code class="docutils literal notranslate"><span class="pre">hooks.pre_run()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_setup"><code class="docutils literal notranslate"><span class="pre">hooks.pre_setup()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_step"><code class="docutils literal notranslate"><span class="pre">hooks.pre_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.pre_sweep"><code class="docutils literal notranslate"><span class="pre">hooks.pre_sweep()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.reset_stats"><code class="docutils literal notranslate"><span class="pre">hooks.reset_stats()</span></code></a></li>
+<li><a class="reference internal" href="#core.Hooks.hooks.return_stats"><code class="docutils literal notranslate"><span class="pre">hooks.return_stats()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Lagrange">core.Lagrange module</a><ul>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation</span></code></a><ul>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.points"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation.points</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.weights"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation.weights</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.getIntegrationMatrix"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation.getIntegrationMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.getInterpolationMatrix"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation.getInterpolationMatrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Lagrange.LagrangeApproximation.n"><code class="docutils literal notranslate"><span class="pre">LagrangeApproximation.n</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core.Lagrange.computeFejerRule"><code class="docutils literal notranslate"><span class="pre">computeFejerRule()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Level">core.Level module</a><ul>
+<li><a class="reference internal" href="#core.Level.level"><code class="docutils literal notranslate"><span class="pre">level</span></code></a><ul>
+<li><a class="reference internal" href="#core.Level.level.params"><code class="docutils literal notranslate"><span class="pre">level.params</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.status"><code class="docutils literal notranslate"><span class="pre">level.status</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.level_index"><code class="docutils literal notranslate"><span class="pre">level.level_index</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.uend"><code class="docutils literal notranslate"><span class="pre">level.uend</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.u"><code class="docutils literal notranslate"><span class="pre">level.u</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.uold"><code class="docutils literal notranslate"><span class="pre">level.uold</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.f"><code class="docutils literal notranslate"><span class="pre">level.f</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.fold"><code class="docutils literal notranslate"><span class="pre">level.fold</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.tau"><code class="docutils literal notranslate"><span class="pre">level.tau</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.dt"><code class="docutils literal notranslate"><span class="pre">level.dt</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.prob"><code class="docutils literal notranslate"><span class="pre">level.prob</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.reset_level"><code class="docutils literal notranslate"><span class="pre">level.reset_level()</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.sweep"><code class="docutils literal notranslate"><span class="pre">level.sweep</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.tag"><code class="docutils literal notranslate"><span class="pre">level.tag</span></code></a></li>
+<li><a class="reference internal" href="#core.Level.level.time"><code class="docutils literal notranslate"><span class="pre">level.time</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Nodes">core.Nodes module</a><ul>
+<li><a class="reference internal" href="#core.Nodes.NodesError"><code class="docutils literal notranslate"><span class="pre">NodesError</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator"><code class="docutils literal notranslate"><span class="pre">NodesGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.node_type"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.node_type</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.quad_type"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.quad_type</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.evalOrthogPoly"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.evalOrthogPoly()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getNodes"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.getNodes()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getOrthogPolyCoefficients"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.getOrthogPolyCoefficients()</span></code></a></li>
+<li><a class="reference internal" href="#core.Nodes.NodesGenerator.getTridiagCoefficients"><code class="docutils literal notranslate"><span class="pre">NodesGenerator.getTridiagCoefficients()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Problem">core.Problem module</a><ul>
+<li><a class="reference internal" href="#core.Problem.ptype"><code class="docutils literal notranslate"><span class="pre">ptype</span></code></a><ul>
+<li><a class="reference internal" href="#core.Problem.ptype.logger"><code class="docutils literal notranslate"><span class="pre">ptype.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.params"><code class="docutils literal notranslate"><span class="pre">ptype.params</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.init"><code class="docutils literal notranslate"><span class="pre">ptype.init</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.dtype_u"><code class="docutils literal notranslate"><span class="pre">ptype.dtype_u</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.dtype_f"><code class="docutils literal notranslate"><span class="pre">ptype.dtype_f</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.apply_mass_matrix"><code class="docutils literal notranslate"><span class="pre">ptype.apply_mass_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#core.Problem.ptype.eval_f"><code class="docutils literal notranslate"><span class="pre">ptype.eval_f()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.SpaceTransfer">core.SpaceTransfer module</a><ul>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer"><code class="docutils literal notranslate"><span class="pre">space_transfer</span></code></a><ul>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.params"><code class="docutils literal notranslate"><span class="pre">space_transfer.params</span></code></a></li>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.logger"><code class="docutils literal notranslate"><span class="pre">space_transfer.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.fine_prob"><code class="docutils literal notranslate"><span class="pre">space_transfer.fine_prob</span></code></a></li>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.coarse_prob"><code class="docutils literal notranslate"><span class="pre">space_transfer.coarse_prob</span></code></a></li>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.prolong"><code class="docutils literal notranslate"><span class="pre">space_transfer.prolong()</span></code></a></li>
+<li><a class="reference internal" href="#core.SpaceTransfer.space_transfer.restrict"><code class="docutils literal notranslate"><span class="pre">space_transfer.restrict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Step">core.Step module</a><ul>
+<li><a class="reference internal" href="#core.Step.step"><code class="docutils literal notranslate"><span class="pre">step</span></code></a><ul>
+<li><a class="reference internal" href="#core.Step.step.params"><code class="docutils literal notranslate"><span class="pre">step.params</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.status"><code class="docutils literal notranslate"><span class="pre">step.status</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.logger"><code class="docutils literal notranslate"><span class="pre">step.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.levels"><code class="docutils literal notranslate"><span class="pre">step.levels</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.connect_levels"><code class="docutils literal notranslate"><span class="pre">step.connect_levels()</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.dt"><code class="docutils literal notranslate"><span class="pre">step.dt</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.init_step"><code class="docutils literal notranslate"><span class="pre">step.init_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.next"><code class="docutils literal notranslate"><span class="pre">step.next</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.prev"><code class="docutils literal notranslate"><span class="pre">step.prev</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.reset_step"><code class="docutils literal notranslate"><span class="pre">step.reset_step()</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.time"><code class="docutils literal notranslate"><span class="pre">step.time</span></code></a></li>
+<li><a class="reference internal" href="#core.Step.step.transfer"><code class="docutils literal notranslate"><span class="pre">step.transfer()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-core.Sweeper">core.Sweeper module</a><ul>
+<li><a class="reference internal" href="#core.Sweeper.sweeper"><code class="docutils literal notranslate"><span class="pre">sweeper</span></code></a><ul>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.logger"><code class="docutils literal notranslate"><span class="pre">sweeper.logger</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.params"><code class="docutils literal notranslate"><span class="pre">sweeper.params</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.coll"><code class="docutils literal notranslate"><span class="pre">sweeper.coll</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.compute_end_point"><code class="docutils literal notranslate"><span class="pre">sweeper.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.compute_residual"><code class="docutils literal notranslate"><span class="pre">sweeper.compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.get_Qdelta_explicit"><code class="docutils literal notranslate"><span class="pre">sweeper.get_Qdelta_explicit()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.get_Qdelta_implicit"><code class="docutils literal notranslate"><span class="pre">sweeper.get_Qdelta_implicit()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.integrate"><code class="docutils literal notranslate"><span class="pre">sweeper.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.level"><code class="docutils literal notranslate"><span class="pre">sweeper.level</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.predict"><code class="docutils literal notranslate"><span class="pre">sweeper.predict()</span></code></a></li>
+<li><a class="reference internal" href="#core.Sweeper.sweeper.update_nodes"><code class="docutils literal notranslate"><span class="pre">sweeper.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-core">Module contents</a></li>
 </ul>
 </li>
@@ -2766,13 +2393,13 @@ taking into account the quadrature type.</p>
         <li class="right" >
           <a href="../projects/Resilience.html" title="Resilience in SDC"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">core package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

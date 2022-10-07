@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>implementations.sweeper_classes package &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.sweeper_classes package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +37,7 @@
         <li class="right" >
           <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" accesskey="U">implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
       </ul>
@@ -655,15 +656,109 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
     <ul>
 <li><a class="reference internal" href="#">implementations.sweeper_classes package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.Runge_Kutta">implementations.sweeper_classes.Runge_Kutta module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.boris_2nd_order">implementations.sweeper_classes.boris_2nd_order module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.explicit">implementations.sweeper_classes.explicit module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_LU">implementations.sweeper_classes.generic_LU module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_implicit">implementations.sweeper_classes.generic_implicit module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order">implementations.sweeper_classes.imex_1st_order module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order_mass">implementations.sweeper_classes.imex_1st_order_mass module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.multi_implicit">implementations.sweeper_classes.multi_implicit module</a></li>
-<li><a class="reference internal" href="#module-implementations.sweeper_classes.verlet">implementations.sweeper_classes.verlet module</a></li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.Runge_Kutta">implementations.sweeper_classes.Runge_Kutta module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableau"><code class="docutils literal notranslate"><span class="pre">ButcherTableau</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.ButcherTableauEmbedded"><code class="docutils literal notranslate"><span class="pre">ButcherTableauEmbedded</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Cash_Karp"><code class="docutils literal notranslate"><span class="pre">Cash_Karp</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.CrankNicholson"><code class="docutils literal notranslate"><span class="pre">CrankNicholson</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.Heun_Euler"><code class="docutils literal notranslate"><span class="pre">Heun_Euler</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.MidpointMethod"><code class="docutils literal notranslate"><span class="pre">MidpointMethod</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK1"><code class="docutils literal notranslate"><span class="pre">RK1</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RK4"><code class="docutils literal notranslate"><span class="pre">RK4</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta"><code class="docutils literal notranslate"><span class="pre">RungeKutta</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.Runge_Kutta.RungeKutta.update_nodes"><code class="docutils literal notranslate"><span class="pre">RungeKutta.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.boris_2nd_order">implementations.sweeper_classes.boris_2nd_order module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.S"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.S</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.SQ"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.SQ</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.ST"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.ST</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.Sx"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.Sx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.compute_end_point"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_manysweep_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_manysweep_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_picardsweep_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_picardsweep_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_scalar_problems_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_scalar_problems_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.get_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.get_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.integrate"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.boris_2nd_order.boris_2nd_order.update_nodes"><code class="docutils literal notranslate"><span class="pre">boris_2nd_order.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.explicit">implementations.sweeper_classes.explicit module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit"><code class="docutils literal notranslate"><span class="pre">explicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.QE"><code class="docutils literal notranslate"><span class="pre">explicit.QE</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">explicit.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.integrate"><code class="docutils literal notranslate"><span class="pre">explicit.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.explicit.explicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">explicit.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_LU">implementations.sweeper_classes.generic_LU module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_LU.generic_LU"><code class="docutils literal notranslate"><span class="pre">generic_LU</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.generic_implicit">implementations.sweeper_classes.generic_implicit module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit"><code class="docutils literal notranslate"><span class="pre">generic_implicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.QI"><code class="docutils literal notranslate"><span class="pre">generic_implicit.QI</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">generic_implicit.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.integrate"><code class="docutils literal notranslate"><span class="pre">generic_implicit.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.generic_implicit.generic_implicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">generic_implicit.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order">implementations.sweeper_classes.imex_1st_order module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order"><code class="docutils literal notranslate"><span class="pre">imex_1st_order</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QI"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.QI</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.QE"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.QE</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.compute_end_point"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_manysweep_mat"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_scalar_problems_manysweep_mat()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_scalar_problems_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_scalar_problems_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.get_sweeper_mats"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.get_sweeper_mats()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.integrate"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order.imex_1st_order.update_nodes"><code class="docutils literal notranslate"><span class="pre">imex_1st_order.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.imex_1st_order_mass">implementations.sweeper_classes.imex_1st_order_mass module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_end_point"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.compute_residual"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.compute_residual()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.imex_1st_order_mass.imex_1st_order_mass.update_nodes"><code class="docutils literal notranslate"><span class="pre">imex_1st_order_mass.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.multi_implicit">implementations.sweeper_classes.multi_implicit module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit"><code class="docutils literal notranslate"><span class="pre">multi_implicit</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q1"><code class="docutils literal notranslate"><span class="pre">multi_implicit.Q1</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.Q2"><code class="docutils literal notranslate"><span class="pre">multi_implicit.Q2</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.compute_end_point"><code class="docutils literal notranslate"><span class="pre">multi_implicit.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.integrate"><code class="docutils literal notranslate"><span class="pre">multi_implicit.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.multi_implicit.multi_implicit.update_nodes"><code class="docutils literal notranslate"><span class="pre">multi_implicit.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-implementations.sweeper_classes.verlet">implementations.sweeper_classes.verlet module</a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet"><code class="docutils literal notranslate"><span class="pre">verlet</span></code></a><ul>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.QQ"><code class="docutils literal notranslate"><span class="pre">verlet.QQ</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.QT"><code class="docutils literal notranslate"><span class="pre">verlet.QT</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.Qx"><code class="docutils literal notranslate"><span class="pre">verlet.Qx</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.qQ"><code class="docutils literal notranslate"><span class="pre">verlet.qQ</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.compute_end_point"><code class="docutils literal notranslate"><span class="pre">verlet.compute_end_point()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.integrate"><code class="docutils literal notranslate"><span class="pre">verlet.integrate()</span></code></a></li>
+<li><a class="reference internal" href="#implementations.sweeper_classes.verlet.verlet.update_nodes"><code class="docutils literal notranslate"><span class="pre">verlet.update_nodes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-implementations.sweeper_classes">Module contents</a></li>
 </ul>
 </li>
@@ -716,14 +811,14 @@ introduced in Ruprecht &amp; Speck, Spectral deferred corrections with fast-wave
         <li class="right" >
           <a href="implementations.problem_classes.boussinesq_helpers.html" title="implementations.problem_classes.boussinesq_helpers package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="implementations.html" >implementations package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.sweeper_classes package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

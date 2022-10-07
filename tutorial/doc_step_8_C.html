@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>&lt;no title&gt; &#8212; pySDC 4.2.3 documentation</title>
+    <title>&lt;no title&gt; &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -28,7 +29,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>  
@@ -40,12 +41,13 @@
             
   <p>Full code: <a class="reference external" href="https://github.com/Parallel-in-Time/pySDC/blob/master/pySDC/tutorial/step_8/C_iteration_estimator.py">pySDC/tutorial/step_8/C_iteration_estimator.py</a></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">filter_stats</span><span class="p">,</span> <span class="n">sort_stats</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.collocation_classes.gauss_radau_right</span> <span class="kn">import</span> <span class="n">CollGaussRadau_Right</span>
+<span class="kn">from</span> <span class="nn">pySDC.helpers.stats_helper</span> <span class="kn">import</span> <span class="n">get_sorted</span>
+
 <span class="kn">from</span> <span class="nn">pySDC.implementations.controller_classes.controller_nonMPI</span> <span class="kn">import</span> <span class="n">controller_nonMPI</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD_forced_periodic</span> <span class="kn">import</span> <span class="n">heatNd_periodic</span>
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic</span> <span class="kn">import</span> <span class="n">advectionNd_periodic</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.HeatEquation_ND_FD</span> <span class="kn">import</span> <span class="n">heatNd_forced</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.AdvectionEquation_ND_FD</span> <span class="kn">import</span> <span class="n">advectionNd</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.Auzinger_implicit</span> <span class="kn">import</span> <span class="n">auzinger</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.imex_1st_order</span> <span class="kn">import</span> <span class="n">imex_1st_order</span>
 <span class="kn">from</span> <span class="nn">pySDC.implementations.sweeper_classes.generic_implicit</span> <span class="kn">import</span> <span class="n">generic_implicit</span>
@@ -59,13 +61,13 @@
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>  <span class="c1"># time-step size</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
     <span class="c1"># sweeper_params[&#39;initial_guess&#39;] = &#39;zero&#39;</span>
@@ -75,6 +77,7 @@
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;ndim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndim</span>  <span class="c1"># will be iterated over</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># order of accuracy for FD discretization in space</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">2</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>  <span class="c1"># frequencies</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;nvars&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="mi">64</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)),</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">))]</span>  <span class="c1"># number of dofs</span>
@@ -86,7 +89,7 @@
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-07</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-07</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -105,7 +108,7 @@
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_periodic</span>  <span class="c1"># pass problem class</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heatNd_forced</span>  <span class="c1"># pass problem class</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imex_1st_order</span>  <span class="c1"># pass sweeper (see part B)</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
@@ -123,13 +126,13 @@
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>  <span class="c1"># time-step size</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;QI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LU&#39;</span><span class="p">]</span>  <span class="c1"># For the IMEX sweeper, the LU-trick can be activated for the implicit part</span>
     <span class="c1"># sweeper_params[&#39;initial_guess&#39;] = &#39;zero&#39;</span>
@@ -139,6 +142,7 @@
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;ndim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ndim</span>  <span class="c1"># will be iterated over</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># order of accuracy for FD discretization in space</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span>  <span class="c1"># order of accuracy for FD discretization in space</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;bc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;periodic&#39;</span>  <span class="c1"># boundary conditions</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># diffusion coefficient</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">2</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">))</span>  <span class="c1"># frequencies</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
@@ -151,7 +155,7 @@
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-07</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-07</span>
 
     <span class="c1"># initialize space transfer parameters</span>
     <span class="n">space_transfer_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -170,7 +174,7 @@
 
     <span class="c1"># fill description dictionary for easy step instantiation</span>
     <span class="n">description</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd_periodic</span>
+    <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">advectionNd</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;problem_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem_params</span>  <span class="c1"># pass problem parameters</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_implicit</span>
     <span class="n">description</span><span class="p">[</span><span class="s1">&#39;sweeper_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweeper_params</span>  <span class="c1"># pass sweeper parameters</span>
@@ -188,13 +192,13 @@
 
     <span class="c1"># initialize level parameters</span>
     <span class="n">level_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-10</span>
+    <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;restol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span>  <span class="c1"># time-step size</span>
     <span class="n">level_params</span><span class="p">[</span><span class="s1">&#39;nsweeps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1"># initialize sweeper parameters</span>
     <span class="n">sweeper_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;collocation_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CollGaussRadau_Right</span>
+    <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;quad_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;RADAU-RIGHT&#39;</span>
     <span class="k">if</span> <span class="n">ml</span><span class="p">:</span>
         <span class="n">sweeper_params</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
@@ -204,13 +208,13 @@
 
     <span class="c1"># initialize problem parameters</span>
     <span class="n">problem_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-12</span>
+    <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_tol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
     <span class="n">problem_params</span><span class="p">[</span><span class="s1">&#39;newton_maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 
     <span class="c1"># initialize step parameters</span>
     <span class="n">step_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">50</span>
-    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1E-07</span>
+    <span class="n">step_params</span><span class="p">[</span><span class="s1">&#39;errtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-07</span>
 
     <span class="c1"># setup the iteration estimator</span>
     <span class="n">convergence_controllers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -246,7 +250,8 @@
     <span class="n">description</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">controller_params</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;step_8_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/step_8_C_out.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">ndim</span> <span class="ow">in</span> <span class="n">ndim_list</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nsteps</span> <span class="ow">in</span> <span class="n">nsteps_list</span><span class="p">:</span>
@@ -280,8 +285,9 @@
             <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;controller_params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">controller_params</span>
 
             <span class="c1"># instantiate controller</span>
-            <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span><span class="n">num_procs</span><span class="o">=</span><span class="n">nprocs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span>
-                                           <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+            <span class="n">controller</span> <span class="o">=</span> <span class="n">controller_nonMPI</span><span class="p">(</span>
+                <span class="n">num_procs</span><span class="o">=</span><span class="n">nprocs</span><span class="p">,</span> <span class="n">controller_params</span><span class="o">=</span><span class="n">controller_params</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span>
+            <span class="p">)</span>
 
             <span class="c1"># get initial values on finest level</span>
             <span class="n">P</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">MS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">prob</span>
@@ -291,7 +297,7 @@
             <span class="n">uend</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">u0</span><span class="o">=</span><span class="n">uinit</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">Tend</span><span class="o">=</span><span class="n">Tend</span><span class="p">)</span>
 
             <span class="c1"># filter statistics by type (number of iterations)</span>
-            <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="n">iter_counts</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;niter&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
 
             <span class="n">niters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iter_counts</span><span class="p">])</span>
             <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Mean number of iterations: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">4.2f</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -299,19 +305,21 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
             <span class="c1"># filter statistics by type (error after time-step)</span>
-            <span class="n">PDE_errors</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PDE_error_after_step&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
-            <span class="n">coll_errors</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;coll_error_after_step&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="n">PDE_errors</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;PDE_error_after_step&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="n">coll_errors</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;coll_error_after_step&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">iters</span><span class="p">,</span> <span class="n">PDE_err</span><span class="p">,</span> <span class="n">coll_err</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">iter_counts</span><span class="p">,</span> <span class="n">PDE_errors</span><span class="p">,</span> <span class="n">coll_errors</span><span class="p">):</span>
                 <span class="k">assert</span> <span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">description</span><span class="p">[</span><span class="s1">&#39;step_params&#39;</span><span class="p">][</span><span class="s1">&#39;errtol&#39;</span><span class="p">],</span> <span class="sa">f</span><span class="s1">&#39;Error too high, got </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;   Errors after step </span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">iters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> iterations: &#39;</span> \
-                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;   Errors after step </span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4f</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">iters</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> iterations: &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">PDE_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1"> / </span><span class="si">{</span><span class="n">coll_err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s1">8.4e</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">()</span>
 
             <span class="c1"># filter statistics by type (error after time-step)</span>
-            <span class="n">timing</span> <span class="o">=</span> <span class="n">sort_stats</span><span class="p">(</span><span class="n">filter_stats</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">),</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="n">timing</span> <span class="o">=</span> <span class="n">get_sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;timing_run&#39;</span><span class="p">,</span> <span class="n">sortby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;...done, took </span><span class="si">{</span><span class="n">timing</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> seconds!&#39;</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -322,7 +330,9 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mean_number_of_iterations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="se">\</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+        <span class="n">mean_number_of_iterations</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-2</span>
+    <span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;Expected </span><span class="se">\</span>
 <span class="si">{</span><span class="n">mean_number_of_iterations</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> mean iterations, but got </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">niters</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">&#39;</span>
 
 
@@ -345,58 +355,58 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 5.75
-   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 3.9801e-13
-   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 2.0461e-13
-   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 4.3165e-13
-   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 5.0071e-13
-   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 3.8611e-13
-   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 2.3964e-13
-   Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.7012e-13
-   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.6265e-13
+   Errors after step   0.1250 with 5 iterations: 1.7804e-08 / 3.9169e-13
+   Errors after step   0.2500 with 5 iterations: 4.9619e-08 / 3.3698e-13
+   Errors after step   0.3750 with 6 iterations: 4.2300e-08 / 2.5890e-13
+   Errors after step   0.5000 with 6 iterations: 3.8684e-08 / 2.8007e-13
+   Errors after step   0.6250 with 6 iterations: 3.7128e-08 / 2.9410e-13
+   Errors after step   0.7500 with 6 iterations: 3.6619e-08 / 1.3529e-13
+   Errors after step   0.8750 with 6 iterations: 3.6530e-08 / 2.8821e-13
+   Errors after step   1.0000 with 6 iterations: 3.6478e-08 / 1.8707e-13
 
-...done, took 0.36601950900012525 seconds!
+...done, took 0.5105299599999853 seconds!
 -----------------------------------------------------------------------------
 Running diffusion in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 3.00
-   Errors after step   0.1250 with 3 iterations: 9.8192e-09 / 4.0892e-13
-   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 3.4928e-13
-   Errors after step   0.3750 with 3 iterations: 2.2849e-08 / 3.1317e-13
-   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 6.8695e-13
-   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 4.6119e-13
-   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 4.3532e-13
-   Errors after step   0.8750 with 3 iterations: 3.5501e-08 / 3.0356e-13
-   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.3842e-13
+   Errors after step   0.1250 with 3 iterations: 9.8190e-09 / 3.2108e-13
+   Errors after step   0.2500 with 3 iterations: 1.7174e-08 / 4.1256e-13
+   Errors after step   0.3750 with 3 iterations: 2.2849e-08 / 2.6208e-13
+   Errors after step   0.5000 with 3 iterations: 2.7307e-08 / 2.5857e-13
+   Errors after step   0.6250 with 3 iterations: 3.0813e-08 / 4.3643e-13
+   Errors after step   0.7500 with 3 iterations: 3.3517e-08 / 2.7439e-13
+   Errors after step   0.8750 with 3 iterations: 3.5502e-08 / 2.1250e-13
+   Errors after step   1.0000 with 3 iterations: 3.6813e-08 / 2.1660e-13
 
-...done, took 0.806514524999784 seconds!
+...done, took 1.099592604999998 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 4.00
-   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 3.3307e-16
+   Errors after step   0.1250 with 4 iterations: 3.6459e-09 / 6.6613e-16
    Errors after step   0.2500 with 4 iterations: 7.2907e-09 / 4.4409e-16
-   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 3.3307e-16
-   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 5.5511e-16
+   Errors after step   0.3750 with 4 iterations: 1.0930e-08 / 5.5511e-16
+   Errors after step   0.5000 with 4 iterations: 1.4571e-08 / 4.4409e-16
    Errors after step   0.6250 with 4 iterations: 1.8225e-08 / 4.4409e-16
-   Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 3.3307e-16
-   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 5.5511e-16
-   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 4.4409e-16
+   Errors after step   0.7500 with 4 iterations: 2.1875e-08 / 6.6613e-16
+   Errors after step   0.8750 with 4 iterations: 2.5517e-08 / 7.7716e-16
+   Errors after step   1.0000 with 4 iterations: 2.9147e-08 / 5.5511e-16
 
-...done, took 0.21706979399959891 seconds!
+...done, took 0.3034306659999402 seconds!
 -----------------------------------------------------------------------------
 Running advection in 1 dimensions with time-step size 0.125...
 
    Mean number of iterations: 2.00
    Errors after step   0.1250 with 2 iterations: 3.7050e-09 / 3.1852e-13
-   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.1886e-13
-   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.1863e-13
-   Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.1886e-13
-   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.1852e-13
-   Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.1841e-13
-   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1886e-13
+   Errors after step   0.2500 with 2 iterations: 7.4360e-09 / 3.1875e-13
+   Errors after step   0.3750 with 2 iterations: 1.1141e-08 / 3.1808e-13
+   Errors after step   0.5000 with 2 iterations: 1.4836e-08 / 3.1875e-13
+   Errors after step   0.6250 with 2 iterations: 1.8580e-08 / 3.1830e-13
+   Errors after step   0.7500 with 2 iterations: 2.2256e-08 / 3.1830e-13
+   Errors after step   0.8750 with 2 iterations: 2.5987e-08 / 3.1841e-13
    Errors after step   1.0000 with 2 iterations: 2.9666e-08 / 3.1808e-13
 
-...done, took 0.626310778000061 seconds!
+...done, took 0.8724177950000467 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -410,7 +420,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 6 iterations: 2.8266e-08 / 0.0000e+00
    Errors after step   1.0000 with 6 iterations: 2.8338e-08 / 0.0000e+00
 
-...done, took 0.1565495690001626 seconds!
+...done, took 0.2151101980000476 seconds!
 -----------------------------------------------------------------------------
 Running auzinger in 1 dimensions with time-step size 0.125...
 
@@ -424,7 +434,7 @@ Running auzinger in 1 dimensions with time-step size 0.125...
    Errors after step   0.8750 with 4 iterations: 3.1486e-08 / 0.0000e+00
    Errors after step   1.0000 with 4 iterations: 3.3802e-08 / 0.0000e+00
 
-...done, took 0.191205471000103 seconds!
+...done, took 0.2573068350000085 seconds!
 -----------------------------------------------------------------------------
 </pre></div>
 </div>
@@ -466,13 +476,13 @@ Running auzinger in 1 dimensions with time-step size 0.125...
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">&lt;no title&gt;</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

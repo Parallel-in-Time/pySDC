@@ -12,6 +12,14 @@ helpers.plot\_helper module
    :undoc-members:
    :show-inheritance:
 
+helpers.problem\_helper module
+------------------------------
+
+.. automodule:: helpers.problem_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 helpers.pysdc\_helper module
 ----------------------------
 

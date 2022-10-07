@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>helpers package &#8212; pySDC 4.2.3 documentation</title>
+    <title>helpers package &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -15,6 +15,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,7 +33,7 @@
         <li class="right" >
           <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers package</a></li> 
       </ul>
     </div>  
@@ -68,6 +69,21 @@
 <dt class="sig sig-object py" id="helpers.plot_helper.setup_mpl">
 <span class="sig-prename descclassname"><span class="pre">helpers.plot_helper.</span></span><span class="sig-name descname"><span class="pre">setup_mpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/plot_helper.html#setup_mpl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.plot_helper.setup_mpl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-helpers.problem_helper">
+<span id="helpers-problem-helper-module"></span><h2>helpers.problem_helper module<a class="headerlink" href="#module-helpers.problem_helper" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_matrix">
+<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cupy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build FD matrix from stencils, with boundary conditions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="helpers.problem_helper.get_finite_difference_stencil">
+<span class="sig-prename descclassname"><span class="pre">helpers.problem_helper.</span></span><span class="sig-name descname"><span class="pre">get_finite_difference_stencil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">derivative</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helpers/problem_helper.html#get_finite_difference_stencil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#helpers.problem_helper.get_finite_difference_stencil" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derive general finite difference stencils from Taylor expansions</p>
+</dd></dl>
 
 </section>
 <section id="module-helpers.pysdc_helper">
@@ -329,11 +345,45 @@ in the vector ps and the points which are found periodically.</p>
     <ul>
 <li><a class="reference internal" href="#">helpers package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-helpers.plot_helper">helpers.plot_helper module</a></li>
-<li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a></li>
-<li><a class="reference internal" href="#module-helpers.stats_helper">helpers.stats_helper module</a></li>
-<li><a class="reference internal" href="#module-helpers.transfer_helper">helpers.transfer_helper module</a></li>
-<li><a class="reference internal" href="#module-helpers.visualization_tools">helpers.visualization_tools module</a></li>
+<li><a class="reference internal" href="#module-helpers.plot_helper">helpers.plot_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.plot_helper.figsize"><code class="docutils literal notranslate"><span class="pre">figsize()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.plot_helper.newfig"><code class="docutils literal notranslate"><span class="pre">newfig()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.plot_helper.savefig"><code class="docutils literal notranslate"><span class="pre">savefig()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.plot_helper.setup_mpl"><code class="docutils literal notranslate"><span class="pre">setup_mpl()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-helpers.problem_helper">helpers.problem_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_matrix"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_matrix()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.problem_helper.get_finite_difference_stencil"><code class="docutils literal notranslate"><span class="pre">get_finite_difference_stencil()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-helpers.pysdc_helper">helpers.pysdc_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass"><code class="docutils literal notranslate"><span class="pre">FrozenClass</span></code></a><ul>
+<li><a class="reference internal" href="#helpers.pysdc_helper.FrozenClass.__isfrozen"><code class="docutils literal notranslate"><span class="pre">FrozenClass.__isfrozen</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-helpers.stats_helper">helpers.stats_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.stats_helper.filter_stats"><code class="docutils literal notranslate"><span class="pre">filter_stats()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.stats_helper.get_list_of_types"><code class="docutils literal notranslate"><span class="pre">get_list_of_types()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.stats_helper.get_sorted"><code class="docutils literal notranslate"><span class="pre">get_sorted()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.stats_helper.sort_stats"><code class="docutils literal notranslate"><span class="pre">sort_stats()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-helpers.transfer_helper">helpers.transfer_helper module</a><ul>
+<li><a class="reference internal" href="#helpers.transfer_helper.border_padding"><code class="docutils literal notranslate"><span class="pre">border_padding()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.transfer_helper.continue_periodic_array"><code class="docutils literal notranslate"><span class="pre">continue_periodic_array()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.transfer_helper.interpolation_matrix_1d"><code class="docutils literal notranslate"><span class="pre">interpolation_matrix_1d()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.transfer_helper.next_neighbors"><code class="docutils literal notranslate"><span class="pre">next_neighbors()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.transfer_helper.next_neighbors_periodic"><code class="docutils literal notranslate"><span class="pre">next_neighbors_periodic()</span></code></a></li>
+<li><a class="reference internal" href="#helpers.transfer_helper.restriction_matrix_1d"><code class="docutils literal notranslate"><span class="pre">restriction_matrix_1d()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-helpers.visualization_tools">helpers.visualization_tools module</a><ul>
+<li><a class="reference internal" href="#helpers.visualization_tools.show_residual_across_simulation"><code class="docutils literal notranslate"><span class="pre">show_residual_across_simulation()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-helpers">Module contents</a></li>
 </ul>
 </li>
@@ -378,13 +428,13 @@ in the vector ps and the points which are found periodically.</p>
         <li class="right" >
           <a href="implementations.transfer_classes.html" title="implementations.transfer_classes package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">helpers package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

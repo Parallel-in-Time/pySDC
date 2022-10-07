@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix &#8212; pySDC 4.2.3 documentation</title>
+    <title>implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix &#8212; pySDC 5.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/classic.css" />
     
@@ -14,6 +14,7 @@
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
     
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -27,7 +28,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix</a></li> 
       </ul>
@@ -42,8 +43,11 @@
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
 
-<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix</span> <span class="kn">import</span> <span class="n">get2DMatrix</span><span class="p">,</span> <span class="n">getBCHorizontal</span><span class="p">,</span> \
-    <span class="n">get2DUpwindMatrix</span>
+<span class="kn">from</span> <span class="nn">pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get2DMatrix</span><span class="p">,</span>
+    <span class="n">getBCHorizontal</span><span class="p">,</span>
+    <span class="n">get2DUpwindMatrix</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="getBoussinesq2DUpwindMatrix"><a class="viewcode-back" href="../../../../pySDC/implementations.problem_classes.boussinesq_helpers.html#implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix.getBoussinesq2DUpwindMatrix">[docs]</a><span class="k">def</span> <span class="nf">getBoussinesq2DUpwindMatrix</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u_adv</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
@@ -78,8 +82,8 @@
 
     <span class="n">M1</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="o">-</span><span class="n">Dx_p</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
     <span class="n">M2</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Id_w</span><span class="p">,</span> <span class="o">-</span><span class="n">Dz_p</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
-    <span class="n">M3</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="o">-</span><span class="n">Nfreq</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Id_w</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
-    <span class="n">M4</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="o">-</span><span class="n">c_s</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Dx_u</span><span class="p">,</span> <span class="o">-</span><span class="n">c_s</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Dz_w</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+    <span class="n">M3</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">Zero</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">Nfreq</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">Id_w</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
+    <span class="n">M4</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="o">-</span><span class="p">(</span><span class="n">c_s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">Dx_u</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">c_s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">Dz_w</span><span class="p">,</span> <span class="n">Zero</span><span class="p">,</span> <span class="n">Zero</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">M1</span><span class="p">,</span> <span class="n">M2</span><span class="p">,</span> <span class="n">M3</span><span class="p">,</span> <span class="n">M4</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;csr&quot;</span><span class="p">)</span>
 
     <span class="n">Id</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">N</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -131,14 +135,14 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">pySDC 4.2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">pySDC 5.0.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">implementations.problem_classes.boussinesq_helpers.buildBoussinesq2DMatrix</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>
