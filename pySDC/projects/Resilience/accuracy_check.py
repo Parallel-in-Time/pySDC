@@ -71,9 +71,9 @@ def setup_mpl(font_size=8):
 
 def get_results_from_stats(stats, var, val, hook_class=log_errors):
     results = {
-        'e_embedded': 0.,
-        'e_extrapolated': 0.,
-        'e': 0.,
+        'e_embedded': 0.0,
+        'e_extrapolated': 0.0,
+        'e': 0.0,
         var: val,
     }
 
@@ -94,8 +94,16 @@ def get_results_from_stats(stats, var, val, hook_class=log_errors):
     return results
 
 
-def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
-                  hook_class=log_errors, custom_controller_params=None):
+def multiple_runs(
+    k=5,
+    serial=True,
+    Tend_fixed=None,
+    custom_description=None,
+    prob=run_piline,
+    dt_list=None,
+    hook_class=log_errors,
+    custom_controller_params=None,
+):
     """
     A simple test program to compute the order of accuracy in time
     """
@@ -104,7 +112,7 @@ def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, pr
     if dt_list is not None:
         pass
     elif Tend_fixed:
-        dt_list = 0.1 * 10.**-(np.arange(5) / 2)
+        dt_list = 0.1 * 10.0 ** -(np.arange(5) / 2)
     else:
         dt_list = 0.01 * 10.0 ** -(np.arange(20) / 10.0)
 
@@ -123,8 +131,13 @@ def multiple_runs(k=5, serial=True, Tend_fixed=None, custom_description=None, pr
         if custom_description is not None:
             desc = {**desc, **custom_description}
         Tend = Tend_fixed if Tend_fixed else 30 * dt_list[i]
-        stats, controller, _ = prob(custom_description=desc, num_procs=num_procs, Tend=Tend,
-                                    hook_class=hook_class, custom_controller_params=custom_controller_params)
+        stats, controller, _ = prob(
+            custom_description=desc,
+            num_procs=num_procs,
+            Tend=Tend,
+            hook_class=hook_class,
+            custom_controller_params=custom_controller_params,
+        )
 
         level = controller.MS[-1].levels[-1]
         e_glob = abs(level.prob.u_exact(t=level.time + level.dt) - level.u[-1])
@@ -162,17 +175,21 @@ def plot(res, ax, k):
     color = plt.rcParams['axes.prop_cycle'].by_key()['color'][k - 2]
 
     for i in range(len(keys)):
-        if all([me == 0. for me in res[keys[i]]]):
+        if all([me == 0.0 for me in res[keys[i]]]):
             continue
         order = get_accuracy_order(res, key=keys[i])
         if keys[i] == 'e_embedded':
             label = rf'$k={{{np.mean(order):.2f}}}$'
-            assert np.isclose(np.mean(order), k, atol=4e-1), f'Expected embedded error estimate to have order {k} \
+            assert np.isclose(
+                np.mean(order), k, atol=4e-1
+            ), f'Expected embedded error estimate to have order {k} \
 but got {np.mean(order):.2f}'
 
         elif keys[i] == 'e_extrapolated':
             label = None
-            assert np.isclose(np.mean(order), k + 1, rtol=3e-1), f'Expected extrapolation error estimate to have order \
+            assert np.isclose(
+                np.mean(order), k + 1, rtol=3e-1
+            ), f'Expected extrapolation error estimate to have order \
 {k+1} but got {np.mean(order):.2f}'
         else:
             label = None
@@ -213,22 +230,52 @@ def get_accuracy_order(results, key='e_embedded', thresh=1e-14):
     return order
 
 
-def plot_orders(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
-                custom_controller_params=None):
+def plot_orders(
+    ax,
+    ks,
+    serial,
+    Tend_fixed=None,
+    custom_description=None,
+    prob=run_piline,
+    dt_list=None,
+    custom_controller_params=None,
+):
     for i in range(len(ks)):
         k = ks[i]
-        res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
-                            prob=prob, dt_list=dt_list, hook_class=do_nothing,
-                            custom_controller_params=custom_controller_params)
+        res = multiple_runs(
+            k=k,
+            serial=serial,
+            Tend_fixed=Tend_fixed,
+            custom_description=custom_description,
+            prob=prob,
+            dt_list=dt_list,
+            hook_class=do_nothing,
+            custom_controller_params=custom_controller_params,
+        )
         plot_order(res, ax, k)
 
 
-def plot_all_errors(ax, ks, serial, Tend_fixed=None, custom_description=None, prob=run_piline, dt_list=None,
-                    custom_controller_params=None):
+def plot_all_errors(
+    ax,
+    ks,
+    serial,
+    Tend_fixed=None,
+    custom_description=None,
+    prob=run_piline,
+    dt_list=None,
+    custom_controller_params=None,
+):
     for i in range(len(ks)):
         k = ks[i]
-        res = multiple_runs(k=k, serial=serial, Tend_fixed=Tend_fixed, custom_description=custom_description,
-                            prob=prob, dt_list=dt_list, custom_controller_params=custom_controller_params)
+        res = multiple_runs(
+            k=k,
+            serial=serial,
+            Tend_fixed=Tend_fixed,
+            custom_description=custom_description,
+            prob=prob,
+            dt_list=dt_list,
+            custom_controller_params=custom_controller_params,
+        )
 
         # visualize results
         plot(res, ax, k)

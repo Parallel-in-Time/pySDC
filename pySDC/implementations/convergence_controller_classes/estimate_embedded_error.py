@@ -63,8 +63,10 @@ class EstimateEmbeddedError(ConvergenceController):
             # order rises by one between sweeps, making this so ridiculously easy
             return abs(L.uold[-1] - L.u[-1])
         else:
-            raise NotImplementedError(f'Don\'t know how to estimate embedded error for sweeper type \
-{self.params.sweeper_type}')
+            raise NotImplementedError(
+                f'Don\'t know how to estimate embedded error for sweeper type \
+{self.params.sweeper_type}'
+            )
 
 
 class EstimateEmbeddedErrorNonMPI(EstimateEmbeddedError):
