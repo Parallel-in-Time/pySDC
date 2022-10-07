@@ -35,14 +35,13 @@ jobs:
         run: |
           flakeheaven lint --benchmark pySDC
 
-  user_cpu_tests:
+  user_cpu_tests_linux:
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python: ['3.7', '3.8', '3.9', '3.10']
         env: ['base', 'fenics', 'mpi4py', 'petsc']
-        os: ['macos-12', 'ubuntu-latest']
-
-    runs-on: ${{ matrix.os }}
 
     defaults:
       run:
@@ -74,6 +73,32 @@ jobs:
             coverage_${{ matrix.env }}_3.10.dat
 
 
+  user_cpu_tests_macos:
+    runs-on: macos-12
+
+    strategy:
+      matrix:
+        env: ['base', 'fenics', 'mpi4py', 'petsc']
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          environment-file: "etc/environment-${{ matrix.env }}.yml"
+
+      - name: Run pytest for CPU stuff
+        run: |
+          pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+
+
+
   post-processing:
     runs-on: ubuntu-latest
 
@@ -81,7 +106,7 @@ jobs:
 
     needs:
       - lint
-      - user_cpu_tests
+      - user_cpu_tests_linux
 
     defaults:
       run:

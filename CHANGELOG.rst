@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- September 23, 2022: Version 5 comes with many changes, both visible and invisible ones. Some of those break the existing API, but
+- October 7, 2022: Version 5 comes with many changes, both visible and invisible ones. Some of those break the existing API, but
   if you are using tests, you should be fine. Major changes include:
 
   - **New convergence controllers**: Checking whether a step has converged can be tricky, so we made separate modules out of these
@@ -20,6 +20,7 @@ Changelog
   - **Toward GPU computing**: We included a new data type based on `CuPy <https://cupy.dev/>`_ making GPU computing possible.
     Thanks to `@timo2705 <https://github.com/timo2705>`_!
   - **Better testing**: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking (at least, in principal), separate environments and so on.
+    The code is tested under Ubuntu and MacOS.
   - **Better code formatting**: `pySDC` now uses `black <https://black.readthedocs.io>`_ and `flakeheaven <https://flakeheaven.readthedocs.io>`_ for cleaner source code.
     After complaints here and there about linting "errors" the recommended way now is to run ``black`` before submission.
 

@@ -16,7 +16,7 @@ Features
 - Many different examples, collocation types, data types already implemented
 - Works with `FEniCS <https://fenicsproject.org/>`_, `mpi4py-fft <https://mpi4py-fft.readthedocs.io/en/latest/>`_ and `PETSc <http://www.mcs.anl.gov/petsc/>`_ (through `petsc4py <https://bitbucket.org/petsc/petsc4py>`_)
 - Continuous integration via `GitHub Actions <https://github.com/Parallel-in-Time/pySDC/actions>`_ and `Gitlab CI <https://gitlab.hzdr.de/r.speck/pysdc/-/pipelines>`_
-- Fully compatible with Python 3.7 - 3.10
+- Fully compatible with Python 3.7 - 3.10, runs at least on Ubuntu and MacOS
 
 
 Getting started

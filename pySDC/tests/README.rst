@@ -1,5 +1,4 @@
 Most of the code is supported by tests, mainly realized by using the tutorial as the test routines with clearly defined results. Also, projects are accompanied by tests.
-The codes also provides some `benchmarks <./benchmarks/index.html>`_.
 
 Github Action reports: |badge-ga|
 
