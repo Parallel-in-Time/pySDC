@@ -156,12 +156,12 @@ jobs:
           name: docs
           path: docs/build/html
 
-#      - name: Deploy 🚀
-#        uses: JamesIves/github-pages-deploy-action@4.1.4
-#        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' && !env.ACT }}
-#        with:
-#          branch: gh-pages # The branch the action should deploy to.
-#          folder: docs/build/html # The folder the action should deploy.
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        if: ${{ github.event_name == 'push' && github.repository_owner == 'Parallel-in-Time' && github.ref == 'refs/heads/master' }}
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs/build/html # The folder the action should deploy.
 
 #  spawn_gitlab_and_postprocess:
 #    runs-on: ubuntu-latest
