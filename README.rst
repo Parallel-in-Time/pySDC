@@ -73,5 +73,4 @@ Acknowledgements
 This project has received funding from the `European High-Performance Computing Joint Undertaking <https://eurohpc-ju.europa.eu/>`_  (JU) under grant agreement No 955701 (`TIME-X <https://www.time-x-eurohpc.eu/>`_).
 The JU receives support from the European Union’s Horizon 2020 research and innovation programme and Belgium, France, Germany, and Switzerland.
 This project also received funding from the `German Federal Ministry of Education and Research <https://www.bmbf.de/bmbf/en/home/home_node.html>`_ (BMBF) grant 16HPC047.
-The CI/CT/CB workflow heavily relies on the `Helmholtz Federated IT Services (HIFIS) <https://www.hifis.net/>`_ Gitlab runners and the underlying infractstructure.
 The project also received help from the `Helmholtz Platform for Research Software Engineering - Preparatory Study (HiRSE_PS) <https://www.helmholtz-hirse.de/>`_.
