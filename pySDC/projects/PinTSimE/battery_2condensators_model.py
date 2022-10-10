@@ -12,7 +12,6 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
 class log_data(hooks):
@@ -26,25 +25,54 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C1', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C2', value=L.uend[2])
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0]
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C1',
+            value=L.uend[1]
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C2',
+            value=L.uend[2]
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=1,
+            initialize=0
+        )
 
 
-def main(use_switch_estimator=True, use_adaptivity=False):
+def main(use_switch_estimator=True):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
     """
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-13
-    level_params['dt'] = 1E-3
+    level_params['restol'] = 1e-13
+    level_params['dt'] = 1e-3
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -59,12 +87,12 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     problem_params = dict()
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C1'] = 1
-    problem_params['C2'] = 1
-    problem_params['R'] = 1
-    problem_params['L'] = 1
-    problem_params['alpha'] = 5
-    problem_params['V_ref'] = np.array([1, 1])  # [V_ref1, V_ref2]
+    problem_params['C1'] = 1.0
+    problem_params['C2'] = 1.0
+    problem_params['R'] = 1.0
+    problem_params['L'] = 1.0
+    problem_params['alpha'] = 5.0
+    problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
     problem_params['set_switch'] = np.array([False, False], dtype=bool)
     problem_params['t_switch'] = np.zeros(np.shape(problem_params['V_ref'])[0])
 
@@ -81,14 +109,7 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     convergence_controllers = dict()
     if use_switch_estimator:
         switch_estimator_params = {}
-        # convergence_controllers = {SwitchEstimator: switch_estimator_params}
         convergence_controllers[SwitchEstimator] = switch_estimator_params
-
-    if use_adaptivity:
-        adaptivity_params = {'e_tol': 1e-7}
-        # convergence_controllers = {Adaptivity: adaptivity_params}
-        convergence_controllers[Adaptivity] = adaptivity_params
-        controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -100,14 +121,14 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     description['step_params'] = step_params
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
 
-    if use_switch_estimator or use_adaptivity:
+    if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
     proof_assertions_description(description, problem_params)
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.0  # 3.5
+    Tend = 3.5
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -119,8 +140,8 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery_2condensators.dat'
-    fname = 'battery_2condensators.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/battery_2condensators.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -150,12 +171,12 @@ def main(use_switch_estimator=True, use_adaptivity=False):
     assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages(description, use_switch_estimator, use_adaptivity)
+    plot_voltages(description, use_switch_estimator)
 
     return np.mean(niters)
 
 
-def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
+def plot_voltages(description, use_switch_estimator, cwd='./'):
     """
     Routine to plot the numerical solution of the model
     """
@@ -209,8 +230,6 @@ def proof_assertions_description(description, problem_params):
 
     assert not type(problem_params['t_switch']) == float, '"t_switch" has to be an array with entry zero'
 
-    # assert all([problem_params['t_switch'][i] == 0 for i in range(np.shape(problem_params['t_switch'])[0])]),
-    # 'All entries of "t_switch" needs to be zero'
     assert problem_params['t_switch'][0] == 0, 'First entry of "t_switch" needs to be zero'
     assert problem_params['t_switch'][1] == 0, 'Second entry of "t_switch" needs to be zero'
 

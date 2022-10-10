@@ -12,14 +12,13 @@ from pySDC.projects.PinTSimE.battery_2condensators_model import log_data, proof_
 import pySDC.helpers.plot_helper as plt_helper
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
-def run(dt, use_switch_estimator=True, use_adaptivity=False):
+def run(dt, use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-13
+    level_params['restol'] = 1e-13
     level_params['dt'] = dt
 
     # initialize sweeper parameters
@@ -35,12 +34,12 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     problem_params = dict()
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C1'] = 1
-    problem_params['C2'] = 1
-    problem_params['R'] = 1
-    problem_params['L'] = 1
-    problem_params['alpha'] = 5
-    problem_params['V_ref'] = np.array([1, 1])  # [V_ref1, V_ref2]
+    problem_params['C1'] = 1.0
+    problem_params['C2'] = 1.0
+    problem_params['R'] = 1.0
+    problem_params['L'] = 1.0
+    problem_params['alpha'] = 5.0
+    problem_params['V_ref'] = np.array([1.0, 1.0])  # [V_ref1, V_ref2]
     problem_params['set_switch'] = np.array([False, False], dtype=bool)
     problem_params['t_switch'] = np.zeros(np.shape(problem_params['V_ref'])[0])
 
@@ -57,14 +56,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     convergence_controllers = dict()
     if use_switch_estimator:
         switch_estimator_params = {}
-        # convergence_controllers = {SwitchEstimator: switch_estimator_params}
         convergence_controllers[SwitchEstimator] = switch_estimator_params
-
-    if use_adaptivity:
-        adaptivity_params = {'e_tol': 1e-7}
-        # convergence_controllers = {Adaptivity: adaptivity_params}
-        convergence_controllers[Adaptivity] = adaptivity_params
-        controller_params['mssdc_jac'] = False
 
     # fill description dictionary for easy step instantiation
     description = dict()
@@ -76,7 +68,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     description['step_params'] = step_params
     description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
 
-    if use_switch_estimator or use_adaptivity:
+    if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
     proof_assertions_description(description, problem_params)
@@ -95,7 +87,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery_2condensators.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
     fname = 'data/battery_2condensators.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -131,7 +123,7 @@ def check(cwd='./'):
     Routine to check the differences between using a switch estimator or not
     """
 
-    dt_list = [1e-1, 1e-2, 1e-3]  # , 1e-4]
+    dt_list = [1e-1, 1e-2, 1e-3, 1e-4]
     use_switch_estimator = [True, False]
     restarts_all = []
     restarts_dict = dict()
@@ -228,8 +220,6 @@ def check(cwd='./'):
         ax1.plot(times_false1, diff_false1, label='SE=False', color='#1f77b4')
         ax1.axvline(x=t_switch1, linestyle='--', color='k', label='Switch1')
         ax1.legend(frameon=False, fontsize=10, loc='lower left')
-        # ax1.set_yticks(np.arange(-3e-2, 3e-2))
-        # ax1.set_xlim(t_switch-5e-1, 2.5)
         ax1.set_yscale('symlog', linthresh=1e-5)
         ax1.set_xlabel('Time')
 
@@ -242,8 +232,6 @@ def check(cwd='./'):
         ax2.plot(times_false2, diff_false2, label='SE=False', color='#1f77b4')
         ax2.axvline(x=t_switch2, linestyle='--', color='k', label='Switch2')
         ax2.legend(frameon=False, fontsize=10, loc='lower left')
-        # ax2.set_yticks(np.arange(-3e-2, 3e-2))
-        # ax2.set_xlim(t_switch-5e-1, 2.5)
         ax2.set_yscale('symlog', linthresh=1e-5)
         ax2.set_xlabel('Time')
 

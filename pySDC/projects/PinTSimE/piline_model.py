@@ -30,14 +30,6 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-<<<<<<< HEAD
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='v2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='p3', value=L.uend[2])
-=======
         self.add_to_stats(
             process=step.status.slot,
             time=L.time,
@@ -65,7 +57,6 @@ class log_data(hooks):
             type='p3',
             value=L.uend[2],
         )
->>>>>>> upstream/master
 
 
 def main():
@@ -75,19 +66,14 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-<<<<<<< HEAD
-    level_params['restol'] = 1E-13
-    level_params['dt'] = 1E-2
-=======
     level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
->>>>>>> upstream/master
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = Collocation
     sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = [3, 5]
+    sweeper_params['num_nodes'] = 5
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
@@ -122,9 +108,9 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 15
+    Tend = 20.0
 
-    num_procs = 8
+    num_procs = 1
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
@@ -136,10 +122,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-<<<<<<< HEAD
-=======
     Path("data").mkdir(parents=True, exist_ok=True)
->>>>>>> upstream/master
     fname = 'data/piline.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -167,19 +150,11 @@ def main():
     assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    # plot_voltages(t0=t0, dt=level_params['dt'], Tend=Tend, uinit=uinit, problem_params=problem_params,
-    # reference_plotted=True)
-
-    compute_ref_error(t0, level_params['dt'], Tend, uinit, problem_params)
+    plot_voltages()
 
 
-<<<<<<< HEAD
-def plot_voltages(t0=None, dt=None, Tend=None, uinit=None, problem_params=None, reference_plotted=False, cwd='./'):
-    f = open(cwd + 'piline.dat', 'rb')
-=======
 def plot_voltages(cwd='./'):
     f = open(cwd + 'data/piline.dat', 'rb')
->>>>>>> upstream/master
     stats = dill.load(f)
     f.close()
 
@@ -192,28 +167,9 @@ def plot_voltages(cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-<<<<<<< HEAD
-    ax.plot(times, [v[1] for v in v1], linewidth=1, label='$v_{C_1}$')
-    ax.plot(times, [v[1] for v in v2], linewidth=1, label='$v_{C_2}$')
-    ax.plot(times, [v[1] for v in p3], linewidth=1, label='$i_{L_\pi}$')
-
-    if reference_plotted:
-        ODE_Solvers = ['Radau', 'DOP853']
-        linestyles = ['k--', 'r--']
-        for style, ref_method in zip(linestyles, ODE_Solvers):
-            v_ref = solve_ivp(piline_ODE, [t0, Tend], uinit, ref_method, args=problem_params.values(),
-                              dense_output=True, first_step=dt)
-
-            v_sol = v_ref.sol(times)
-
-            ax.plot(times, v_sol[0, :], style, label=ref_method)
-            ax.plot(times, v_sol[1, :], style)
-            ax.plot(times, v_sol[2, :], style)
-=======
     ax.plot(times, [v[1] for v in v1], linewidth=1, label=r'$v_{C_1}$')
     ax.plot(times, [v[1] for v in v2], linewidth=1, label=r'$v_{C_2}$')
     ax.plot(times, [v[1] for v in p3], linewidth=1, label=r'$i_{L_\pi}$')
->>>>>>> upstream/master
     ax.legend(frameon=False, fontsize=12, loc='center right')
 
     ax.set_xlabel('Time')
@@ -221,71 +177,6 @@ def plot_voltages(cwd='./'):
 
     fig.savefig('data/piline_model_solution.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
-
-
-def compute_ref_error(t0, dt, Tend, uinit, problem_params, ref_method='DOP853', cwd='./'):
-    """
-    Routine to compute error between PFASST and a reference method
-    """
-
-    f = open(cwd + 'piline.dat', 'rb')
-    stats = dill.load(f)
-    f.close()
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    v1 = get_sorted(stats, type='v1', sortby='time')
-    v2 = get_sorted(stats, type='v2', sortby='time')
-    p3 = get_sorted(stats, type='p3', sortby='time')
-
-    v1_val = [v[1] for v in v1]
-    v2_val = [v[1] for v in v2]
-    p3_val = [v[1] for v in p3]
-
-    times = [v[0] for v in v1]
-
-    v_ref = solve_ivp(piline_ODE, [t0, Tend], uinit, ref_method, args=problem_params.values(),
-                      dense_output=True, first_step=dt)
-
-    v_sol = v_ref.sol(times)
-
-    setup_mpl()
-    fig, ax = plt_helper.plt.subplots(1, 3, figsize=(6, 2), sharex='col', sharey='row')
-    ax[0].plot(times, v1_val - v_sol[0, :])
-    ax[0].set_title('Ref.-Error of $v_{C_1}$')
-    ax[0].set_yscale('log', base=10)
-    ax[0].tick_params(axis='both')
-    # ax[0].set_ylim(1e-9, 1e-1)
-    ax[2].set_ylim(1e-14, 1e-1)
-    ax[0].set_xlabel('Time')
-
-    ax[1].plot(times, v2_val - v_sol[1, :])
-    ax[1].set_title('Ref.-Error of $v_{C_2}$')
-    ax[1].set_yscale('log', base=10)
-    ax[1].tick_params(axis='both')
-    # ax[1].set_ylim(1e-9, 1e-1)
-    ax[2].set_ylim(1e-14, 1e-1)
-    ax[1].set_xlabel('Time')
-
-    ax[2].plot(times, p3_val - v_sol[2, :])
-    ax[2].set_title('Ref.-Error of $i_{L_\pi}$')
-    ax[2].set_yscale('log', base=10)
-    ax[2].tick_params(axis='both')
-    # ax[2].set_ylim(1e-9, 1e-1)
-    ax[2].set_ylim(1e-14, 1e-1)
-    ax[2].set_xlabel('Time')
-
-    fig.savefig('data/piline_model_reference_error.png', dpi=300, bbox_inches='tight')
-
-
-def piline_ODE(t, y, Vs, Rs, C1, Rpi, C2, Lpi, Rl):
-    """
-    Routine which defines the piline model problem as ODE for scipy ODE solvers
-    """
-    x1, x2, x3 = y
-    dydt = [(-1 / (Rs * C1)) * x1 - (1 / C1) * x3 + Vs / (Rs * C1), (-1 / (Rl * C2)) * x2 + (1 / C2) * x3,
-            (1 / Lpi) * x1 - (1 / Lpi) * x2 - (Rpi / Lpi) * x3]
-
-    return dydt
 
 
 def setup_mpl(fontsize=8):

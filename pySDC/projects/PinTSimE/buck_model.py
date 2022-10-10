@@ -38,7 +38,7 @@ def main():
     problem_params['Rp'] = 0.01
     problem_params['L1'] = 1e-3
     problem_params['C2'] = 1e-3
-    problem_params['Rl'] = 10
+    problem_params['Rl'] = 10.0
 
     # initialize step parameters
     step_params = dict()

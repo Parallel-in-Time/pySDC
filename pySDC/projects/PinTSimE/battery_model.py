@@ -12,7 +12,6 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
 
 
 class log_data(hooks):
@@ -25,17 +24,6 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-<<<<<<< HEAD
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index,
-                          iter=step.status.iter, sweep=L.status.sweep, type='residuals',
-                          value=L.status.residual)
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
-=======
         self.add_to_stats(
             process=step.status.slot,
             time=L.time + L.dt,
@@ -64,7 +52,6 @@ class log_data(hooks):
             value=1,
             initialize=0,
         )
->>>>>>> upstream/master
 
 
 def main(use_switch_estimator=True, use_adaptivity=True):
@@ -74,13 +61,8 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
     # initialize level parameters
     level_params = dict()
-<<<<<<< HEAD
-    level_params['restol'] = 1E-13
-    level_params['dt'] = 1E-3
-=======
-    level_params['restol'] = 1e-10
+    level_params['restol'] = 1e-13
     level_params['dt'] = 1e-3
->>>>>>> upstream/master
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -95,10 +77,10 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     problem_params = dict()
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C'] = 1
-    problem_params['R'] = 1
-    problem_params['L'] = 1
-    problem_params['alpha'] = 5
+    problem_params['C'] = 1.0
+    problem_params['R'] = 1.0
+    problem_params['L'] = 1.0
+    problem_params['alpha'] = 5.0
     problem_params['V_ref'] = 1.0
     problem_params['set_switch'] = np.array([False], dtype=bool)
     problem_params['t_switch'] = np.zeros(1)
@@ -118,11 +100,6 @@ def main(use_switch_estimator=True, use_adaptivity=True):
         switch_estimator_params = {}
         convergence_controllers[SwitchEstimator] = switch_estimator_params
 
-    if use_adaptivity:
-        adaptivity_params = {'e_tol': 1e-7}
-        convergence_controllers[Adaptivity] = adaptivity_params
-        controller_params['mssdc_jac'] = False
-
     # fill description dictionary for easy step instantiation
     description = dict()
     description['problem_class'] = battery  # pass problem class
@@ -132,7 +109,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
-    if use_switch_estimator or use_adaptivity:
+    if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
     proof_assertions_description(description, problem_params)
@@ -151,11 +128,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-<<<<<<< HEAD
-    # fname = 'data/battery.dat'
-=======
     Path("data").mkdir(parents=True, exist_ok=True)
->>>>>>> upstream/master
     fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -186,12 +159,12 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages(description, use_switch_estimator, use_adaptivity)
+    plot_voltages(description, use_switch_estimator)
 
     return np.mean(niters)
 
 
-def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
+def plot_voltages(description, use_switch_estimator, cwd='./'):
     """
     Routine to plot the numerical solution of the model
     """

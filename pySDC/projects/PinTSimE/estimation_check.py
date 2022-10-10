@@ -85,7 +85,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
     fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -187,8 +187,6 @@ def check(cwd='./'):
         ax.plot(times_false, diff_false, label='SE=False', color='#1f77b4')
         ax.axvline(x=t_switch, linestyle='--', color='k', label='Switch')
         ax.legend(frameon=False, fontsize=10, loc='lower left')
-        # ax.set_yticks(np.arange(-3e-2, 3e-2))
-        # ax.set_xlim(t_switch-5e-1, 2.5)
         ax.set_yscale('symlog', linthresh=1e-5)
         ax.set_xlabel('Time')
 
