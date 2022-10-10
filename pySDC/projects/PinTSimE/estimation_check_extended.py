@@ -96,7 +96,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # fname = 'data/battery_2condensators.dat'
-    fname = 'battery_2condensators.dat'
+    fname = 'data/battery_2condensators.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -108,7 +108,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
     min_iter = 20
     max_iter = 0
 
-    f = open('battery_2condensators_out.txt', 'w')
+    f = open('data/battery_2condensators_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -128,7 +128,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
 
 def check(cwd='./'):
     """
-        Routine to check the differences between using a switch estimator or not
+    Routine to check the differences between using a switch estimator or not
     """
 
     dt_list = [1e-1, 1e-2, 1e-3]  # , 1e-4]
@@ -139,7 +139,7 @@ def check(cwd='./'):
         for item in use_switch_estimator:
             stats, description = run(dt=dt_item, use_switch_estimator=item)
 
-            fname = 'battery_2condensators_dt{}_USE{}.dat'.format(dt_item, item)
+            fname = 'data/battery_2condensators_dt{}_USE{}.dat'.format(dt_item, item)
             f = open(fname, 'wb')
             dill.dump(stats, f)
             f.close()
@@ -162,11 +162,11 @@ def check(cwd='./'):
     restarts_dt_switch1 = []
     restarts_dt_switch2 = []
     for dt_item in dt_list:
-        f1 = open(cwd + 'battery_2condensators_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/battery_2condensators_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'battery_2condensators_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/battery_2condensators_dt{}_USEFalse.dat'.format(dt_item), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -233,7 +233,7 @@ def check(cwd='./'):
         ax1.set_yscale('symlog', linthresh=1e-5)
         ax1.set_xlabel('Time')
 
-        fig1.savefig('difference_estimation_vC1_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig1.savefig('data/difference_estimation_vC1_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
@@ -247,7 +247,7 @@ def check(cwd='./'):
         ax2.set_yscale('symlog', linthresh=1e-5)
         ax2.set_xlabel('Time')
 
-        fig2.savefig('difference_estimation_vC2_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig2.savefig('data/difference_estimation_vC2_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -270,7 +270,7 @@ def check(cwd='./'):
     labels = [l.get_label() for l in lines]
     ax1.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 
-    fig1.savefig('diffs_estimation_vC1.png', dpi=300, bbox_inches='tight')
+    fig1.savefig('data/diffs_estimation_vC1.png', dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -293,7 +293,7 @@ def check(cwd='./'):
     labels = [l.get_label() for l in lines]
     ax2.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 
-    fig2.savefig('diffs_estimation_vC2.png', dpi=300, bbox_inches='tight')
+    fig2.savefig('data/diffs_estimation_vC2.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":

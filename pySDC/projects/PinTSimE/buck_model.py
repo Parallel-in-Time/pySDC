@@ -80,7 +80,7 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # fname = 'data/buck.dat'
-    fname = 'buck.dat'
+    fname = 'data/buck.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -92,7 +92,7 @@ def main():
     min_iter = 20
     max_iter = 0
 
-    f = open('buck_out.txt', 'w')
+    f = open('data/buck_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -111,7 +111,7 @@ def main():
 
 
 def plot_voltages(cwd='./'):
-    f = open(cwd + 'buck.dat', 'rb')
+    f = open(cwd + 'data/buck.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
