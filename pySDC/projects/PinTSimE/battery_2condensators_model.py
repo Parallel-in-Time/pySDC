@@ -36,7 +36,7 @@ class log_data(hooks):
                              sweep=L.status.sweep, type='restart', value=1, initialize=0)
 
 
-def main(use_switch_estimator=False, use_adaptivity=False):
+def main(use_switch_estimator=True, use_adaptivity=False):
     """
     A simple test program to do SDC/PFASST runs for the battery drain model using 2 condensators
     """
@@ -44,7 +44,7 @@ def main(use_switch_estimator=False, use_adaptivity=False):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1E-13
-    level_params['dt'] = 4E-3
+    level_params['dt'] = 1E-3
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -107,7 +107,7 @@ def main(use_switch_estimator=False, use_adaptivity=False):
 
     # set time parameters
     t0 = 0.0
-    Tend = 3.5
+    Tend = 2.0  # 3.5
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -143,6 +143,9 @@ def main(use_switch_estimator=False, use_adaptivity=False):
         # print(out)
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
+
+    restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+    print("Restarts for dt: ", level_params['dt'], " -- ", np.sum(restarts))
 
     assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()

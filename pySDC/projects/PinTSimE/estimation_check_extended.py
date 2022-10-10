@@ -120,7 +120,7 @@ def run(dt, use_switch_estimator=True, use_adaptivity=False):
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
-    assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 10.5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return stats, description
@@ -131,9 +131,10 @@ def check(cwd='./'):
         Routine to check the differences between using a switch estimator or not
     """
 
-    dt_list = [1e-1, 1e-2, 1e-3]
+    dt_list = [1e-1, 1e-2, 1e-3]  # , 1e-4]
     use_switch_estimator = [True, False]
     restarts_all = []
+    restarts_dict = dict()
     for dt_item in dt_list:
         for item in use_switch_estimator:
             stats, description = run(dt=dt_item, use_switch_estimator=item)
@@ -144,7 +145,8 @@ def check(cwd='./'):
             f.close()
 
             if item:
-                restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+                restarts_dict[dt_item] = np.array(get_sorted(stats, type='restart', recomputed=False, sortby='time'))
+                restarts = restarts_dict[dt_item][:, 1]
                 restarts_all.append(np.sum(restarts))
                 print("Restarts for dt: ", dt_item, " -- ", np.sum(restarts))
 
@@ -157,6 +159,8 @@ def check(cwd='./'):
     diff_true_all2 = []
     diff_false_all_before2 = []
     diff_false_all_after2 = []
+    restarts_dt_switch1 = []
+    restarts_dt_switch2 = []
     for dt_item in dt_list:
         f1 = open(cwd + 'battery_2condensators_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
@@ -171,17 +175,8 @@ def check(cwd='./'):
         t_switch1 = [v[0] for v in val_switch1]
         t_switch2 = [v[0] for v in val_switch2]
 
-        if len(t_switch1) > 1:
-            t_switch1 = t_switch1[-1]
-
-        else:
-            t_switch1 = t_switch1[0]
-
-        if len(t_switch2) > 1:
-            t_switch2 = t_switch2[-1]
-
-        else:
-            t_switch2 = t_switch2[0]
+        t_switch1 = t_switch1[0]
+        t_switch2 = t_switch2[0]
 
         val_switch_all.append([t_switch1, t_switch2])
 
@@ -217,6 +212,14 @@ def check(cwd='./'):
             if times_false2[m - 1] < t_switch2 < times_false2[m]:
                 diff_false_all_before2.append(diff_false2[m - 1])
                 diff_false_all_after2.append(diff_false2[m])
+
+        restarts_dt = restarts_dict[dt_item]
+        for i in range(len(restarts_dt[:, 0])):
+            if round(restarts_dt[i, 0], 13) == round(t_switch1, 13):
+                restarts_dt_switch1.append(np.sum(restarts_dt[0:i, 1]))
+
+            if round(restarts_dt[i, 0], 13) == round(t_switch2, 13):
+                restarts_dt_switch2.append(np.sum(restarts_dt[i - 1:, 1]))
 
         setup_mpl()
         fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
@@ -260,7 +263,7 @@ def check(cwd='./'):
     ax1.set_xlabel("$\Delta t$")
 
     restart_ax = ax1.twinx()
-    restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
+    restarts = restart_ax.plot(dt_list, restarts_dt_switch1, 'cs--', label='Restarts')
     restart_ax.set_ylabel("Restarts")
 
     lines = pos1 + pos2 + pos3 + restarts
@@ -283,7 +286,7 @@ def check(cwd='./'):
     ax2.set_xlabel("$\Delta t$")
 
     restart_ax = ax2.twinx()
-    restarts = restart_ax.plot(dt_list, restarts_all, 'cs--', label='Restarts')
+    restarts = restart_ax.plot(dt_list, restarts_dt_switch2, 'cs--', label='Restarts')
     restart_ax.set_ylabel("Restarts")
 
     lines = pos1 + pos2 + pos3 + restarts
