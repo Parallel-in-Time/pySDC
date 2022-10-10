@@ -86,7 +86,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -95,7 +95,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
-    f = open('battery_out.txt', 'w')
+    f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
 
     # depends on which step sizes are used
@@ -107,7 +107,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
 def check(cwd='./'):
     """
-        Routine to check the differences between using a switch estimator or not
+    Routine to check the differences between using a switch estimator or not
     """
 
     V_ref = 1.0
@@ -118,7 +118,7 @@ def check(cwd='./'):
         for item in use_switch_estimator:
             stats = run(dt=dt_item, use_switch_estimator=item, V_ref=V_ref)
 
-            fname = 'battery_dt{}_USE{}.dat'.format(dt_item, item)
+            fname = 'data/battery_dt{}_USE{}.dat'.format(dt_item, item)
             f = open(fname, 'wb')
             dill.dump(stats, f)
             f.close()
@@ -132,11 +132,11 @@ def check(cwd='./'):
     diff_false_all_before = []
     diff_false_all_after = []
     for dt_item in dt_list:
-        f1 = open(cwd + 'battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
+        f1 = open(cwd + 'data/battery_dt{}_USETrue.dat'.format(dt_item), 'rb')
         stats_true = dill.load(f1)
         f1.close()
 
-        f2 = open(cwd + 'battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
+        f2 = open(cwd + 'data/battery_dt{}_USEFalse.dat'.format(dt_item), 'rb')
         stats_false = dill.load(f2)
         f2.close()
 
@@ -178,7 +178,7 @@ def check(cwd='./'):
         ax1.legend(frameon=False, fontsize=10, loc='upper right')
         ax1.set_xlabel('Time')
         ax1.set_ylabel('Energy')
-        fig1.savefig('simulation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig1.savefig('data/simulation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
         setup_mpl()
         fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
@@ -192,7 +192,7 @@ def check(cwd='./'):
         ax.set_yscale('symlog', linthresh=1e-5)
         ax.set_xlabel('Time')
 
-        fig.savefig('difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -215,7 +215,7 @@ def check(cwd='./'):
     labels = [l.get_label() for l in lines]
     ax.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 
-    fig.savefig('diffs_estimation.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
 
 
 if __name__ == "__main__":

@@ -157,7 +157,7 @@ def main(use_switch_estimator=True, use_adaptivity=False):
 
 def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
     f = open(cwd + 'battery_2condensators.dat', 'rb')
@@ -189,12 +189,12 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('battery_2condensators_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/battery_2condensators_model_solution.png', dpi=300, bbox_inches='tight')
 
 
 def proof_assertions_description(description, problem_params):
     """
-        Function to proof the assertions (function to get cleaner code)
+    Function to proof the assertions (function to get cleaner code)
     """
 
     assert problem_params['alpha'] > problem_params['V_ref'][0], 'Please set "alpha" greater than "V_ref1"'

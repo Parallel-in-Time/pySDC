@@ -116,7 +116,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -128,7 +128,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     min_iter = 20
     max_iter = 0
 
-    f = open('battery_out.txt', 'w')
+    f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -153,10 +153,10 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
 def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'battery.dat', 'rb')
+    f = open(cwd + 'data/battery.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
@@ -181,12 +181,12 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
-    fig.savefig('battery_model_solution.png', dpi=300, bbox_inches='tight')
+    fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
 
 
 def proof_assertions_description(description, problem_params):
     """
-        Function to proof the assertions (function to get cleaner code)
+    Function to proof the assertions (function to get cleaner code)
     """
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
