@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
@@ -8,7 +9,7 @@ from matplotlib.patches import Polygon
 
 from pySDC.implementations.problem_classes.FastWaveSlowWave_0D import swfw_scalar
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 
 from pySDC.core.Step import step
 
@@ -42,7 +43,7 @@ def compute_stability():
     # initialize sweeper parameters
     sweeper_params = dict()
     # SET TYPE AND NUMBER OF QUADRATURE NODES ###
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['do_coll_update'] = True
 
@@ -85,8 +86,7 @@ def compute_stability():
                 # Compute stability function of collocation solution
                 Mat_sweep = np.linalg.inv(np.eye(nnodes) - dt * (lambda_fast + lambda_slow) * Q)
             if L.sweep.params.do_coll_update:
-                stab_fh = 1.0 + (lambda_fast + lambda_slow) * L.sweep.coll.weights.dot(
-                    Mat_sweep.dot(np.ones(nnodes)))
+                stab_fh = 1.0 + (lambda_fast + lambda_slow) * L.sweep.coll.weights.dot(Mat_sweep.dot(np.ones(nnodes)))
             else:
                 q = np.zeros(nnodes)
                 q[nnodes - 1] = 1.0
@@ -125,15 +125,24 @@ def plot_stability(lambda_s, lambda_f, num_nodes, K, stab):
     manual_locations = [(1.5, 2.5)]
     if K > 0:  # for K=0 and no 1.0 isoline, this crashes Matplotlib for somer reason
         plt.clabel(CS2, inline=True, fmt='%3.2f', fontsize=fs - 2, manual=manual_locations)
-    plt.gca().add_patch(Polygon([[0, 0], [lam_s_max, 0], [lam_s_max, lam_s_max]], visible=True, fill=True,
-                                facecolor='.75', edgecolor='k', linewidth=1.0, zorder=11))
+    plt.gca().add_patch(
+        Polygon(
+            [[0, 0], [lam_s_max, 0], [lam_s_max, lam_s_max]],
+            visible=True,
+            fill=True,
+            facecolor='.75',
+            edgecolor='k',
+            linewidth=1.0,
+            zorder=11,
+        )
+    )
     plt.gca().set_xticks(np.arange(0, int(lam_s_max) + 1))
     plt.gca().set_yticks(np.arange(0, int(lam_f_max) + 2, 2))
     plt.gca().tick_params(axis='both', which='both', labelsize=fs)
     plt.xlim([0.0, lam_s_max])
     plt.ylim([0.0, lam_f_max])
-    plt.xlabel('$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
-    plt.ylabel('$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
+    plt.xlabel(r'$\Delta t \lambda_{slow}$', fontsize=fs, labelpad=0.0)
+    plt.ylabel(r'$\Delta t \lambda_{fast}$', fontsize=fs, labelpad=0.0)
     plt.title(r'$M=%1i$, $K=%1i$' % (num_nodes, K), fontsize=fs)
     filename = 'data/stability-K' + str(K) + '-M' + str(num_nodes) + '.png'
     fig.savefig(filename, bbox_inches='tight')

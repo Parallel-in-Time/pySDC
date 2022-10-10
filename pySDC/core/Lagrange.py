@@ -38,9 +38,7 @@ def computeFejerRule(n):
     m = n - lN
     K = np.arange(m)
     # -- Build v0
-    v0 = np.concatenate([
-        2 * np.exp(1j * np.pi * K / n) / (1 - 4 * K**2),
-        np.zeros(lN + 1)])
+    v0 = np.concatenate([2 * np.exp(1j * np.pi * K / n) / (1 - 4 * K**2), np.zeros(lN + 1)])
     # -- Build v1 from v0
     v1 = np.empty(len(v0) - 1, dtype=complex)
     np.conjugate(v0[:0:-1], out=v1)
@@ -48,8 +46,7 @@ def computeFejerRule(n):
     # -- Compute inverse fourier transform
     w = np.fft.ifft(v1)
     if max(w.imag) > 1.0e-15:
-        raise ValueError(
-            f'Max imaginary value to important for ifft: {max(w.imag)}')
+        raise ValueError(f'Max imaginary value to important for ifft: {max(w.imag)}')
     # -- Store weights
     weights[:] = w.real
 
@@ -75,7 +72,7 @@ class LagrangeApproximation(object):
         w_j = \frac{1}{\prod_{k\neq j}(x_j-x_k)}
 
     are the barycentric weights.
-    The theory and implementation is inspired from [1]_.
+    The theory and implementation is inspired from `this paper <http://dx.doi.org/10.1137/S0036144502417715>`_.
 
     Attributes
     ----------
@@ -83,20 +80,7 @@ class LagrangeApproximation(object):
         The interpolating points
     weights : np.1darray
         The associated barycentric weights
-    n : int (property)
-        The number of points
 
-    Methods
-    -------
-    __init__(self, points, weightComputation='AUTO', scaleRef='MAX')
-        Instanciate the LagrangeApproximation object.
-    getInterpolationMatrix(self, times):
-        Compute the interpolation matrix for a given set of discrete "time" points.
-    getIntegrationMatrix(self, intervals, numQuad='LEGENDRE_NUMPY')
-        Compute the integration matrix for a given set of intervals.
-
-    .. [1] Berrut, J. P., & Trefethen, L. N. (2004).
-           "Barycentric lagrange interpolation." SIAM review, 46(3), 501-517.
     """
 
     def __init__(self, points, weightComputation='AUTO', scaleRef='MAX'):
@@ -155,7 +139,7 @@ class LagrangeApproximation(object):
             diffs *= 4 / (points.max() - points.min())
             sign = np.sign(diffs).prod(axis=1)
             vv = np.exp(np.log(np.abs(diffs)).sum(axis=1))
-            invProd = (sign * vv)
+            invProd = sign * vv
             invProd **= -1
             invProd /= np.linalg.norm(invProd, np.inf)
             return invProd
@@ -173,8 +157,7 @@ class LagrangeApproximation(object):
         elif weightComputation == 'CHEBFUN':
             invProd = chebfun(diffs)
         else:
-            raise NotImplementedError(
-                f'weightComputation={weightComputation}')
+            raise NotImplementedError(f'weightComputation={weightComputation}')
         weights = invProd
 
         # Store attributes
@@ -295,8 +278,7 @@ class LagrangeApproximation(object):
         tEval = (bj - aj) / 2 * tau + (bj + aj) / 2
 
         # Compute the integrand function on nodes
-        integrand = self.getInterpolationMatrix(tEval.ravel()).T.reshape(
-            (-1,) + tEval.shape)
+        integrand = self.getInterpolationMatrix(tEval.ravel()).T.reshape((-1,) + tEval.shape)
 
         # Apply quadrature rule to integrate
         integrand *= omega

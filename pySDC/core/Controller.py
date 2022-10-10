@@ -72,7 +72,8 @@ class controller(object):
         # specify formats and handlers
         if log_to_file:
             file_formatter = logging.Formatter(
-                fmt='%(asctime)s - %(name)s - %(module)s - %(funcName)s - %(lineno)d - %(levelname)s: %(message)s')
+                fmt='%(asctime)s - %(name)s - %(module)s - %(funcName)s - %(lineno)d - %(levelname)s: %(message)s'
+            )
             if os.path.isfile(fname):
                 file_handler = logging.FileHandler(fname, mode='a')
             else:
@@ -100,16 +101,18 @@ class controller(object):
             pass
 
     def welcome_message(self):
-        out = 'Welcome to the one and only, really very astonishing and 87.3% bug free' + \
-              '\n                                 _____ _____   _____ ' + \
-              '\n                                / ____|  __ \ / ____|' + \
-              '\n                    _ __  _   _| (___ | |  | | |     ' + \
-              '\n                   | \'_ \| | | |\___ \| |  | | |     ' + \
-              '\n                   | |_) | |_| |____) | |__| | |____ ' + \
-              '\n                   | .__/ \__, |_____/|_____/ \_____|' + \
-              '\n                   | |     __/ |                     ' + \
-              '\n                   |_|    |___/                      ' + \
-              '\n                                                     '
+        out = (
+            'Welcome to the one and only, really very astonishing and 87.3% bug free'
+            + r'\n                                 _____ _____   _____ '
+            + r'\n                                / ____|  __ \ / ____|'
+            + r'\n                    _ __  _   _| (___ | |  | | |     '
+            + r'\n                   | \'_ \| | | |\___ \| |  | | |     '
+            + r'\n                   | |_) | |_| |____) | |__| | |____ '
+            + r'\n                   | .__/ \__, |_____/|_____/ \_____|'
+            + r'\n                   | |     __/ |                     '
+            + r'\n                   |_|    |___/                      '
+            + r'\n                                                     '
+        )
         self.logger.info(out)
 
     def dump_setup(self, step, controller_params, description):

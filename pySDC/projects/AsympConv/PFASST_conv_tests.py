@@ -7,14 +7,13 @@ import numpy as np
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 
 
 def main():
@@ -42,13 +41,13 @@ def run_diffusion(nsweeps):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [nsweeps, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'zero'
@@ -57,6 +56,7 @@ def run_diffusion(nsweeps):
     problem_params = dict()
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -74,7 +74,7 @@ def run_diffusion(nsweeps):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -94,7 +94,7 @@ def run_diffusion(nsweeps):
     for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1)) ** 2
 
-        problem_params['nu'] = 10.0 ** i / ratio  # diffusion coefficient
+        problem_params['nu'] = 10.0**i / ratio  # diffusion coefficient
         description['problem_params'] = problem_params  # pass problem parameters
 
         out = 'Working on c = %6.4e' % problem_params['nu']
@@ -114,10 +114,7 @@ def run_diffusion(nsweeps):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 
@@ -125,8 +122,9 @@ def run_diffusion(nsweeps):
         print(out)
 
         if nsweeps == 3 and (i == -3 or i == 9):
-            assert np.mean(niters) <= 2, 'ERROR: too much iterations for diffusive asymptotics, got %s' \
-                                         % np.mean(niters)
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for diffusive asymptotics, got %s' % np.mean(
+                niters
+            )
 
         results[cfl] = np.mean(niters)
 
@@ -148,13 +146,13 @@ def run_advection(nsweeps):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.25
     level_params['nsweeps'] = [nsweeps, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'zero'
@@ -165,6 +163,7 @@ def run_advection(nsweeps):
     problem_params['nvars'] = [128, 64]  # number of degrees of freedom for each level
     problem_params['order'] = 2
     problem_params['type'] = 'center'
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -182,7 +181,7 @@ def run_advection(nsweeps):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advection1d  # pass problem class
+    description['problem_class'] = advectionNd  # pass problem class
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -202,7 +201,7 @@ def run_advection(nsweeps):
     for i in range(-3, 10):
         ratio = level_params['dt'] / (1.0 / (problem_params['nvars'][0] + 1))
 
-        problem_params['c'] = 10.0 ** i / ratio  # diffusion coefficient
+        problem_params['c'] = 10.0**i / ratio  # diffusion coefficient
         description['problem_params'] = problem_params  # pass problem parameters
 
         out = 'Working on nu = %6.4e' % problem_params['c']
@@ -222,10 +221,7 @@ def run_advection(nsweeps):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 
@@ -233,8 +229,9 @@ def run_advection(nsweeps):
         print(out)
 
         if nsweeps == 3 and (i == -3 or i == 9):
-            assert np.mean(niters) <= 2, 'ERROR: too much iterations for advective asymptotics, got %s' \
-                                         % np.mean(niters)
+            assert np.mean(niters) <= 2, 'ERROR: too much iterations for advective asymptotics, got %s' % np.mean(
+                niters
+            )
 
         results[cfl] = np.mean(niters)
 
@@ -275,14 +272,15 @@ def plot_results(nsweeps):
         niter_adv.append(results_adv[x])
 
     # set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
 
     # set up figure

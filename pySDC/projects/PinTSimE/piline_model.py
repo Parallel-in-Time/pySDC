@@ -1,12 +1,16 @@
 import matplotlib as mpl
 import numpy as np
 import dill
+<<<<<<< HEAD
 from scipy.integrate import solve_ivp
+=======
+from pathlib import Path
+>>>>>>> upstream/master
 
 mpl.use('Agg')
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -17,7 +21,6 @@ from pySDC.core.Hooks import hooks
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -27,12 +30,42 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
+<<<<<<< HEAD
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v1', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='v2', value=L.uend[1])
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='p3', value=L.uend[2])
+=======
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v1',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='v2',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='p3',
+            value=L.uend[2],
+        )
+>>>>>>> upstream/master
 
 
 def main():
@@ -42,13 +75,17 @@ def main():
 
     # initialize level parameters
     level_params = dict()
+<<<<<<< HEAD
     level_params['restol'] = 1E-13
     level_params['dt'] = 1E-2
+=======
+    level_params['restol'] = 1e-10
+    level_params['dt'] = 0.25
+>>>>>>> upstream/master
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = Collocation
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [3, 5]
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -74,13 +111,12 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = piline                         # pass problem class
-    description['problem_params'] = problem_params                # pass problem parameters
-    description['sweeper_class'] = imex_1st_order                 # pass sweeper
-    description['sweeper_params'] = sweeper_params                # pass sweeper parameters
-    description['level_params'] = level_params                    # pass level parameters
-    description['step_params'] = step_params                      # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh            # pass spatial transfer class
+    description['problem_class'] = piline  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
 
     assert 'errtol' not in description['step_params'].keys(), "No exact or reference solution known to compute error"
 
@@ -100,6 +136,10 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+<<<<<<< HEAD
+=======
+    Path("data").mkdir(parents=True, exist_ok=True)
+>>>>>>> upstream/master
     fname = 'data/piline.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -133,8 +173,13 @@ def main():
     compute_ref_error(t0, level_params['dt'], Tend, uinit, problem_params)
 
 
+<<<<<<< HEAD
 def plot_voltages(t0=None, dt=None, Tend=None, uinit=None, problem_params=None, reference_plotted=False, cwd='./'):
     f = open(cwd + 'piline.dat', 'rb')
+=======
+def plot_voltages(cwd='./'):
+    f = open(cwd + 'data/piline.dat', 'rb')
+>>>>>>> upstream/master
     stats = dill.load(f)
     f.close()
 
@@ -147,6 +192,7 @@ def plot_voltages(t0=None, dt=None, Tend=None, uinit=None, problem_params=None, 
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
+<<<<<<< HEAD
     ax.plot(times, [v[1] for v in v1], linewidth=1, label='$v_{C_1}$')
     ax.plot(times, [v[1] for v in v2], linewidth=1, label='$v_{C_2}$')
     ax.plot(times, [v[1] for v in p3], linewidth=1, label='$i_{L_\pi}$')
@@ -163,12 +209,18 @@ def plot_voltages(t0=None, dt=None, Tend=None, uinit=None, problem_params=None, 
             ax.plot(times, v_sol[0, :], style, label=ref_method)
             ax.plot(times, v_sol[1, :], style)
             ax.plot(times, v_sol[2, :], style)
+=======
+    ax.plot(times, [v[1] for v in v1], linewidth=1, label=r'$v_{C_1}$')
+    ax.plot(times, [v[1] for v in v2], linewidth=1, label=r'$v_{C_2}$')
+    ax.plot(times, [v[1] for v in p3], linewidth=1, label=r'$i_{L_\pi}$')
+>>>>>>> upstream/master
     ax.legend(frameon=False, fontsize=12, loc='center right')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
     fig.savefig('data/piline_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 def compute_ref_error(t0, dt, Tend, uinit, problem_params, ref_method='DOP853', cwd='./'):

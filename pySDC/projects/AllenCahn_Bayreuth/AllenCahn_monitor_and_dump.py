@@ -5,7 +5,6 @@ from pySDC.core.Hooks import hooks
 
 
 class monitor_and_dump(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -60,13 +59,13 @@ class monitor_and_dump(hooks):
         else:
             c_global = c_local
         if self.ndim == 3:
-            vol = c_global * L.prob.dx ** 3
+            vol = c_global * L.prob.dx**3
             radius = (vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
-            self.init_vol = np.pi * 4.0 / 3.0 * L.prob.params.radius ** 3
+            self.init_vol = np.pi * 4.0 / 3.0 * L.prob.params.radius**3
         elif self.ndim == 2:
-            vol = c_global * L.prob.dx ** 2
+            vol = c_global * L.prob.dx**2
             radius = np.sqrt(vol / np.pi)
-            self.init_vol = np.pi * L.prob.params.radius ** 2
+            self.init_vol = np.pi * L.prob.params.radius**2
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
 
@@ -78,14 +77,42 @@ class monitor_and_dump(hooks):
 
         # write to stats
         if L.time == 0.0:
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='computed_radius', value=radius)
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='exact_radius', value=self.init_radius)
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='computed_volume', value=vol)
-            self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                              sweep=L.status.sweep, type='exact_volume', value=self.init_vol)
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='computed_radius',
+                value=radius,
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='exact_radius',
+                value=self.init_radius,
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='computed_volume',
+                value=vol,
+            )
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=-1,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='exact_volume',
+                value=self.init_vol,
+            )
 
         # compute local offset for I/O
         nbytes_local = tmp.nbytes
@@ -93,7 +120,7 @@ class monitor_and_dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         # dump initial data
         fname = f"./data/{L.prob.params.name}_{0:08d}"
@@ -148,14 +175,14 @@ class monitor_and_dump(hooks):
             c_global = c_local
 
         if self.ndim == 3:
-            vol = c_global * L.prob.dx ** 3
+            vol = c_global * L.prob.dx**3
             radius = (vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
-            exact_vol = np.pi * 4.0 / 3.0 * (max(self.init_radius ** 2 - 4.0 * (L.time + L.dt), 0)) ** (3.0 / 2.0)
+            exact_vol = np.pi * 4.0 / 3.0 * (max(self.init_radius**2 - 4.0 * (L.time + L.dt), 0)) ** (3.0 / 2.0)
             exact_radius = (exact_vol / (np.pi * 4.0 / 3.0)) ** (1.0 / 3.0)
         elif self.ndim == 2:
-            vol = c_global * L.prob.dx ** 2
+            vol = c_global * L.prob.dx**2
             radius = np.sqrt(vol / np.pi)
-            exact_vol = np.pi * max(self.init_radius ** 2 - 2.0 * (L.time + L.dt), 0)
+            exact_vol = np.pi * max(self.init_radius**2 - 2.0 * (L.time + L.dt), 0)
             exact_radius = np.sqrt(exact_vol / np.pi)
         else:
             raise NotImplementedError('Can use this only for 2 or 3D problems')
@@ -164,14 +191,42 @@ class monitor_and_dump(hooks):
         vol *= self.corr_vol
 
         # write to stats
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='computed_radius', value=radius)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_radius', value=exact_radius)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='computed_volume', value=vol)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='exact_volume', value=exact_vol)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='computed_radius',
+            value=radius,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_radius',
+            value=exact_radius,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='computed_volume',
+            value=vol,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='exact_volume',
+            value=exact_vol,
+        )
 
         # compute local offset for I/O
         nbytes_local = tmp.nbytes
@@ -179,7 +234,7 @@ class monitor_and_dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         #  dump initial data
         fname = f"./data/{L.prob.params.name}_{self.time_step + step.status.slot:08d}"

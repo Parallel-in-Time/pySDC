@@ -1,10 +1,11 @@
 import sys
+from pathlib import Path
 
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.HeatEquation_2D_PETSc_forced import heat2d_petsc_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -40,13 +41,13 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.125
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'zero'
@@ -58,7 +59,7 @@ def main():
     problem_params['cnvars'] = [(65, 65)]  # number of degrees of freedom for the coarsest level
     problem_params['refine'] = [1, 0]  # number of refinements
     problem_params['comm'] = space_comm  # pass space-communicator to problem class
-    problem_params['sol_tol'] = 1E-12  # set tolerance to PETSc' linear solver
+    problem_params['sol_tol'] = 1e-12  # set tolerance to PETSc' linear solver
 
     # initialize step parameters
     step_params = dict()
@@ -105,10 +106,7 @@ def main():
     err = abs(uex - uend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     niters = np.array([item[1] for item in iter_counts])
 
@@ -118,7 +116,8 @@ def main():
             fname = str(sys.argv[2])
         else:
             fname = 'step_7_C_out.txt'
-        f = open(fname, 'a+')
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/' + fname, 'a+')
 
         out = 'This is time-rank %i...' % time_rank
         f.write(out + '\n')
@@ -136,15 +135,17 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
 
         out = 'Time to solution: %6.4f sec.' % timing[0][1]
         f.write(out + '\n')
@@ -155,7 +156,7 @@ def main():
 
         f.close()
 
-    assert err < 2E-04, 'ERROR: did not match error tolerance, got %s' % err
+    assert err < 2e-04, 'ERROR: did not match error tolerance, got %s' % err
     assert np.mean(niters) <= 12, 'ERROR: number of iterations is too high, got %s' % np.mean(niters)
 
 

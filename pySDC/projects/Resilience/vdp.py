@@ -2,12 +2,11 @@
 import numpy as np
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core.Errors import ProblemError
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
+from pySDC.core.Errors import ProblemError
 
 
 def plot_step_sizes(stats, ax):
@@ -43,7 +42,6 @@ def plot_step_sizes(stats, ax):
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -53,22 +51,71 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='u', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='p', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_em', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_ex', value=L.status.error_extrapolation_estimate)
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=int(step.status.restart))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='p',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_em',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_ex',
+            value=L.status.error_extrapolation_estimate,
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=int(step.status.restart),
+        )
 
 
-def run_vdp(custom_description=None, num_procs=1, Tend=10., hook_class=log_data, fault_stuff=None,
-            custom_controller_params=None, custom_problem_params=None):
+def run_vdp(
+    custom_description=None,
+    num_procs=1,
+    Tend=10.0,
+    hook_class=log_data,
+    fault_stuff=None,
+    custom_controller_params=None,
+    custom_problem_params=None,
+):
 
     # initialize level parameters
     level_params = dict()
@@ -76,15 +123,15 @@ def run_vdp(custom_description=None, num_procs=1, Tend=10., hook_class=log_data,
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
 
     problem_params = {
-        'mu': 5.,
+        'mu': 5.0,
         'newton_tol': 1e-9,
         'newton_maxiter': 99,
-        'u0': np.array([2.0, 0.]),
+        'u0': np.array([2.0, 0.0]),
     }
 
     if custom_problem_params is not None:
@@ -123,14 +170,15 @@ def run_vdp(custom_description=None, num_procs=1, Tend=10., hook_class=log_data,
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
-                                   args={'time': 1., 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(
+            rnd_args={'iteration': 3, **fault_stuff.get('rnd_params', {})},
+            args={'time': 1.0, 'target': 0, **fault_stuff.get('args', {})},
+        )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

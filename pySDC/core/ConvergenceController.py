@@ -15,10 +15,11 @@ class Pars(FrozenClass):
 
 # short helper class to store status variables
 class Status(FrozenClass):
-    '''
+    """
     Initialize status variables with None, since at the time of instantiation of the convergence controllers, not all
     relevant information about the controller are known.
-    '''
+    """
+
     def __init__(self, status_variabes):
 
         [setattr(self, key, None) for key in status_variabes]
@@ -33,14 +34,14 @@ class ConvergenceController(object):
     """
 
     def __init__(self, controller, params, description):
-        '''
+        """
         Initialization routine
 
         Args:
             controller (pySDC.Controller): The controller
             params (dict): The params passed for this specific convergence controller
             description (dict): The description object used to instantiate the controller
-        '''
+        """
         self.params = Pars(self.setup(controller, params, description))
         params_ok, msg = self.check_parameters(controller, params, description)
         assert params_ok, msg
@@ -48,7 +49,7 @@ class ConvergenceController(object):
         self.logger = logging.getLogger(f'{type(self).__name__}')
 
     def log(self, msg, S, level=15):
-        '''
+        """
         Shortcut that has a default level for the logger. 15 is above debug but below info.
 
         Args:
@@ -58,12 +59,12 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         self.logger.log(level, f'Process {S.status.slot:2d} on time {S.time:.6f} - {msg}')
         return None
 
     def setup(self, controller, params, description):
-        '''
+        """
         Setup various variables that only need to be set once in the beginning.
 
         Args:
@@ -73,11 +74,11 @@ class ConvergenceController(object):
 
         Returns:
             (dict): The updated params dictionary after setup
-        '''
+        """
         return params
 
     def dependencies(self, controller, description):
-        '''
+        """
         Load dependencies on other convergence controllers here.
 
         Args:
@@ -86,11 +87,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def check_parameters(self, controller, params, description):
-        '''
+        """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
         Args:
@@ -101,11 +102,11 @@ class ConvergenceController(object):
         Returns:
             bool: Whether the parameters are compatible
             str: The error message
-        '''
+        """
         return True, ''
 
     def check_iteration_status(self, controller, S):
-        '''
+        """
         Determine whether to keep iterating or not in this function.
 
         Args:
@@ -114,11 +115,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def get_new_step_size(self, controller, S):
-        '''
+        """
         This function allows to set a step size with arbitrary criteria.
         Make sure to give an order to the convergence controller by setting the `control_order` variable in the params.
         This variable is an integer and you can see what the current order is by using
@@ -130,11 +131,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def determine_restart(self, controller, S):
-        '''
+        """
         Determine for each step separately if it wants to be restarted for whatever reason.
 
         Args:
@@ -143,11 +144,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def setup_status_variables(self, controller):
-        '''
+        """
         Setup status variables.
         This is not done at the time of instatiation, since the controller is not fully instantiated at that time and
         hence not all information are available. Instead, this function is called after the controller has been fully
@@ -158,11 +159,11 @@ class ConvergenceController(object):
 
         Reutrns:
             None
-        '''
+        """
         return None
 
     def reset_buffers_nonMPI(self, controller):
-        '''
+        """
         Buffers refer to variables used across multiple steps that are stored in the convergence controller classes to
         immitate communication in non mpi versions. These have to be reset in order to replicate avalability of
         variables in mpi versions.
@@ -182,11 +183,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def post_iteration_processing(self, controller, S):
-        '''
+        """
         Do whatever you want to after each iteration here.
 
         Args:
@@ -195,11 +196,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def post_step_processing(self, controller, S):
-        '''
+        """
         Do whatever you want to after each step here.
 
         Args:
@@ -208,11 +209,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def prepare_next_block(self, controller, S, size, time, Tend):
-        '''
+        """
         Prepare stuff like spreading step sizes or whatever.
 
         Args:
@@ -224,11 +225,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def prepare_next_block_nonMPI(self, controller, MS, active_slots, time, Tend):
-        '''
+        """
         This is an extension to the function `prepare_next_block`, which is only called in the non MPI controller and
         is needed because there is no chance to communicate backwards otherwise. While you should not do this in the
         first place, the first step in the new block comes after the last step in the last block, such that it is still
@@ -243,11 +244,11 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
         pass
 
     def convergence_control(self, controller, S):
-        '''
+        """
         Call all the functions related to convergence control.
         This is called in `it_check` in the controller after every iteration just after `post_iteration_processing`.
         Args:
@@ -256,7 +257,7 @@ class ConvergenceController(object):
 
         Returns:
             None
-        '''
+        """
 
         self.get_new_step_size(controller, S)
         self.determine_restart(controller, S)
@@ -265,11 +266,11 @@ class ConvergenceController(object):
         return None
 
     def post_spread_processing(self, controller, S):
-        '''
+        """
         This function is called at the end of the `SPREAD` stage in the controller
 
         Args:
             controller (pySDC.Controller): The controller
             S (pySDC.Step): The current step
-        '''
+        """
         pass

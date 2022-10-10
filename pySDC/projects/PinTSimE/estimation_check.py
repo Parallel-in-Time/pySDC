@@ -20,7 +20,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-13
+    level_params['restol'] = 1e-13
     level_params['dt'] = dt
 
     # initialize sweeper parameters

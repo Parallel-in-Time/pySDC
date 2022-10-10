@@ -63,8 +63,11 @@ class linearized_implicit_parallel(generic_implicit):
         # solve implicit system with Jacobians
         uv = []
         for m in range(M):  # hell yeah, this is parallel!!
-            uv.append(P.solve_system_jacobian(dfdu[m], Guv[m], L.dt * self.D[m], L.u[m + 1],
-                                              L.time + L.dt * self.coll.nodes[m]))
+            uv.append(
+                P.solve_system_jacobian(
+                    dfdu[m], Guv[m], L.dt * self.D[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+                )
+            )
 
         # transform solution backward
         for m in range(M):

@@ -55,8 +55,14 @@ class grayscott_imex_diffusion(ptype):
         # Creating FFT structure
         self.ndim = len(problem_params['nvars'])
         axes = tuple(range(self.ndim))
-        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64,
-                        collapse=True, backend='fftw')
+        self.fft = PFFT(
+            problem_params['comm'],
+            list(problem_params['nvars']),
+            axes=axes,
+            dtype=np.float64,
+            collapse=True,
+            backend='fftw',
+        )
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
@@ -66,8 +72,9 @@ class grayscott_imex_diffusion(ptype):
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(grayscott_imex_diffusion, self).__init__(init=(sizes, problem_params['comm'], tmp_u.dtype),
-                                                       dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(grayscott_imex_diffusion, self).__init__(
+            init=(sizes, problem_params['comm'], tmp_u.dtype), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         L = np.array([self.params.L] * self.ndim, dtype=float)
 
@@ -81,8 +88,8 @@ class grayscott_imex_diffusion(ptype):
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N[:-1]]
-        k.append(np.fft.rfftfreq(N[-1], 1. / N[-1]).astype(int))
+        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
+        k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
         K = [ki[si] for ki, si in zip(k, s)]
         Ks = np.meshgrid(*K, indexing='ij', sparse=True)
         Lp = 2 * np.pi / L
@@ -120,8 +127,8 @@ class grayscott_imex_diffusion(ptype):
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv ** 2 + self.params.A * (1 - tmpu)
-            tmpfv = tmpu * tmpv ** 2 - self.params.B * tmpv
+            tmpfu = -tmpu * tmpv**2 + self.params.A * (1 - tmpu)
+            tmpfv = tmpu * tmpv**2 - self.params.B * tmpv
             f.expl[..., 0] = self.fft.forward(tmpfu)
             f.expl[..., 1] = self.fft.forward(tmpfv)
 
@@ -161,10 +168,10 @@ class grayscott_imex_diffusion(ptype):
         else:
 
             rhs_hat = self.fft.forward(rhs[..., 0])
-            rhs_hat /= (1.0 - factor * self.Ku)
+            rhs_hat /= 1.0 - factor * self.Ku
             me[..., 0] = self.fft.backward(rhs_hat, me[..., 0])
             rhs_hat = self.fft.forward(rhs[..., 1])
-            rhs_hat /= (1.0 - factor * self.Kv)
+            rhs_hat /= 1.0 - factor * self.Kv
             me[..., 1] = self.fft.backward(rhs_hat, me[..., 1])
 
         return me
@@ -204,7 +211,6 @@ class grayscott_imex_diffusion(ptype):
 
 
 class grayscott_imex_linear(grayscott_imex_diffusion):
-
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Init routine for the IMEX problem class with linear splitting
@@ -237,8 +243,8 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv ** 2 + self.params.A
-            tmpfv = tmpu * tmpv ** 2
+            tmpfu = -tmpu * tmpv**2 + self.params.A
+            tmpfv = tmpu * tmpv**2
             f.expl[..., 0] = self.fft.forward(tmpfu)
             f.expl[..., 1] = self.fft.forward(tmpfv)
 
@@ -257,7 +263,6 @@ class grayscott_imex_linear(grayscott_imex_diffusion):
 
 
 class grayscott_mi_diffusion(grayscott_imex_diffusion):
-
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
         """
         Init routine for the multi-implicit problem class with diffusion splitting
@@ -295,8 +300,8 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv ** 2 + self.params.A * (1 - tmpu)
-            tmpfv = tmpu * tmpv ** 2 - self.params.B * tmpv
+            tmpfu = -tmpu * tmpv**2 + self.params.A * (1 - tmpu)
+            tmpfv = tmpu * tmpv**2 - self.params.B * tmpv
             f.comp2[..., 0] = self.fft.forward(tmpfu)
             f.comp2[..., 1] = self.fft.forward(tmpfv)
 
@@ -367,8 +372,8 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
         while n < self.params.newton_maxiter:
             # print(n, res)
             # form the function g with g(u) = 0
-            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv ** 2 + self.params.A * (1 - tmpu))
-            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv ** 2 - self.params.B * tmpv)
+            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.params.A * (1 - tmpu))
+            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2 - self.params.B * tmpv)
 
             # if g is close to 0, then we are done
             res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
@@ -376,9 +381,9 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
                 break
 
             # assemble dg
-            dg00 = 1 - factor * (-tmpv ** 2 - self.params.A)
+            dg00 = 1 - factor * (-(tmpv**2) - self.params.A)
             dg01 = -factor * (-2 * tmpu * tmpv)
-            dg10 = -factor * (tmpv ** 2)
+            dg10 = -factor * (tmpv**2)
             dg11 = 1 - factor * (2 * tmpu * tmpv - self.params.B)
 
             # interleave and unravel to put into sparse matrix
@@ -423,7 +428,6 @@ class grayscott_mi_diffusion(grayscott_imex_diffusion):
 
 
 class grayscott_mi_linear(grayscott_imex_linear):
-
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=comp2_mesh):
         """
         Init routine for the multi-implicit problem class with linear splitting
@@ -461,8 +465,8 @@ class grayscott_mi_linear(grayscott_imex_linear):
             tmpv = newDistArray(self.fft, False)
             tmpu[:] = self.fft.backward(u[..., 0], tmpu)
             tmpv[:] = self.fft.backward(u[..., 1], tmpv)
-            tmpfu = -tmpu * tmpv ** 2 + self.params.A
-            tmpfv = tmpu * tmpv ** 2
+            tmpfu = -tmpu * tmpv**2 + self.params.A
+            tmpfv = tmpu * tmpv**2
             f.comp2[..., 0] = self.fft.forward(tmpfu)
             f.comp2[..., 1] = self.fft.forward(tmpfv)
 
@@ -533,8 +537,8 @@ class grayscott_mi_linear(grayscott_imex_linear):
         while n < self.params.newton_maxiter:
             # print(n, res)
             # form the function g with g(u) = 0
-            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv ** 2 + self.params.A)
-            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv ** 2)
+            tmpgu = tmpu - tmprhsu - factor * (-tmpu * tmpv**2 + self.params.A)
+            tmpgv = tmpv - tmprhsv - factor * (tmpu * tmpv**2)
 
             # if g is close to 0, then we are done
             res = max(np.linalg.norm(tmpgu, np.inf), np.linalg.norm(tmpgv, np.inf))
@@ -542,9 +546,9 @@ class grayscott_mi_linear(grayscott_imex_linear):
                 break
 
             # assemble dg
-            dg00 = 1 - factor * (-tmpv ** 2)
+            dg00 = 1 - factor * (-(tmpv**2))
             dg01 = -factor * (-2 * tmpu * tmpv)
-            dg10 = -factor * (tmpv ** 2)
+            dg10 = -factor * (tmpv**2)
             dg11 = 1 - factor * (2 * tmpu * tmpv)
 
             # interleave and unravel to put into sparse matrix

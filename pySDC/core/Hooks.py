@@ -201,8 +201,15 @@ class hooks(object):
         if add_to_stats:
             L = step.levels[level_number]
 
-            self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                              sweep=L.status.sweep, type='timing_comm', value=self.__t1_comm[level_number])
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time,
+                level=L.level_index,
+                iter=step.status.iter,
+                sweep=L.status.sweep,
+                type='timing_comm',
+                value=self.__t1_comm[level_number],
+            )
             self.__t1_comm[level_number] = 0.0
 
     def post_sweep(self, step, level_number):
@@ -217,15 +224,35 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.logger.info('Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Sweep: %2i -- '
-                         'residual: %12.8e',
-                         step.status.slot, L.time, step.status.stage, L.level_index, step.status.iter, L.status.sweep,
-                         L.status.residual)
+        self.logger.info(
+            'Process %2i on time %8.6f at stage %15s: Level: %s -- Iteration: %2i -- Sweep: %2i -- ' 'residual: %12.8e',
+            step.status.slot,
+            L.time,
+            step.status.stage,
+            L.level_index,
+            step.status.iter,
+            L.status.sweep,
+            L.status.residual,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='residual_post_sweep', value=L.status.residual)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='timing_sweep', value=self.__t1_sweep - self.__t0_sweep)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='residual_post_sweep',
+            value=L.status.residual,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='timing_sweep',
+            value=self.__t1_sweep - self.__t0_sweep,
+        )
 
     def post_iteration(self, step, level_number):
         """
@@ -240,11 +267,24 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='residual_post_iteration', value=L.status.residual)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='timing_iteration',
-                          value=self.__t1_iteration - self.__t0_iteration)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='residual_post_iteration',
+            value=L.status.residual,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='timing_iteration',
+            value=self.__t1_iteration - self.__t0_iteration,
+        )
 
     def post_step(self, step, level_number):
         """
@@ -259,18 +299,41 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='timing_step', value=self.__t1_step - self.__t0_step)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='niter', value=step.status.iter)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=-1,
-                          sweep=L.status.sweep, type='residual_post_step', value=L.status.residual)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='timing_step',
+            value=self.__t1_step - self.__t0_step,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='niter',
+            value=step.status.iter,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=-1,
+            sweep=L.status.sweep,
+            type='residual_post_step',
+            value=L.status.residual,
+        )
 
         # record the recomputed quantities at weird positions to make sure there is only one value for each step
-        self.add_to_stats(process=-1, time=L.time + L.dt, level=-1, iter=-1,
-                          sweep=-1, type='recomputed', value=step.status.restart)
-        self.add_to_stats(process=-1, time=L.time, level=-1, iter=-1,
-                          sweep=-1, type='recomputed', value=step.status.restart)
+        self.add_to_stats(
+            process=-1, time=L.time + L.dt, level=-1, iter=-1, sweep=-1, type='recomputed', value=step.status.restart
+        )
+        self.add_to_stats(
+            process=-1, time=L.time, level=-1, iter=-1, sweep=-1, type='recomputed', value=step.status.restart
+        )
 
     def post_predict(self, step, level_number):
         """
@@ -284,8 +347,15 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='timing_predictor', value=self.__t1_predict - self.__t0_predict)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='timing_predictor',
+            value=self.__t1_predict - self.__t0_predict,
+        )
 
     def post_run(self, step, level_number):
         """
@@ -299,8 +369,15 @@ class hooks(object):
 
         L = step.levels[level_number]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='timing_run', value=self.__t1_run - self.__t0_run)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='timing_run',
+            value=self.__t1_run - self.__t0_run,
+        )
 
     def post_setup(self, step, level_number):
         """
@@ -312,5 +389,12 @@ class hooks(object):
         """
         self.__t1_setup = time.perf_counter()
 
-        self.add_to_stats(process=-1, time=-1, level=-1, iter=-1, sweep=-1, type='timing_setup',
-                          value=self.__t1_setup - self.__t0_setup)
+        self.add_to_stats(
+            process=-1,
+            time=-1,
+            level=-1,
+            iter=-1,
+            sweep=-1,
+            type='timing_setup',
+            value=self.__t1_setup - self.__t0_setup,
+        )

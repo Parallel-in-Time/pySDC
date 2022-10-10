@@ -2,6 +2,7 @@ import json
 import glob
 import numpy as np
 import matplotlib
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
@@ -39,7 +40,7 @@ def plot_data(name=''):
         plt.colorbar()
         plt.title(f"Field - Time: {obj['time']:6.4f}")
 
-        plt.savefig(f'data/{name}_field_{index}.png',  bbox_inches='tight')
+        plt.savefig(f'data/{name}_field_{index}.png', bbox_inches='tight')
         plt.close()
 
         plt.figure()
@@ -49,7 +50,7 @@ def plot_data(name=''):
         plt.colorbar()
         plt.title(f"Temperature - Time: {obj['time']:6.4f}")
 
-        plt.savefig(f'data/{name}_temperature_{index}.png',  bbox_inches='tight')
+        plt.savefig(f'data/{name}_temperature_{index}.png', bbox_inches='tight')
         plt.close()
 
 
@@ -78,7 +79,7 @@ def make_gif(name=''):
         array = np.fromfile(data_file, dtype=obj['datatype'])
         array = array.reshape(obj['shape'], order='C')
 
-        fig, ax = plt.subplots(1,2)
+        fig, ax = plt.subplots(1, 2)
 
         ax[0].imshow(array[..., 1], vmin=0, vmax=1)
         ax[1].imshow(array[..., 0], vmin=0, vmax=1)

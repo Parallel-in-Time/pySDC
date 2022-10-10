@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 def evaluate(solution):
@@ -13,11 +10,15 @@ def evaluate(solution):
     coll = CollGaussRadau_Right(num_nodes=m, tleft=0.0, tright=1.0)
     Q = coll.Qmat[1:, 1:]
 
-    Qd = np.array([[x['x11'], x['x12'], x['x13'], x['x14'], x['x15']],
-                   [0.0, x['x22'], x['x23'], x['x24'], x['x25']],
-                   [0.0, 0.0, x['x33'], x['x34'], x['x35']],
-                   [0.0, 0.0, 0.0, x['x44'], x['x45']],
-                   [0.0, 0.0, 0.0, 0.0, x['x55']]])
+    Qd = np.array(
+        [
+            [x['x11'], x['x12'], x['x13'], x['x14'], x['x15']],
+            [0.0, x['x22'], x['x23'], x['x24'], x['x25']],
+            [0.0, 0.0, x['x33'], x['x34'], x['x35']],
+            [0.0, 0.0, 0.0, x['x44'], x['x45']],
+            [0.0, 0.0, 0.0, 0.0, x['x55']],
+        ]
+    )
 
     nsteps = 8
 
@@ -37,9 +38,10 @@ def evaluate(solution):
     for i in range(-8, 8):
         for l in range(-8, 8):
             k += 1
-            lamdt = -10 ** i + 1j * 10 ** l
+            lamdt = -(10**i) + 1j * 10**l
             R = np.linalg.inv(np.eye(nsteps * m) - lamdt * np.kron(np.eye(nsteps), Qd) - np.kron(Ea, N)).dot(
-                lamdt * np.kron(np.eye(nsteps), Q - Qd) + np.kron(E - Ea, N))
+                lamdt * np.kron(np.eye(nsteps), Q - Qd) + np.kron(E - Ea, N)
+            )
             rhoR = max(abs(np.linalg.eigvals(R)))
             obj_val += rhoR
 
@@ -72,9 +74,11 @@ params['x44'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax,
 params['x45'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': 0.0}
 params['x55'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_ud_sum_diag',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_ud_sum_diag',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

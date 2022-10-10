@@ -4,8 +4,8 @@ import numpy as np
 from mpi4py import MPI
 from mpi4py_fft import newDistArray
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_Temp_MPIFFT import allencahn_temp_imex
@@ -46,13 +46,13 @@ def run_simulation(name='', spectral=None, nprocs_time=None, nprocs_space=None, 
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = dt
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'spread'
@@ -111,18 +111,18 @@ def run_simulation(name='', spectral=None, nprocs_time=None, nprocs_space=None, 
     if space_rank == 0:
 
         # convert filtered statistics of iterations count, sorted by time
-        iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
         niters = np.mean(np.array([item[1] for item in iter_counts]))
         out = f'Mean number of iterations: {niters:.4f}'
         print(out)
 
         # get setup time
-        timing = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
+        timing = get_sorted(stats, type='timing_setup', sortby='time')
         out = f'Setup time: {timing[0][1]:.4f} sec.'
         print(out)
 
         # get running time
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
         out = f'Time to solution: {timing[0][1]:.4f} sec.'
         print(out)
 
@@ -158,33 +158,33 @@ def main(nprocs_space=None, cwd='.'):
     """
     name = 'AC-test-tempforce'
 
-    nsteps = [2 ** i for i in range(4)]
+    nsteps = [2**i for i in range(4)]
 
     errors = [1]
     orders = []
     for n in nsteps:
-        err = run_simulation(name=name, spectral=False, nprocs_time=n, nprocs_space=nprocs_space, dt=1E-03 / n, cwd=cwd)
+        err = run_simulation(name=name, spectral=False, nprocs_time=n, nprocs_space=nprocs_space, dt=1e-03 / n, cwd=cwd)
         errors.append(err)
         orders.append(np.log(errors[-1] / errors[-2]) / np.log(0.5))
         print(f'Error: {errors[-1]:6.4e}')
         print(f'Order of accuracy: {orders[-1]:4.2f}\n')
 
-    assert errors[2 + 1] < 8E-10, f'Errors are too high, got {errors[2 + 1]}'
-    assert np.isclose(orders[3], 5.3, rtol=2E-02), f'Order of accuracy is not within tolerance, got {orders[3]}'
+    assert errors[2 + 1] < 8e-10, f'Errors are too high, got {errors[2 + 1]}'
+    assert np.isclose(orders[3], 5.3, rtol=2e-02), f'Order of accuracy is not within tolerance, got {orders[3]}'
 
     print()
 
     errors = [1]
     orders = []
     for n in nsteps:
-        err = run_simulation(name=name, spectral=True, nprocs_time=n, nprocs_space=nprocs_space, dt=1E-03 / n, cwd=cwd)
+        err = run_simulation(name=name, spectral=True, nprocs_time=n, nprocs_space=nprocs_space, dt=1e-03 / n, cwd=cwd)
         errors.append(err)
         orders.append(np.log(errors[-1] / errors[-2]) / np.log(0.5))
         print(f'Error: {errors[-1]:6.4e}')
         print(f'Order of accuracy: {orders[-1]:4.2f}\n')
 
-    assert errors[2 + 1] < 8E-10, f'Errors are too high, got {errors[2 + 1]}'
-    assert np.isclose(orders[1], 4.6, rtol=7E-02), f'Order of accuracy is not within tolerance, got {orders[1]}'
+    assert errors[2 + 1] < 8e-10, f'Errors are too high, got {errors[2 + 1]}'
+    assert np.isclose(orders[1], 4.6, rtol=7e-02), f'Order of accuracy is not within tolerance, got {orders[1]}'
 
 
 if __name__ == "__main__":

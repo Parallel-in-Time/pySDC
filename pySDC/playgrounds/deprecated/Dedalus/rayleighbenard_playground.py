@@ -3,9 +3,9 @@ import sys
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.collocation_classes.equidistant_right import EquidistantNoLeft
+from pySDC.helpers.stats_helper import get_sorted
+
+
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
@@ -43,18 +43,20 @@ def main():
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.0001
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     # sweeper_params['collocation_class'] = EquidistantNoLeft
     sweeper_params['num_nodes'] = [1]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -62,7 +64,7 @@ def main():
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['Ra'] = 1E+05
+    problem_params['Ra'] = 1e05
     problem_params['Pr'] = 1.0
     problem_params['initial'] = 'random'
     problem_params['nvars'] = [(64, 32)]  # number of degrees of freedom for each level
@@ -105,7 +107,7 @@ def main():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # if space_size == 1:
-    #     bx_maxes = sort_stats(filter_stats(stats, type='bx_max'), sortby='time')
+    #     bx_maxes = get_sorted(stats, type='bx_max', sortby='time')
     #
     #     times = [t0 + i * level_params['dt'] for i in range(int((Tend - t0) / level_params['dt']) + 1)]
     #     half = int(len(times) / 2)
@@ -115,6 +117,7 @@ def main():
     #     plt.figure(3)
     #     plt.semilogy(times, [item[1] for item in bx_maxes])
     #     plt.pause(0.1)
+
 
 if __name__ == "__main__":
     main()

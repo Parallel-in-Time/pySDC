@@ -2,7 +2,6 @@ from pySDC.core.Hooks import hooks
 
 
 class libpfasst_output(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -99,5 +98,3 @@ class libpfasst_output(hooks):
         if step.status.slot == 0:
             print('--- END RUN OUTPUT')
             print()
-
-

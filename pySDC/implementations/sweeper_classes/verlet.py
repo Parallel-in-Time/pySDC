@@ -1,7 +1,6 @@
 import numpy as np
 
 from pySDC.core.Sweeper import sweeper
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
 class verlet(sweeper):
@@ -64,12 +63,13 @@ class verlet(sweeper):
 
         # if we have Gauss-Lobatto nodes, we can do a magic trick from the Book
         # this takes Gauss-Lobatto IIIB and create IIIA out of this
-        if isinstance(self.coll, CollGaussLobatto):
+        if self.coll.node_type == 'LEGENDRE' and self.coll.quad_type == 'LOBATTO':
 
             for m in range(self.coll.num_nodes):
                 for n in range(self.coll.num_nodes):
-                    QQ[m + 1, n + 1] = self.coll.weights[n] * (1.0 - self.coll.Qmat[n + 1, m + 1] /
-                                                               self.coll.weights[m])
+                    QQ[m + 1, n + 1] = self.coll.weights[n] * (
+                        1.0 - self.coll.Qmat[n + 1, m + 1] / self.coll.weights[m]
+                    )
             QQ = np.dot(self.coll.Qmat, QQ)
 
         # if we do not have Gauss-Lobatto, just multiply Q (will not get a symplectic method, they say)
@@ -192,7 +192,7 @@ class verlet(sweeper):
         P = L.prob
 
         # start with u0 and add integral over the full interval (using coll.weights)
-        if (self.coll.right_is_node and not self.params.do_coll_update):
+        if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
         else:

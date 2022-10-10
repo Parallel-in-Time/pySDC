@@ -1,4 +1,3 @@
-
 from dedalus import public as de
 from dedalus import core
 import numpy as np
@@ -21,7 +20,7 @@ from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field
 
 de.logging_setup.rootlogger.setLevel('INFO')
 
-xbasis = de.Fourier('x', 16, interval=(0,1), dealias=1)
+xbasis = de.Fourier('x', 16, interval=(0, 1), dealias=1)
 
 
 domain = de.Domain([xbasis], grid_dtype=np.float64, comm=None)
@@ -41,8 +40,6 @@ print(f['g'], g['g'])
 print(f, g)
 
 
-
-
 # exit()
 g = domain.new_field()
 
@@ -55,14 +52,14 @@ except ValueError:
 
 x = domain.grid(0, scales=1)
 
-f['g'] = np.sin(2*np.pi*x)
+f['g'] = np.sin(2 * np.pi * x)
 print(fxx.evaluate()['g'])
-f['g'] = np.cos(2*np.pi*x)
+f['g'] = np.cos(2 * np.pi * x)
 print(fxx.evaluate()['g'])
 exit()
 
 
-g['g'] = np.cos(2*np.pi*x)
+g['g'] = np.cos(2 * np.pi * x)
 
 u = domain.new_field()
 
@@ -92,7 +89,7 @@ h = (f + g).evaluate()
 hxx = de.operators.differentiate(h, x=2).evaluate()
 
 hxxex = domain.new_field()
-hxxex['g'] = -(2*np.pi)**2 * np.sin(2*np.pi*x) - (2*np.pi) ** 2 * np.cos(2*np.pi*x)
+hxxex['g'] = -((2 * np.pi) ** 2) * np.sin(2 * np.pi * x) - (2 * np.pi) ** 2 * np.cos(2 * np.pi * x)
 
 print(max(abs(hxx - hxxex).evaluate()['g']))
 # exit()
@@ -108,7 +105,7 @@ u_old['g'] = np.copy(f['g'])
 problem = de.LinearBoundaryValueProblem(domain=domain, variables=['u'])
 problem.meta[:]['x']['dirichlet'] = True
 problem.parameters['dt'] = dt
-problem.parameters['u_old'] = u_old + dt*forcing
+problem.parameters['u_old'] = u_old + dt * forcing
 problem.add_equation("u - dt * dx(dx(u)) = u_old")
 
 
@@ -116,11 +113,11 @@ solver = problem.build_solver()
 u = solver.state['u']
 
 Tend = 1.0
-nsteps = int(Tend/dt)
+nsteps = int(Tend / dt)
 
 t = 0.0
 for n in range(nsteps):
-    problem.parameters['u_old'] = u_old + dt*forcing
+    problem.parameters['u_old'] = u_old + dt * forcing
     solver.solve()
     t += dt
     forcing['g'] = -np.sin(np.pi * 2 * x) * (np.sin(t) - (np.pi * 2) ** 2 * np.cos(t))
@@ -130,9 +127,9 @@ for n in range(nsteps):
 
 uex = domain.new_field()
 # uex['g'] = np.sin(2*np.pi*x) * np.exp(-(2*np.pi)**2 * Tend)
-uex['g'] = np.sin(2*np.pi*x) * np.cos(Tend)
+uex['g'] = np.sin(2 * np.pi * x) * np.cos(Tend)
 
-print(np.linalg.norm(u['g']-uex['g'], np.inf))
+print(np.linalg.norm(u['g'] - uex['g'], np.inf))
 
 # plt.figure(1)
 # plt.plot(x,u['g'])
@@ -155,10 +152,10 @@ ts = de.timesteppers.SBDF1
 solver = problem.build_solver(ts)
 u = solver.state['u']
 # u['g'] = np.sin(2*np.pi*x)
-tmp = np.tanh((0.25 - np.sqrt((x -0.5) ** 2)) / (np.sqrt(2) * 0.04))
+tmp = np.tanh((0.25 - np.sqrt((x - 0.5) ** 2)) / (np.sqrt(2) * 0.04))
 u['g'] = tmp
 
-dt = 1.912834231231E+07
+dt = 1.912834231231e07
 t = 0.0
 for n in range(nsteps):
     # u['g'] = u['g'] - dt * np.sin(np.pi * 2 * x) * (np.sin(t) - (np.pi * 2) ** 2 * np.cos(t))
@@ -166,10 +163,10 @@ for n in range(nsteps):
     t += dt
 
     uxx = de.operators.differentiate(u, x=2).evaluate()
-    print(max(abs(u['g'] - dt*uxx['g'] - tmp)))
+    print(max(abs(u['g'] - dt * uxx['g'] - tmp)))
     exit()
 
-print(np.linalg.norm(u['g']-uex['g'], np.inf))
+print(np.linalg.norm(u['g'] - uex['g'], np.inf))
 
 # #
 # plt.figure(1)

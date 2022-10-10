@@ -1,14 +1,14 @@
 import numpy as np
 from scipy.linalg import eigh_tridiagonal
 
-NODE_TYPES = ['EQUID', 'LEGENDRE',
-              'CHEBY-1', 'CHEBY-2', 'CHEBY-3', 'CHEBY-4']
+NODE_TYPES = ['EQUID', 'LEGENDRE', 'CHEBY-1', 'CHEBY-2', 'CHEBY-3', 'CHEBY-4']
 
 QUAD_TYPES = ['GAUSS', 'RADAU-LEFT', 'RADAU-RIGHT', 'LOBATTO']
 
 
 class NodesError(Exception):
     """Exception class to handle error in NodesGenerator class"""
+
     pass
 
 
@@ -16,7 +16,7 @@ class NodesGenerator(object):
     """
     Class that can be used to generate generic distribution of nodes derived
     from Gauss quadrature rule.
-    Its implementation is fully inspired from a book of W. Gautschi [1]_.
+    Its implementation is fully inspired from a `book of W. Gautschi <https://doi.org/10.1093/oso/9780198506720.001.0001>`_.
 
     Attributes
     ----------
@@ -25,23 +25,6 @@ class NodesGenerator(object):
     quad_type : str
         The quadrature type
 
-    Methods
-    -------
-    __init__(self, node_type='LEGENDRE', quad_type='LOBATTO')
-        Instanciate the NodesGenerator object.
-    getNodes(self, num_nodes)
-        Computes a given number of quadrature nodes.
-    getOrthogPolyCoefficients(self, num_coeff)
-        Produces a given number of analytic three-term recurrence coefficients.
-    evalOrthogPoly(self, t, alpha, beta)
-        Evaluates the two higher order orthogonal polynomials corresponding
-        to the given (alpha,beta) coefficients.
-    getTridiagCoefficients(self, num_nodes)
-        Computes recurrence coefficients for the tridiagonal Jacobian matrix,
-        taking into account the quadrature type.
-
-    .. [1] W. Gautschi, "Orthogonal polynomials: computation and approximation."
-       OUP Oxford, 2004.
     """
 
     def __init__(self, node_type='LEGENDRE', quad_type='LOBATTO'):
@@ -73,12 +56,10 @@ class NodesGenerator(object):
         """
 
         # Check argument validity
-        for arg, vals in zip(['node_type', 'quad_type'],
-                             [NODE_TYPES, QUAD_TYPES]):
+        for arg, vals in zip(['node_type', 'quad_type'], [NODE_TYPES, QUAD_TYPES]):
             val = eval(arg)
             if val not in vals:
-                raise NodesError(
-                    f"{arg}='{val}' not implemented, must be in {vals}")
+                raise NodesError(f"{arg}='{val}' not implemented, must be in {vals}")
 
         # Store attributes
         self.node_type = node_type
@@ -100,9 +81,7 @@ class NodesGenerator(object):
         """
         # Check number of nodes
         if self.quad_type in ['LOBATTO', 'RADAU-LEFT'] and num_nodes < 2:
-            raise NodesError(
-                f"num_nodes must be larger than 2 for {self.quad_type}, "
-                f"but for {num_nodes}")
+            raise NodesError(f"num_nodes must be larger than 2 for {self.quad_type}, " f"but for {num_nodes}")
         elif num_nodes < 1:
             raise NodesError("you surely want at least one node ;)")
 
@@ -192,7 +171,7 @@ class NodesGenerator(object):
         pi = np.array([np.zeros_like(t) for i in range(3)])
         pi[1:] += 1
         for alpha_j, beta_j in zip(alpha, beta):
-            pi[2] *= (t - alpha_j)
+            pi[2] *= t - alpha_j
             pi[0] *= beta_j
             pi[2] -= pi[0]
             pi[0] = pi[1]
@@ -221,15 +200,12 @@ class NodesGenerator(object):
 
         # If not Gauss quadrature type, modify the alpha/beta coefficients
         if self.quad_type.startswith('RADAU'):
-            b = -1. if self.quad_type.endswith('LEFT') else 1.
+            b = -1.0 if self.quad_type.endswith('LEFT') else 1.0
             b1, b2 = self.evalOrthogPoly(b, alpha[:-1], beta[:-1])[:2]
             alpha[-1] = b - beta[-1] * b1 / b2
         elif self.quad_type == 'LOBATTO':
-            a, b = -1., 1.
+            a, b = -1.0, 1.0
             a2, a1 = self.evalOrthogPoly(a, alpha[:-1], beta[:-1])[:2]
             b2, b1 = self.evalOrthogPoly(b, alpha[:-1], beta[:-1])[:2]
-            alpha[-1], beta[-1] = np.linalg.solve(
-                [[a1, a2],
-                 [b1, b2]],
-                [a * a1, b * b1])
+            alpha[-1], beta[-1] = np.linalg.solve([[a1, a2], [b1, b2]], [a * a1, b * b1])
         return alpha, beta

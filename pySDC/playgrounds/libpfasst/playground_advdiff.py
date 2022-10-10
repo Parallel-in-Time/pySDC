@@ -1,7 +1,7 @@
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AdvectionDiffusionEquation_1D_FFT import advectiondiffusion1d_implicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -16,13 +16,13 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = 0.9 / 32
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['initial_guess'] = 'spread'
@@ -31,10 +31,10 @@ def main():
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.02  # diffusion coefficient
-    problem_params['c'] = 1.0   # advection speed
+    problem_params['c'] = 1.0  # advection speed
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [256, 128]  # number of degrees of freedom for each level
-    problem_params['L'] = 1.0   # length of the interval [-L/2, L/2]
+    problem_params['L'] = 1.0  # length of the interval [-L/2, L/2]
 
     # initialize step parameters
     step_params = dict()
@@ -49,7 +49,7 @@ def main():
     # fill description dictionary for easy step instantiation
     description = dict()
     # description['problem_class'] = advectiondiffusion1d_imex # pass problem class
-    description['problem_class'] = advectiondiffusion1d_implicit # pass problem class
+    description['problem_class'] = advectiondiffusion1d_implicit  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     # description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_class'] = generic_implicit  # pass sweeper
@@ -83,10 +83,7 @@ def main():
     err = abs(uex - uend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     for item in iter_counts:
@@ -98,8 +95,7 @@ def main():
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)

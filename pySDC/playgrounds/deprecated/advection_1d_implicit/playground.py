@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class (this is optional!)
     lparams = {}
-    lparams['restol'] = 1E-10
+    lparams['restol'] = 1e-10
 
     # This comes as read-in for the step class (this is optional!)
     sparams = {}
@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # This comes as read-in for the problem class
     pparams = {}
     pparams['c'] = 1
-    pparams['nvars'] = [8,4]
+    pparams['nvars'] = [8, 4]
     pparams['order'] = [2]
 
     # This comes as read-in for the transfer operations (this is optional!)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     description['transfer_params'] = tparams
 
     # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    MS = mp.generate_steps(num_procs, sparams, description)
 
     # setup parameters "in time"
     t0 = 0.0
@@ -58,13 +58,15 @@ if __name__ == "__main__":
     uinit = P.u_exact(t0)
 
     # call main function to get things done...
-    uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
+    uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
 
     # compute exact solution and compare
     uex = P.u_exact(Tend)
 
-    print('error at time %s: %s' %(Tend,np.linalg.norm(uex.values-uend.values,np.inf)/np.linalg.norm(
-        uex.values,np.inf)))
+    print(
+        'error at time %s: %s'
+        % (Tend, np.linalg.norm(uex.values - uend.values, np.inf) / np.linalg.norm(uex.values, np.inf))
+    )
 
     # extract_stats = grep_stats(stats,iter=-1,type='residual')
     # sortedlist_stats = sort_stats(extract_stats,sortby='step')

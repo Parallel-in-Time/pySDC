@@ -5,11 +5,16 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AllenCahn_2D_FD import allencahn_fullyimplicit, allencahn_semiimplicit, \
-    allencahn_semiimplicit_v2, allencahn_multiimplicit, allencahn_multiimplicit_v2
+from pySDC.implementations.problem_classes.AllenCahn_2D_FD import (
+    allencahn_fullyimplicit,
+    allencahn_semiimplicit,
+    allencahn_semiimplicit_v2,
+    allencahn_multiimplicit,
+    allencahn_multiimplicit_v2,
+)
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.sweeper_classes.multi_implicit import multi_implicit
@@ -32,13 +37,13 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
-    level_params['dt'] = 1E-03 / 2
+    level_params['restol'] = 1e-07
+    level_params['dt'] = 1e-03 / 2
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
@@ -52,8 +57,8 @@ def setup_parameters():
     problem_params['nvars'] = (128, 128)
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-08
-    problem_params['lin_tol'] = 1E-09
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-09
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
 
@@ -134,8 +139,7 @@ def run_SDC_variant(variant=None, inexact=False):
     Tend = 0.032
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -145,10 +149,7 @@ def run_SDC_variant(variant=None, inexact=False):
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     niters = np.array([item[1] for item in iter_counts])
@@ -156,17 +157,18 @@ def run_SDC_variant(variant=None, inexact=False):
     print(out)
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     print(out)
 
     print('   Iteration count (nonlinear/linear): %i / %i' % (P.newton_itercount, P.lin_itercount))
-    print('   Mean Iteration count per call: %4.2f / %4.2f' % (P.newton_itercount / max(P.newton_ncalls, 1),
-                                                               P.lin_itercount / max(P.lin_ncalls, 1)))
+    print(
+        '   Mean Iteration count per call: %4.2f / %4.2f'
+        % (P.newton_itercount / max(P.newton_ncalls, 1), P.lin_itercount / max(P.lin_ncalls, 1))
+    )
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
 
     print('Time to solution: %6.4f sec.' % timing[0][1])
 
@@ -203,8 +205,8 @@ def show_results(fname, cwd=''):
     timings = {}
     niters = {}
     for key, item in results.items():
-        timings[key] = sort_stats(filter_stats(item, type='timing_run'), sortby='time')[0][1]
-        iter_counts = sort_stats(filter_stats(item, type='niter'), sortby='time')
+        timings[key] = get_sorted(item, type='timing_run', sortby='time')[0][1]
+        iter_counts = get_sorted(item, type='niter', sortby='time')
         niters[key] = np.mean(np.array([item[1] for item in iter_counts]))
 
     xcoords = [i for i in range(len(timings))]
@@ -242,20 +244,21 @@ def show_results(fname, cwd=''):
 
     exact_radii = []
     for key, item in results.items():
-        computed_radii = sort_stats(filter_stats(item, type='computed_radius'), sortby='time')
+        computed_radii = get_sorted(item, type='computed_radius', sortby='time')
 
         xcoords = [item0[0] for item0 in computed_radii]
         radii = [item0[1] for item0 in computed_radii]
         if key[0] + ' ' + key[1] == 'fully-implicit exact':
             ax.plot(xcoords, radii, label=(key[0] + ' ' + key[1]).replace('_v2', ' mod.'))
 
-        exact_radii = sort_stats(filter_stats(item, type='exact_radius'), sortby='time')
+        exact_radii = get_sorted(item, type='exact_radius', sortby='time')
 
         diff = np.array([abs(item0[1] - item1[1]) for item0, item1 in zip(exact_radii, computed_radii)])
         max_pos = int(np.argmax(diff))
         assert max(diff) < 0.07, 'ERROR: computed radius is too far away from exact radius, got %s' % max(diff)
-        assert 0.028 < computed_radii[max_pos][0] < 0.03, \
+        assert 0.028 < computed_radii[max_pos][0] < 0.03, (
             'ERROR: largest difference is at wrong time, got %s' % computed_radii[max_pos][0]
+        )
 
     xcoords = [item[0] for item in exact_radii]
     radii = [item[1] for item in exact_radii]
@@ -280,7 +283,7 @@ def show_results(fname, cwd=''):
 
     interface_width = []
     for key, item in results.items():
-        interface_width = sort_stats(filter_stats(item, type='interface_width'), sortby='time')
+        interface_width = get_sorted(item, type='interface_width', sortby='time')
         xcoords = [item[0] for item in interface_width]
         width = [item[1] for item in interface_width]
         if key[0] + ' ' + key[1] == 'fully-implicit exact':

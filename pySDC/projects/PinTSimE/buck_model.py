@@ -1,8 +1,9 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.BuckConverter import buck_converter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
@@ -17,13 +18,12 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
-    level_params['dt'] = 1E-5
+    level_params['restol'] = 1e-12
+    level_params['dt'] = 1e-5
 
     # initialize sweeper parameters
     sweeper_params = dict()
     sweeper_params['collocation_class'] = Collocation
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -51,11 +51,11 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = buck_converter   # pass problem class
+    description['problem_class'] = buck_converter  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
-    description['sweeper_class'] = imex_1st_order   # pass sweeper
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
-    description['level_params'] = level_params      # pass level parameters
+    description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
@@ -69,8 +69,7 @@ def main():
     Tend = 2e-2
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -79,7 +78,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/buck.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
     fname = 'data/buck.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
@@ -124,15 +123,16 @@ def plot_voltages(cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in v1], linewidth=1, label='$v_{C_1}$')
-    ax.plot(times, [v[1] for v in v2], linewidth=1, label='$v_{C_2}$')
-    ax.plot(times, [v[1] for v in p3], linewidth=1, label='$i_{L_\pi}$')
+    ax.plot(times, [v[1] for v in v1], linewidth=1, label=r'$v_{C_1}$')
+    ax.plot(times, [v[1] for v in v2], linewidth=1, label=r'$v_{C_2}$')
+    ax.plot(times, [v[1] for v in p3], linewidth=1, label=r'$i_{L_\pi}$')
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
     fig.savefig('data/buck_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 if __name__ == "__main__":

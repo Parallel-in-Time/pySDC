@@ -31,7 +31,6 @@ def get_modules_in_path(base_package):
     return modules
 
 
-
 def load_modules_from_base(base_package):
     """
     Loads all modules of given package and its subpackages

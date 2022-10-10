@@ -4,4 +4,4 @@ Full code: `pySDC/tutorial/step_6/B_odd_temporal_distribution.py <https://github
 
 Results:
 
-.. literalinclude:: ../../../step_6_B_out.txt
+.. literalinclude:: ../../../data/step_6_B_out.txt

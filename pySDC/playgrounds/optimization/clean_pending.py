@@ -1,11 +1,8 @@
-
 import indiesolver
 
 params = {}
 
-problem = {'problem_name': 'bla',
-           'parameters': params,
-           'metrics': { 'rho' : { 'type': 'objective', 'goal': 'minimize'}}}
+problem = {'problem_name': 'bla', 'parameters': params, 'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")
@@ -21,6 +18,5 @@ for problem_name in problem_names['problems']:
     for metric in problem['metrics']:
         for solution in pending_solutions['solutions']:
             solution['metrics'] = {}
-            solution['metrics'][metric] = 1e+10
+            solution['metrics'][metric] = 1e10
         worker.tell_metrics(pending_solutions)
-

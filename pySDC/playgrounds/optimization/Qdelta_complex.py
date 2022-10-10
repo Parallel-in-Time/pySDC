@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 def evaluate(solution):
@@ -41,9 +38,11 @@ params['x3i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax,
 params['x4i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 params['x5i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_complex',
-           'parameters': params,
-           'metrics': { 'rho' : { 'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_complex',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")
@@ -59,9 +58,9 @@ for iteration in range(0, 100000):
     reply = worker.ask_new_solutions(1)
     solutions = {}
     solutions["solutions"] = []
-    if (reply["status"] == "success"):
+    if reply["status"] == "success":
         for solution in reply["solutions"]:
-            solutions["solutions"].append( evaluate(solution) )
+            solutions["solutions"].append(evaluate(solution))
         worker.tell_metrics(solutions)
         rho = reply["solutions"][0]["metrics"]["rho"]
         curr_min = min(curr_min, rho)
@@ -71,4 +70,3 @@ for iteration in range(0, 100000):
     else:
         print(reply)
         exit()
-

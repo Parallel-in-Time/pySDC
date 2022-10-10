@@ -39,12 +39,25 @@ class fenics_output(hooks):
 
         err = abs(uex - L.u[-1]) / abs(uex)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='error', value=err)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='error',
+            value=err,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='residual', value=L.status.residual / abs(L.u[0]))
-
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='residual',
+            value=L.status.residual / abs(L.u[0]),
+        )
 
     # def post_step(self, step, level_number):
     #     """

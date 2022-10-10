@@ -23,7 +23,7 @@ def plot_buoyancy(cwd=''):
     err_imex = np.linalg.norm(uimex.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
     err_sdc = np.linalg.norm(uend.flatten() - uref.flatten(), np.inf) / np.linalg.norm(uref.flatten(), np.inf)
 
-    assert err_split < 4.821E-02, 'ERROR: split error is too high, got %s' % err_split
+    assert err_split < 4.821e-02, 'ERROR: split error is too high, got %s' % err_split
     assert err_dirk < 1.495e-01, 'ERROR: dirk error is too high, got %s' % err_dirk
     assert err_imex < 1.305e-01, 'ERROR: imex error is too high, got %s' % err_imex
     assert err_sdc < 9.548e-02, 'ERROR: sdc error is too high, got %s' % err_sdc

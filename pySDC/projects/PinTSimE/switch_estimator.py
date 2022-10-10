@@ -6,7 +6,7 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 class SwitchEstimator(ConvergenceController):
     """
-        Method to estimate a discrete event (switch)
+    Method to estimate a discrete event (switch)
     """
 
     def setup(self, controller, params, description):
@@ -18,18 +18,17 @@ class SwitchEstimator(ConvergenceController):
         return {'control_order': 100, **params}
 
     def get_new_step_size(self, controller, S):
-
         def regulaFalsiMethod(a0, b0, f, tol, maxIter=50):
             """
-                Regula falsi method to find the root for the switch
-                Args:
-                    a0, b0 (np.float):              points to start the method
-                    f (callable function):          function values
-                    tol (np.float):                 when tol is reached, the secant method breaks
-                    maxIter (np.int):               maximum number of iterations to find root
+            Regula falsi method to find the root for the switch
+            Args:
+                a0, b0 (np.float):              points to start the method
+                f (callable function):          function values
+                tol (np.float):                 when tol is reached, the secant method breaks
+                maxIter (np.int):               maximum number of iterations to find root
 
-                Return:
-                    The root of f
+            Return:
+                The root of f
             """
             count = 0
             while count <= maxIter:

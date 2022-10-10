@@ -31,8 +31,12 @@ class battery(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(battery, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                      dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(battery, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.A = np.zeros((2, 2))
 
@@ -107,6 +111,7 @@ class battery(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
 

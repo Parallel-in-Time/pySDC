@@ -2,7 +2,6 @@ from pySDC.core.Hooks import hooks
 
 
 class gmres_tolerance(hooks):
-
     def pre_iteration(self, step, level_number):
         """
         Routine called before iteration starts, set new GMRES tolerance depending on the initial SDC residual

@@ -10,7 +10,6 @@ from pySDC.core import CollocationClasses as collclass
 from pySDC.core import Log
 
 
-
 if __name__ == "__main__":
 
     # set global logger (remove this if you do not want the output at all)
@@ -20,7 +19,7 @@ if __name__ == "__main__":
 
     # This comes as read-in for the level class
     lparams = {}
-    lparams['restol'] = 1E-12
+    lparams['restol'] = 1e-12
 
     sparams = {}
     sparams['maxiter'] = 4
@@ -42,26 +41,26 @@ if __name__ == "__main__":
     description['level_params'] = lparams
 
     # quickly generate block of steps
-    MS = mp.generate_steps(num_procs,sparams,description)
+    MS = mp.generate_steps(num_procs, sparams, description)
 
     Nsteps_v = np.array([1, 2, 4, 8, 10, 15, 20])
     Tend = 1.0
-    t0   = 0
+    t0 = 0
 
     P = MS[0].levels[0].prob
     uinit = P.u_exact(t0)
     uex = P.u_exact(Tend)
     error = np.zeros(np.size(Nsteps_v))
     convline = np.zeros(np.size(Nsteps_v))
-    
-    for j in range(0,np.size(Nsteps_v)):
-    # setup parameters "in time"
-      dt   = Tend/float(Nsteps_v[j])
 
-      # call main function to get things done...
-      uend,stats = mp.run_pfasst(MS,u0=uinit,t0=t0,dt=dt,Tend=Tend)
-      error[j] = np.abs(uend.values - uex.values)
-      convline[j] = error[j]*(float(Nsteps_v[j])/float(Nsteps_v[j]))**sparams['maxiter']
+    for j in range(0, np.size(Nsteps_v)):
+        # setup parameters "in time"
+        dt = Tend / float(Nsteps_v[j])
+
+        # call main function to get things done...
+        uend, stats = mp.run_pfasst(MS, u0=uinit, t0=t0, dt=dt, Tend=Tend)
+        error[j] = np.abs(uend.values - uex.values)
+        convline[j] = error[j] * (float(Nsteps_v[j]) / float(Nsteps_v[j])) ** sparams['maxiter']
 
     plt.figure()
     plt.loglog(Nsteps_v, error, 'bo', markersize=12)

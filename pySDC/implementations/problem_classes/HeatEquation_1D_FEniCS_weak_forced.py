@@ -1,4 +1,3 @@
-
 import logging
 
 import dolfin as df
@@ -66,8 +65,13 @@ class fenics_heat_weak_fullyimplicit(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat_weak_fullyimplicit, self).__init__(self.V, dtype_u, dtype_f, problem_params)
 
-        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
-                               degree=self.params.order)
+        self.g = df.Expression(
+            '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+            a=np.pi,
+            b=self.params.nu,
+            t=self.params.t0,
+            degree=self.params.order,
+        )
 
         # rhs in weak form
         self.w = df.Function(self.V)
@@ -132,8 +136,8 @@ class fenics_heat_weak_fullyimplicit(ptype):
         solver = df.NonlinearVariationalSolver(problem)
 
         prm = solver.parameters
-        prm['newton_solver']['absolute_tolerance'] = 1E-12
-        prm['newton_solver']['relative_tolerance'] = 1E-12
+        prm['newton_solver']['absolute_tolerance'] = 1e-12
+        prm['newton_solver']['relative_tolerance'] = 1e-12
         prm['newton_solver']['maximum_iterations'] = 25
         prm['newton_solver']['relaxation_parameter'] = 1.0
 
@@ -242,8 +246,13 @@ class fenics_heat_weak_imex(ptype):
         # invoke super init, passing number of dofs, dtype_u and dtype_f
         super(fenics_heat_weak_imex, self).__init__(self.V, dtype_u, dtype_f, problem_params)
 
-        self.g = df.Expression('-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))', a=np.pi, b=self.params.nu, t=self.params.t0,
-                               degree=self.params.order)
+        self.g = df.Expression(
+            '-sin(a*x[0]) * (sin(t) - b*a*a*cos(t))',
+            a=np.pi,
+            b=self.params.nu,
+            t=self.params.t0,
+            degree=self.params.order,
+        )
 
         # rhs in weak form
         self.u = df.TrialFunction(self.V)

@@ -32,35 +32,34 @@ class sharpclaw(ptype):
         assert 'nvars' in cparams
 
         # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        for k, v in cparams.items():
+            setattr(self, k, v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(sharpclaw,self).__init__(self.nvars,dtype_u,dtype_f)
-        
-        riemann_solver              = riemann.burgers_1D # NOTE: This uses the FORTRAN kernels of clawpack
-        self.solver                 = pyclaw.SharpClawSolver1D(riemann_solver)
-        self.solver.weno_order      = 5
-        self.solver.time_integrator = 'Euler' # Remove later
+        super(sharpclaw, self).__init__(self.nvars, dtype_u, dtype_f)
+
+        riemann_solver = riemann.burgers_1D  # NOTE: This uses the FORTRAN kernels of clawpack
+        self.solver = pyclaw.SharpClawSolver1D(riemann_solver)
+        self.solver.weno_order = 5
+        self.solver.time_integrator = 'Euler'  # Remove later
         self.solver.kernel_language = 'Fortran'
-        self.solver.bc_lower[0]     = pyclaw.BC.periodic
-        self.solver.bc_upper[0]     = pyclaw.BC.periodic
-        self.solver.cfl_max         = 1.0
+        self.solver.bc_lower[0] = pyclaw.BC.periodic
+        self.solver.bc_upper[0] = pyclaw.BC.periodic
+        self.solver.cfl_max = 1.0
         assert self.solver.is_valid()
 
-        x           = pyclaw.Dimension(0.0,1.0,self.nvars,name='x')
+        x = pyclaw.Dimension(0.0, 1.0, self.nvars, name='x')
         self.domain = pyclaw.Domain(x)
 
-        self.state                   = pyclaw.State(self.domain, self.solver.num_eqn)
+        self.state = pyclaw.State(self.domain, self.solver.num_eqn)
         self.dx = self.state.grid.x.centers[1] - self.state.grid.x.centers[0]
-        
+
         solution = pyclaw.Solution(self.state, self.domain)
         self.solver.setup(solution)
 
-        self.A = self.__get_A(self.nvars,self.nu,self.dx)
+        self.A = self.__get_A(self.nvars, self.nu, self.dx)
 
-
-    def __get_A(self,N,nu,dx):
+    def __get_A(self, N, nu, dx):
         """
         Helper function to assemble FD matrix A in sparse format
 
@@ -74,12 +73,11 @@ class sharpclaw(ptype):
         """
 
         stencil = [1, -2, 1]
-        A = sp.diags(stencil,[-1,0,1],shape=(N,N))
+        A = sp.diags(stencil, [-1, 0, 1], shape=(N, N))
         A *= nu / (dx**2)
         return A.tocsc()
 
-
-    def solve_system(self,rhs,factor,u0,t):
+    def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-dtA)u = rhs
 
@@ -94,12 +92,11 @@ class sharpclaw(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me.values = LA.spsolve(sp.eye(self.nvars) - factor * self.A, rhs.values)
 
         return me
 
-
-    def __eval_fexpl(self,u,t):
+    def __eval_fexpl(self, u, t):
         """
         Helper routine to evaluate the explicit part of the RHS
 
@@ -112,15 +109,15 @@ class sharpclaw(ptype):
         """
 
         # Copy values of u into pyClaw state object
-        self.state.q[0,:] = u.values
-        
+        self.state.q[0, :] = u.values
+
         # Evaluate right hand side
-        fexpl        = mesh(self.nvars)
+        fexpl = mesh(self.nvars)
         fexpl.values = self.solver.dqdt(self.state)
-                
+
         return fexpl
 
-    def __eval_fimpl(self,u,t):
+    def __eval_fimpl(self, u, t):
         """
         Helper routine to evaluate the implicit part of the RHS
 
@@ -132,13 +129,12 @@ class sharpclaw(ptype):
             implicit part of RHS
         """
 
-        fimpl = mesh(self.nvars,val=0.0)
+        fimpl = mesh(self.nvars, val=0.0)
         fimpl.values = self.A.dot(u.values)
-        
+
         return fimpl
 
-
-    def eval_f(self,u,t):
+    def eval_f(self, u, t):
         """
         Routine to evaluate both parts of the RHS
 
@@ -151,12 +147,11 @@ class sharpclaw(ptype):
         """
 
         f = rhs_imex_mesh(self.nvars)
-        f.impl = self.__eval_fimpl(u,t)
-        f.expl = self.__eval_fexpl(u,t)
+        f.impl = self.__eval_fimpl(u, t)
+        f.expl = self.__eval_fexpl(u, t)
         return f
 
-
-    def u_exact(self,t):
+    def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
 
@@ -166,8 +161,8 @@ class sharpclaw(ptype):
         Returns:
             exact solution
         """
-        
-        xc        = self.state.grid.x.centers
-        me        = mesh(self.nvars)
-        me.values = np.sin(2.0*np.pi*(xc - t))
+
+        xc = self.state.grid.x.centers
+        me = mesh(self.nvars)
+        me.values = np.sin(2.0 * np.pi * (xc - t))
         return me

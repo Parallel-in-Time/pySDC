@@ -1,8 +1,9 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -15,7 +16,6 @@ from pySDC.implementations.convergence_controller_classes.adaptivity import Adap
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -25,6 +25,7 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
+<<<<<<< HEAD
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='current L', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
@@ -34,6 +35,36 @@ class log_data(hooks):
                           value=L.status.residual)
         self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
                              sweep=L.status.sweep, type='restart', value=1, initialize=0)
+=======
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C',
+            value=L.uend[1],
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=1,
+            initialize=0,
+        )
+>>>>>>> upstream/master
 
 
 def main(use_switch_estimator=True, use_adaptivity=True):
@@ -43,8 +74,13 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
     # initialize level parameters
     level_params = dict()
+<<<<<<< HEAD
     level_params['restol'] = 1E-13
     level_params['dt'] = 1E-3
+=======
+    level_params['restol'] = 1e-10
+    level_params['dt'] = 1e-3
+>>>>>>> upstream/master
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -115,7 +151,11 @@ def main(use_switch_estimator=True, use_adaptivity=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
+<<<<<<< HEAD
     # fname = 'data/battery.dat'
+=======
+    Path("data").mkdir(parents=True, exist_ok=True)
+>>>>>>> upstream/master
     fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)

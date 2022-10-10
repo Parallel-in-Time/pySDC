@@ -6,7 +6,6 @@ from pySDC.core.Hooks import hooks
 
 
 class dump(hooks):
-
     def __init__(self):
         """
         Initialization of Allen-Cahn monitoring
@@ -57,7 +56,7 @@ class dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         # dump initial data
         fname = f"./data/{L.prob.params.name}_{0:08d}"
@@ -118,7 +117,7 @@ class dump(hooks):
             nbytes_global = self.comm.allgather(nbytes_local)
         else:
             nbytes_global = [nbytes_local]
-        local_offset = sum(nbytes_global[:self.rank])
+        local_offset = sum(nbytes_global[: self.rank])
 
         #  dump data
         fname = f"./data/{L.prob.params.name}_{self.time_step + step.status.slot:08d}"

@@ -9,8 +9,8 @@ from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_deda
 
 
 class dynamo_2d_dedalus(ptype):
-    """
-    """
+    """ """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -36,8 +36,9 @@ class dynamo_2d_dedalus(ptype):
         domain = de.Domain([xbasis, ybasis], grid_dtype=np.complex128, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(dynamo_2d_dedalus, self).__init__(init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f,
-                                                params=problem_params)
+        super(dynamo_2d_dedalus, self).__init__(
+            init=(domain, 2), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         self.x = self.init[0].grid(0, scales=1)
         self.y = self.init[0].grid(1, scales=1)
@@ -79,7 +80,7 @@ class dynamo_2d_dedalus(ptype):
             dtype_f: the RHS with two parts
         """
 
-        pseudo_dt = 1E-05
+        pseudo_dt = 1e-05
 
         f = self.dtype_f(self.init)
 

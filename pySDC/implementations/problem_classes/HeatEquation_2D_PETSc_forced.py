@@ -35,7 +35,7 @@ class heat2d_petsc_forced(ptype):
         if 'comm' not in problem_params:
             problem_params['comm'] = PETSc.COMM_WORLD
         if 'sol_tol' not in problem_params:
-            problem_params['sol_tol'] = 1E-10
+            problem_params['sol_tol'] = 1e-10
         if 'sol_maxiter' not in problem_params:
             problem_params['sol_maxiter'] = None
 
@@ -50,8 +50,9 @@ class heat2d_petsc_forced(ptype):
             raise ProblemError('this is a 2d example, got %s' % problem_params['cnvars'])
 
         # create DMDA object which will be used for all grid operations
-        da = PETSc.DMDA().create([problem_params['cnvars'][0], problem_params['cnvars'][1]], stencil_width=1,
-                                 comm=problem_params['comm'])
+        da = PETSc.DMDA().create(
+            [problem_params['cnvars'][0], problem_params['cnvars'][1]], stencil_width=1, comm=problem_params['comm']
+        )
         for _ in range(problem_params['refine']):
             da = da.refine()
 
@@ -108,13 +109,13 @@ class heat2d_petsc_forced(ptype):
                 if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
                     A.setValueStencil(row, row, 1.0)
                 else:
-                    diag = self.params.nu * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2)
+                    diag = self.params.nu * (-2.0 / self.dx**2 - 2.0 / self.dy**2)
                     for index, value in [
-                        ((i, j - 1), self.params.nu / self.dy ** 2),
-                        ((i - 1, j), self.params.nu / self.dx ** 2),
+                        ((i, j - 1), self.params.nu / self.dy**2),
+                        ((i - 1, j), self.params.nu / self.dx**2),
                         ((i, j), diag),
-                        ((i + 1, j), self.params.nu / self.dx ** 2),
-                        ((i, j + 1), self.params.nu / self.dy ** 2),
+                        ((i + 1, j), self.params.nu / self.dx**2),
+                        ((i, j + 1), self.params.nu / self.dy**2),
                     ]:
                         col.index = index
                         col.field = 0
@@ -171,9 +172,11 @@ class heat2d_petsc_forced(ptype):
         # evaluate forcing term for explicit part
         fa = self.init.getVecArray(f.expl)
         xv, yv = np.meshgrid(range(self.xs, self.xe), range(self.ys, self.ye), indexing='ij')
-        fa[self.xs:self.xe, self.ys:self.ye] = -np.sin(np.pi * self.params.freq * xv * self.dx) * \
-            np.sin(np.pi * self.params.freq * yv * self.dy) * \
-            (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        fa[self.xs : self.xe, self.ys : self.ye] = (
+            -np.sin(np.pi * self.params.freq * xv * self.dx)
+            * np.sin(np.pi * self.params.freq * yv * self.dy)
+            * (np.sin(t) - self.params.nu * 2.0 * (np.pi * self.params.freq) ** 2 * np.cos(t))
+        )
 
         return f
 
@@ -213,7 +216,10 @@ class heat2d_petsc_forced(ptype):
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j] = np.sin(np.pi * self.params.freq * i * self.dx) * \
-                    np.sin(np.pi * self.params.freq * j * self.dy) * np.cos(t)
+                xa[i, j] = (
+                    np.sin(np.pi * self.params.freq * i * self.dx)
+                    * np.sin(np.pi * self.params.freq * j * self.dy)
+                    * np.cos(t)
+                )
 
         return me
