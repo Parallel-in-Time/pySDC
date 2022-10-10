@@ -29,9 +29,11 @@ class log_data(hooks):
                           sweep=L.status.sweep, type='current L', value=L.uend[0])
         self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
                           sweep=L.status.sweep, type='voltage C', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index,
+        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index,
                           iter=step.status.iter, sweep=L.status.sweep, type='residuals',
                           value=L.status.residual)
+        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
+                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
 
 
 def main(use_switch_estimator=True, use_adaptivity=True):
@@ -41,7 +43,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1E-13
     level_params['dt'] = 1E-3
 
     # initialize sweeper parameters
@@ -101,7 +103,7 @@ def main(use_switch_estimator=True, use_adaptivity=True):
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.4
+    Tend = 2.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -138,6 +140,9 @@ def main(use_switch_estimator=True, use_adaptivity=True):
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
+    restarts = np.array(get_sorted(stats, type='restart', recomputed=False))[:, 1]
+    print("Restarts for dt: ", level_params['dt'], " -- ", np.sum(restarts))
+
     assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
@@ -169,7 +174,7 @@ def plot_voltages(description, use_switch_estimator, use_adaptivity, cwd='./'):
     if use_switch_estimator:
         val_switch = get_sorted(stats, type='switch1', sortby='time')
         t_switch = [v[0] for v in val_switch]
-        ax.axvline(x=t_switch, linestyle='--', color='k', label='Switch')
+        ax.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch')
 
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
@@ -187,7 +192,6 @@ def proof_assertions_description(description, problem_params):
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
     assert type(problem_params['V_ref']) == float, '"V_ref" needs to be of type float'
-    assert type(problem_params['V_ref']) == int, '"V_ref" needs to be of type int'
 
     assert type(problem_params['set_switch'][0]) == np.bool_, '"set_switch" has to be an bool array'
     assert type(problem_params['t_switch']) == np.ndarray, '"t_switch" has to be an array'
