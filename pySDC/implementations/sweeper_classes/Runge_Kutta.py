@@ -38,8 +38,8 @@ class ButcherTableau(object):
 
         # Set number of nodes, left and right interval boundaries
         self.num_nodes = matrix.shape[0] + 1
-        self.tleft = 0.
-        self.tright = 1.
+        self.tleft = 0.0
+        self.tright = 1.0
 
         self.nodes = np.append(np.append([0], nodes), [1])
         self.weights = weights
@@ -95,8 +95,8 @@ class ButcherTableauEmbedded(object):
 
         # Set number of nodes, left and right interval boundaries
         self.num_nodes = matrix.shape[0] + 2
-        self.tleft = 0.
-        self.tright = 1.
+        self.tleft = 0.0
+        self.tright = 1.0
 
         self.nodes = np.append(np.append([0], nodes), [1, 1])
         self.weights = weights
@@ -158,13 +158,16 @@ class RungeKutta(generic_implicit):
         self.params = _Pars(params)
 
         if 'collocation_class' in params or 'num_nodes' in params:
-            self.logger.warning('You supplied parameters to setup a collocation problem to the Runge-Kutta sweeper. \
-Please be aware that they are ignored since the quadrature matrix is entirely determined by the Butcher tableau.')
+            self.logger.warning(
+                'You supplied parameters to setup a collocation problem to the Runge-Kutta sweeper. \
+Please be aware that they are ignored since the quadrature matrix is entirely determined by the Butcher tableau.'
+            )
         self.coll = params['butcher_tableau']
 
         if not self.coll.right_is_node and not self.params.do_coll_update:
-            self.logger.warning('we need to do a collocation update here, since the right end point is not a node. '
-                                'Changing this!')
+            self.logger.warning(
+                'we need to do a collocation update here, since the right end point is not a node. ' 'Changing this!'
+            )
             self.params.do_coll_update = True
 
         # This will be set as soon as the sweeper is instantiated at the level
@@ -200,8 +203,9 @@ Please be aware that they are ignored since the quadrature matrix is entirely de
 
             # implicit solve with prefactor stemming from the diagonal of Qd
             if self.coll.implicit:
-                L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
-                                            L.time + L.dt * self.coll.nodes[m])
+                L.u[m + 1] = P.solve_system(
+                    rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+                )
             else:
                 L.u[m + 1] = rhs
             # update function values
@@ -216,12 +220,20 @@ Please be aware that they are ignored since the quadrature matrix is entirely de
 class RK1(RungeKutta):
     def __init__(self, params):
         implicit = params.get('implicit', False)
-        nodes = np.array([0.])
-        weights = np.array([1.])
+        nodes = np.array([0.0])
+        weights = np.array([1.0])
         if implicit:
-            matrix = np.array([[1.], ])
+            matrix = np.array(
+                [
+                    [1.0],
+                ]
+            )
         else:
-            matrix = np.array([[0.], ])
+            matrix = np.array(
+                [
+                    [0.0],
+                ]
+            )
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
         super(RK1, self).__init__(params)
 
@@ -230,6 +242,7 @@ class CrankNicholson(RungeKutta):
     '''
     Implicit Runge-Kutta method of second order
     '''
+
     def __init__(self, params):
         nodes = np.array([0, 1])
         weights = np.array([0.5, 0.5])
@@ -244,13 +257,14 @@ class MidpointMethod(RungeKutta):
     '''
     Runge-Kutta method of second order
     '''
+
     def __init__(self, params):
         implicit = params.get('implicit', False)
         if implicit:
             nodes = np.array([0.5])
             weights = np.array([1])
             matrix = np.zeros((1, 1))
-            matrix[0, 0] = 1. / 2.
+            matrix[0, 0] = 1.0 / 2.0
         else:
             nodes = np.array([0, 0.5])
             weights = np.array([0, 1])
@@ -264,13 +278,14 @@ class RK4(RungeKutta):
     '''
     Explicit Runge-Kutta of fourth order: Everybodies darling.
     '''
+
     def __init__(self, params):
         nodes = np.array([0, 0.5, 0.5, 1])
-        weights = np.array([1., 2., 2., 1.]) / 6.
+        weights = np.array([1.0, 2.0, 2.0, 1.0]) / 6.0
         matrix = np.zeros((4, 4))
         matrix[1, 0] = 0.5
         matrix[2, 1] = 0.5
-        matrix[3, 2] = 1.
+        matrix[3, 2] = 1.0
         params['butcher_tableau'] = ButcherTableau(weights, nodes, matrix)
         super(RK4, self).__init__(params)
 
@@ -279,6 +294,7 @@ class Heun_Euler(RungeKutta):
     '''
     Second order explicit embedded Runge-Kutta
     '''
+
     def __init__(self, params):
         nodes = np.array([0, 1])
         weights = np.array([[0.5, 0.5], [1, 0]])
@@ -292,15 +308,20 @@ class Cash_Karp(RungeKutta):
     '''
     Fifth order explicit embedded Runge-Kutta
     '''
+
     def __init__(self, params):
-        nodes = np.array([0, 0.2, 0.3, 0.6, 1., 7. / 8.])
-        weights = np.array([[37. / 378., 0., 250. / 621., 125. / 594., 0., 512. / 1771.],
-                            [2825. / 27648., 0., 18575. / 48384., 13525. / 55296., 277. / 14336., 1. / 4.]])
+        nodes = np.array([0, 0.2, 0.3, 0.6, 1.0, 7.0 / 8.0])
+        weights = np.array(
+            [
+                [37.0 / 378.0, 0.0, 250.0 / 621.0, 125.0 / 594.0, 0.0, 512.0 / 1771.0],
+                [2825.0 / 27648.0, 0.0, 18575.0 / 48384.0, 13525.0 / 55296.0, 277.0 / 14336.0, 1.0 / 4.0],
+            ]
+        )
         matrix = np.zeros((6, 6))
-        matrix[1, 0] = 1. / 5.
-        matrix[2, :2] = [3. / 40., 9. / 40.]
+        matrix[1, 0] = 1.0 / 5.0
+        matrix[2, :2] = [3.0 / 40.0, 9.0 / 40.0]
         matrix[3, :3] = [0.3, -0.9, 1.2]
-        matrix[4, :4] = [-11. / 54., 5. / 2., -70. / 27., 35. / 27.]
-        matrix[5, :5] = [1631. / 55296., 175. / 512., 575. / 13824., 44275. / 110592., 253. / 4096.]
+        matrix[4, :4] = [-11.0 / 54.0, 5.0 / 2.0, -70.0 / 27.0, 35.0 / 27.0]
+        matrix[5, :5] = [1631.0 / 55296.0, 175.0 / 512.0, 575.0 / 13824.0, 44275.0 / 110592.0, 253.0 / 4096.0]
         params['butcher_tableau'] = ButcherTableauEmbedded(weights, nodes, matrix)
         super(Cash_Karp, self).__init__(params)

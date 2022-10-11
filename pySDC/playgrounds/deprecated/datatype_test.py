@@ -8,8 +8,6 @@ from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field
 from pySDC.playgrounds.Dedalus.dedalus_field_fast import dedalus_field_fast
 
 
-
-
 def inner_loop(iloops, dtype, maxb, a, b):
     for i in range(iloops):
         b += 0.1 / (i + 1) * a
@@ -23,7 +21,7 @@ def inner_loop(iloops, dtype, maxb, a, b):
 def mesh_test(oloops, iloops, N):
 
     maxtime = 0.0
-    mintime = 1E99
+    mintime = 1e99
     meantime = 0.0
     maxb = 0.0
     for i in range(oloops):
@@ -45,7 +43,7 @@ def mesh_test(oloops, iloops, N):
 def parallelmesh_test(oloops, iloops, N):
 
     maxtime = 0.0
-    mintime = 1E99
+    mintime = 1e99
     meantime = 0.0
     maxb = 0.0
     for i in range(oloops):
@@ -71,7 +69,7 @@ def field_test(oloops, iloops, N):
     domain = de.Domain([xbasis, ybasis], grid_dtype=np.float64, comm=None)
 
     maxtime = 0.0
-    mintime = 1E99
+    mintime = 1e99
     meantime = 0.0
     maxb = 0.0
     for i in range(oloops):
@@ -98,7 +96,7 @@ def fast_field_test(oloops, iloops, N):
     domain = de.Domain([xbasis, ybasis], grid_dtype=np.float64, comm=None)
 
     maxtime = 0.0
-    mintime = 1E99
+    mintime = 1e99
     meantime = 0.0
     maxb = 0.0
     for i in range(oloops):
@@ -116,6 +114,7 @@ def fast_field_test(oloops, iloops, N):
     meantime /= oloops
     print(maxb)
     print(maxtime, mintime, meantime)
+
 
 if __name__ == '__main__':
 

@@ -1,4 +1,3 @@
-
 class FrozenClass(object):
     """
     Helper class to freeze a class, i.e. to avoid adding more attributes

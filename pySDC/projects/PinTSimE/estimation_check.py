@@ -20,7 +20,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-13
+    level_params['restol'] = 1e-13
     level_params['dt'] = dt
 
     # initialize sweeper parameters
@@ -71,7 +71,7 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
     assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
     assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-    assert level_params['dt'] <= 4E-1, 'Time step dt is too coarse, please set dt less than 4E-1'
+    assert level_params['dt'] <= 4e-1, 'Time step dt is too coarse, please set dt less than 4E-1'
 
     assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
     assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
@@ -113,11 +113,11 @@ def run(dt, use_switch_estimator=True, V_ref=1):
 
 def check(cwd='./'):
     """
-        Routine to check the differences between using a switch estimator or not
+    Routine to check the differences between using a switch estimator or not
     """
 
     V_ref = 1
-    dt_list = [4E-1, 4E-2, 4E-3, 4E-4]
+    dt_list = [4e-1, 4e-2, 4e-3, 4e-4]
     # dt_list = [2e-2]
     use_switch_estimator = [True, False]
     for dt_item in dt_list:

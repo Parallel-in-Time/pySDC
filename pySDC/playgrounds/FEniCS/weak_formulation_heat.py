@@ -1,4 +1,3 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
@@ -13,7 +12,7 @@ if __name__ == "__main__":
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-09
+    level_params['restol'] = 5e-09
     level_params['dt'] = dt
 
     # initialize step parameters
@@ -26,7 +25,7 @@ if __name__ == "__main__":
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     problem_params = dict()
@@ -53,8 +52,7 @@ if __name__ == "__main__":
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # quickly generate block of steps
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                             description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

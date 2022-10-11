@@ -15,15 +15,13 @@ as its keys are tuples which contain the process, time, level, iteration
 and type of entry for the values. This way, each value has some sort of
 time stamp attached to it, so that it is clear when this value was
 added. To help dealing with the statistics, we make use of the
-``filter_stats`` and ``sort_stats`` routines. The first one filters the
+``get_sorted`` routine. This filters the
 dictionary, following the keys we provide. Here, we would like to have
 all residuals logged during time 0.1 (i.e. for all iterations in the
-first time step). Analogously, we could ask for all residuals at the
-final iteration of each step by calling
-``filter_stats(stats, iter=-1, type='residual')``. The second helper
-routine converts the filtered or non-filtered dictionary to a list of
+first time step). Then, it is converted to a list of
 tuples, where the first part is the item defined by the parameter
-``sortby`` and the second part is the value. Here, we would like to have
+``sortby`` and the second part is the value.
+Here, we would like to have
 a list of iterations and residuals to see how SDC converged over the
 iterations.
 

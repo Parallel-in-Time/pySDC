@@ -27,8 +27,9 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         # call parent's initialization routine
         super(linearized_implicit_fixed_parallel, self).__init__(params)
 
-        assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes + 1), \
+        assert self.params.fixed_time_in_jacobian in range(self.coll.num_nodes + 1), (
             "ERROR: fixed_time_in_jacobian is too small or too large, got %s" % self.params.fixed_time_in_jacobian
+        )
 
         self.D, self.V = np.linalg.eig(self.coll.Qmat[1:, 1:])
         self.Vi = np.linalg.inv(self.V)
@@ -70,8 +71,9 @@ class linearized_implicit_fixed_parallel(linearized_implicit_parallel):
         # solve implicit system with Jacobian (just this one, does not change with the nodes)
         uv = []
         for m in range(M):  # hell yeah, this is parallel!!
-            uv.append(P.solve_system_jacobian(dfdu, Guv[m], L.dt * self.D[m], L.u[m + 1],
-                                              L.time + L.dt * self.coll.nodes[m]))
+            uv.append(
+                P.solve_system_jacobian(dfdu, Guv[m], L.dt * self.D[m], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
+            )
 
         # transform soultion backward
         for m in range(M):

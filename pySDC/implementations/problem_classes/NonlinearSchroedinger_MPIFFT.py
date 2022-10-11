@@ -60,15 +60,20 @@ class nonlinearschroedinger_imex(ptype):
         # Creating FFT structure
         self.ndim = len(problem_params['nvars'])
         axes = tuple(range(self.ndim))
-        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.complex128,
-                        collapse=True)
+        self.fft = PFFT(
+            problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.complex128, collapse=True
+        )
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(nonlinearschroedinger_imex, self).__init__(init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
-                                                         dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(nonlinearschroedinger_imex, self).__init__(
+            init=(tmp_u.shape, problem_params['comm'], tmp_u.dtype),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.L = np.array([self.params.L] * self.ndim, dtype=float)
 
@@ -76,13 +81,13 @@ class nonlinearschroedinger_imex(ptype):
         X = np.ogrid[self.fft.local_slice(False)]
         N = self.fft.global_shape()
         for i in range(len(N)):
-            X[i] = (X[i] * self.L[i] / N[i])
+            X[i] = X[i] * self.L[i] / N[i]
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
 
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N]
+        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N]
         K = [ki[si] for ki, si in zip(k, s)]
         Ks = np.meshgrid(*K, indexing='ij', sparse=True)
         Lp = 2 * np.pi / self.L
@@ -148,7 +153,7 @@ class nonlinearschroedinger_imex(ptype):
 
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs)
-            rhs_hat /= (1.0 + factor * self.K2 * 1j)
+            rhs_hat /= 1.0 + factor * self.K2 * 1j
             me[:] = self.fft.backward(rhs_hat)
 
         return me

@@ -54,8 +54,9 @@ class allencahn_temp_imex(ptype):
         # creating FFT structure
         ndim = len(problem_params['nvars'])
         axes = tuple(range(ndim))
-        self.fft = PFFT(problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64,
-                        collapse=True)
+        self.fft = PFFT(
+            problem_params['comm'], list(problem_params['nvars']), axes=axes, dtype=np.float64, collapse=True
+        )
 
         # get test data to figure out type and dimensions
         tmp_u = newDistArray(self.fft, problem_params['spectral'])
@@ -65,8 +66,9 @@ class allencahn_temp_imex(ptype):
         sizes = tmp_u.shape + (self.ncomp,)
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_temp_imex, self).__init__(init=(sizes, problem_params['comm'], tmp_u.dtype),
-                                                  dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(allencahn_temp_imex, self).__init__(
+            init=(sizes, problem_params['comm'], tmp_u.dtype), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         L = np.array([self.params.L] * ndim, dtype=float)
 
@@ -74,14 +76,14 @@ class allencahn_temp_imex(ptype):
         X = np.ogrid[self.fft.local_slice(False)]
         N = self.fft.global_shape()
         for i in range(len(N)):
-            X[i] = (X[i] * L[i] / N[i])
+            X[i] = X[i] * L[i] / N[i]
         self.X = [np.broadcast_to(x, self.fft.shape(False)) for x in X]
 
         # get local wavenumbers and Laplace operator
         s = self.fft.local_slice()
         N = self.fft.global_shape()
-        k = [np.fft.fftfreq(n, 1. / n).astype(int) for n in N[:-1]]
-        k.append(np.fft.rfftfreq(N[-1], 1. / N[-1]).astype(int))
+        k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
+        k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
         K = [ki[si] for ki, si in zip(k, s)]
         Ks = np.meshgrid(*K, indexing='ij', sparse=True)
         Lp = 2 * np.pi / L
@@ -118,8 +120,9 @@ class allencahn_temp_imex(ptype):
                 tmp_T = newDistArray(self.fft, False)
                 tmp_u = self.fft.backward(u[..., 0], tmp_u)
                 tmp_T = self.fft.backward(u[..., 1], tmp_T)
-                tmpf = - 2.0 / self.params.eps ** 2 * tmp_u * (1.0 - tmp_u) * (1.0 - 2.0 * tmp_u) - \
-                    6.0 * self.params.dw * (tmp_T - self.params.TM) / self.params.TM * tmp_u * (1.0 - tmp_u)
+                tmpf = -2.0 / self.params.eps**2 * tmp_u * (1.0 - tmp_u) * (
+                    1.0 - 2.0 * tmp_u
+                ) - 6.0 * self.params.dw * (tmp_T - self.params.TM) / self.params.TM * tmp_u * (1.0 - tmp_u)
                 f.expl[..., 0] = self.fft.forward(tmpf)
 
             f.impl[..., 1] = -self.params.D * self.K2 * u[..., 1]
@@ -132,9 +135,10 @@ class allencahn_temp_imex(ptype):
             f.impl[..., 0] = self.fft.backward(lap_u_hat, f.impl[..., 0])
 
             if self.params.eps > 0:
-                f.expl[..., 0] = -2.0 / self.params.eps ** 2 * u[..., 0] * (1.0 - u[..., 0]) * (1.0 - 2.0 * u[..., 0])
-                f.expl[..., 0] -= 6.0 * self.params.dw * (u[..., 1] - self.params.TM) / self.params.TM * u[..., 0] * \
-                    (1.0 - u[..., 0])
+                f.expl[..., 0] = -2.0 / self.params.eps**2 * u[..., 0] * (1.0 - u[..., 0]) * (1.0 - 2.0 * u[..., 0])
+                f.expl[..., 0] -= (
+                    6.0 * self.params.dw * (u[..., 1] - self.params.TM) / self.params.TM * u[..., 0] * (1.0 - u[..., 0])
+                )
 
             u_hat = self.fft.forward(u[..., 1])
             lap_u_hat = -self.params.D * self.K2 * u_hat
@@ -167,10 +171,10 @@ class allencahn_temp_imex(ptype):
 
             me = self.dtype_u(self.init)
             rhs_hat = self.fft.forward(rhs[..., 0])
-            rhs_hat /= (1.0 + factor * self.K2)
+            rhs_hat /= 1.0 + factor * self.K2
             me[..., 0] = self.fft.backward(rhs_hat)
             rhs_hat = self.fft.forward(rhs[..., 1])
-            rhs_hat /= (1.0 + factor * self.params.D * self.K2)
+            rhs_hat /= 1.0 + factor * self.params.D * self.K2
             me[..., 1] = self.fft.backward(rhs_hat)
 
         return me

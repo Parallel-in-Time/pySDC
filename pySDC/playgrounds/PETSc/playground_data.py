@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from petsc4py import PETSc
@@ -7,11 +6,10 @@ from petsc4py import PETSc
 def main():
     # import petsc4py
 
-
     n = 4
-    dx = 1.0/(n - 1)
+    dx = 1.0 / (n - 1)
     dy = dx
-    comm= PETSc.COMM_WORLD
+    comm = PETSc.COMM_WORLD
     da = PETSc.DMDA().create([n, n], dof=1, stencil_width=1, comm=comm)
     dar = da.refine()
     print(dar.getSizes())
@@ -23,11 +21,11 @@ def main():
     x = da.createGlobalVec()
     xa = da.getVecArray(x)
     (xs, xe), (ys, ye) = da.getRanges()
-    print(xs,xe,ys,ye, xa.shape)
+    print(xs, xe, ys, ye, xa.shape)
     for i in range(xs, xe):
         for j in range(ys, ye):
-            xa[i, j, 0] = np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
-            xa[i, j, 1] = 0.1 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            xa[i, j, 0] = np.sin(2 * np.pi * (i) * dx) * np.sin(2 * np.pi * (j) * dy)
+            xa[i, j, 1] = 0.1 * np.sin(2 * np.pi * (i) * dx) * np.sin(2 * np.pi * (j) * dy)
     print('x=', rank, x.getArray())
     # print('x:', x.getSizes(), da.getRanges())
     # print()
@@ -37,7 +35,7 @@ def main():
     (xs, xe), (ys, ye) = da.getRanges()
     for i in range(xs, xe):
         for j in range(ys, ye):
-            ya[i, j, 0] = -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i ) * dx) * np.sin(2 * np.pi * (j ) * dy)
+            ya[i, j, 0] = -2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i) * dx) * np.sin(2 * np.pi * (j) * dy)
             ya[i, j, 1] = -0.2 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * (i) * dx) * np.sin(2 * np.pi * (j) * dy)
     #
     # z = da.createGlobalVec()
@@ -46,7 +44,6 @@ def main():
     # for i in range(xs, xe):
     #     for j in range(ys, ye):
     #         za[i, j] = 4 * (2.0 * np.pi) ** 4 * np.sin(2 * np.pi * (i + 1) * dx) * np.sin(2 * np.pi * (j + 1) * dy)
-
 
     # z = y.copy()
     # print('z=', z.getArray())
@@ -57,7 +54,7 @@ def main():
     A = da.createMatrix()
     A.setType('aij')  # sparse
     A.setFromOptions()
-    A.setPreallocationNNZ((5,5))
+    A.setPreallocationNNZ((5, 5))
     A.setUp()
 
     A.zeroEntries()
@@ -67,7 +64,7 @@ def main():
     (xs, xe), (ys, ye) = da.getRanges()
     for j in range(ys, ye):
         for i in range(xs, xe):
-            if (i == 0 or j == 0 or i == mx - 1 or j == my - 1):
+            if i == 0 or j == 0 or i == mx - 1 or j == my - 1:
                 row.index = (i, j)
                 row.field = 0
                 A.setValueStencil(row, row, 1.0)
@@ -76,13 +73,13 @@ def main():
                 # pass
             else:
                 # u = x[i, j] # center
-                diag = -2.0 / dx ** 2 - 2.0 / dy ** 2
+                diag = -2.0 / dx**2 - 2.0 / dy**2
                 for index, value in [
-                    ((i, j - 1), 1.0 / dy ** 2),
-                    ((i - 1, j), 1.0 / dx ** 2),
+                    ((i, j - 1), 1.0 / dy**2),
+                    ((i - 1, j), 1.0 / dx**2),
                     ((i, j), diag),
-                    ((i + 1, j), 1.0 / dx ** 2),
-                    ((i, j + 1), 1.0 / dy ** 2),
+                    ((i + 1, j), 1.0 / dx**2),
+                    ((i, j + 1), 1.0 / dy**2),
                 ]:
                     row.index = (i, j)
                     row.field = 0
@@ -126,7 +123,7 @@ def main():
     res = da.createGlobalVec()
     A.mult(x, res)
     print('1st turn', rank, res.getArray())
-    print((res-y).norm(PETSc.NormType.NORM_INFINITY))
+    print((res - y).norm(PETSc.NormType.NORM_INFINITY))
 
     ksp = PETSc.KSP().create()
     ksp.setOperators(A)
@@ -142,7 +139,6 @@ def main():
     x2 = da.createGlobalVec()
     Id.mult(x1, x2)
     print((x2 - x1).norm(PETSc.NormType.NORM_INFINITY))
-
 
     # # A.view()
     # res1 = da.createNaturalVec()

@@ -2,7 +2,6 @@ from pySDC.core.Hooks import hooks
 
 
 class hamiltonian_output(hooks):
-
     def __init__(self):
         """
         Initialization of particles output
@@ -34,11 +33,25 @@ class hamiltonian_output(hooks):
         L.sweep.compute_end_point()
         H = P.eval_hamiltonian(L.uend)
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='hamiltonian', value=H)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='hamiltonian',
+            value=H,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='err_hamiltonian', value=abs(self.ham_init - H))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='err_hamiltonian',
+            value=abs(self.ham_init - H),
+        )
 
         return None
 
@@ -55,7 +68,14 @@ class hamiltonian_output(hooks):
         # some abbreviations
         L = step.levels[0]
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='position', value=L.uend.pos)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='position',
+            value=L.uend.pos,
+        )
 
         return None

@@ -7,7 +7,6 @@ from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 
 # noinspection PyUnusedLocal
 class vanderpol_jac(vanderpol):
-
     def eval_jacobian(self, u):
         """
         Evaluation of the Jacobian of the right-hand side
@@ -22,7 +21,7 @@ class vanderpol_jac(vanderpol):
         x1 = u[0]
         x2 = u[1]
 
-        dfdu = np.array([[0, 1], [-2 * self.params.mu * x1 * x2 - 1, self.params.mu * (1 - x1 ** 2)]])
+        dfdu = np.array([[0, 1], [-2 * self.params.mu * x1 * x2 - 1, self.params.mu * (1 - x1**2)]])
 
         return dfdu
 

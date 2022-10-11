@@ -1,6 +1,29 @@
 Changelog
 ---------
 
+- October 7, 2022: Version 5 comes with many changes, both visible and invisible ones. Some of those break the existing API, but
+  if you are using tests, you should be fine. Major changes include:
+
+  - **New convergence controllers**: Checking whether a step has converged can be tricky, so we made separate modules out of these
+    checks. This makes features like adaptivity easier to implement. Also, the controllers have been streamlined a bit to make them more readable/digestible.
+    Thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_!
+  - **Adaptivity and error estimators**: SDC now comes with adaptivity and error estimation, leveraging the new convergence controllers out of the box.
+    Thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_!
+  - **New collocation classes**: We completely rewrote the way collocation nodes and weights are computed. It is now faster, more reliable, shorter, better.
+    But: this **breaks the API**, since the old collocation classes do not exist anymore. The projects, tutorials, tests and most of the playgrounds
+    have been adapted, so have a look over there to see `what to change <https://github.com/Parallel-in-Time/pySDC/commit/01ffabf71a8d71d33b74809271e8ad5a7b03ac5e#diff-adf74297b6c64d320f4da0f1d5528eda6229803a6615baf5d54c418032543681>`_.
+    Thanks to `@tlunet <https://github.com/tlunet>`_!
+  - **New projects**: Resilience and energy grid simulations are ready to play with and are waiting for more ideas!
+    We used this effort to condense and clean up the problem classes a bit, reducing the number of files and classes with only marginal differences significantly.
+    This could potentially **break your code**, too, if you rely on any of those affected ones.
+    Thanks to `@brownbaerchen <https://github.com/brownbaerchen>`_ and `@lisawim <https://github.com/lisawim>`_!
+  - **Toward GPU computing**: We included a new data type based on `CuPy <https://cupy.dev/>`_ making GPU computing possible.
+    Thanks to `@timo2705 <https://github.com/timo2705>`_!
+  - **Better testing**: The CI pipeline got a complete overhaul (again), now enabling simultaneous tests, faster/earlier linting, benchmarking (at least, in principal), separate environments and so on.
+    The code is tested under Ubuntu and MacOS.
+  - **Better code formatting**: `pySDC` now uses `black <https://black.readthedocs.io>`_ and `flakeheaven <https://flakeheaven.readthedocs.io>`_ for cleaner source code.
+    After complaints here and there about linting "errors" the recommended way now is to run ``black`` before submission.
+
 - December 13, 2021: Version 4.2 brings compatibility with Python 3.9, including some code cleanup. The CI test
   suite seems to run faster now, since sorting out the dependencies is faster. Tested `mamba <https://github.com/mamba-org/mamba>`_,
   which for now makes the CI pipeline much faster. Also, the CI workflow can now run locally using `act <https://github.com/nektos/act>`_.

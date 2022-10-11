@@ -1,6 +1,8 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pathlib import Path
+
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -12,12 +14,12 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.5
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     # initialize problem parameters
@@ -25,6 +27,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = [31, 15, 7]  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -37,7 +40,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d_forced  # pass problem class
+    description['problem_class'] = heatNd_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -50,7 +53,8 @@ def main():
     controller = controller_nonMPI(num_procs=10, controller_params={}, description=description)
 
     # check number of levels
-    f = open('step_5_A_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_5_A_out.txt', 'w')
     for i in range(len(controller.MS)):
         out = "Process %2i has %2i levels" % (i, len(controller.MS[i].levels))
         f.write(out + '\n')

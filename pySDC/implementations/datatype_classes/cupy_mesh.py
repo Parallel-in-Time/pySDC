@@ -27,8 +27,11 @@ class cupy_mesh:
         if isinstance(init, cupy_mesh):
             self.values = cp.ndarray(shape=init.values.shape, dtype=init.values.dtype, strides=strides, order=order)
             self.values[:] = init.values.copy()
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], cp.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], cp.dtype)
+        ):
             self.values = cp.ndarray(shape=init[0], dtype=init[2], strides=strides, order=order)
             self.values[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
         else:
@@ -143,8 +146,11 @@ class imex_cupy_mesh(object):
         if isinstance(init, type(self)):
             self.impl = cupy_mesh(init.impl)
             self.expl = cupy_mesh(init.expl)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], cp.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], cp.dtype)
+        ):
             self.impl = cupy_mesh(init, val=val)
             self.expl = cupy_mesh(init, val=val)
         # something is wrong, if none of the ones above hit
@@ -175,8 +181,11 @@ class comp2_cupy_mesh(object):
         if isinstance(init, type(self)):
             self.comp1 = cupy_mesh(init.comp1)
             self.comp2 = cupy_mesh(init.comp2)
-        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
-                and isinstance(init[2], cp.dtype):
+        elif (
+            isinstance(init, tuple)
+            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
+            and isinstance(init[2], cp.dtype)
+        ):
             self.comp1 = cupy_mesh(init, val=val)
             self.comp2 = cupy_mesh(init, val=val)
         # something is wrong, if none of the ones above hit

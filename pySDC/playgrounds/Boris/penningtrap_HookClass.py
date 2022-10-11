@@ -49,14 +49,10 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = (
-                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
-                )
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = (
-                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
-                )
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= (
                 L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
@@ -104,14 +100,10 @@ class particles_output(hooks):
         for i in range(N):
             # inner loop, omit ith particle
             for j in range(0, i):
-                dist2 = (
-                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
-                )
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             for j in range(i + 1, N):
-                dist2 = (
-                    np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
-                )
+                dist2 = np.linalg.norm(part.pos[:, i] - part.pos[:, j], 2) ** 2 + L.prob.params.sig**2
                 fpot[i] += part.q[j] / np.sqrt(dist2)
             fpot[i] -= (
                 L.prob.params.omega_E**2 * part.m[i] / part.q[i] / 2.0 * np.dot(w, part.pos[:, i] * part.pos[:, i])
@@ -136,9 +128,7 @@ class particles_output(hooks):
 
         oldcol = self.sframe
         # # self.sframe = self.ax.scatter(L.uend.pos[0],L.uend.pos[1],L.uend.pos[2])
-        self.sframe = self.ax.scatter(
-            L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3]
-        )
+        self.sframe = self.ax.scatter(L.uend.pos[0::3], L.uend.pos[1::3], L.uend.pos[2::3])
         # Remove old line collection before drawing
         if oldcol is not None:
             self.ax.collections.remove(oldcol)

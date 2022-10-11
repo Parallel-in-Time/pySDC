@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
 def evaluate(solution):
@@ -34,18 +31,22 @@ def evaluate(solution):
 
     QQ = QQ[1:, 1:]
 
-    Qd = np.array([[0.0, 0.0, 0.0, 0.0, 0.0],
-                   [x['x21'], 0.0, 0.0, 0.0, 0.0],
-                   [x['x31'], x['x32'], 0.0, 0.0, 0.0],
-                   [x['x41'], x['x42'], x['x43'], 0.0, 0.0],
-                   [x['x51'], x['x52'], x['x53'], x['x54'], 0.0]])
+    Qd = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [x['x21'], 0.0, 0.0, 0.0, 0.0],
+            [x['x31'], x['x32'], 0.0, 0.0, 0.0],
+            [x['x41'], x['x42'], x['x43'], 0.0, 0.0],
+            [x['x51'], x['x52'], x['x53'], x['x54'], 0.0],
+        ]
+    )
 
     # THIS WORKS REALLY WELL! No need to take imaginary parts in x, though (found minimum has zero imaginary parts)
     k = 0
     obj_val = 0.0
     for i in range(-8, 4):
         k += 1
-        lamdt = -10 ** i
+        lamdt = -(10**i)
         try:
             R = lamdt * np.linalg.inv(np.eye(m) - lamdt * Qd).dot(QQ - Qd)
         except np.linalg.linalg.LinAlgError:
@@ -100,9 +101,11 @@ params['x52'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax,
 params['x53'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': 0.0}
 params['x54'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': 0.0}
 
-problem = {'problem_name': 'Qdelta_sum_verlet_ld',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum_verlet_ld',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

@@ -1,7 +1,8 @@
+from pathlib import Path
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_matrix_forced import fenics_heat_mass, fenics_heat
 from pySDC.implementations.problem_classes.HeatEquation_1D_FEniCS_weak_forced import fenics_heat_weak_imex
@@ -23,7 +24,7 @@ def setup(t0=None, ml=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.2
 
     # initialize step parameters
@@ -32,7 +33,7 @@ def setup(t0=None, ml=None):
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     if ml:
         # Note that coarsening in the nodes actually HELPS MLSDC to converge (M=1 is exact on the coarse level)
         sweeper_params['num_nodes'] = [3, 1]
@@ -117,17 +118,15 @@ def run_variants(variant=None, ml=None, num_procs=None):
     uex = P.u_exact(Tend)
     err = abs(uex - uend) / abs(uex)
 
-    f = open('step_7_A_out.txt', 'a')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_7_A_out.txt', 'a')
 
     out = f'Variant {variant} with ml={ml} and num_procs={num_procs} -- error at time {Tend}: {err}'
     f.write(out + '\n')
     print(out)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
@@ -136,25 +135,24 @@ def run_variants(variant=None, ml=None, num_procs=None):
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     f.write(out + '\n')
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
     f.write(out + '\n')
     print(out)
 
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
     out = f'Time to solution: {timing[0][1]:6.4f} sec.'
     f.write(out + '\n')
     print(out)
 
     if num_procs == 1:
         assert np.mean(niters) <= 6.0, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.1E-08, 'Error is too high, got %s' % err
+        assert err <= 4.1e-08, 'Error is too high, got %s' % err
     else:
         assert np.mean(niters) <= 11.6, 'Mean number of iterations is too high, got %s' % np.mean(niters)
-        assert err <= 4.0E-08, 'Error is too high, got %s' % err
+        assert err <= 4.0e-08, 'Error is too high, got %s' % err
 
     f.write('\n')
     print()

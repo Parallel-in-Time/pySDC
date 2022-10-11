@@ -5,8 +5,8 @@ import dill
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted, filter_stats
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.FermiPastaUlamTsingou import fermi_pasta_ulam_tsingou
 from pySDC.implementations.sweeper_classes.verlet import verlet
@@ -25,12 +25,12 @@ def setup_fput():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = 2.0
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = [5, 3]
     sweeper_params['initial_guess'] = 'zero'
 
@@ -77,14 +77,13 @@ def run_simulation():
     Tend = 1000.0
     num_procs = 1
 
-    f = open('fput_out.txt', 'w')
+    f = open('data/fput_out.txt', 'w')
     out = 'Running fput problem with %s processors...' % num_procs
     f.write(out + '\n')
     print(out)
 
     # instantiate the controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -94,10 +93,7 @@ def run_simulation():
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     # for item in iter_counts:
@@ -112,8 +108,7 @@ def run_simulation():
     out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
     f.write(out + '\n')
     print(out)
-    out = '   Position of max/min number of iterations: %2i -- %2i' % \
-          (int(np.argmax(niters)), int(np.argmin(niters)))
+    out = '   Position of max/min number of iterations: %2i -- %2i' % (int(np.argmax(niters)), int(np.argmin(niters)))
     f.write(out + '\n')
     print(out)
     out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -121,7 +116,7 @@ def run_simulation():
     print(out)
 
     # get runtime
-    timing_run = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')[0][1]
+    timing_run = get_sorted(stats, type='timing_run', sortby='time')[0][1]
     out = '... took %6.4f seconds to run this.' % timing_run
     f.write(out + '\n')
     print(out)
@@ -187,8 +182,7 @@ def show_results(cwd=''):
 
     # ENERGY PLOTTING #
     # extract error in hamiltonian and prepare for plotting
-    extract_stats = filter_stats(stats, type='energy_step')
-    result = sort_stats(extract_stats, sortby='time')
+    result = get_sorted(stats, type='energy_step', sortby='time')
 
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 
@@ -211,8 +205,7 @@ def show_results(cwd=''):
 
     # POSITION PLOTTING #
     # extract positions and prepare for plotting
-    extract_stats = filter_stats(stats, type='position')
-    result = sort_stats(extract_stats, sortby='time')
+    result = get_sorted(stats, type='position', sortby='time')
 
     plt_helper.newfig(textwidth=238.96, scale=0.89)
 

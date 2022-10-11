@@ -24,6 +24,7 @@ def is_number(s):
 
     try:
         import unicodedata
+
         unicodedata.numeric(s)
         return True
     except (TypeError, ValueError):
@@ -72,8 +73,8 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
         cropped colormap
     """
     new_cmap = colors.LinearSegmentedColormap.from_list(
-        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval), cmap(np.linspace(minval, maxval, n))
+    )
     return new_cmap
 
 
@@ -87,7 +88,7 @@ def visualize_matrix(result=None):
     process_list = [1, 2, 4, 6, 12, 24]
     dim = len(process_list)
     mat = np.zeros((dim, dim))
-    tmin = 1E03
+    tmin = 1e03
     tmax = 0
     for key, item in result.items():
         mat[process_list.index(key[0]), process_list.index(key[1])] = item
@@ -98,13 +99,19 @@ def visualize_matrix(result=None):
     plt_helper.newfig(textwidth=120, scale=1.5)
     cmap = plt_helper.plt.get_cmap('RdYlGn_r')
     new_cmap = truncate_colormap(cmap, 0.1, 0.9)
-    plt_helper.plt.imshow(mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap,
-                          aspect='auto')
+    plt_helper.plt.imshow(
+        mat.T, origin='lower', norm=colors.LogNorm(vmin=tmin, vmax=tmax), cmap=new_cmap, aspect='auto'
+    )
 
     for key, item in result.items():
         timing = "{:3.1f}".format(item)
-        plt_helper.plt.annotate(timing, xy=(process_list.index(key[0]), process_list.index(key[1])), size='x-small',
-                                ha='center', va='center')
+        plt_helper.plt.annotate(
+            timing,
+            xy=(process_list.index(key[0]), process_list.index(key[1])),
+            size='x-small',
+            ha='center',
+            va='center',
+        )
 
     plt_helper.plt.xticks(range(dim), process_list)
     plt_helper.plt.yticks(range(dim), process_list)
@@ -170,8 +177,14 @@ def main(cwd=''):
 
     """
     result = {}
-    files = ['data/result_PFASST_1_NEW.dat', 'data/result_PFASST_2_NEW.dat', 'data/result_PFASST_4_NEW.dat',
-             'data/result_PFASST_6_NEW.dat', 'data/result_PFASST_12_NEW.dat', 'data/result_PFASST_24_NEW.dat']
+    files = [
+        'data/result_PFASST_1_NEW.dat',
+        'data/result_PFASST_2_NEW.dat',
+        'data/result_PFASST_4_NEW.dat',
+        'data/result_PFASST_6_NEW.dat',
+        'data/result_PFASST_12_NEW.dat',
+        'data/result_PFASST_24_NEW.dat',
+    ]
     for file in files:
         result = join_timings(file=file, result=result, cwd=cwd)
     visualize_matrix(result=result)

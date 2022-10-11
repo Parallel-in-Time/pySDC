@@ -2,8 +2,8 @@ import timeit
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.AllenCahn_1D_FD import allencahn_front_fullyimplicit
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -24,13 +24,13 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1.0 / (16.0 * 128.0 ** 2)
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1.0 / (16.0 * 128.0**2)
     level_params['nsweeps'] = 1
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [1]
     sweeper_params['Q1'] = ['LU']
     sweeper_params['Q2'] = ['LU']
@@ -44,8 +44,8 @@ def setup_parameters():
     problem_params['dw'] = -0.04
     problem_params['eps'] = 0.04
     problem_params['newton_maxiter'] = 100
-    problem_params['newton_tol'] = 1E-08
-    problem_params['lin_tol'] = 1E-08
+    problem_params['newton_tol'] = 1e-08
+    problem_params['lin_tol'] = 1e-08
     problem_params['lin_maxiter'] = 100
     problem_params['radius'] = 0.25
     problem_params['interval'] = (-0.5, 0.5)
@@ -95,7 +95,7 @@ def run_SDC_variant(variant=None, inexact=False):
 
     # setup parameters "in time"
     t0 = 0
-    Tend = 1.0 / (16.0 * 128.0 ** 2)
+    Tend = 1.0 / (16.0 * 128.0**2)
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -113,6 +113,7 @@ def run_SDC_variant(variant=None, inexact=False):
 def wrapper(func, *args, **kwargs):
     def wrapped():
         return func(*args, **kwargs)
+
     return wrapped
 
 

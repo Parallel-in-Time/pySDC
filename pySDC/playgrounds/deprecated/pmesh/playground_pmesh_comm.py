@@ -1,5 +1,6 @@
 from mpi4py import MPI
 import matplotlib
+
 matplotlib.use("TkAgg")
 
 import numpy as np
@@ -10,10 +11,12 @@ from numpy.fft import rfft2, irfft2
 
 from pmesh.pm import ParticleMesh, RealField, ComplexField
 
+
 def doublesine(i, v):
     r = [ii * (Li / ni) for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
     # xx, yy = np.meshgrid(r[0], r[1])
-    return np.sin(2*np.pi*r[0]) * np.sin(2*np.pi*r[1])
+    return np.sin(2 * np.pi * r[0]) * np.sin(2 * np.pi * r[1])
+
 
 nvars = 128
 nruns = 1
@@ -68,8 +71,3 @@ t1 = time.perf_counter()
 
 print(f'PMESH setup time: {t1 - t0:6.4f} sec.')
 exit()
-
-
-
-
-

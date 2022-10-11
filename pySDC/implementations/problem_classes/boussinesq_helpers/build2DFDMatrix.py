@@ -1,8 +1,12 @@
 import numpy as np
 import scipy.sparse as sp
 
-from pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix import getMatrix, getUpwindMatrix, \
-    getBCLeft, getBCRight
+from pySDC.implementations.problem_classes.boussinesq_helpers.buildFDMatrix import (
+    getMatrix,
+    getUpwindMatrix,
+    getBCLeft,
+    getBCRight,
+)
 
 
 #
@@ -19,10 +23,12 @@ def get2DUpwindMatrix(N, dx, order):
 def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
 
     assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
-    assert np.size(
-        x_b) == 2, 'x_b needs to be an array with two entries: x_b[0] = left boundary, x_b[1] = right boundary'
-    assert np.size(
-        z_b) == 2, 'z_b needs to be an array with two entries: z_b[0] = lower boundary, z_b[1] = upper boundary'
+    assert (
+        np.size(x_b) == 2
+    ), 'x_b needs to be an array with two entries: x_b[0] = left boundary, x_b[1] = right boundary'
+    assert (
+        np.size(z_b) == 2
+    ), 'z_b needs to be an array with two entries: z_b[0] = lower boundary, z_b[1] = upper boundary'
 
     h = np.zeros(2)
     x = None
@@ -35,7 +41,7 @@ def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
 
     if bc_hor[0] in ['dirichlet', 'neumann']:
         x = np.linspace(x_b[0], x_b[1], N[0] + 2, endpoint=True)
-        x = x[1:N[0] + 1]
+        x = x[1 : N[0] + 1]
         h[0] = x[1] - x[0]
 
     if bc_ver[0] in ['periodic']:
@@ -45,7 +51,7 @@ def get2DMesh(N, x_b, z_b, bc_hor, bc_ver):
 
     if bc_ver[0] in ['dirichlet', 'neumann']:
         z = np.linspace(z_b[0], z_b[1], N[1] + 2, endpoint=True)
-        z = z[1:N[1] + 1]
+        z = z[1 : N[1] + 1]
         h[1] = z[1] - z[0]
 
     xx, zz = np.meshgrid(x, z, indexing="ij")
@@ -72,13 +78,16 @@ def get2DMatrix(N, h, bc_hor, bc_ver, order):
 # NOTE: So far only constant dirichlet values can be prescribed, i.e. one fixed value for a whole segment
 #
 
+
 def getBCHorizontal(value, N, dx, bc_hor):
-    assert np.size(value) == 2, \
-        'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
+    assert (
+        np.size(value) == 2
+    ), 'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
     assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
     assert np.size(dx) == 1, 'dx must be a scalar'
-    assert np.size(bc_hor) == 2, \
-        'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
+    assert (
+        np.size(bc_hor) == 2
+    ), 'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
 
     bl = getBCLeft(value[0], N[0], dx, bc_hor[0])
     bl = np.kron(bl, np.ones(N[1]))
@@ -90,12 +99,14 @@ def getBCHorizontal(value, N, dx, bc_hor):
 
 
 def getBCVertical(value, N, dz, bc_ver):
-    assert np.size(value) == 2, \
-        'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
+    assert (
+        np.size(value) == 2
+    ), 'Value needs to be an array with two entries: value[0] for the left and value[1] for the right boundary'
     assert np.size(N) == 2, 'N needs to be an array with two entries: N[0]=Nx and N[1]=Nz'
     assert np.size(dz) == 1, 'dx must be a scalar'
-    assert np.size(bc_ver) == 2, \
-        'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
+    assert (
+        np.size(bc_ver) == 2
+    ), 'bc_hor must have two entries, bc_hor[0] specifying the BC at the left, bc_hor[1] at the right boundary'
 
     bd = getBCLeft(value[0], N[1], dz, bc_ver[0])
     bd = np.kron(np.ones(N[0]), bd)

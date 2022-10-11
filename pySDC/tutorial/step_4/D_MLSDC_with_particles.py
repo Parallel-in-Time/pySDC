@@ -1,9 +1,10 @@
 import time
+from pathlib import Path
 
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -22,47 +23,59 @@ def main():
     stats_mlsdc, time_mlsdc = run_penning_trap_simulation(mlsdc=True)
     stats_mlsdc_finter, time_mlsdc_finter = run_penning_trap_simulation(mlsdc=True, finter=True)
 
-    f = open('step_4_D_out.txt', 'w')
-    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % \
-          (time_sdc, time_mlsdc, time_mlsdc_finter)
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_4_D_out.txt', 'w')
+    out = 'Timings for SDC, MLSDC and MLSDC+finter: %12.8f -- %12.8f -- %12.8f' % (
+        time_sdc,
+        time_mlsdc,
+        time_mlsdc_finter,
+    )
     f.write(out + '\n')
     print(out)
 
-    # filter statistics type (etot)
-    filtered_stats_sdc = filter_stats(stats_sdc, type='etot')
-    filtered_stats_mlsdc = filter_stats(stats_mlsdc, type='etot')
-    filtered_stats_mlsdc_finter = filter_stats(stats_mlsdc_finter, type='etot')
-
     # sort and convert stats to list, sorted by iteration numbers (only pre- and after-step are present here)
-    energy_sdc = sort_stats(filtered_stats_sdc, sortby='iter')
-    energy_mlsdc = sort_stats(filtered_stats_mlsdc, sortby='iter')
-    energy_mlsdc_finter = sort_stats(filtered_stats_mlsdc_finter, sortby='iter')
+    energy_sdc = get_sorted(stats_sdc, type='etot', sortby='iter')
+    energy_mlsdc = get_sorted(stats_mlsdc, type='etot', sortby='iter')
+    energy_mlsdc_finter = get_sorted(stats_mlsdc_finter, type='etot', sortby='iter')
 
     # get base energy and show differences
     base_energy = energy_sdc[0][1]
     for item in energy_sdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     for item in energy_mlsdc_finter:
-        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % \
-              (item[0], item[1], abs(base_energy - item[1]) / base_energy)
+        out = 'Total energy and relative deviation in iteration %2i: %12.10f -- %12.8e' % (
+            item[0],
+            item[1],
+            abs(base_energy - item[1]) / base_energy,
+        )
         f.write(out + '\n')
         print(out)
     f.close()
 
-    assert abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6E-10, \
-        'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
-        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy)
-    assert abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 8E-10, \
-        'ERROR: energy deviated too much after using finter, got %s' % (
-        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy)
+    assert (
+        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy < 6e-10
+    ), 'ERROR: energy deviated too much between SDC and MLSDC, got %s' % (
+        abs(energy_sdc[-1][1] - energy_mlsdc[-1][1]) / base_energy
+    )
+    assert (
+        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy < 8e-10
+    ), 'ERROR: energy deviated too much after using finter, got %s' % (
+        abs(energy_mlsdc[-1][1] - energy_mlsdc_finter[-1][1]) / base_energy
+    )
 
 
 def run_penning_trap_simulation(mlsdc, finter=False):
@@ -71,12 +84,12 @@ def run_penning_trap_simulation(mlsdc, finter=False):
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-07
+    level_params['restol'] = 1e-07
     level_params['dt'] = 1.0 / 8
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 5
 
     # initialize problem parameters for the Penning trap

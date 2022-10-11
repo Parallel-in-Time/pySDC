@@ -10,7 +10,7 @@ class dump_energy(hooks):
         """
         super(dump_energy, self).__init__()
 
-        self.file = open('energy-sdc.txt', 'w')
+        self.file = open('data/energy-sdc.txt', 'w')
 
     def post_step(self, step, level_number):
         """

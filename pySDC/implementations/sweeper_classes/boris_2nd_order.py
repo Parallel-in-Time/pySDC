@@ -111,9 +111,7 @@ class boris_2nd_order(sweeper):
                 # build RHS from f-terms (containing the E field) and the B field
                 f = P.build_f(L.f[j], L.u[j], L.time + L.dt * self.coll.nodes[j - 1])
                 # add SQF(u^k) - SxF(u^k) for the position
-                integral[m].pos += L.dt * (
-                    L.dt * (self.SQ[m + 1, j] - self.Sx[m + 1, j]) * f
-                )
+                integral[m].pos += L.dt * (L.dt * (self.SQ[m + 1, j] - self.Sx[m + 1, j]) * f)
                 # add SF(u^k) - STF(u^k) for the velocity
                 integral[m].vel += L.dt * (self.S[m + 1, j] - self.ST[m + 1, j]) * f
             # add tau if associated
@@ -143,9 +141,7 @@ class boris_2nd_order(sweeper):
             ck = tmp.vel
 
             # do the boris scheme
-            L.u[m + 1].vel = P.boris_solver(
-                ck, L.dt * self.coll.delta_m[m], L.f[m], L.f[m + 1], L.u[m]
-            )
+            L.u[m + 1].vel = P.boris_solver(ck, L.dt * self.coll.delta_m[m], L.f[m], L.f[m + 1], L.u[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
@@ -173,9 +169,7 @@ class boris_2nd_order(sweeper):
             # integrate RHS over all collocation nodes, RHS is here only f(x,v)!
             for j in range(1, self.coll.num_nodes + 1):
                 f = P.build_f(L.f[j], L.u[j], L.time + L.dt * self.coll.nodes[j - 1])
-                p[-1].pos += (
-                    L.dt * (L.dt * self.QQ[m, j] * f) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
-                )
+                p[-1].pos += L.dt * (L.dt * self.QQ[m, j] * f) + L.dt * self.coll.Qmat[m, j] * L.u[0].vel
                 p[-1].vel += L.dt * self.coll.Qmat[m, j] * f
 
         return p
@@ -198,9 +192,7 @@ class boris_2nd_order(sweeper):
         L.uend = P.dtype_u(L.u[0])
         for m in range(self.coll.num_nodes):
             f = P.build_f(L.f[m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
-            L.uend.pos += (
-                L.dt * (L.dt * self.qQ[m] * f) + L.dt * self.coll.weights[m] * L.u[0].vel
-            )
+            L.uend.pos += L.dt * (L.dt * self.qQ[m] * f) + L.dt * self.coll.weights[m] * L.u[0].vel
             L.uend.vel += L.dt * self.coll.weights[m] * f
         # add up tau correction of the full interval (last entry)
         if L.tau[-1] is not None:
@@ -233,9 +225,7 @@ class boris_2nd_order(sweeper):
         if lambdas is None:
             pass
             # should use lambdas from attached problem and make sure it is scalar SDC
-            raise NotImplementedError(
-                "At the moment, the values for the lambda have to be provided"
-            )
+            raise NotImplementedError("At the moment, the values for the lambda have to be provided")
         else:
             k = lambdas[0]
             mu = lambdas[1]
@@ -250,9 +240,7 @@ class boris_2nd_order(sweeper):
             ]
         )
 
-        C_coll = np.block(
-            [[np.eye(nnodes), dt * Q], [np.zeros([nnodes, nnodes]), np.eye(nnodes)]]
-        )
+        C_coll = np.block([[np.eye(nnodes), dt * Q], [np.zeros([nnodes, nnodes]), np.eye(nnodes)]])
         Q_coll = np.block(
             [
                 [dt**2 * QQ, np.zeros([nnodes, nnodes])],
@@ -280,9 +268,7 @@ class boris_2nd_order(sweeper):
         """
         nnodes = self.coll.num_nodes
 
-        C_coll, Q_coll, Q_vv, M_vv, F = self.get_scalar_problems_sweeper_mats(
-            lambdas=lambdas
-        )
+        C_coll, Q_coll, Q_vv, M_vv, F = self.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
         K_sdc = np.dot(np.linalg.inv(M_vv), Q_coll - Q_vv) @ F
 
@@ -309,9 +295,7 @@ class boris_2nd_order(sweeper):
         """
         nnodes = self.coll.num_nodes
 
-        C_coll, Q_coll, Q_vv, M_vv, F = self.get_scalar_problems_sweeper_mats(
-            lambdas=lambdas
-        )
+        C_coll, Q_coll, Q_vv, M_vv, F = self.get_scalar_problems_sweeper_mats(lambdas=lambdas)
 
         K_sdc = np.dot(Q_coll, F)
 

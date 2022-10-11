@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -16,12 +16,12 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 0.015625
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussLobatto
+    sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters for the Penning trap
@@ -66,8 +66,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    extract_stats = filter_stats(stats, type='etot')
-    sortedlist_stats = sort_stats(extract_stats, sortby='time')
+    sortedlist_stats = get_sorted(stats, type='etot', sortby='time')
 
     energy = [entry[1] for entry in sortedlist_stats]
 
@@ -77,7 +76,7 @@ def main():
     plt.xlabel('Time')
     plt.ylabel('Energy')
 
-    plt.savefig('penningtrap_energy.png',  transparent=True, bbox_inches='tight')
+    plt.savefig('penningtrap_energy.png', transparent=True, bbox_inches='tight')
 
 
 if __name__ == "__main__":

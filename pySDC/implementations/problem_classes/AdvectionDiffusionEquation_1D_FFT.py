@@ -44,18 +44,23 @@ class advectiondiffusion1d_imex(ptype):
             raise ProblemError('setup requires nvars = 2^p')
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectiondiffusion1d_imex, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                                        dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(advectiondiffusion1d_imex, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
-        self.xvalues = np.array([i * self.params.L / self.params.nvars - self.params.L / 2.0
-                                 for i in range(self.params.nvars)])
+        self.xvalues = np.array(
+            [i * self.params.L / self.params.nvars - self.params.L / 2.0 for i in range(self.params.nvars)]
+        )
 
         kx = np.zeros(self.init[0] // 2 + 1)
         for i in range(0, len(kx)):
             kx[i] = 2 * np.pi / self.params.L * i
 
         self.ddx = kx * 1j
-        self.lap = -kx ** 2
+        self.lap = -(kx**2)
 
     def eval_f(self, u, t):
         """
@@ -112,19 +117,20 @@ class advectiondiffusion1d_imex(ptype):
         me = self.dtype_u(self.init, val=0.0)
         if self.params.freq > 0:
             omega = 2.0 * np.pi * self.params.freq
-            me[:] = np.sin(omega * (self.xvalues - self.params.c * t)) * np.exp(-t * self.params.nu * omega ** 2)
+            me[:] = np.sin(omega * (self.xvalues - self.params.c * t)) * np.exp(-t * self.params.nu * omega**2)
         elif self.params.freq == 0:
             np.random.seed(1)
             me[:] = np.random.rand(self.params.nvars)
         else:
             t00 = 0.08
             if self.params.nu > 0:
-                nbox = int(np.ceil(np.sqrt(4.0 * self.params.nu * (t00 + t) * 37.0 / (self.params.L ** 2))))
+                nbox = int(np.ceil(np.sqrt(4.0 * self.params.nu * (t00 + t) * 37.0 / (self.params.L**2))))
                 for k in range(-nbox, nbox + 1):
                     for i in range(self.init[0]):
                         x = self.xvalues[i] - self.params.c * t + k * self.params.L
-                        me[i] += np.sqrt(t00) / np.sqrt(t00 + t) * \
-                            np.exp(-x ** 2 / (4.0 * self.params.nu * (t00 + t)))
+                        me[i] += (
+                            np.sqrt(t00) / np.sqrt(t00 + t) * np.exp(-(x**2) / (4.0 * self.params.nu * (t00 + t)))
+                        )
         return me
 
 
@@ -145,8 +151,9 @@ class advectiondiffusion1d_implicit(advectiondiffusion1d_imex):
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advectiondiffusion1d_implicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
-                                                            dtype_f=dtype_f)
+        super(advectiondiffusion1d_implicit, self).__init__(
+            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
+        )
 
     def eval_f(self, u, t):
         """

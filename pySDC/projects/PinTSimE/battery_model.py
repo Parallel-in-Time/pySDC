@@ -1,8 +1,9 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -14,7 +15,6 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -24,12 +24,34 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C', value=L.uend[1])
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C',
+            value=L.uend[1],
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=1,
+            initialize=0,
+        )
 
 
 def main(use_switch_estimator=True):
@@ -39,8 +61,8 @@ def main(use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
-    level_params['dt'] = 1E-3
+    level_params['restol'] = 1e-10
+    level_params['dt'] = 1e-3
 
     # initialize sweeper parameters
     sweeper_params = dict()
@@ -109,8 +131,8 @@ def main(use_switch_estimator=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -122,7 +144,7 @@ def main(use_switch_estimator=True):
     min_iter = 20
     max_iter = 0
 
-    f = open('battery_out.txt', 'w')
+    f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -144,10 +166,10 @@ def main(use_switch_estimator=True):
 
 def plot_voltages(cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'battery.dat', 'rb')
+    f = open(cwd + 'data/battery.dat', 'rb')
     stats = dill.load(f)
     f.close()
 

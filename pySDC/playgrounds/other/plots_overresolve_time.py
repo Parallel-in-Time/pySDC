@@ -1,5 +1,6 @@
 import pySDC.helpers.plot_helper as plt_helper
 
+
 def beautify_plot(nprocs, fname):
     plt_helper.plt.grid()
     plt_helper.plt.legend(loc=2)
@@ -15,6 +16,7 @@ def beautify_plot(nprocs, fname):
     # save plot, beautify
     plt_helper.savefig(fname)
 
+
 def plot_data():
 
     nprocs = [1, 2, 4, 8, 16, 32]
@@ -24,7 +26,9 @@ def plot_data():
 
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=1.0)
-    plt_helper.plt.semilogx(nprocs, speedup_overres, color='g', marker='o', markersize=6, label=r'$N_\mathcal{F}=1024, \alpha=\frac{1}{32}$')
+    plt_helper.plt.semilogx(
+        nprocs, speedup_overres, color='g', marker='o', markersize=6, label=r'$N_\mathcal{F}=1024, \alpha=\frac{1}{32}$'
+    )
     beautify_plot(nprocs, 'fool_speedup_overres_time')
 
     niter_wellres_1 = [1, 2, 4, 8, 16, 32]
@@ -41,8 +45,12 @@ def plot_data():
 
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=1.0)
-    plt_helper.plt.semilogx(nprocs, speedup_wellres_1, color='r', marker='d', markersize=6, label=r'$N_\mathcal{F}=32, \alpha=\frac{1}{32}$')
-    plt_helper.plt.semilogx(nprocs, speedup_wellres_2, color='b', marker='s', markersize=6, label=r'$N_\mathcal{F}=32, \alpha=\frac{1}{4}$')
+    plt_helper.plt.semilogx(
+        nprocs, speedup_wellres_1, color='r', marker='d', markersize=6, label=r'$N_\mathcal{F}=32, \alpha=\frac{1}{32}$'
+    )
+    plt_helper.plt.semilogx(
+        nprocs, speedup_wellres_2, color='b', marker='s', markersize=6, label=r'$N_\mathcal{F}=32, \alpha=\frac{1}{4}$'
+    )
     # plt_helper.plt.semilogx(nprocs, speedup_wellres_3, color='c', marker='v', markersize=6, label=r'$Nt_f=32, \alpha=\frac{1}{2}$')
     beautify_plot(nprocs, 'fool_speedup_wellres_time')
 
