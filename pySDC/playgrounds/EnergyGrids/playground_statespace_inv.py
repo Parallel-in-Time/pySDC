@@ -6,13 +6,13 @@ from pySDC.core import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.StateSpaceInverter import state_space_inverter
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
 # from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.playgrounds.EnergyGrids.log_data import log_data
 import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -22,22 +22,78 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage CDC1', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage CDC2', value=L.uend[1])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L1', value=L.uend[2])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L2', value=L.uend[3])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L3', value=L.uend[4])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C1', value=L.uend[5])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C2', value=L.uend[6])
-        self.add_to_stats(process=step.status.slot, time=L.time+L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C3', value=L.uend[7]) 
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage CDC1',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage CDC2',
+            value=L.uend[1],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L1',
+            value=L.uend[2],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L2',
+            value=L.uend[3],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L3',
+            value=L.uend[4],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C1',
+            value=L.uend[5],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C2',
+            value=L.uend[6],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time+L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C3', 
+            value=L.uend[7],
+        ) 
                           
 def main():
     """
@@ -46,13 +102,11 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-12
+    level_params['restol'] = 1e-12
     level_params['dt'] = 1e-6  
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = Collocation
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -99,8 +153,7 @@ def main():
     Tend = 1e-1
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -109,8 +162,7 @@ def main():
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/state_space.dat'
-    fname = 'state_space.dat'
+    fname = 'data/state_space.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()

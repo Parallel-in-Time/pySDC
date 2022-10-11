@@ -1,0 +1,22 @@
+# These packages are required for pySDC's base functionality, installing those is sufficient to start playing
+numpy>=1.15.4
+scipy>=0.17.1
+dill>=0.2.6
+# These packages are used in examples or for testing, they can be omitted if necessary
+matplotlib>=3.0,<=3.5.3
+numba>=0.35
+sympy>=1.0
+# These packages are required for some of the more involved examples (and data types etc.), can be omitted
+mpich
+petsc4py>=3.10.0
+mpi4py>=3.0.0
+fenics>=2019.1.0
+mpi4py-fft>=2.0.2
+# These packages are used for CI/CD and can be ignored
+pip
+flake8
+flake8-comprehensions
+flake8-bugbear
+pytest
+pytest-cov
+sphinx

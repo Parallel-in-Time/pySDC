@@ -50,19 +50,33 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
+<<<<<<< HEAD
     description['problem_class'] = piline  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
     description['step_params'] = step_params  # pass step parameters
+=======
+    description['problem_class'] = piline                  # pass problem class
+    description['problem_params'] = problem_params                # pass problem parameters
+    description['sweeper_class'] = imex_1st_order              # pass sweeper
+    description['sweeper_params'] = sweeper_params                # pass sweeper parameters
+    description['level_params'] = level_params                    # pass level parameters
+    description['step_params'] = step_params                      # pass step parameters
+>>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 
     # set time parameters
     t0 = 0.0
     Tend = 20
 
     # instantiate controller
+<<<<<<< HEAD
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+=======
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
+                                               description=description)
+>>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -98,6 +112,10 @@ def plot_voltages(cwd='./'):
     plt_helper.plt.show()
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 if __name__ == "__main__":
     main()
     plot_voltages()

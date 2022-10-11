@@ -1,5 +1,8 @@
 import numpy as np
+<<<<<<< HEAD
 
+=======
+>>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 # import progressbar
 
 from pySDC.core.Hooks import hooks

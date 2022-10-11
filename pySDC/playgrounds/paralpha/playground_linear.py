@@ -17,6 +17,7 @@ def run():
     t0 = 0.0
     nblocks = nsteps // L
 
+
     # initialize problem (ADVECTION)
     ndim = 1
     problem_params = dict()

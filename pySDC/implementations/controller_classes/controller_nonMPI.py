@@ -81,6 +81,12 @@ class controller_nonMPI(controller):
             C.reset_buffers_nonMPI(self)
             C.setup_status_variables(self)
 
+        self.add_convergence_controller(BasicRestartingNonMPI, description)
+
+        for C in [self.convergence_controllers[i] for i in self.convergence_controller_order]:
+            C.reset_buffers_nonMPI(self)
+            C.setup_status_variables(self)
+
     def run(self, u0, t0, Tend):
         """
         Main driver for running the serial version of SDC, MSSDC, MLSDC and PFASST (virtual parallelism)

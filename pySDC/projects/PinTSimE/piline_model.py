@@ -1,11 +1,7 @@
 import matplotlib as mpl
 import numpy as np
 import dill
-<<<<<<< HEAD
-from scipy.integrate import solve_ivp
-=======
 from pathlib import Path
->>>>>>> upstream/master
 
 mpl.use('Agg')
 

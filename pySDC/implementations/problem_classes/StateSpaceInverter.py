@@ -32,8 +32,12 @@ class state_space_inverter(ptype):
                 raise ParameterError(msg)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(state_space_inverter, self).__init__(init=(problem_params['nvars'], None, np.dtype('float64')),
-                                                   dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(state_space_inverter, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('float64')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.A = np.zeros((8, 8))
 
@@ -333,6 +337,7 @@ class state_space_inverter(ptype):
         Returns:
             dtype_u: exact solution
         """
+        assert t == 0, 'ERROR: u_exact only valid for t=0'
 
         me = self.dtype_u(self.init)
 

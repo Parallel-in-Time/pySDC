@@ -12,6 +12,10 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
+<<<<<<< HEAD
+=======
+from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
+>>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 
 
 class log_data(hooks):
