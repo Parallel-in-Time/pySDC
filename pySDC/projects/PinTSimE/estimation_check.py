@@ -69,7 +69,17 @@ def run(dt, use_switch_estimator=True, V_ref=1):
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
+<<<<<<< HEAD
     proof_assertions_description(description, problem_params)
+=======
+    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
+    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
+    assert level_params['dt'] <= 4e-1, 'Time step dt is too coarse, please set dt less than 4E-1'
+
+    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
+    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
+    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+>>>>>>> upstream/master
 
     # set time parameters
     t0 = 0.0
@@ -110,8 +120,9 @@ def check(cwd='./'):
     Routine to check the differences between using a switch estimator or not
     """
 
-    V_ref = 1.0
-    dt_list = [1E-1, 1E-2, 1E-3, 1E-4]
+    V_ref = 1
+    dt_list = [4e-1, 4e-2, 4e-3, 4e-4]
+    # dt_list = [2e-2]
     use_switch_estimator = [True, False]
     restarts_all = []
     for dt_item in dt_list:

@@ -11,7 +11,6 @@ tolQuad = 1e-13
 node_types = ['EQUID', 'LEGENDRE']
 quad_types = ['GAUSS', 'LOBATTO', 'RADAU-RIGHT', 'RADAU-LEFT']
 
-tolQuad = 1e-13
 
 @pytest.mark.base
 @pytest.mark.parametrize("node_type", node_types)

@@ -30,9 +30,11 @@ jobs:
       - name: Code reformatting with black
         run: |
           black pySDC  --check --diff --color
+
       - name: Linting with flakeheaven
         run: |
           flakeheaven lint --benchmark pySDC
+
   user_cpu_tests_linux:
     runs-on: ubuntu-latest
 
@@ -55,10 +57,12 @@ jobs:
           environment-file: "etc/environment-${{ matrix.env }}.yml"
           extra-specs: |
               python=${{ matrix.python }}
+
       - name: Run pytest for CPU stuff
         run: |
           coverage run --data-file=coverage_${{ matrix.env }}_${{ matrix.python }}.dat -m pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
           mv data data_${{ matrix.python }}
+
       - name: Uploading artifacts
         uses: actions/upload-artifact@v3
         if: matrix.python == '3.10'
@@ -67,6 +71,8 @@ jobs:
           path: |
             data_3.10
             coverage_${{ matrix.env }}_3.10.dat
+
+
   user_cpu_tests_macos:
     runs-on: macos-12
 
@@ -90,6 +96,9 @@ jobs:
       - name: Run pytest for CPU stuff
         run: |
           pytest --continue-on-collection-errors -v --durations=0 pySDC/tests -m ${{ matrix.env }}
+
+
+
   post-processing:
     runs-on: ubuntu-latest
 
@@ -124,10 +133,12 @@ jobs:
           python -m coverage combine cpu-test-artifacts/coverage_*_3.10.dat
           python -m coverage xml
           python -m coverage html
+
       - name: Generate Coverage badge
         run: |
           pip install genbadge[all]
           genbadge coverage -i coverage.xml -o htmlcov/coverage-badge.svg
+
 #      - name: Generate benchmark report
 #        uses: pancetta/github-action-benchmark@v1
 #        if: ${{ (!contains(github.event.head_commit.message, '[CI-no-benchmarks]')) && (github.event_name == 'push') }}
@@ -158,6 +169,7 @@ jobs:
           sphinx-build -b html docs/source docs/build/html
           mkdir -p docs/build/html/coverage
           mv htmlcov/* docs/build/html/coverage/.
+
 #      - name: Build html II
 #        if: "!contains(github.event.head_commit.message, '[CI-no-benchmarks]')"
 #        run: |
@@ -230,3 +242,5 @@ jobs:
 #          curl --output artifacts.zip "https://gitlab.hzdr.de/api/v4/projects/3525/jobs/$job_id/artifacts"
 #          rm -rf data
 #          unzip artifacts.zip
+#
+

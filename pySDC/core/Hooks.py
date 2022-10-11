@@ -335,12 +335,6 @@ class hooks(object):
             process=-1, time=L.time, level=-1, iter=-1, sweep=-1, type='recomputed', value=step.status.restart
         )
 
-        # record the recomputed quantities at weird positions to make sure there is only one value for each step
-        self.add_to_stats(process=-1, time=L.time + L.dt, level=-1, iter=-1,
-                          sweep=-1, type='recomputed', value=step.status.restart)
-        self.add_to_stats(process=-1, time=L.time, level=-1, iter=-1,
-                          sweep=-1, type='recomputed', value=step.status.restart)
-
     def post_predict(self, step, level_number):
         """
         Default routine called after each predictor
