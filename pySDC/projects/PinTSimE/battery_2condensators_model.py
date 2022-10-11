@@ -1,5 +1,6 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core import CollBase as Collocation
@@ -12,10 +13,6 @@ import pySDC.helpers.plot_helper as plt_helper
 from pySDC.core.Hooks import hooks
 
 from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
-<<<<<<< HEAD
-=======
-from pySDC.implementations.convergence_controller_classes.adaptivity import Adaptivity
->>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
 
 
 class log_data(hooks):

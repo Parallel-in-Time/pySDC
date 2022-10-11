@@ -6,14 +6,7 @@ from pySDC.implementations.collocations import Collocation
 from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
->>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
-=======
-
->>>>>>> upstream/master
 # from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.playgrounds.EnergyGrids.log_data_battery import log_data_battery
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
@@ -27,15 +20,7 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-<<<<<<< HEAD
-<<<<<<< HEAD
     level_params['restol'] = -1e-10
-=======
-    level_params['restol'] = -1E-10
->>>>>>> cc6eca75eb87b56f0a241e6c47a713b1449d2239
-=======
-    level_params['restol'] = -1e-10
->>>>>>> upstream/master
     level_params['e_tol'] = 1e-5
     level_params['dt'] = 2e-2
 

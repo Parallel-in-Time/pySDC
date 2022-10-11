@@ -1,5 +1,6 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
 from pySDC.core import CollBase as Collocation
