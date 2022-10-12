@@ -25,8 +25,7 @@ class battery_2condensators(ptype):
         problem_params['nvars'] = 3
 
         # these parameters will be used later, so assert their existence
-        essential_keys = ['Vs', 'Rs', 'C1', 'C2', 'R', 'L', 'alpha', 'V_ref', 'set_switch',
-                          't_switch']
+        essential_keys = ['Vs', 'Rs', 'C1', 'C2', 'R', 'L', 'alpha', 'V_ref', 'set_switch', 't_switch']
 
         for key in essential_keys:
             if key not in problem_params:
@@ -57,8 +56,12 @@ class battery_2condensators(ptype):
         f.impl[:] = self.A.dot(u)
 
         # switch to C2
-        if (u[1] <= self.params.V_ref[0] and u[2] > self.params.V_ref[1] or
-                self.params.set_switch[0] and not self.params.set_switch[1]):
+        if (
+            u[1] <= self.params.V_ref[0]
+            and u[2] > self.params.V_ref[1]
+            or self.params.set_switch[0]
+            and not self.params.set_switch[1]
+        ):
             if self.params.set_switch[0]:
                 if t >= self.params.t_switch[0]:
                     f.expl[0] = 0
@@ -82,8 +85,12 @@ class battery_2condensators(ptype):
             else:
                 f.expl[0] = self.params.Vs / self.params.L
 
-        elif (u[1] > self.params.V_ref[0] and u[2] > self.params.V_ref[1] or
-                not self.params.set_switch[0] and not self.params.set_switch[1]):
+        elif (
+            u[1] > self.params.V_ref[0]
+            and u[2] > self.params.V_ref[1]
+            or not self.params.set_switch[0]
+            and not self.params.set_switch[1]
+        ):
             # C1 supplies energy
             f.expl[0] = 0
 
@@ -103,15 +110,18 @@ class battery_2condensators(ptype):
         self.A = np.zeros((3, 3))
 
         # switch to C2
-        if (rhs[1] <= self.params.V_ref[0] and rhs[2] > self.params.V_ref[1] or
-                self.params.set_switch[0] and not self.params.set_switch[1]):
+        if (
+            rhs[1] <= self.params.V_ref[0]
+            and rhs[2] > self.params.V_ref[1]
+            or self.params.set_switch[0]
+            and not self.params.set_switch[1]
+        ):
             if self.params.set_switch[0]:
                 if t >= self.params.t_switch[0]:
                     self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
                 else:
                     self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
-                    
             else:
                 self.A[2, 2] = -1 / (self.params.C2 * self.params.R)
 
@@ -127,8 +137,12 @@ class battery_2condensators(ptype):
             else:
                 self.A[0, 0] = -(self.params.Rs + self.params.R) / self.params.L
 
-        elif (rhs[1] > self.params.V_ref[0] and rhs[2] > self.params.V_ref[1] or
-                not self.params.set_switch[0] and not self.params.set_switch[1]):
+        elif (
+            rhs[1] > self.params.V_ref[0]
+            and rhs[2] > self.params.V_ref[1]
+            or not self.params.set_switch[0]
+            and not self.params.set_switch[1]
+        ):
             # C1 supplies energy
             self.A[1, 1] = -1 / (self.params.C1 * self.params.R)
 

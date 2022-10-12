@@ -32,7 +32,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='current L',
-            value=L.uend[0]
+            value=L.uend[0],
         )
         self.add_to_stats(
             process=step.status.slot,
@@ -41,7 +41,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='voltage C1',
-            value=L.uend[1]
+            value=L.uend[1],
         )
         self.add_to_stats(
             process=step.status.slot,
@@ -50,7 +50,7 @@ class log_data(hooks):
             iter=0,
             sweep=L.status.sweep,
             type='voltage C2',
-            value=L.uend[2]
+            value=L.uend[2],
         )
         self.increment_stats(
             process=step.status.slot,
@@ -60,7 +60,7 @@ class log_data(hooks):
             sweep=L.status.sweep,
             type='restart',
             value=1,
-            initialize=0
+            initialize=0,
         )
 
 
@@ -240,4 +240,3 @@ def proof_assertions_description(description, problem_params):
 
 if __name__ == "__main__":
     main()
-

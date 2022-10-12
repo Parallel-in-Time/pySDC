@@ -212,7 +212,7 @@ def check(cwd='./'):
                 restarts_dt_switch1.append(np.sum(restarts_dt[0:i, 1]))
 
             if round(restarts_dt[i, 0], 13) == round(t_switch2, 13):
-                restarts_dt_switch2.append(np.sum(restarts_dt[i - 1:, 1]))
+                restarts_dt_switch2.append(np.sum(restarts_dt[i - 1 :, 1]))
 
         setup_mpl()
         fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))

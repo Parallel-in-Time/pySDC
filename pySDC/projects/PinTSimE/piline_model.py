@@ -105,8 +105,7 @@ def main():
     # set time parameters
     t0 = 0.0
     Tend = 15
-    
-    num_procs = 8
+    num_procs = 1
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
