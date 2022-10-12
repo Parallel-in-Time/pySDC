@@ -9,7 +9,6 @@ from pySDC.core.Errors import ProblemError
 
 from pySDC.implementations.problem_classes.HarmonicOscillator import harmonic_oscillator
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.core.Step import step
 
 
@@ -47,7 +46,7 @@ def compute_stability():
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params["collocation_class"] = CollGaussLegendre
+    sweeper_params['quad_type'] = 'GAUSS'
     sweeper_params["num_nodes"] = 2
     sweeper_params["do_coll_update"] = True
     sweeper_params["picard_mats_sweep"] = True
