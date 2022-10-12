@@ -249,7 +249,7 @@ def check(cwd='./'):
     ax1.set_xscale('log', base=10)
     ax1.set_yscale('symlog', linthresh=1e-10)
     ax1.set_ylim(-2, 2)
-    ax1.set_xlabel('$\Delta t$')
+    ax1.set_xlabel(r'$\Delta t$')
 
     restart_ax = ax1.twinx()
     restarts = restart_ax.plot(dt_list, restarts_dt_switch1, 'cs--', label='Restarts')
@@ -273,7 +273,7 @@ def check(cwd='./'):
     ax2.set_xscale('log', base=10)
     ax2.set_yscale('symlog', linthresh=1e-10)
     ax2.set_ylim(-2, 2)
-    ax2.set_xlabel('$\Delta t$')
+    ax2.set_xlabel(r'$\Delta t$')
 
     restart_ax = ax2.twinx()
     restarts = restart_ax.plot(dt_list, restarts_dt_switch2, 'cs--', label='Restarts')

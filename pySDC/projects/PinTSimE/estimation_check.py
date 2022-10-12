@@ -188,7 +188,7 @@ def check(cwd='./'):
     ax.set_xscale('log', base=10)
     ax.set_yscale('symlog', linthresh=1e-8)
     ax.set_ylim(-1, 1)
-    ax.set_xlabel('$\Delta t$')
+    ax.set_xlabel(r'$\Delta t$')
 
     fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
     plt_helper.plt.close(fig)
