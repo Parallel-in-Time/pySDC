@@ -146,9 +146,7 @@ def main():
     assert np.mean(niters) <= 10, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    #plot_voltages(t0=t0, dt=level_params['dt'], Tend=Tend, uinit=uinit, problem_params=problem_params, reference_plotted=True)
-    
-    compute_ref_error(t0, level_params['dt'], Tend, uinit, problem_params)
+    plot_voltages()
 
 
 def plot_voltages(cwd='./'):
