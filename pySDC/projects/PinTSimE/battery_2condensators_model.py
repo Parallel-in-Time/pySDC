@@ -209,6 +209,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     ax.set_ylabel('Energy')
 
     fig.savefig('data/battery_2condensators_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 def proof_assertions_description(description, problem_params):

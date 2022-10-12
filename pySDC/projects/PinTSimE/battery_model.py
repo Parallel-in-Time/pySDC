@@ -174,8 +174,8 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in cL], label='$i_L$')
-    ax.plot(times, [v[1] for v in vC], label='$v_C$')
+    ax.plot(times, [v[1] for v in cL], label=r'$i_L$')
+    ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
 
     if use_switch_estimator:
         val_switch = get_sorted(stats, type='switch1', sortby='time')
@@ -188,6 +188,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     ax.set_ylabel('Energy')
 
     fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 def proof_assertions_description(description, problem_params):

@@ -223,6 +223,7 @@ def check(cwd='./'):
         ax1.set_xlabel('Time')
 
         fig1.savefig('data/difference_estimation_vC1_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        plt_helper.plt.close(fig1)
 
         setup_mpl()
         fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
@@ -235,6 +236,7 @@ def check(cwd='./'):
         ax2.set_xlabel('Time')
 
         fig2.savefig('data/difference_estimation_vC2_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        plt_helper.plt.close(fig2)
 
     setup_mpl()
     fig1, ax1 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -247,17 +249,18 @@ def check(cwd='./'):
     ax1.set_xscale('log', base=10)
     ax1.set_yscale('symlog', linthresh=1e-10)
     ax1.set_ylim(-2, 2)
-    ax1.set_xlabel("$\Delta t$")
+    ax1.set_xlabel('$\Delta t$')
 
     restart_ax = ax1.twinx()
     restarts = restart_ax.plot(dt_list, restarts_dt_switch1, 'cs--', label='Restarts')
-    restart_ax.set_ylabel("Restarts")
+    restart_ax.set_ylabel('Restarts')
 
     lines = pos1 + pos2 + pos3 + restarts
     labels = [l.get_label() for l in lines]
     ax1.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 
     fig1.savefig('data/diffs_estimation_vC1.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig1)
 
     setup_mpl()
     fig2, ax2 = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -270,17 +273,18 @@ def check(cwd='./'):
     ax2.set_xscale('log', base=10)
     ax2.set_yscale('symlog', linthresh=1e-10)
     ax2.set_ylim(-2, 2)
-    ax2.set_xlabel("$\Delta t$")
+    ax2.set_xlabel('$\Delta t$')
 
     restart_ax = ax2.twinx()
     restarts = restart_ax.plot(dt_list, restarts_dt_switch2, 'cs--', label='Restarts')
-    restart_ax.set_ylabel("Restarts")
+    restart_ax.set_ylabel('Restarts')
 
     lines = pos1 + pos2 + pos3 + restarts
     labels = [l.get_label() for l in lines]
     ax2.legend(lines, labels, frameon=False, fontsize=8, loc='center right')
 
     fig2.savefig('data/diffs_estimation_vC2.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig2)
 
 
 if __name__ == "__main__":

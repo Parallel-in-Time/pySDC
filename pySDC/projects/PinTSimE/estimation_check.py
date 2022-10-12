@@ -174,6 +174,7 @@ def check(cwd='./'):
         ax.set_xlabel('Time')
 
         fig.savefig('data/difference_estimation_dt{}.png'.format(dt_item), dpi=300, bbox_inches='tight')
+        plt_helper.plt.close(fig)
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(3, 3))
@@ -187,9 +188,10 @@ def check(cwd='./'):
     ax.set_xscale('log', base=10)
     ax.set_yscale('symlog', linthresh=1e-8)
     ax.set_ylim(-1, 1)
-    ax.set_xlabel("$\Delta t$")
+    ax.set_xlabel('$\Delta t$')
 
     fig.savefig('data/diffs_estimation.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
 if __name__ == "__main__":

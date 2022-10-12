@@ -10,7 +10,6 @@ from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Piline import piline
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
-from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 import pySDC.helpers.plot_helper as plt_helper
 
 from pySDC.core.Hooks import hooks
