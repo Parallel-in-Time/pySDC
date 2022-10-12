@@ -6,11 +6,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -40,12 +40,12 @@ def run_diffusion(QI):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = [QI, 'LU']
     sweeper_params['initial_guess'] = 'zero'
@@ -55,6 +55,7 @@ def run_diffusion(QI):
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = -1  # frequency for the test value
     problem_params['nvars'] = [127, 63]  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -72,7 +73,7 @@ def run_diffusion(QI):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -94,7 +95,7 @@ def run_diffusion(QI):
 
     for i in range(0, 13):
 
-        num_proc = 2 ** i
+        num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
 
@@ -115,10 +116,7 @@ def run_diffusion(QI):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 
@@ -143,12 +141,12 @@ def run_advection(QI):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = [QI, 'LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'zero'
@@ -160,6 +158,7 @@ def run_advection(QI):
     problem_params['order'] = 2
     problem_params['type'] = 'center'
     problem_params['c'] = 0.1
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -177,7 +176,7 @@ def run_advection(QI):
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advection1d  # pass problem class
+    description['problem_class'] = advectionNd  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -199,7 +198,7 @@ def run_advection(QI):
 
     for i in range(0, 7):
 
-        num_proc = 2 ** i
+        num_proc = 2**i
         level_params['dt'] = (Tend - t0) / num_proc
         description['level_params'] = level_params  # pass level parameters
 
@@ -220,10 +219,7 @@ def run_advection(QI):
         uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
 
@@ -271,14 +267,15 @@ def plot_results(cwd=''):
         file.close()
 
         # set up plotting parameters
-        params = {'legend.fontsize': 20,
-                  'figure.figsize': (12, 8),
-                  'axes.labelsize': 20,
-                  'axes.titlesize': 20,
-                  'xtick.labelsize': 16,
-                  'ytick.labelsize': 16,
-                  'lines.linewidth': 3
-                  }
+        params = {
+            'legend.fontsize': 20,
+            'figure.figsize': (12, 8),
+            'axes.labelsize': 20,
+            'axes.titlesize': 20,
+            'xtick.labelsize': 16,
+            'ytick.labelsize': 16,
+            'lines.linewidth': 3,
+        }
         plt.rcParams.update(params)
 
         # set up figure

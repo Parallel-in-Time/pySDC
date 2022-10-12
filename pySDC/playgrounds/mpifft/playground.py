@@ -10,7 +10,7 @@ def get_local_mesh(FFT, L):
     X = np.ogrid[FFT.local_slice(False)]
     N = FFT.global_shape()
     for i in range(len(N)):
-        X[i] = (X[i]*L[i]/N[i])
+        X[i] = X[i] * L[i] / N[i]
     X = [np.broadcast_to(x, FFT.shape(False)) for x in X]
     return X
 
@@ -20,13 +20,13 @@ def get_local_wavenumbermesh(FFT, L):
     s = FFT.local_slice()
     N = FFT.global_shape()
     # Set wavenumbers in grid
-    k = [np.fft.fftfreq(n, 1./n).astype(int) for n in N[:-1]]
-    k.append(np.fft.rfftfreq(N[-1], 1./N[-1]).astype(int))
+    k = [np.fft.fftfreq(n, 1.0 / n).astype(int) for n in N[:-1]]
+    k.append(np.fft.rfftfreq(N[-1], 1.0 / N[-1]).astype(int))
     K = [ki[si] for ki, si in zip(k, s)]
     Ks = np.meshgrid(*K, indexing='ij', sparse=True)
-    Lp = 2*np.pi/L
+    Lp = 2 * np.pi / L
     for i in range(ndim):
-        Ks[i] = (Ks[i]*Lp[i]).astype(float)
+        Ks[i] = (Ks[i] * Lp[i]).astype(float)
     return [np.broadcast_to(k, FFT.shape(True)) for k in Ks]
 
 
@@ -47,17 +47,17 @@ print(fft.subcomm)
 X = get_local_mesh(fft, L)
 K = get_local_wavenumbermesh(fft, L)
 K = np.array(K).astype(float)
-K2 = np.sum(K*K, 0, dtype=float)
+K2 = np.sum(K * K, 0, dtype=float)
 
 u = newDistArray(fft, False)
 print(type(u))
 print(u.subcomm)
 uex = newDistArray(fft, False)
 
-u[:] = np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
+u[:] = np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi * X[1])
 print(u.shape, X[0].shape)
 # exit()
-uex[:] = -2.0 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi* X[1])
+uex[:] = -2.0 * (2.0 * np.pi) ** 2 * np.sin(2 * np.pi * X[0]) * np.sin(2 * np.pi * X[1])
 u_hat = fft.forward(u)
 
 lap_u_hat = -K2 * u_hat
@@ -106,13 +106,13 @@ uexs = fft.forward(uex)
 fft_pad = PFFT(MPI.COMM_WORLD, Nc, padding=[ratio] * ndim, axes=axes, dtype=np.float, slab=True)
 # uf = fft_pad.backward(uexc_hat)
 # ufs = fft.forward(uf)
-ufs = np.pad(uexc_hat, [(0, Nc[0]), (0, Nc[1]//2)], mode='constant')
+ufs = np.pad(uexc_hat, [(0, Nc[0]), (0, Nc[1] // 2)], mode='constant')
 # ufs[:][0] *= 2
 print(uexc_hat[1])
 print(uexs[1])
 print(uexc_hat.shape, ufs.shape, uexs.shape)
 
-local_error = np.amax(abs(ufs/4 - uexs))
+local_error = np.amax(abs(ufs / 4 - uexs))
 err = MPI.COMM_WORLD.allreduce(local_error, MPI.MAX)
 print('Interpolation error spectral:', err)
 exit()
@@ -134,7 +134,7 @@ for i in range(nruns):
     # print(u[0][0], v[0][0])
     s += u[0][0] - v[0][0]
 t1 = time.perf_counter()
-print(s + nruns*(nruns-1)/2, t1-t0)
+print(s + nruns * (nruns - 1) / 2, t1 - t0)
 
 s = 0
 t0 = time.perf_counter()
@@ -148,4 +148,4 @@ for i in range(nruns):
     # print(u[0][0], v[0][0])
     s += u[0][0] - v[0][0]
 t1 = time.perf_counter()
-print(s + nruns*(nruns-1)/2, t1-t0)
+print(s + nruns * (nruns - 1) / 2, t1 - t0)

@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 def evaluate(solution):
@@ -13,7 +10,7 @@ def evaluate(solution):
     coll = CollGaussRadau_Right(num_nodes=m, tleft=0.0, tright=1.0)
     Q = coll.Qmat[1:, 1:]
 
-    var = [x['x'+str(j)] for j in range(1, m)]
+    var = [x['x' + str(j)] for j in range(1, m)]
     # var = [x['x' + str(j) + 'r'] + 1j * x['x' + str(j) + 'i'] for j in range(1, m + 1)]
 
     Qd = np.zeros((m, m))
@@ -28,7 +25,7 @@ def evaluate(solution):
     for i in range(-8, 1):
         for l in range(-8, 1):
             k += 1
-            lamdt = -10 ** i + 1j * 10 ** l
+            lamdt = -(10**i) + 1j * 10**l
             R = lamdt * np.linalg.inv(np.eye(m) - lamdt * Qd).dot(Q - Qd)
             rhoR = max(abs(np.linalg.eigvals(R)))
             obj_val += rhoR
@@ -61,9 +58,11 @@ params['x2'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 
 params['x3'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[2]}
 params['x4'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 
-problem = {'problem_name': 'Qdelta_sum_expl',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum_expl',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 import numpy as np
 import scipy.optimize as opt
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.core.Collocation import CollBase
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
 
     M = 2
 
-    coll = CollGaussRadau_Right(M, 0, 1)
+    coll = CollBase(M, 0, 1, quad_type='RADAU-RIGHT')
 
     x0 = np.ones(M)
     d = opt.minimize(rho, x0, method='Nelder-Mead')
@@ -29,14 +29,15 @@ def main():
             minfield[idx, idy] = max(abs(np.linalg.eigvals(np.eye(M) - np.diag([x, y]).dot(coll.Qmat[1:, 1:]))))
 
     # Set up plotting parameters
-    params = {'legend.fontsize': 20,
-              'figure.figsize': (12, 8),
-              'axes.labelsize': 20,
-              'axes.titlesize': 20,
-              'xtick.labelsize': 16,
-              'ytick.labelsize': 16,
-              'lines.linewidth': 3
-              }
+    params = {
+        'legend.fontsize': 20,
+        'figure.figsize': (12, 8),
+        'axes.labelsize': 20,
+        'axes.titlesize': 20,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'lines.linewidth': 3,
+    }
     plt.rcParams.update(params)
     matplotlib.style.use('classic')
 
@@ -54,9 +55,9 @@ def main():
     plt.savefig(fname, bbox_inches='tight')
 
     plt.figure()
-    xdim_part = xdim[int(0.25 * numsteps):int(0.75 * numsteps) + 1]
-    ydim_part = ydim[0:int(0.25 * numsteps)]
-    minfield_part = minfield[int(0.25 * numsteps):int(0.75 * numsteps) + 1, 0:int(0.25 * numsteps)]
+    xdim_part = xdim[int(0.25 * numsteps) : int(0.75 * numsteps) + 1]
+    ydim_part = ydim[0 : int(0.25 * numsteps)]
+    minfield_part = minfield[int(0.25 * numsteps) : int(0.75 * numsteps) + 1, 0 : int(0.25 * numsteps)]
     plt.pcolor(xdim_part, ydim_part, minfield_part.T, cmap='Reds', vmin=0, vmax=1)
     plt.text(d.x[0], d.x[1], 'X', horizontalalignment='center', verticalalignment='center')
     plt.xlim((min(xdim_part), max(xdim_part)))

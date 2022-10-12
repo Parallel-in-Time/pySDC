@@ -1,8 +1,10 @@
 from petsc4py import PETSc
 import numpy as np
 
+
 class mymesh(PETSc.Vec):
     __array_priority__ = 1000
+
     def __new__(cls, init=None, val=0.0):
         if isinstance(init, mymesh) or isinstance(init, PETSc.Vec):
             obj = PETSc.Vec().__new__(cls)
@@ -32,7 +34,6 @@ class mymesh(PETSc.Vec):
         # take absolute values of the mesh values
         # print(self.norm(3))
         return self.norm(3)
-
 
     # def __array_finalize__(self, obj):
     #     """
@@ -89,4 +90,3 @@ print(abs(w))
 
 
 exit()
-

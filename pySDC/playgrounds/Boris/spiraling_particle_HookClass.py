@@ -1,11 +1,11 @@
 import numpy as np
+
 # import progressbar
 
 from pySDC.core.Hooks import hooks
 
 
 class particles_output(hooks):
-
     def __init__(self):
         """
         Initialization of particles output
@@ -48,10 +48,24 @@ class particles_output(hooks):
         R = np.linalg.norm(u.pos)
         H = 1 / 2 * np.dot(u.vel[:, 0], u.vel[:, 0]) + L.prob.params.a0 / R
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='energy', value=H)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='energy',
+            value=H,
+        )
 
-        self.add_to_stats(process=step.status.slot, time=L.time, level=-1, iter=step.status.iter,
-                          sweep=L.status.sweep, type='position', value=L.uend.pos)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=-1,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='position',
+            value=L.uend.pos,
+        )
 
         return None

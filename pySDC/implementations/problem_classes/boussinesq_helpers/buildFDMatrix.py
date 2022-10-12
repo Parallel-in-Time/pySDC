@@ -37,7 +37,7 @@ def getUpwindMatrix(N, dx, order):
     first_col = np.zeros(N)
 
     # Because we need to specific first column (not row) in circulant, flip stencil array
-    first_col[0:np.size(stencil)] = np.flipud(stencil)
+    first_col[0 : np.size(stencil)] = np.flipud(stencil)
 
     # Circulant shift of coefficient column so that entry number zero_pos becomes first entry
     first_col = np.roll(first_col, -np.size(stencil) + zero_pos, axis=0)

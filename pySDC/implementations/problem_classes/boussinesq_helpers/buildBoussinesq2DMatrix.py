@@ -1,8 +1,11 @@
 import numpy as np
 import scipy.sparse as sp
 
-from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import get2DMatrix, getBCHorizontal, \
-    get2DUpwindMatrix
+from pySDC.implementations.problem_classes.boussinesq_helpers.build2DFDMatrix import (
+    get2DMatrix,
+    getBCHorizontal,
+    get2DUpwindMatrix,
+)
 
 
 def getBoussinesq2DUpwindMatrix(N, dx, u_adv, order):
@@ -37,8 +40,8 @@ def getBoussinesq2DMatrix(N, h, bc_hor, bc_ver, c_s, Nfreq, order):
 
     M1 = sp.hstack((Zero, Zero, Zero, -Dx_p), format="csr")
     M2 = sp.hstack((Zero, Zero, Id_w, -Dz_p), format="csr")
-    M3 = sp.hstack((Zero, -Nfreq ** 2 * Id_w, Zero, Zero), format="csr")
-    M4 = sp.hstack((-c_s ** 2 * Dx_u, -c_s ** 2 * Dz_w, Zero, Zero), format="csr")
+    M3 = sp.hstack((Zero, -(Nfreq**2) * Id_w, Zero, Zero), format="csr")
+    M4 = sp.hstack((-(c_s**2) * Dx_u, -(c_s**2) * Dz_w, Zero, Zero), format="csr")
     M = sp.vstack((M1, M2, M3, M4), format="csr")
 
     Id = sp.eye(4 * N[0] * N[1])

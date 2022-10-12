@@ -26,7 +26,21 @@ class error_output(hooks):
         upde = P.u_exact(step.time + step.dt)
         pde_err = abs(upde - L.uend)
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='error_after_step', value=pde_err)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='residual_after_step', value=L.status.residual)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='error_after_step',
+            value=pde_err,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='residual_after_step',
+            value=L.status.residual,
+        )

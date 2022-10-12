@@ -1,8 +1,12 @@
 import numpy as np
 import scipy.sparse as sp
 
-from pySDC.implementations.problem_classes.acoustic_helpers.buildFDMatrix import getMatrix, getHorizontalDx, \
-    getBCLeft, getBCRight
+from pySDC.implementations.problem_classes.acoustic_helpers.buildFDMatrix import (
+    getMatrix,
+    getHorizontalDx,
+    getBCLeft,
+    getBCRight,
+)
 
 wave_order = 6
 

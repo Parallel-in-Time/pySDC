@@ -6,6 +6,7 @@ from pySDC.implementations.collocations import Collocation
 from pySDC.projects.PinTSimE.switch_controller_nonMPI import switch_controller_nonMPI
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
+
 # from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.playgrounds.EnergyGrids.log_data_battery import log_data_battery
 from pySDC.projects.PinTSimE.piline_model import setup_mpl
@@ -19,14 +20,13 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = -1E-10
+    level_params['restol'] = -1e-10
     level_params['e_tol'] = 1e-5
     level_params['dt'] = 2e-2
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = Collocation
-    sweeper_params['node_type'] = 'LEGENDRE'
+
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -39,7 +39,7 @@ def main():
     problem_params['C'] = 1
     problem_params['R'] = 1
     problem_params['L'] = 1
-    problem_params['alpha'] = 10
+    problem_params['alpha'] = 3  # 10
     problem_params['V_ref'] = 1
 
     # initialize step parameters
@@ -82,9 +82,10 @@ def main():
     dill.dump(stats, f)
     f.close()
 
+
 def plot_voltages(cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
     f = open(cwd + 'battery.dat', 'rb')

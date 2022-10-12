@@ -7,7 +7,6 @@ from pySDC.implementations.datatype_classes.mesh import mesh
 
 
 class mytype(np.ndarray):
-
     def __new__(cls, init, val=0.0):
         if isinstance(init, mytype):
             obj = np.ndarray.__new__(cls, init.shape, dtype=np.float, buffer=None)
@@ -38,7 +37,7 @@ for i in range(nruns):
         n += 0.1 * j * o
     res = max(res, abs(n))
 t1 = time.perf_counter()
-print(res, t1-t0)
+print(res, t1 - t0)
 
 # res = 0
 # t0 = time.perf_counter()
@@ -61,7 +60,7 @@ for i in range(nruns):
         n += 0.1 * j * o
     res = max(res, abs(n))
 t1 = time.perf_counter()
-print(res, t1-t0)
+print(res, t1 - t0)
 
 m = mytype((nvars, nvars), val=2.0)
 n = mytype((nvars, nvars), val=2.0)
@@ -75,7 +74,7 @@ assert o is not m
 exit()
 
 print(type(m))
-print(type(m+n))
+print(type(m + n))
 print(abs(m))
 print(type(abs(m)))
 
@@ -96,5 +95,3 @@ m[:] = comm.Get_rank()
 print(type(m))
 print(m.subcomm)
 print(abs(m), type(abs(m)))
-
-

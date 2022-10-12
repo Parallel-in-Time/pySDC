@@ -2,6 +2,7 @@ import json
 import glob
 import numpy as np
 import matplotlib
+
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import AxesGrid
@@ -38,13 +39,9 @@ def plot_data(path='./data', name='', output='.'):
 
         fig = plt.figure()
 
-        grid = AxesGrid(fig, 111,
-                        nrows_ncols=(1, 2),
-                        axes_pad=0.15,
-                        cbar_mode='single',
-                        cbar_location='right',
-                        cbar_pad=0.15
-                        )
+        grid = AxesGrid(
+            fig, 111, nrows_ncols=(1, 2), axes_pad=0.15, cbar_mode='single', cbar_location='right', cbar_pad=0.15
+        )
 
         im = grid[0].imshow(array[..., 0], vmin=0, vmax=1)
         im = grid[1].imshow(array[..., 1], vmin=0, vmax=1)

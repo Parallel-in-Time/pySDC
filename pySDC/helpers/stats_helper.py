@@ -22,19 +22,22 @@ def filter_stats(stats, process=None, time=None, level=None, iter=None, type=Non
     # check which steps have been recomputed
     if recomputed is not None:
         # this will contain a 2d array with all times and whether they have been recomputed
-        restarts = np.array(get_sorted(stats, process=None, time=None, iter=None, type='recomputed',
-                            recomputed=None, sortby='time'))
+        restarts = np.array(
+            get_sorted(stats, process=None, time=None, iter=None, type='recomputed', recomputed=None, sortby='time')
+        )
     else:
         # dummy values for when no filtering of restarts is desired
         restarts = np.array([[None, None]])
 
     for k, v in stats.items():
         # get data if key matches the filter (if specified)
-        if (k.time == time or time is None) and \
-                (k.process == process or process is None) and \
-                (k.level == level or level is None) and \
-                (k.iter == iter or iter is None) and \
-                (k.type == type or type is None):
+        if (
+            (k.time == time or time is None)
+            and (k.process == process or process is None)
+            and (k.level == level or level is None)
+            and (k.iter == iter or iter is None)
+            and (k.type == type or type is None)
+        ):
 
             if k.time in restarts[:, 0]:
                 # we know there is only one entry for each time, so we make a mask for the time and take the first and
@@ -90,5 +93,7 @@ def get_list_of_types(stats):
 
 
 def get_sorted(stats, process=None, time=None, level=None, iter=None, type=None, recomputed=None, sortby='time'):
-    return sort_stats(filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type,
-                      recomputed=recomputed), sortby=sortby)
+    return sort_stats(
+        filter_stats(stats, process=process, time=time, level=level, iter=iter, type=type, recomputed=recomputed),
+        sortby=sortby,
+    )

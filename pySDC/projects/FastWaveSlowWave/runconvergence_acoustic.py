@@ -8,7 +8,7 @@ from pylab import rcParams
 from matplotlib.ticker import ScalarFormatter
 
 from pySDC.projects.FastWaveSlowWave.HookClass_acoustic import dump_energy
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.problem_classes.AcousticAdvection_1D_FD_imex import acoustic_1d_imex
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -26,7 +26,7 @@ def compute_convergence_data(cwd=''):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-14
+    level_params['restol'] = 1e-14
 
     # This comes as read-in for the step class
     step_params = dict()
@@ -40,7 +40,7 @@ def compute_convergence_data(cwd=''):
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['do_coll_update'] = True
 
@@ -92,8 +92,9 @@ def compute_convergence_data(cwd=''):
             description['level_params'] = level_params
 
             # instantiate the controller
-            controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                           description=description)
+            controller = controller_nonMPI(
+                num_procs=num_procs, controller_params=controller_params, description=description
+            )
             # get initial values on finest level
             P = controller.MS[0].levels[0].prob
             uinit = P.u_exact(t0)
@@ -157,8 +158,9 @@ def plot_convergence(cwd=''):
         for jj in range(0, N):
             error_plot[ii, jj] = error[N * ii + jj]
             nsteps_plot[ii, jj] = nsteps[N * ii + jj]
-            convline[ii, jj] = error_plot[ii, 0] * (float(nsteps_plot[ii, 0]) / float(nsteps_plot[ii, jj])) ** \
-                order_plot[ii]
+            convline[ii, jj] = (
+                error_plot[ii, 0] * (float(nsteps_plot[ii, 0]) / float(nsteps_plot[ii, jj])) ** order_plot[ii]
+            )
 
     color = ['r', 'b', 'g']
     shape = ['o', 'd', 's']
@@ -167,8 +169,14 @@ def plot_convergence(cwd=''):
     fig = plt.figure()
     for ii in range(0, 3):
         plt.loglog(nsteps_plot[ii, :], convline[ii, :], '-', color=color[ii])
-        plt.loglog(nsteps_plot[ii, :], error_plot[ii, :], shape[ii], markersize=fs, color=color[ii],
-                   label='p=' + str(int(order_plot[ii])))
+        plt.loglog(
+            nsteps_plot[ii, :],
+            error_plot[ii, :],
+            shape[ii],
+            markersize=fs,
+            color=color[ii],
+            label='p=' + str(int(order_plot[ii])),
+        )
 
     plt.legend(loc='lower left', fontsize=fs, prop={'size': fs})
     plt.xlabel('Number of time steps', fontsize=fs)

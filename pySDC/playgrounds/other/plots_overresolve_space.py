@@ -1,5 +1,6 @@
 import pySDC.helpers.plot_helper as plt_helper
 
+
 def beautify_plot(nprocs, fname):
     plt_helper.plt.grid()
     plt_helper.plt.legend(loc=2)
@@ -23,27 +24,42 @@ def plot_data():
     niter_overres = [21, 12, 16, 22]
     # niter_overres = [9, 5, 11, 23]
     alpha_overres = 1.0 / 4.0
-    speedup_overres = [p / (p / niter_overres[0] * alpha_overres + k / niter_overres[0] * (1 + alpha_overres)) for p, k in zip(nprocs, niter_overres)]
+    speedup_overres = [
+        p / (p / niter_overres[0] * alpha_overres + k / niter_overres[0] * (1 + alpha_overres))
+        for p, k in zip(nprocs, niter_overres)
+    ]
     print(speedup_overres)
 
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=1.0)
-    plt_helper.plt.semilogx(nprocs, speedup_overres, color='g', marker='o', markersize=6, label=r'$Nx_\mathcal{F}=512, \alpha=\frac{1}{4}$')
+    plt_helper.plt.semilogx(
+        nprocs, speedup_overres, color='g', marker='o', markersize=6, label=r'$Nx_\mathcal{F}=512, \alpha=\frac{1}{4}$'
+    )
     beautify_plot(nprocs, 'fool_speedup_overres_space')
 
     niter_wellres_1 = [21, 24, 32, 48]
     alpha_wellres_1 = 1.0 / 4.0
-    speedup_wellres_1 = [p / (p / niter_wellres_1[0] * alpha_wellres_1 + k / niter_wellres_1[0] * (1 + alpha_wellres_1)) for p, k in zip(nprocs, niter_wellres_1)]
+    speedup_wellres_1 = [
+        p / (p / niter_wellres_1[0] * alpha_wellres_1 + k / niter_wellres_1[0] * (1 + alpha_wellres_1))
+        for p, k in zip(nprocs, niter_wellres_1)
+    ]
 
     print(speedup_wellres_1)
     niter_wellres_2 = [21, 24, 33, 49]
     alpha_wellres_2 = 1.0 / 2.0
-    speedup_wellres_2 = [p / (p / niter_wellres_2[0] * alpha_wellres_2 + k / niter_wellres_2[0] * (1 + alpha_wellres_2)) for p, k in zip(nprocs, niter_wellres_2)]
+    speedup_wellres_2 = [
+        p / (p / niter_wellres_2[0] * alpha_wellres_2 + k / niter_wellres_2[0] * (1 + alpha_wellres_2))
+        for p, k in zip(nprocs, niter_wellres_2)
+    ]
 
     plt_helper.setup_mpl()
     plt_helper.newfig(textwidth=238.96, scale=1.0)
-    plt_helper.plt.semilogx(nprocs, speedup_wellres_1, color='r', marker='d', markersize=6, label=r'$Nx_\mathcal{F}=32, \alpha=\frac{1}{4}$')
-    plt_helper.plt.semilogx(nprocs, speedup_wellres_2, color='b', marker='s', markersize=6, label=r'$Nx_\mathcal{F}=32, \alpha=\frac{1}{2}$')
+    plt_helper.plt.semilogx(
+        nprocs, speedup_wellres_1, color='r', marker='d', markersize=6, label=r'$Nx_\mathcal{F}=32, \alpha=\frac{1}{4}$'
+    )
+    plt_helper.plt.semilogx(
+        nprocs, speedup_wellres_2, color='b', marker='s', markersize=6, label=r'$Nx_\mathcal{F}=32, \alpha=\frac{1}{2}$'
+    )
     beautify_plot(nprocs, 'fool_speedup_wellres_space')
 
 

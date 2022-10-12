@@ -41,8 +41,10 @@ def main():
     time_rank = time_comm.Get_rank()
     time_size = time_comm.Get_size()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     n = 7
     da = PETSc.DMDA().create([n, n], stencil_width=1, comm=space_comm)

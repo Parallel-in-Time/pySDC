@@ -4,8 +4,8 @@ import pickle
 import numpy as np
 
 import pySDC.helpers.plot_helper as plt_helper
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.projects.parallelSDC.GeneralizedFisher_1D_FD_implicit_Jac import generalized_fisher_jac
@@ -17,7 +17,7 @@ from pySDC.projects.parallelSDC.linearized_implicit_parallel import linearized_i
 def main():
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.01
 
     # This comes as read-in for the step class (this is optional!)
@@ -30,12 +30,12 @@ def main():
     problem_params['nvars'] = 255
     problem_params['lambda0'] = 5.0
     problem_params['newton_maxiter'] = 50
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['interval'] = (-5, 5)
 
     # This comes as read-in for the sweeper class
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'
     sweeper_params['fixed_time_in_jacobian'] = 0
@@ -52,10 +52,14 @@ def main():
     description['level_params'] = level_params
     description['step_params'] = step_params
 
-    sweeper_list = [generic_implicit, linearized_implicit_fixed_parallel_prec, linearized_implicit_fixed_parallel,
-                    linearized_implicit_parallel]
+    sweeper_list = [
+        generic_implicit,
+        linearized_implicit_fixed_parallel_prec,
+        linearized_implicit_fixed_parallel,
+        linearized_implicit_parallel,
+    ]
 
-    f = open('parallelSDC_nonlinear_out.txt', 'w')
+    f = open('data/parallelSDC_nonlinear_out.txt', 'w')
     uinit = None
     uex = None
     uend = None
@@ -86,10 +90,7 @@ def main():
         print('error at time %s: %s' % (Tend, err))
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         # compute and print statistics
         niters = np.array([item[1] for item in iter_counts])
@@ -99,12 +100,13 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
-        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % \
-              (float(np.std(niters)), float(np.var(niters)))
+        out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         f.write(out + '\n')
         f.write(out + '\n')
         print(out)
@@ -113,8 +115,9 @@ def main():
         print()
 
         assert err < 3.686e-05, 'ERROR: error is too high for sweeper %s, got %s' % (sweeper.__name__, err)
-        assert np.mean(niters) == 7.5 or np.mean(niters) == 4.0, \
-            'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
+        assert (
+            np.mean(niters) == 7.5 or np.mean(niters) == 4.0
+        ), 'ERROR: mean number of iterations not as expected, got %s' % np.mean(niters)
 
     f.close()
 

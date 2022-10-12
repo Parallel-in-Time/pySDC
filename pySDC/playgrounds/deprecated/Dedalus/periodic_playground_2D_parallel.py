@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
@@ -42,18 +42,20 @@ def main():
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
+    level_params['restol'] = 1e-08
     level_params['dt'] = 1.0 / 4
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     # sweeper_params['spread'] = False
@@ -104,10 +106,7 @@ def main():
     err = abs(uex - uend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     if space_rank == 0:
 
@@ -123,13 +122,15 @@ def main():
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
 
         out = 'Time to solution: %6.4f sec.' % timing[0][1]
         print(out)

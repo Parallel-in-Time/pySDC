@@ -1,10 +1,12 @@
 import os
+from pathlib import Path
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.helpers.visualization_tools import show_residual_across_simulation
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD import heat1d
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_unforced
 from pySDC.implementations.sweeper_classes.generic_LU import generic_LU
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -16,18 +18,19 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 5E-10
+    level_params['restol'] = 5e-10
     level_params['dt'] = 0.125
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
 
     # initialize problem parameters
     problem_params = dict()
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 2  # frequency for the test value
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -44,7 +47,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d  # pass problem class
+    description['problem_class'] = heatNd_unforced  # pass problem class
     description['sweeper_class'] = generic_LU  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
     description['level_params'] = level_params  # pass level parameters
@@ -75,12 +78,15 @@ def main():
     num_proc = 8
 
     # instantiate controllers
-    controller_mssdc_jac = controller_nonMPI(num_procs=num_proc, controller_params=controller_params_jac,
-                                             description=description_mssdc)
-    controller_mssdc_gs = controller_nonMPI(num_procs=num_proc, controller_params=controller_params_gs,
-                                            description=description_mssdc)
-    controller_pfasst = controller_nonMPI(num_procs=num_proc, controller_params=controller_params,
-                                          description=description_pfasst)
+    controller_mssdc_jac = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params_jac, description=description_mssdc
+    )
+    controller_mssdc_gs = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params_gs, description=description_mssdc
+    )
+    controller_pfasst = controller_nonMPI(
+        num_procs=num_proc, controller_params=controller_params, description=description_pfasst
+    )
 
     # get initial values on finest level
     P = controller_mssdc_jac.MS[0].levels[0].prob
@@ -100,7 +106,8 @@ def main():
     diff_gs = abs(uend_mssdc_gs - uend_pfasst)
     diff_jac_gs = abs(uend_mssdc_gs - uend_mssdc_jac)
 
-    f = open('step_8_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_8_B_out.txt', 'w')
 
     out = 'Error PFASST: %12.8e' % err_pfasst
     f.write(out + '\n')
@@ -121,38 +128,41 @@ def main():
     f.write(out + '\n')
     print(out)
 
-    # filter statistics by type (number of iterations)
-    filtered_stats_pfasst = filter_stats(stats_pfasst, type='niter')
-    filtered_stats_mssdc_jac = filter_stats(stats_mssdc_jac, type='niter')
-    filtered_stats_mssdc_gs = filter_stats(stats_mssdc_gs, type='niter')
-
     # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts_pfasst = sort_stats(filtered_stats_pfasst, sortby='time')
-    iter_counts_mssdc_jac = sort_stats(filtered_stats_mssdc_jac, sortby='time')
-    iter_counts_mssdc_gs = sort_stats(filtered_stats_mssdc_gs, sortby='time')
+    iter_counts_pfasst = get_sorted(stats_pfasst, type='niter', sortby='time')
+    iter_counts_mssdc_jac = get_sorted(stats_mssdc_jac, type='niter', sortby='time')
+    iter_counts_mssdc_gs = get_sorted(stats_mssdc_gs, type='niter', sortby='time')
 
     # compute and print statistics
-    for item_pfasst, item_mssdc_jac, item_mssdc_gs in \
-            zip(iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs):
-        out = 'Number of iterations for time %4.2f (PFASST/parMSSDC/serMSSDC): %2i / %2i / %2i' % \
-              (item_pfasst[0], item_pfasst[1], item_mssdc_jac[1], item_mssdc_gs[1])
+    for item_pfasst, item_mssdc_jac, item_mssdc_gs in zip(
+        iter_counts_pfasst, iter_counts_mssdc_jac, iter_counts_mssdc_gs
+    ):
+        out = 'Number of iterations for time %4.2f (PFASST/parMSSDC/serMSSDC): %2i / %2i / %2i' % (
+            item_pfasst[0],
+            item_pfasst[1],
+            item_mssdc_jac[1],
+            item_mssdc_gs[1],
+        )
         f.write(out + '\n')
         print(out)
 
     f.close()
 
     # call helper routine to produce residual plot
-    show_residual_across_simulation(stats_mssdc_jac, 'step_8_residuals_mssdc_jac.png')
-    show_residual_across_simulation(stats_mssdc_gs, 'step_8_residuals_mssdc_gs.png')
+    show_residual_across_simulation(stats_mssdc_jac, 'data/step_8_residuals_mssdc_jac.png')
+    show_residual_across_simulation(stats_mssdc_gs, 'data/step_8_residuals_mssdc_gs.png')
 
-    assert os.path.isfile('step_8_residuals_mssdc_jac.png')
-    assert os.path.isfile('step_8_residuals_mssdc_gs.png')
-    assert diff_jac < 3.1E-10, \
+    assert os.path.isfile('data/step_8_residuals_mssdc_jac.png')
+    assert os.path.isfile('data/step_8_residuals_mssdc_gs.png')
+    assert diff_jac < 3.1e-10, (
         "ERROR: difference between PFASST and parallel MSSDC controller is too large, got %s" % diff_jac
-    assert diff_gs < 3.1E-10, \
+    )
+    assert diff_gs < 3.1e-10, (
         "ERROR: difference between PFASST and serial MSSDC controller is too large, got %s" % diff_gs
-    assert diff_jac_gs < 3.1E-10, \
+    )
+    assert diff_jac_gs < 3.1e-10, (
         "ERROR: difference between parallel and serial MSSDC controller is too large, got %s" % diff_jac_gs
+    )
 
 
 if __name__ == "__main__":

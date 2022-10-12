@@ -44,22 +44,22 @@ class acoustic_1d_imex(ptype):
         assert 'cadv' in cparams
         assert 'order_adv' in cparams
         assert 'multiscale' in cparams
-        
+
         # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        for k, v in cparams.items():
+            setattr(self, k, v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(acoustic_1d_imex,self).__init__(self.nvars,dtype_u,dtype_f)
-        
-        self.mesh   = np.linspace(0.0, 1.0, self.nvars[1], endpoint=False)
-        self.dx     = self.mesh[1] - self.mesh[0]
-        
-        self.Dx     = -self.cadv*getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
-        self.Id, A  = getWave1DMatrix(self.nvars[1], self.dx, ['periodic','periodic'], ['periodic','periodic'])
-        self.A      = -self.cs*A
-                
-    def solve_system(self,rhs,factor,u0,t):
+        super(acoustic_1d_imex, self).__init__(self.nvars, dtype_u, dtype_f)
+
+        self.mesh = np.linspace(0.0, 1.0, self.nvars[1], endpoint=False)
+        self.dx = self.mesh[1] - self.mesh[0]
+
+        self.Dx = -self.cadv * getWave1DAdvectionMatrix(self.nvars[1], self.dx, self.order_adv)
+        self.Id, A = getWave1DMatrix(self.nvars[1], self.dx, ['periodic', 'periodic'], ['periodic', 'periodic'])
+        self.A = -self.cs * A
+
+    def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-dtA)u = rhs
 
@@ -72,20 +72,19 @@ class acoustic_1d_imex(ptype):
         Returns:
             solution as mesh
         """
-        
-        M  = self.Id - factor*self.A
-        
-        b = np.concatenate( (rhs.values[0,:], rhs.values[1,:]) )
-        
+
+        M = self.Id - factor * self.A
+
+        b = np.concatenate((rhs.values[0, :], rhs.values[1, :]))
+
         sol = LA.spsolve(M, b)
 
         me = mesh(self.nvars)
-        me.values[0,:], me.values[1,:] = np.split(sol, 2)
-        
+        me.values[0, :], me.values[1, :] = np.split(sol, 2)
+
         return me
 
-
-    def __eval_fexpl(self,u,t):
+    def __eval_fexpl(self, u, t):
         """
         Helper routine to evaluate the explicit part of the RHS
 
@@ -97,17 +96,15 @@ class acoustic_1d_imex(ptype):
             explicit part of RHS
         """
 
-
-        b = np.concatenate( (u.values[0,:], u.values[1,:]) )
+        b = np.concatenate((u.values[0, :], u.values[1, :]))
         sol = self.Dx.dot(b)
-        
-        fexpl        = mesh(self.nvars)
-        fexpl.values[0,:], fexpl.values[1,:] = np.split(sol, 2)
+
+        fexpl = mesh(self.nvars)
+        fexpl.values[0, :], fexpl.values[1, :] = np.split(sol, 2)
 
         return fexpl
 
-
-    def __eval_fimpl(self,u,t):
+    def __eval_fimpl(self, u, t):
         """
         Helper routine to evaluate the implicit part of the RHS
 
@@ -119,16 +116,15 @@ class acoustic_1d_imex(ptype):
             implicit part of RHS
         """
 
-        b = np.concatenate( (u.values[0,:], u.values[1,:]) )
+        b = np.concatenate((u.values[0, :], u.values[1, :]))
         sol = self.A.dot(b)
-        
-        fimpl             = mesh(self.nvars,val=0.0)
-        fimpl.values[0,:], fimpl.values[1,:] = np.split(sol, 2)
-        
+
+        fimpl = mesh(self.nvars, val=0.0)
+        fimpl.values[0, :], fimpl.values[1, :] = np.split(sol, 2)
+
         return fimpl
 
-
-    def eval_f(self,u,t):
+    def eval_f(self, u, t):
         """
         Routine to evaluate both parts of the RHS
 
@@ -141,11 +137,11 @@ class acoustic_1d_imex(ptype):
         """
 
         f = rhs_imex_mesh(self.nvars)
-        f.impl = self.__eval_fimpl(u,t)
-        f.expl = self.__eval_fexpl(u,t)
+        f.impl = self.__eval_fimpl(u, t)
+        f.expl = self.__eval_fexpl(u, t)
         return f
 
-    def u_exact(self,t):
+    def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
 
@@ -155,19 +151,19 @@ class acoustic_1d_imex(ptype):
         Returns:
             exact solution
         """
-        
+
         sigma_0 = 0.1
-        k       = 7.0*2.0*np.pi
-        x_0     = 0.75
-        x_1     = 0.25
-        
+        k = 7.0 * 2.0 * np.pi
+        x_0 = 0.75
+        x_1 = 0.25
+
         ms = 0.0
         if self.multiscale:
-          ms = 1.0
+            ms = 1.0
 
-        me             = mesh(self.nvars)
-        me.values[0,:] = np.exp(-np.square(self.mesh-x_0-self.cs*t)/(sigma_0*sigma_0)) + ms*np.exp(-np.square(self.mesh-x_1-self.cs*t)/(sigma_0*sigma_0))*np.cos(k*(self.mesh-self.cs*t)/sigma_0)
-        me.values[1,:] = me.values[0,:]
+        me = mesh(self.nvars)
+        me.values[0, :] = np.exp(-np.square(self.mesh - x_0 - self.cs * t) / (sigma_0 * sigma_0)) + ms * np.exp(
+            -np.square(self.mesh - x_1 - self.cs * t) / (sigma_0 * sigma_0)
+        ) * np.cos(k * (self.mesh - self.cs * t) / sigma_0)
+        me.values[1, :] = me.values[0, :]
         return me
-
-

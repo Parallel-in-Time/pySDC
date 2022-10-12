@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD_periodic import advectionNd_periodic
-
+from pySDC.core.Collocation import CollBase
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 
 
 def run():
@@ -18,7 +17,6 @@ def run():
     t0 = 0.0
     nblocks = nsteps // L
 
-
     # initialize problem (ADVECTION)
     ndim = 1
     problem_params = dict()
@@ -30,14 +28,15 @@ def run():
     problem_params['nvars'] = tuple(N for _ in range(ndim))  # number of dofs
     problem_params['direct_solver'] = False  # do GMRES instead of LU
     problem_params['liniter'] = 10  # number of GMRES iterations
+    problem_params['bc'] = 'periodic'  # boundary conditions
 
-    prob = advectionNd_periodic(problem_params)
+    prob = advectionNd(problem_params)
 
     IL = np.eye(L)
     LM = np.eye(M)
     IN = np.eye(N)
 
-    coll = CollGaussRadau_Right(M, 0, 1)
+    coll = CollBase(M, 0, 1, quad_type='RADAU-RIGHT')
 
     Q = coll.Qmat[1:, 1:]
     A = prob.A.todense()
@@ -68,7 +67,7 @@ def run():
     for nb in range(nblocks):
 
         k = 0
-        restol = 1E-10
+        restol = 1e-10
         res = u0 - C @ u
         while k < maxiter and np.linalg.norm(res, np.inf) > restol:
             k += 1
@@ -82,7 +81,6 @@ def run():
         u0_M = np.kron(np.ones(M), uinit)
         u0 = np.kron(np.concatenate([[1], [0] * (L - 1)]), u0_M)[:, None]
         u = u0.copy()
-
 
     # plt.plot(uex-u[-N:])
     # plt.plot(uinit)

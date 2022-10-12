@@ -3,19 +3,20 @@ from scipy.special import roots_legendre
 from scipy.interpolate import BarycentricInterpolator
 
 from pySDC.core.Errors import CollocationError, ParameterError
-from pySDC.implementations.collocation_classes.equidistant import Equidistant
+from pySDC.core.Collocation import CollBase
 
 
 class MyBarycentricInterpolator(BarycentricInterpolator):
     """
     Overwrite BarycentricInterolator to inject custom weights
     """
+
     def __init__(self, xi, yi=None, weights=None, axis=0):
         super(MyBarycentricInterpolator, self).__init__(xi, yi, axis)
         self.wi = weights
 
 
-class Equidistant_RDC(Equidistant):
+class Equidistant_RDC(CollBase):
     """
     Implements equidistant nodes with blended barycentric interpolation
 
@@ -23,7 +24,7 @@ class Equidistant_RDC(Equidistant):
         fh_weights: blended FH weights for barycentric interpolation
     """
 
-    def __init__(self, num_nodes, tleft, tright):
+    def __init__(self, num_nodes, tleft=0, tright=1, **kwargs):
         """
         Initialization
 
@@ -52,7 +53,7 @@ class Equidistant_RDC(Equidistant):
             raise CollocationError("Number of nodes should be at least 2 for equidistant, but is %d" % num_nodes)
 
         try:
-            super(Equidistant, self).__init__(nnodes, tleft, tright)
+            super(Equidistant_RDC, self).__init__(num_nodes=nnodes, node_type='EQUID', quad_type='LOBATTO', **kwargs)
         except AttributeError:
             pass
 

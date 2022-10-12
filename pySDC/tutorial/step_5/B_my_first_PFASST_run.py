@@ -1,9 +1,10 @@
+from pathlib import Path
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -15,12 +16,12 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
@@ -29,6 +30,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 8  # frequency for the test value
     problem_params['nvars'] = [511, 255]  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -46,7 +48,7 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d_forced  # pass problem class
+    description['problem_class'] = heatNd_forced  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = imex_1st_order  # pass sweeper (see part B)
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -61,9 +63,10 @@ def main():
 
     # set up list of parallel time-steps to run PFASST with
     nsteps = int(Tend / level_params['dt'])
-    num_proc_list = [2 ** i for i in range(int(np.log2(nsteps) + 1))]
+    num_proc_list = [2**i for i in range(int(np.log2(nsteps) + 1))]
 
-    f = open('step_5_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_5_B_out.txt', 'w')
     # loop over different number of processes and check results
     for num_proc in num_proc_list:
         out = 'Working with %2i processes...' % num_proc
@@ -84,10 +87,7 @@ def main():
         err = abs(uex - uend)
 
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         # compute and print statistics
         for item in iter_counts:
@@ -103,8 +103,10 @@ def main():
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -115,7 +117,7 @@ def main():
         print()
         print()
 
-        assert err < 1.3505E-04, "ERROR: error is too high, got %s" % err
+        assert err < 1.3505e-04, "ERROR: error is too high, got %s" % err
         assert np.ptp(niters) <= 1, "ERROR: range of number of iterations is too high, got %s" % np.ptp(niters)
         assert np.mean(niters) <= 5.0, "ERROR: mean number of iteratiobs is too high, got %s" % np.mean(niters)
 

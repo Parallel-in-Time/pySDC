@@ -1,4 +1,3 @@
-
 from pySDC.core.Errors import TransferError
 from pySDC.core.SpaceTransfer import space_transfer
 from pySDC.implementations.datatype_classes.petsc_vec import petsc_vec, petsc_vec_imex, petsc_vec_comp2

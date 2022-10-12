@@ -3,10 +3,11 @@ import sys
 
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.problem_classes.AllenCahn_2D_FFT import allencahn2d_imex, allencahn2d_imex_stab
+
 # from pySDC.implementations.problem_classes.AllenCahn_2D_parFFT import allencahn2d_imex, allencahn2d_imex_stab
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh_FFT2D import mesh_to_mesh_fft2d
@@ -31,13 +32,13 @@ def setup_parameters():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-02
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-02
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']
     sweeper_params['QE'] = ['EE']
@@ -126,8 +127,10 @@ def run_SDC_variant(variant=None):
     time_size = time_comm.Get_size()
     time_rank = time_comm.Get_rank()
 
-    print("IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i" % (world_rank, world_size, space_rank, space_size,
-                                                                        time_rank, time_size))
+    print(
+        "IDs (world, space, time):  %i / %i -- %i / %i -- %i / %i"
+        % (world_rank, world_size, space_rank, space_size, time_rank, time_size)
+    )
 
     description['problem_params']['comm'] = space_comm
     # set level depending on rank
@@ -156,17 +159,14 @@ def run_SDC_variant(variant=None):
     rank = comm.Get_rank()
 
     # filter statistics by variant (number of iterations)
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     niters = np.array([item[1] for item in iter_counts])
     print(f'Mean number of iterations on rank {rank}: {np.mean(niters):.4f}')
 
     if rank == 0:
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
 
         print(f'---> Time to solution: {timing[0][1]:.4f} sec.')
         print()

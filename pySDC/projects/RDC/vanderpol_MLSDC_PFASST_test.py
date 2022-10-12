@@ -1,6 +1,6 @@
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
+from pySDC.helpers.stats_helper import get_sorted
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.Van_der_Pol_implicit import vanderpol
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -25,7 +25,7 @@ def run_RDC(cwd=''):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
@@ -36,7 +36,7 @@ def run_RDC(cwd=''):
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 1E-12
+    problem_params['newton_tol'] = 1e-12
     problem_params['newton_maxiter'] = 50
     problem_params['mu'] = 10
     problem_params['u0'] = (2.0, 0)
@@ -79,9 +79,7 @@ def run_RDC(cwd=''):
     uend_rdc, stats_rdc = controller_rdc.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats_rdc, type='niter')
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats_rdc, type='niter', sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_rdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
@@ -94,9 +92,7 @@ def run_RDC(cwd=''):
     uend_mlrdc, stats_mlrdc = controller_mlrdc.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats_mlrdc, type='niter')
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats_mlrdc, type='niter', sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_mlrdc - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)
@@ -108,9 +104,7 @@ def run_RDC(cwd=''):
     uend_pfasst, stats_pfasst = controller_pfasst.run(u0=uinit, t0=t0, Tend=Tend)
 
     # filter statistics by type (number of iterations)
-    filtered_stats = filter_stats(stats_pfasst, type='niter')
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats_pfasst, type='niter', sortby='time')
     mean_niter = np.mean(np.array([item[1] for item in iter_counts]))
 
     err = np.linalg.norm(uend_pfasst - ref_sol, np.inf) / np.linalg.norm(ref_sol, np.inf)

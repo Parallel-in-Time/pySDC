@@ -37,12 +37,18 @@ class StepSizeLimiter(ConvergenceController):
         for L in S.levels:
             if L.status.dt_new is not None:
                 if L.status.dt_new < self.params.dt_min:
-                    self.log(f'Step size is below minimum, increasing from {L.status.dt_new:.2e} to \
-{self.params.dt_min:.2e}', S)
+                    self.log(
+                        f'Step size is below minimum, increasing from {L.status.dt_new:.2e} to \
+{self.params.dt_min:.2e}',
+                        S,
+                    )
                     L.status.dt_new = self.params.dt_min
                 elif L.status.dt_new > self.params.dt_max:
-                    self.log(f'Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \
-{self.params.dt_max:.2e}', S)
+                    self.log(
+                        f'Step size exceeds maximum, decreasing from {L.status.dt_new:.2e} to \
+{self.params.dt_max:.2e}',
+                        S,
+                    )
                     L.status.dt_new = self.params.dt_max
 
         return None

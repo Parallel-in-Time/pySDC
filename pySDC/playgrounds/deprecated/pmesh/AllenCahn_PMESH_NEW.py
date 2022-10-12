@@ -48,16 +48,22 @@ class allencahn_imex(ptype):
             raise ProblemError('Need at least two dimensions')
 
         # Creating ParticleMesh structure
-        self.pm = ParticleMesh(BoxSize=problem_params['L'], Nmesh=list(problem_params['nvars']), dtype='f8',
-                               plan_method='measure', comm=problem_params['comm'])
+        self.pm = ParticleMesh(
+            BoxSize=problem_params['L'],
+            Nmesh=list(problem_params['nvars']),
+            dtype='f8',
+            plan_method='measure',
+            comm=problem_params['comm'],
+        )
 
         # create test RealField to get the local dimensions (there's probably a better way to do that)
         tmp = self.pm.create(type='real')
         tmps = tmp.r2c()
 
         # invoke super init, passing the communicator and the local dimensions as init
-        super(allencahn_imex, self).__init__(init=(self.pm.comm, tmps.value.shape), dtype_u=dtype_u, dtype_f=dtype_f,
-                                             params=problem_params)
+        super(allencahn_imex, self).__init__(
+            init=(self.pm.comm, tmps.value.shape), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         # Need this for diagnostics
         self.dx = self.params.L / problem_params['nvars'][0]
@@ -78,7 +84,7 @@ class allencahn_imex(ptype):
         """
 
         def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k)
+            k2 = sum(ki**2 for ki in k)
             return -k2 * v
 
         f = self.dtype_f(self.init)
@@ -87,8 +93,9 @@ class allencahn_imex(ptype):
 
         if self.params.eps > 0:
             tmp_u = tmp_u.c2r(out=Ellipsis)
-            tmp_f = - 2.0 / self.params.eps ** 2 * tmp_u * (1.0 - tmp_u) * (1.0 - 2.0 * tmp_u) - \
-                6.0 * self.params.dw * tmp_u * (1.0 - tmp_u)
+            tmp_f = -2.0 / self.params.eps**2 * tmp_u * (1.0 - tmp_u) * (
+                1.0 - 2.0 * tmp_u
+            ) - 6.0 * self.params.dw * tmp_u * (1.0 - tmp_u)
             f.expl.values = tmp_f.r2c(out=Ellipsis).value
 
         return f
@@ -108,7 +115,7 @@ class allencahn_imex(ptype):
         """
 
         def linear_solve(k, v):
-            k2 = sum(ki ** 2 for ki in k)
+            k2 = sum(ki**2 for ki in k)
             return 1.0 / (1.0 + factor * k2) * v
 
         me = self.dtype_u(self.init)
@@ -129,7 +136,7 @@ class allencahn_imex(ptype):
 
         def circle(i, v):
             r = [ii * (Li / ni) - 0.5 * Li for ii, ni, Li in zip(i, v.Nmesh, v.BoxSize)]
-            r2 = sum(ri ** 2 for ri in r)
+            r2 = sum(ri**2 for ri in r)
             return 0.5 * (1.0 + np.tanh((self.params.radius - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)))
 
         def circle_rand(i, v):
@@ -148,10 +155,10 @@ class allencahn_imex(ptype):
                 for indexi, i in enumerate(range(-L[0] + 1, L[0], 2)):
                     for indexj, j in enumerate(range(-L[1] + 1, L[1], 2)):
                         # shift x and y coordinate depending on which box we are in
-                        rshift[0] = r[0] + i/2
-                        rshift[1] = r[1] + j/2
+                        rshift[0] = r[0] + i / 2
+                        rshift[1] = r[1] + j / 2
                         # build radius
-                        r2 = sum(ri ** 2 for ri in rshift)
+                        r2 = sum(ri**2 for ri in rshift)
                         # add this blob, shifted by 1 to avoid issues with adding up negative contributions
                         data += np.tanh((rand_radii[indexi, indexj] - np.sqrt(r2)) / (np.sqrt(2) * self.params.eps)) + 1
             # get rid of the 1
@@ -194,7 +201,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
         """
 
         def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k)
+            k2 = sum(ki**2 for ki in k)
             return -k2 * v
 
         f = self.dtype_f(self.init)
@@ -202,7 +209,7 @@ class allencahn_imex_timeforcing(allencahn_imex):
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
 
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
+            f.expl.values = -2.0 / self.params.eps**2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
 
         # build sum over RHS without driving force
         Rt_local = f.impl.values.sum() + f.expl.values.sum()
@@ -244,16 +251,18 @@ class allencahn_imex_stab(allencahn_imex):
         """
 
         def Laplacian(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
+            k2 = sum(ki**2 for ki in k) + 1.0 / self.params.eps**2
             return -k2 * v
 
         f = self.dtype_f(self.init)
         tmp_u = self.pm.create(type='real', value=u.values)
         f.impl.values = tmp_u.r2c().apply(Laplacian, out=Ellipsis).c2r(out=Ellipsis).value
         if self.params.eps > 0:
-            f.expl.values = - 2.0 / self.params.eps ** 2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values) - \
-                6.0 * self.params.dw * u.values * (1.0 - u.values) + \
-                1.0 / self.params.eps ** 2 * u.values
+            f.expl.values = (
+                -2.0 / self.params.eps**2 * u.values * (1.0 - u.values) * (1.0 - 2.0 * u.values)
+                - 6.0 * self.params.dw * u.values * (1.0 - u.values)
+                + 1.0 / self.params.eps**2 * u.values
+            )
         return f
 
     def solve_system(self, rhs, factor, u0, t):
@@ -271,7 +280,7 @@ class allencahn_imex_stab(allencahn_imex):
         """
 
         def linear_solve(k, v):
-            k2 = sum(ki ** 2 for ki in k) + 1.0 / self.params.eps ** 2
+            k2 = sum(ki**2 for ki in k) + 1.0 / self.params.eps**2
             return 1.0 / (1.0 + factor * k2) * v
 
         me = self.dtype_u(self.init)

@@ -32,7 +32,6 @@ Projects
    :maxdepth: 1
 
    projects/parallelSDC.rst
-   projects/node_failure.rst
    projects/fwsw.rst
    projects/RDC.rst
    projects/asymp_conv.rst

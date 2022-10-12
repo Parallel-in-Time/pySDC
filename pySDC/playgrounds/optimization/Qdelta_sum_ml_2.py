@@ -1,9 +1,6 @@
-
 import indiesolver
 import numpy as np
 import scipy
-
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 
 
 def evaluate(solution):
@@ -46,11 +43,19 @@ def evaluate(solution):
         solution["metrics"]["rho"] = 99
         return solution
 
-    Tr = np.array([[x['x11r'] / sum1r, x['x12r'] / sum1r, x['x13r'] / sum1r],
-                   [x['x21r'] / sum2r, x['x22r'] / sum2r, x['x23r'] / sum2r]])
-    Ti = np.array([[x['x11i'] / sum1i, x['x12i'] / sum1i],
-                   [x['x21i'] / sum2i, x['x22i'] / sum2i],
-                   [x['x31i'] / sum3i, x['x32i'] / sum3i]])
+    Tr = np.array(
+        [
+            [x['x11r'] / sum1r, x['x12r'] / sum1r, x['x13r'] / sum1r],
+            [x['x21r'] / sum2r, x['x22r'] / sum2r, x['x23r'] / sum2r],
+        ]
+    )
+    Ti = np.array(
+        [
+            [x['x11i'] / sum1i, x['x12i'] / sum1i],
+            [x['x21i'] / sum2i, x['x22i'] / sum2i],
+            [x['x31i'] / sum3i, x['x32i'] / sum3i],
+        ]
+    )
 
     # THIS WORKS REALLY WELL! No need to take imaginary parts in x, though (found minimum has zero imaginary parts)
     k = 0
@@ -58,7 +63,7 @@ def evaluate(solution):
     for i in range(-8, 8):
         for l in range(-8, 8):
             k += 1
-            lamdt = -10 ** i + 1j * 10 ** l
+            lamdt = -(10**i) + 1j * 10**l
             C = Idf - lamdt * Qf
             Pf = Idf - lamdt * Qdf
             Rf = Idf - np.linalg.inv(Pf).dot(C)
@@ -94,9 +99,11 @@ params['x22i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax
 params['x31i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 params['x32i'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_sum_ml',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum_ml',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

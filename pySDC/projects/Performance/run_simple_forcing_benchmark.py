@@ -2,12 +2,13 @@ from argparse import ArgumentParser
 import numpy as np
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_MPI import controller_MPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.AllenCahn_MPIFFT import allencahn_imex, allencahn_imex_timeforcing
 from pySDC.implementations.transfer_classes.TransferMesh_MPIFFT import fft_to_fft
+
 # from pySDC.projects.AllenCahn_Bayreuth.AllenCahn_dump import dump
 
 # from pySDC.projects.Performance.controller_MPI_scorep import controller_MPI
@@ -48,13 +49,13 @@ def run_simulation(name=None, nprocs_space=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-03
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-03
     level_params['nsweeps'] = [3, 1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'zero'
@@ -119,9 +120,9 @@ def run_simulation(name=None, nprocs_space=None):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    timing = sort_stats(filter_stats(stats, type='timing_setup'), sortby='time')
+    timing = get_sorted(stats, type='timing_setup', sortby='time')
     max_timing_setup = time_comm.allreduce(timing[0][1], MPI.MAX)
-    timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+    timing = get_sorted(stats, type='timing_run', sortby='time')
     max_timing = time_comm.allreduce(timing[0][1], MPI.MAX)
 
     if space_rank == 0 and time_rank == time_size - 1:
@@ -133,7 +134,7 @@ def run_simulation(name=None, nprocs_space=None):
         out = f'Time to solution: {max_timing:.4f} sec.'
         print(out)
 
-        iter_counts = sort_stats(filter_stats(stats, type='niter'), sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
         niters = np.array([item[1] for item in iter_counts])
         out = f'Mean number of iterations: {np.mean(niters):.4f}'
         print(out)
@@ -142,8 +143,14 @@ def run_simulation(name=None, nprocs_space=None):
 if __name__ == "__main__":
     # Add parser to get number of processors in space and setup (have to do this here to enable automatic testing)
     parser = ArgumentParser()
-    parser.add_argument("-s", "--setup", help='Specifies the setup', type=str, default='AC-bench-noforce',
-                        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'])
+    parser.add_argument(
+        "-s",
+        "--setup",
+        help='Specifies the setup',
+        type=str,
+        default='AC-bench-noforce',
+        choices=['AC-bench-noforce', 'AC-bench-constforce', 'AC-bench-timeforce'],
+    )
     parser.add_argument("-n", "--nprocs_space", help='Specifies the number of processors in space', type=int)
     args = parser.parse_args()
 
