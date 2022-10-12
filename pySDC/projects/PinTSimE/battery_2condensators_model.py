@@ -3,7 +3,7 @@ import dill
 from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery_2Condensators import battery_2condensators
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -181,7 +181,7 @@ def plot_voltages(description, use_switch_estimator, cwd='./'):
     Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'battery_2condensators.dat', 'rb')
+    f = open(cwd + 'data/battery_2condensators.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
