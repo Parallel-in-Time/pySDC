@@ -5,4 +5,4 @@ import pytest
 def test_main():
     from pySDC.projects.PinTSimE.estimation_check import check
 
-    main()
+    check()
