@@ -26,6 +26,11 @@ class boris_2nd_order(sweeper):
 
         # call parent's initialization routine
 
+        if "QI" not in params:
+            params["QI"] = "IE"
+        if "QE" not in params:
+            params["QE"] = "EE"
+
         super(boris_2nd_order, self).__init__(params)
 
         # S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator
@@ -53,9 +58,9 @@ class boris_2nd_order(sweeper):
             Sx: node-to-node Euler half-step for position update
         """
 
-        # set implicit and explicit Euler matrices
-        QI = self.get_Qdelta_implicit(self.coll, "IE")
-        QE = self.get_Qdelta_explicit(self.coll, "EE")
+        # set implicit and explicit Euler matrices (default, but can be changed)
+        QI = self.get_Qdelta_implicit(self.coll, qd_type=self.params.QI)
+        QE = self.get_Qdelta_explicit(self.coll, qd_type=self.params.QE)
 
         # trapezoidal rule
         QT = 1 / 2 * (QI + QE)
