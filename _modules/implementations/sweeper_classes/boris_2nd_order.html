@@ -68,6 +68,11 @@
 
         <span class="c1"># call parent&#39;s initialization routine</span>
 
+        <span class="k">if</span> <span class="s2">&quot;QI&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QI&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;IE&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;QE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;QE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EE&quot;</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">boris_2nd_order</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
         <span class="c1"># S- and SQ-matrices (derived from Q) and Sx- and ST-matrices for the integrator</span>
@@ -95,9 +100,9 @@
 <span class="sd">            Sx: node-to-node Euler half-step for position update</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># set implicit and explicit Euler matrices</span>
-        <span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="s2">&quot;IE&quot;</span><span class="p">)</span>
-        <span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="s2">&quot;EE&quot;</span><span class="p">)</span>
+        <span class="c1"># set implicit and explicit Euler matrices (default, but can be changed)</span>
+        <span class="n">QI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_implicit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QI</span><span class="p">)</span>
+        <span class="n">QE</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_Qdelta_explicit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coll</span><span class="p">,</span> <span class="n">qd_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">QE</span><span class="p">)</span>
 
         <span class="c1"># trapezoidal rule</span>
         <span class="n">QT</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">QI</span> <span class="o">+</span> <span class="n">QE</span><span class="p">)</span>
