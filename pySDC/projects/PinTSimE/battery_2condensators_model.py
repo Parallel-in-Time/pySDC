@@ -72,7 +72,7 @@ def main(use_switch_estimator=True):
     # initialize level parameters
     level_params = dict()
     level_params['restol'] = 1e-13
-    level_params['dt'] = 1e-3
+    level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
     sweeper_params = dict()

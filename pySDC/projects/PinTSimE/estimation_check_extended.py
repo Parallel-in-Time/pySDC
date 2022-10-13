@@ -111,7 +111,7 @@ def run(dt, use_switch_estimator=True):
         min_iter = min(min_iter, item[1])
         max_iter = max(max_iter, item[1])
 
-    assert np.mean(niters) <= 10.5, "Mean number of iterations is too high, got %s" % np.mean(niters)
+    assert np.mean(niters) <= 12, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
     return stats, description
@@ -122,7 +122,7 @@ def check(cwd='./'):
     Routine to check the differences between using a switch estimator or not
     """
 
-    dt_list = [1e-1, 1e-2, 1e-3, 1e-4]
+    dt_list = [4e-1, 4e-2, 4e-3]
     use_switch_estimator = [True, False]
     restarts_all = []
     restarts_dict = dict()
