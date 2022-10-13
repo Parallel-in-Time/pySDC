@@ -54,8 +54,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">134 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">120<span class="text"> run</span></button>
+            <span class="text">136 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">122<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">14<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">7<span class="text"> excluded</span></button>
         </h2>
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_test_Runge_Kutta_sweeper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.5.0</a>,
-            created at 2022-10-13 07:38 +0000
+            created at 2022-10-13 08:18 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -434,11 +434,13 @@
     <p class="run"><span class="n"><a id="t352" href="#t352">352</a></span><span class="t">                <span class="nam">sol_fig</span><span class="op">,</span> <span class="nam">sol_ax</span> <span class="op">=</span> <span class="nam">plt</span><span class="op">.</span><span class="nam">subplots</span><span class="op">(</span><span class="num">1</span><span class="op">,</span> <span class="num">1</span><span class="op">,</span> <span class="nam">figsize</span><span class="op">=</span><span class="op">(</span><span class="num">3.5</span><span class="op">,</span> <span class="num">3</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t353" href="#t353">353</a></span><span class="t">                <span class="nam">plot_solution</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">sol_ax</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t354" href="#t354">354</a></span><span class="t">                <span class="nam">sol_fig</span><span class="op">.</span><span class="nam">savefig</span><span class="op">(</span><span class="str">'data/piline_solution_adaptive.png'</span><span class="op">,</span> <span class="nam">bbox_inches</span><span class="op">=</span><span class="str">'tight'</span><span class="op">,</span> <span class="nam">dpi</span><span class="op">=</span><span class="num">300</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t355" href="#t355">355</a></span><span class="t">            <span class="nam">check_solution</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">use_adaptivity</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">,</span> <span class="nam">generate_reference</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t356" href="#t356">356</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t357" href="#t357">357</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t358" href="#t358">358</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc show_exc"><span class="n"><a id="t359" href="#t359">359</a></span><span class="t">    <span class="nam">main</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t355" href="#t355">355</a></span><span class="t">                <span class="nam">plt</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="nam">sol_fig</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t356" href="#t356">356</a></span><span class="t">            <span class="nam">check_solution</span><span class="op">(</span><span class="nam">data</span><span class="op">,</span> <span class="nam">use_adaptivity</span><span class="op">,</span> <span class="nam">num_procs</span><span class="op">,</span> <span class="nam">generate_reference</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t357" href="#t357">357</a></span><span class="t">            <span class="nam">plt</span><span class="op">.</span><span class="nam">close</span><span class="op">(</span><span class="nam">fig</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t358" href="#t358">358</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t359" href="#t359">359</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t360" href="#t360">360</a></span><span class="t"><span class="key">if</span> <span class="nam">__name__</span> <span class="op">==</span> <span class="str">"__main__"</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc show_exc"><span class="n"><a id="t361" href="#t361">361</a></span><span class="t">    <span class="nam">main</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -448,7 +450,7 @@
             <a id="nextFileLink" class="nav" href="d_5893b65af8042ae2_test_Runge_Kutta_sweeper_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.5.0</a>,
-            created at 2022-10-13 07:38 +0000
+            created at 2022-10-13 08:18 +0000
         </p>
     </div>
 </footer>
