@@ -7,118 +7,35 @@ except ImportError:
     MPI = None
 
 
-class cupy_mesh:
+class cupy_mesh(cp.ndarray):
     """
-    cupy-based datatype
-
-    Attributes:
-        values: cupy.ndarray
-        _comm: MPI communicator or None
-    """
-
-    def __init__(self, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
+        CuPy-based datatype for serial or parallel meshes.
         """
-        Instantiates new datatype. This ensures that even when manipulating data, the result is still a cupy_mesh.
+
+    def __new__(cls, init, val=0.0, offset=0, buffer=None, strides=None, order=None):
+        """
+        Instantiates new datatype. This ensures that even when manipulating data, the result is still a mesh.
 
         Args:
-            init: either another mesh or a tuple containing the dimensions and the dtype
+            init: either another mesh or a tuple containing the dimensions, the communicator and the dtype
             val: value to initialize
+
+        Returns:
+            obj of type mesh
+
         """
         if isinstance(init, cupy_mesh):
-            self.values = cp.ndarray(shape=init.values.shape, dtype=init.values.dtype, strides=strides, order=order)
-            self.values[:] = init.values.copy()
-        elif (
-            isinstance(init, tuple)
-            and (init[1] is None or isinstance(init[1], MPI.Intracomm))
-            and isinstance(init[2], cp.dtype)
-        ):
-            self.values = cp.ndarray(shape=init[0], dtype=init[2], strides=strides, order=order)
-            self.values[:] = cp.full(shape=init[0], fill_value=val, dtype=init[2], order=order)
-            self._comm = init[1]
+            obj = cp.ndarray.__new__(cls, shape=init.shape, dtype=init.dtype, strides=strides, order=order)
+            obj[:] = init[:]
+            obj._comm = init._comm
+        elif isinstance(init, tuple) and (init[1] is None or isinstance(init[1], MPI.Intracomm)) \
+                and isinstance(init[2], cp.dtype):
+            obj = cp.ndarray.__new__(cls, init[0], dtype=init[2], strides=strides, order=order)
+            obj.fill(val)
+            obj._comm = init[1]
         else:
             raise NotImplementedError(type(init))
-
-    def __abs__(self):
-        """
-        Overloading the abs operator
-
-        Returns:
-            float: absolute maximum of all mesh values
-        """
-        # take absolute values of the mesh values
-        local_absval = float(cp.amax(cp.ndarray.__abs__(self.values)))
-        global_absval = local_absval
-        return float(global_absval)
-
-    def __setitem__(self, key, value):
-        """
-        Overloading the setitem operator
-        """
-        self.values[key] = value
-
-    def __getitem__(self, item):
-        """
-        Overloading the getitem operator
-        """
-        return self.values[item]
-
-    def flatten(self):
-        """
-        Overloading the flatten operator
-        Returns:
-             cupy.ndarray
-        """
-        return self.values.flatten()
-
-    def __add__(self, other):
-        """
-        Overloading the add operator
-        Returns:
-            new: cupy_mesh
-        """
-        if type(other) is cupy_mesh:
-            new = cupy_mesh(other)
-            new.values = other.values + self.values
-        if type(other) is int or type(other) is float:
-            new = cupy_mesh(self)
-            new.values = other + self.values
-        return new
-
-    def __rmul__(self, other):
-        """
-        Overloading the rmul operator
-        Returns:
-            new: cupy_mesh
-        """
-        new = None
-        if type(other) is cupy_mesh:
-            raise NotImplementedError("not implemendet to multiplicate to cupy_class obj")
-        if type(other) is int or type(other) is float:
-            new = cupy_mesh(self)
-            new.values = other * self.values
-        return new
-
-    def __sub__(self, other):
-        """
-        Overloading the sub operator
-        Returns:
-            new: cupy_mesh
-        """
-        new = cupy_mesh(self)
-        if type(other) is cupy_mesh:
-            new.values = self.values - other.values
-        if type(other) is int or type(other) is float:
-            new = cupy_mesh(self)
-            new.values = self.values - other
-        return new
-
-    def get(self):
-        """
-        Overloading the get operator from cupy.ndarray
-        Returns:
-            numpy.ndarray
-        """
-        return self.values.get()
+        return obj
 
     @property
     def comm(self):
@@ -127,13 +44,61 @@ class cupy_mesh:
         """
         return self._comm
 
+    def __array_finalize__(self, obj):
+        """
+        Finalizing the datatype. Without this, new datatypes do not 'inherit' the communicator.
+        """
+        if obj is None:
+            return
+        self._comm = getattr(obj, '_comm', None)
+
+    def __array_ufunc__(self, ufunc, method, *inputs, out=None, **kwargs):
+        """
+        Overriding default ufunc, cf. https://numpy.org/doc/stable/user/basics.subclassing.html#array-ufunc-for-ufuncs
+        """
+        args = []
+        comm = None
+        for _, input_ in enumerate(inputs):
+            if isinstance(input_, cupy_mesh):
+                args.append(input_.view(cp.ndarray))
+                comm = input_.comm
+            else:
+                args.append(input_)
+        results = super(cupy_mesh, self).__array_ufunc__(ufunc, method, *args, **kwargs).view(cupy_mesh)
+        if not method == 'reduce':
+            results._comm = comm
+        return results
+
+    def __abs__(self):
+        """
+            Overloading the abs operator
+
+            Returns:
+                float: absolute maximum of all mesh values
+        """
+        # take absolute values of the mesh values
+        local_absval = float(cp.amax(cp.ndarray.__abs__(self)))
+
+        if self.comm is not None:
+            if self.comm.Get_size() > 1:
+                global_absval = 0.0
+                global_absval = max(self.comm.allreduce(sendobj=local_absval, op=MPI.MAX), global_absval)
+            else:
+                global_absval = local_absval
+        else:
+            global_absval = local_absval
+
+        return float(global_absval)
+
     def isend(self, dest=None, tag=None, comm=None):
         """
         Routine for sending data forward in time (non-blocking)
+
         Args:
             dest (int): target rank
             tag (int): communication tag
             comm: communicator
+
         Returns:
             request handle
         """
@@ -142,10 +107,12 @@ class cupy_mesh:
     def irecv(self, source=None, tag=None, comm=None):
         """
         Routine for receiving in time
+
         Args:
             source (int): source rank
             tag (int): communication tag
             comm: communicator
+
         Returns:
             None
         """
@@ -154,9 +121,11 @@ class cupy_mesh:
     def bcast(self, root=None, comm=None):
         """
         Routine for broadcasting values
+
         Args:
             root (int): process with value to broadcast
             comm: communicator
+
         Returns:
             broadcasted values
         """
