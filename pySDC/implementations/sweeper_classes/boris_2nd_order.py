@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Sweeper import sweeper
 
-
+import pdb
 class boris_2nd_order(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
@@ -40,6 +40,7 @@ class boris_2nd_order(sweeper):
             self.SQ,
             self.Sx,
             self.QQ,
+            self.QI,
             self.QT,
             self.Qx,
             self.Q,
@@ -86,11 +87,11 @@ class boris_2nd_order(sweeper):
         # QQ-matrix via product of Q
         QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
-        return [S, ST, SQ, Sx, QQ, QT, Qx, self.coll.Qmat]
+        return [S, ST, SQ, Sx, QQ, QI, QT, Qx, self.coll.Qmat]
 
     def update_nodes(self):
         """
-        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
+        Update the u- and f-values at the collocation nodes -> corresponds to a sieccf4e803b97ngle sweep over all nodes
 
         Returns:
             None
@@ -144,9 +145,9 @@ class boris_2nd_order(sweeper):
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
             ck = tmp.vel
-
+            # pdb.set_trace()
             # do the boris scheme
-            L.u[m + 1].vel = P.boris_solver(ck, L.dt * self.coll.delta_m[m], L.f[m], L.f[m + 1], L.u[m])
+            L.u[m + 1].vel = P.boris_solver(ck, L.dt*np.diag(self.QI)[m+1] , L.f[m], L.f[m + 1], L.u[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
