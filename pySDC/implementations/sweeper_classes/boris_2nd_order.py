@@ -2,7 +2,7 @@ import numpy as np
 
 from pySDC.core.Sweeper import sweeper
 
-import pdb
+
 class boris_2nd_order(sweeper):
     """
     Custom sweeper class, implements Sweeper.py
@@ -91,7 +91,7 @@ class boris_2nd_order(sweeper):
 
     def update_nodes(self):
         """
-        Update the u- and f-values at the collocation nodes -> corresponds to a sieccf4e803b97ngle sweep over all nodes
+        Update the u- and f-values at the collocation nodes -> corresponds to a single sweep over all nodes
 
         Returns:
             None
@@ -147,7 +147,7 @@ class boris_2nd_order(sweeper):
             ck = tmp.vel
 
             # do the boris scheme
-            L.u[m + 1].vel = P.boris_solver(ck, L.dt*np.diag(self.QI)[m+1] , L.f[m], L.f[m + 1], L.u[m])
+            L.u[m + 1].vel = P.boris_solver(ck, L.dt * np.diag(self.QI)[m + 1], L.f[m], L.f[m + 1], L.u[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
