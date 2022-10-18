@@ -68,7 +68,7 @@ def main():
     sweeper_params = dict()
     sweeper_params['collocation_class'] = Collocation
     sweeper_params['quad_type'] = 'LOBATTO'
-    sweeper_params['num_nodes'] = 3
+    sweeper_params['num_nodes'] = 5
     # sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
     # initialize problem parameters
@@ -103,10 +103,11 @@ def main():
 
     # set time parameters
     t0 = 0.0
-    Tend = 20
+    Tend = 15
+    num_procs = 1
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

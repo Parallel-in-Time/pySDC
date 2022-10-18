@@ -11,8 +11,9 @@ class SwitchEstimator(ConvergenceController):
 
     def setup(self, controller, params, description):
         self.switch_detected = False
-        self.dt_adapted = False
+        self.switch_detected_step = False
         self.t_switch = None
+        self.count_switches = 0
         self.dt_initial = description['level_params']['dt']
         return {'control_order': 100, **params}
 
@@ -55,10 +56,19 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if S.status.iter > 0:
+        if not type(L.prob.params.V_ref) == int and not type(L.prob.params.V_ref) == float:
+            # if V_ref is not a scalar, but an (np.)array
+            V_ref = np.zeros(np.shape(L.prob.params.V_ref)[0], dtype=float)
+            for m in range(np.shape(L.prob.params.V_ref)[0]):
+                V_ref[m] = L.prob.params.V_ref[m]
+        else:
+            V_ref = np.array([L.prob.params.V_ref], dtype=float)
+
+        if S.status.iter > 0 and self.count_switches < np.shape(V_ref)[0]:
             for m in range(len(L.u)):
-                if L.u[m][1] - L.prob.params.V_ref <= 0:
+                if L.u[m][self.count_switches + 1] - V_ref[self.count_switches] <= 0:
                     self.switch_detected = True
+                    m_guess = m - 1
                     break
 
             if self.switch_detected:
@@ -66,23 +76,18 @@ class SwitchEstimator(ConvergenceController):
 
                 vC_switch = []
                 for m in range(1, len(L.u)):
-                    vC_switch.append(L.u[m][1] - L.prob.params.V_ref)
+                    vC_switch.append(L.u[m][self.count_switches + 1] - V_ref[self.count_switches])
 
                 # only find root if vc_switch[0], vC_switch[-1] have opposite signs (intermediate value theorem)
                 if vC_switch[0] * vC_switch[-1] < 0:
                     p = sp.interpolate.interp1d(t_interp, vC_switch, 'cubic', bounds_error=False)
 
-                    self.t_switch = regulaFalsiMethod(t_interp[0], t_interp[-1], p, 1e-12)
+                    # self.t_switch = regulaFalsiMethod(t_interp[0], t_interp[-1], p, 1e-12)
+                    t_switch, info, _, _ = sp.optimize.fsolve(p, t_interp[m_guess], full_output=True)
+                    self.t_switch = t_switch[0]
 
                     # if the switch is not find, we need to do ... ?
                     if L.time < self.t_switch < L.time + L.dt:
-                        # for coarser time steps, tolerance have to be adapted with a ratio
-                        # if 1 > self.dt_initial > 1e-1:
-                        #    r = L.dt / 1e-1
-                        #    r = self.dt_initial / 1e-1
-
-                        # else:
-                        #    r = 1
                         r = 1
                         tol = self.dt_initial / r
 
@@ -92,17 +97,19 @@ class SwitchEstimator(ConvergenceController):
                         else:
                             print('Switch located at time: {}'.format(self.t_switch))
                             L.status.dt_new = self.t_switch - L.time
-                            L.prob.params.set_switch = self.switch_detected
-                            L.prob.params.t_switch = self.t_switch
+                            L.prob.params.set_switch[self.count_switches] = self.switch_detected
+                            L.prob.params.t_switch[self.count_switches] = self.t_switch
                             controller.hooks.add_to_stats(
                                 process=S.status.slot,
                                 time=self.t_switch,
                                 level=L.level_index,
                                 iter=0,
                                 sweep=L.status.sweep,
-                                type='switch',
+                                type='switch{}'.format(self.count_switches + 1),
                                 value=p(self.t_switch),
                             )
+                            # self.switch_detected_step = self.switch_detected
+                            self.switch_detected_step = True
 
                     else:
                         self.switch_detected = False
@@ -122,11 +129,12 @@ class SwitchEstimator(ConvergenceController):
 
         L = S.levels[0]
 
-        if self.switch_detected:
-            if L.time + L.dt > self.t_switch:
-                L.prob.params.set_switch = False  # allows to detecting more discrete events
+        if self.switch_detected_step:
+            if L.prob.params.set_switch[self.count_switches] and L.time + L.dt > self.t_switch:
+                self.count_switches += 1
+                self.t_switch = None
+                self.switch_detected_step = False
 
-        # if self.t_switch is not None and L.time > self.t_switch:
         L.status.dt_new = self.dt_initial
 
         super(SwitchEstimator, self).post_step_processing(controller, S)
