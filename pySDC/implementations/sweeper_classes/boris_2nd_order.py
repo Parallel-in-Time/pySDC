@@ -40,6 +40,7 @@ class boris_2nd_order(sweeper):
             self.SQ,
             self.Sx,
             self.QQ,
+            self.QI,
             self.QT,
             self.Qx,
             self.Q,
@@ -86,7 +87,7 @@ class boris_2nd_order(sweeper):
         # QQ-matrix via product of Q
         QQ = np.dot(self.coll.Qmat, self.coll.Qmat)
 
-        return [S, ST, SQ, Sx, QQ, QT, Qx, self.coll.Qmat]
+        return [S, ST, SQ, Sx, QQ, QI, QT, Qx, self.coll.Qmat]
 
     def update_nodes(self):
         """
@@ -146,7 +147,7 @@ class boris_2nd_order(sweeper):
             ck = tmp.vel
 
             # do the boris scheme
-            L.u[m + 1].vel = P.boris_solver(ck, L.dt * self.coll.delta_m[m], L.f[m], L.f[m + 1], L.u[m])
+            L.u[m + 1].vel = P.boris_solver(ck, L.dt * np.diag(self.QI)[m + 1], L.f[m], L.f[m + 1], L.u[m])
 
         # indicate presence of new values at this level
         L.status.updated = True
