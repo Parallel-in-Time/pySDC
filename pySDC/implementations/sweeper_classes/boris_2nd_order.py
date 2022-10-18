@@ -145,7 +145,7 @@ class boris_2nd_order(sweeper):
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
             ck = tmp.vel
-            # pdb.set_trace()
+
             # do the boris scheme
             L.u[m + 1].vel = P.boris_solver(ck, L.dt*np.diag(self.QI)[m+1] , L.f[m], L.f[m + 1], L.u[m])
 
