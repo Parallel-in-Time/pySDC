@@ -10,6 +10,7 @@ class Fault(FrozenClass):
     '''
     Class for storing all the data that belongs to a fault, i.e. when and where it happens
     '''
+
     def __init__(self, params=None):
         '''
         Initialization routine for faults
@@ -90,8 +91,10 @@ class Fault(FrozenClass):
         mods = [me[1] - me[0] for me in ranges]
 
         if len(np.unique(mods)) < len(mods):
-            raise NotImplementedError('I can\'t deal with combinations when parameters have the same admissable number\
- of values yet!')
+            raise NotImplementedError(
+                'I can\'t deal with combinations when parameters have the same admissable number\
+ of values yet!'
+            )
 
         coeff = [(generator // np.prod(mods[:i], dtype=int)) % mods[i] for i in range(len(mods))]
 
@@ -129,8 +132,10 @@ class FaultInjector(hooks):
         elif type(self.random_generator) == np.random.RandomState:
             self.add_random_fault(args, rnd_args)
         else:
-            raise NotImplementedError(f'Don\'t know how to add fault with generator of type \
-{type(self.random_generator)}')
+            raise NotImplementedError(
+                f'Don\'t know how to add fault with generator of type \
+{type(self.random_generator)}'
+            )
 
     def add_stored_faults(self):
         '''
@@ -167,8 +172,11 @@ class FaultInjector(hooks):
         if self.rnd_params == {}:
             self.fault_init += [{'args': args, 'rnd_args': rnd_args, 'kind': 'random'}]
         else:
-            self.faults += [Fault.random(args=args, rnd_params={**self.rnd_params, **rnd_args},
-                            random_generator=self.random_generator)]
+            self.faults += [
+                Fault.random(
+                    args=args, rnd_params={**self.rnd_params, **rnd_args}, random_generator=self.random_generator
+                )
+            ]
 
         return None
 
@@ -192,8 +200,11 @@ class FaultInjector(hooks):
         if self.rnd_params == {}:
             self.fault_init += [{'args': args, 'rnd_args': rnd_args, 'kind': 'combination'}]
         else:
-            self.faults += [Fault.index_to_combination(args=args, rnd_params={**self.rnd_params, **rnd_args},
-                            generator=self.random_generator)]
+            self.faults += [
+                Fault.index_to_combination(
+                    args=args, rnd_params={**self.rnd_params, **rnd_args}, generator=self.random_generator
+                )
+            ]
 
         return None
 
@@ -231,9 +242,15 @@ class FaultInjector(hooks):
 
         # log what happened to stats and screen
         self.logger.info(f'Flipping bit {f.bit} {f.when} iteration {f.iteration} in node {f.node}. Target: {f.target}')
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=step.status.iter,
-                          sweep=L.status.sweep, type='bitflip',
-                          value=(f.level_number, f.iteration, f.node, f.problem_pos, f.bit, f.target))
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=step.status.iter,
+            sweep=L.status.sweep,
+            type='bitflip',
+            value=(f.level_number, f.iteration, f.node, f.problem_pos, f.bit, f.target),
+        )
 
         # remove the fault from the list to make sure it happens only once
         self.faults.remove(f)
@@ -255,8 +272,10 @@ class FaultInjector(hooks):
         super(FaultInjector, self).pre_run(step, level_number)
 
         if not type(step.levels[level_number].u[0]) == mesh:
-            raise NotImplementedError(f'Fault insertion is only implemented for type mesh, not \
-{type(step.levels[level_number].u[0])}')
+            raise NotImplementedError(
+                f'Fault insertion is only implemented for type mesh, not \
+{type(step.levels[level_number].u[0])}'
+            )
 
         # define parameters for randomization
         self.rnd_params = {
@@ -431,7 +450,7 @@ def test_float_conversion():
     num_tests = int(1e3)
     for i in range(num_tests):
         # generate a random number almost between the full range of python float
-        rand = np.random.uniform(low=-1.797693134862315e+307, high=1.797693134862315e+307, size=1)[0]
+        rand = np.random.uniform(low=-1.797693134862315e307, high=1.797693134862315e307, size=1)[0]
         # convert to bytes and back
         res = injector.to_float(injector.to_binary(rand))
         assert np.isclose(res, rand), f"Conversion between bytes and float failed for {rand}: result: {res}"
@@ -440,7 +459,10 @@ def test_float_conversion():
         for i in range(len(exp)):
             res = injector.flip_bit(rand, bit[i]) / rand
             if np.isfinite(res):
-                assert exp[i] in [res, 1. / res], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or \
+                assert exp[i] in [
+                    res,
+                    1.0 / res,
+                ], f'Bitflip failed: expected ratio: {exp[i]}, got: {res:.2e} or \
 {1./res:.2e}'
             else:
                 nan_counter += 1

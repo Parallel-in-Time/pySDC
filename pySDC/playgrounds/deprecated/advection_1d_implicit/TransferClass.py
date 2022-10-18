@@ -1,4 +1,3 @@
-
 import numpy as np
 from pySDC.core.Transfer import transfer
 
@@ -22,7 +21,7 @@ class mesh_to_mesh_1d_periodic(transfer):
         Pspace: spatial prolongation matrix, dim. Nc x Nf
     """
 
-    def __init__(self,fine_level,coarse_level,params):
+    def __init__(self, fine_level, coarse_level, params):
         """
         Initialization routine
         Args:
@@ -32,7 +31,7 @@ class mesh_to_mesh_1d_periodic(transfer):
         """
 
         # invoke super initialization
-        super(mesh_to_mesh_1d_periodic,self).__init__(fine_level,coarse_level,params)
+        super(mesh_to_mesh_1d_periodic, self).__init__(fine_level, coarse_level, params)
 
         fine_grid = np.array([i * fine_level.prob.dx for i in range(fine_level.prob.nvars)])
         coarse_grid = np.array([i * coarse_level.prob.dx for i in range(coarse_level.prob.nvars)])
@@ -49,7 +48,9 @@ class mesh_to_mesh_1d_periodic(transfer):
 
             else:
 
-                self.Rspace = 0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['rorder'], periodic=True).T
+                self.Rspace = (
+                    0.5 * th.interpolation_matrix_1d(fine_grid, coarse_grid, k=params['rorder'], periodic=True).T
+                )
 
         # if number of variables is the same on both levels, Rspace and Pspace are identity
         if self.init_f == self.init_c:
@@ -61,8 +62,7 @@ class mesh_to_mesh_1d_periodic(transfer):
         # exit()
         pass
 
-
-    def restrict_space(self,F):
+    def restrict_space(self, F):
         """
         Restriction implementation
 
@@ -70,17 +70,17 @@ class mesh_to_mesh_1d_periodic(transfer):
             F: the fine level data (easier to access than via the fine attribute)
         """
 
-        if isinstance(F,mesh):
-            u_coarse = mesh(self.init_c,val=0.0)
+        if isinstance(F, mesh):
+            u_coarse = mesh(self.init_c, val=0.0)
             u_coarse.values = self.Rspace.dot(F.values)
-        elif isinstance(F,rhs_imex_mesh):
+        elif isinstance(F, rhs_imex_mesh):
             u_coarse = rhs_imex_mesh(self.init_c)
             u_coarse.impl.values = self.Rspace.dot(F.impl.values)
             u_coarse.expl.values = self.Rspace.dot(F.expl.values)
 
         return u_coarse
 
-    def prolong_space(self,G):
+    def prolong_space(self, G):
         """
         Prolongation implementation
 
@@ -88,10 +88,10 @@ class mesh_to_mesh_1d_periodic(transfer):
             G: the coarse level data (easier to access than via the coarse attribute)
         """
 
-        if isinstance(G,mesh):
-            u_fine = mesh(self.init_c,val=0.0)
+        if isinstance(G, mesh):
+            u_fine = mesh(self.init_c, val=0.0)
             u_fine.values = self.Pspace.dot(G.values)
-        elif isinstance(G,rhs_imex_mesh):
+        elif isinstance(G, rhs_imex_mesh):
             u_fine = rhs_imex_mesh(self.init_c)
             u_fine.impl.values = self.Pspace.dot(G.impl.values)
             u_fine.expl.values = self.Pspace.dot(G.expl.values)

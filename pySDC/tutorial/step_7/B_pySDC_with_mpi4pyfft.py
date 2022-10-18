@@ -1,8 +1,9 @@
 import numpy as np
+from pathlib import Path
 from mpi4py import MPI
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.problem_classes.NonlinearSchroedinger_MPIFFT import nonlinearschroedinger_imex
@@ -24,13 +25,13 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-08
-    level_params['dt'] = 1E-01 / 2
+    level_params['restol'] = 1e-08
+    level_params['dt'] = 1e-01 / 2
     level_params['nsweeps'] = [1]
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = [3]
     sweeper_params['QI'] = ['LU']  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
     sweeper_params['initial_guess'] = 'zero'
@@ -69,7 +70,8 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     f = None
     if rank == 0:
-        f = open('step_7_B_out.txt', 'a')
+        Path("data").mkdir(parents=True, exist_ok=True)
+        f = open('data/step_7_B_out.txt', 'a')
         out = f'Running with ml={ml} and num_procs={num_procs}...'
         f.write(out + '\n')
         print(out)
@@ -88,21 +90,22 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
 
     if rank == 0:
         # filter statistics by type (number of iterations)
-        filtered_stats = filter_stats(stats, type='niter')
-
-        # convert filtered statistics to list of iterations count, sorted by process
-        iter_counts = sort_stats(filtered_stats, sortby='time')
+        iter_counts = get_sorted(stats, type='niter', sortby='time')
 
         niters = np.array([item[1] for item in iter_counts])
-        out = f'   Min/Mean/Max number of iterations: ' \
-              f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        out = (
+            f'   Min/Mean/Max number of iterations: '
+            f'{np.min(niters):4.2f} / {np.mean(niters):4.2f} / {np.max(niters):4.2f}'
+        )
         f.write(out + '\n')
         print(out)
         out = '   Range of values for number of iterations: %2i ' % np.ptp(niters)
         f.write(out + '\n')
         print(out)
-        out = '   Position of max/min number of iterations: %2i -- %2i' % \
-              (int(np.argmax(niters)), int(np.argmin(niters)))
+        out = '   Position of max/min number of iterations: %2i -- %2i' % (
+            int(np.argmax(niters)),
+            int(np.argmin(niters)),
+        )
         f.write(out + '\n')
         print(out)
         out = '   Std and var for number of iterations: %4.2f -- %4.2f' % (float(np.std(niters)), float(np.var(niters)))
@@ -113,12 +116,12 @@ def run_simulation(spectral=None, ml=None, num_procs=None):
         f.write(out + '\n')
         print(out)
 
-        timing = sort_stats(filter_stats(stats, type='timing_run'), sortby='time')
+        timing = get_sorted(stats, type='timing_run', sortby='time')
         out = f'Time to solution: {timing[0][1]:6.4f} sec.'
         f.write(out + '\n')
         print(out)
 
-        assert err <= 1.133E-05, 'Error is too high, got %s' % err
+        assert err <= 1.133e-05, 'Error is too high, got %s' % err
         if ml:
             if num_procs > 1:
                 maxmean = 12.5

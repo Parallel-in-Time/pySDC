@@ -1,6 +1,6 @@
 # script to run a simple advection problem
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.problem_classes.AdvectionEquation_1D_FD import advection1d
+
+from pySDC.implementations.problem_classes.AdvectionEquation_ND_FD import advectionNd
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.core.Hooks import hooks
@@ -21,14 +21,20 @@ def plot_embedded(stats, ax):
 
 
 class log_data(hooks):
-
     def post_iteration(self, step, level_number):
         super(log_data, self).post_iteration(step, level_number)
         if step.status.iter == step.params.maxiter - 1:
             L = step.levels[level_number]
             L.sweep.compute_end_point()
-            self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                              sweep=L.status.sweep, type='uold', value=L.uold[-1])
+            self.add_to_stats(
+                process=step.status.slot,
+                time=L.time + L.dt,
+                level=L.level_index,
+                iter=0,
+                sweep=L.status.sweep,
+                type='uold',
+                value=L.uold[-1],
+            )
 
     def post_step(self, step, level_number):
 
@@ -39,18 +45,53 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='u', value=L.uend)
-        self.add_to_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='dt', value=L.dt)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_embedded', value=L.status.error_embedded_estimate)
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='e_extrapolated', value=L.status.error_extrapolation_estimate)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='u',
+            value=L.uend,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='dt',
+            value=L.dt,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_embedded',
+            value=L.status.error_embedded_estimate,
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='e_extrapolated',
+            value=L.status.error_extrapolation_estimate,
+        )
 
 
-def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=log_data, fault_stuff=None,
-                  custom_controller_params=None, custom_problem_params=None):
+def run_advection(
+    custom_description=None,
+    num_procs=1,
+    Tend=2e-1,
+    hook_class=log_data,
+    fault_stuff=None,
+    custom_controller_params=None,
+    custom_problem_params=None,
+):
 
     # initialize level parameters
     level_params = dict()
@@ -58,17 +99,11 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'IE'
 
-    problem_params = {
-        'freq': 2,
-        'nvars': 2**9,
-        'c': 1.,
-        'type': 'upwind',
-        'order': 5
-    }
+    problem_params = {'freq': 2, 'nvars': 2**9, 'c': 1.0, 'type': 'backward', 'order': 5, 'bc': 'periodic'}
 
     if custom_problem_params is not None:
         problem_params = {**problem_params, **custom_problem_params}
@@ -88,7 +123,7 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = advection1d  # pass problem class
+    description['problem_class'] = advectionNd  # pass problem class
     description['problem_params'] = problem_params  # pass problem parameters
     description['sweeper_class'] = generic_implicit  # pass sweeper
     description['sweeper_params'] = sweeper_params  # pass sweeper parameters
@@ -106,14 +141,15 @@ def run_advection(custom_description=None, num_procs=1, Tend=2e-1, hook_class=lo
     t0 = 0.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params,
-                                   description=description)
+    controller = controller_nonMPI(num_procs=num_procs, controller_params=controller_params, description=description)
 
     # insert faults
     if fault_stuff is not None:
         controller.hooks.random_generator = fault_stuff['rng']
-        controller.hooks.add_fault(rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
-                                   args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})})
+        controller.hooks.add_fault(
+            rnd_args={'iteration': 5, **fault_stuff.get('rnd_params', {})},
+            args={'time': 1e-1, 'target': 0, **fault_stuff.get('args', {})},
+        )
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob

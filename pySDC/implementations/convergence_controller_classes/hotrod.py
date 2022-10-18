@@ -3,8 +3,9 @@ import numpy as np
 from pySDC.core.ConvergenceController import ConvergenceController
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.convergence_controller_classes.estimate_embedded_error import EstimateEmbeddedErrorNonMPI
-from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import \
-    EstimateExtrapolationErrorNonMPI
+from pySDC.implementations.convergence_controller_classes.estimate_extrapolation_error import (
+    EstimateExtrapolationErrorNonMPI,
+)
 
 
 class HotRod(ConvergenceController):
@@ -20,7 +21,7 @@ class HotRod(ConvergenceController):
     """
 
     def setup(self, controller, params, description):
-        '''
+        """
         Setup default values for crucial parameters.
 
         Args:
@@ -30,16 +31,12 @@ class HotRod(ConvergenceController):
 
         Returns:
             dict: The updated params
-        '''
-        default_params = {
-            'HotRod_tol': np.inf,
-            'control_order': -40,
-            'no_storage': False
-        }
+        """
+        default_params = {'HotRod_tol': np.inf, 'control_order': -40, 'no_storage': False}
         return {**default_params, **params}
 
     def dependencies(self, controller, description):
-        '''
+        """
         Load the dependencies of Hot Rod, which are the two error estimators
 
         Args:
@@ -48,16 +45,17 @@ class HotRod(ConvergenceController):
 
         Returns:
             None
-        '''
+        """
         if type(controller) == controller_nonMPI:
             controller.add_convergence_controller(EstimateEmbeddedErrorNonMPI, description=description)
-            controller.add_convergence_controller(EstimateExtrapolationErrorNonMPI, description=description,
-                                                  params={'no_storage': self.params.no_storage})
+            controller.add_convergence_controller(
+                EstimateExtrapolationErrorNonMPI, description=description, params={'no_storage': self.params.no_storage}
+            )
         else:
             raise NotImplementedError("Don\'t know how to estimate errors with MPI")
 
     def check_parameters(self, controller, params, description):
-        '''
+        """
         Check whether parameters are compatible with whatever assumptions went into the step size functions etc.
 
         Args:
@@ -68,14 +66,19 @@ class HotRod(ConvergenceController):
         Returns:
             bool: Whether the parameters are compatible
             str: Error message
-        '''
+        """
         if self.params.HotRod_tol == np.inf:
-            controller.logger.warning('Hot Rod needs a detection threshold, which is now set to infinity, such that a \
-restart is never triggered!')
+            controller.logger.warning(
+                'Hot Rod needs a detection threshold, which is now set to infinity, such that a \
+restart is never triggered!'
+            )
 
-        if description['step_params'].get('restol', -1.) >= 0:
-            return False, 'Hot Rod needs constant order in time and hence restol in the step parameters has to be \
-smaller than 0!'
+        if description['step_params'].get('restol', -1.0) >= 0:
+            return (
+                False,
+                'Hot Rod needs constant order in time and hence restol in the step parameters has to be \
+smaller than 0!',
+            )
 
         if controller.params.mssdc_jac:
             return False, 'Hot Rod needs the same order on all steps, please activate Gauss-Seidel multistep mode!'
@@ -83,7 +86,7 @@ smaller than 0!'
         return True, ''
 
     def determine_restart(self, controller, S):
-        '''
+        """
         Check if the difference between the error estimates exceeds the allowed tolerance
 
         Args:
@@ -92,7 +95,7 @@ smaller than 0!'
 
         Returns:
             None
-        '''
+        """
         # we determine whether to restart only on the last sweep
         if S.status.iter < S.params.maxiter:
             return None
@@ -107,7 +110,7 @@ smaller than 0!'
         return None
 
     def post_iteration_processing(self, controller, S):
-        '''
+        """
         Throw away the final sweep to match the error estimates.
 
         Args:
@@ -116,7 +119,7 @@ smaller than 0!'
 
         Returns:
             None
-        '''
+        """
         if S.status.iter == S.params.maxiter:
             for L in S.levels:
                 L.u[:] = L.uold[:]

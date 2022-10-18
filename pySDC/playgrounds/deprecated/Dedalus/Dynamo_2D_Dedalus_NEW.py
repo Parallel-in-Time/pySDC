@@ -9,8 +9,8 @@ from pySDC.implementations.datatype_classes.mesh import mesh, imex_mesh
 
 
 class dynamo_2d_dedalus(ptype):
-    """
-    """
+    """ """
+
     def __init__(self, problem_params, dtype_u=mesh, dtype_f=imex_mesh):
         """
         Initialization routine
@@ -38,9 +38,12 @@ class dynamo_2d_dedalus(ptype):
         nvars = tuple(self.domain.local_grid_shape()) + (2,)
 
         # invoke super init, passing number of dofs (and more), dtype_u and dtype_f
-        super(dynamo_2d_dedalus, self).__init__(init=(nvars, self.domain.dist.comm, xbasis.grid_dtype),
-                                                dtype_u=dtype_u, dtype_f=dtype_f,
-                                                params=problem_params)
+        super(dynamo_2d_dedalus, self).__init__(
+            init=(nvars, self.domain.dist.comm, xbasis.grid_dtype),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.x = self.domain.grid(0, scales=1)
         self.y = self.domain.grid(1, scales=1)
@@ -82,7 +85,7 @@ class dynamo_2d_dedalus(ptype):
             dtype_f: the RHS with two parts
         """
 
-        pseudo_dt = 1E-05
+        pseudo_dt = 1e-05
 
         f = self.dtype_f(self.init)
 
@@ -151,8 +154,8 @@ class dynamo_2d_dedalus(ptype):
 
         if self.params.initial == 'random':
 
-            me[ ..., 0] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
-            me[ ..., 1] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+            me[..., 0] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
+            me[..., 1] = np.random.uniform(low=-1e-5, high=1e-5, size=(xvar_loc, yvar_loc))
 
         elif self.params.initial == 'low-res':
 
@@ -171,7 +174,7 @@ class dynamo_2d_dedalus(ptype):
             tmp0.set_scales(1)
             tmp1.set_scales(1)
 
-            me[ ..., 0] = tmp0['g']
-            me[ ..., 1] = tmp1['g']
+            me[..., 0] = tmp0['g']
+            me[..., 1] = tmp1['g']
 
         return me

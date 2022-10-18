@@ -5,7 +5,7 @@ import scipy.interpolate as intpl
 
 from pySDC.core.Nodes import NodesGenerator
 from pySDC.core.Errors import CollocationError
-from pySDC.core import LagrangeApproximation
+from pySDC.core.Lagrange import LagrangeApproximation
 
 
 class CollBase(object):
@@ -70,10 +70,11 @@ class CollBase(object):
         left_is_node (bool): flag to indicate whether left point is collocation node
     """
 
-    def __init__(self, num_nodes, tleft=0, tright=1,
-                 node_type='LEGENDRE', quad_type='LOBATTO', useSpline=False):
+    def __init__(
+        self, num_nodes=None, tleft=0, tright=1, node_type='LEGENDRE', quad_type=None, useSpline=False, **kwargs
+    ):
         """
-        Initialization routine for an collocation object
+        Initialization routine for a collocation object
 
         Args:
             num_nodes (int): number of collocation nodes
@@ -93,29 +94,33 @@ class CollBase(object):
         self.tleft = tleft
         self.tright = tright
 
+        self.node_type = node_type
+        self.quad_type = quad_type
+
         # Instanciate attributes
-        self.nodeGenerator = NodesGenerator(node_type, quad_type)
+        self.nodeGenerator = NodesGenerator(self.node_type, self.quad_type)
         if useSpline:
             self._getWeights = self._getWeights_spline
             # We need: 1<=order<=5 and order < num_nodes
             self.order = min(num_nodes - 1, 3)
-        elif node_type == 'EQUID':
+        elif self.node_type == 'EQUID':
             self.order = num_nodes
         else:
-            if quad_type == 'GAUSS':
+            if self.quad_type == 'GAUSS':
                 self.order = 2 * num_nodes
-            elif quad_type.startswith('RADAU'):
+            elif self.quad_type.startswith('RADAU'):
                 self.order = 2 * num_nodes - 1
-            elif quad_type == 'LOBATTO':
+            elif self.quad_type == 'LOBATTO':
                 self.order = 2 * num_nodes - 2
+
+        self.left_is_node = self.quad_type in ['LOBATTO', 'RADAU-LEFT']
+        self.right_is_node = self.quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
         self.nodes = self._getNodes
         self.weights = self._getWeights(tleft, tright)
         self.Qmat = self._gen_Qmatrix_spline if useSpline else self._gen_Qmatrix
         self.Smat = self._gen_Smatrix
         self.delta_m = self._gen_deltas
-        self.left_is_node = quad_type in ['LOBATTO', 'RADAU-LEFT']
-        self.right_is_node = quad_type in ['LOBATTO', 'RADAU-RIGHT']
 
     @staticmethod
     def evaluate(weights, data):
@@ -172,10 +177,15 @@ class CollBase(object):
         # Scale nodes to [tleft, tright]
         a = self.tleft
         b = self.tright
-        nodes += 1
-        nodes /= 2
+        nodes += 1.0
+        nodes /= 2.0
         nodes *= b - a
         nodes += a
+
+        if self.left_is_node:
+            nodes[0] = self.tleft
+        if self.right_is_node:
+            nodes[-1] = self.tright
 
         return nodes
 
@@ -258,7 +268,8 @@ class CollBase(object):
         tcks = []
         for i in range(self.num_nodes):
             tcks.append(
-                intpl.splrep(self.nodes, np.roll(circ_one, i), xb=self.tleft, xe=self.tright, k=self.order, s=0.0))
+                intpl.splrep(self.nodes, np.roll(circ_one, i), xb=self.tleft, xe=self.tright, k=self.order, s=0.0)
+            )
 
         weights = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):

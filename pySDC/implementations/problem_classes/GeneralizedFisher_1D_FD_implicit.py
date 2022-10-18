@@ -1,10 +1,10 @@
-
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import spsolve
 
 from pySDC.core.Errors import ParameterError, ProblemError
 from pySDC.core.Problem import ptype
+from pySDC.helpers import problem_helper
 from pySDC.implementations.datatype_classes.mesh import mesh
 
 
@@ -43,31 +43,21 @@ class generalized_fisher(ptype):
             problem_params['stop_at_nan'] = True
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(generalized_fisher, self).__init__((problem_params['nvars'], None, np.dtype('float64')),
-                                                 dtype_u, dtype_f, problem_params)
+        super(generalized_fisher, self).__init__(
+            (problem_params['nvars'], None, np.dtype('float64')), dtype_u, dtype_f, problem_params
+        )
 
         # compute dx and get discretization matrix A
         self.dx = (self.params.interval[1] - self.params.interval[0]) / (self.params.nvars + 1)
-        self.A = self.__get_A(self.params.nvars, self.dx)
-
-    @staticmethod
-    def __get_A(N, dx):
-        """
-        Helper function to assemble FD matrix A in sparse format
-
-        Args:
-            N (int): number of dofs
-            dx (float): distance between two spatial nodes
-
-        Returns:
-            scipy.sparse.csc_matrix: matrix A in CSC format
-        """
-
-        stencil = [1, -2, 1]
-        A = sp.diags(stencil, [-1, 0, 1], shape=(N + 2, N + 2), format='lil')
-        A *= 1.0 / (dx ** 2)
-
-        return A
+        self.A = problem_helper.get_finite_difference_matrix(
+            derivative=2,
+            order=2,
+            type='center',
+            dx=self.dx,
+            size=self.params.nvars + 2,
+            dim=1,
+            bc='dirichlet-zero',
+        )
 
     # noinspection PyTypeChecker
     def solve_system(self, rhs, factor, u0, t):
@@ -91,11 +81,13 @@ class generalized_fisher(ptype):
 
         # set up boundary values to embed inner points
         lam1 = lambda0 / 2.0 * ((nu / 2.0 + 1) ** 0.5 + (nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - lambda0 ** 2)
-        ul = (1 + (2 ** (nu / 2.0) - 1) *
-              np.exp(-nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2.0 / nu)
-        ur = (1 + (2 ** (nu / 2.0) - 1) *
-              np.exp(-nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2.0 / nu)
+        sig1 = lam1 - np.sqrt(lam1**2 - lambda0**2)
+        ul = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (
+            -2.0 / nu
+        )
+        ur = (1 + (2 ** (nu / 2.0) - 1) * np.exp(-nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (
+            -2.0 / nu
+        )
 
         # start newton iteration
         n = 0
@@ -104,8 +96,7 @@ class generalized_fisher(ptype):
 
             # form the function g with g(u) = 0
             uext = np.concatenate(([ul], u, [ur]))
-            g = u - \
-                factor * (self.A.dot(uext)[1:-1] + lambda0 ** 2 * u * (1 - u ** nu)) - rhs
+            g = u - factor * (self.A.dot(uext)[1:-1] + lambda0**2 * u * (1 - u**nu)) - rhs
 
             # if g is close to 0, then we are done
             res = np.linalg.norm(g, np.inf)
@@ -114,8 +105,9 @@ class generalized_fisher(ptype):
                 break
 
             # assemble dg
-            dg = sp.eye(self.params.nvars) - factor * \
-                (self.A[1:-1, 1:-1] + sp.diags(lambda0 ** 2 - lambda0 ** 2 * (nu + 1) * u ** nu, offsets=0))
+            dg = sp.eye(self.params.nvars) - factor * (
+                self.A[1:-1, 1:-1] + sp.diags(lambda0**2 - lambda0**2 * (nu + 1) * u**nu, offsets=0)
+            )
 
             # newton update: u1 = u0 - g/dg
             u -= spsolve(dg, g)
@@ -146,16 +138,22 @@ class generalized_fisher(ptype):
         """
         # set up boundary values to embed inner points
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        ul = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))) ** (-2 / self.params.nu)
-        ur = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-              np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))) ** (-2 / self.params.nu)
+        sig1 = lam1 - np.sqrt(lam1**2 - self.params.lambda0**2)
+        ul = (
+            1
+            + (2 ** (self.params.nu / 2.0) - 1)
+            * np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[0] + 2 * lam1 * t))
+        ) ** (-2 / self.params.nu)
+        ur = (
+            1
+            + (2 ** (self.params.nu / 2.0) - 1)
+            * np.exp(-self.params.nu / 2.0 * sig1 * (self.params.interval[1] + 2 * lam1 * t))
+        ) ** (-2 / self.params.nu)
 
         uext = np.concatenate(([ul], u, [ur]))
 
         f = self.dtype_f(self.init)
-        f[:] = self.A.dot(uext)[1:-1] + self.params.lambda0 ** 2 * u * (1 - u ** self.params.nu)
+        f[:] = self.A.dot(uext)[1:-1] + self.params.lambda0**2 * u * (1 - u**self.params.nu)
         return f
 
     def u_exact(self, t):
@@ -173,7 +171,8 @@ class generalized_fisher(ptype):
         xvalues = np.array([(i + 1 - (self.params.nvars + 1) / 2) * self.dx for i in range(self.params.nvars)])
 
         lam1 = self.params.lambda0 / 2.0 * ((self.params.nu / 2.0 + 1) ** 0.5 + (self.params.nu / 2.0 + 1) ** (-0.5))
-        sig1 = lam1 - np.sqrt(lam1 ** 2 - self.params.lambda0 ** 2)
-        me[:] = (1 + (2 ** (self.params.nu / 2.0) - 1) *
-                 np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))) ** (-2.0 / self.params.nu)
+        sig1 = lam1 - np.sqrt(lam1**2 - self.params.lambda0**2)
+        me[:] = (
+            1 + (2 ** (self.params.nu / 2.0) - 1) * np.exp(-self.params.nu / 2.0 * sig1 * (xvalues + 2 * lam1 * t))
+        ) ** (-2.0 / self.params.nu)
         return me

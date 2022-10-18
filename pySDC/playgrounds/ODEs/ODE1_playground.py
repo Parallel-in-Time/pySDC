@@ -1,4 +1,3 @@
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.nonlinear_ODE_1 import nonlinear_ODE_1
 from pySDC.implementations.sweeper_classes.generic_implicit import generic_implicit
@@ -11,18 +10,18 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.01
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'
 
     # initialize problem parameters
     problem_params = dict()
-    problem_params['newton_tol'] = 5E-11
+    problem_params['newton_tol'] = 5e-11
     problem_params['newton_maxiter'] = 500
     problem_params['u0'] = 0.0
 

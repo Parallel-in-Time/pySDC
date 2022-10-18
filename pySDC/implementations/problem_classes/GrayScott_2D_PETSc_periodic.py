@@ -10,6 +10,7 @@ class GS_full(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
+
     def __init__(self, da, params, factor, dx, dy):
         """
         Initialization routine
@@ -54,14 +55,24 @@ class GS_full(object):
                 u_w = x[i - 1, j]  # west
                 u_s = x[i, j + 1]  # south
                 u_n = x[i, j - 1]  # north
-                u_xx = (u_e - 2 * u + u_w)
-                u_yy = (u_n - 2 * u + u_s)
-                f[i, j, 0] = x[i, j, 0] - \
-                    (self.factor * (self.params.Du * (u_xx[0] / self.dx ** 2 + u_yy[0] / self.dy ** 2) -
-                     x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
-                f[i, j, 1] = x[i, j, 1] - \
-                    (self.factor * (self.params.Dv * (u_xx[1] / self.dx ** 2 + u_yy[1] / self.dy ** 2) +
-                     x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
+                u_xx = u_e - 2 * u + u_w
+                u_yy = u_n - 2 * u + u_s
+                f[i, j, 0] = x[i, j, 0] - (
+                    self.factor
+                    * (
+                        self.params.Du * (u_xx[0] / self.dx**2 + u_yy[0] / self.dy**2)
+                        - x[i, j, 0] * x[i, j, 1] ** 2
+                        + self.params.A * (1 - x[i, j, 0])
+                    )
+                )
+                f[i, j, 1] = x[i, j, 1] - (
+                    self.factor
+                    * (
+                        self.params.Dv * (u_xx[1] / self.dx**2 + u_yy[1] / self.dy**2)
+                        + x[i, j, 0] * x[i, j, 1] ** 2
+                        - self.params.B * x[i, j, 1]
+                    )
+                )
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -91,8 +102,9 @@ class GS_full(object):
                 col.index = (i, j)
                 row.field = 0
                 col.field = 0
-                val = 1.0 - self.factor * (self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2) -
-                                           x[i, j, 1] ** 2 - self.params.A)
+                val = 1.0 - self.factor * (
+                    self.params.Du * (-2.0 / self.dx**2 - 2.0 / self.dy**2) - x[i, j, 1] ** 2 - self.params.A
+                )
                 P.setValueStencil(row, col, val)
                 row.field = 0
                 col.field = 1
@@ -100,8 +112,11 @@ class GS_full(object):
                 P.setValueStencil(row, col, val)
                 row.field = 1
                 col.field = 1
-                val = 1.0 - self.factor * (self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2) +
-                                           2.0 * x[i, j, 0] * x[i, j, 1] - self.params.B)
+                val = 1.0 - self.factor * (
+                    self.params.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2)
+                    + 2.0 * x[i, j, 0] * x[i, j, 1]
+                    - self.params.B
+                )
                 P.setValueStencil(row, col, val)
                 row.field = 1
                 col.field = 0
@@ -112,31 +127,31 @@ class GS_full(object):
                 col.index = (i, j - 1)
                 col.field = 0
                 row.field = 0
-                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy**2)
                 col.index = (i, j + 1)
                 col.field = 0
                 row.field = 0
-                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy**2)
                 col.index = (i - 1, j)
                 col.field = 0
                 row.field = 0
-                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy**2)
                 col.index = (i + 1, j)
                 col.field = 0
                 row.field = 0
-                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy ** 2)
+                P.setValueStencil(row, col, -self.factor * self.params.Dv / self.dy**2)
 
         P.assemble()
         if J != P:
@@ -148,6 +163,7 @@ class GS_reaction(object):
     """
     Helper class to generate residual and Jacobian matrix for PETSc's nonlinear solver SNES
     """
+
     def __init__(self, da, params, factor):
         """
         Initialization routine
@@ -183,10 +199,10 @@ class GS_reaction(object):
         (xs, xe), (ys, ye) = self.da.getRanges()
         for j in range(ys, ye):
             for i in range(xs, xe):
-                f[i, j, 0] = x[i, j, 0] - \
-                    (self.factor * (-x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0])))
-                f[i, j, 1] = x[i, j, 1] - \
-                    (self.factor * (x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
+                f[i, j, 0] = x[i, j, 0] - (
+                    self.factor * (-x[i, j, 0] * x[i, j, 1] ** 2 + self.params.A * (1 - x[i, j, 0]))
+                )
+                f[i, j, 1] = x[i, j, 1] - (self.factor * (x[i, j, 0] * x[i, j, 1] ** 2 - self.params.B * x[i, j, 1]))
 
     def formJacobian(self, snes, X, J, P):
         """
@@ -249,7 +265,7 @@ class petsc_grayscott_multiimplicit(ptype):
         if 'comm' not in problem_params:
             problem_params['comm'] = PETSc.COMM_WORLD
         if 'sol_tol' not in problem_params:
-            problem_params['sol_tol'] = 1E-10
+            problem_params['sol_tol'] = 1e-10
         if 'sol_maxiter' not in problem_params:
             problem_params['sol_maxiter'] = None
 
@@ -261,12 +277,18 @@ class petsc_grayscott_multiimplicit(ptype):
                 raise ParameterError(msg)
 
         # create DMDA object which will be used for all grid operations (boundary_type=3 -> periodic BC)
-        da = PETSc.DMDA().create([problem_params['nvars'][0], problem_params['nvars'][1]], dof=2, boundary_type=3,
-                                 stencil_width=1, comm=problem_params['comm'])
+        da = PETSc.DMDA().create(
+            [problem_params['nvars'][0], problem_params['nvars'][1]],
+            dof=2,
+            boundary_type=3,
+            stencil_width=1,
+            comm=problem_params['comm'],
+        )
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_grayscott_multiimplicit, self).__init__(init=da, dtype_u=dtype_u, dtype_f=dtype_f,
-                                                            params=problem_params)
+        super(petsc_grayscott_multiimplicit, self).__init__(
+            init=da, dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         # compute dx, dy and get local ranges
         self.dx = 100.0 / (self.params.nvars[0])
@@ -296,8 +318,12 @@ class petsc_grayscott_multiimplicit(ptype):
         # self.snes.getKSP().setType('cg')
         # self.snes.setType('ngmres')
         self.snes.setFromOptions()
-        self.snes.setTolerances(rtol=self.params.nlsol_tol, atol=self.params.nlsol_tol, stol=self.params.nlsol_tol,
-                                max_it=self.params.nlsol_maxiter)
+        self.snes.setTolerances(
+            rtol=self.params.nlsol_tol,
+            atol=self.params.nlsol_tol,
+            stol=self.params.nlsol_tol,
+            max_it=self.params.nlsol_maxiter,
+        )
         self.snes_itercount = 0
         self.snes_ncalls = 0
 
@@ -323,41 +349,41 @@ class petsc_grayscott_multiimplicit(ptype):
             for i in range(xs, xe):
                 row.index = (i, j)
                 row.field = 0
-                A.setValueStencil(row, row, self.params.Du * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
+                A.setValueStencil(row, row, self.params.Du * (-2.0 / self.dx**2 - 2.0 / self.dy**2))
                 row.field = 1
-                A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx ** 2 - 2.0 / self.dy ** 2))
+                A.setValueStencil(row, row, self.params.Dv * (-2.0 / self.dx**2 - 2.0 / self.dy**2))
                 # if j > 0:
                 col.index = (i, j - 1)
                 col.field = 0
                 row.field = 0
-                A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                A.setValueStencil(row, col, self.params.Du / self.dy**2)
                 col.field = 1
                 row.field = 1
-                A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                A.setValueStencil(row, col, self.params.Dv / self.dy**2)
                 # if j < my - 1:
                 col.index = (i, j + 1)
                 col.field = 0
                 row.field = 0
-                A.setValueStencil(row, col, self.params.Du / self.dy ** 2)
+                A.setValueStencil(row, col, self.params.Du / self.dy**2)
                 col.field = 1
                 row.field = 1
-                A.setValueStencil(row, col, self.params.Dv / self.dy ** 2)
+                A.setValueStencil(row, col, self.params.Dv / self.dy**2)
                 # if i > 0:
                 col.index = (i - 1, j)
                 col.field = 0
                 row.field = 0
-                A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                A.setValueStencil(row, col, self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
+                A.setValueStencil(row, col, self.params.Dv / self.dx**2)
                 # if i < mx - 1:
                 col.index = (i + 1, j)
                 col.field = 0
                 row.field = 0
-                A.setValueStencil(row, col, self.params.Du / self.dx ** 2)
+                A.setValueStencil(row, col, self.params.Du / self.dx**2)
                 col.field = 1
                 row.field = 1
-                A.setValueStencil(row, col, self.params.Dv / self.dx ** 2)
+                A.setValueStencil(row, col, self.params.Dv / self.dx**2)
         A.assemble()
 
         return A
@@ -484,10 +510,12 @@ class petsc_grayscott_multiimplicit(ptype):
         xa = self.init.getVecArray(me)
         for i in range(self.xs, self.xe):
             for j in range(self.ys, self.ye):
-                xa[i, j, 0] = 1.0 - 0.5 * np.power(np.sin(np.pi * i * self.dx / 100) *
-                                                   np.sin(np.pi * j * self.dy / 100), 100)
-                xa[i, j, 1] = 0.25 * np.power(np.sin(np.pi * i * self.dx / 100) *
-                                              np.sin(np.pi * j * self.dy / 100), 100)
+                xa[i, j, 0] = 1.0 - 0.5 * np.power(
+                    np.sin(np.pi * i * self.dx / 100) * np.sin(np.pi * j * self.dy / 100), 100
+                )
+                xa[i, j, 1] = 0.25 * np.power(
+                    np.sin(np.pi * i * self.dx / 100) * np.sin(np.pi * j * self.dy / 100), 100
+                )
 
         return me
 
@@ -508,8 +536,9 @@ class petsc_grayscott_fullyimplicit(petsc_grayscott_multiimplicit):
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_grayscott_fullyimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
-                                                            dtype_f=dtype_f)
+        super(petsc_grayscott_fullyimplicit, self).__init__(
+            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
+        )
 
     def eval_f(self, u, t):
         """
@@ -582,8 +611,9 @@ class petsc_grayscott_semiimplicit(petsc_grayscott_multiimplicit):
         """
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(petsc_grayscott_semiimplicit, self).__init__(problem_params=problem_params, dtype_u=dtype_u,
-                                                           dtype_f=dtype_f)
+        super(petsc_grayscott_semiimplicit, self).__init__(
+            problem_params=problem_params, dtype_u=dtype_u, dtype_f=dtype_f
+        )
 
     def eval_f(self, u, t):
         """

@@ -1,4 +1,3 @@
-
 import numpy as np
 import scipy.sparse as sp
 import scipy.sparse.linalg as LA
@@ -32,21 +31,21 @@ class advection(ptype):
         assert 'c' in cparams
         assert 'order' in cparams
 
-        assert cparams['nvars']%2 == 0
-        
+        assert cparams['nvars'] % 2 == 0
+
         # add parameters as attributes for further reference
-        for k,v in cparams.items():
-            setattr(self,k,v)
+        for k, v in cparams.items():
+            setattr(self, k, v)
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(advection,self).__init__(self.nvars,dtype_u,dtype_f)
+        super(advection, self).__init__(self.nvars, dtype_u, dtype_f)
 
         # compute dx and get discretization matrix A
         self.mesh = np.linspace(0, 1, num=self.nvars, endpoint=False)
-        self.dx   = self.mesh[1] - self.mesh[0]
-        self.A    = -self.c*getFDMatrix(self.nvars, self.order, self.dx)
-    
-    def solve_system(self,rhs,factor,u0,t):
+        self.dx = self.mesh[1] - self.mesh[0]
+        self.A = -self.c * getFDMatrix(self.nvars, self.order, self.dx)
+
+    def solve_system(self, rhs, factor, u0, t):
         """
         Simple linear solver for (I-dtA)u = rhs
 
@@ -61,11 +60,10 @@ class advection(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = LA.spsolve(sp.eye(self.nvars)-factor*self.A,rhs.values)
+        me.values = LA.spsolve(sp.eye(self.nvars) - factor * self.A, rhs.values)
         return me
 
-
-    def __eval_fimpl(self,u,t):
+    def __eval_fimpl(self, u, t):
         """
         Helper routine to evaluate the implicit part of the RHS
 
@@ -77,12 +75,11 @@ class advection(ptype):
             implicit part of RHS
         """
 
-        fimpl        = mesh(self.nvars)
+        fimpl = mesh(self.nvars)
         fimpl.values = self.A.dot(u.values)
         return fimpl
 
-
-    def eval_f(self,u,t):
+    def eval_f(self, u, t):
         """
         Routine to evaluate both parts of the RHS
 
@@ -98,8 +95,7 @@ class advection(ptype):
         f.values = self.A.dot(u.values)
         return f
 
-
-    def u_exact(self,t):
+    def u_exact(self, t):
         """
         Routine to compute the exact solution at time t
 
@@ -111,5 +107,5 @@ class advection(ptype):
         """
 
         me = mesh(self.nvars)
-        me.values = np.cos(2.0*np.pi*(self.mesh-self.c*t))
+        me.values = np.cos(2.0 * np.pi * (self.mesh - self.c * t))
         return me

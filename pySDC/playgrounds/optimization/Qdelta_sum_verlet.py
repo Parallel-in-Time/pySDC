@@ -1,8 +1,5 @@
-
 import indiesolver
 import numpy as np
-
-from pySDC.implementations.collocation_classes.gauss_lobatto import CollGaussLobatto
 
 
 def evaluate(solution):
@@ -34,7 +31,7 @@ def evaluate(solution):
 
     QQ = QQ[1:, 1:]
 
-    var = [x['x'+str(j)] for j in range(1, m)]
+    var = [x['x' + str(j)] for j in range(1, m)]
     # var = [x['x' + str(j) + 'r'] + 1j * x['x' + str(j) + 'i'] for j in range(1, m)]
     Qd = np.diag(var, k=-1)
 
@@ -44,7 +41,7 @@ def evaluate(solution):
     for i in range(-3, 2):
         # for l in range(-8, 8):
         k += 1
-        lamdt = -10 ** i
+        lamdt = -(10**i)
         R = lamdt * np.linalg.inv(np.eye(m) - lamdt * Qd).dot(QQ - Qd)
         rhoR = max(abs(np.linalg.eigvals(R)))
         obj_val += rhoR
@@ -83,9 +80,11 @@ params['x4'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 
 # params['x8'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[3]}
 # params['x9'] = {'type': 'float', 'space': 'decision', 'min': ymin, 'max': ymax, 'init': y[4]}
 
-problem = {'problem_name': 'Qdelta_sum_verlet',
-           'parameters': params,
-           'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}}}
+problem = {
+    'problem_name': 'Qdelta_sum_verlet',
+    'parameters': params,
+    'metrics': {'rho': {'type': 'objective', 'goal': 'minimize'}},
+}
 
 worker = indiesolver.indiesolver()
 worker.initialize("indiesolver.com", 8080, "dg8f5a0dd9ed")

@@ -92,8 +92,9 @@ class generic_implicit(sweeper):
                 rhs += L.dt * self.QI[m + 1, j] * L.f[j]
 
             # implicit solve with prefactor stemming from the diagonal of Qd
-            L.u[m + 1] = P.solve_system(rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1],
-                                        L.time + L.dt * self.coll.nodes[m])
+            L.u[m + 1] = P.solve_system(
+                rhs, L.dt * self.QI[m + 1, m + 1], L.u[m + 1], L.time + L.dt * self.coll.nodes[m]
+            )
             # update function values
             L.f[m + 1] = P.eval_f(L.u[m + 1], L.time + L.dt * self.coll.nodes[m])
 
@@ -117,7 +118,7 @@ class generic_implicit(sweeper):
         P = L.prob
 
         # check if Mth node is equal to right point and do_coll_update is false, perform a simple copy
-        if (self.coll.right_is_node and not self.params.do_coll_update):
+        if self.coll.right_is_node and not self.params.do_coll_update:
             # a copy is sufficient
             L.uend = P.dtype_u(L.u[-1])
         else:

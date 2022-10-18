@@ -26,7 +26,7 @@ class penningtrap_coarse(penningtrap):
 
         # only compute external forces here: O(N) instead of O(N*N)
         for n in range(N):
-            f.elec[:, n] = self.params.omega_E ** 2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
+            f.elec[:, n] = self.params.omega_E**2 / (part.q[n] / part.m[n]) * np.dot(Emat, part.pos[:, n])
             f.magn[:, n] = self.params.omega_B * np.array([0, 0, 1])
 
         return f

@@ -22,10 +22,28 @@ def joint_plots(list_of_result_paths):
     plt_helper.newfig(textwidth=238.96, scale=1.0)
 
     plt_helper.plt.loglog(np.unique(ncores), ideal, 'k--', label='ideal')
-    plt_helper.plt.loglog(ncores[0:len(results[0])], timings_space, lw=1, ls='-', color='b', marker='o',
-                          markersize=4, markeredgecolor='k', label='parallel-in-space')
-    plt_helper.plt.loglog(ncores[-len(results[1]):], timings_spacetime, lw=1, ls='-', color='r', marker='d',
-                          markersize=4, markeredgecolor='k', label='parallel-in-space-time')
+    plt_helper.plt.loglog(
+        ncores[0 : len(results[0])],
+        timings_space,
+        lw=1,
+        ls='-',
+        color='b',
+        marker='o',
+        markersize=4,
+        markeredgecolor='k',
+        label='parallel-in-space',
+    )
+    plt_helper.plt.loglog(
+        ncores[-len(results[1]) :],
+        timings_spacetime,
+        lw=1,
+        ls='-',
+        color='r',
+        marker='d',
+        markersize=4,
+        markeredgecolor='k',
+        label='parallel-in-space-time',
+    )
 
     plt_helper.plt.grid()
     plt_helper.plt.legend(loc=3, ncol=1)
@@ -81,8 +99,10 @@ def plot_data(name=''):
 
 
 if __name__ == '__main__':
-    list_of_result_paths = ['data/bench_run_SPxTS/000004/result/result.dat',
-                            'data/bench_run_SPxTP/000002/result/result.dat']
+    list_of_result_paths = [
+        'data/bench_run_SPxTS/000004/result/result.dat',
+        'data/bench_run_SPxTP/000002/result/result.dat',
+    ]
 
     # joint_plots(list_of_result_paths)
     plot_data(name='AC-bench-noforce')

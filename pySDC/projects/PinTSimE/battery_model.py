@@ -1,8 +1,9 @@
 import numpy as np
 import dill
+from pathlib import Path
 
 from pySDC.helpers.stats_helper import get_sorted
-from pySDC.core import CollBase as Collocation
+from pySDC.core.Collocation import CollBase as Collocation
 from pySDC.implementations.problem_classes.Battery import battery
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
@@ -14,7 +15,6 @@ from pySDC.projects.PinTSimE.switch_estimator import SwitchEstimator
 
 
 class log_data(hooks):
-
     def post_step(self, step, level_number):
 
         super(log_data, self).post_step(step, level_number)
@@ -24,12 +24,34 @@ class log_data(hooks):
 
         L.sweep.compute_end_point()
 
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='current L', value=L.uend[0])
-        self.add_to_stats(process=step.status.slot, time=L.time + L.dt, level=L.level_index, iter=0,
-                          sweep=L.status.sweep, type='voltage C', value=L.uend[1])
-        self.increment_stats(process=step.status.slot, time=L.time, level=L.level_index, iter=0,
-                             sweep=L.status.sweep, type='restart', value=1, initialize=0)
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='current L',
+            value=L.uend[0],
+        )
+        self.add_to_stats(
+            process=step.status.slot,
+            time=L.time + L.dt,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='voltage C',
+            value=L.uend[1],
+        )
+        self.increment_stats(
+            process=step.status.slot,
+            time=L.time,
+            level=L.level_index,
+            iter=0,
+            sweep=L.status.sweep,
+            type='restart',
+            value=1,
+            initialize=0,
+        )
 
 
 def main(use_switch_estimator=True):
@@ -39,13 +61,11 @@ def main(use_switch_estimator=True):
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
-    level_params['dt'] = 1E-3
+    level_params['restol'] = 1e-10
+    level_params['dt'] = 1e-2
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = Collocation
-    sweeper_params['node_type'] = 'LEGENDRE'
     sweeper_params['quad_type'] = 'LOBATTO'
     sweeper_params['num_nodes'] = 5
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
@@ -55,13 +75,13 @@ def main(use_switch_estimator=True):
     problem_params = dict()
     problem_params['Vs'] = 5.0
     problem_params['Rs'] = 0.5
-    problem_params['C'] = 1
-    problem_params['R'] = 1
-    problem_params['L'] = 1
-    problem_params['alpha'] = 10
-    problem_params['V_ref'] = 1
-    problem_params['set_switch'] = False
-    problem_params['t_switch'] = False
+    problem_params['C'] = 1.0
+    problem_params['R'] = 1.0
+    problem_params['L'] = 1.0
+    problem_params['alpha'] = 5.0
+    problem_params['V_ref'] = 1.0
+    problem_params['set_switch'] = np.array([False], dtype=bool)
+    problem_params['t_switch'] = np.zeros(1)
 
     # initialize step parameters
     step_params = dict()
@@ -88,16 +108,11 @@ def main(use_switch_estimator=True):
     if use_switch_estimator:
         description['convergence_controllers'] = convergence_controllers
 
-    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
-    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
-
-    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
-    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
-    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
+    proof_assertions_description(description, problem_params)
 
     # set time parameters
     t0 = 0.0
-    Tend = 2.4
+    Tend = 2.0
 
     # instantiate controller
     controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
@@ -109,8 +124,8 @@ def main(use_switch_estimator=True):
     # call main function to get things done...
     uend, stats = controller.run(u0=uinit, t0=t0, Tend=Tend)
 
-    # fname = 'data/battery.dat'
-    fname = 'battery.dat'
+    Path("data").mkdir(parents=True, exist_ok=True)
+    fname = 'data/battery.dat'
     f = open(fname, 'wb')
     dill.dump(stats, f)
     f.close()
@@ -122,7 +137,7 @@ def main(use_switch_estimator=True):
     min_iter = 20
     max_iter = 0
 
-    f = open('battery_out.txt', 'w')
+    f = open('data/battery_out.txt', 'w')
     niters = np.array([item[1] for item in iter_counts])
     out = '   Mean number of iterations: %4.2f' % np.mean(niters)
     f.write(out + '\n')
@@ -137,17 +152,17 @@ def main(use_switch_estimator=True):
     assert np.mean(niters) <= 5, "Mean number of iterations is too high, got %s" % np.mean(niters)
     f.close()
 
-    plot_voltages()
+    plot_voltages(description, use_switch_estimator)
 
     return np.mean(niters)
 
 
-def plot_voltages(cwd='./'):
+def plot_voltages(description, use_switch_estimator, cwd='./'):
     """
-        Routine to plot the numerical solution of the model
+    Routine to plot the numerical solution of the model
     """
 
-    f = open(cwd + 'battery.dat', 'rb')
+    f = open(cwd + 'data/battery.dat', 'rb')
     stats = dill.load(f)
     f.close()
 
@@ -159,25 +174,39 @@ def plot_voltages(cwd='./'):
 
     setup_mpl()
     fig, ax = plt_helper.plt.subplots(1, 1, figsize=(4.5, 3))
-    ax.plot(times, [v[1] for v in cL], label='$i_L$')
-    ax.plot(times, [v[1] for v in vC], label='$v_C$')
+    ax.plot(times, [v[1] for v in cL], label=r'$i_L$')
+    ax.plot(times, [v[1] for v in vC], label=r'$v_C$')
+
+    if use_switch_estimator:
+        val_switch = get_sorted(stats, type='switch1', sortby='time')
+        t_switch = [v[0] for v in val_switch]
+        ax.axvline(x=t_switch[0], linestyle='--', color='k', label='Switch')
+
     ax.legend(frameon=False, fontsize=12, loc='upper right')
 
     ax.set_xlabel('Time')
     ax.set_ylabel('Energy')
 
     fig.savefig('data/battery_model_solution.png', dpi=300, bbox_inches='tight')
+    plt_helper.plt.close(fig)
 
 
-def estimation_check():
-    use_switch_estimator = [True, False]
-    niters_mean = []
-    for item in use_switch_estimator:
-        niters_mean.append(main(use_switch_estimator=item))
+def proof_assertions_description(description, problem_params):
+    """
+    Function to proof the assertions (function to get cleaner code)
+    """
 
-    for item, element in zip(use_switch_estimator, niters_mean):
-        out = 'Switch estimation: {} -- Average number of iterations: {}'.format(item, element)
-        print(out)
+    assert problem_params['alpha'] > problem_params['V_ref'], 'Please set "alpha" greater than "V_ref"'
+    assert problem_params['V_ref'] > 0, 'Please set "V_ref" greater than 0'
+    assert type(problem_params['V_ref']) == float, '"V_ref" needs to be of type float'
+
+    assert type(problem_params['set_switch'][0]) == np.bool_, '"set_switch" has to be an bool array'
+    assert type(problem_params['t_switch']) == np.ndarray, '"t_switch" has to be an array'
+    assert problem_params['t_switch'][0] == 0, '"t_switch" is only allowed to have entry zero'
+
+    assert 'errtol' not in description['step_params'].keys(), 'No exact solution known to compute error'
+    assert 'alpha' in description['problem_params'].keys(), 'Please supply "alpha" in the problem parameters'
+    assert 'V_ref' in description['problem_params'].keys(), 'Please supply "V_ref" in the problem parameters'
 
 
 if __name__ == "__main__":

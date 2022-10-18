@@ -2,16 +2,16 @@ from pySDC.core.ConvergenceController import ConvergenceController
 
 
 class CheckConvergence(ConvergenceController):
-    '''
+    """
     Perform simple checks on convergence for SDC iterations.
 
     Iteration is terminated via one of two criteria:
      - Residual tolerance
      - Maximum number of iterations
-    '''
+    """
 
     def setup(self, controller, params, description):
-        '''
+        """
         Define default parameters here
 
         Args:
@@ -21,7 +21,7 @@ class CheckConvergence(ConvergenceController):
 
         Returns:
             (dict): The updated params dictionary
-        '''
+        """
         return {'control_order': +200, **params}
 
     def check_iteration_status(self, controller, S):

@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from pySDC.core.Step import step
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 
 
@@ -10,12 +12,12 @@ def main():
     """
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.1
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
 
     # initialize problem parameters
@@ -23,6 +25,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 4  # frequency for the test value
     problem_params['nvars'] = 1023  # number of degrees of freedom
+    problem_params['bc'] = 'dirichlet-zero'  # boundary conditions
 
     # initialize step parameters
     step_params = dict()
@@ -30,7 +33,7 @@ def main():
 
     # Fill description dictionary for easy hierarchy creation
     description = dict()
-    description['problem_class'] = heat1d_forced
+    description['problem_class'] = heatNd_forced
     description['problem_params'] = problem_params
     description['sweeper_class'] = imex_1st_order
     description['sweeper_params'] = sweeper_params
@@ -44,7 +47,7 @@ def main():
     err, res, niter = run_imex_sdc(S)
     print('Error and residual: %12.8e -- %12.8e' % (err, res))
 
-    assert err <= 1E-5, "ERROR: IMEX SDC iteration did not reduce the error enough, got %s" % err
+    assert err <= 1e-5, "ERROR: IMEX SDC iteration did not reduce the error enough, got %s" % err
     assert res <= level_params['restol'], "ERROR: IMEX SDC iteration did not reduce the residual enough, got %s" % res
     assert niter <= 12, "ERROR: IMEX SDC took too many iterations, got %s" % niter
 
@@ -79,7 +82,8 @@ def run_imex_sdc(S):
     # reset iteration counter
     S.status.iter = 0
     # run the SDC iteration until either the maximum number of iterations is reached or the residual is small enough
-    f = open('step_2_B_out.txt', 'w')
+    Path("data").mkdir(parents=True, exist_ok=True)
+    f = open('data/step_2_B_out.txt', 'w')
     while S.status.iter < S.params.maxiter and L.status.residual > L.params.restol:
         # this is where the nodes are actually updated according to the SDC formulas
         L.sweep.update_nodes()
@@ -87,8 +91,12 @@ def run_imex_sdc(S):
         L.sweep.compute_residual()
         # increment the iteration counter
         S.status.iter += 1
-        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' \
-              % (L.time, L.level_index, S.status.iter, L.status.residual)
+        out = 'Time %4.2f of %s -- Iteration: %2i -- Residual: %12.8e' % (
+            L.time,
+            L.level_index,
+            S.status.iter,
+            L.status.residual,
+        )
         f.write(out + '\n')
         print(out)
     f.close()

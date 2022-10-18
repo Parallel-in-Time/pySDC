@@ -6,7 +6,6 @@ import numpy as np
 
 
 from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_legendre import CollGaussLegendre
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
 from pySDC.implementations.problem_classes.PenningTrap_3D import penningtrap
 from pySDC.implementations.sweeper_classes.boris_2nd_order import boris_2nd_order
@@ -45,7 +44,7 @@ def compute_covnergence_data(cwd=""):
 
     # This comes as read-in for the sweeper params
     sweeper_params = dict()
-    sweeper_params["collocation_class"] = CollGaussLegendre
+    sweeper_params['quad_type'] = 'GAUSS'
     sweeper_params["num_nodes"] = 3
     sweeper_params["do_coll_update"] = True
     sweeper_params["initial_guess"] = "random"
@@ -112,15 +111,11 @@ def compute_covnergence_data(cwd=""):
             for mm, nn in enumerate(values):
                 data = sortedlist_stats[0][1][nn].values()
                 u_val[nn] = np.array(list(data))
-                u_val[nn] = u_val[nn].reshape(
-                    np.shape(u_val[nn])[0], np.shape(u_val[nn])[1]
-                )
+                u_val[nn] = u_val[nn].reshape(np.shape(u_val[nn])[0], np.shape(u_val[nn])[1])
 
                 data = sortedlist_stats[0][1][nn + "_exact"].values()
                 uex_val[nn] = np.array(list(data))
-                uex_val[nn] = uex_val[nn].reshape(
-                    np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1]
-                )
+                uex_val[nn] = uex_val[nn].reshape(np.shape(uex_val[nn])[0], np.shape(uex_val[nn])[1])
 
                 error_val[nn][:, ii] = error_calculator(uex_val[nn], u_val[nn])
 
@@ -142,7 +137,7 @@ def plot_convergence(cwd=""):
     fs = 10
     Kiter = np.array([1, 2, 3])
     omega_B = 25.0
-    num_nodes = 4
+    num_nodes = 3
     plot = "position"
     axis = 1
     order = np.min([Kiter, np.ones(len(Kiter)) * 2 * num_nodes], 0)

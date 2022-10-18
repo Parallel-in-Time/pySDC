@@ -1,9 +1,9 @@
 import numpy as np
 
-from pySDC.helpers.stats_helper import filter_stats, sort_stats
-from pySDC.implementations.collocation_classes.gauss_radau_right import CollGaussRadau_Right
+from pySDC.helpers.stats_helper import get_sorted
+
 from pySDC.implementations.controller_classes.controller_nonMPI import controller_nonMPI
-from pySDC.implementations.problem_classes.HeatEquation_1D_FD_forced import heat1d_forced
+from pySDC.implementations.problem_classes.HeatEquation_ND_FD import heatNd_forced
 from pySDC.implementations.sweeper_classes.imex_1st_order import imex_1st_order
 from pySDC.implementations.transfer_classes.TransferMesh import mesh_to_mesh
 
@@ -15,12 +15,12 @@ def main():
 
     # initialize level parameters
     level_params = dict()
-    level_params['restol'] = 1E-10
+    level_params['restol'] = 1e-10
     level_params['dt'] = 0.25
 
     # initialize sweeper parameters
     sweeper_params = dict()
-    sweeper_params['collocation_class'] = CollGaussRadau_Right
+    sweeper_params['quad_type'] = 'RADAU-RIGHT'
     sweeper_params['num_nodes'] = 3
     sweeper_params['QI'] = 'LU'  # For the IMEX sweeper, the LU-trick can be activated for the implicit part
 
@@ -29,6 +29,7 @@ def main():
     problem_params['nu'] = 0.1  # diffusion coefficient
     problem_params['freq'] = 8  # frequency for the test value
     problem_params['nvars'] = 511  # number of degrees of freedom for each level
+    problem_params['bc'] = 'dirichlet-zero'  # BCs
 
     # initialize step parameters
     step_params = dict()
@@ -45,13 +46,13 @@ def main():
 
     # fill description dictionary for easy step instantiation
     description = dict()
-    description['problem_class'] = heat1d_forced                  # pass problem class
-    description['problem_params'] = problem_params                # pass problem parameters
-    description['sweeper_class'] = imex_1st_order                 # pass sweeper
-    description['sweeper_params'] = sweeper_params                # pass sweeper parameters
-    description['level_params'] = level_params                    # pass level parameters
-    description['step_params'] = step_params                      # pass step parameters
-    description['space_transfer_class'] = mesh_to_mesh            # pass spatial transfer class
+    description['problem_class'] = heatNd_forced  # pass problem class
+    description['problem_params'] = problem_params  # pass problem parameters
+    description['sweeper_class'] = imex_1st_order  # pass sweeper
+    description['sweeper_params'] = sweeper_params  # pass sweeper parameters
+    description['level_params'] = level_params  # pass level parameters
+    description['step_params'] = step_params  # pass step parameters
+    description['space_transfer_class'] = mesh_to_mesh  # pass spatial transfer class
     description['space_transfer_params'] = space_transfer_params  # pass paramters for spatial transfer
 
     # set time parameters
@@ -59,8 +60,7 @@ def main():
     Tend = 4.0
 
     # instantiate controller
-    controller = controller_nonMPI(num_procs=1, controller_params=controller_params,
-                                               description=description)
+    controller = controller_nonMPI(num_procs=1, controller_params=controller_params, description=description)
 
     # get initial values on finest level
     P = controller.MS[0].levels[0].prob
@@ -77,10 +77,7 @@ def main():
 
     print('\nError (vs. exact solution) at time %4.2f: %6.4e\n' % (Tend, err))
 
-    filtered_stats = filter_stats(stats, type='niter')
-
-    # convert filtered statistics to list of iterations count, sorted by process
-    iter_counts = sort_stats(filtered_stats, sortby='time')
+    iter_counts = get_sorted(stats, type='niter', sortby='time')
 
     # compute and print statistics
     for item in iter_counts:

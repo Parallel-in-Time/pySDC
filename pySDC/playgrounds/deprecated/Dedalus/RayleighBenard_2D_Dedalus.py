@@ -9,8 +9,8 @@ from pySDC.playgrounds.Dedalus.dedalus_field import dedalus_field, rhs_imex_deda
 
 
 class rayleighbenard_2d_dedalus(ptype):
-    """
-    """
+    """ """
+
     def __init__(self, problem_params, dtype_u=dedalus_field, dtype_f=rhs_imex_dedalus_field):
         """
         Initialization routine
@@ -36,8 +36,9 @@ class rayleighbenard_2d_dedalus(ptype):
         domain = de.Domain([xbasis, zbasis], grid_dtype=np.complex128, comm=problem_params['comm'])
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(rayleighbenard_2d_dedalus, self).__init__(init=(domain, 3), dtype_u=dtype_u, dtype_f=dtype_f,
-                                                        params=problem_params)
+        super(rayleighbenard_2d_dedalus, self).__init__(
+            init=(domain, 3), dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params
+        )
 
         self.x = self.init[0].grid(0, scales=1)
         self.z = self.init[0].grid(1, scales=1)
@@ -91,7 +92,7 @@ class rayleighbenard_2d_dedalus(ptype):
             dtype_f: the RHS with two parts
         """
 
-        pseudo_dt = 1E-05
+        pseudo_dt = 1e-05
 
         f = self.dtype_f(self.init)
 
@@ -117,8 +118,12 @@ class rayleighbenard_2d_dedalus(ptype):
 
         for l in range(self.init[1]):
             self.exp_var[l].set_scales(1)
-            f.expl.values[l]['g'] = 1.0 / pseudo_dt * (self.exp_var[l]['g'] - u.values[l]['g'])# - f.impl.values[l]['g']
-            f.expl.values[l]['c'] = 1.0 / pseudo_dt * (self.exp_var[l]['c'] - u.values[l]['c'])# - f.impl.values[l]['c']
+            f.expl.values[l]['g'] = (
+                1.0 / pseudo_dt * (self.exp_var[l]['g'] - u.values[l]['g'])
+            )  # - f.impl.values[l]['g']
+            f.expl.values[l]['c'] = (
+                1.0 / pseudo_dt * (self.exp_var[l]['c'] - u.values[l]['c'])
+            )  # - f.impl.values[l]['c']
 
         return f
 

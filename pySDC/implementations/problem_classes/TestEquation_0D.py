@@ -33,14 +33,19 @@ class testequation0d(ptype):
                 msg = 'need %s to instantiate problem, only got %s' % (key, str(problem_params.keys()))
                 raise ParameterError(msg)
 
-        assert not any(isinstance(i, list) for i in problem_params['lambdas']), \
+        assert not any(isinstance(i, list) for i in problem_params['lambdas']), (
             'ERROR: expect flat list here, got %s' % problem_params['lambdas']
+        )
         problem_params['nvars'] = len(problem_params['lambdas'])
         assert problem_params['nvars'] > 0, 'ERROR: expect at least one lambda parameter here'
 
         # invoke super init, passing number of dofs, dtype_u and dtype_f
-        super(testequation0d, self).__init__(init=(problem_params['nvars'], None, np.dtype('complex128')),
-                                             dtype_u=dtype_u, dtype_f=dtype_f, params=problem_params)
+        super(testequation0d, self).__init__(
+            init=(problem_params['nvars'], None, np.dtype('complex128')),
+            dtype_u=dtype_u,
+            dtype_f=dtype_f,
+            params=problem_params,
+        )
 
         self.A = self.__get_A(self.params.lambdas)
 

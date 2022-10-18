@@ -38,34 +38,79 @@ class rk_imex:
             beta = 0.06042356519705
             eta = 0.12915286960590
             self.A_hat = np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 1.0, 0, 0], [0, 1.0 / 4.0, 1.0 / 4.0, 0]])
-            self.A = np.array([[alpha, 0, 0, 0], [-alpha, alpha, 0, 0], [0, 1.0 - alpha, alpha, 0],
-                               [beta, eta, 0.5 - beta - eta - alpha, alpha]])
+            self.A = np.array(
+                [
+                    [alpha, 0, 0, 0],
+                    [-alpha, alpha, 0, 0],
+                    [0, 1.0 - alpha, alpha, 0],
+                    [beta, eta, 0.5 - beta - eta - alpha, alpha],
+                ]
+            )
             self.b_hat = np.array([0, 1.0 / 6.0, 1.0 / 6.0, 2.0 / 3.0])
             self.b = self.b_hat
             self.nstages = 4
 
         elif self.order == 4:
 
-            self.A_hat = np.array([[0, 0, 0, 0, 0, 0],
-                                   [1. / 2, 0, 0, 0, 0, 0],
-                                   [13861. / 62500., 6889. / 62500., 0, 0, 0, 0],
-                                   [-116923316275. / 2393684061468., -2731218467317. / 15368042101831.,
-                                    9408046702089. / 11113171139209., 0, 0, 0],
-                                   [-451086348788. / 2902428689909., -2682348792572. / 7519795681897.,
-                                    12662868775082. / 11960479115383., 3355817975965. / 11060851509271., 0, 0],
-                                   [647845179188. / 3216320057751., 73281519250. / 8382639484533.,
-                                    552539513391. / 3454668386233., 3354512671639. / 8306763924573., 4040. / 17871.,
-                                    0]])
-            self.A = np.array([[0, 0, 0, 0, 0, 0],
-                               [1. / 4, 1. / 4, 0, 0, 0, 0],
-                               [8611. / 62500., -1743. / 31250., 1. / 4, 0, 0, 0],
-                               [5012029. / 34652500., -654441. / 2922500., 174375. / 388108., 1. / 4, 0, 0],
-                               [15267082809. / 155376265600., -71443401. / 120774400., 730878875. / 902184768.,
-                                2285395. / 8070912., 1. / 4, 0],
-                               [82889. / 524892., 0, 15625. / 83664., 69875. / 102672., -2260. / 8211, 1. / 4]])
-            self.b = np.array([82889. / 524892., 0, 15625. / 83664., 69875. / 102672., -2260. / 8211, 1. / 4])
-            self.b_hat = np.array([4586570599. / 29645900160., 0, 178811875. / 945068544., 814220225. / 1159782912.,
-                                   -3700637. / 11593932., 61727. / 225920.])
+            self.A_hat = np.array(
+                [
+                    [0, 0, 0, 0, 0, 0],
+                    [1.0 / 2, 0, 0, 0, 0, 0],
+                    [13861.0 / 62500.0, 6889.0 / 62500.0, 0, 0, 0, 0],
+                    [
+                        -116923316275.0 / 2393684061468.0,
+                        -2731218467317.0 / 15368042101831.0,
+                        9408046702089.0 / 11113171139209.0,
+                        0,
+                        0,
+                        0,
+                    ],
+                    [
+                        -451086348788.0 / 2902428689909.0,
+                        -2682348792572.0 / 7519795681897.0,
+                        12662868775082.0 / 11960479115383.0,
+                        3355817975965.0 / 11060851509271.0,
+                        0,
+                        0,
+                    ],
+                    [
+                        647845179188.0 / 3216320057751.0,
+                        73281519250.0 / 8382639484533.0,
+                        552539513391.0 / 3454668386233.0,
+                        3354512671639.0 / 8306763924573.0,
+                        4040.0 / 17871.0,
+                        0,
+                    ],
+                ]
+            )
+            self.A = np.array(
+                [
+                    [0, 0, 0, 0, 0, 0],
+                    [1.0 / 4, 1.0 / 4, 0, 0, 0, 0],
+                    [8611.0 / 62500.0, -1743.0 / 31250.0, 1.0 / 4, 0, 0, 0],
+                    [5012029.0 / 34652500.0, -654441.0 / 2922500.0, 174375.0 / 388108.0, 1.0 / 4, 0, 0],
+                    [
+                        15267082809.0 / 155376265600.0,
+                        -71443401.0 / 120774400.0,
+                        730878875.0 / 902184768.0,
+                        2285395.0 / 8070912.0,
+                        1.0 / 4,
+                        0,
+                    ],
+                    [82889.0 / 524892.0, 0, 15625.0 / 83664.0, 69875.0 / 102672.0, -2260.0 / 8211, 1.0 / 4],
+                ]
+            )
+            self.b = np.array([82889.0 / 524892.0, 0, 15625.0 / 83664.0, 69875.0 / 102672.0, -2260.0 / 8211, 1.0 / 4])
+            self.b_hat = np.array(
+                [
+                    4586570599.0 / 29645900160.0,
+                    0,
+                    178811875.0 / 945068544.0,
+                    814220225.0 / 1159782912.0,
+                    -3700637.0 / 11593932.0,
+                    61727.0 / 225920.0,
+                ]
+            )
             self.nstages = 6
 
         elif self.order == 5:
@@ -75,91 +120,91 @@ class rk_imex:
             self.A_hat = np.zeros((8, 8))
             getcontext().prec = 56
             self.A_hat[1, 0] = Decimal(41.0) / Decimal(100.0)
-            self.A_hat[2, 0] = Decimal(367902744464.) / Decimal(2072280473677.)
-            self.A_hat[2, 1] = Decimal(677623207551.) / Decimal(8224143866563.)
-            self.A_hat[3, 0] = Decimal(1268023523408.) / Decimal(10340822734521.)
+            self.A_hat[2, 0] = Decimal(367902744464.0) / Decimal(2072280473677.0)
+            self.A_hat[2, 1] = Decimal(677623207551.0) / Decimal(8224143866563.0)
+            self.A_hat[3, 0] = Decimal(1268023523408.0) / Decimal(10340822734521.0)
             self.A_hat[3, 1] = 0.0
-            self.A_hat[3, 2] = Decimal(1029933939417.) / Decimal(13636558850479.)
-            self.A_hat[4, 0] = Decimal(14463281900351.) / Decimal(6315353703477.)
+            self.A_hat[3, 2] = Decimal(1029933939417.0) / Decimal(13636558850479.0)
+            self.A_hat[4, 0] = Decimal(14463281900351.0) / Decimal(6315353703477.0)
             self.A_hat[4, 1] = 0.0
-            self.A_hat[4, 2] = Decimal(66114435211212.) / Decimal(5879490589093.)
-            self.A_hat[4, 3] = Decimal(-54053170152839.) / Decimal(4284798021562.)
-            self.A_hat[5, 0] = Decimal(14090043504691.) / Decimal(34967701212078.)
+            self.A_hat[4, 2] = Decimal(66114435211212.0) / Decimal(5879490589093.0)
+            self.A_hat[4, 3] = Decimal(-54053170152839.0) / Decimal(4284798021562.0)
+            self.A_hat[5, 0] = Decimal(14090043504691.0) / Decimal(34967701212078.0)
             self.A_hat[5, 1] = 0.0
-            self.A_hat[5, 2] = Decimal(15191511035443.) / Decimal(11219624916014.)
-            self.A_hat[5, 3] = Decimal(-18461159152457.) / Decimal(12425892160975.)
-            self.A_hat[5, 4] = Decimal(-281667163811.) / Decimal(9011619295870.)
-            self.A_hat[6, 0] = Decimal(19230459214898.) / Decimal(13134317526959.)
+            self.A_hat[5, 2] = Decimal(15191511035443.0) / Decimal(11219624916014.0)
+            self.A_hat[5, 3] = Decimal(-18461159152457.0) / Decimal(12425892160975.0)
+            self.A_hat[5, 4] = Decimal(-281667163811.0) / Decimal(9011619295870.0)
+            self.A_hat[6, 0] = Decimal(19230459214898.0) / Decimal(13134317526959.0)
             self.A_hat[6, 1] = 0.0
-            self.A_hat[6, 2] = Decimal(21275331358303.) / Decimal(2942455364971.)
-            self.A_hat[6, 3] = Decimal(-38145345988419.) / Decimal(4862620318723.)
+            self.A_hat[6, 2] = Decimal(21275331358303.0) / Decimal(2942455364971.0)
+            self.A_hat[6, 3] = Decimal(-38145345988419.0) / Decimal(4862620318723.0)
             self.A_hat[6, 4] = Decimal(-1.0) / Decimal(8.0)
             self.A_hat[6, 5] = Decimal(-1.0) / Decimal(8.0)
-            self.A_hat[7, 0] = Decimal(-19977161125411.) / Decimal(11928030595625.)
+            self.A_hat[7, 0] = Decimal(-19977161125411.0) / Decimal(11928030595625.0)
             self.A_hat[7, 1] = 0.0
-            self.A_hat[7, 2] = Decimal(-40795976796054.) / Decimal(6384907823539.)
-            self.A_hat[7, 3] = Decimal(177454434618887.) / Decimal(12078138498510.)
-            self.A_hat[7, 4] = Decimal(782672205425.) / Decimal(8267701900261.)
-            self.A_hat[7, 5] = Decimal(-69563011059811.) / Decimal(9646580694205.)
-            self.A_hat[7, 6] = Decimal(7356628210526.) / Decimal(4942186776405.)
+            self.A_hat[7, 2] = Decimal(-40795976796054.0) / Decimal(6384907823539.0)
+            self.A_hat[7, 3] = Decimal(177454434618887.0) / Decimal(12078138498510.0)
+            self.A_hat[7, 4] = Decimal(782672205425.0) / Decimal(8267701900261.0)
+            self.A_hat[7, 5] = Decimal(-69563011059811.0) / Decimal(9646580694205.0)
+            self.A_hat[7, 6] = Decimal(7356628210526.0) / Decimal(4942186776405.0)
 
             self.b_hat = np.zeros(8)
-            self.b_hat[0] = Decimal(-872700587467.) / Decimal(9133579230613.)
+            self.b_hat[0] = Decimal(-872700587467.0) / Decimal(9133579230613.0)
             self.b_hat[1] = 0.0
             self.b_hat[2] = 0.0
-            self.b_hat[3] = Decimal(22348218063261.) / Decimal(9555858737531.)
-            self.b_hat[4] = Decimal(-1143369518992.) / Decimal(8141816002931.)
-            self.b_hat[5] = Decimal(-39379526789629.) / Decimal(19018526304540.)
-            self.b_hat[6] = Decimal(32727382324388.) / Decimal(42900044865799.)
+            self.b_hat[3] = Decimal(22348218063261.0) / Decimal(9555858737531.0)
+            self.b_hat[4] = Decimal(-1143369518992.0) / Decimal(8141816002931.0)
+            self.b_hat[5] = Decimal(-39379526789629.0) / Decimal(19018526304540.0)
+            self.b_hat[6] = Decimal(32727382324388.0) / Decimal(42900044865799.0)
             self.b_hat[7] = Decimal(41.0) / Decimal(200.0)
 
             self.A = np.zeros((8, 8))
-            self.A[1, 0] = Decimal(41.) / Decimal(200.)
-            self.A[1, 1] = Decimal(41.) / Decimal(200.)
-            self.A[2, 0] = Decimal(41.) / Decimal(400.)
-            self.A[2, 1] = Decimal(-567603406766.) / Decimal(11931857230679.)
-            self.A[2, 2] = Decimal(41.) / Decimal(200.)
-            self.A[3, 0] = Decimal(683785636431.) / Decimal(9252920307686.)
+            self.A[1, 0] = Decimal(41.0) / Decimal(200.0)
+            self.A[1, 1] = Decimal(41.0) / Decimal(200.0)
+            self.A[2, 0] = Decimal(41.0) / Decimal(400.0)
+            self.A[2, 1] = Decimal(-567603406766.0) / Decimal(11931857230679.0)
+            self.A[2, 2] = Decimal(41.0) / Decimal(200.0)
+            self.A[3, 0] = Decimal(683785636431.0) / Decimal(9252920307686.0)
             self.A[3, 1] = 0.0
-            self.A[3, 2] = Decimal(-110385047103.) / Decimal(1367015193373.)
-            self.A[3, 3] = Decimal(41.) / Decimal(200.)
-            self.A[4, 0] = Decimal(3016520224154.) / Decimal(10081342136671.)
+            self.A[3, 2] = Decimal(-110385047103.0) / Decimal(1367015193373.0)
+            self.A[3, 3] = Decimal(41.0) / Decimal(200.0)
+            self.A[4, 0] = Decimal(3016520224154.0) / Decimal(10081342136671.0)
             self.A[4, 1] = 0.0
-            self.A[4, 2] = Decimal(30586259806659.) / Decimal(12414158314087.)
-            self.A[4, 3] = Decimal(-22760509404356.) / Decimal(11113319521817.)
-            self.A[4, 4] = Decimal(41.) / Decimal(200.)
-            self.A[5, 0] = Decimal(218866479029.) / Decimal(1489978393911.)
+            self.A[4, 2] = Decimal(30586259806659.0) / Decimal(12414158314087.0)
+            self.A[4, 3] = Decimal(-22760509404356.0) / Decimal(11113319521817.0)
+            self.A[4, 4] = Decimal(41.0) / Decimal(200.0)
+            self.A[5, 0] = Decimal(218866479029.0) / Decimal(1489978393911.0)
             self.A[5, 1] = 0.0
-            self.A[5, 2] = Decimal(638256894668.) / Decimal(5436446318841.)
-            self.A[5, 3] = Decimal(-1179710474555.) / Decimal(5321154724896.)
-            self.A[5, 4] = Decimal(-60928119172.) / Decimal(8023461067671.)
-            self.A[5, 5] = Decimal(41.) / Decimal(200.)
-            self.A[6, 0] = Decimal(1020004230633.) / Decimal(5715676835656.)
+            self.A[5, 2] = Decimal(638256894668.0) / Decimal(5436446318841.0)
+            self.A[5, 3] = Decimal(-1179710474555.0) / Decimal(5321154724896.0)
+            self.A[5, 4] = Decimal(-60928119172.0) / Decimal(8023461067671.0)
+            self.A[5, 5] = Decimal(41.0) / Decimal(200.0)
+            self.A[6, 0] = Decimal(1020004230633.0) / Decimal(5715676835656.0)
             self.A[6, 1] = 0.0
-            self.A[6, 2] = Decimal(25762820946817.) / Decimal(25263940353407.)
-            self.A[6, 3] = Decimal(-2161375909145.) / Decimal(9755907335909.)
-            self.A[6, 4] = Decimal(-211217309593.) / Decimal(5846859502534.)
-            self.A[6, 5] = Decimal(-4269925059573.) / Decimal(7827059040749.)
-            self.A[6, 6] = Decimal(41.) / Decimal(200.)
-            self.A[7, 0] = Decimal(-872700587467.) / Decimal(9133579230613.)
+            self.A[6, 2] = Decimal(25762820946817.0) / Decimal(25263940353407.0)
+            self.A[6, 3] = Decimal(-2161375909145.0) / Decimal(9755907335909.0)
+            self.A[6, 4] = Decimal(-211217309593.0) / Decimal(5846859502534.0)
+            self.A[6, 5] = Decimal(-4269925059573.0) / Decimal(7827059040749.0)
+            self.A[6, 6] = Decimal(41.0) / Decimal(200.0)
+            self.A[7, 0] = Decimal(-872700587467.0) / Decimal(9133579230613.0)
             self.A[7, 1] = 0.0
             self.A[7, 2] = 0.0
-            self.A[7, 3] = Decimal(22348218063261.) / Decimal(9555858737531.)
-            self.A[7, 4] = Decimal(-1143369518992.) / Decimal(8141816002931.)
-            self.A[7, 5] = Decimal(-39379526789629.) / Decimal(19018526304540.)
-            self.A[7, 6] = Decimal(32727382324388.) / Decimal(42900044865799.)
-            self.A[7, 7] = Decimal(41.) / Decimal(200.)
+            self.A[7, 3] = Decimal(22348218063261.0) / Decimal(9555858737531.0)
+            self.A[7, 4] = Decimal(-1143369518992.0) / Decimal(8141816002931.0)
+            self.A[7, 5] = Decimal(-39379526789629.0) / Decimal(19018526304540.0)
+            self.A[7, 6] = Decimal(32727382324388.0) / Decimal(42900044865799.0)
+            self.A[7, 7] = Decimal(41.0) / Decimal(200.0)
 
             self.b = np.zeros(8)
 
-            self.b[0] = Decimal(-975461918565.) / Decimal(9796059967033.)
+            self.b[0] = Decimal(-975461918565.0) / Decimal(9796059967033.0)
             self.b[1] = 0.0
             self.b[2] = 0.0
-            self.b[3] = Decimal(78070527104295.) / Decimal(32432590147079.)
-            self.b[4] = Decimal(-548382580838.) / Decimal(3424219808633.)
-            self.b[5] = Decimal(-33438840321285.) / Decimal(15594753105479.)
-            self.b[6] = Decimal(3629800801594.) / Decimal(4656183773603.)
-            self.b[7] = Decimal(4035322873751.) / Decimal(18575991585200.)
+            self.b[3] = Decimal(78070527104295.0) / Decimal(32432590147079.0)
+            self.b[4] = Decimal(-548382580838.0) / Decimal(3424219808633.0)
+            self.b[5] = Decimal(-33438840321285.0) / Decimal(15594753105479.0)
+            self.b[6] = Decimal(3629800801594.0) / Decimal(4656183773603.0)
+            self.b[7] = Decimal(4035322873751.0) / Decimal(18575991585200.0)
 
             self.nstages = 8
 
@@ -176,8 +221,9 @@ class rk_imex:
             # Construct RHS
             rhs = np.copy(u0)
             for j in range(0, i):
-                rhs += dt * self.A_hat[i, j] * (self.f_slow(self.stages[j, :])) + \
-                    dt * self.A[i, j] * (self.f_fast(self.stages[j, :]))
+                rhs += dt * self.A_hat[i, j] * (self.f_slow(self.stages[j, :])) + dt * self.A[i, j] * (
+                    self.f_fast(self.stages[j, :])
+                )
 
             # Solve for stage i
             if self.A[i, i] == 0:
@@ -188,8 +234,9 @@ class rk_imex:
 
         # Update
         for i in range(0, self.nstages):
-            u0 += dt * self.b_hat[i] * (self.f_slow(self.stages[i, :])) + \
-                dt * self.b[i] * (self.f_fast(self.stages[i, :]))
+            u0 += dt * self.b_hat[i] * (self.f_slow(self.stages[i, :])) + dt * self.b[i] * (
+                self.f_fast(self.stages[i, :])
+            )
 
         return u0
 
@@ -201,9 +248,16 @@ class rk_imex:
 
     def f_fast_solve(self, rhs, alpha, u0):
         cb = Callback()
-        sol, info = gmres(self.problem.Id - alpha * self.problem.M, rhs, x0=u0,
-                          tol=self.problem.params.gmres_tol_limit, restart=self.problem.params.gmres_restart,
-                          maxiter=self.problem.params.gmres_maxiter, callback=cb)
+        sol, info = gmres(
+            self.problem.Id - alpha * self.problem.M,
+            rhs,
+            x0=u0,
+            tol=self.problem.params.gmres_tol_limit,
+            restart=self.problem.params.gmres_restart,
+            maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
+            callback=cb,
+        )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
         return sol
@@ -237,9 +291,16 @@ class trapezoidal:
     #
     def f_solve(self, b, alpha, u0):
         cb = Callback()
-        sol, info = gmres(self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M), b, x0=u0,
-                          tol=self.problem.params.gmres_tol_limit, restart=self.problem.params.gmres_restart,
-                          maxiter=self.problem.params.gmres_maxiter, callback=cb)
+        sol, info = gmres(
+            self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
+            b,
+            x0=u0,
+            tol=self.problem.params.gmres_tol_limit,
+            restart=self.problem.params.gmres_restart,
+            maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
+            callback=cb,
+        )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
         return sol
@@ -274,9 +335,16 @@ class bdf2:
     #
     def f_solve(self, b, alpha, u0):
         cb = Callback()
-        sol, info = gmres(self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M), b, x0=u0,
-                          tol=self.problem.params.gmres_tol_limit, restart=self.problem.params.gmres_restart,
-                          maxiter=self.problem.params.gmres_maxiter, callback=cb)
+        sol, info = gmres(
+            self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
+            b,
+            x0=u0,
+            tol=self.problem.params.gmres_tol_limit,
+            restart=self.problem.params.gmres_restart,
+            maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
+            callback=cb,
+        )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
         return sol
@@ -285,6 +353,7 @@ class bdf2:
 #
 #  Split-Explicit method
 #
+
 
 class SplitExplicit:
     def __init__(self, problem, method, pparams):
@@ -308,9 +377,9 @@ class SplitExplicit:
         if self.method == 'RK3':
             self.nstages = 3
             self.aRunge = np.zeros((4, 4))
-            self.aRunge[0, 0] = 1. / 3.
-            self.aRunge[1, 1] = 1. / 2.
-            self.aRunge[2, 2] = 1.
+            self.aRunge[0, 0] = 1.0 / 3.0
+            self.aRunge[1, 1] = 1.0 / 2.0
+            self.aRunge[2, 2] = 1.0
             self.dRunge = np.zeros((4, 4))
             self.gRunge = np.zeros((4, 4))
         if self.method == 'MIS4_4':
@@ -337,13 +406,13 @@ class SplitExplicit:
             self.gRunge[1, 1] = 0.13145089796226542
             self.gRunge[2, 1] = -0.36855857648747881
             self.gRunge[2, 2] = 0.33159232636600550
-            self.gRunge[3, 1] = -6.5767130537473045E-002
-            self.gRunge[3, 2] = 4.0591093109036858E-002
-            self.gRunge[3, 3] = 6.4902111640806712E-002
+            self.gRunge[3, 1] = -6.5767130537473045e-002
+            self.gRunge[3, 2] = 4.0591093109036858e-002
+            self.gRunge[3, 3] = 6.4902111640806712e-002
         self.dtRunge = np.zeros(self.nstages)
         for i in range(0, self.nstages):
             self.dtRunge[i] = 0
-            temp = 1.
+            temp = 1.0
             for j in range(0, i + 1):
                 self.dtRunge[i] = self.dtRunge[i] + self.aRunge[i, j]
                 temp = temp - self.dRunge[i, j]
@@ -361,7 +430,7 @@ class SplitExplicit:
     def NumSmallTimeSteps(self, dx, dz, dt):
 
         cs = self.pparams['c_s']
-        ns = dt / (.9 / np.sqrt(1 / (dx * dx) + 1 / (dz * dz)) / cs)
+        ns = dt / (0.9 / np.sqrt(1 / (dx * dx) + 1 / (dz * dz)) / cs)
         ns = max(np.int(np.ceil(ns)), self.nsMin)
         return ns
 
@@ -373,9 +442,9 @@ class SplitExplicit:
 
         for i in range(0, self.nstages):
             self.F[:, i] = self.f_slow(self.U[:, i])
-            self.FSlow[:] = 0.
+            self.FSlow[:] = 0.0
             for j in range(0, i + 1):
-                self.FSlow += (self.aRunge[i, j] * self.F[:, j] + self.gRunge[i, j] / dt * (self.U[:, j] - u0))
+                self.FSlow += self.aRunge[i, j] * self.F[:, j] + self.gRunge[i, j] / dt * (self.U[:, j] - u0)
             self.U[:, i + 1] = 0
             for j in range(0, i + 1):
                 self.U[:, i + 1] += self.dRunge[i, j] * self.U[:, j]
@@ -389,8 +458,8 @@ class SplitExplicit:
 
     def VerletLin(self, u0, FSlow, ns, dTau):
         for _ in range(0, ns):
-            u0[0:self.NdofMom] += dTau * (self.f_fastMom(u0) + FSlow[0:self.NdofMom])
-            u0[self.NdofMom:self.Ndof] += dTau * (self.f_fastTher(u0) + FSlow[self.NdofMom:self.Ndof])
+            u0[0 : self.NdofMom] += dTau * (self.f_fastMom(u0) + FSlow[0 : self.NdofMom])
+            u0[self.NdofMom : self.Ndof] += dTau * (self.f_fastTher(u0) + FSlow[self.NdofMom : self.Ndof])
 
         return u0
 
@@ -398,8 +467,8 @@ class SplitExplicit:
 
         u = u0
         for _ in range(0, ns):
-            u = u0 + dTau / 3. * (self.f_fast(u) + FSlow)
-            u = u0 + dTau / 2. * (self.f_fast(u) + FSlow)
+            u = u0 + dTau / 3.0 * (self.f_fast(u) + FSlow)
+            u = u0 + dTau / 2.0 * (self.f_fast(u) + FSlow)
             u = u0 + dTau * (self.f_fast(u) + FSlow)
             u0 = u
 
@@ -412,10 +481,10 @@ class SplitExplicit:
         return self.problem.M.dot(u)
 
     def f_fastMom(self, u):
-        return self.problem.M[0:self.NdofMom, self.NdofMom:self.Ndof].dot(u[self.NdofMom:self.Ndof])
+        return self.problem.M[0 : self.NdofMom, self.NdofMom : self.Ndof].dot(u[self.NdofMom : self.Ndof])
 
     def f_fastTher(self, u):
-        return self.problem.M[self.NdofMom:self.Ndof, 0:self.NdofMom].dot(u[0:self.NdofMom])
+        return self.problem.M[self.NdofMom : self.Ndof, 0 : self.NdofMom].dot(u[0 : self.NdofMom])
 
 
 class dirk:
@@ -474,7 +543,7 @@ class dirk:
             self.A[0, 0] = (1.0 + alpha) / 2.0
             self.A[1, 0] = -alpha / 2.0
             self.A[1, 1] = self.A[0, 0]
-            self.A[2, 0] = (1.0 + alpha)
+            self.A[2, 0] = 1.0 + alpha
             self.A[2, 1] = -(1.0 + 2.0 * alpha)
             self.A[2, 2] = self.A[0, 0]
 
@@ -493,32 +562,32 @@ class dirk:
             # From Kennedy, Carpenter "Diagonally Implicit Runge-Kutta Methods for Ordinary Differential Equations.
             # A Review"
             self.A = np.zeros((5, 5))
-            self.A[0, 0] = 4024571134387. / 14474071345096.
+            self.A[0, 0] = 4024571134387.0 / 14474071345096.0
 
-            self.A[1, 0] = 9365021263232. / 12572342979331.
+            self.A[1, 0] = 9365021263232.0 / 12572342979331.0
             self.A[1, 1] = self.A[0, 0]
 
-            self.A[2, 0] = 2144716224527. / 9320917548702.
-            self.A[2, 1] = -397905335951. / 4008788611757.
+            self.A[2, 0] = 2144716224527.0 / 9320917548702.0
+            self.A[2, 1] = -397905335951.0 / 4008788611757.0
             self.A[2, 2] = self.A[0, 0]
 
-            self.A[3, 0] = -291541413000. / 6267936762551.
-            self.A[3, 1] = 226761949132. / 4473940808273.
-            self.A[3, 2] = -1282248297070. / 9697416712681.
+            self.A[3, 0] = -291541413000.0 / 6267936762551.0
+            self.A[3, 1] = 226761949132.0 / 4473940808273.0
+            self.A[3, 2] = -1282248297070.0 / 9697416712681.0
             self.A[3, 3] = self.A[0, 0]
 
-            self.A[4, 0] = -2481679516057. / 4626464057815.
-            self.A[4, 1] = -197112422687. / 6604378783090.
-            self.A[4, 2] = 3952887910906. / 9713059315593.
-            self.A[4, 3] = 4906835613583. / 8134926921134.
+            self.A[4, 0] = -2481679516057.0 / 4626464057815.0
+            self.A[4, 1] = -197112422687.0 / 6604378783090.0
+            self.A[4, 2] = 3952887910906.0 / 9713059315593.0
+            self.A[4, 3] = 4906835613583.0 / 8134926921134.0
             self.A[4, 4] = self.A[0, 0]
 
             self.b = np.zeros(5)
-            self.b[0] = -2522702558582. / 12162329469185.
-            self.b[1] = 1018267903655. / 12907234417901.
-            self.b[2] = 4542392826351. / 13702606430957.
-            self.b[3] = 5001116467727. / 12224457745473.
-            self.b[4] = 1509636094297. / 3891594770934.
+            self.b[0] = -2522702558582.0 / 12162329469185.0
+            self.b[1] = 1018267903655.0 / 12907234417901.0
+            self.b[2] = 4542392826351.0 / 13702606430957.0
+            self.b[3] = 5001116467727.0 / 12224457745473.0
+            self.b[4] = 1509636094297.0 / 3891594770934.0
 
         self.stages = np.zeros((self.nstages, self.Ndof))
 
@@ -555,9 +624,16 @@ class dirk:
     #
     def f_solve(self, b, alpha, u0):
         cb = Callback()
-        sol, info = gmres(self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M), b, x0=u0,
-                          tol=self.problem.params.gmres_tol_limit, restart=self.problem.params.gmres_restart,
-                          maxiter=self.problem.params.gmres_maxiter, callback=cb)
+        sol, info = gmres(
+            self.problem.Id - alpha * (self.problem.D_upwind + self.problem.M),
+            b,
+            x0=u0,
+            tol=self.problem.params.gmres_tol_limit,
+            restart=self.problem.params.gmres_restart,
+            maxiter=self.problem.params.gmres_maxiter,
+            atol=0,
+            callback=cb,
+        )
         if alpha != 0.0:
             self.logger.add(cb.getcounter())
         return sol
