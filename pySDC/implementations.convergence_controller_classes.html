@@ -847,6 +847,8 @@ In serial this is the local error, but in block Gauss-Seidel MSSDC this is a sem
 <dt class="sig sig-object py" id="implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">implementations.convergence_controller_classes.estimate_extrapolation_error.</span></span><span class="sig-name descname"><span class="pre">EstimateExtrapolationErrorBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">controller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/implementations/convergence_controller_classes/estimate_extrapolation_error.html#EstimateExtrapolationErrorBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#implementations.convergence_controller_classes.estimate_extrapolation_error.EstimateExtrapolationErrorBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConvergenceController</span></code></p>
+<section id="abstract-base-class-for-extrapolated-error-estimates">
+<h3>Abstract base class for extrapolated error estimates<a class="headerlink" href="#abstract-base-class-for-extrapolated-error-estimates" title="Permalink to this heading">¶</a></h3>
 <p>This error estimate extrapolates a solution based on Taylor expansions using solutions of previous time steps.
 In particular, child classes need to implement how to make these solutions available, which works differently for
 MPI and non-MPI versions.</p>
@@ -960,6 +962,7 @@ node on the finest level at the moment.</p>
 </dl>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
@@ -1595,7 +1598,7 @@ on Tend</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Robert Speck.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
     </div>
   </body>
 </html>
