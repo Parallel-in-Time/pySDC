@@ -91,11 +91,7 @@ def main():
     timing_gpu = sort_stats(filter_stats(stats_gpu, type='timing_run'), sortby='time')
     print('Runtime GPU:', timing_gpu[0][1])
 
-<<<<<<< HEAD:pySDC/playgrounds/GPU/ac-fft.py
-    assert abs(uend_gpu.get()-uend_cpu) < 1E-15
-=======
     assert abs(uend_gpu.get() - uend_cpu) < 1e-13, abs(uend_gpu.get() - uend_cpu)
->>>>>>> upstream/master:pySDC/projects/GPU/ac_fft.py
 
 
 if __name__ == '__main__':
